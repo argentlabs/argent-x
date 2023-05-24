@@ -1,16 +1,17 @@
 import {
+  AlertDialogBody,
   AlertDialogContent,
+  AlertDialogFooter,
   AlertDialogOverlay,
   AlertDialog as ChakraAlertDialog,
   AlertDialogProps as ChakraAlertDialogProps,
-  HStack,
   VStack,
 } from "@chakra-ui/react"
 import { FC, PropsWithChildren, useRef } from "react"
 
 import { pxToRem } from "../theme/utilities/pxToRem"
 import { Button } from "./Button"
-import { H5, P4 } from "./Typography"
+import { H5, P3 } from "./Typography"
 
 export interface AlertDialogProps
   extends PropsWithChildren,
@@ -50,6 +51,7 @@ export const AlertDialog: FC<AlertDialogProps> = ({
     <ChakraAlertDialog
       onClose={onCancel}
       leastDestructiveRef={cancelRef}
+      isCentered
       {...rest}
     >
       <AlertDialogOverlay bg="black50">
@@ -59,31 +61,33 @@ export const AlertDialog: FC<AlertDialogProps> = ({
           rounded="lg"
           maxWidth={[pxToRem(320), pxToRem(480)]}
         >
-          <VStack textAlign="center" spacing={6}>
-            <H5>{title}</H5>
-            {message && <P4>{message}</P4>}
-            {children}
-            <HStack>
-              <Button
-                ref={cancelRef}
-                colorScheme="tertiary"
-                size="sm"
-                onClick={onCancel}
-              >
-                {cancelTitle}
+          <AlertDialogBody>
+            <VStack textAlign="center" spacing={6}>
+              <H5>{title}</H5>
+              {message && <P3>{message}</P3>}
+              {children}
+            </VStack>
+          </AlertDialogBody>
+          <AlertDialogFooter flexDirection="column" gap="3">
+            <Button
+              ref={cancelRef}
+              colorScheme="neutrals"
+              w="100%"
+              onClick={onCancel}
+            >
+              {cancelTitle}
+            </Button>
+            {!!onDestroy && (
+              <Button colorScheme="danger" w="100%" onClick={onDestroy}>
+                {destroyTitle}
               </Button>
-              {!!onDestroy && (
-                <Button colorScheme="danger" size="sm" onClick={onDestroy}>
-                  {destroyTitle}
-                </Button>
-              )}
-              {!!onConfirm && (
-                <Button colorScheme="primary" size="sm" onClick={onConfirm}>
-                  {confirmTitle}
-                </Button>
-              )}
-            </HStack>
-          </VStack>
+            )}
+            {!!onConfirm && (
+              <Button colorScheme="primary" w="100%" onClick={onConfirm}>
+                {confirmTitle}
+              </Button>
+            )}
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialogOverlay>
     </ChakraAlertDialog>

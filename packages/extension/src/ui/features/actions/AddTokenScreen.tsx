@@ -1,25 +1,16 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
 import { BigNumber } from "@ethersproject/bignumber"
-import React, { FC, useEffect, useMemo, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { number } from "starknet"
+import { FC, FormEvent, useCallback } from "react"
 import styled from "styled-components"
 import { ZodError } from "zod"
 
-import { addToken } from "../../../shared/token/storage"
-import { RequestToken, Token } from "../../../shared/token/type"
-import { useAppState } from "../../app.state"
+import { Token } from "../../../shared/token/type"
 import { Button, ButtonGroupHorizontal } from "../../components/Button"
 import { InfoCircle } from "../../components/Icons/InfoCircle"
 import { InputText } from "../../components/InputText"
 import Row from "../../components/Row"
 import { Spinner } from "../../components/Spinner"
-import { routes } from "../../routes"
-import { isValidAddress } from "../../services/addresses"
 import { FormError, H2, WarningText } from "../../theme/Typography"
-import { useSelectedAccount } from "../accounts/accounts.state"
-import { fetchTokenDetails } from "../accountTokens/tokens.service"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
 
 const AddTokenScreenWrapper = styled.div`
   display: flex;
@@ -39,7 +30,6 @@ const AddTokenScreenWrapper = styled.div`
     margin-top: 64px;
   }
 `
-
 const TokenWarningWrapper = styled(Row)`
   margin-bottom: 16px;
   padding: 12px;
@@ -53,109 +43,54 @@ const ButtonSpacer = styled.div`
   flex: 1;
 `
 
-const isDataComplete = (data: Partial<Token>): data is Token => {
-  if (
-    data.address &&
-    isValidAddress(data.address) &&
-    data.decimals?.toString() &&
-    data.name &&
-    data.symbol
-  ) {
-    return true
-  }
-  return false
-}
-
-function addressFormat64Byte(address: number.BigNumberish): string {
-  return `0x${number.toBN(address).toString("hex").padStart(64, "0")}`
-}
+/** TODO: refactor: encapsulate form state inside AddTokenScreenProps */
 
 interface AddTokenScreenProps {
-  defaultToken?: RequestToken
+  error: string
+  tokenDetails?: Token
   hideBackButton?: boolean
-  onSubmit?: () => void
+  loading?: boolean
+  onFormSubmit: () => void
   onReject?: () => void
+  setTokenAddress: (x: string) => void
+  setTokenDecimals: (x: string) => void
+  setTokenName: (x: string) => void
+  setTokenSymbol: (x: string) => void
+  tokenAddress: string
+  tokenExist: boolean
+  tokenName: string
+  tokenSymbol: string
+  validAddress: boolean
+  tokenDecimals?: string | number
+  disableSubmit: boolean
 }
 
 export const AddTokenScreen: FC<AddTokenScreenProps> = ({
-  defaultToken,
+  error,
   hideBackButton,
-  onSubmit,
+  loading,
+  onFormSubmit,
   onReject,
+  setTokenAddress,
+  setTokenDecimals,
+  setTokenName,
+  setTokenSymbol,
+  tokenAddress,
+  tokenDetails,
+  tokenDecimals,
+  tokenExist,
+  tokenName,
+  tokenSymbol,
+  validAddress,
+  disableSubmit,
 }) => {
-  const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const account = useSelectedAccount()
-  const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
-  const [tokenName, setTokenName] = useState(defaultToken?.name || "")
-  const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
-  const [tokenDecimals, setTokenDecimals] = useState(
-    defaultToken?.decimals || "0",
+  const onSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault()
+      onFormSubmit()
+    },
+    [onFormSubmit],
   )
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [tokenDetails, setTokenDetails] = useState<Token>()
-  const prevValidAddress = useRef("")
-  const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
-
-  const validAddress = useMemo(() => {
-    return isValidAddress(tokenAddress)
-  }, [tokenAddress])
-
-  const tokenExist = useMemo(
-    () =>
-      tokensInNetwork.some(
-        (token) => defaultToken && token.address === defaultToken.address,
-      ),
-    [defaultToken, tokensInNetwork],
-  )
-
-  useEffect(() => {
-    if (
-      defaultToken &&
-      defaultToken.address === tokenAddress &&
-      !tokenDetails
-    ) {
-      setLoading(true)
-    }
-  }, [defaultToken, tokenAddress, tokenDetails])
-
-  useEffect(() => {
-    if (account) {
-      if (loading && account) {
-        fetchTokenDetails(tokenAddress, account)
-          .then((details) => {
-            setTokenDetails(details)
-            setTokenName(details.name || "")
-            setTokenSymbol(details.symbol || "")
-          })
-          .catch(() => {
-            setTokenDetails(undefined)
-          })
-          .finally(() => {
-            setLoading(false)
-          })
-      } else if (
-        isValidAddress(tokenAddress) &&
-        tokenAddress !== prevValidAddress.current
-      ) {
-        prevValidAddress.current = tokenAddress
-        setLoading(true)
-      }
-    }
-  }, [loading, tokenAddress, account])
-
-  const compiledData = {
-    address: tokenAddress,
-    ...(tokenDetails ?? {}),
-    ...(tokenName && { name: tokenName }),
-    ...(tokenSymbol && { symbol: tokenSymbol }),
-    ...(!tokenDetails?.decimals && {
-      decimals: parseInt(tokenDecimals.toString(), 10) || 0,
-    }),
-    networkId: switcherNetworkId,
-  }
-
   return (
     <NavigationContainer leftButton={hideBackButton ? null : <BarBackButton />}>
       <AddTokenScreenWrapper>
@@ -172,25 +107,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
           </TokenWarningWrapper>
         )}
 
-        <form
-          onSubmit={async (e: React.FormEvent) => {
-            e.preventDefault()
-            compiledData.address = addressFormat64Byte(compiledData.address)
-            if (isDataComplete(compiledData)) {
-              try {
-                await addToken(compiledData)
-                onSubmit?.()
-                navigate(routes.accountTokens())
-              } catch (e) {
-                if (e instanceof ZodError) {
-                  setError(e.issues[0].message)
-                } else {
-                  setError("Token not supported")
-                }
-              }
-            }
-          }}
-        >
+        <form onSubmit={onSubmit}>
           <InputText
             autoFocus
             placeholder="Contract address"
@@ -244,10 +161,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
                 Reject
               </Button>
             )}
-            <Button
-              type="submit"
-              disabled={loading || !isDataComplete(compiledData)}
-            >
+            <Button type="submit" disabled={disableSubmit}>
               Continue
             </Button>
           </ButtonGroupHorizontal>

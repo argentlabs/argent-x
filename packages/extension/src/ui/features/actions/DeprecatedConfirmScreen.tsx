@@ -14,13 +14,9 @@ import {
 import { Header } from "../../components/Header"
 import { H2 } from "../../theme/Typography"
 import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
+import { AccountAvatar } from "../accounts/AccountAvatar"
 import { getAccountImageUrl } from "../accounts/accounts.service"
-import { ProfilePicture } from "../accounts/ProfilePicture"
-import { NetworkSwitcher } from "../networks/NetworkSwitcher"
+import { NetworkSwitcherContainer } from "../networks/NetworkSwitcher/NetworkSwitcherContainer"
 
 const ConfirmScreenWrapper = styled.form<{
   accountShown: boolean
@@ -64,13 +60,13 @@ const Placeholder = styled.div`
   margin-top: 8px;
 `
 
-export interface ConfirmPageProps {
+interface DeprecatedConfirmPageProps {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
   onReject?: () => void
   selectedAccount?: Account
-} // re-export for backwards compatibility
+}
 
-interface DeprecatedConfirmScreenProps extends ConfirmPageProps {
+interface DeprecatedConfirmScreenProps extends DeprecatedConfirmPageProps {
   title?: string
   rejectButtonText?: string
   confirmButtonText?: string
@@ -109,7 +105,6 @@ export const DeprecatedConfirmScreen: FC<DeprecatedConfirmScreenProps> = ({
   ...props
 }) => {
   const navigate = useNavigate()
-  const { accountNames } = useAccountMetadata()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
   onReject ??= () => navigate(-1)
 
@@ -126,14 +121,10 @@ export const DeprecatedConfirmScreen: FC<DeprecatedConfirmScreenProps> = ({
       >
         {showHeader && selectedAccount && (
           <Header style={{ margin: "0 -32px 16px" }}>
-            <ProfilePicture
-              src={getAccountImageUrl(
-                getAccountName(selectedAccount, accountNames),
-                selectedAccount,
-              )}
-              disabled
+            <AccountAvatar
+              src={getAccountImageUrl(selectedAccount.name, selectedAccount)}
             />
-            <NetworkSwitcher disabled />
+            <NetworkSwitcherContainer disabled />
           </Header>
         )}
         {title && (

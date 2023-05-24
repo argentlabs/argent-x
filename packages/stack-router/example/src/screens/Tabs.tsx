@@ -10,10 +10,11 @@ import { Center, Flex } from "@chakra-ui/react"
 import { ComponentProps, FC, ReactNode } from "react"
 import { Link, NavLink } from "react-router-dom"
 
-const Tab: FC<ComponentProps<typeof NavLink> & ComponentProps<typeof Center>> =
-  (props) => {
-    return <Center flex={1} as={NavLink} color={"white"} {...props} />
-  }
+const Tab: FC<
+  ComponentProps<typeof NavLink> & ComponentProps<typeof Center>
+> = (props) => {
+  return <Center flex={1} as={NavLink} color={"white"} {...props} />
+}
 
 export function TabScreenContainer({ children }: { children: ReactNode }) {
   return (

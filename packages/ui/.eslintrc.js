@@ -1,5 +1,9 @@
 module.exports = {
   extends: ["../extension/.eslintrc.js"],
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+  },
+  ignorePatterns: ["scripts"],
   rules: {
     "react/prop-types": "off",
     "@typescript-eslint/ban-types": [

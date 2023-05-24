@@ -16,7 +16,7 @@ import {
   useTokenAmountToCurrencyValue,
   useTokenPriceDetails,
 } from "../../accountTokens/tokenPriceHooks"
-import { useCurrentNetwork } from "../../networks/useNetworks"
+import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 
 interface TokenPriceProps {
   currency: Currency
@@ -68,7 +68,6 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
           </P4>
         ) : null
       }
-      currencyValue={currencyValue}
       w="100%"
     />
   )

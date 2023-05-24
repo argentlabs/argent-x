@@ -1,6 +1,6 @@
-import { Button, FieldError, H6, P4, TextWithAmount, icons } from "@argent/ui"
-import { Flex, Skeleton, Tooltip } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { FieldError, H6, P4, TextWithAmount, icons } from "@argent/ui"
+import { ButtonProps, Flex, Skeleton, Tooltip } from "@chakra-ui/react"
+import { FC } from "react"
 
 import {
   prettifyCurrencyValue,
@@ -16,7 +16,7 @@ const { AlertIcon } = icons
 
 export type TokenListItemVariant = "default" | "no-currency"
 
-export interface TokenListItemProps extends ComponentProps<typeof Button> {
+export interface TokenListItemProps extends ButtonProps {
   token: TokenDetailsWithBalance
   variant?: TokenListItemVariant
   isLoading?: boolean

@@ -7,19 +7,13 @@ import {
   Box,
 } from "@chakra-ui/react"
 import { getThemingArgTypes } from "@chakra-ui/storybook-addon"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
-  title: "components/Accordion",
   component: Accordion,
   argTypes: {
     ...getThemingArgTypes(theme, "Accordion"),
   },
-} as ComponentMeta<typeof Accordion>
-
-const Template: ComponentStory<typeof Accordion> = (props) => (
-  <Accordion {...props}></Accordion>
-)
+}
 
 const children = (
   <AccordionItem>
@@ -38,16 +32,18 @@ const children = (
   </AccordionItem>
 )
 
-export const Default = Template.bind({})
-Default.args = {
-  allowToggle: true,
-  children,
+export const Default = {
+  args: {
+    allowToggle: true,
+    children,
+  },
 }
 
-export const ColorSchemeError = Template.bind({})
-ColorSchemeError.args = {
-  allowToggle: true,
-  size: "sm",
-  colorScheme: "error",
-  children,
+export const ColorSchemeError = {
+  args: {
+    allowToggle: true,
+    size: "sm",
+    colorScheme: "error",
+    children,
+  },
 }

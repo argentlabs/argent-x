@@ -1,24 +1,23 @@
 import { ShieldBaseEmailScreen } from "@argent-x/extension/src/ui/features/shield/ShieldBaseEmailScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "shield/ShieldBaseEmailScreen",
   component: ShieldBaseEmailScreen,
-} as ComponentMeta<typeof ShieldBaseEmailScreen>
-
-const Template: ComponentStory<typeof ShieldBaseEmailScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <ShieldBaseEmailScreen {...props} />
-  </MemoryRouter>
-)
-
-export const HasGuardian = Template.bind({})
-HasGuardian.args = {
-  hasGuardian: true,
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
 }
 
-export const NoGuardian = Template.bind({})
-NoGuardian.args = {
-  hasGuardian: false,
+export const HasGuardian = {
+  args: {
+    hasGuardian: true,
+  },
+}
+
+export const NoGuardian = {
+  args: {
+    hasGuardian: false,
+  },
 }

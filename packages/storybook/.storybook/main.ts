@@ -19,9 +19,11 @@ export default {
   features: {
     emotionAlias: false,
   },
-  framework: "@storybook/react",
+  framework: {
+    name: "@storybook/react-webpack5",
+    options: {},
+  },
   core: {
-    builder: "@storybook/builder-webpack5",
     disableTelemetry: true,
   },
   webpackFinal: async (config: Configuration) => {

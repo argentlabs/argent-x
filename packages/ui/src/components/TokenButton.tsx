@@ -1,21 +1,27 @@
-import { Box, Circle, Flex, Image, Tooltip } from "@chakra-ui/react"
-import { ComponentProps, FC, ReactNode } from "react"
+import {
+  Box,
+  ButtonProps,
+  Circle,
+  Flex,
+  Image,
+  Tooltip,
+} from "@chakra-ui/react"
+import { FC, ReactNode } from "react"
 
 import { Button } from "./Button"
 import { AlertIcon } from "./icons"
 import { LoadingPulse } from "./LoadingPulse"
 import { FieldError, H6, P4 } from "./Typography"
 
-export interface TokenListItemProps extends ComponentProps<typeof Button> {
+export interface TokenListItemProps extends ButtonProps {
   name: string
   symbol: string
   image: string
+  bigFont?: boolean
   getTokenIconUrl: ({ name, url }: { name: string; url: string }) => string
-
   subtitle?: string | ReactNode
   valueLabelPrimary: string | ReactNode
   valueLabelSecondary?: string | ReactNode | undefined
-
   isLoading?: boolean
   showTokenSymbol?: boolean
   errorMessage?: {
@@ -28,18 +34,14 @@ const TokenButton: FC<TokenListItemProps> = ({
   name,
   symbol,
   image,
-  balance,
   getTokenIconUrl,
-  variant,
-
   valueLabelPrimary,
   valueLabelSecondary,
   subtitle,
-
   isLoading = false,
   showTokenSymbol = false,
-  currencyValue,
   errorMessage,
+  bigFont,
   ...rest
 }) => {
   const src = getTokenIconUrl({ name, url: image })
@@ -73,17 +75,22 @@ const TokenButton: FC<TokenListItemProps> = ({
         gap={2}
         overflow={"hidden"}
       >
-        <Flex direction={"column"} overflow="hidden">
-          <H6 overflow="hidden" textOverflow={"ellipsis"}>
+        <Flex direction={"column"} overflow="hidden" gap={bigFont ? "1.5" : 0}>
+          <H6
+            overflow="hidden"
+            textOverflow={"ellipsis"}
+            fontSize={bigFont ? "2xl" : "base"}
+          >
             {name === "Ether" ? "Ethereum" : name}
           </H6>
           {subtitle === "default" && (
             <LoadingPulse isLoading={isLoading}>
               <P4
                 color="neutrals.300"
-                fontWeight={"semibold"}
+                fontWeight={bigFont ? "" : "semibold"}
                 overflow="hidden"
                 textOverflow={"ellipsis"}
+                fontSize={bigFont ? "base" : "xs"}
               >
                 {subtitle}
               </P4>
@@ -95,8 +102,12 @@ const TokenButton: FC<TokenListItemProps> = ({
             </P4>
           )}
         </Flex>
-        <Flex direction={"column"} overflow="hidden">
-          <LoadingPulse isLoading={isLoading}>
+        <LoadingPulse isLoading={isLoading}>
+          <Flex
+            direction={"column"}
+            overflow="hidden"
+            gap={bigFont ? "1.5" : 0}
+          >
             {errorMessage ? (
               <Tooltip label={errorMessage.description}>
                 <FieldError
@@ -111,23 +122,29 @@ const TokenButton: FC<TokenListItemProps> = ({
               </Tooltip>
             ) : (
               <>
-                <H6 overflow="hidden" textOverflow={"ellipsis"} textAlign="end">
+                <H6
+                  overflow="hidden"
+                  textOverflow={"ellipsis"}
+                  textAlign="end"
+                  fontSize={bigFont ? "2xl" : "base"}
+                >
                   {valueLabelPrimary}
                 </H6>
                 {valueLabelSecondary && (
                   <Box
                     color="neutrals.400"
-                    fontWeight={"semibold"}
+                    fontWeight="semibold"
                     textOverflow={"ellipsis"}
                     textAlign="end"
+                    fontSize="xs"
                   >
                     {valueLabelSecondary}
                   </Box>
                 )}
               </>
             )}
-          </LoadingPulse>
-        </Flex>
+          </Flex>
+        </LoadingPulse>
       </Flex>
     </Button>
   )

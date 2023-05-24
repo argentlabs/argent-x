@@ -1,17 +1,15 @@
 import { LockScreen } from "@argent-x/extension/src/ui/features/lock/LockScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "features/LockScreen",
   component: LockScreen,
-} as ComponentMeta<typeof LockScreen>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof LockScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <LockScreen {...props}></LockScreen>
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {
+  args: {},
+}

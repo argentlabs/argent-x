@@ -2,6 +2,8 @@ import { Token } from "../../../../../shared/token/type"
 import { Transaction } from "../../../../../shared/transactions"
 import { ActivityTransaction } from "../../useActivity"
 import { TransformedTransaction } from "../type"
+import changeMultisigThresholdTransformer from "./transformers/changeMultisigThresholdTransformer"
+import addMultisigTransformer from "./transformers/changeMultisigTransformer"
 import dateTransformer from "./transformers/dateTransformer"
 import declareContractTransformer from "./transformers/declareContractTransformer"
 import defaultDisplayNameTransformer from "./transformers/defaultDisplayNameTransformer"
@@ -28,6 +30,8 @@ const mainTransformers = [
   tokenMintTransformer,
   tokenTransferTransformer,
   guardianTransformer,
+  addMultisigTransformer,
+  changeMultisigThresholdTransformer,
 ]
 
 /** all are executed */

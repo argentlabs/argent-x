@@ -1,112 +1,160 @@
-import { MenuItem, MenuList, Paper } from "@mui/material"
-import OutlinedInput from "@mui/material/OutlinedInput"
-import Select, { SelectChangeEvent } from "@mui/material/Select"
-import { FC, useState } from "react"
-import styled from "styled-components"
+import { icons } from "@argent/ui"
+import { Box, Flex } from "@chakra-ui/react"
+import { FC, useCallback } from "react"
+import ReactSelect, {
+  ControlProps,
+  MenuListProps,
+  MenuProps,
+  OptionProps,
+  SingleValue,
+  SingleValueProps,
+  ValueContainerProps,
+} from "react-select"
 
-import { KeyboardArrowDownRounded } from "../../components/Icons/MuiIcons"
-import { scrollbarStyle } from "../../theme"
 import { AccountListItem, AccountListItemProps } from "./AccountListItem"
 
-const StyledPaper = styled(Paper)`
-  max-height: 220px;
-  ${scrollbarStyle}
-`
+const { ChevronDownIcon } = icons
 
-const StyledMenuList = styled(MenuList)`
-  padding: 0;
-`
-
-const SelectMenuProps = {
-  MenuListProps: {
-    component: StyledMenuList,
-  },
-  PaperProps: {
-    component: StyledPaper,
-  },
+const Control = ({
+  children,
+  innerProps,
+  isFocused,
+}: ControlProps<AccountListItemProps>) => {
+  return (
+    <Flex
+      {...innerProps}
+      backgroundColor={isFocused ? "neutrals.700" : "neutrals.800"}
+      rounded={"xl"}
+      _hover={{ bg: "neutrals.700" }}
+      transitionProperty={"common"}
+      transitionDuration={"fast"}
+      cursor={"pointer"}
+    >
+      {children}
+    </Flex>
+  )
 }
 
-const StyledOutlinedInput = styled(OutlinedInput)`
-  .MuiOutlinedInput-input {
-    transition: all 200ms ease-in-out;
-    padding: 0;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.15);
-    }
+const ValueContainer = ({
+  children,
+}: ValueContainerProps<AccountListItemProps>) => {
+  return <>{children}</>
+}
+
+const SingleValue = ({ data }: SingleValueProps<AccountListItemProps>) => {
+  return (
+    <AccountListItem
+      {...data}
+      width={"full"}
+      transparent
+      pointerEvents={"none"}
+    >
+      <ChevronDownIcon />
+    </AccountListItem>
+  )
+}
+
+const IndicatorsContainer = () => {
+  return null
+}
+
+const Menu = ({ children, innerProps }: MenuProps<AccountListItemProps>) => {
+  return (
+    <Box
+      {...innerProps}
+      rounded={"xl"}
+      position={"absolute"}
+      width={"100%"}
+      zIndex={1}
+    >
+      {children}
+    </Box>
+  )
+}
+
+const MenuList = ({
+  children,
+  innerProps,
+}: MenuListProps<AccountListItemProps>) => {
+  return (
+    <Box
+      {...innerProps}
+      rounded={"xl"}
+      maxHeight={"300px"}
+      overflowY={"auto"}
+      position={"relative"}
+      boxShadow={"menu"}
+    >
+      {children}
+    </Box>
+  )
+}
+
+const Option = ({
+  innerProps,
+  isDisabled,
+  isFocused,
+  isSelected,
+  data,
+}: OptionProps<AccountListItemProps>) => {
+  if (isDisabled) {
+    return null
   }
-  fieldset {
-    border: none;
-  }
-`
+  return (
+    <Box {...innerProps}>
+      <AccountListItem
+        {...data}
+        width={"full"}
+        rounded={"none"}
+        _active={{
+          transform: false,
+        }}
+        backgroundColor={
+          isFocused || isSelected ? "neutrals.600" : "neutrals.800"
+        }
+      />
+    </Box>
+  )
+}
 
-const StyledSelect = styled(Select<string>)`
-  width: 100%;
-`
+const components = {
+  Control,
+  ValueContainer,
+  SingleValue,
+  IndicatorsContainer,
+  Option,
+  Menu,
+  MenuList,
+}
 
-const StyledMenuItem = styled(MenuItem)`
-  transition: all 200ms ease-in-out;
-  padding: 0;
-  background-color: rgba(255, 255, 255, 0.05);
-  &.Mui-selected {
-    background-color: rgba(255, 255, 255, 0.15);
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-  }
-`
-
-const StyledAccountListItem = styled(AccountListItem)`
-  width: 100%;
-`
-
-export interface IAccountSelect {
+interface AccountSelectProps {
   selectedAccount?: AccountListItemProps
   accounts: AccountListItemProps[]
   onSelectedAccountChange?: (selectedAccount: AccountListItemProps) => void
-  style?: React.CSSProperties
-  className?: string
 }
 
-export const AccountSelect: FC<IAccountSelect> = ({
+export const AccountSelect: FC<AccountSelectProps> = ({
   selectedAccount,
   accounts = [],
   onSelectedAccountChange,
-  ...divProps
 }) => {
-  const [value, setValue] = useState(
-    selectedAccount && selectedAccount.accountAddress,
+  const onChange = useCallback(
+    (option: SingleValue<AccountListItemProps>) => {
+      if (onSelectedAccountChange && option) {
+        onSelectedAccountChange(option)
+      }
+    },
+    [onSelectedAccountChange],
   )
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    const selectedAccountAddress = event.target.value
-    const selectedAccount = accounts.find(
-      ({ accountAddress }) => accountAddress === selectedAccountAddress,
-    )
-    setValue(selectedAccountAddress)
-    selectedAccount &&
-      onSelectedAccountChange &&
-      onSelectedAccountChange(selectedAccount)
-  }
   return (
-    <StyledSelect
-      value={value}
-      onChange={handleChange}
-      input={<StyledOutlinedInput />}
-      IconComponent={KeyboardArrowDownRounded}
-      /* @ts-expect-error valid 'component' key is missing in MUI types @see https://github.com/mui/material-ui/pull/32404 */
-      MenuProps={SelectMenuProps}
-      {...divProps}
-    >
-      {accounts.map((account) => (
-        <StyledMenuItem
-          value={account.accountAddress}
-          key={account.accountAddress}
-          disableRipple
-        >
-          <StyledAccountListItem transparent {...account} />
-        </StyledMenuItem>
-      ))}
-    </StyledSelect>
+    <ReactSelect<AccountListItemProps>
+      isSearchable={false}
+      defaultValue={selectedAccount}
+      options={accounts}
+      components={components}
+      getOptionLabel={(option) => `${option.accountName}`}
+      getOptionValue={(option) => `${option.accountAddress}`}
+      onChange={onChange}
+    />
   )
 }

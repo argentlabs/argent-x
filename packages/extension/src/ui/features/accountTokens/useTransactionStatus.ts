@@ -1,20 +1,24 @@
 import { memoize } from "lodash-es"
 import { useMemo } from "react"
-import { Status as StarkNetStatus } from "starknet"
 
 import { transactionsStore } from "../../../background/transactions/store"
 import { useArrayStorage } from "../../../shared/storage/hooks"
-import { Transaction } from "../../../shared/transactions"
+import {
+  ExtendedTransactionStatus,
+  Transaction,
+} from "../../../shared/transactions"
 
-function transformStatus(status: StarkNetStatus): Status {
+function transformStatus(status: ExtendedTransactionStatus): Status {
   return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"].includes(status)
     ? "SUCCESS"
     : status === "REJECTED"
     ? "ERROR"
+    : status === "CANCELLED"
+    ? "CANCELLED"
     : "PENDING"
 }
 
-type Status = "UNKNOWN" | "PENDING" | "SUCCESS" | "ERROR"
+type Status = "UNKNOWN" | "PENDING" | "SUCCESS" | "ERROR" | "CANCELLED"
 
 const transactionSelector = memoize(
   (hash?: string, networkId?: string) => (transaction: Transaction) =>

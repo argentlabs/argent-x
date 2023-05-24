@@ -3,17 +3,31 @@ import { Call, Status, TransactionType, number } from "starknet"
 
 import { WalletAccount } from "./wallet.model"
 
+export type ExtendedTransactionStatus = Status | "CANCELLED"
+
 // Global Constants for Transactions
-export const SUCCESS_STATUSES: Status[] = [
+export const SUCCESS_STATUSES: ExtendedTransactionStatus[] = [
   "ACCEPTED_ON_L1",
   "ACCEPTED_ON_L2",
   "PENDING",
 ]
 
-export const TRANSACTION_STATUSES_TO_TRACK: Status[] = [
+export const FAILED_STATUS: ExtendedTransactionStatus[] = [
+  "REJECTED",
+  "CANCELLED",
+]
+
+export const TRANSACTION_STATUSES_TO_TRACK: ExtendedTransactionStatus[] = [
   "RECEIVED",
   "NOT_RECEIVED",
 ]
+export type ExtendedTransactionType =
+  | TransactionType
+  | "MULTISIG_ADD_SIGNERS"
+  | "MULTISIG_UPDATE_THRESHOLD"
+  | "MULTISIG_REMOVE_SIGNER"
+  | "ADD_ARGENT_SHIELD"
+  | "REMOVE_ARGENT_SHIELD"
 
 export interface TransactionMeta {
   title?: string
@@ -23,7 +37,7 @@ export interface TransactionMeta {
   isDeployAccount?: boolean
   isCancelEscape?: boolean
   transactions?: Call | Call[]
-  type?: TransactionType
+  type?: ExtendedTransactionType
 }
 
 export interface TransactionBase {
@@ -39,7 +53,7 @@ export interface TransactionRequest extends TransactionBase {
 }
 
 export interface Transaction extends TransactionRequest {
-  status: Status
+  status: ExtendedTransactionStatus
   failureReason?: { code: string; error_message: string }
   timestamp: number
 }
@@ -47,7 +61,7 @@ export interface Transaction extends TransactionRequest {
 export const compareTransactions = (
   a: TransactionBase,
   b: TransactionBase,
-): boolean => a.hash === b.hash && a.account.networkId === a.account.networkId
+): boolean => a.hash === b.hash && a.account.networkId === b.account.networkId
 
 export function entryPointToHumanReadable(entryPoint: string): string {
   try {
@@ -87,3 +101,19 @@ export function transactionNamesToTitle(
     : lastName
   return upperFirst(title)
 }
+
+export function transformEntrypointName(entryPoint: string) {
+  if (entryPoint === "changeThreshold") {
+    return "setConfirmations"
+  } else if (entryPoint === "addSigners") {
+    return "addOwner"
+  } else {
+    return entryPoint
+  }
+}
+
+export const MULTISG_TXN_TYPES: ExtendedTransactionType[] = [
+  "MULTISIG_ADD_SIGNERS",
+  "MULTISIG_UPDATE_THRESHOLD",
+  "MULTISIG_REMOVE_SIGNER",
+]

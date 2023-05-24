@@ -1,17 +1,15 @@
 import { ShieldAccountActivate } from "@argent-x/extension/src/ui/features/shield/ShieldAccountActivate"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "shield/ShieldAccountActivate",
   component: ShieldAccountActivate,
-} as ComponentMeta<typeof ShieldAccountActivate>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof ShieldAccountActivate> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <ShieldAccountActivate {...props} />
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {
+  args: {},
+}

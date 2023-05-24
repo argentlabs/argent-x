@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { getPrivateKey } from "../../services/backgroundAccounts"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 
 export const usePrivateKey = (address?: string, networkId?: string) => {
   const [privateKey, setPrivateKey] = useState<string>()
@@ -19,6 +20,6 @@ export const usePrivateKey = (address?: string, networkId?: string) => {
 }
 
 export const usePrivateKeyForSelectedAccount = () => {
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
   return usePrivateKey(account?.address, account?.networkId)
 }

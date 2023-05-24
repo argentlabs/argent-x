@@ -4,7 +4,8 @@ import path from "path"
 import { Config, transform } from "@svgr/core"
 import fetch from "cross-fetch"
 import * as dotenv from "dotenv"
-import { camelCase, upperFirst } from "lodash-es"
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+import { camelCase, upperFirst } from "lodash"
 
 dotenv.config()
 
@@ -34,6 +35,11 @@ const ICONS_CONFIG: IconsConfig[] = [
   {
     displayName: "Logos",
     figmaNodeId: decodeURIComponent("150%3A31"),
+    additionalSvgConfig: {
+      replaceAttrValues: {
+        "#fff": "currentColor",
+      } /** allows logos to be coloured using current css color */,
+    },
     outputFolder: path.join(__dirname, "../src/components/logos"),
   },
 ]

@@ -13,6 +13,8 @@
   </a>
 </p>
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=argentlabs_argent-x-private&metric=alert_status&token=37f8b93db6e967b7992252f0e70c62ff6da11bbb)](https://sonarcloud.io/summary/new_code?id=argentlabs_argent-x-private) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=argentlabs_argent-x-private&metric=sqale_index&token=37f8b93db6e967b7992252f0e70c62ff6da11bbb)](https://sonarcloud.io/summary/new_code?id=argentlabs_argent-x-private) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=argentlabs_argent-x-private&metric=coverage&token=37f8b93db6e967b7992252f0e70c62ff6da11bbb)](https://sonarcloud.io/summary/new_code?id=argentlabs_argent-x-private)
+
 ---
 
 <h2>🌈 Table of contents</h2>

@@ -10,14 +10,19 @@ import {
   WalletSession,
   WalletStorageProps,
 } from "../src/background/wallet"
-import { deserialize, serialize } from "../src/shared/account/serialize"
+import { deserialize, serialize } from "../src/shared/account/store/serialize"
+import { pendingMultisigEqual } from "../src/shared/multisig/store"
+import { PendingMultisig } from "../src/shared/multisig/types"
 import { Network } from "../src/shared/network"
 import {
   ArrayStorage,
   KeyValueStorage,
   ObjectStorage,
 } from "../src/shared/storage"
-import { WalletAccount } from "../src/shared/wallet.model"
+import {
+  BaseMultisigWalletAccount,
+  WalletAccount,
+} from "../src/shared/wallet.model"
 import { accountsEqual } from "../src/shared/wallet.service"
 import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
@@ -53,6 +58,25 @@ const getSessionStore = (name: string) => {
   return new ObjectStorage<WalletSession | null>(null, name)
 }
 
+const getMultisigStore = (
+  name: string,
+  defaults: BaseMultisigWalletAccount[] = [],
+) => {
+  return new ArrayStorage<BaseMultisigWalletAccount>(defaults, {
+    namespace: name,
+    compare: accountsEqual,
+  })
+}
+const getPendingMultisigStore = (
+  name: string,
+  defaults: PendingMultisig[] = [],
+) => {
+  return new ArrayStorage<PendingMultisig>(defaults, {
+    namespace: name,
+    compare: pendingMultisigEqual,
+  })
+}
+
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 
 const NETWORK = "testnetwork"
@@ -70,10 +94,16 @@ describe("Wallet", () => {
     const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet1")
     const accountStore = getAccountStore("test:accounts1")
     const sessionStore = getSessionStore("test:sessions1")
+    const baseMultisigStore = getMultisigStore("test:multisig1")
+    const pendingMultisigStore = getPendingMultisigStore(
+      "test:multisig:pending1",
+    )
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
+      pendingMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -117,6 +147,7 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts2", [
       {
+        name: backup.argent.accounts[0].name,
         address: backup.argent.accounts[0].address,
         networkId: backup.argent.accounts[0].network,
         signer: {
@@ -124,15 +155,21 @@ describe("Wallet", () => {
           derivationPath: backup.argent.accounts[0].signer.derivationPath,
         },
         network: await getNetwork(backup.argent.accounts[0].network),
-        type: "argent",
+        type: "standard",
       },
     ])
     const sessionStore = getSessionStore("test:sessions2")
+    const baseMultisigStore = getMultisigStore("test:multisig2")
+    const pendingMultisigStore = getPendingMultisigStore(
+      "test:multisig:pending2",
+    )
 
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
+      pendingMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -176,11 +213,17 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts3")
     const sessionStore = getSessionStore("test:sessions3")
+    const baseMultisigStore = getMultisigStore("test:multisig3")
+    const pendingMultisigStore = getPendingMultisigStore(
+      "test:multisig:pending3",
+    )
 
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
+      pendingMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -201,11 +244,17 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts4")
     const sessionStore = getSessionStore("test:sessions4")
+    const baseMultisigStore = getMultisigStore("test:multisig4")
+    const pendingMultisigStore = getPendingMultisigStore(
+      "test:multisig:pending4",
+    )
 
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
+      pendingMultisigStore,
       loadContracts,
       getNetwork,
     )
@@ -230,10 +279,17 @@ describe("Wallet", () => {
     )
     const accountStore = getAccountStore("test:accounts5")
     const sessionStore = getSessionStore("test:sessions5")
+    const baseMultisigStore = getMultisigStore("test:multisig5")
+    const pendingMultisigStore = getPendingMultisigStore(
+      "test:multisig:pending5",
+    )
+
     const wallet = new Wallet(
       storage,
       accountStore,
       sessionStore,
+      baseMultisigStore,
+      pendingMultisigStore,
       loadContracts,
       getNetwork,
     )

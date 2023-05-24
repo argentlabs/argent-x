@@ -8,11 +8,9 @@ import type {
 import { assertNever } from "./../ui/services/assertNever"
 import { getProvider } from "../shared/network/provider"
 import { ArgentXAccount } from "./ArgentXAccount"
-import { ArgentXAccount3, getProvider3 } from "./ArgentXAccount3"
 import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./messaging"
 import {
-  handleAddNetworkRequest,
   handleAddTokenRequest,
   handleSwitchNetworkRequest,
 } from "./requestMessageHandlers"
@@ -40,7 +38,8 @@ export const starknetWindowObject: StarknetWindowObject = {
     ) {
       return await handleAddTokenRequest(call.params)
     } else if (call.type === "wallet_addStarknetChain" && "id" in call.params) {
-      return await handleAddNetworkRequest(call.params)
+      // TODO: implement
+      throw Error("Not implemented")
     } else if (
       call.type === "wallet_switchStarknetChain" &&
       "chainId" in call.params
@@ -49,7 +48,7 @@ export const starknetWindowObject: StarknetWindowObject = {
     }
     throw Error("Not implemented")
   },
-  enable: async ({ starknetVersion = "v3" } = {}) => {
+  enable: async ({ starknetVersion = "v4" } = {}) => {
     const walletAccountP = Promise.race([
       waitForMessage("CONNECT_DAPP_RES", 10 * 60 * 1000),
       waitForMessage("REJECT_PREAUTHORIZATION", 10 * 60 * 1000).then(
@@ -80,10 +79,9 @@ export const starknetWindowObject: StarknetWindowObject = {
       starknet.provider = provider
       starknet.account = new ArgentXAccount(address, provider)
     } else {
-      const provider = getProvider3(network)
-      ;(starknet as any).starknetJsVersion = "v3"
-      ;(starknet as any).provider = provider
-      ;(starknet as any).account = new ArgentXAccount3(address, provider)
+      throw Error(
+        "ArgentX only supports Account from starknet.js v4. We ask the dApp developers to use latest get-starknet package",
+      )
     }
 
     starknet.selectedAddress = address

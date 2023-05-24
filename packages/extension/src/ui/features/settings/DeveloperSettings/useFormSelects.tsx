@@ -1,24 +1,19 @@
 import { SelectOption } from "@argent/ui"
 import { useMemo } from "react"
 
-import { accountStore } from "../../../../shared/account/store"
 import { Network } from "../../../../shared/network/type"
-import { useArrayStorage } from "../../../../shared/storage/hooks"
 import { WalletAccount } from "../../../../shared/wallet.model"
+import { visibleAccountsView } from "../../../views/account"
+import { useView } from "../../../views/implementation/react"
 import type { Account } from "../../accounts/Account"
-import { AccountAvatar } from "../../accounts/AccountListItem"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
+import { AccountAvatar } from "../../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
-import { useNetworks } from "../../networks/useNetworks"
+import { useNetworks } from "../../networks/hooks/useNetworks"
 import { SelectOptionAccount } from "./SelectOptionAccount"
 
 const useFormSelects = (selectedNetwork: string) => {
   const networks = useNetworks()
-  const accounts = useArrayStorage(accountStore)
-  const { accountNames } = useAccountMetadata()
+  const accounts = useView(visibleAccountsView)
 
   const networkOptions = useMemo(
     () =>
@@ -43,7 +38,7 @@ const useFormSelects = (selectedNetwork: string) => {
           icon: (
             <AccountAvatar
               src={getNetworkAccountImageUrl({
-                accountName: getAccountName(account as Account, accountNames),
+                accountName: account.name,
                 accountAddress: account.address,
                 networkId: account.networkId,
                 backgroundColor: undefined,
@@ -51,10 +46,10 @@ const useFormSelects = (selectedNetwork: string) => {
             />
           ),
           label: <SelectOptionAccount account={account as Account} />,
-          labelSelected: getAccountName(account as Account, accountNames),
+          labelSelected: account.name,
           value: account.address,
         })),
-    [accounts, accountNames, selectedNetwork],
+    [accounts, selectedNetwork],
   )
 
   return {

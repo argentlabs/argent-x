@@ -1,56 +1,37 @@
-import { FC, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import { H3, P3 } from "@argent/ui"
+import { Flex } from "@chakra-ui/react"
+import { FC } from "react"
 
-import { routes } from "../../routes"
-import { upgradeAccount } from "../../services/backgroundAccounts"
-import { P } from "../../theme/Typography"
-import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
-import { useSelectedAccount } from "./accounts.state"
+import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 
-const StyledP = styled(P)`
-  margin-bottom: 16px;
-  line-height: 1.5em;
-`
+interface UpgradeScreenProps {
+  onUpgrade: () => void
+  onCancel: () => void
+}
 
-export const UpgradeScreen: FC = () => {
-  const navigate = useNavigate()
-  const selectedAccount = useSelectedAccount()
-
-  // If no account is selected, navigate to the account list screen. Dont show anything while doing so.
-  useEffect(() => {
-    if (!selectedAccount) {
-      navigate(routes.accounts())
-    }
-    // on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!selectedAccount) {
-    return <></>
-  }
-
+export const UpgradeScreen: FC<UpgradeScreenProps> = ({
+  onUpgrade,
+  onCancel,
+}) => {
   return (
-    <DeprecatedConfirmScreen
-      title="Upgrade Wallet"
+    <ConfirmScreen
       confirmButtonText="Upgrade"
       rejectButtonText="Cancel"
-      onSubmit={async () => {
-        await upgradeAccount(selectedAccount)
-        navigate(routes.accountTokens())
-      }}
-      onReject={() => {
-        navigate(routes.accountTokens())
-      }}
+      onSubmit={onUpgrade}
+      onReject={onCancel}
     >
-      <StyledP>
-        You will upgrade your wallet implementation to use the latest features
-        and security.
-      </StyledP>
-      <StyledP>
-        This upgrade is required due to network and account contract changes. We
-        expect these kind of upgrades to be less frequent as the network
-        matures.
-      </StyledP>
-    </DeprecatedConfirmScreen>
+      <Flex flexDirection={"column"} flex={1} gap={4}>
+        <H3>Upgrade Wallet</H3>
+        <P3>
+          You will upgrade your wallet implementation to use the latest features
+          and security.
+        </P3>
+        <P3>
+          This upgrade is required due to network and account contract changes.
+          We expect these kind of upgrades to be less frequent as the network
+          matures.
+        </P3>
+      </Flex>
+    </ConfirmScreen>
   )
 }

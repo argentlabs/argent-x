@@ -8,12 +8,12 @@ import {
 } from "@argent-x/extension/src/ui/features/accountActivity/transform"
 import { FC } from "react"
 
-interface ITransactionDetailWrapped
+interface TransactionDetailWrappedProps
   extends Omit<TransactionDetailProps, "transactionTransformed"> {
   accountAddress: string
 }
 
-export const TransactionDetailWrapped: FC<ITransactionDetailWrapped> = ({
+export const TransactionDetailWrapped: FC<TransactionDetailWrappedProps> = ({
   transaction,
   explorerTransaction,
   accountAddress,

@@ -33,9 +33,13 @@ export const typedDataSchema = z.object({
 export const StarknetMethodArgumentsSchemas = {
   enable: z
     .tuple([
-      z.object({
-        starknetVersion: z.union([z.literal("v3"), z.literal("v4")]).optional(),
-      }),
+      z
+        .object({
+          starknetVersion: z
+            .union([z.literal("v3"), z.literal("v4")])
+            .optional(),
+        })
+        .optional(),
     ])
     .or(z.tuple([])),
   addStarknetChain: z.tuple([
@@ -98,6 +102,7 @@ export type StarknetMethods = {
   watchAsset: (
     ...args: z.infer<typeof StarknetMethodArgumentsSchemas.watchAsset>
   ) => Promise<boolean>
+
   execute: (
     ...args: z.infer<typeof StarknetMethodArgumentsSchemas.execute>
   ) => Promise<InvokeFunctionResponse>

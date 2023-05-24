@@ -1,50 +1,23 @@
-import { FC, useEffect, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { icons } from "@argent/ui"
+import { Circle, SimpleGrid } from "@chakra-ui/react"
+import { FC, MouseEventHandler } from "react"
 
-import {
-  AccountBalanceWalletIcon,
-  RefreshIcon,
-} from "../../components/Icons/MuiIcons"
-import Row from "../../components/Row"
-import { routes } from "../../routes"
-import {
-  usePageTracking,
-  useTimeSpentWithSuccessTracking,
-} from "../../services/analytics"
-import { extensionIsInTab, openExtensionInTab } from "../browser/tabs"
+import { OnboardingRectButton } from "./ui/OnboardingRectButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
-import {
-  CreateWalletRectButtonIcon,
-  RectButton,
-  RestoreWalletRectButtonIcon,
-} from "./ui/RectButton"
 
-export const OnboardingStartScreen: FC = () => {
-  const didRunInit = useRef(false)
-  const navigate = useNavigate()
-  usePageTracking("welcome")
-  const { trackSuccess } = useTimeSpentWithSuccessTracking(
-    "onboardingStepFinished",
-    { stepId: "welcome" },
-  )
+const { WalletIcon, RestoreIcon } = icons
 
-  useEffect(() => {
-    const init = async () => {
-      /** prevent opening more than once when useEffect is called multiple times in dev */
-      if (!didRunInit.current) {
-        didRunInit.current = true
-        /** When user clicks extension icon, open onboarding in full screen */
-        const inTab = await extensionIsInTab()
-        if (!inTab) {
-          /** Note: cannot detect and focus an existing extension tab here, so open a new one */
-          await openExtensionInTab()
-          window.close()
-        }
-      }
-    }
-    init()
-  }, [])
+interface OnboardingStartScreenProps {
+  /** Called when user clicks to create a new wallet */
+  onCreate: MouseEventHandler
+  /** Called when user clicks to restore an existing wallet */
+  onRestore: MouseEventHandler
+}
 
+export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
+  onCreate,
+  onRestore,
+}) => {
   return (
     <OnboardingScreen
       length={4}
@@ -52,30 +25,20 @@ export const OnboardingStartScreen: FC = () => {
       title="Welcome to Argent X"
       subtitle="Enjoy the security of Ethereum with the scale of StarkNet"
     >
-      <Row gap={"12px"} align="stretch">
-        <RectButton
-          onClick={() => {
-            trackSuccess()
-            navigate(routes.onboardingDisclaimer())
-          }}
-        >
-          <CreateWalletRectButtonIcon>
-            <AccountBalanceWalletIcon />
-          </CreateWalletRectButtonIcon>
+      <SimpleGrid columns={2} gap={3} w={"full"}>
+        <OnboardingRectButton onClick={onCreate}>
+          <Circle size={16} bg={"primary.500"}>
+            <WalletIcon fontSize={"2xl"} />
+          </Circle>
           Create a new wallet
-        </RectButton>
-        <RectButton
-          onClick={() => {
-            trackSuccess()
-            navigate(routes.onboardingRestoreSeed())
-          }}
-        >
-          <RestoreWalletRectButtonIcon>
-            <RefreshIcon />
-          </RestoreWalletRectButtonIcon>
+        </OnboardingRectButton>
+        <OnboardingRectButton onClick={onRestore}>
+          <Circle size={16} bg={"neutrals.700"}>
+            <RestoreIcon fontSize={"2xl"} />
+          </Circle>
           Restore an existing wallet
-        </RectButton>
-      </Row>
+        </OnboardingRectButton>
+      </SimpleGrid>
     </OnboardingScreen>
   )
 }

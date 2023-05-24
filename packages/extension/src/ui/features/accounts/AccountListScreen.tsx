@@ -5,145 +5,134 @@ import {
   icons,
 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { partition, some } from "lodash-es"
-import { FC, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import { isEmpty, some } from "lodash-es"
+import { FC, ReactEventHandler } from "react"
 
-import { routes, useReturnTo } from "../../routes"
-import { isEqualAddress } from "../../services/addresses"
-import { P } from "../../theme/Typography"
-import { LoadingScreen } from "../actions/LoadingScreen"
-import { useCurrentNetwork } from "../networks/useNetworks"
-import { useBackupRequired } from "../recovery/backupDownload.state"
-import { recover } from "../recovery/recovery.service"
+import { PendingMultisig } from "../../../shared/multisig/types"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
+import { MultisigListAccounts } from "../multisig/MultisigListAccounts"
 import { RecoveryBanner } from "../recovery/RecoveryBanner"
-import { AccountListScreenItem } from "./AccountListScreenItem"
-import {
-  isHiddenAccount,
-  useAccounts,
-  useSelectedAccount,
-} from "./accounts.state"
+import { Account } from "./Account"
+import { AccountListScreenItemContainer } from "./AccountListScreenItemContainer"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
-import { HiddenAccountsBar } from "./HiddenAccountsBar"
-import { usePartitionDeprecatedAccounts } from "./upgrade.service"
-import { useAddAccount } from "./useAddAccount"
+import { GroupedAccountList } from "./GroupedAccountList"
+import { HiddenAccountsBarContainer } from "./HiddenAccountsBar"
 
-const { AddIcon } = icons
+const { AddIcon, WalletIcon, MultisigIcon } = icons
 
-const Paragraph = styled(P)`
-  text-align: center;
-`
+interface AccountListScreenProps {
+  deprecatedAccounts: Account[]
+  hiddenAccounts: BaseWalletAccount[]
+  hiddenPendingMultisigs: PendingMultisig[]
+  isBackupRequired: boolean
+  multisigAccounts: Account[]
+  newAccounts: Account[]
+  onAdd: () => void
+  onClose: ReactEventHandler
+  pendingMultisigs: PendingMultisig[]
+  returnTo?: string
+  selectedAccount?: BaseWalletAccount
+  standardAccounts: Account[]
+  title: string
+  visiblePendingMultisigs: PendingMultisig[]
+}
 
-const DimmingContainer = styled.div`
-  background-color: ${({ theme }) => theme.bg1};
-  opacity: 0.5;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-`
+export const AccountListScreen: FC<AccountListScreenProps> = ({
+  deprecatedAccounts,
+  hiddenAccounts,
+  hiddenPendingMultisigs,
+  isBackupRequired,
+  multisigAccounts,
+  newAccounts,
+  onAdd,
+  onClose,
+  pendingMultisigs,
+  returnTo,
+  selectedAccount,
+  standardAccounts,
+  title,
+  visiblePendingMultisigs,
+}) => {
+  const hasHiddenAccounts =
+    hiddenAccounts.length > 0 || hiddenPendingMultisigs.length > 0
 
-export const AccountListScreen: FC = () => {
-  const navigate = useNavigate()
-  const returnTo = useReturnTo()
-  const selectedAccount = useSelectedAccount()
-  const allAccounts = useAccounts({ showHidden: true })
-  const [hiddenAccounts, visibleAccounts] = partition(
-    allAccounts,
-    isHiddenAccount,
-  )
-  const { isBackupRequired } = useBackupRequired()
-  const currentNetwork = useCurrentNetwork()
-  const { isAdding } = useAddAccount()
+  const hasMultisigAccounts =
+    !isEmpty(multisigAccounts) || !isEmpty(pendingMultisigs)
 
-  const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
-    visibleAccounts,
-    currentNetwork,
-  )
-  const hasHiddenAccounts = hiddenAccounts.length > 0
+  const hasMultipleAccountTypes =
+    !isEmpty(standardAccounts) && hasMultisigAccounts
 
-  const accountFromAddress = useCallback(
-    (accountAddress: string) => {
-      return allAccounts.find(
-        (account) =>
-          isEqualAddress(account.address, accountAddress) &&
-          currentNetwork.id === account.networkId,
-      )
-    },
-    [allAccounts, currentNetwork],
-  )
+  const hasOnlyMultisigAccounts =
+    hasMultisigAccounts && isEmpty(standardAccounts)
 
-  const onClose = useCallback(async () => {
-    if (returnTo) {
-      navigate(returnTo)
-    } else {
-      navigate(await recover())
-    }
-  }, [navigate, returnTo])
-
-  if (!partitionedAccounts) {
-    return <LoadingScreen />
-  }
-
-  const [deprecatedAccounts, newAccounts] = partitionedAccounts
-
+  const hasDeprecatedAccounts = some(deprecatedAccounts)
   return (
     <>
       <NavigationContainer
-        leftButton={<BarCloseButton onClick={onClose} disabled={isAdding} />}
-        title={`${currentNetwork.name} accounts`}
+        leftButton={<BarCloseButton onClick={onClose} />}
+        title={title}
         rightButton={
-          <BarIconButton
-            aria-label="Create new wallet"
-            onClick={() => navigate(routes.newAccount())}
-            isLoading={isAdding}
-          >
+          <BarIconButton aria-label="Create new wallet" onClick={onAdd}>
             <AddIcon />
           </BarIconButton>
         }
       >
         <Flex p={4} gap={2} direction="column">
           {isBackupRequired && <RecoveryBanner />}
-          {visibleAccounts.length === 0 && (
-            <Paragraph>
-              No {hasHiddenAccounts ? "visible" : ""} accounts on this network,
-              click below to add one.
-            </Paragraph>
-          )}
-          {newAccounts.map((accountAddress) => {
-            const account = accountFromAddress(accountAddress)
-            return account ? (
-              <AccountListScreenItem
+          {hasMultipleAccountTypes ? (
+            <Flex direction="column" gap={6}>
+              <GroupedAccountList
+                title="Standard Accounts"
+                accounts={standardAccounts}
+                icon={<WalletIcon w={4} h={4} />}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+                type="standard"
+              />
+              <GroupedAccountList
+                title="Multisig Accounts"
+                accounts={multisigAccounts}
+                icon={<MultisigIcon w={4} h={4} />}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+                type="multisig"
+                pendingMultisigs={visiblePendingMultisigs}
+              />
+            </Flex>
+          ) : hasOnlyMultisigAccounts ? (
+            <MultisigListAccounts
+              accounts={newAccounts}
+              pendingMultisigs={visiblePendingMultisigs}
+              selectedAccount={selectedAccount}
+              returnTo={returnTo}
+            />
+          ) : (
+            newAccounts.map((account) => (
+              <AccountListScreenItemContainer
                 key={account.address}
                 account={account}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
               />
-            ) : null
-          })}
-          {some(deprecatedAccounts) && (
+            ))
+          )}
+          {hasDeprecatedAccounts && (
             <>
               <DeprecatedAccountsWarning />
-              {deprecatedAccounts.map((accountAddress) => {
-                const account = accountFromAddress(accountAddress)
-                return account ? (
-                  <AccountListScreenItem
-                    key={account.address}
-                    account={account}
-                    selectedAccount={selectedAccount}
-                    returnTo={returnTo}
-                    needsUpgrade
-                  />
-                ) : null
-              })}
+              {deprecatedAccounts.map((account) => (
+                <AccountListScreenItemContainer
+                  key={account.address}
+                  account={account}
+                  selectedAccount={selectedAccount}
+                  returnTo={returnTo}
+                  needsUpgrade
+                />
+              ))}
             </>
           )}
-          {isAdding && <DimmingContainer />}
         </Flex>
       </NavigationContainer>
-      {hasHiddenAccounts && <HiddenAccountsBar />}
+      {hasHiddenAccounts && <HiddenAccountsBarContainer />}
     </>
   )
 }

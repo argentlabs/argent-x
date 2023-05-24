@@ -73,6 +73,16 @@ export const AspectContractSchema = z.object({
   floor_list_price: z.string().nullable(),
 })
 
+export const AspectCollectionSchema = z.object({
+  name: z.string().nullable(),
+  contract_address: z.string(),
+  symbol: z.string().nullable(),
+  schema: z.union([z.literal("ERC721"), z.literal("ERC1155")]),
+  name_custom: z.string().nullable(),
+  image_url: z.string().nullable(),
+  banner_image_url: z.string().nullable(),
+})
+
 export const CollectionSchema = z.object({
   name: z.string(),
   contractAddress: z.string(),
@@ -91,3 +101,4 @@ export type AspectNftOwner = z.infer<typeof AspectNftOwnerSchema>
 export type AspectNftContract = z.infer<typeof AspectNftContractSchema>
 export type AspectContract = z.infer<typeof AspectContractSchema>
 export type Collection = z.infer<typeof CollectionSchema>
+export type AspectCollection = z.infer<typeof AspectCollectionSchema>

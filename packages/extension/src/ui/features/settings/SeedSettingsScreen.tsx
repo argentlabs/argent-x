@@ -9,8 +9,8 @@ import { checkPassword } from "../../services/backgroundSessions"
 import { StickyGroup } from "../actions/DeprecatedConfirmScreen"
 import { PasswordForm } from "../lock/PasswordForm"
 import { CopySeedPhrase } from "../recovery/CopySeedPhrase"
+import { useSeedPhrase } from "../recovery/hooks/useSeedPhrase"
 import { SeedPhrase } from "../recovery/SeedPhrase"
-import { useSeedPhrase } from "../recovery/useSeedPhrase"
 
 const CopySeedScreen: FC = () => {
   const seedPhrase = useSeedPhrase()

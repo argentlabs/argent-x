@@ -1,19 +1,7 @@
-import { FC, useEffect } from "react"
-import styled from "styled-components"
+import { Center, CircularProgress } from "@chakra-ui/react"
+import { FC } from "react"
 
-import { useLoadingProgress } from "../../app.state"
-import { Spinner } from "../../components/Spinner"
 import { Greetings } from "../lock/Greetings"
-
-const LoadingScreenWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 48px 32px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100vh;
-`
 
 const loadingTexts = [
   "Loading…",
@@ -22,17 +10,31 @@ const loadingTexts = [
   "Almost there…",
 ]
 
-export const LoadingScreen: FC = () => {
-  const { progress, clearProgress } = useLoadingProgress()
+interface LoadingScreenProps {
+  progress?: number
+}
 
-  // TODO: make clearProgress function stable
-  // reset to 'indeterminate' spinner type on unmount
-  useEffect(() => () => clearProgress(), []) // eslint-disable-line react-hooks/exhaustive-deps
-
+export const LoadingScreen: FC<LoadingScreenProps> = ({ progress }) => {
   return (
-    <LoadingScreenWrapper>
-      <Spinner size={92} value={progress} />
+    <Center
+      textAlign={"center"}
+      flex={1}
+      px={2}
+      py={12}
+      flexDirection={"column"}
+      height={"100vh"}
+    >
+      <CircularProgress
+        size={"100px"}
+        thickness={"8px"}
+        isIndeterminate={progress === undefined}
+        max={1}
+        value={progress}
+        trackColor={"transparent"}
+        color={"text"}
+        capIsRound
+      />
       <Greetings greetings={loadingTexts} />
-    </LoadingScreenWrapper>
+    </Center>
   )
 }

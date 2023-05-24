@@ -1,4 +1,4 @@
-import { getAccounts } from "../shared/account/store"
+import { accountService } from "../shared/account/service"
 import { ActionItem, ExtQueueItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
 import { addNetwork, getNetworks } from "../shared/network"
@@ -8,6 +8,7 @@ import { assertNever } from "../ui/services/assertNever"
 import { accountDeployAction } from "./accountDeployAction"
 import { analytics } from "./analytics"
 import { BackgroundService } from "./background"
+import { multisigDeployAction } from "./multisigDeployAction"
 import { openUi } from "./openUi"
 import { executeTransactionAction } from "./transactions/transactionExecution"
 import { udcDeclareContract, udcDeployContract } from "./udcAction"
@@ -25,11 +26,11 @@ export const handleActionApproval = async (
       const selectedAccount = await wallet.getSelectedAccount()
 
       if (!selectedAccount) {
-        openUi()
+        void openUi()
         return
       }
 
-      analytics.track("preauthorizeDapp", {
+      void analytics.track("preauthorizeDapp", {
         host,
         networkId: selectedAccount.networkId,
       })
@@ -59,7 +60,7 @@ export const handleActionApproval = async (
       try {
         const txHash = await accountDeployAction(action, background)
 
-        analytics.track("deployAccount", {
+        void analytics.track("deployAccount", {
           status: "success",
           trigger: "sign",
           networkId: action.payload.networkId,
@@ -75,7 +76,7 @@ export const handleActionApproval = async (
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
 
-        analytics.track("deployAccount", {
+        void analytics.track("deployAccount", {
           status: "failure",
           networkId: action.payload.networkId,
           errorMessage: `${error}`,
@@ -88,6 +89,39 @@ export const handleActionApproval = async (
       }
     }
 
+    case "DEPLOY_MULTISIG_ACTION": {
+      try {
+        const txHash = await multisigDeployAction(action, background)
+
+        void analytics.track("deployMultisig", {
+          status: "success",
+          trigger: "transaction",
+          networkId: action.payload.networkId,
+        })
+
+        return {
+          type: "DEPLOY_MULTISIG_ACTION_SUBMITTED",
+          data: { txHash, actionHash },
+        }
+      } catch (exception: unknown) {
+        let error = `${exception}`
+        if (error.includes("403")) {
+          error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
+        }
+
+        void analytics.track("deployMultisig", {
+          status: "failure",
+          networkId: action.payload.networkId,
+          errorMessage: `${error}`,
+        })
+
+        return {
+          type: "DEPLOY_MULTISIG_ACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
+      }
+    }
+
     case "SIGN": {
       const typedData = action.payload
       if (!(await wallet.isSessionOpen())) {
@@ -95,13 +129,12 @@ export const handleActionApproval = async (
       }
       const starknetAccount = await wallet.getSelectedStarknetAccount()
 
-      const [r, s] = await starknetAccount.signMessage(typedData)
+      const signature = await starknetAccount.signMessage(typedData)
 
       return {
         type: "SIGNATURE_SUCCESS",
         data: {
-          r: r.toString(),
-          s: s.toString(),
+          signature,
           actionHash,
         },
       }
@@ -111,21 +144,6 @@ export const handleActionApproval = async (
       return {
         type: "APPROVE_REQUEST_TOKEN",
         data: { actionHash },
-      }
-    }
-
-    case "REQUEST_ADD_CUSTOM_NETWORK": {
-      try {
-        await addNetwork(action.payload)
-        return {
-          type: "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
-          data: { actionHash },
-        }
-      } catch (error) {
-        return {
-          type: "REJECT_REQUEST_ADD_CUSTOM_NETWORK",
-          data: { actionHash },
-        }
       }
     }
 
@@ -141,7 +159,7 @@ export const handleActionApproval = async (
           throw Error(`Network with chainId ${chainId} not found`)
         }
 
-        const accountsOnNetwork = await getAccounts((account) => {
+        const accountsOnNetwork = await accountService.get((account) => {
           return account.networkId === network.id && !account.hidden
         })
 
@@ -265,6 +283,13 @@ export const handleActionRejection = async (
       }
     }
 
+    case "DEPLOY_MULTISIG_ACTION": {
+      return {
+        type: "DEPLOY_MULTISIG_ACTION_FAILED",
+        data: { actionHash },
+      }
+    }
+
     case "SIGN": {
       return {
         type: "SIGNATURE_FAILURE",
@@ -275,13 +300,6 @@ export const handleActionRejection = async (
     case "REQUEST_TOKEN": {
       return {
         type: "REJECT_REQUEST_TOKEN",
-        data: { actionHash },
-      }
-    }
-
-    case "REQUEST_ADD_CUSTOM_NETWORK": {
-      return {
-        type: "REJECT_REQUEST_ADD_CUSTOM_NETWORK",
         data: { actionHash },
       }
     }

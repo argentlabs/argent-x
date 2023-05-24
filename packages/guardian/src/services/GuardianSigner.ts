@@ -118,7 +118,7 @@ export class GuardianSigner extends Signer {
       ),
       maxFee: number.toBN(maxFee).toString(10),
       chainId: number.toBN(chainId).toString(10),
-      version,
+      version: number.toBN(version).toString(10),
     }
 
     const cosignerSignature = await this.cosignMessage({

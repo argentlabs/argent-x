@@ -1,11 +1,10 @@
 import { mergeArrayStableWith } from "../storage/array"
 import { SelectorFn } from "../storage/types"
-import { assertSchema } from "../utils/schema"
+import { defaultNetworks } from "./defaults"
 import { networkSchema } from "./schema"
 import { networkSelector, networkSelectorByChainId } from "./selectors"
 import {
-  customNetworksStore,
-  defaultCustomNetworks,
+  allNetworksStore,
   defaultReadonlyNetworks,
   equalNetwork,
 } from "./storage"
@@ -22,8 +21,8 @@ export function extendByDefaultReadonlyNetworks(customNetworks: Network[]) {
 export async function getNetworks(
   selector?: SelectorFn<Network>,
 ): Promise<Network[]> {
-  const customNetworks = await customNetworksStore.get()
-  const allNetworks = extendByDefaultReadonlyNetworks(customNetworks)
+  const storedNetworks = await allNetworksStore.get()
+  const allNetworks = extendByDefaultReadonlyNetworks(storedNetworks)
   if (selector) {
     return allNetworks.filter(selector)
   }
@@ -41,22 +40,20 @@ export async function getNetworkByChainId(chainId: string) {
 }
 
 export const addNetwork = async (network: Network) => {
-  await assertSchema(networkSchema, network)
-  return customNetworksStore.push(network)
+  networkSchema.parse(network)
+  await allNetworksStore.push(network)
 }
 
 export const removeNetwork = async (networkId: string) => {
-  return customNetworksStore.remove(networkSelector(networkId))
+  return allNetworksStore.remove(networkSelector(networkId))
 }
 
 export const restoreDefaultCustomNetworks = async () => {
-  const customNetworks = await customNetworksStore.get()
-  await customNetworksStore.remove(customNetworks)
-  await customNetworksStore.push(defaultCustomNetworks)
+  await allNetworksStore.remove((network) => !!network.id)
+  await allNetworksStore.push(defaultNetworks)
 }
 
 export type { Network, NetworkStatus } from "./type"
-export { customNetworksStore } from "./storage"
 export { networkSchema } from "./schema"
 export { getProvider } from "./provider"
 export { defaultNetworks, defaultNetwork } from "./defaults"

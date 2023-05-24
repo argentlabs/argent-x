@@ -1,17 +1,13 @@
 import { AccountListItem } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
-import { Flex } from "@chakra-ui/layout"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
+import { CellStack } from "@argent/ui"
+import { ComponentProps } from "react"
 
 export default {
-  title: "accounts/AccountListItem",
   component: AccountListItem,
-} as ComponentMeta<typeof AccountListItem>
-
-const Template: ComponentStory<typeof AccountListItem> = (props) => (
-  <Flex flex={1} flexDirection="column">
-    <AccountListItem {...props}></AccountListItem>
-  </Flex>
-)
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
 const account = {
   accountName: "Account 1 Lorem Ipsum Dolor Sit Amet",
@@ -20,61 +16,85 @@ const account = {
   networkId: "goerli-alpha",
 }
 
-export const Default = Template.bind({})
-Default.args = {
-  ...account,
+export const Default = {
+  render: (props: ComponentProps<typeof AccountListItem>) => (
+    <CellStack>
+      <AccountListItem {...props}></AccountListItem>
+    </CellStack>
+  ),
+  args: {
+    ...account,
+  },
 }
 
-export const Outline = Template.bind({})
-Outline.args = {
-  ...account,
-  outlined: true,
+export const Outline = {
+  ...Default,
+  args: {
+    ...account,
+    outlined: true,
+  },
 }
 
-export const Highlight = Template.bind({})
-Highlight.args = {
-  ...account,
-  highlighted: true,
+export const Highlight = {
+  ...Default,
+  args: {
+    ...account,
+    highlighted: true,
+  },
 }
 
-export const Deploying = Template.bind({})
-Deploying.args = {
-  ...account,
-  deploying: true,
+export const Deploying = {
+  ...Default,
+  args: {
+    ...account,
+    deploying: true,
+  },
 }
 
-export const Upgrade = Template.bind({})
-Upgrade.args = {
-  ...account,
-  upgrade: true,
+export const Upgrade = {
+  ...Default,
+  args: {
+    ...account,
+    upgrade: true,
+  },
 }
 
-export const Connected = Template.bind({})
-Connected.args = {
-  ...account,
-  connectedHost: "foobar.xyz",
+export const Connected = {
+  ...Default,
+  args: {
+    ...account,
+    connectedHost: "foobar.xyz",
+  },
 }
 
-export const Hidden = Template.bind({})
-Hidden.args = {
-  ...account,
-  hidden: true,
+export const Hidden = {
+  ...Default,
+  args: {
+    ...account,
+    hidden: true,
+  },
 }
 
-export const Children = Template.bind({})
-Children.args = {
-  ...account,
-  children: <span>Child in here</span>,
+export const Children = {
+  ...Default,
+  args: {
+    ...account,
+    children: <span>Child in here</span>,
+  },
 }
 
-export const AvatarOutlined = Template.bind({})
-AvatarOutlined.args = {
-  ...account,
-  avatarOutlined: true,
+export const AvatarOutlined = {
+  ...Default,
+  args: {
+    ...account,
+    avatarOutlined: true,
+  },
 }
 
-export const PluginAccount = Template.bind({})
-PluginAccount.args = {
-  ...account,
-  accountType: "argent-plugin",
+export const PluginAccount = {
+  ...Default,
+  args: {
+    ...account,
+    accountType: "plugin",
+  },
 }

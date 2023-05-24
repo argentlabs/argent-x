@@ -12,21 +12,21 @@ import { NoSwap } from "../swap/NoSwap"
 import { Swap } from "../swap/Swap"
 import { AccountContainer } from "./AccountContainer"
 import { useSelectedAccount } from "./accounts.state"
-import { AccountScreenEmpty } from "./AccountScreenEmpty"
-import { useAddAccount } from "./useAddAccount"
+import { AccountScreenEmptyContainer } from "./AccountScreenEmptyContainer"
 
 interface AccountScreenProps {
   tab: "tokens" | "collections" | "activity" | "swap"
 }
 
+/** TODO: refactor: rename 'RootContainer' or similar */
+
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const account = useSelectedAccount()
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
-  const { isAdding } = useAddAccount()
 
-  const hasAcccount = !!account
-  const showEmpty = !hasAcccount || (hasAcccount && isAdding)
+  const hasAccount = !!account
+  const showEmpty = !hasAccount
 
   const multicall = account && getMulticallForNetwork(account?.network)
 
@@ -41,7 +41,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   let body: ReactNode
   let scrollKey = "accounts/AccountScreen"
   if (showEmpty) {
-    return <AccountScreenEmpty />
+    return <AccountScreenEmptyContainer />
   } else if (shouldShowFullScreenStatusMessage) {
     return <StatusMessageFullScreenContainer />
   } else if (tab === "tokens") {

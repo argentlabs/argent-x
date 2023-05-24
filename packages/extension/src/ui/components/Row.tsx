@@ -14,7 +14,7 @@ const Row = styled.div<{
   padding: ${({ padding }) => padding};
   border: ${({ border }) => border};
   border-radius: ${({ borderRadius }) => borderRadius};
-  gap: ${({ gap }) => gap && gap};
+  gap: ${({ gap }) => gap};
 `
 
 export const RowBetween = styled(Row)`
@@ -37,7 +37,7 @@ export const RowFlat = styled.div`
 export const AutoRow = styled(Row)<{ gap?: string; justify?: string }>`
   flex-wrap: wrap;
   margin: ${({ gap }) => gap && `-${gap}`};
-  justify-content: ${({ justify }) => justify && justify};
+  justify-content: ${({ justify }) => justify};
 
   & > * {
     margin: ${({ gap }) => gap} !important;

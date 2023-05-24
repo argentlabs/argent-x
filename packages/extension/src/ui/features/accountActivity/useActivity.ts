@@ -8,6 +8,7 @@ export interface ActivityTransaction {
   date: string
   meta?: TransactionMeta
   isRejected?: boolean
+  isCancelled?: boolean
   timestamp?: number
 }
 
@@ -22,12 +23,14 @@ export function useActivity(account: BaseWalletAccount): DailyActivity {
       const date = new Date(timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
       const isRejected = status === "REJECTED"
+      const isCancelled = status === "CANCELLED"
       activity[dateLabel] ||= []
       activity[dateLabel].push({
         hash,
         date,
         meta,
         isRejected,
+        isCancelled,
       })
     }
   }

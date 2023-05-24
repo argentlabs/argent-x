@@ -1,5 +1,8 @@
+import "./polyfill"
+
 import { theme } from "@argent/ui"
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport"
+import { Preview } from "@storybook/react"
 
 const CUSTOM_VIEWPORTS = {
   extension: {
@@ -12,7 +15,7 @@ const CUSTOM_VIEWPORTS = {
   },
 }
 
-export const parameters = {
+export const parameters: Preview["parameters"] = {
   chakra: {
     theme,
   },
@@ -53,6 +56,6 @@ export const parameters = {
   },
 }
 
-export { decorators } from "./decorators"
+export { decorators } from "../src/decorators/globalDecorators"
 
 export { globalTypes } from "./globalTypes"

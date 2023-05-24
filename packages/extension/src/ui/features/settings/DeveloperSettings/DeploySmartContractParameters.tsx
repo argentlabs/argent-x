@@ -41,7 +41,7 @@ const DeploySmartContractParameters: FC<{
 
   useEffect(() => {
     resetField("parameters")
-    fields.map((_, index) => remove(index))
+    fields.forEach((_, index) => remove(index))
 
     constructorParameters?.map((input) => {
       append({ name: input.name, type: input.type, value: input.value })

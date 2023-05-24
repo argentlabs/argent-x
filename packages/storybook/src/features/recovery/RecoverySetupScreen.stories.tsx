@@ -1,17 +1,15 @@
 import { RecoverySetupScreen } from "@argent-x/extension/src/ui/features/recovery/RecoverySetupScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "features/RecoverySetupScreen",
   component: RecoverySetupScreen,
-} as ComponentMeta<typeof RecoverySetupScreen>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof RecoverySetupScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <RecoverySetupScreen {...props}></RecoverySetupScreen>
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {
+  args: {},
+}

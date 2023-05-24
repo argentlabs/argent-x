@@ -16,5 +16,5 @@
     "jsx": "react-jsx",
     "isolatedModules": true
   },
-  "include": ["src"]
+  "include": ["src", ".eslintrc.js"]
 }

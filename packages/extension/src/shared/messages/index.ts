@@ -5,9 +5,9 @@ import { IS_DEV } from "../utils/dev"
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
 import { MiscenalleousMessage } from "./MiscellaneousMessage"
+import { MultisigMessage } from "./MultisigMessage"
 import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
-import { RecoveryMessage } from "./RecoveryMessage"
 import { SessionMessage } from "./SessionMessage"
 import { ShieldMessage } from "./ShieldMessage"
 import { TokenMessage } from "./TokenMessage"
@@ -20,12 +20,12 @@ export type MessageType =
   | MiscenalleousMessage
   | NetworkMessage
   | PreAuthorisationMessage
-  | RecoveryMessage
   | SessionMessage
   | TokenMessage
   | TransactionMessage
   | UdcMessage
   | ShieldMessage
+  | MultisigMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean
@@ -50,6 +50,8 @@ export function sendMessage(
   return _sendMessage(cleanMessage, options)
 }
 
+export type SendMessage = typeof sendMessage
+
 export async function waitForMessage<
   K extends MessageType["type"],
   T extends { type: K } & MessageType,
@@ -61,6 +63,8 @@ export async function waitForMessage<
     ([msg]: any) => msg.type === type && predicate(msg),
   ).then(([msg]: any) => msg.data)
 }
+
+export type WaitForMessage = typeof waitForMessage
 
 if ((<any>window).PLAYWRIGHT || IS_DEV) {
   ;(<any>window).messageStream = messageStream

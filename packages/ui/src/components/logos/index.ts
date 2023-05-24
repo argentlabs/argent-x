@@ -2,6 +2,7 @@
 
 export { default as ArgentXLogoFull } from "./ArgentXLogoFull"
 export { default as ArgentXLogo } from "./ArgentXLogo"
+export { default as ArgentLogo } from "./ArgentLogo"
 export { default as Github } from "./Github"
 export { default as Discord } from "./Discord"
 export { default as Twitter } from "./Twitter"
@@ -15,3 +16,4 @@ export { default as Ledger } from "./Ledger"
 export { default as Coinbase } from "./Coinbase"
 export { default as Ethereum } from "./Ethereum"
 export { default as Starknet } from "./Starknet"
+export { default as MultisigDiagram } from "./MultisigDiagram"

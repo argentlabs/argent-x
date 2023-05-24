@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import create from "zustand"
+import { create } from "zustand"
 
 import { messageStream } from "../shared/messages"
 import { defaultNetwork } from "../shared/network"
@@ -13,7 +13,7 @@ interface State {
   isFirstRender: boolean
 }
 
-export const useAppState = create<State>(() => ({
+export const useAppState = create<State>()(() => ({
   switcherNetworkId: defaultNetwork.id,
   isLoading: true,
   isFirstRender: true,

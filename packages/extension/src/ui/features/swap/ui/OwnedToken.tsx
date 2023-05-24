@@ -15,7 +15,8 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../../shared/token/price"
-import { useSelectedAccount } from "../../accounts/accounts.state"
+import { selectedAccountView } from "../../../views/account"
+import { useView } from "../../../views/implementation/react"
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
@@ -26,7 +27,7 @@ interface OwnedTokenProps {
 }
 
 const OwnedToken: FC<OwnedTokenProps> = ({ onClick, currency }) => {
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
 
   const token = wrappedCurrency(
     currency,
@@ -74,7 +75,6 @@ const OwnedToken: FC<OwnedTokenProps> = ({ onClick, currency }) => {
       showTokenSymbol
       valueLabelPrimary={displayBalance}
       valueLabelSecondary={displayCurrencyValue}
-      currencyValue={currencyValue}
       w="100%"
     />
   )

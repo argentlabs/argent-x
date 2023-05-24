@@ -2,16 +2,16 @@
 import { Button } from "@argent-x/extension/src/ui/components/Button"
 import Column from "@argent-x/extension/src/ui/components/Column"
 import { StyledControlledTextArea } from "@argent-x/extension/src/ui/components/InputText"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { useCallback } from "react"
+import { ComponentProps, FC, useCallback } from "react"
 import { useForm } from "react-hook-form"
 
 export default {
-  title: "components/InputTextArea",
   component: StyledControlledTextArea,
-} as ComponentMeta<typeof StyledControlledTextArea>
+}
 
-const Template: ComponentStory<typeof StyledControlledTextArea> = (props) => {
+const Template: FC<ComponentProps<typeof StyledControlledTextArea>> = (
+  props,
+) => {
   const { control, handleSubmit, setValue } = useForm()
 
   const onMaxClicked = useCallback(() => {
@@ -38,18 +38,24 @@ const Template: ComponentStory<typeof StyledControlledTextArea> = (props) => {
   )
 }
 
-export const Default = Template.bind({})
-Default.args = {}
-
-export const OnlyNumeric = Template.bind({})
-OnlyNumeric.args = {
-  onlyNumeric: true,
-  maxRows: 3,
+export const Default = {
+  render: Template,
+  args: {},
 }
 
-export const OnlyAddressHex = Template.bind({})
-OnlyAddressHex.args = {
-  onlyAddressHex: true,
-  minRows: 3,
-  maxRows: 3,
+export const OnlyNumeric = {
+  ...Default,
+  args: {
+    onlyNumeric: true,
+    maxRows: 3,
+  },
+}
+
+export const OnlyAddressHex = {
+  ...Default,
+  args: {
+    onlyAddressHex: true,
+    minRows: 3,
+    maxRows: 3,
+  },
 }

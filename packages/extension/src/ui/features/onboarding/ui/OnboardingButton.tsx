@@ -1,9 +1,6 @@
-import styled from "styled-components"
+import { Button } from "@argent/ui"
+import { ComponentProps, FC } from "react"
 
-import { PressableButton } from "../../../components/Button"
-
-export const OnboardingButton = styled(PressableButton).attrs(() => ({
-  variant: "primary",
-}))`
-  width: 200px;
-`
+export const OnboardingButton: FC<ComponentProps<typeof Button>> = (props) => {
+  return <Button colorScheme={"primary"} minWidth={"200px"} {...props} />
+}

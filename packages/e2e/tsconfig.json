@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "Esnext",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "resolveJsonModule": true,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "composite": true,
+    "types": ["node"]
+  },
+  "include": ["**/src"],
+  "exclude": ["node_modules"]
+}

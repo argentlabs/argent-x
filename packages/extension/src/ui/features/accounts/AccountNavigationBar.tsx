@@ -1,57 +1,47 @@
-import {
-  BarIconButton,
-  NavigationBar,
-  NavigationBarProps,
-  icons,
-} from "@argent/ui"
+import { BarIconButton, NavigationBar, icons } from "@argent/ui"
 import { Button, Flex, Text } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { FC, ReactEventHandler } from "react"
 
-import { routes, useCurrentPathnameWithQuery } from "../../routes"
-import { NetworkSwitcher } from "../networks/NetworkSwitcher"
-import { getAccountName, useAccountMetadata } from "./accountMetadata.state"
-import { useSelectedAccount } from "./accounts.state"
+import { NetworkSwitcherContainer } from "../networks/NetworkSwitcher/NetworkSwitcherContainer"
+import { AccountNavigationBarContainerProps } from "./AccountNavigationBarContainer"
 
-const { SettingsIcon, DropdownDownIcon, ArgentShieldIcon } = icons
+const { SettingsIcon, DropdownDownIcon, ArgentShieldIcon, MultisigIcon } = icons
 
-export interface AccountNavigationBarProps
-  extends Pick<NavigationBarProps, "scroll"> {
-  showAccountButton?: boolean
+interface AccountNavigationBarProps extends AccountNavigationBarContainerProps {
+  accountName?: string
+  isShield?: boolean
+  isMultisig?: boolean
+  onAccountList?: ReactEventHandler
+  onSettings?: ReactEventHandler
 }
 
 export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
+  accountName,
+  isShield,
+  isMultisig,
+  onAccountList,
+  onSettings,
   scroll,
   showAccountButton = true,
+  showNetworkSwitcher = true,
 }) => {
-  const { accountNames } = useAccountMetadata()
-  const account = useSelectedAccount()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const returnTo = useCurrentPathnameWithQuery()
-  const isShield = Boolean(account?.guardian)
-
-  const openAccountList = useCallback(() => {
-    navigate(routes.accounts(location.pathname))
-  }, [location.pathname, navigate])
-
-  const showSettings = useCallback(() => {
-    navigate(routes.settings(returnTo))
-  }, [navigate, returnTo])
-
-  const accountName = account && getAccountName(account, accountNames)
   return (
     <NavigationBar scroll={scroll}>
-      {showAccountButton && account && (
+      {showAccountButton && (
         <Button
           aria-label={"Show account list"}
           colorScheme={"neutrals"}
           size={"2xs"}
-          onClick={openAccountList}
+          onClick={onAccountList}
         >
           {isShield && (
             <Text fontSize={"2xs"} mr={1}>
               <ArgentShieldIcon />
+            </Text>
+          )}
+          {isMultisig && (
+            <Text fontSize={"2xs"} mr={1}>
+              <MultisigIcon />
             </Text>
           )}
           <Text noOfLines={1} maxW={"180px"}>
@@ -63,11 +53,11 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
         </Button>
       )}
       <Flex ml={"auto"}>
-        <NetworkSwitcher />
+        {showNetworkSwitcher && <NetworkSwitcherContainer />}
         <BarIconButton
           ml={1}
           aria-label="Show settings"
-          onClick={showSettings}
+          onClick={onSettings}
           colorScheme={"neutrals"}
         >
           <SettingsIcon />

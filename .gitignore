@@ -15,3 +15,5 @@ sourcemaps
 coverage
 *.tsbuildinfo
 license-report.md
+
+**/.next

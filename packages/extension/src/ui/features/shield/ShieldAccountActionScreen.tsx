@@ -28,7 +28,7 @@ export const ShieldAccountActionScreen: FC = () => {
   useEffect(() => {
     if (pendingChangeGuardian && account) {
       /** a guardian transaction for this account is now pending - move to finish */
-      trackSuccess()
+      void trackSuccess()
       navigate(routes.shieldAccountFinish(account?.address), { replace: true })
     }
   }, [account, navigate, pendingChangeGuardian, trackSuccess])

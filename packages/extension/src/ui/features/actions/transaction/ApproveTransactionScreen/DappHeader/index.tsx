@@ -7,24 +7,25 @@ import {
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
 } from "../../../../../../shared/transactionReview.service"
+import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 import { VerifiedDappBanner } from "../VerifiedDappBanner"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
 
 export interface DappHeaderProps {
-  transactions: Call[]
+  transactions?: Call[]
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
-  declareOrDeployType?: "declare" | "deploy"
+  approveScreenType: ApproveScreenType
 }
 
 export const DappHeader = ({
   transactions,
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
+  approveScreenType,
   verifiedDapp,
 }: DappHeaderProps) => {
   const targetedDappWebsite = useMemo(
@@ -32,7 +33,6 @@ export const DappHeader = ({
       transactionReview?.targetedDapp?.links.find((l) => l.name === "website"),
     [transactionReview?.targetedDapp?.links],
   )
-
   return (
     <Box mb="6">
       <Flex
@@ -45,7 +45,7 @@ export const DappHeader = ({
           transactionReview={transactionReview}
           aggregatedData={aggregatedData}
           verifiedDapp={transactionReview?.targetedDapp}
-          declareOrDeployType={declareOrDeployType}
+          approveScreenType={approveScreenType}
         />
         {verifiedDapp && <VerifiedDappBanner dapp={verifiedDapp} />}
         <Flex
@@ -59,9 +59,11 @@ export const DappHeader = ({
               transactionReview={transactionReview}
               aggregatedData={aggregatedData}
               fallback={
-                transactions.length > 1 ? "transactions" : "transaction"
+                transactions && transactions.length > 1
+                  ? "transactions"
+                  : "transaction"
               }
-              declareOrDeployType={declareOrDeployType}
+              approveScreenType={approveScreenType}
             />
           </H5>
           {targetedDappWebsite && (

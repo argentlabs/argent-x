@@ -1,4 +1,9 @@
-import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
+import {
+  AlertDialog,
+  BarBackButton,
+  CellStack,
+  NavigationContainer,
+} from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { isFunction } from "lodash-es"
 import { nanoid } from "nanoid"
@@ -17,7 +22,6 @@ import {
   AddressBookContact,
   AddressBookContactNoId,
 } from "../../../shared/addressBook/type"
-import { AlertDialog } from "../../components/AlertDialog"
 import { Button, ButtonTransparent } from "../../components/Button"
 import { AddRoundedIcon } from "../../components/Icons/MuiIcons"
 import { EditRoundedIcon } from "../../components/Icons/MuiIcons"
@@ -31,7 +35,8 @@ import { useAddressBook } from "../../services/addressBook"
 import useDebounce from "../../services/useDebounce"
 import { FormErrorAlt } from "../../theme/Typography"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import { useCurrentNetwork, useNetworks } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { useNetworks } from "../networks/hooks/useNetworks"
 import { useYupValidationResolver } from "./useYupValidationResolver"
 
 const IconWrapper = styled(RowCentered)`

@@ -20,6 +20,8 @@ export const routeWithReturnTo = (route: string) => {
   return returnTo
 }
 
+/** TODO: refactor: move hooks into /hooks folder in individual files */
+
 /** hook that builds on useLocation to parse query string */
 
 export const useQuery = () => {
@@ -39,6 +41,16 @@ export const useRouteAccountAddress = () => {
   return accountAddress
 }
 
+export const useRouteRequestId = () => {
+  const { requestId } = useParams()
+  return requestId
+}
+
+export const useRouteSignerToRemove = () => {
+  const { signerToRemove } = useParams()
+  return signerToRemove
+}
+
 export const useRouteEmailAddress = () => {
   return useQuery().get("email") || undefined
 }
@@ -50,7 +62,7 @@ export const useCurrentPathnameWithQuery = () => {
 }
 
 export const routes = {
-  onboardingStart: route("/index.html"),
+  onboardingStart: route("/onboarding/start"),
   onboardingDisclaimer: route("/onboarding/disclaimer"),
   onboardingPrivacyStatement: route("/onboarding/privacy"),
   onboardingPassword: route("/onboarding/password"),
@@ -220,8 +232,62 @@ export const routes = {
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
 
+  /** Multisig Routes **/
+  multisigNew: route("/account/new/multisig"),
   multisigSetup: route("/multisig/setup"),
-  multisigCreate: route("/multisig/create"),
-  multisigJoin: route("/multisig/join"),
+  multisigCreate: route(
+    (networkId: string) => `/multisig/create/${networkId}`,
+    "/multisig/create/:networkId",
+  ),
+  multisigJoin: route(
+    (publicKey: string) => `/multisig/join/${publicKey}`,
+    "/multisig/join/:publicKey",
+  ),
+  multisigJoinSettings: route(
+    (publicKey: string, returnTo?: string) =>
+      returnTo
+        ? `/multisig/join/${publicKey}/settings?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/multisig/join/${publicKey}/settings`,
+    "/multisig/join/:publicKey/settings",
+  ),
+  multisigOwners: route(
+    (accountAddress) => `/multisig/${accountAddress}/owners`,
+    "/multisig/:accountAddress/owners",
+  ),
+  multisigConfirmations: route(
+    (accountAddress) => `/multisig/${accountAddress}/confirmations`,
+    "/multisig/:accountAddress/confirmations",
+  ),
+  multisigAddOwners: route(
+    (accountAddress) => `/multisig/${accountAddress}/add-owners`,
+    "/multisig/:accountAddress/add-owners",
+  ),
+  multisigRemoveOwners: route(
+    (accountAddress, signerToRemove) =>
+      `/multisig/${accountAddress}/${signerToRemove}/remove-owners`,
+    "/multisig/:accountAddress/:signerToRemove/remove-owners",
+  ),
+  multisigPendingTransactionDetails: route(
+    (accountAddress, requestId) =>
+      `/multisig/${accountAddress}/${requestId}/details`,
+    "/multisig/:accountAddress/:requestId/details",
+  ),
+  multisigPendingTransactionConfirmations: route(
+    (accountAddress, requestId) =>
+      `/multisig/${accountAddress}/${requestId}/confirmations`,
+    "/multisig/:accountAddress/:requestId/confirmations",
+  ),
+  multisigRemovedSettings: route(
+    (accountAddress: string, returnTo?: string) =>
+      returnTo
+        ? `/multisig/removed/${accountAddress}/settings?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/multisig/removed/${accountAddress}/settings`,
+    "/multisig/removed/:accountAddress/settings",
+  ),
+
   swap: route("/swap"),
 }

@@ -1,4 +1,11 @@
-import { WalletAccount } from "./../wallet.model"
+import {
+  BaseMultisigWalletAccount,
+  MultisigWalletAccount,
+  WalletAccount,
+} from "./../wallet.model"
+import { fetchMultisigAccountData } from "../multisig/multisig.service"
+import { multisigBaseWalletStore } from "../multisig/store"
+import { getMultisigAccounts } from "../multisig/utils/baseMultisig"
 import { ARGENT_SHIELD_ENABLED } from "../shield/constants"
 import { BaseWalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
@@ -9,15 +16,16 @@ import {
   DetailFetchers,
   getAndMergeAccountDetails,
 } from "./details/getAndMergeAccountDetails"
-import { addAccounts, getAccounts } from "./store"
+import { accountService } from "./service"
 
 type UpdateScope = "all" | "type" | "deploy" | "guardian"
 
+// TODO: move into worker instead of calling it explicitly
 export async function updateAccountDetails(
   scope: UpdateScope,
   accounts?: BaseWalletAccount[],
 ) {
-  const allAccounts = await getAccounts((a) =>
+  const allAccounts = await accountService.get((a) =>
     accounts ? accounts.some((a2) => accountsEqual(a, a2)) : true,
   )
 
@@ -53,5 +61,35 @@ export async function updateAccountDetails(
     accountDetailFetchers,
   )
 
-  await addAccounts(newAccountsWithDetails) // handles deduplication and updates
+  await accountService.upsert(newAccountsWithDetails) // handles deduplication and updates
+}
+
+export async function updateMultisigAccountDetails(
+  accounts?: BaseWalletAccount[],
+) {
+  const multisigAccounts = await getMultisigAccounts((a) =>
+    accounts ? accounts.some((a2) => accountsEqual(a, a2)) : true,
+  )
+
+  const updater = async ({
+    address,
+    networkId,
+    publicKey,
+  }: MultisigWalletAccount): Promise<BaseMultisigWalletAccount> => {
+    const { content } = await fetchMultisigAccountData({
+      address,
+      networkId,
+    })
+
+    return {
+      ...content,
+      address,
+      networkId,
+      publicKey,
+    }
+  }
+
+  const updated = await Promise.all(multisigAccounts.map(updater))
+
+  await multisigBaseWalletStore.push(updated) // handles deduplication and updates
 }

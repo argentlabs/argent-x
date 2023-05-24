@@ -3,6 +3,7 @@ import { differenceWith } from "lodash-es"
 import { ArrayStorage } from "../../shared/storage"
 import { StorageChange } from "../../shared/storage/types"
 import {
+  ExtendedTransactionStatus,
   Transaction,
   TransactionRequest,
   compareTransactions,
@@ -18,14 +19,19 @@ export const transactionsStore = new ArrayStorage<Transaction>([], {
 
 const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)
 
-export const addTransaction = async (transaction: TransactionRequest) => {
+export const addTransaction = async (
+  transaction: TransactionRequest,
+  status?: ExtendedTransactionStatus,
+) => {
   // sanity checks
   if (!checkTransactionHash(transaction.hash)) {
     return // dont throw
   }
 
+  const defaultStatus: ExtendedTransactionStatus = "RECEIVED"
+
   const newTransaction = {
-    status: "RECEIVED" as const,
+    status: status ?? defaultStatus,
     timestamp: timestampInSeconds(),
     ...transaction,
   }

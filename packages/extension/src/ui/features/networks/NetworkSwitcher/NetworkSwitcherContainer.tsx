@@ -1,0 +1,61 @@
+import { Menu } from "@chakra-ui/react"
+import { FC, useCallback, useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+
+import { NetworkStatus } from "../../../../shared/network"
+import { routes } from "../../../routes"
+import { autoSelectAccountOnNetwork } from "../../accounts/switchAccount"
+import { useCurrentNetwork } from "../hooks/useCurrentNetwork"
+import { useNeedsToShowNetworkStatusWarning } from "../hooks/useNeedsToShowNetworkStatusWarning"
+import { useNetworks } from "../hooks/useNetworks"
+import { NetworkSwitcherButton } from "./NetworkSwitcherButton"
+import { NetworkSwitcherList } from "./NetworkSwitcherList"
+
+const valuesToShowNetwortWarning: Array<NetworkStatus> = ["degraded", "error"]
+
+interface NetworkSwitcherProps {
+  disabled?: boolean
+}
+
+export const NetworkSwitcherContainer: FC<NetworkSwitcherProps> = ({
+  disabled,
+}) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const allNetworks = useNetworks()
+  const currentNetwork = useCurrentNetwork()
+  const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
+  const currentNetworkStatus = currentNetwork.status
+
+  useEffect(() => {
+    if (
+      currentNetworkStatus &&
+      valuesToShowNetwortWarning.includes(currentNetworkStatus) &&
+      needsToShowNetworkStatusWarning
+    ) {
+      navigate(routes.networkWarning(location.pathname))
+    }
+    // just trigger on network status change
+  }, [currentNetworkStatus]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const onChangeNetwork = useCallback(async (networkId: string) => {
+    await autoSelectAccountOnNetwork(networkId)
+  }, [])
+
+  return (
+    <Menu>
+      {currentNetworkStatus && (
+        <NetworkSwitcherButton
+          disabled={disabled}
+          currentNetwork={currentNetwork}
+          currentNetworkStatus={currentNetworkStatus}
+        />
+      )}
+      <NetworkSwitcherList
+        currentNetwork={currentNetwork}
+        allNetworks={allNetworks}
+        onChangeNetwork={onChangeNetwork}
+      />
+    </Menu>
+  )
+}

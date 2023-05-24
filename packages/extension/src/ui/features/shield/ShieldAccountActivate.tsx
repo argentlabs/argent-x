@@ -5,13 +5,8 @@ import { FC } from "react"
 import { ShieldIconRow } from "./ui/ShieldIconRow"
 import { ShieldLearnMoreButton } from "./ui/ShieldLearnMoreButton"
 
-const {
-  EmailIcon,
-  LockIcon,
-  InfoIcon,
-  ArgentShieldDeactivateIcon,
-  ArgentShieldIcon,
-} = icons
+const { EmailIcon, LockIcon, ArgentShieldDeactivateIcon, ArgentShieldIcon } =
+  icons
 
 export const ShieldAccountActivate: FC = () => {
   return (
@@ -32,10 +27,6 @@ export const ShieldAccountActivate: FC = () => {
         </ShieldIconRow>
         <ShieldIconRow icon={ArgentShieldDeactivateIcon}>
           Remove Argent Shield at any time
-        </ShieldIconRow>
-        <ShieldIconRow icon={InfoIcon}>
-          An account protected by Argent Shield cannot be used with other
-          wallets
         </ShieldIconRow>
       </VStack>
       <Center flexDirection={"column"}>

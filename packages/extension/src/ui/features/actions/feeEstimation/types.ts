@@ -5,6 +5,8 @@ import {
   UniversalDeployerContractPayload,
 } from "starknet"
 
+import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
+
 export interface TransactionsFeeEstimationProps {
   transactions: Call | Call[]
   defaultMaxFee?: BigNumber
@@ -34,4 +36,12 @@ export type DeployContractFeeEstimationProps = Omit<
 > & {
   needsDeploy?: boolean
   payload: UniversalDeployerContractPayload
+}
+
+export interface FeeEstimationProps {
+  fee?: EstimateFeeResponse
+  accountAddress: string
+  networkId: string
+  onErrorChange?: (error: boolean) => void
+  feeError?: any
 }

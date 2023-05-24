@@ -1,9 +1,9 @@
-import { Image } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { Image, ImageProps } from "@chakra-ui/react"
+import { FC } from "react"
 
 import { useAspectNft } from "../../accountNfts/aspect.service"
 
-export interface NFTImageProps extends ComponentProps<typeof Image> {
+export interface NFTImageProps extends ImageProps {
   contractAddress?: string
   tokenId?: string
   networkId: string

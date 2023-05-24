@@ -9,7 +9,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
-    <g clipPath="url(#prefix__a)" fill="#fff">
+    <g clipPath="url(#prefix__a)" fill="currentColor">
       <path d="M10.641 10.507 12 9.162l1.358 1.345-1.358 1.344-1.358-1.345Z" />
       <path
         fillRule="evenodd"
@@ -29,7 +29,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     </g>
     <defs>
       <clipPath id="prefix__a">
-        <path fill="#fff" d="M0 0h24v24H0z" />
+        <path fill="currentColor" d="M0 0h24v24H0z" />
       </clipPath>
     </defs>
   </svg>

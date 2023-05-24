@@ -1,5 +1,5 @@
 import { getNetworkSelector } from "../../../shared/account/selectors"
-import { accountStore } from "../../../shared/account/store"
+import { accountService } from "../../../shared/account/service"
 import { defaultNetworks } from "../../../shared/network"
 import { useAppState } from "../../app.state"
 
@@ -11,7 +11,7 @@ export const validateRemoveNetwork = async (networkId: string) => {
     )
   }
 
-  const accountsOnNetwork = await accountStore.get(
+  const accountsOnNetwork = await accountService.get(
     getNetworkSelector(networkId),
   )
   if (accountsOnNetwork.length) {

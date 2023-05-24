@@ -1,5 +1,6 @@
 import { EncryptJWT, KeyLike, compactDecrypt, importJWK } from "jose"
-import { encode } from "starknet"
+
+import { bytesToUft8 } from "../shared/utils/encode"
 
 export const encryptForUi = async (
   value: string,
@@ -8,7 +9,7 @@ export const encryptForUi = async (
 ) => {
   const { plaintext } = await compactDecrypt(encryptedSecret, privateKey)
 
-  const jwk = JSON.parse(encode.arrayBufferToString(plaintext))
+  const jwk = JSON.parse(bytesToUft8(plaintext))
   const symmetricSecret = await importJWK(jwk)
 
   return await new EncryptJWT({ value })

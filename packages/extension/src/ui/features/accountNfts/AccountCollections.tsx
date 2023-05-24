@@ -9,6 +9,7 @@ import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { Account } from "../accounts/Account"
 import { Collection } from "./aspect.model"
+import { getNftPicture } from "./aspect.service"
 import { EmptyCollections } from "./EmptyCollections"
 import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
@@ -54,7 +55,7 @@ const Collections: FC<AccountCollectionsProps> = ({
             >
               <NftItem
                 name={collectible.name}
-                thumbnailSrc={collectible.nfts[0].image_url_copy || ""}
+                thumbnailSrc={getNftPicture(collectible.nfts[0]) || ""}
                 logoSrc={collectible.imageUri}
                 total={collectible.nfts.length}
               />

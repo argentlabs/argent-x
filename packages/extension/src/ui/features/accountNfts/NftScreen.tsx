@@ -27,7 +27,8 @@ import { Schema, object } from "yup"
 
 import { routes } from "../../routes"
 import { addressSchema, isEqualAddress } from "../../services/addresses"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { getNftPicture } from "./aspect.service"
 import { useNfts } from "./useNfts"
@@ -47,7 +48,7 @@ export const SendNftSchema: Schema<SendNftInput> = object().required().shape({
 export const NftScreen: FC = () => {
   const navigate = useNavigate()
   const { contractAddress, tokenId } = useParams()
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
 
   const { nfts = [] } = useNfts(account)
   const nft = nfts

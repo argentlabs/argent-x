@@ -5,12 +5,7 @@ import { FC } from "react"
 import { Transaction } from "../../../../shared/transactions"
 import { formatTruncatedAddress } from "../../../services/addresses"
 import { formatDateTimeBase } from "../../../services/dates"
-import type { Account } from "../../accounts/Account"
-import { AccountAvatar } from "../../accounts/AccountListItem"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
+import { AccountAvatar } from "../../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
 
 interface ClassHashOptionProps {
@@ -26,8 +21,6 @@ const ClassHashOption: FC<ClassHashOptionProps> = ({
   onClick,
   transaction,
 }) => {
-  const { accountNames } = useAccountMetadata()
-
   return (
     <>
       <Flex
@@ -46,10 +39,7 @@ const ClassHashOption: FC<ClassHashOptionProps> = ({
       >
         <AccountAvatar
           src={getNetworkAccountImageUrl({
-            accountName: getAccountName(
-              transaction?.account as Account,
-              accountNames,
-            ),
+            accountName: transaction.account.name,
             accountAddress: transaction.account.address,
             networkId: transaction.account.networkId,
             backgroundColor: undefined,

@@ -5,12 +5,13 @@ import { Navigate, useParams } from "react-router-dom"
 import { compareTransactions } from "../../../shared/transactions"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import { useAspectContractAddresses } from "../accountNfts/aspect.service"
-import { useSelectedAccount } from "../accounts/accounts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
-import { LoadingScreen } from "../actions/LoadingScreen"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { LoadingScreenContainer } from "../actions/LoadingScreenContainer"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { TransactionDetail } from "./TransactionDetail"
 import { transformExplorerTransaction, transformTransaction } from "./transform"
 import { useArgentExplorerTransaction } from "./useArgentExplorer"
@@ -28,7 +29,7 @@ export const TransactionDetailScreen: FC = () => {
   })
   const isInitialLoad = !explorerTransaction && !error && isValidating
 
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
   const { data: nftContractAddresses } = useAspectContractAddresses()
@@ -104,7 +105,7 @@ export const TransactionDetailScreen: FC = () => {
   }
 
   if (isInitialLoad) {
-    return <LoadingScreen />
+    return <LoadingScreenContainer />
   }
 
   if (

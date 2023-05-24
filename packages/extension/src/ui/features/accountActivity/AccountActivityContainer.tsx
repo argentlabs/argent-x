@@ -13,8 +13,10 @@ import { useAspectContractAddresses } from "../accountNfts/aspect.service"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useMultisigPendingTransactionsByAccount } from "../multisig/multisigTransactions.state"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { AccountActivity } from "./AccountActivity"
+import { PendingMultisigTransactions } from "./PendingMultisigTransactions"
 import { PendingTransactions } from "./PendingTransactions"
 import { isVoyagerTransaction } from "./transform/is"
 import { ActivityTransaction } from "./useActivity"
@@ -58,6 +60,8 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
   const { data: nftContractAddresses } = useAspectContractAddresses()
+  const pendingMultisigTransactions =
+    useMultisigPendingTransactionsByAccount(account)
 
   const { data, setSize, error, isValidating } =
     useArgentExplorerAccountTransactionsInfinite({
@@ -160,11 +164,13 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
       if (isVoyagerTransaction(transaction)) {
         const { hash, meta, status } = transaction
         const isRejected = status === "REJECTED"
+        const isCancelled = status === "CANCELLED"
         const activityTransaction: ActivityTransaction = {
           hash,
           date,
           meta,
           isRejected,
+          isCancelled,
         }
         mergedActivity[dateLabel].push(activityTransaction)
       } else {
@@ -209,7 +215,11 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     )
   }
 
-  if (!pendingTransactions.length && !Object.keys(mergedActivity).length) {
+  if (
+    !pendingTransactions.length &&
+    !Object.keys(mergedActivity).length &&
+    !pendingMultisigTransactions?.length
+  ) {
     return (
       <Empty icon={<ActivityIcon />} title={"No activity for this network"} />
     )
@@ -217,6 +227,14 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
 
   return (
     <>
+      {pendingMultisigTransactions &&
+        pendingMultisigTransactions.length > 0 && (
+          <PendingMultisigTransactions
+            pendingTransactions={pendingMultisigTransactions}
+            account={account}
+            network={network}
+          />
+        )}
       <PendingTransactions
         pendingTransactions={pendingTransactions}
         network={network}

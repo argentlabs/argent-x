@@ -24,7 +24,7 @@ import { Token } from "../../../shared/token/type"
 import { isNumeric } from "../../../shared/utils/number"
 import { argentApiFetcher } from "../../services/argentApiFetcher"
 import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
-import { useIsMainnet } from "../networks/useNetworks"
+import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import { TokenDetailsWithBalance } from "./tokens.state"
 
 /** @returns true if API is enabled, app is on mainnet and the user has enabled Argent services */

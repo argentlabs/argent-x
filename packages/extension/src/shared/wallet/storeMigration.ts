@@ -2,7 +2,7 @@ import { isBoolean, isPlainObject } from "lodash-es"
 import browser from "webextension-polyfill"
 
 import { Wallet } from "../../background/wallet"
-import { walletStore } from "../../shared/wallet/walletStore"
+import { old_walletStore } from "../../shared/wallet/walletStore"
 import { migrateWalletAccounts } from "../account/storeMigration"
 
 export async function migrateWallet() {
@@ -28,7 +28,7 @@ export async function migrateBackup() {
     if (!Wallet.validateBackup(oldWallet)) {
       throw new Error("Invalid backup")
     }
-    await walletStore.set("backup", oldWallet)
+    await old_walletStore.set("backup", oldWallet)
     return browser.storage.local.remove("wallet:backup")
   } catch (e) {
     console.log(e)
@@ -49,7 +49,7 @@ export async function migrateDiscoveredOnce() {
     if (!isBoolean(oldDiscoveredOnce)) {
       throw new Error("Invalid discoveredOnce")
     }
-    await walletStore.set("discoveredOnce", oldDiscoveredOnce)
+    await old_walletStore.set("discoveredOnce", oldDiscoveredOnce)
     return browser.storage.local.remove("wallet:discoveredOnce")
   } catch (e) {
     console.log(e)
@@ -74,7 +74,7 @@ export async function migrateSelected() {
     ) {
       throw new Error("Invalid selected")
     }
-    await walletStore.set("selected", oldSelected)
+    await old_walletStore.set("selected", oldSelected)
     return browser.storage.local.remove("wallet:selected")
   } catch (e) {
     console.log(e)

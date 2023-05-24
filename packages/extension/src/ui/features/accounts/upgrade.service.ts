@@ -4,11 +4,14 @@ import { number } from "starknet"
 import useSWR from "swr"
 
 import { getAccountIdentifier } from "./../../../shared/wallet.service"
-import { getAccounts } from "../../../shared/account/store"
+import { accountService } from "../../../shared/account/service"
 import { getMulticallForNetwork } from "../../../shared/multicall"
 import { Network, getProvider } from "../../../shared/network"
+import { WalletAccount } from "../../../shared/wallet.model"
+import { withPolling } from "../../services/swr"
 import { fetchFeeTokenBalanceForAccounts } from "./../accountTokens/tokens.service"
-import { useCurrentNetwork, useNetwork } from "./../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { useNetwork } from "../networks/hooks/useNetwork"
 import { Account } from "./Account"
 
 export async function checkIfUpgradeAvailable(
@@ -19,21 +22,28 @@ export async function checkIfUpgradeAvailable(
     return false
   }
 
-  const currentImplementation = await account.getCurrentImplementation()
+  try {
+    const currentImplementation = await account.getCurrentImplementation()
 
-  // Just show for not deprecated accounts, as targetImplementation will always be a contract class hash, which is not supported by the old proxy
-  // const oldAccount = isDeprecated(account)
+    // Just show for not deprecated accounts, as targetImplementation will always be a contract class hash, which is not supported by the old proxy
+    // const oldAccount = isDeprecated(account)
 
-  // matches all current target implementations. If you want to change the account type please do it using a different flow than this banner
-  const targetImplementations = Object.values(targetClassHash)
+    // matches all current target implementations. If you want to change the account type please do it using a different flow than this banner
+    const targetImplementations = Object.values(targetClassHash)
 
-  const isInKnownImplementationsList = targetImplementations.some(
-    (targetImplementation) =>
-      currentImplementation &&
-      number.toBN(currentImplementation).eq(number.toBN(targetImplementation)),
-  )
+    const isInKnownImplementationsList = targetImplementations.some(
+      (targetImplementation) =>
+        currentImplementation &&
+        number
+          .toBN(currentImplementation)
+          .eq(number.toBN(targetImplementation)),
+    )
 
-  return !!targetImplementations && !isInKnownImplementationsList
+    return !!targetImplementations && !isInKnownImplementationsList
+  } catch (e) {
+    console.error(e)
+    return false
+  }
 }
 
 export async function checkIfV4UpgradeAvailableOnNetwork(
@@ -55,7 +65,7 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
     network.multicallAddress,
   )
 
-  const accounts = await getAccounts(
+  const accounts = await accountService.get(
     (acc) =>
       acc.networkId === network.id &&
       onlyHidden === Boolean(acc.hidden) &&
@@ -107,7 +117,7 @@ export async function checkIfV4UpgradeAvailableOnNetwork(
 }
 
 export async function partitionDeprecatedAccount(
-  accounts: Account[],
+  accounts: WalletAccount[],
   network: Network,
 ): Promise<[string[], string[]]> {
   const accountAddresses = accounts.map((account) => account.address)
@@ -142,8 +152,6 @@ export async function partitionDeprecatedAccount(
 
     const implementations = response.flat()
 
-    const { argentAccount, argentPluginAccount } = network.accountClassHash
-
     const implementationsToAccountsMap = accounts.reduce<
       Record<string, string | undefined>
     >((acc, account, i) => {
@@ -154,8 +162,7 @@ export async function partitionDeprecatedAccount(
         }
       }
 
-      const currentImpl =
-        account.type === "argent" ? argentAccount : argentPluginAccount
+      const currentImpl = network.accountClassHash?.[account.type]
 
       return {
         ...acc,
@@ -167,20 +174,18 @@ export async function partitionDeprecatedAccount(
       (ti) => number.toBN(ti),
     )
 
-    return partition(
-      accountAddresses,
-      (accountAddress) =>
-        !targetImplementations.some((ti) => {
-          const impl = implementationsToAccountsMap[accountAddress]
-          if (impl) {
-            return ti.eq(number.toBN(impl))
-          }
-          return false
-        }),
+    return partition(accountAddresses, (accountAddress) =>
+      targetImplementations.some((ti) => {
+        const impl = implementationsToAccountsMap[accountAddress]
+        if (impl) {
+          return ti.eq(number.toBN(impl))
+        }
+        return true
+      }),
     )
   } catch (error) {
     console.error("Error while checking for deprecated accounts", error)
-    return [[], accountAddresses]
+    return [accountAddresses, []]
   }
 }
 
@@ -197,16 +202,11 @@ export const useCheckV4UpgradeAvailable = (
 }
 
 export const usePartitionDeprecatedAccounts = (
-  accounts: Account[],
+  accounts: WalletAccount[],
   network: Network,
 ) => {
   return useSWR(
-    [
-      network.id,
-      accounts.length,
-      "partition-deprecated-accounts",
-      "whatever___",
-    ],
+    [network.id, accounts.length, "partition-deprecated-accounts"],
     () => partitionDeprecatedAccount(accounts, network),
     { refreshInterval: 30000, revalidateIfStale: true },
   )
@@ -221,11 +221,18 @@ export const useCheckUpgradeAvailable = (account?: Account) => {
     data: needsUpgrade,
     error: needsUpgradeError,
     isValidating: needsUpgradeValidating,
+    mutate,
   } = useSWR(
     [accountIdentifier, accountClassHash, "showUpgradeBanner"],
-    () => account && checkIfUpgradeAvailable(account, accountClassHash),
-    { suspense: false },
+    () => {
+      if (!account) {
+        return false
+      }
+
+      return checkIfUpgradeAvailable(account, accountClassHash)
+    },
+    { ...withPolling(60 * 1000) },
   )
 
-  return { needsUpgrade, needsUpgradeError, needsUpgradeValidating }
+  return { needsUpgrade, needsUpgradeError, needsUpgradeValidating, mutate }
 }

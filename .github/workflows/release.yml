@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "extension/*"
 
 env:
   FEATURE_PRIVACY_SETTINGS: "true"
@@ -14,25 +14,25 @@ env:
   FEATURE_VERIFIED_DAPPS: "true"
   FEATURE_ARGENT_SHIELD: "true"
   ARGENT_SHIELD_NETWORK_ID: "mainnet-alpha"
+  FEATURE_MULTISIG: "false"
+  NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+  SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
+  FILENAME: argent-extension
+  SAFE_ENV_VARS: true
+  ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+  ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ vars.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+  ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+  ARGENT_EXPLORER_BASE_URL: ${{ vars.ARGENT_EXPLORER_BASE_URL }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-      SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
-      FILENAME: argent-extension-${{ github.ref_name }}
-      UPLOAD_SENTRY_SOURCEMAPS: true
-      SAFE_ENV_VARS: true
-      ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
-      ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ vars.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
-      ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
-      ARGENT_EXPLORER_BASE_URL: ${{ vars.ARGENT_EXPLORER_BASE_URL }}
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -40,7 +40,7 @@ jobs:
           node-version: "16"
           cache: "yarn"
       - run: yarn setup
-      - run: yarn build
+      - run: yarn build --ignore @argent/web
 
       - name: Release npm packages
         # if flow is triggered by a tag, publish to npm
@@ -69,7 +69,6 @@ jobs:
         run: yarn run bundlewatch
 
       - name: Upload artifacts for chrome
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         uses: actions/upload-artifact@v3
         with:
           name: chrome
@@ -78,13 +77,44 @@ jobs:
           if-no-files-found: error
 
       - name: Upload artifacts for firefox
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         uses: actions/upload-artifact@v3
         with:
           name: firefox
           path: "*-firefox.zip"
           retention-days: 14
           if-no-files-found: error
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get Extension version
+        id: package-version
+        run: |
+          PACKAGE_VERSION=$(cat ./packages/extension/package.json | jq -r '.version')
+          echo "current-version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Check sourcemaps
+        run: |
+          ls -l ./packages/extension
+          if [ ! -d "./packages/extension/sourcemaps" ]; then
+            echo "No sourcemaps found"
+            exit 0
+          fi
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_LOG_LEVEL: debug
+        with:
+          environment: production
+          sourcemaps: "./packages/extension/sourcemaps"
+          url_prefix: "~/sourcemaps"
+          version: ${{ steps.package-version.outputs.current-version }}
+          ignore_missing: true
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')

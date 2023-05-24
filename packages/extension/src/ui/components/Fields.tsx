@@ -20,22 +20,6 @@ export const Field = styled.div<{ clickable?: boolean }>`
     `}
 `
 
-export const FieldAlt = styled(Field)`
-  padding: 16px 10px;
-`
-
-export const FieldError = styled.div<{ justify?: string }>`
-  color: ${({ theme }) => theme.text1};
-  background-color: ${({ theme }) => theme.red1};
-  display: flex;
-  justify-content: ${({ justify }) => (justify ? justify : "center")};
-  align-items: center;
-
-  padding: 8px 10px;
-  font-size: 12px;
-  line-height: 15px;
-`
-
 export const FieldGroup = styled.section<{ error?: boolean }>`
   background: ${({ theme }) => theme.bg2};
   border-radius: 8px;
@@ -71,10 +55,6 @@ export const FieldKeyGroup = styled.div`
   justify-content: center;
 `
 
-export const FieldValueGroup = styled(FieldKeyGroup)`
-  align-items: flex-end;
-`
-
 export const FieldKey = styled(FieldValue)<{ withoutColor?: boolean }>`
   ${({ withoutColor = false }) =>
     !withoutColor &&
@@ -82,24 +62,6 @@ export const FieldKey = styled(FieldValue)<{ withoutColor?: boolean }>`
       color: ${({ theme }) => theme.text2};
     `}
 `
-
-export const FieldKeySub = styled(FieldKey)`
-  font-size: 13px;
-  line-height: 18px;
-`
-
-export const FieldValueSub = styled(FieldValue)`
-  font-size: 13px;
-  line-height: 18px;
-`
-
-export const FieldKeyMeta = styled(FieldKey)`
-  font-size: 12px;
-  line-height: 14px;
-  margin-top: 2px;
-`
-
-export const FieldValueMeta = styled(FieldKeyMeta)``
 
 export const LeftPaddedField = styled.div`
   margin-left: 8px;

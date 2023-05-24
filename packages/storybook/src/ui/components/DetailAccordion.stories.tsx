@@ -6,11 +6,10 @@ import {
   DetailAccordionPanel,
   DetailAccordionRow,
 } from "@argent/ui"
-import { Meta } from "@storybook/react"
 
 export default {
-  title: "components/DetailAccordion",
-} as Meta
+  component: DetailAccordion,
+}
 
 const Inner = () => (
   <DetailAccordion>

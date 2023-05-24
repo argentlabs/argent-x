@@ -7,7 +7,7 @@ import {
   SkeletonCircle,
 } from "@chakra-ui/react"
 import BigNumber from "bignumber.js"
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 
 import { generateAvatarImage } from "../../../../../../shared/avatarImage"
 import {
@@ -16,6 +16,7 @@ import {
 } from "../../../../../../shared/token/price"
 import {
   getNftPicture,
+  useAspectCollection,
   useAspectNft,
 } from "../../../../accountNfts/aspect.service"
 import { getColor } from "../../../../accounts/accounts.service"
@@ -47,7 +48,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
   amount,
   usdValue,
 }) => {
-  const { data: fetchedNft, isValidating } = useAspectNft(
+  const { data: fetchedNft, isValidating: isNftLoading } = useAspectNft(
     contractAddress,
     tokenId,
     networkId,
@@ -57,17 +58,48 @@ export const NftDetails: FC<NftDetailsProps> = ({
     },
   )
 
-  const nft = useMemo(
-    () => ({
+  const { data: fetchedCollection, isValidating: isCollectionLoading } =
+    useAspectCollection(contractAddress, networkId)
+
+  const unknownNftAvatar = useCallback(
+    (contractAddress: string, nameOrSymbol?: string | null) => {
+      return generateAvatarImage(nameOrSymbol ?? "Unknown NFT", {
+        background: getColor(contractAddress),
+      })
+    },
+    [],
+  )
+
+  const nft = useMemo(() => {
+    if (fetchedNft && fetchedNft.name) {
+      return {
+        name: fetchedNft.name,
+        description: fetchedNft.description,
+        image_url_copy:
+          fetchedNft.image_url_copy ??
+          fetchedNft.image_uri ??
+          unknownNftAvatar(contractAddress, fetchedNft.name),
+      }
+    }
+
+    if (fetchedCollection) {
+      return {
+        name: `${fetchedCollection.name} NFT`,
+        description: `${fetchedCollection.name} NFT`,
+        image_url_copy:
+          fetchedCollection.image_url ??
+          unknownNftAvatar(contractAddress, fetchedCollection.symbol),
+      }
+    }
+
+    return {
       name: "Unknown NFT",
       description: "Unknown NFT",
-      image_url_copy: generateAvatarImage("Unknown NFT", {
-        background: getColor(contractAddress),
-      }),
-      ...fetchedNft,
-    }),
-    [contractAddress, fetchedNft],
-  )
+      image_url_copy: unknownNftAvatar(contractAddress),
+    }
+  }, [contractAddress, fetchedCollection, fetchedNft, unknownNftAvatar])
+
+  const isValidating = isNftLoading || isCollectionLoading
 
   const isLoading = !nft && isValidating
 

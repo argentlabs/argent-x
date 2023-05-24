@@ -3,22 +3,26 @@ import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
 import { Escape } from "../../../../shared/account/details/getEscape"
+import { accountService } from "../../../../shared/account/service"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
 import { isNumeric } from "../../../../shared/utils/number"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { routes } from "../../../routes"
-import { selectAccount } from "../../../services/backgroundAccounts"
 import { withPolling } from "../../../services/swr"
-import { Account } from "../../accounts/Account"
-import { useAccounts } from "../../accounts/accounts.state"
+import { allAccountsWithEscapeView } from "../../../views/account"
+import { useView } from "../../../views/implementation/react"
 import { useAccountTransactions } from "../../accounts/accountTransactions.state"
 import {
   escapeWarningStore,
   getEscapeWarningStoreKey,
 } from "./escapeWarningStore"
 
-export const accountHasEscape = (account: Account) => Boolean(account.escape)
+export const accountHasEscape = (account: WalletAccount) =>
+  Boolean(account.escape)
 
 const pluralise = (value: number, unit: string) => {
   return `${value} ${unit}${value === 1 ? "" : "s"}`
@@ -56,7 +60,7 @@ export type LiveAccountEscapeProps = Escape &
 
 /** returns escape attributes including live countdown */
 
-export const useLiveAccountEscape = (account?: Account) => {
+export const useLiveAccountEscape = (account?: WalletAccount) => {
   const { data: liveAccountEscape } = useSWR<
     LiveAccountEscapeProps | undefined
   >(
@@ -80,23 +84,12 @@ export const useLiveAccountEscape = (account?: Account) => {
   return liveAccountEscape
 }
 
-export const useAccountsWithEscape = () => {
-  const allAccounts = useAccounts({ showHidden: true, allNetworks: true })
-
-  const filteredAccounts = useMemo(
-    () => allAccounts.filter(accountHasEscape),
-    [allAccounts],
-  )
-
-  return filteredAccounts
-}
-
 /** checks and shows a warning if an account has an escape state that has not yet shown to the user */
 
 export const useAccountEscapeWarning = () => {
   const navigate = useNavigate()
 
-  const accountsWithEscape = useAccountsWithEscape()
+  const accountsWithEscape = useView(allAccountsWithEscapeView)
   const escapeWarningKeys = useArrayStorage(escapeWarningStore)
 
   const accountWithNewEscape = useMemo(() => {
@@ -109,7 +102,7 @@ export const useAccountEscapeWarning = () => {
   useEffect(() => {
     const maybeShowWarning = async () => {
       if (accountWithNewEscape) {
-        await selectAccount(accountWithNewEscape)
+        await accountService.select(accountWithNewEscape)
         navigate(routes.shieldEscapeWarning(accountWithNewEscape.address))
       }
     }
@@ -117,7 +110,7 @@ export const useAccountEscapeWarning = () => {
   }, [accountWithNewEscape, escapeWarningKeys, navigate])
 }
 
-export const hideEscapeWarning = async (account: Account) => {
+export const hideEscapeWarning = async (account: WalletAccount) => {
   /** handles duplicates */
   await escapeWarningStore.push(getEscapeWarningStoreKey(account))
 }

@@ -1,5 +1,5 @@
+import { chakra } from "@chakra-ui/react"
 import { FC } from "react"
-import styled from "styled-components"
 
 import { IExplorerTransactionParameters } from "../../../../../shared/explorer/type"
 import { entryPointToHumanReadable } from "../../../../../shared/transactions"
@@ -11,25 +11,29 @@ import {
 } from "../../../../services/addresses"
 import { AccountAddressField } from "./AccountAddressField"
 
-interface IParameterField {
+interface ParameterFieldProps {
   parameter: IExplorerTransactionParameters
   networkId?: string
 }
 
-const StyledCopyIconButton = styled(CopyIconButton)`
-  position: relative;
-  left: 12px;
-`
+const StyledCopyIconButton = chakra(CopyIconButton, {
+  baseStyle: {
+    position: "relative",
+    left: 3,
+  },
+})
 
-const ParameterFieldValue = styled(FieldValue)`
-  display: block;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  margin-left: 8px;
-`
+const ParameterFieldValue = chakra(FieldValue, {
+  baseStyle: {
+    display: "block",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    marginLeft: 2,
+  },
+})
 
-export const ParameterField: FC<IParameterField> = ({
+export const ParameterField: FC<ParameterFieldProps> = ({
   parameter,
   networkId,
 }) => {

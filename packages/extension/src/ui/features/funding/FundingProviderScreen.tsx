@@ -13,8 +13,9 @@ import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
 import { trackAddFundsService } from "../../services/analytics"
-import { useSelectedAccount } from "../accounts/accounts.state"
-import { useIsMainnet } from "../networks/useNetworks"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
+import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import BanxaSvg from "./banxa.svg"
 import RampSvg from "./ramp.svg"
 
@@ -53,7 +54,7 @@ const RAMP_ENABLED =
 
 export const FundingProviderScreen: FC = () => {
   const navigate = useNavigate()
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
   const isMainnet = useIsMainnet()
 
   const allowFiatPurchase = account && isMainnet

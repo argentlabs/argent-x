@@ -40,5 +40,13 @@ export const accountsEqual = (a: BaseWalletAccount, b: BaseWalletAccount) => {
   }
 }
 
+export const isAccountHidden = (account: Pick<WalletAccount, "hidden">) =>
+  account.hidden === true
+
 export const getAccountIdentifier = (account: BaseWalletAccount) =>
   `${account.networkId}::${account.address}`
+
+export const getPendingMultisigIdentifier = (pendingMultisig: {
+  networkId: string
+  publicKey: string
+}) => `${pendingMultisig.networkId}::${pendingMultisig.publicKey}`

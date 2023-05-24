@@ -10,11 +10,9 @@ import {
 } from "react-hook-form"
 import { AbiEntry, number, uint256 } from "starknet"
 
+import { accountService } from "../../../../shared/account/service"
 import { Transaction } from "../../../../shared/transactions"
-import { WalletAccount } from "../../../../shared/wallet.model"
 import { useAppState } from "../../../app.state"
-import { isEqualAddress } from "../../../services/addresses"
-import { selectAccount } from "../../../services/backgroundAccounts"
 import {
   deployContract,
   fetchConstructorParams,
@@ -84,8 +82,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   const currentClassHash = watch("classHash")
 
   const lastDeclaredContracts = useLastDeclaredContracts({ limit: 10 })
-  const { accounts, accountOptions, networkOptions } =
-    useFormSelects(currentNetwork)
+  const { accountOptions, networkOptions } = useFormSelects(currentNetwork)
 
   const onSubmit: SubmitHandler<FieldValues> = async ({
     account,
@@ -95,13 +92,12 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     salt,
     unique,
   }: FieldValues) => {
-    const selectedAccount = accounts.find(
-      (act: WalletAccount) =>
-        isEqualAddress(act.address, account) && act.networkId === network,
-    )
     useAppState.setState({ switcherNetworkId: network })
 
-    await selectAccount(selectedAccount)
+    await accountService.select({
+      address: account,
+      networkId: network,
+    })
 
     const constructorCalldata = parameters.flatMap<string>((param, i) => {
       try {

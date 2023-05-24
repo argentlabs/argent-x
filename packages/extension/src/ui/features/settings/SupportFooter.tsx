@@ -50,7 +50,7 @@ const SupportFooter: FC = () => (
     </SimpleGrid>
     <Link to={routes.settingsPrivacyStatement()}>
       <L2 color="neutrals.400" cursor="inherit" textDecoration="underline">
-        Privacy Statement
+        Privacy statement
       </L2>
     </Link>
     <L2 color="neutrals.500" py="2">

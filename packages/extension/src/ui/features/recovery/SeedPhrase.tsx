@@ -1,60 +1,10 @@
 import { wordlists } from "ethers"
 import { FC } from "react"
-import styled, { keyframes } from "styled-components"
 
-const SeedPhraseGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  grid-gap: 12px;
-
-  margin-bottom: 35px;
-`
-
-const SeedWordBadge = styled.div`
-  padding: 4px 12px 4px 4px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 18px;
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`
-
-const SeedWordBadgeNumber = styled.span`
-  font-weight: 600;
-  border-radius: 20px;
-  color: ${({ theme }) => theme.bg1};
-  background-color: ${({ theme }) => theme.bg5};
-  margin-right: 4px;
-  line-height: 18px;
-  width: 18px;
-  text-align: center;
-  font-size: 12px;
-`
-
-const pulseKeyframe = keyframes`
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.2;
-  }
-`
-
-const LoadingSeedWordBadge = styled.div<{
-  animationDelay?: number
-}>`
-  height: 26px;
-  width: 100%;
-  border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.1);
-  animation: ${pulseKeyframe} 1s alternate infinite;
-  animation-delay: ${({ animationDelay = 0 }) => animationDelay}ms;
-`
+import { LoadingSeedWordBadge } from "./ui/LoadingSeedWordBadge"
+import { SeedPhraseGrid } from "./ui/SeedPhraseGrid"
+import { SeedWordBadge } from "./ui/SeedWordBadge"
+import { SeedWordBadgeNumber } from "./ui/SeedWordBadgeNumber"
 
 interface SeedPhraseProps {
   seedPhrase?: string

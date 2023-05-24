@@ -1,0 +1,52 @@
+{
+  "name": "@argent/web-sdk",
+  "version": "6.3.0",
+  "repository": "github:argentlabs/argent-x",
+  "private": false,
+  "browser": {
+    "crypto": false
+  },
+  "keywords": [
+    "starknet",
+    "starkware",
+    "l2",
+    "zk",
+    "rollup",
+    "wallet",
+    "dapp"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/web-sdk.js",
+      "require": "./dist/web-sdk.umd.cjs"
+    }
+  },
+  "main": "./dist/web-sdk.umd.cjs",
+  "module": "./dist/web-sdk.js",
+  "types": "./dist/web-sdk.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "setup": "yarn build"
+  },
+  "dependencies": {
+    "@argent/x-window": "^6.3.0",
+    "get-starknet-core": "^2.0.0",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/async-retry": "^1.4.5",
+    "typescript": "^4.9.3",
+    "vite": "^3.0.0",
+    "vite-plugin-dts": "^1.4.0"
+  },
+  "peerDependencies": {
+    "starknet": "^4.21.0"
+  },
+  "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"
+}

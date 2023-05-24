@@ -5,7 +5,7 @@ const Column = styled.div<{ gap?: string }>`
   flex-direction: column;
   justify-content: flex-start;
 
-  gap: ${({ gap }) => gap && gap};
+  gap: ${({ gap }) => gap};
 `
 export const ColumnCenter = styled(Column)`
   width: 100%;
@@ -30,7 +30,7 @@ export const AutoColumn = styled.div<{
     (gap === "md" && "12px") ||
     (gap === "lg" && "24px") ||
     gap};
-  justify-items: ${({ justify }) => justify && justify};
+  justify-items: ${({ justify }) => justify};
 `
 
 export default Column

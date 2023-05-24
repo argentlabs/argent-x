@@ -1,29 +1,18 @@
-import { TextWithAmount } from "@argent/ui"
+import { L1, TextWithAmount } from "@argent/ui"
+import { Box } from "@chakra-ui/react"
 import { FC } from "react"
-import styled from "styled-components"
 
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
 import { useNetworkFeeToken } from "../../../accountTokens/tokens.state"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 
-const FeeAmount = styled.div`
-  text-align: right;
-`
-const FeeValue = styled.div`
-  text-align: right;
-  color: ${({ theme }) => theme.text2};
-  font-size: 12px;
-  line-height: 14px;
-  margin-top: 2px;
-`
-
-export interface IFeeField {
+interface FeeFieldProps {
   title?: string
   fee: string
   networkId: string
 }
 
-export const FeeField: FC<IFeeField> = ({
+export const FeeField: FC<FeeFieldProps> = ({
   title = "Network fee",
   fee,
   networkId,
@@ -40,9 +29,9 @@ export const FeeField: FC<IFeeField> = ({
       <FieldKey>{title}</FieldKey>
       <LeftPaddedField>
         <TextWithAmount amount={fee} decimals={feeToken.decimals}>
-          <FeeAmount>{displayAmount}</FeeAmount>
+          <Box textAlign={"right"}>{displayAmount}</Box>
         </TextWithAmount>
-        {displayValue && <FeeValue>{displayValue}</FeeValue>}
+        {displayValue && <L1 color={"neutrals.400"}>{displayValue}</L1>}
       </LeftPaddedField>
     </Field>
   )

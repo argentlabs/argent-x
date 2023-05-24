@@ -1,248 +1,81 @@
-import { FC, useCallback, useMemo, useState } from "react"
-import styled from "styled-components"
+import { H6, L2, P3, P4, icons } from "@argent/ui"
+import { Center, Circle, Flex, List, ListItem } from "@chakra-ui/react"
+import { FC } from "react"
 
 import {
-  equalPreAuthorization,
-  useIsPreauthorized,
-  usePreAuthorizations,
-} from "../../../../shared/preAuthorizations"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { accountsEqual } from "../../../../shared/wallet.service"
-import { ColumnCenter } from "../../../components/Column"
-import { LinkIcon } from "../../../components/Icons/MuiIcons"
-import { Account } from "../../accounts/Account"
-import { AccountListItemProps } from "../../accounts/AccountListItem"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../accounts/accountMetadata.state"
-import { useAccounts, useSelectedAccount } from "../../accounts/accounts.state"
-import { AccountSelect } from "../../accounts/AccountSelect"
-import {
-  ConfirmPageProps,
-  DeprecatedConfirmScreen,
-} from "../DeprecatedConfirmScreen"
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../../shared/wallet.model"
+import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
+import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
 import { DappIcon } from "./DappIcon"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 
-interface ConnectDappProps extends Omit<ConfirmPageProps, "onSubmit"> {
-  onConnect: (selectedAccount: Account) => void
-  onDisconnect: (selectedAccount: Account) => void
-  host: string
-}
+const { LinkIcon } = icons
 
-export interface IConnectDappAccountSelect {
-  accounts: Account[]
+interface ConnectDappScreenProps {
+  isConnected: boolean
+  onConnect: () => void
+  onDisconnect: () => void
+  onReject?: () => void
+  host: string
+  accounts: WalletAccount[]
   selectedAccount?: BaseWalletAccount
-  onSelectedAccountChange?: (account: BaseWalletAccount) => void
-  host: string
+  onSelectedAccountChange: (account: BaseWalletAccount) => void
 }
 
-export const ConnectDappAccountSelect: FC<IConnectDappAccountSelect> = ({
-  accounts = [],
+export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
+  isConnected,
+  onConnect,
+  onDisconnect,
+  onReject,
+  host,
+  accounts,
   selectedAccount,
   onSelectedAccountChange,
-  host,
 }) => {
-  const { accountNames } = useAccountMetadata()
-  const preAuths = usePreAuthorizations()
-  const makeAccountListItem = useCallback(
-    (account: Account): AccountListItemProps => {
-      const accountName = getAccountName(account, accountNames)
-      const connected = Boolean(
-        preAuths.some((preAuth) =>
-          equalPreAuthorization(preAuth, {
-            host,
-            account,
-          }),
-        ),
-      )
-      return {
-        accountName,
-        accountAddress: account.address,
-        networkId: account.networkId,
-        connectedHost: connected ? host : undefined,
-        accountType: account.type,
-      }
-    },
-    [accountNames, host, preAuths],
-  )
-  const accountItems = useMemo(
-    () => accounts.map(makeAccountListItem),
-    [accounts, makeAccountListItem],
-  )
-  const selectedAccountItem = useMemo(
-    () =>
-      accountItems.find(
-        (accountItem) =>
-          selectedAccount &&
-          accountsEqual(
-            {
-              address: accountItem.accountAddress,
-              networkId: accountItem.networkId,
-            },
-            selectedAccount,
-          ),
-      ),
-    [accountItems, selectedAccount],
-  )
-  const onSelectedAccountItemChange = useCallback(
-    (accountItem: AccountListItemProps) => {
-      onSelectedAccountChange &&
-        onSelectedAccountChange({
-          address: accountItem.accountAddress,
-          networkId: accountItem.networkId,
-        })
-    },
-    [onSelectedAccountChange],
-  )
-  return (
-    <AccountSelect
-      accounts={accountItems}
-      selectedAccount={selectedAccountItem}
-      onSelectedAccountChange={onSelectedAccountItemChange}
-    />
-  )
-}
-
-const DappIconContainer = styled.div`
-  width: 64px;
-  height: 64px;
-`
-
-const Title = styled.div`
-  font-weight: 600;
-  font-size: 17px;
-  margin-top: 16px;
-  text-align: center;
-`
-
-const Host = styled.div`
-  font-size: 15px;
-  color: ${({ theme }) => theme.text2};
-  margin-bottom: 8px;
-  text-align: center;
-`
-
-const HR = styled.div`
-  width: 100%;
-  border-bottom: 1px solid ${({ theme }) => theme.bg2};
-  margin: 16px 0;
-`
-
-const SmallText = styled.div`
-  font-size: 13px;
-`
-
-const SelectContainer = styled.div`
-  padding-top: 16px;
-`
-
-const ConnectedStatusWrapper = styled.div`
-  color: ${({ theme }) => theme.blue1};
-  display: flex;
-  align-items: center;
-  font-size: 10px;
-  padding-top: 8px;
-`
-
-const ConnectedIcon = styled(LinkIcon)`
-  transform: rotate(-45deg);
-  font-size: 16px;
-`
-
-const List = styled.ul`
-  font-size: 15px;
-  line-height: 20px;
-  margin-top: 8px;
-  list-style-position: inside;
-`
-
-const Bullet = styled.li``
-
-const SmallGreyText = styled.span`
-  font-size: 13px;
-  color: ${({ theme }) => theme.text2};
-  margin-left: 20px;
-`
-
-export const ConnectDappScreen: FC<ConnectDappProps> = ({
-  onConnect: onConnectProp,
-  onDisconnect: onDisconnectProp,
-  onReject: onRejectProp,
-  host,
-  ...rest
-}) => {
-  const initiallySelectedAccount = useSelectedAccount()
-  const visibleAccounts = useAccounts()
-  const [connectedAccount, setConnectedAccount] = useState<
-    BaseWalletAccount | undefined
-  >(initiallySelectedAccount)
-  const isConnected = useIsPreauthorized(host, initiallySelectedAccount)
-
-  const selectedAccount = useMemo(() => {
-    if (connectedAccount) {
-      const account = visibleAccounts.find((account) =>
-        accountsEqual(account, connectedAccount),
-      )
-      return account
-    }
-  }, [visibleAccounts, connectedAccount])
-
-  const onSelectedAccountChange = useCallback((account: BaseWalletAccount) => {
-    setConnectedAccount(account)
-  }, [])
-
-  const onConnect = useCallback(() => {
-    selectedAccount && onConnectProp(selectedAccount)
-  }, [onConnectProp, selectedAccount])
-
-  const onDisconnect = useCallback(() => {
-    selectedAccount && onDisconnectProp(selectedAccount)
-  }, [onDisconnectProp, selectedAccount])
-
   const dappDisplayAttributes = useDappDisplayAttributes(host)
-
   return (
-    <DeprecatedConfirmScreen
+    <ConfirmScreen
       confirmButtonText={isConnected ? "Continue" : "Connect"}
       rejectButtonText={isConnected ? "Disconnect" : "Reject"}
       onSubmit={onConnect}
-      onReject={isConnected ? onDisconnect : onRejectProp}
-      {...rest}
+      onReject={isConnected ? onDisconnect : onReject}
     >
-      <ColumnCenter gap={"4px"}>
-        <DappIconContainer>
+      <Center flexDirection={"column"} textAlign={"center"} gap={1}>
+        <Circle size={16}>
           <DappIcon host={host} />
-        </DappIconContainer>
-        <Title>Connect to {dappDisplayAttributes?.title}</Title>
-        <Host>{host}</Host>
-      </ColumnCenter>
-      <HR />
-      <SmallText>Select the account to connect:</SmallText>
-      <SelectContainer>
+        </Circle>
+        <H6 mt={4}>Connect to {dappDisplayAttributes?.title}</H6>
+        <P4 color={"neutrals.300"}>{host}</P4>
+      </Center>
+      <Flex my={4} borderTop={"1px solid"} borderTopColor={"neutrals.600"} />
+      <P4>Select the account to connect:</P4>
+      <Flex mt={4} w={"full"} flexDirection={"column"}>
         <ConnectDappAccountSelect
-          accounts={visibleAccounts}
-          selectedAccount={connectedAccount}
+          accounts={accounts}
+          selectedAccount={selectedAccount}
           onSelectedAccountChange={onSelectedAccountChange}
           host={host}
         />
         {isConnected && (
-          <ConnectedStatusWrapper>
-            <ConnectedIcon />
-            <span> This account is already connected</span>
-          </ConnectedStatusWrapper>
+          <Flex gap={1} color={"info.300"} alignItems={"center"} mt={2}>
+            <L2>
+              <LinkIcon transform={"rotate(-45deg)"} display={"inline-block"} />{" "}
+              This account is already connected
+            </L2>
+          </Flex>
         )}
-      </SelectContainer>
-      <HR />
-      <SmallText>This dapp will be able to:</SmallText>
-      <List>
-        <Bullet>Read your wallet address</Bullet>
-        <Bullet>Request transactions</Bullet>{" "}
-        <SmallGreyText>
+      </Flex>
+      <Flex my={4} borderTop={"1px solid"} borderTopColor={"neutrals.600"} />
+      <P4>This dapp will be able to:</P4>
+      <P3 as={List} stylePosition={"inside"} listStyleType={"disc"} mt={2}>
+        <ListItem>Read your wallet address</ListItem>
+        <ListItem>Request transactions</ListItem>
+        <P4 as={"span"} ml={5} color={"neutrals.300"}>
           You will still need to sign any new transaction
-        </SmallGreyText>
-      </List>
-    </DeprecatedConfirmScreen>
+        </P4>
+      </P3>
+    </ConfirmScreen>
   )
 }

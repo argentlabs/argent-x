@@ -13,14 +13,14 @@ import {
 import { isEqualAddress } from "../../../../services/addresses"
 import { TokenIcon } from "../../../accountTokens/TokenIcon"
 
-export interface ITokenField {
+interface TokenFieldProps {
   label: string
   contractAddress?: string
   amount?: BigNumberish
   tokensByNetwork: Token[]
 }
 
-export const TokenField: FC<ITokenField> = ({
+export const TokenField: FC<TokenFieldProps> = ({
   label,
   contractAddress,
   amount,

@@ -1,7 +1,7 @@
 import { number } from "starknet"
 
 import { KeyValueStorage } from "../shared/storage"
-import { BaseWalletAccount } from "../shared/wallet.model"
+import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { getAccountIdentifier } from "../shared/wallet.service"
 import { Wallet } from "./wallet"
 
@@ -14,14 +14,19 @@ const nonceStore = new KeyValueStorage<Record<string, string>>(
 )
 
 export async function getNonce(
-  baseWallet: BaseWalletAccount,
+  account: WalletAccount,
   wallet: Wallet,
 ): Promise<string> {
-  const account = await wallet.getStarknetAccount(baseWallet)
-  const storageAddress = getAccountIdentifier(baseWallet)
-  const result = await account.getNonce()
+  const starknetAccount = await wallet.getStarknetAccount(account)
+  const storageAddress = getAccountIdentifier(account)
+  const result = await starknetAccount.getNonce()
   const nonceBn = number.toBN(result)
   const storedNonce = await nonceStore.get(storageAddress)
+
+  if (account.type === "multisig") {
+    // If the account is a multisig, we don't want to store the nonce
+    return number.toHex(nonceBn)
+  }
 
   // If there's no nonce stored or the fetched nonce is bigger than the stored one, store the fetched nonce
   if (!storedNonce || nonceBn.gt(number.toBN(storedNonce))) {

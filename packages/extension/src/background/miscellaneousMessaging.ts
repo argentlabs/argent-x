@@ -17,10 +17,10 @@ export const handleMiscellaneousMessage: HandleMessage<
 
     case "RESET_ALL": {
       try {
-        browser.storage.local.clear()
-        browser.storage.sync.clear()
-        browser.storage.managed.clear()
-        browser.storage.session.clear()
+        await browser.storage.local.clear()
+        await browser.storage.sync.clear()
+        await browser.storage.managed.clear()
+        await browser.storage.session.clear()
       } catch {
         // Ignore browser.storage.session error "This is a read-only store"
       }

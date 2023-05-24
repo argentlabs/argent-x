@@ -1,10 +1,8 @@
-import browser from "webextension-polyfill"
+import { onboardingWorker } from "./__new/services/onboarding"
 
-export const initOnboarding = () => {
-  browser.runtime.onInstalled.addListener((details) => {
-    if (details.reason === browser.runtime.OnInstalledReason.INSTALL) {
-      const url = browser.runtime.getURL("index.html")
-      browser.tabs.create({ url })
-    }
-  })
+/** TODO: refactor: remove this facade */
+export function initOnboarding() {
+  return {
+    onboardingWorker,
+  }
 }

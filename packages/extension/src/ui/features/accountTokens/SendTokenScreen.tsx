@@ -12,6 +12,7 @@ import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
 } from "../../../shared/token/price"
+import { WalletAccount } from "../../../shared/wallet.model"
 import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button, ButtonTransparent } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
@@ -43,16 +44,11 @@ import {
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { getAddressFromStarkName } from "../../services/useStarknetId"
 import { H3, H5 } from "../../theme/Typography"
-import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
+import { AccountAvatar } from "../accounts/AccountAvatar"
 import { getAccountImageUrl } from "../accounts/accounts.service"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddressBookMenu } from "../accounts/AddressBookMenu"
-import { ProfilePicture } from "../accounts/ProfilePicture"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { TokenIcon } from "./TokenIcon"
 import { TokenMenuDeprecated } from "./TokenMenuDeprecated"
@@ -216,21 +212,12 @@ export const SendTokenScreen: FC = () => {
   const feeToken = useNetworkFeeToken(account?.networkId)
   const [maxClicked, setMaxClicked] = useState(false)
   const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
+    WalletAccount | AddressBookContact
   >()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
-  const { accountNames } = useAccountMetadata()
   const [starknetIdLoading, setStarknetIdLoading] = useState(false)
 
-  const accountName = useMemo(
-    () =>
-      addressBookRecipient
-        ? "name" in addressBookRecipient
-          ? addressBookRecipient.name
-          : getAccountName(addressBookRecipient, accountNames)
-        : undefined,
-    [accountNames, addressBookRecipient],
-  )
+  const accountName = addressBookRecipient?.name
 
   const { id: currentNetworkId } = useCurrentNetwork()
 
@@ -368,7 +355,9 @@ export const SendTokenScreen: FC = () => {
     setMaxInputAmount(token, maxFee)
   }
 
-  const handleAddressSelect = (account?: Account | AddressBookContact) => {
+  const handleAddressSelect = (
+    account?: WalletAccount | AddressBookContact,
+  ) => {
     if (!account) {
       return
     }
@@ -511,20 +500,20 @@ export const SendTokenScreen: FC = () => {
               </div>
 
               <div>
+                {/** TODO: refactor - same pattern used in SendNftScreen */}
                 {addressBookRecipient && accountName ? (
                   <AddressBookRecipient
                     onDoubleClick={() => setAddressBookRecipient(undefined)}
                   >
                     <RowBetween>
                       <Row gap="16px">
-                        <ProfilePicture
+                        <AccountAvatar
                           src={getAccountImageUrl(
                             accountName,
                             addressBookRecipient,
                           )}
-                          size="lg"
+                          size={9}
                         />
-
                         <Column>
                           <H5>{accountName}</H5>
                           <StyledAccountAddress>

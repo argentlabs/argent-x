@@ -1,12 +1,13 @@
 import { ethers, wordlists } from "ethers"
-import create from "zustand"
+import { z } from "zod"
+import { create } from "zustand"
 
 interface State {
   seedPhrase?: string
   password?: string
 }
 
-export const useSeedRecovery = create<State>(() => ({}))
+export const useSeedRecovery = create<State>()(() => ({}))
 
 export const validateSeedPhrase = (seedPhrase: string): boolean => {
   const words = wordlists.en.split(seedPhrase.trim())
@@ -29,11 +30,13 @@ export const validateSeedPhrase = (seedPhrase: string): boolean => {
   return true
 }
 
+export const passwordSchema = z
+  .string()
+  .min(5, "Password must be at least 5 characters")
+
 export const validatePassword = (password: string): boolean => {
-  if (password.length > 5) {
-    return true
-  }
-  return false
+  const { success } = passwordSchema.safeParse(password)
+  return success
 }
 
 export const validateAndSetSeedPhrase = (seedPhrase: string): void => {

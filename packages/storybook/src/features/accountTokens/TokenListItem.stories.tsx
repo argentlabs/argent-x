@@ -3,19 +3,12 @@ import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/utils"
 import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens/TokenListItem"
 import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { CellStack } from "@argent/ui"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { BigNumber } from "ethers"
+import { ComponentProps } from "react"
 
 export default {
-  title: "features/TokenListItem",
   component: TokenListItem,
-} as ComponentMeta<typeof TokenListItem>
-
-const Template: ComponentStory<typeof TokenListItem> = (props) => (
-  <CellStack>
-    <TokenListItem {...props}></TokenListItem>
-  </CellStack>
-)
+}
 
 const tokenWithSymbol = (symbol: string): Token => {
   const token = parsedDefaultTokens.find((token) => token.symbol === symbol)
@@ -38,85 +31,112 @@ const tokenWithBalance = (
   }
 }
 
-export const Default = Template.bind({})
-Default.args = {
-  isLoading: false,
-  token: tokenWithBalance("1000000000000000000"),
-  currencyValue: "1.19905823328686698812",
-}
+export const Default = {
+  render: (props: ComponentProps<typeof TokenListItem>) => (
+    <CellStack>
+      <TokenListItem {...props}></TokenListItem>
+    </CellStack>
+  ),
 
-export const Thousands = Template.bind({})
-Thousands.args = {
-  isLoading: false,
-  token: tokenWithBalance("1234000000000000000000"),
-  currencyValue: "1199.05823328686698812",
-}
-
-export const HighLongBalance = Template.bind({})
-HighLongBalance.args = {
-  isLoading: false,
-  token: tokenWithBalance("12345678000000000000000000"),
-  currencyValue: "12345678.19905823328686698812",
-}
-
-export const LowLongBalance = Template.bind({})
-LowLongBalance.args = {
-  isLoading: false,
-  token: tokenWithBalance("100000000000000"),
-  currencyValue: "0.0000002",
-}
-
-export const DustLongBalance = Template.bind({})
-DustLongBalance.args = {
-  isLoading: false,
-  token: tokenWithBalance("892308777860895"),
-  currencyValue: "1.00948100047026519429651",
-}
-
-export const MissingCurrencyValue = Template.bind({})
-MissingCurrencyValue.args = {
-  isLoading: false,
-  token: tokenWithBalance("100000000000000"),
-  currencyValue: undefined,
-}
-
-export const MissingBalance = Template.bind({})
-MissingBalance.args = {
-  isLoading: false,
-  token: tokenWithBalance(),
-}
-
-export const MissingBalanceAndError = Template.bind({})
-MissingBalanceAndError.args = {
-  isLoading: false,
-  token: tokenWithBalance(),
-  errorMessage: {
-    message: "Token not found",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lectus nisl, diam iaculis porttitor.",
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("1000000000000000000"),
+    currencyValue: "1.19905823328686698812",
   },
 }
 
-export const NoCurrencyVariant = Template.bind({})
-NoCurrencyVariant.args = {
-  isLoading: false,
-  token: tokenWithBalance("12345678000000000000000000"),
-  currencyValue: "12345678.19905823328686698812",
-  variant: "no-currency",
+export const Thousands = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("1234000000000000000000"),
+    currencyValue: "1199.05823328686698812",
+  },
 }
 
-export const MissingCurrencyValueNoCurrencyVariant = Template.bind({})
-MissingCurrencyValueNoCurrencyVariant.args = {
-  isLoading: false,
-  token: tokenWithBalance("100000000000000"),
-  currencyValue: undefined,
-  variant: "no-currency",
+export const HighLongBalance = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("12345678000000000000000000"),
+    currencyValue: "12345678.19905823328686698812",
+  },
 }
 
-export const LongTokenNameAndBalance = Template.bind({})
-LongTokenNameAndBalance.args = {
-  isLoading: false,
-  token: tokenWithBalance("400", testToken),
-  currencyValue: undefined,
-  variant: "no-currency",
+export const LowLongBalance = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("100000000000000"),
+    currencyValue: "0.0000002",
+  },
+}
+
+export const DustLongBalance = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("892308777860895"),
+    currencyValue: "1.00948100047026519429651",
+  },
+}
+
+export const MissingCurrencyValue = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("100000000000000"),
+    currencyValue: undefined,
+  },
+}
+
+export const MissingBalance = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance(),
+  },
+}
+
+export const MissingBalanceAndError = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance(),
+    errorMessage: {
+      message: "Token not found",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lectus nisl, diam iaculis porttitor.",
+    },
+  },
+}
+
+export const NoCurrencyVariant = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("12345678000000000000000000"),
+    currencyValue: "12345678.19905823328686698812",
+    variant: "no-currency",
+  },
+}
+
+export const MissingCurrencyValueNoCurrencyVariant = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("100000000000000"),
+    currencyValue: undefined,
+    variant: "no-currency",
+  },
+}
+
+export const LongTokenNameAndBalance = {
+  ...Default,
+  args: {
+    isLoading: false,
+    token: tokenWithBalance("400", testToken),
+    currencyValue: undefined,
+    variant: "no-currency",
+  },
 }

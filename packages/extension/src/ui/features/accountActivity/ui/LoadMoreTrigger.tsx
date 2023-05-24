@@ -1,7 +1,7 @@
-import { Box } from "@chakra-ui/react"
-import { ComponentProps, FC, useEffect, useRef } from "react"
+import { Box, BoxProps } from "@chakra-ui/react"
+import { FC, useEffect, useRef } from "react"
 
-interface LoadMoreProps extends ComponentProps<typeof Box> {
+interface LoadMoreProps extends BoxProps {
   onLoadMore: () => void
   oneShot?: boolean
 }

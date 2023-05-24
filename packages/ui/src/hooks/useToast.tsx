@@ -4,6 +4,7 @@ import {
   UseToastOptions,
   useToast as chakraUseToast,
 } from "@chakra-ui/react"
+import type { ToastId } from "@chakra-ui/toast"
 import { ReactNode } from "react"
 
 import { L1, icons } from "../components"
@@ -34,7 +35,7 @@ interface ToastOptions extends UseToastOptions {
 
 export const useToast = (defaultOptions?: ToastOptions) => {
   const chakraToast = chakraUseToast(defaultOptions)
-  return (options: UseToastOptions) => {
+  return (options: UseToastOptions): ToastId => {
     const { title, status = "info" } = options
     const icon = defaultOptions?.icon || ICON_MAP[status]
     const backgroundColor = COLOR_MAP[status]

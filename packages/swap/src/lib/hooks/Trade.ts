@@ -101,7 +101,7 @@ export function useTradeExactIn(
       if (currencyAmountIn && currencyOut && allowedPairs.length > 0) {
         const trade =
           Trade.bestTradeExactIn(allowedPairs, currencyAmountIn, currencyOut, {
-            maxHops: 3,
+            maxHops: 1, // TODO: Change back to 3 when Jediswap has more liquidity
             maxNumResults: 1,
           })[0] ?? null
 
@@ -130,7 +130,7 @@ export function useTradeExactOut(
       if (currencyIn && currencyAmountOut && allowedPairs.length > 0) {
         return (
           Trade.bestTradeExactOut(allowedPairs, currencyIn, currencyAmountOut, {
-            maxHops: 3,
+            maxHops: 1, // TODO: Change back to 3 when Jediswap has more liquidity
             maxNumResults: 1,
           })[0] ?? null
         )

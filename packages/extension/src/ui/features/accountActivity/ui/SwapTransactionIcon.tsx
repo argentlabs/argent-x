@@ -1,12 +1,11 @@
-import { Square } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { Square, SquareProps } from "@chakra-ui/react"
+import { FC } from "react"
 
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { isSwapTransaction } from "../transform/is"
 import { TransformedTransaction } from "../transform/type"
 
-export interface SwapTransactionIconProps
-  extends Omit<ComponentProps<typeof Square>, "size"> {
+export interface SwapTransactionIconProps extends Omit<SquareProps, "size"> {
   transaction: TransformedTransaction
   size: string | number
 }

@@ -1,4 +1,5 @@
 import { typedData } from "starknet"
+import { z } from "zod"
 
 export interface CosignerMessage {
   message: any
@@ -11,12 +12,14 @@ export interface CosignerOffchainMessage {
   message: typedData.TypedData
 }
 
-export interface CosignerResponse {
-  signature: {
-    r: string
-    s: string
-  }
-}
+export const CosignerResponseSchema = z.object({
+  signature: z.object({
+    r: z.string(),
+    s: z.string(),
+  }),
+})
+
+export type CosignerResponse = z.infer<typeof CosignerResponseSchema>
 
 export type Cosigner = (
   message: CosignerMessage | CosignerOffchainMessage,

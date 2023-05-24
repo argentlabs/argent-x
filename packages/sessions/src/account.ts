@@ -196,8 +196,8 @@ export class SessionAccount extends Account implements AccountInterface {
       },
       {
         maxFee,
-        version,
         nonce,
+        version,
       },
     )
   }

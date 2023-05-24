@@ -21,7 +21,15 @@ module.exports = {
     },
     ecmaVersion: "latest",
     sourceType: "module",
+    project: "./tsconfig.json",
+    tsconfigRootDir: __dirname,
   },
+  ignorePatterns: [
+    "**/dist/**",
+    "**/node_modules/**",
+    "vite.config.ts",
+    "webpack.config.js",
+  ],
   plugins: ["react", "react-hooks", "@typescript-eslint"],
   rules: {
     "react/jsx-no-target-blank": "off",
@@ -52,5 +60,7 @@ module.exports = {
         ],
       },
     ],
+    "@typescript-eslint/no-misused-promises": "warn",
+    "@typescript-eslint/no-floating-promises": "warn",
   },
 }

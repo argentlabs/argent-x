@@ -5,11 +5,11 @@ import { Field, FieldKey, FieldValue } from "../../../../components/Fields"
 import { ContentCopyIcon } from "../../../../components/Icons/MuiIcons"
 import { formatTruncatedAddress } from "../../../../services/addresses"
 
-export interface IContractField {
+interface ContractFieldProps {
   contractAddress?: string
 }
 
-export const ContractField: FC<IContractField> = ({ contractAddress }) => {
+export const ContractField: FC<ContractFieldProps> = ({ contractAddress }) => {
   if (!contractAddress) {
     return null
   }

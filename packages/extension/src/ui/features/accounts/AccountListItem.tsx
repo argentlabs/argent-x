@@ -1,6 +1,6 @@
-import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
-import { Circle, Flex, Image, Text, Tooltip, chakra } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { H6, P4, icons, typographyStyles } from "@argent/ui"
+import { Circle, Flex, Text, Tooltip, chakra } from "@chakra-ui/react"
+import { FC } from "react"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"
 import {
@@ -9,12 +9,13 @@ import {
 } from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { formatTruncatedAddress } from "../../services/addresses"
-import { getEscapeDisplayAttributes } from "../shield/escape/EscapeBanner"
-import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
+import { AccountAvatar } from "./AccountAvatar"
+import { AccountLabel } from "./AccountLabel"
+import { AccountListItemShieldBadgeContainer } from "./AccountListItemShieldBadgeContainer"
+import { AccountListItemUpgradeBadge } from "./AccountListItemUpgradeBadge"
 import { getNetworkAccountImageUrl } from "./accounts.service"
-import { useAccount } from "./accounts.state"
 
-const { LinkIcon, ViewIcon, UpgradeIcon, ArgentShieldIcon } = icons
+const { LinkIcon, ViewIcon } = icons
 
 export interface AccountListItemProps extends CustomButtonCellProps {
   accountName: string
@@ -27,42 +28,9 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   connectedHost?: string
   hidden?: boolean
   avatarOutlined?: boolean
+  avatarSize?: number
   isShield?: boolean
-}
-
-interface AccountAvatarProps extends ComponentProps<"img"> {
-  outlined?: boolean
-}
-
-export const AccountAvatar: FC<AccountAvatarProps> = ({
-  outlined,
-  children,
-  ...rest
-}) => {
-  return (
-    <Flex position={"relative"} flexShrink={0}>
-      <Image borderRadius={"full"} width={12} height={12} {...rest} />
-      {outlined && (
-        <>
-          <Circle
-            position={"absolute"}
-            top={0}
-            size={12}
-            borderWidth={"0.25rem"}
-            borderColor={"black"}
-          />
-          <Circle
-            position={"absolute"}
-            top={0}
-            size={12}
-            borderWidth={"0.125rem"}
-            borderColor={"white"}
-          />
-        </>
-      )}
-      {children}
-    </Flex>
-  )
+  isRemovedFromMultisig?: boolean
 }
 
 const NetworkStatusWrapper = chakra(Flex, {
@@ -76,71 +44,6 @@ const NetworkStatusWrapper = chakra(Flex, {
   },
 })
 
-export const AccountListItemUpgradeBadge: FC = () => (
-  <Tooltip label="This account needs to be upgraded">
-    <Circle
-      position={"absolute"}
-      right={-0.5}
-      bottom={-0.5}
-      size={5}
-      bg={"primary.500"}
-      border={"2px solid"}
-      borderColor={"neutrals.800"}
-      color={"neutrals.800"}
-      fontSize={"2xs"}
-    >
-      <UpgradeIcon />
-    </Circle>
-  </Tooltip>
-)
-
-type AccountListItemShieldBadgeProps = Pick<
-  AccountListItemProps,
-  "accountAddress" | "networkId"
->
-
-export const AccountListItemShieldBadge: FC<
-  AccountListItemShieldBadgeProps
-> = ({ accountAddress, networkId }) => {
-  const account = useAccount({ address: accountAddress, networkId })
-  const liveAccountEscape = useLiveAccountEscape(account)
-  if (liveAccountEscape) {
-    const { colorScheme, title } = getEscapeDisplayAttributes(liveAccountEscape)
-    return (
-      <Tooltip label={title}>
-        <Circle
-          position={"absolute"}
-          right={-0.5}
-          bottom={-0.5}
-          size={5}
-          bg={`${colorScheme}.500`}
-          border={"2px solid"}
-          borderColor={"neutrals.800"}
-          color={"neutrals.900"}
-          fontSize={"2xs"}
-        >
-          <ArgentShieldIcon />
-        </Circle>
-      </Tooltip>
-    )
-  }
-  return (
-    <Tooltip label="This account is protected by Argent Shield 2FA">
-      <Circle
-        position={"absolute"}
-        right={-0.5}
-        bottom={-0.5}
-        size={5}
-        bg={"neutrals.800"}
-        color={"white"}
-        fontSize={"2xs"}
-      >
-        <ArgentShieldIcon />
-      </Circle>
-    </Tooltip>
-  )
-}
-
 export const AccountListItem: FC<AccountListItemProps> = ({
   accountName,
   accountAddress,
@@ -153,13 +56,15 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   connectedHost,
   hidden,
   avatarOutlined,
+  avatarSize,
+  isRemovedFromMultisig,
   children,
   ...rest
 }) => {
   const avatarBadge = upgrade ? (
     <AccountListItemUpgradeBadge />
   ) : isShield ? (
-    <AccountListItemShieldBadge
+    <AccountListItemShieldBadgeContainer
       accountAddress={accountAddress}
       networkId={networkId}
     />
@@ -168,11 +73,12 @@ export const AccountListItem: FC<AccountListItemProps> = ({
     <CustomButtonCell {...rest}>
       <AccountAvatar
         outlined={avatarOutlined}
+        size={avatarSize}
         src={getNetworkAccountImageUrl({
           accountName,
           accountAddress,
           networkId,
-          backgroundColor: hidden ? "333332" : undefined,
+          backgroundColor: hidden ? "#333332" : undefined,
         })}
       >
         {avatarBadge}
@@ -188,26 +94,15 @@ export const AccountListItem: FC<AccountListItemProps> = ({
             <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
             </H6>
-            {accountType !== "argent" && (
-              <L2
-                backgroundColor={"neutrals.900"}
-                px={1}
-                py={0.5}
-                textTransform="uppercase"
-                fontWeight={"extrabold"}
-                color={"neutrals.200"}
-                borderRadius={"base"}
-                border={"1px solid"}
-                borderColor={"neutrals.700"}
-              >
-                {accountType === "argent-plugin" && "Plugin"}
-                {accountType === "argent-better-multicall" && "Better MC"}
-              </L2>
-            )}
+            {accountType && <AccountLabel accountType={accountType} />}
           </Flex>
           <Flex gap={2} color={"neutrals.300"}>
             <P4 fontWeight={"semibold"}>
-              {formatTruncatedAddress(accountAddress)}
+              {isRemovedFromMultisig ? (
+                <>Removed from multisig</>
+              ) : (
+                formatTruncatedAddress(accountAddress)
+              )}
             </P4>
             {networkName && <P4 noOfLines={1}>{networkName}</P4>}
           </Flex>

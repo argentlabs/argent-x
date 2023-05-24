@@ -1,42 +1,50 @@
 import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
-import { FC } from "react"
-import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { FC, ReactEventHandler } from "react"
 
-import { useAppState } from "../../app.state"
-import { routes, useReturnTo } from "../../routes"
-import { AccountListHiddenScreenItem } from "./AccountListHiddenScreenItem"
-import { isHiddenAccount, useAccountsOnNetwork } from "./accounts.state"
+import { PendingMultisig } from "../../../shared/multisig/types"
+import { WalletAccount } from "../../../shared/wallet.model"
+import { PendingMultisigListItem } from "../multisig/PendingMultisigListItem"
+import { AccountListItem } from "./AccountListItem"
 
-export const AccountListHiddenScreen: FC = () => {
-  const { networkId } = useParams()
-  const { switcherNetworkId } = useAppState()
-  const navigate = useNavigate()
+interface AccountListHiddenScreenProps {
+  onBack: ReactEventHandler
+  hiddenAccounts: WalletAccount[]
+  hiddenPendingMultisigAccounts: PendingMultisig[]
+  onUnhideAccount: (account: WalletAccount) => void
+  onUnhidePendingMultisig: (pendingMultisig: PendingMultisig) => void
+}
 
-  const hiddenAccounts = useAccountsOnNetwork({
-    showHidden: true,
-    networkId: networkId ?? switcherNetworkId,
-  }).filter(isHiddenAccount)
-
-  const returnTo = useReturnTo()
-
-  const hasHiddenAccounts = hiddenAccounts.length > 0
-  if (!hasHiddenAccounts) {
-    return <Navigate to={returnTo ? returnTo : routes.accounts()} />
-  }
+export const AccountListHiddenScreen: FC<AccountListHiddenScreenProps> = ({
+  onBack,
+  hiddenAccounts = [],
+  hiddenPendingMultisigAccounts = [],
+  onUnhideAccount,
+  onUnhidePendingMultisig,
+}) => {
   return (
     <NavigationContainer
       title={"Hidden Accounts"}
-      leftButton={
-        <BarBackButton
-          onClick={() => navigate(returnTo ? returnTo : routes.accounts())}
-        />
-      }
+      leftButton={<BarBackButton onClick={onBack} />}
     >
       <CellStack>
         {hiddenAccounts.map((account) => (
-          <AccountListHiddenScreenItem
+          <AccountListItem
             key={account.address}
-            account={account}
+            accountName={account.name}
+            accountAddress={account.address}
+            networkId={account.networkId}
+            hidden
+            onClick={() => onUnhideAccount(account)}
+          />
+        ))}
+        {hiddenPendingMultisigAccounts.map((pendingMultisig) => (
+          <PendingMultisigListItem
+            key={pendingMultisig.publicKey}
+            accountName={pendingMultisig.name}
+            publicKey={pendingMultisig.publicKey}
+            networkId={pendingMultisig.networkId}
+            hidden
+            onClick={() => onUnhidePendingMultisig(pendingMultisig)}
           />
         ))}
       </CellStack>

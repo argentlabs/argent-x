@@ -8,5 +8,9 @@
     "**/.{idea,git,cache,output,temp}/**"
   ],
   "vitest.enable": true,
-  "vitest.commandLine": "npx vitest -r packages/extension/"
+  "vitest.commandLine": "npx vitest -r packages/extension/",
+  "explorer.fileNesting.patterns": {
+    "*.tsx": "${capture}.ts, ${capture}.typegen.ts, ${capture}Container.tsx, ${capture}.container.tsx, ${capture}.test.tsx, ${capture}.spec.tsx, ${capture}.test.ts, ${capture}.spec.ts",
+    "*.ts": "${capture}.ts, ${capture}.typegen.ts, ${capture}Container.tsx, ${capture}.container.tsx, ${capture}.test.tsx, ${capture}.spec.tsx, ${capture}.test.ts, ${capture}.spec.ts"
+  }
 }
