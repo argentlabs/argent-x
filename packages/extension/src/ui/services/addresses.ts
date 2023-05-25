@@ -1,3 +1,4 @@
+import { memoize } from "lodash-es"
 import {
   constants,
   getChecksumAddress,
@@ -9,27 +10,38 @@ import * as yup from "yup"
 
 export const normalizeAddress = (address: string) => getChecksumAddress(address)
 
-export const formatTruncatedAddress = (address: string) => {
+export const formatTruncatedSignerKey = memoize((signerKey: string) => {
+  const start = signerKey.slice(0, 6)
+  const end = signerKey.slice(-4)
+  return `${start}…${end}`
+})
+
+export const formatTruncatedAddress = memoize((address: string) => {
   const normalized = normalizeAddress(address)
   const hex = normalized.slice(0, 2)
   const start = normalized.slice(2, 6)
   const end = normalized.slice(-4)
   return `${hex}${start}…${end}`
-}
+})
 
-export const formatFullAddress = (address: string) => {
+export const formatFullAddress = memoize((address: string) => {
   const normalized = normalizeAddress(address)
   const hex = normalized.slice(0, 2)
   const rest = normalized.slice(2)
   const parts = rest.match(/.{1,4}/g) || []
   return `${hex} ${parts.join(" ")}`
-}
+})
 
-const isChecksumAddress = (address: string) => {
+const isChecksumAddress = memoize((address: string) => {
   if (/^0x[0-9a-f]{63,64}$/.test(address)) {
     return false
   }
   return true
+})
+
+export const isStarknetId = (address: string) => {
+  const starkNetIdRegex = /^[a-zA-Z0-9]+\.stark$/
+  return starkNetIdRegex.test(address)
 }
 
 export const isStarknetId = (address: string) => {

@@ -1,10 +1,7 @@
+import { chakra } from "@chakra-ui/react"
 import { FC } from "react"
-import styled from "styled-components"
 
-import {
-  KnownDapp,
-  getKnownDappForContractAddress,
-} from "../../../../../shared/knownDapps"
+import { KnownDapp } from "../../../../../shared/knownDapps"
 import {
   Field,
   FieldKey,
@@ -14,31 +11,16 @@ import {
 import { DappIcon } from "../../connectDapp/DappIcon"
 import { useDappDisplayAttributes } from "../../connectDapp/useDappDisplayAttributes"
 
-const DappFieldValue = styled(FieldValue)`
-  margin-left: 8px;
-`
+const DappFieldValue = chakra(FieldValue, {
+  baseStyle: { marginLeft: 2 },
+})
 
-const DappIconContainer = styled.div`
-  width: 24px;
-  height: 24px;
-  display: flex;
-  flex-shrink: 0;
-`
-
-export const MaybeDappContractField: FC<{ contractAddress: string }> = ({
-  contractAddress,
-}) => {
-  const knownContract = getKnownDappForContractAddress(contractAddress)
-  if (!knownContract) {
-    return null
-  }
-  return <DappContractField knownContract={knownContract} />
-}
-
-export const DappContractField: FC<{
+interface DappContractFieldProps {
   knownContract: Omit<KnownDapp, "contracts">
   useDappDisplayAttributesImpl?: typeof useDappDisplayAttributes
-}> = ({
+}
+
+export const DappContractField: FC<DappContractFieldProps> = ({
   knownContract,
   useDappDisplayAttributesImpl = useDappDisplayAttributes,
 }) => {
@@ -48,12 +30,11 @@ export const DappContractField: FC<{
     <Field>
       <FieldKey>Dapp</FieldKey>
       <DappFieldValue>
-        <DappIconContainer>
-          <DappIcon
-            host={host}
-            useDappDisplayAttributesImpl={useDappDisplayAttributesImpl}
-          />
-        </DappIconContainer>
+        <DappIcon
+          host={host}
+          useDappDisplayAttributesImpl={useDappDisplayAttributesImpl}
+          size={6}
+        />
         <LeftPaddedField>
           {dappDisplayAttributes?.title || host}
         </LeftPaddedField>

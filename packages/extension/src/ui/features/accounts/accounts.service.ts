@@ -1,3 +1,6 @@
+/**
+ * All of this file should probably go into the data model for accounts, either as a field which gets updated from a worker, or as a computed field, if we have such a concept.
+ */
 import { ethers } from "ethers"
 import { number } from "starknet"
 import useSWR from "swr"
@@ -6,20 +9,12 @@ import { updateAccountDetails } from "../../../shared/account/update"
 import { generateAvatarImage } from "../../../shared/avatarImage"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
-import { startSession } from "../../services/backgroundSessions"
 import { withPolling } from "../../services/swr"
+import { allAccountsView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import { Account } from "./Account"
-import { useAccounts } from "./accounts.state"
 
 const { toBN } = number
-
-export const createAccount = async (networkId: string, password?: string) => {
-  if (password) {
-    await startSession(password)
-  }
-
-  return Account.create(networkId)
-}
 
 const argentColorsArray = [
   "02BBA8",
@@ -102,7 +97,7 @@ export const getStatus = (
 /** periodically check ALL accounts for escape+guardian status so we can alert user to relevant changes */
 
 export const useUpdateAccountsOnChainEscapeState = () => {
-  const allAccounts = useAccounts({ showHidden: true, allNetworks: true })
+  const allAccounts = useView(allAccountsView)
   return useSWR(
     "useUpdateAccountsOnChainEscapeState",
     async () => {

@@ -1,4 +1,4 @@
-import type { typedData } from "starknet"
+import type { Signature, typedData } from "starknet"
 
 import { ExtensionActionItem } from "../actionQueue/types"
 
@@ -15,5 +15,5 @@ export type ActionMessage =
   | { type: "SIGNATURE_FAILURE"; data: { actionHash: string } }
   | {
       type: "SIGNATURE_SUCCESS"
-      data: { r: string; s: string; actionHash: string }
+      data: { signature: Signature; actionHash: string }
     }

@@ -20,7 +20,7 @@ export const jwtFetcher = async <T>(
   }
   const fetcher = fetcherWithArgentApiHeaders()
   try {
-    return fetcher<T>(input, initWithArgentJwtHeaders)
+    return await fetcher<T>(input, initWithArgentJwtHeaders)
   } catch (error) {
     IS_DEV && console.warn(coerceErrorToString(error))
     throw error

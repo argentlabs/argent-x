@@ -1,33 +1,36 @@
 import { DappIcon } from "@argent-x/extension/src/ui/features/actions/connectDapp/DappIcon"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
+import { ComponentProps } from "react"
 
 export default {
-  title: "components/DappIcon",
   component: DappIcon,
-} as ComponentMeta<typeof DappIcon>
-
-const Template: ComponentStory<typeof DappIcon> = (props) => (
-  <div style={{ width: "100px", height: "100px" }}>
-    <DappIcon {...props}></DappIcon>
-  </div>
-)
-
-export const Default = Template.bind({})
-Default.args = {
-  host: "app.testnet.jediswap.xyz",
 }
 
-export const BitmapBox = Template.bind({})
-BitmapBox.args = {
-  host: "www.bitmapbox.xyz",
+export const Default = {
+  render: (props: ComponentProps<typeof DappIcon>) => (
+    <DappIcon size={24} {...props}></DappIcon>
+  ),
+  args: {
+    host: "app.testnet.jediswap.xyz",
+  },
 }
 
-export const Briq = Template.bind({})
-Briq.args = {
-  host: "briq.construction",
+export const BitmapBox = {
+  ...Default,
+  args: {
+    host: "www.bitmapbox.xyz",
+  },
 }
 
-export const MintSquare = Template.bind({})
-MintSquare.args = {
-  host: "mintsquare.io",
+export const Briq = {
+  ...Default,
+  args: {
+    host: "briq.construction",
+  },
+}
+
+export const MintSquare = {
+  ...Default,
+  args: {
+    host: "mintsquare.io",
+  },
 }

@@ -37,11 +37,7 @@ export const usePageTracking = <T extends keyof Pages>(
   ...rest: Pages[T] extends undefined ? [data?: Pages[T]] : [data: Pages[T]]
 ) => {
   useEffect(() => {
-    try {
-      analytics.page(name, ...rest)
-    } catch (e) {
-      // nothing of this should be blocking
-    }
+    analytics.page(name, ...rest)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, rest[0]]) // as React in strict mode renders every component twice, this page will be tracked 2x in development. This is not the case in production.
 }

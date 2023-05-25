@@ -144,6 +144,6 @@ export class ArgentXAccount extends Account {
       throw Error("User action timed out")
     }
 
-    return [result.r, result.s]
+    return result.signature
   }
 }

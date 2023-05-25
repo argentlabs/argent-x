@@ -1,6 +1,5 @@
 import { icons } from "@argent/ui"
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { FC } from "react"
 
 const { DropdownDownIcon } = icons
@@ -31,16 +30,14 @@ const MenuStory: FC = (props) => (
 )
 
 export default {
-  title: "components/Menu",
   component: MenuStory,
-} as ComponentMeta<typeof MenuStory>
+}
 
-const Template: ComponentStory<typeof MenuStory> = (props) => (
-  <MenuStory {...props}></MenuStory>
-)
+export const Default = {
+  args: {},
+}
 
-export const Default = Template.bind({})
-Default.args = {}
-
-export const Disabled = Template.bind({})
-Disabled.args = { isDisabled: true }
+export const Disabled = {
+  ...Default,
+  args: { isDisabled: true },
+}

@@ -8,9 +8,13 @@ export default defineConfig({
   plugins: [
     dts({
       insertTypesEntry: true,
+      tsConfigFilePath: resolvePath(__dirname, "tsconfig.json"),
     }),
     react(),
   ],
+  optimizeDeps: {
+    include: ["starknet"],
+  },
   test: {
     globals: true,
     setupFiles: "test/setup.ts",
@@ -51,6 +55,7 @@ export default defineConfig({
         "react",
         "react-dom",
         "react-router-dom",
+        "starknet",
         "react/jsx-runtime",
         "@chakra-ui/react",
         "@chakra-ui/anatomy",
@@ -63,6 +68,7 @@ export default defineConfig({
       output: {
         globals: {
           react: "React",
+          starknet: "starknet",
           "react-dom": "ReactDOM",
           "react-router-dom": "ReactRouterDOM",
           "react/jsx-runtime": "ReactJSXRuntime",

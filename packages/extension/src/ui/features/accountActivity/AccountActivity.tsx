@@ -66,7 +66,7 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
 }) => {
   const navigate = useNavigate()
   if (isActivityTransaction(transaction)) {
-    const { hash, isRejected } = transaction
+    const { hash, isRejected, isCancelled } = transaction
     const transactionTransformed = transformTransaction({
       transaction,
       accountAddress: account.address,
@@ -80,6 +80,7 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
           transactionTransformed={transactionTransformed}
           network={account.network}
           onClick={() => navigate(routes.transactionDetail(hash))}
+          isCancelled={isCancelled}
         >
           {isRejected ? (
             <div style={{ display: "flex" }}>

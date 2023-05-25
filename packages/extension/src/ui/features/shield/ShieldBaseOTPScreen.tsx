@@ -142,63 +142,67 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
           <Center>
             <form
               ref={formRef}
-              onSubmit={handleSubmit(async ({ otp }) => {
-                try {
-                  await confirmEmail(otp)
-
-                  /** always check the account can be used and exists in backend */
-                  await shieldValidateAccount()
-                  await shieldAddAccount()
-
-                  /** successfully verifified and added account with backend - persist this email in the local db */
-                  await updateVerifiedEmail(email)
-
-                  onOTPConfirmed()
-                } catch (e) {
-                  /** Email validation error */
-                  const shieldError =
-                    getShieldValidationErrorFromBackendError(e)
-                  if (shieldError) {
-                    return setShieldValdationError(shieldError)
-                  }
-                  /** Other possible error status from backend */
+              onSubmit={(e) => {
+                e.preventDefault()
+                void handleSubmit(async ({ otp }) => {
                   try {
-                    const errorObject = z
-                      .object({
-                        message: z.string(),
-                      })
-                      .parse(e)
-                    const error = emailVerificationStatusErrorSchema.safeParse(
-                      JSON.parse(errorObject.message),
-                    )
-                    if (error.success) {
-                      if (error.data.responseJson.status === "notRequested") {
-                        /** need to start verification over again */
-                        toast({
-                          title: "Please re-enter email",
-                          status: "error",
-                          duration: 3000,
-                        })
-                        onOTPReEnterEmail()
-                      } else {
-                        return setError("otp", {
-                          type: "manual",
-                          message: getVerificationErrorMessage(
-                            error.data.responseJson
-                              .status as EmailVerificationStatus,
-                          ),
-                        })
-                      }
+                    await confirmEmail(otp)
+
+                    /** always check the account can be used and exists in backend */
+                    await shieldValidateAccount()
+                    await shieldAddAccount()
+
+                    /** successfully verifified and added account with backend - persist this email in the local db */
+                    await updateVerifiedEmail(email)
+
+                    onOTPConfirmed()
+                  } catch (e) {
+                    /** Email validation error */
+                    const shieldError =
+                      getShieldValidationErrorFromBackendError(e)
+                    if (shieldError) {
+                      return setShieldValdationError(shieldError)
                     }
-                  } catch {
-                    // couldn't parse the error
+                    /** Other possible error status from backend */
+                    try {
+                      const errorObject = z
+                        .object({
+                          message: z.string(),
+                        })
+                        .parse(e)
+                      const error =
+                        emailVerificationStatusErrorSchema.safeParse(
+                          JSON.parse(errorObject.message),
+                        )
+                      if (error.success) {
+                        if (error.data.responseJson.status === "notRequested") {
+                          /** need to start verification over again */
+                          toast({
+                            title: "Please re-enter email",
+                            status: "error",
+                            duration: 3000,
+                          })
+                          onOTPReEnterEmail()
+                        } else {
+                          return setError("otp", {
+                            type: "manual",
+                            message: getVerificationErrorMessage(
+                              error.data.responseJson
+                                .status as EmailVerificationStatus,
+                            ),
+                          })
+                        }
+                      }
+                    } catch {
+                      // couldn't parse the error
+                    }
+                    return setError("otp", {
+                      type: "manual",
+                      message: "Unknown error - please try again later",
+                    })
                   }
-                  return setError("otp", {
-                    type: "manual",
-                    message: "Unknown error - please try again later",
-                  })
-                }
-              })}
+                })(e)
+              }}
             >
               <HStack spacing={1.5}>
                 <ControlledPinInput
@@ -230,7 +234,7 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
           <Center flexDirection={"column"}>
             <Button
               mt={8}
-              onClick={onResendEmail}
+              onClick={(e) => void onResendEmail(e)}
               size="2xs"
               colorScheme="transparent"
               color="neutrals.400"

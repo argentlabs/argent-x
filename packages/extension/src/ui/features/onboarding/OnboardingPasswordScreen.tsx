@@ -1,163 +1,116 @@
-import { FC, useCallback, useMemo, useState } from "react"
+import { Box, FormControl } from "@chakra-ui/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { FC, MouseEventHandler, useMemo } from "react"
 import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import { z } from "zod"
 
-import { useAppState } from "../../app.state"
-import { StyledControlledInput } from "../../components/InputText"
-import { routes } from "../../routes"
-import {
-  analytics,
-  usePageTracking,
-  useTimeSpentWithSuccessTracking,
-} from "../../services/analytics"
-import { selectAccount } from "../../services/backgroundAccounts"
-import { FormError } from "../../theme/Typography"
-import { createAccount } from "../accounts/accounts.service"
-import { validatePassword } from "../recovery/seedRecovery.state"
+import { AllowPromise } from "../../../shared/storage/types"
+import { ControlledInput } from "../../components/ControlledInput"
+import { passwordSchema } from "../recovery/seedRecovery.state"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-self: stretch;
-`
-
-const StyledOnboardingButton = styled(OnboardingButton)`
-  margin-top: 20px;
-`
-
-interface FieldValues {
-  password: string
-  repeatPassword: string
-}
-
-interface NewWalletScreenProps {
-  overrideSubmit?: (values: { password: string }) => Promise<void>
-  overrideTitle?: string
-  overrideSubmitText?: string
-}
-
-export const OnboardingPasswordScreen: FC<NewWalletScreenProps> = ({
-  overrideSubmit,
-  overrideTitle,
-  overrideSubmitText,
-}) => {
-  usePageTracking("createWallet")
-  const { trackSuccess } = useTimeSpentWithSuccessTracking(
-    "onboardingStepFinished",
-    { stepId: "newWalletPassword" },
-  )
-  const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const { control, handleSubmit, formState, watch } = useForm<FieldValues>({
-    criteriaMode: "firstError",
+const setPasswordFormSchema = z
+  .object({
+    password: passwordSchema,
+    repeatPassword: z.string(), // not using passwordSchema here, as we want to show a different error message
   })
-  const { errors, isDirty } = formState
-  const [isDeploying, setIsDeploying] = useState(false)
-  const [deployFailed, setDeployFailed] = useState(false)
+  .refine((data) => data.password === data.repeatPassword, {
+    message: "Passwords do not match",
+    path: ["repeatPassword"],
+  })
 
-  const password = watch("password")
+type PasswordForm = z.infer<typeof setPasswordFormSchema>
 
-  const handleDeploy = useCallback(
-    async (password?: string) => {
-      if (!password) {
-        return
-      }
-      if (overrideSubmit) {
-        useAppState.setState({ isLoading: true })
-        await overrideSubmit({ password })
-        useAppState.setState({ isLoading: false })
-      } else {
-        setIsDeploying(true)
-        setDeployFailed(false)
-        try {
-          const newAccount = await createAccount(switcherNetworkId, password)
-          selectAccount(newAccount)
-          analytics.track("createWallet", {
-            status: "success",
-            networkId: newAccount.networkId,
-          })
-          setIsDeploying(false)
-          trackSuccess()
-          navigate(routes.onboardingFinish.path, { replace: true })
-        } catch (error: any) {
-          analytics.track("createWallet", {
-            status: "failure",
-            errorMessage: error.message,
-            networkId: switcherNetworkId,
-          })
-          setIsDeploying(false)
-          setDeployFailed(true)
-        }
-      }
+export interface OnboardingPasswordScreenProps {
+  title?: string
+  submitText?: {
+    start: string
+    submitting: string
+    retryAfterError: string
+  }
+  onSubmit: (password: string) => AllowPromise<void>
+  onBack?: MouseEventHandler
+}
+
+export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
+  title = "Password",
+  submitText,
+  onBack,
+  onSubmit,
+}) => {
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm<PasswordForm>({
+    criteriaMode: "firstError",
+    resolver: zodResolver(setPasswordFormSchema),
+    defaultValues: {
+      password: "",
+      repeatPassword: "",
     },
-    [navigate, overrideSubmit, switcherNetworkId, trackSuccess],
+  })
+
+  const submitButtonText = useMemo(
+    () =>
+      errors.root?.message
+        ? submitText?.retryAfterError ?? "Retry create wallet"
+        : isSubmitting
+        ? submitText?.submitting ?? "Creating wallet…"
+        : submitText?.start ?? "Create wallet",
+    [isSubmitting, errors.root?.message, submitText],
   )
 
-  const buttonText = useMemo(() => {
-    if (overrideSubmitText) {
-      return overrideSubmitText
+  const handleForm = handleSubmit(async ({ password }) => {
+    try {
+      await onSubmit(password)
+    } catch (error) {
+      setError("root", { message: "Something went wrong" })
     }
-    if (isDeploying) {
-      return "Creating wallet…"
-    }
-    return deployFailed ? "Retry create wallet" : "Create wallet"
-  }, [deployFailed, isDeploying, overrideSubmitText])
+  })
 
   return (
     <OnboardingScreen
-      back
+      onBack={onBack}
       length={4}
       currentIndex={2}
-      title={overrideTitle || "New wallet"}
+      title={title}
       subtitle="Enter a password to protect your wallet"
     >
-      <Form onSubmit={handleSubmit(({ password }) => handleDeploy(password))}>
-        <StyledControlledInput
+      <FormControl
+        as="form"
+        display={"flex"}
+        flexDirection={"column"}
+        gap={3}
+        onSubmit={handleForm}
+      >
+        <ControlledInput
           name="password"
           control={control}
-          defaultValue=""
-          rules={{ required: true, validate: validatePassword }}
           autoFocus
           type="password"
           placeholder="Password"
-          disabled={isDeploying}
-          variant="neutrals800"
+          isDisabled={isSubmitting}
         />
-        {errors.password?.type === "required" && (
-          <FormError>A new password is required</FormError>
-        )}
-        {errors.password?.type === "validate" && (
-          <FormError>Password is too short</FormError>
-        )}
-        <StyledControlledInput
+        <ControlledInput
           name="repeatPassword"
           control={control}
-          defaultValue=""
-          rules={{ validate: (x) => x === password }}
           type="password"
           placeholder="Repeat password"
-          disabled={isDeploying}
-          variant="neutrals800"
+          isDisabled={isSubmitting}
         />
-        {errors.repeatPassword?.type === "validate" && (
-          <FormError>Passwords do not match</FormError>
-        )}
-        {deployFailed && (
-          <FormError>
-            Sorry, unable to create wallet. Please try again later.
-          </FormError>
-        )}
-        <StyledOnboardingButton
-          type="submit"
-          disabled={!isDirty || isDeploying}
-        >
-          {buttonText}
-        </StyledOnboardingButton>
-      </Form>
+        <Box>
+          <OnboardingButton
+            mt={5}
+            type="submit"
+            isDisabled={!isDirty || isSubmitting}
+          >
+            {submitButtonText}
+          </OnboardingButton>
+        </Box>
+      </FormControl>
     </OnboardingScreen>
   )
 }

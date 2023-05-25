@@ -20,6 +20,7 @@ import {
   shieldIsTokenExpired,
 } from "../../../shared/shield/register"
 import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
+import { coerceErrorToString } from "../../../shared/utils/error"
 import { useSelectedAccount } from "../accounts/accounts.state"
 import { WithArgentServicesEnabled } from "../settings/WithArgentServicesEnabled"
 import { useShieldState } from "./shield.state"
@@ -39,6 +40,7 @@ enum ArgentShieldVerifiedState {
   VERIFY_OTP = "VERIFY_OTP",
   VERIFIED = "VERIFIED",
   USER_ABORTED = "USER_ABORTED",
+  ERROR = "ERROR",
 }
 
 /**
@@ -77,6 +79,7 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
   const navigate = useNavigate()
   const hasGuardian = Boolean(account?.guardian)
   const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
+  const [error, setError] = useState<string>()
 
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
   const [state, setState] = useState(
@@ -149,7 +152,7 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
   // update state
 
   useEffect(() => {
-    ;(async () => {
+    void (async () => {
       if (hasGuardian) {
         if (cosignNotRequired || accountGuardianIsSelf) {
           setState(ArgentShieldVerifiedState.NOT_REQUIRED)
@@ -169,8 +172,16 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
             : await shieldIsTokenExpired()
           if (isTokenExpired) {
             // need to re-verify existing email
-            await requestEmail(verifiedEmail)
-            setState(ArgentShieldVerifiedState.VERIFY_OTP)
+            try {
+              await resetDevice()
+              await requestEmail(verifiedEmail)
+              setState(ArgentShieldVerifiedState.VERIFY_OTP)
+            } catch (error) {
+              console.error(coerceErrorToString(error))
+
+              setError(coerceErrorToString(error))
+              setState(ArgentShieldVerifiedState.ERROR)
+            }
           } else {
             setState(ArgentShieldVerifiedState.VERIFIED)
           }
@@ -230,5 +241,8 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
     case ArgentShieldVerifiedState.VERIFIED:
     case ArgentShieldVerifiedState.USER_ABORTED:
       return <>{children}</>
+
+    case ArgentShieldVerifiedState.ERROR:
+      throw new Error(error) // should be caught by error boundary
   }
 }

@@ -16,6 +16,7 @@ export type TransformedTransactionAction =
   | "DEPLOY"
   | "ADD"
   | "REMOVE"
+  | "CHANGE"
 
 export type TransformedTransactionEntity =
   | "UNKNOWN"
@@ -25,6 +26,8 @@ export type TransformedTransactionEntity =
   | "NFT"
   | "CONTRACT"
   | "GUARDIAN"
+  | "SIGNER"
+  | "THRESHOLD"
 
 export interface BaseTransformedTransaction {
   action: TransformedTransactionAction
@@ -107,6 +110,18 @@ export interface ChangeGuardianTransaction extends BaseTransformedTransaction {
   entity: "GUARDIAN"
 }
 
+export interface ChangeMultisigSignerTransaction
+  extends BaseTransformedTransaction {
+  action: "ADD" | "REMOVE"
+  entity: "SIGNER"
+}
+
+export interface ChangeMultisigThresholdTransaction
+  extends BaseTransformedTransaction {
+  action: "CHANGE"
+  entity: "THRESHOLD"
+}
+
 export type TransformedTransaction =
   | BaseTransformedTransaction
   | TokenTransferTransaction
@@ -118,3 +133,5 @@ export type TransformedTransaction =
   | DeclareContractTransaction
   | DeployContractTransaction
   | ChangeGuardianTransaction
+  | ChangeMultisigSignerTransaction
+  | ChangeMultisigThresholdTransaction

@@ -12,7 +12,7 @@ import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
 const { MoreIcon } = icons
 

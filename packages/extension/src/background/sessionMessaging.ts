@@ -1,7 +1,7 @@
 import { compactDecrypt } from "jose"
-import { encode } from "starknet"
 
 import { SessionMessage } from "../shared/messages/SessionMessage"
+import { bytesToUft8 } from "../shared/utils/encode"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
@@ -19,7 +19,7 @@ export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
         throw Error("session can only be started with encryption")
       }
       const { plaintext } = await compactDecrypt(body, privateKey)
-      const sessionPassword = encode.arrayBufferToString(plaintext)
+      const sessionPassword = bytesToUft8(plaintext)
       const result = await wallet.startSession(sessionPassword, (percent) => {
         respond({ type: "LOADING_PROGRESS", data: percent })
       })
@@ -36,7 +36,7 @@ export const handleSessionMessage: HandleMessage<SessionMessage> = async ({
     case "CHECK_PASSWORD": {
       const { body } = msg.data
       const { plaintext } = await compactDecrypt(body, privateKey)
-      const password = encode.arrayBufferToString(plaintext)
+      const password = bytesToUft8(plaintext)
       if (await wallet.checkPassword(password)) {
         return sendMessageToUi({ type: "CHECK_PASSWORD_RES" })
       }

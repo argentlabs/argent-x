@@ -23,11 +23,12 @@ const accountAddress =
 const makeTransaction = (transactions: Call | Call[]): Transaction => {
   return {
     account: {
+      name: "Account 1",
       address: accountAddress,
-      type: "argent",
+      type: "standard",
       network: {
         accountClassHash: {
-          argentAccount:
+          standard:
             "0x389a968f62e344b2e08a50e091987797a74b34840840022fd797769230a9d3f",
         },
         baseUrl: "https://alpha4.starknet.io",
@@ -38,6 +39,7 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
           "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
         name: "Goerli Testnet",
         readonly: true,
+        status: "unknown",
       },
       networkId: "goerli-alpha",
       signer: {
@@ -231,7 +233,7 @@ describe("transformTransaction", () => {
         {
           "action": "ADD",
           "date": "2022-09-01T15:47:40.000Z",
-          "displayName": "Add Argent Shield",
+          "displayName": "Activate Argent Shield",
           "entity": "GUARDIAN",
         }
       `)
@@ -243,7 +245,7 @@ describe("transformTransaction", () => {
         {
           "action": "REMOVE",
           "date": "2022-09-01T15:47:40.000Z",
-          "displayName": "Remove Argent Shield",
+          "displayName": "Deactivate Argent Shield",
           "entity": "GUARDIAN",
         }
       `)

@@ -1,7 +1,7 @@
 import { ListItem, OrderedList } from "@chakra-ui/react"
 
 export default {
-  title: "components/List",
+  component: OrderedList,
 }
 
 export const Ordered = () => (

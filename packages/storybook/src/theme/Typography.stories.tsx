@@ -17,10 +17,9 @@ import {
   P4,
 } from "@argent/ui"
 import { StackDivider, VStack } from "@chakra-ui/layout"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
 import { FC } from "react"
 
-const TypographyStory: FC = () => {
+const Typography: FC = () => {
   return (
     <VStack
       divider={<StackDivider borderColor="border" />}
@@ -48,18 +47,12 @@ const TypographyStory: FC = () => {
 }
 
 export default {
-  title: "theme/Typography",
-  component: TypographyStory,
+  component: Typography,
   parameters: {
     viewport: {
       defaultViewport: "reset",
     },
   },
-} as ComponentMeta<typeof TypographyStory>
+}
 
-const Template: ComponentStory<typeof TypographyStory> = (props) => (
-  <TypographyStory {...props}></TypographyStory>
-)
-
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {}

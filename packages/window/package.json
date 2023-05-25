@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-window",
-  "version": "5.3.21",
+  "version": "6.3.0",
   "license": "MIT",
   "files": [
     "dist"
@@ -16,7 +16,8 @@
   },
   "scripts": {
     "dev": "vite build --watch",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build": "tsc && vite build",
     "setup": "yarn build"
   },
@@ -32,5 +33,5 @@
     "starknet": "^4.21.0",
     "zod": "^3.20.6"
   },
-  "gitHead": "54c5d4dc549cc4d0ac044f7c0c1c80936becadde"
+  "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"
 }

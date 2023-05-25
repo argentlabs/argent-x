@@ -7,6 +7,7 @@ import styled from "styled-components"
 import { Schema, object } from "yup"
 
 import { AddressBookContact } from "../../../shared/addressBook"
+import { WalletAccount } from "../../../shared/wallet.model"
 import { AddContactBottomSheet } from "../../components/AddContactBottomSheet"
 import { Button } from "../../components/Button"
 import Column, { ColumnCenter } from "../../components/Column"
@@ -34,15 +35,11 @@ import {
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 import { getAddressFromStarkName } from "../../services/useStarknetId"
 import { H3, H5 } from "../../theme/Typography"
-import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
+import { AccountAvatar } from "../accounts/AccountAvatar"
 import { getAccountImageUrl } from "../accounts/accounts.service"
-import { useSelectedAccount } from "../accounts/accounts.state"
 import { AddressBookMenu } from "../accounts/AddressBookMenu"
-import { ProfilePicture } from "../accounts/ProfilePicture"
 import {
   AddressBookRecipient,
   AtTheRateWrapper,
@@ -52,7 +49,7 @@ import {
   StyledAccountAddress,
 } from "../accountTokens/SendTokenScreen"
 import { TokenMenuDeprecated } from "../accountTokens/TokenMenuDeprecated"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { useNfts } from "./useNfts"
 
@@ -94,7 +91,7 @@ export const SendNftSchema: Schema<SendNftInput> = object().required().shape({
 export const SendNftScreen: FC = () => {
   const navigate = useNavigate()
   const { contractAddress, tokenId } = useParams()
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
 
   const { nfts = [] } = useNfts(account)
 
@@ -107,10 +104,8 @@ export const SendNftScreen: FC = () => {
 
   const { id: currentNetworkId } = useCurrentNetwork()
   const [addressBookRecipient, setAddressBookRecipient] = useState<
-    Account | AddressBookContact
+    WalletAccount | AddressBookContact
   >()
-
-  const { accountNames } = useAccountMetadata()
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const [starknetIdLoading, setStarknetIdLoading] = useState(false)
 
@@ -119,9 +114,9 @@ export const SendNftScreen: FC = () => {
       addressBookRecipient
         ? "name" in addressBookRecipient
           ? addressBookRecipient.name
-          : getAccountName(addressBookRecipient, accountNames)
+          : account?.name
         : undefined,
-    [accountNames, addressBookRecipient],
+    [account?.name, addressBookRecipient],
   )
 
   const {
@@ -206,7 +201,9 @@ export const SendNftScreen: FC = () => {
     navigate(routes.accountActivity(), { replace: true })
   }
 
-  const handleAddressSelect = (account?: Account | AddressBookContact) => {
+  const handleAddressSelect = (
+    account?: WalletAccount | AddressBookContact,
+  ) => {
     if (!account) {
       return
     }
@@ -281,36 +278,37 @@ export const SendNftScreen: FC = () => {
                 </NftImageContainer>
               </RowCentered>
               <div>
+                {/** TODO: refactor - same pattern used in SendTokenScreen */}
                 {addressBookRecipient && accountName ? (
-                  <AddressBookRecipient
-                    onDoubleClick={() => setAddressBookRecipient(undefined)}
-                  >
-                    <RowBetween>
-                      <Row gap="16px">
-                        <ProfilePicture
-                          src={getAccountImageUrl(
-                            accountName,
-                            addressBookRecipient,
-                          )}
-                          width="40px"
-                          height="40px"
-                        />
-
-                        <Column>
-                          <H5>{accountName}</H5>
-                          <StyledAccountAddress>
-                            {formatTruncatedAddress(
-                              addressBookRecipient.address,
+                  <>
+                    <AddressBookRecipient
+                      onDoubleClick={() => setAddressBookRecipient(undefined)}
+                    >
+                      <RowBetween>
+                        <Row gap="16px">
+                          <AccountAvatar
+                            src={getAccountImageUrl(
+                              accountName,
+                              addressBookRecipient,
                             )}
-                          </StyledAccountAddress>
-                        </Column>
-                      </Row>
-                      <CloseIconAlt
-                        {...makeClickable(resetAddressBookRecipient)}
-                        style={{ cursor: "pointer" }}
-                      />
-                    </RowBetween>
-                  </AddressBookRecipient>
+                            size={8}
+                          />
+                          <Column>
+                            <H5>{accountName}</H5>
+                            <StyledAccountAddress>
+                              {formatTruncatedAddress(
+                                addressBookRecipient.address,
+                              )}
+                            </StyledAccountAddress>
+                          </Column>
+                        </Row>
+                        <CloseIconAlt
+                          {...makeClickable(resetAddressBookRecipient)}
+                          style={{ cursor: "pointer" }}
+                        />
+                      </RowBetween>
+                    </AddressBookRecipient>
+                  </>
                 ) : (
                   <div ref={ref}>
                     <StyledControlledTextArea

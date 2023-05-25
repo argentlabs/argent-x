@@ -12,10 +12,7 @@ export const defaultReadonlyNetworks = defaultNetworks.filter(
   ({ readonly }) => !!readonly,
 )
 
-export const customNetworksStore = new ArrayStorage<Network>(
-  defaultCustomNetworks,
-  {
-    namespace: "core:customNetworks",
-    compare: equalNetwork,
-  },
-)
+export const allNetworksStore = new ArrayStorage<Network>(defaultNetworks, {
+  namespace: "core:allNetworks",
+  compare: equalNetwork,
+})

@@ -1,17 +1,15 @@
 import { SettingsScreen } from "@argent-x/extension/src/ui/features/settings/SettingsScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "features/SettingsScreen",
   component: SettingsScreen,
-} as ComponentMeta<typeof SettingsScreen>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof SettingsScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <SettingsScreen {...props}></SettingsScreen>
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {
+  args: {},
+}

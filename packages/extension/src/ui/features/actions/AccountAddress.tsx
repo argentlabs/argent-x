@@ -9,7 +9,11 @@ import {
 import { Account } from "../accounts/Account"
 import { AccountAddressField } from "./transaction/fields/AccountAddressField"
 
-const AccountAddress: FC<{ selectedAccount: Account }> = ({
+interface AccountAddressProps {
+  selectedAccount: Account
+}
+
+export const AccountAddress: FC<AccountAddressProps> = ({
   selectedAccount,
 }) => (
   <FieldGroup>
@@ -24,5 +28,3 @@ const AccountAddress: FC<{ selectedAccount: Account }> = ({
     </Field>
   </FieldGroup>
 )
-
-export { AccountAddress }

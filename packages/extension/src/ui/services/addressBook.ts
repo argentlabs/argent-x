@@ -1,11 +1,12 @@
 import { accountNetworkSelector } from "./../../shared/addressBook/selectors"
 import { AddressBookContact, addressBookStore } from "../../shared/addressBook"
 import { useArrayStorage } from "../../shared/storage/hooks"
-import { Account } from "../features/accounts/Account"
-import { useAccounts } from "../features/accounts/accounts.state"
+import { WalletAccount } from "../../shared/wallet.model"
+import { allAccountsView } from "../views/account"
+import { useView } from "../views/implementation/react"
 
 export interface AddressBook {
-  userAccounts: Account[]
+  userAccounts: WalletAccount[]
   contacts: AddressBookContact[]
 }
 
@@ -15,7 +16,8 @@ export const useAddressBook = (networkId?: string): AddressBook => {
     networkId ? accountNetworkSelector(networkId) : undefined,
   )
 
-  const userAccounts = useAccounts()
+  const allUserAccounts = useView(allAccountsView)
+  const userAccounts = allUserAccounts.filter((a) => a.networkId === networkId)
 
   if (!networkId) {
     return { userAccounts, contacts: contactsOnNetwork }

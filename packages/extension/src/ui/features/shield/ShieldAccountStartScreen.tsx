@@ -11,6 +11,7 @@ import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { ARGENT_SHIELD_NETWORK_ID } from "../../../shared/shield/constants"
+import { resetDevice } from "../../../shared/shield/jwt"
 import {
   requestEmail,
   shieldIsTokenExpired,
@@ -18,7 +19,7 @@ import {
 import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { routes } from "../../routes"
 import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { ShieldAccountActivate } from "./ShieldAccountActivate"
 import { ShieldAccountDeactivate } from "./ShieldAccountDeactivate"
 import { ShieldAccountNotReady } from "./ShieldAccountNotDeployed"
@@ -42,7 +43,7 @@ export const ShieldAccountStartScreen: FC = () => {
   })
 
   const onActivate = useCallback(async () => {
-    trackSuccess()
+    void trackSuccess()
     if (verifiedEmail) {
       try {
         setIsLoading(true)
@@ -50,6 +51,7 @@ export const ShieldAccountStartScreen: FC = () => {
           ? await getVerifiedEmailIsExpiredForRemoval()
           : await shieldIsTokenExpired()
         if (isExpired) {
+          await resetDevice()
           await requestEmail(verifiedEmail)
           navigate(routes.shieldAccountOTP(account?.address, verifiedEmail))
         } else {

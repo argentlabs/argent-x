@@ -12,20 +12,13 @@ import { settingsStore } from "../../../shared/settings"
 import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { resetDevice } from "../../../shared/shield/jwt"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import { Account } from "../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
+import { WalletAccount } from "../../../shared/wallet.model"
 import { useAccountsWithGuardian } from "../shield/useAccountGuardian"
 import { SettingsScreenWrapper } from "./SettingsScreen"
 
-const useAccountNames = (accounts: Account[]) => {
-  const { accountNames } = useAccountMetadata()
+const formatAccountNames = (accounts: WalletAccount[]) => {
   const elements = accounts.map((account) => {
-    const accountName = account
-      ? getAccountName(account, accountNames)
-      : "Unknown"
+    const accountName = account ? account.name : "Unknown"
     return accountName
   })
   const formatter = new Intl.ListFormat("en", {
@@ -40,7 +33,7 @@ export const PrivacyExperimentalSettings: FC = () => {
 
   const accountsWithGuardian = useAccountsWithGuardian()
   const hasAccountsWithGuardian = accountsWithGuardian.length > 0
-  const accountGuardianNames = useAccountNames(accountsWithGuardian)
+  const accountGuardianNames = formatAccountNames(accountsWithGuardian)
 
   const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,

@@ -1,42 +1,49 @@
-import styled from "styled-components"
+import { Center, Flex, chakra } from "@chakra-ui/react"
 
-export const Panel = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 0 56px;
-`
+export const Panel = chakra(Center, {
+  baseStyle: {
+    flexDirection: "column",
+    width: "full",
+    px: 0,
+    py: 14,
+    _last: {
+      width: [null, "40%"],
+      height: [null, "100%"],
+    },
+  },
+})
 
-export const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-  margin-top: max(120px, 15vh);
+export const DecoratedPanel = chakra(Panel, {
+  baseStyle: {
+    _last: {
+      background: [
+        null,
+        `url('./assets/onboarding-background.svg') no-repeat center`,
+      ],
+      backgroundSize: [null, "cover"],
+    },
+  },
+})
 
-  ${({ theme }) => theme.mediaMinWidth.md`
-    flex-direction: row;
-    margin-top: 0;
-    height: 100vh;
+export const PageWrapper = chakra(Flex, {
+  baseStyle: {
+    flexDirection: ["column-reverse", "row"],
+    alignItems: "center",
+    justifyContent: "flex-end",
+    width: "full",
+    mt: ["max(120px, 15vh)", 0],
+    height: [null, "100vh"],
+  },
+})
 
-    > ${Panel}:last-child {
-      width: 40%;
-      display: flex;
-      background-color: black;
-      height: 100%;
-    }
-  `}
-`
-
-export const ContentWrapper = styled.div`
-  margin: 32px auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  max-width: 600px;
-`
+export const ContentWrapper = chakra(Flex, {
+  baseStyle: {
+    mx: "auto",
+    my: 4,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    width: "full",
+    maxWidth: "600px",
+  },
+})

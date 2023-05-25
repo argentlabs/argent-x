@@ -1,22 +1,21 @@
 import { ShieldBaseActionScreen } from "@argent-x/extension/src/ui/features/shield/ShieldBaseActionScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "shield/ShieldBaseActionScreen",
   component: ShieldBaseActionScreen,
-} as ComponentMeta<typeof ShieldBaseActionScreen>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof ShieldBaseActionScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <ShieldBaseActionScreen {...props} />
-  </MemoryRouter>
-)
+export const Add = {
+  args: {},
+}
 
-export const Add = Template.bind({})
-Add.args = {}
-
-export const Remove = Template.bind({})
-Remove.args = {
-  guardian: "0x123",
+export const Remove = {
+  args: {
+    guardian: "0x123",
+  },
 }

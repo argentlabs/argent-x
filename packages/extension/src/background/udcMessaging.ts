@@ -5,13 +5,10 @@ import { HandleMessage, UnhandledMessage } from "./background"
 
 export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
   msg,
-  background,
+  background: { actionQueue, wallet },
   respond,
 }) => {
-  const { actionQueue, wallet } = background
-  const { type } = msg
-
-  switch (type) {
+  switch (msg.type) {
     case "REQUEST_DECLARE_CONTRACT": {
       const { data } = msg
       const { classHash, contract, ...restData } = data

@@ -3,7 +3,10 @@ import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode, useMemo } from "react"
 
 import { Network } from "../../../shared/network"
-import { CustomButtonCell } from "../../components/CustomButtonCell"
+import {
+  CustomButtonCell,
+  CustomButtonCellProps,
+} from "../../components/CustomButtonCell"
 import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import {
   isDeclareContractTransaction,
@@ -22,21 +25,24 @@ import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
 
-export interface TransactionListItemProps {
+export interface TransactionListItemProps extends CustomButtonCellProps {
   transactionTransformed: TransformedTransaction
   network: Network
   highlighted?: boolean
-  onClick?: () => void
   children?: ReactNode | ReactNode[]
   txHash: string
+  isCancelled?: boolean
 }
 
 export const TransactionListItem: FC<TransactionListItemProps> = ({
   transactionTransformed,
   network,
   highlighted,
-  children,
   txHash,
+  isCancelled,
+  onClick,
+  _active,
+  children,
   ...props
 }) => {
   const { action, displayName, dapp } = transactionTransformed
@@ -56,14 +62,33 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
         (action === "SEND" || action === "TRANSFER")
       const { toAddress, fromAddress } = transactionTransformed
       return (
-        <>
-          {titleShowsTo ? "To: " : "From: "}
-          <PrettyAccountAddress
-            accountAddress={titleShowsTo ? toAddress : fromAddress}
-            networkId={network.id}
-            icon={false}
-          />
-        </>
+        <Flex align="center">
+          <P4
+            color="neutrals.300"
+            fontWeight="semibold"
+            overflow="hidden"
+            textOverflow="ellipsis"
+          >
+            {titleShowsTo ? "To: " : "From: "}
+            <PrettyAccountAddress
+              accountAddress={titleShowsTo ? toAddress : fromAddress}
+              networkId={network.id}
+              icon={false}
+            />
+            {isCancelled && <> ∙ </>}
+          </P4>
+
+          {isCancelled && (
+            <P4
+              color="error.500"
+              fontWeight="semibold"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
+              Cancelled
+            </P4>
+          )}
+        </Flex>
       )
     }
     if (dapp) {
@@ -78,13 +103,14 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     return null
   }, [
     isTransfer,
-    dapp,
     isNFTTransfer,
+    dapp,
     isDeclareContract,
     isDeployContract,
     action,
     transactionTransformed,
     network.id,
+    isCancelled,
   ])
 
   const icon = useMemo(() => {
@@ -108,8 +134,14 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
         <SwapTransactionIcon transaction={transactionTransformed} size={9} />
       )
     }
-    return <TransactionIcon transaction={transactionTransformed} size={9} />
-  }, [isNFT, isSwap, transactionTransformed, network.id])
+    return (
+      <TransactionIcon
+        transaction={transactionTransformed}
+        size={9}
+        isCancelled={isCancelled}
+      />
+    )
+  }, [isNFT, isSwap, transactionTransformed, isCancelled, network.id])
 
   const accessory = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
@@ -122,7 +154,13 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   }, [isTransfer, isTokenMint, isTokenApprove, isSwap, transactionTransformed])
 
   return (
-    <CustomButtonCell highlighted={highlighted} {...props}>
+    <CustomButtonCell
+      highlighted={highlighted}
+      onClick={(e) => !isCancelled && onClick?.(e)}
+      _hover={{ cursor: isCancelled ? "default" : "pointer" }}
+      _active={!isCancelled ? _active : {}}
+      {...props}
+    >
       {icon}
       <Flex
         flexGrow={1}
@@ -135,14 +173,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
           <H6 overflow="hidden" textOverflow={"ellipsis"}>
             {displayName}
           </H6>
-          <P4
-            color="neutrals.300"
-            fontWeight={"semibold"}
-            overflow="hidden"
-            textOverflow={"ellipsis"}
-          >
-            {subtitle}
-          </P4>
+          {subtitle}
         </Flex>
       </Flex>
       {accessory}

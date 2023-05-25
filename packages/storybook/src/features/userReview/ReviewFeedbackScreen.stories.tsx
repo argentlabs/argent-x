@@ -1,17 +1,12 @@
 import { ReviewFeedbackScreen } from "@argent-x/extension/src/ui/features/userReview/ReviewFeedbackScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "features/ReviewFeedbackScreen",
   component: ReviewFeedbackScreen,
-} as ComponentMeta<typeof ReviewFeedbackScreen>
+  decorators,
+}
 
-const Template: ComponentStory<typeof ReviewFeedbackScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <ReviewFeedbackScreen {...props}></ReviewFeedbackScreen>
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {
+  args: {},
+}

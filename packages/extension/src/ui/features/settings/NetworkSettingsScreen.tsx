@@ -16,7 +16,7 @@ import { ResponsiveFixedBox } from "../../components/Responsive"
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
 import { P } from "../../theme/Typography"
-import { useCustomNetworks, useNetworks } from "../networks/useNetworks"
+import { useNetworks } from "../networks/hooks/useNetworks"
 import { DappConnection } from "./DappConnection"
 import { useSelectedNetwork } from "./selectedNetwork.state"
 import {
@@ -73,13 +73,12 @@ export const NetworkSettingsScreen: FC = () => {
   const allNetworks = useNetworks()
   const navigate = useNavigate()
   const [, setSelectedCustomNetwork] = useSelectedNetwork()
-  const customNetworks = useCustomNetworks()
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
   const isDefaultCustomNetworks = useMemo(() => {
-    return isEqual(customNetworks, defaultCustomNetworks)
-  }, [customNetworks])
+    return isEqual(allNetworks, [...allNetworks, ...defaultCustomNetworks])
+  }, [allNetworks])
 
   const removeNetworkClick = useCallback(async (networkId: string) => {
     try {

@@ -1,8 +1,10 @@
-import { Status } from "starknet"
 import browser from "webextension-polyfill"
 
 import { ArrayStorage } from "../shared/storage"
-import { TransactionMeta } from "../shared/transactions"
+import {
+  ExtendedTransactionStatus,
+  TransactionMeta,
+} from "../shared/transactions"
 
 const notificationsStorage = new ArrayStorage<string>(
   [],
@@ -18,9 +20,9 @@ export async function addToAlreadyShown(hash: string) {
   await notificationsStorage.push(hash)
 }
 
-export async function sentTransactionNotification(
+export function sendTransactionNotification(
   hash: string,
-  status: Status,
+  status: ExtendedTransactionStatus,
   meta?: TransactionMeta,
 ) {
   const id = `TX:${hash}`
@@ -33,6 +35,30 @@ export async function sentTransactionNotification(
     type: "basic",
     title,
     message: `${hash}\nStatus: ${status}`,
+    iconUrl: "./assets/logo.png",
+    eventTime: Date.now(),
+  })
+}
+
+export function sendMultisigAccountReadyNotification(address: string) {
+  const id = `MS:READY:${address}`
+  const title = "Multisig is ready!"
+  return browser.notifications.create(id, {
+    type: "basic",
+    title,
+    message: "Your multisig account is ready to use",
+    iconUrl: "./assets/logo.png",
+    eventTime: Date.now(),
+  })
+}
+
+export function sendMultisigTransactionNotification(hash: string) {
+  const id = `MS:${hash}`
+  const title = "Multisig Transaction"
+  return browser.notifications.create(id, {
+    type: "basic",
+    title,
+    message: `New multisig transaction is waiting for your approval`,
     iconUrl: "./assets/logo.png",
     eventTime: Date.now(),
   })

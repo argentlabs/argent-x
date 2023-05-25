@@ -1,4 +1,4 @@
-import create from "zustand"
+import { create } from "zustand"
 
 import { USDC } from "../../lib/constants"
 import { SupportedNetworks } from "../../sdk/constants"

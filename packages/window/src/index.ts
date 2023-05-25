@@ -7,7 +7,11 @@ export type {
   WalletEvents,
 } from "get-starknet-core"
 
-export type { GetArgentStarknetWindowObject, Variant } from "./starknet"
+export type {
+  GetArgentStarknetWindowObject,
+  Variant,
+  WebWalletStarknetWindowObject,
+} from "./starknet"
 export type {
   StarknetMethods,
   IframeMethods,
@@ -27,6 +31,6 @@ export type {
 
 export { getArgentStarknetWindowObject } from "./starknet"
 export { WindowMessenger } from "./messages/messenger/window"
-export { BidirectionalExchange } from "./messages/exchange/bidirectional"
+export { Sender, Receiver } from "./messages/exchange/bidirectional"
 export { Relayer } from "./messages/exchange/relayer"
 export { StarknetMethodArgumentsSchemas } from "./types"

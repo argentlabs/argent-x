@@ -3,14 +3,14 @@ import { FC, ReactNode } from "react"
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
 import { PrettyAccountAddress } from "../../../accounts/PrettyAccountAddress"
 
-interface IAccountAddressField {
+interface AccountAddressFieldProps {
   title: string
   accountAddress: string
   networkId: string
   fallbackValue?: (accountAddress: string) => ReactNode
 }
 
-export const AccountAddressField: FC<IAccountAddressField> = ({
+export const AccountAddressField: FC<AccountAddressFieldProps> = ({
   title,
   accountAddress,
   networkId,

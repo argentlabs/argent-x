@@ -1,4 +1,6 @@
-export const globalTypes = {
+import { Preview } from "@storybook/react"
+
+export const globalTypes: Preview["globalTypes"] = {
   colorMode: {
     title: "Color Mode",
     defaultValue: "dark",

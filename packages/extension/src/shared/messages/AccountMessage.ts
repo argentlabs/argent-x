@@ -5,18 +5,6 @@ import {
 } from "../wallet.model"
 
 export type AccountMessage =
-  | { type: "NEW_ACCOUNT"; data: string }
-  | {
-      type: "NEW_ACCOUNT_RES"
-      data: {
-        account: WalletAccount
-        accounts: WalletAccount[]
-      }
-    }
-  | { type: "NEW_ACCOUNT_REJ"; data: { error: string } }
-  | { type: "DEPLOY_ACCOUNT"; data: BaseWalletAccount }
-  | { type: "DEPLOY_ACCOUNT_RES" }
-  | { type: "DEPLOY_ACCOUNT_REJ" }
   | {
       type: "DEPLOY_ACCOUNT_ACTION_SUBMITTED"
       data: { txHash: string; actionHash: string }
@@ -25,9 +13,6 @@ export type AccountMessage =
       type: "DEPLOY_ACCOUNT_ACTION_FAILED"
       data: { actionHash: string; error?: string }
     }
-  | { type: "GET_ACCOUNTS"; data?: { showHidden: boolean } }
-  | { type: "GET_ACCOUNTS_RES"; data: WalletAccount[] }
-  | { type: "CONNECT_ACCOUNT"; data?: BaseWalletAccount }
   | { type: "CONNECT_ACCOUNT_RES"; data?: WalletAccount }
   | { type: "DISCONNECT_ACCOUNT" }
   | { type: "GET_SELECTED_ACCOUNT" }
@@ -70,7 +55,18 @@ export type AccountMessage =
     }
   | {
       type: "GET_PUBLIC_KEY_RES"
+      data: { publicKey: string; account: BaseWalletAccount }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY"
+      data: { networkId: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY_RES"
       data: { publicKey: string }
+    }
+  | {
+      type: "GET_NEXT_PUBLIC_KEY_REJ"
     }
   | {
       type: "GET_ENCRYPTED_SEED_PHRASE"
@@ -82,7 +78,7 @@ export type AccountMessage =
     }
   | {
       type: "ACCOUNT_CHANGE_GUARDIAN"
-      data: { account: BaseWalletAccount; guardian: string | undefined }
+      data: { account: BaseWalletAccount; guardian: string }
     }
   | {
       type: "ACCOUNT_CHANGE_GUARDIAN_RES"

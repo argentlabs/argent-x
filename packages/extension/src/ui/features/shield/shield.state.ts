@@ -1,4 +1,4 @@
-import create from "zustand"
+import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 interface State {
@@ -6,6 +6,6 @@ interface State {
   unverifiedEmail?: string
 }
 
-export const useShieldState = create<State>(
+export const useShieldState = create<State>()(
   persist((_set, _get) => ({}), { name: "shield" }),
 )

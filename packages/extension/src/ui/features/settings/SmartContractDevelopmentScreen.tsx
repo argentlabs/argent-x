@@ -8,13 +8,14 @@ import {
 import { FC } from "react"
 
 import { routes } from "../../routes"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 
-const { ArgentShieldIcon } = icons
+const { ShieldIcon } = icons
 
 const SmartContractDevelopmentScreen: FC = () => {
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
   const hasGuardian = Boolean(account?.guardian)
   return (
     <>
@@ -24,7 +25,7 @@ const SmartContractDevelopmentScreen: FC = () => {
       />
       {hasGuardian ? (
         <Empty
-          icon={<ArgentShieldIcon />}
+          icon={<ShieldIcon />}
           title={
             "You must remove Argent Shield from this account to access this feature"
           }

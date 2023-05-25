@@ -1,23 +1,22 @@
-import { FC } from "react"
-import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import { FC, MouseEventHandler } from "react"
 
 import { PrivacyStatementText } from "../../components/PrivacyStatementText"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
-const PrivacyStatementTextContainer = styled.div`
-  margin-bottom: 32px;
-`
+export interface OnboardingPrivacyStatementScreenProps {
+  onBack?: MouseEventHandler
+}
 
-export const OnboardingPrivacyStatementScreen: FC = () => {
-  const naviagte = useNavigate()
+export const OnboardingPrivacyStatementScreen: FC<
+  OnboardingPrivacyStatementScreenProps
+> = ({ onBack }) => {
   return (
-    <OnboardingScreen back title="Privacy statement">
-      <PrivacyStatementTextContainer>
-        <PrivacyStatementText />
-      </PrivacyStatementTextContainer>
-      <OnboardingButton onClick={() => naviagte(-1)}>Back</OnboardingButton>
+    <OnboardingScreen onBack={onBack} title="Privacy statement">
+      <PrivacyStatementText />
+      <OnboardingButton mt={8} onClick={onBack}>
+        Back
+      </OnboardingButton>
     </OnboardingScreen>
   )
 }

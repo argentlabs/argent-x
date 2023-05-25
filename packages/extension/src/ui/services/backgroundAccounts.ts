@@ -1,31 +1,18 @@
 import { sendMessage, waitForMessage } from "../../shared/messages"
-import {
-  ArgentAccountType,
-  BaseWalletAccount,
-  WalletAccount,
-} from "../../shared/wallet.model"
-import { walletStore } from "../../shared/wallet/walletStore"
-import { Account } from "../features/accounts/Account"
+import { BaseWalletAccount, WalletAccount } from "../../shared/wallet.model"
 import { decryptFromBackground, generateEncryptedSecret } from "./crypto"
 
-export const createNewAccount = async (networkId: string) => {
-  sendMessage({ type: "NEW_ACCOUNT", data: networkId })
-  try {
-    return await Promise.race([
-      waitForMessage("NEW_ACCOUNT_RES"),
-      waitForMessage("NEW_ACCOUNT_REJ").then(() => "error" as const),
-    ])
-  } catch {
-    throw Error("Could add new account")
-  }
-}
+/**
+ * @deprecated use `accountService` instead
+ * @see accountService
+ */
+export const deployNewMultisig = async (account: BaseWalletAccount) => {
+  sendMessage({ type: "DEPLOY_MULTISIG", data: account })
 
-export const deployNewAccount = async (account: BaseWalletAccount) => {
-  sendMessage({ type: "DEPLOY_ACCOUNT", data: account })
   try {
     await Promise.race([
-      waitForMessage("DEPLOY_ACCOUNT_RES"),
-      waitForMessage("DEPLOY_ACCOUNT_REJ").then(() => {
+      waitForMessage("DEPLOY_MULTISIG_RES"),
+      waitForMessage("DEPLOY_MULTISIG_REJ").then(() => {
         throw new Error("Rejected")
       }),
     ])
@@ -39,78 +26,10 @@ export const getLastSelectedAccount = async () => {
   return waitForMessage("GET_SELECTED_ACCOUNT_RES")
 }
 
-export const getAccounts = async (showHidden = false) => {
-  sendMessage({ type: "GET_ACCOUNTS", data: { showHidden } })
-  return waitForMessage("GET_ACCOUNTS_RES")
-}
-
 export const accountsOnNetwork = (
   accounts: WalletAccount[],
   networkId: string,
 ) => accounts.filter((account) => account.networkId === networkId)
-
-function isNotBaseWalletAccount(
-  account?: BaseWalletAccount,
-): account is Account {
-  return Boolean(account && "toBaseWalletAccount" in account)
-}
-
-export const selectAccount = async (
-  account?: BaseWalletAccount,
-): Promise<void> => {
-  /** coerce to sparse BaseWalletAccount to prevent DataCloneError from full Account class instance on FireFox */
-  if (isNotBaseWalletAccount(account)) {
-    account = account.toBaseWalletAccount()
-  }
-  await walletStore.set("selected", account ?? null)
-
-  return connectAccount(account)
-}
-
-export const connectAccount = (account?: BaseWalletAccount) => {
-  sendMessage({
-    type: "CONNECT_ACCOUNT",
-    data: account,
-  })
-}
-
-export const deleteAccount = async (address: string, networkId: string) => {
-  sendMessage({
-    type: "DELETE_ACCOUNT",
-    data: { address, networkId },
-  })
-
-  try {
-    await Promise.race([
-      waitForMessage("DELETE_ACCOUNT_RES"),
-      waitForMessage("DELETE_ACCOUNT_REJ").then(() => {
-        throw new Error("Rejected")
-      }),
-    ])
-  } catch {
-    throw Error("Could not delete account")
-  }
-}
-
-export const upgradeAccount = async (
-  wallet: BaseWalletAccount,
-  targetImplementationType?: ArgentAccountType,
-) => {
-  sendMessage({
-    type: "UPGRADE_ACCOUNT",
-    data: { wallet, targetImplementationType },
-  })
-  try {
-    await Promise.race([
-      waitForMessage("UPGRADE_ACCOUNT_RES"),
-      waitForMessage("UPGRADE_ACCOUNT_REJ").then(() => {
-        throw new Error("Rejected")
-      }),
-    ])
-  } catch {
-    throw Error("Could not upgrade account")
-  }
-}
 
 export const redeployAccount = async (data: BaseWalletAccount) => {
   sendMessage({ type: "REDEPLOY_ACCOUNT", data })
@@ -149,7 +68,25 @@ export const getPublicKey = async (account?: BaseWalletAccount) => {
     data: account,
   })
 
-  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES")
+  const { publicKey } = await waitForMessage("GET_PUBLIC_KEY_RES", (x) =>
+    account ? x.data.account.address === account.address : true,
+  )
+
+  return publicKey
+}
+
+export const getNextPublicKey = async (networkId: string) => {
+  sendMessage({
+    type: "GET_NEXT_PUBLIC_KEY",
+    data: { networkId },
+  })
+
+  const { publicKey } = await Promise.race([
+    waitForMessage("GET_NEXT_PUBLIC_KEY_RES"),
+    waitForMessage("GET_NEXT_PUBLIC_KEY_REJ").then(() => {
+      throw new Error("Getting next public key failed")
+    }),
+  ])
 
   return publicKey
 }
@@ -170,7 +107,7 @@ export const getSeedPhrase = async (): Promise<string> => {
 
 export const accountChangeGuardian = async (
   account: BaseWalletAccount,
-  guardian: string | undefined,
+  guardian: string, // let's make it mandatory
 ) => {
   sendMessage({ type: "ACCOUNT_CHANGE_GUARDIAN", data: { account, guardian } })
 

@@ -1,15 +1,18 @@
-import { AccountListItemProps } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
 import { AccountSelect } from "@argent-x/extension/src/ui/features/accounts/AccountSelect"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
+import { P3 } from "@argent/ui"
+import { ComponentProps } from "react"
 
 export default {
-  title: "accounts/AccountSelect",
   component: AccountSelect,
-} as ComponentMeta<typeof AccountSelect>
-
-const Template: ComponentStory<typeof AccountSelect> = (props) => (
-  <AccountSelect {...props}></AccountSelect>
-)
+  render: (props: ComponentProps<typeof AccountSelect>) => {
+    return (
+      <>
+        <AccountSelect {...props} />
+        <P3 mt={4}>Lorem ipsum dolor sit amet</P3>
+      </>
+    )
+  },
+}
 
 const accounts = [
   {
@@ -62,13 +65,9 @@ const accounts = [
   },
 ]
 
-const onSelectedAccountChange = (selectedAccount: AccountListItemProps) => {
-  console.log("onSelectedAccountChange", selectedAccount)
-}
-
-export const Default = Template.bind({})
-Default.args = {
-  accounts,
-  selectedAccount: accounts[3],
-  onSelectedAccountChange,
+export const Default = {
+  args: {
+    accounts,
+    selectedAccount: accounts[3],
+  },
 }

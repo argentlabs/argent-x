@@ -18,13 +18,19 @@
     "prettier-plugin-import-sort": "^0.0.7",
     "ts-node": "^10.8.1"
   },
+  "workspaces": {
+    "nohoist": [
+      "packages/web",
+      "packages/dapp"
+    ],
+    "packages": [
+      "packages/*"
+    ]
+  },
   "resolutions": {
     "@babel/preset-react": "7.17.12",
     "@babel/plugin-transform-react-jsx": "7.17.12"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
     "dev": "NODE_ENV=development lerna run dev --parallel",
@@ -36,13 +42,14 @@
     "lint": "lerna run lint --stream",
     "test": "lerna run test --stream",
     "test:watch": "lerna run test:watch --stream",
-    "test:e2e": "lerna run test:e2e --stream",
+    "test:e2e": "yarn workspace @argent-x/e2e run test:e2e",
     "setup": "yarn install --frozen-lockfile && yarn allow-scripts && husky install && patch-package && lerna run setup --stream",
-    "test:ci": "lerna run test:ci --stream",
+    "test:ci": "lerna run test:ci --stream --parallel",
     "storybook": "cd packages/storybook && yarn storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
     "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts",
-    "version": "lerna version --no-push --no-git-tag-version && yarn --cwd packages/extension run version"
+    "version": "lerna version --no-push --no-git-tag-version && yarn --cwd packages/extension run version",
+    "export": "lerna run export --scope=@argent/web"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {

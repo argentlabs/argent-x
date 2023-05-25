@@ -21,7 +21,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { analytics } from "../../../background/analytics"
 import { executeTransaction } from "../../services/backgroundTransactions"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { HighPriceImpactModal } from "./ui/HighPriceImpactModal"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
@@ -251,6 +251,7 @@ const Swap = () => {
             tradeLoading={tradeLoading}
           />
           <SwitchDirectionButton
+            aria-label="Switch input and output"
             animation={rotate ? `${spin} 0.125s linear` : ""}
             icon={<StyledSwitchDirectionIcon />}
             onClick={() => {

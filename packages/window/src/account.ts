@@ -7,7 +7,7 @@ import {
   typedData,
 } from "starknet"
 
-import { BidirectionalExchange } from "./messages/exchange/bidirectional"
+import { Sender } from "./messages/exchange/bidirectional"
 import { StarknetMethods } from "./types"
 
 class UnimplementedSigner implements SignerInterface {
@@ -38,7 +38,7 @@ export class MessageAccount extends Account implements AccountInterface {
   constructor(
     provider: ProviderInterface,
     public address: string,
-    private readonly remoteHandle: BidirectionalExchange<StarknetMethods, {}>,
+    private readonly remoteHandle: Sender<StarknetMethods>,
   ) {
     super(provider, address, new UnimplementedSigner())
   }

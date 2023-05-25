@@ -1,4 +1,4 @@
-import { Status } from "starknet"
+import { ExtendedTransactionStatus } from "../transactions"
 
 export interface IExplorerTransactionParameters {
   /** @example tokenId @example response_len */
@@ -37,7 +37,7 @@ export interface IExplorerTransaction {
   maxFee?: string
   /** @example 0x490b183da37 */
   actualFee: string
-  status: Status
+  status: ExtendedTransactionStatus
   statusData: string
   events: IExplorerTransactionEvent[]
   calls?: IExplorerTransactionCall[]

@@ -6,7 +6,7 @@ import {
   getNetworkSelector,
   withGuardianSelector,
 } from "../shared/account/selectors"
-import { getAccounts } from "../shared/account/store"
+import { accountService } from "../shared/account/service"
 import { ShieldMessage } from "../shared/messages/ShieldMessage"
 import {
   addBackendAccount,
@@ -52,10 +52,10 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
 
         /** Get current account state */
 
-        const localAccounts = await getAccounts(
+        const localAccounts = await accountService.get(
           getNetworkSelector(ARGENT_SHIELD_NETWORK_ID),
         )
-        const localAccountsWithGuardian = await getAccounts(
+        const localAccountsWithGuardian = await accountService.get(
           withGuardianSelector,
         )
         const backendAccounts = await getBackendAccounts()
@@ -121,7 +121,7 @@ export const handleShieldMessage: HandleMessage<ShieldMessage> = async ({
             privateKeyHex,
           )
 
-          const { r, s } = Signature.fromHex(deploySignature)
+          const { r, s } = Signature.fromDER(deploySignature.toDERHex())
           const response = await addBackendAccount(
             publicKey,
             selectedAccount.address,

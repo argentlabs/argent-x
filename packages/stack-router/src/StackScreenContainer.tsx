@@ -1,7 +1,15 @@
-import { chakra, shouldForwardProp } from "@chakra-ui/react"
-import { isValidMotionProp, motion } from "framer-motion"
+import { ChakraComponent, chakra, shouldForwardProp } from "@chakra-ui/react"
+import {
+  ForwardRefComponent,
+  HTMLMotionProps,
+  isValidMotionProp,
+  motion,
+} from "framer-motion"
 
-export const StackScreenMotionContainer = chakra(motion.div, {
+export const StackScreenMotionContainer: ChakraComponent<
+  ForwardRefComponent<HTMLDivElement, HTMLMotionProps<"div">>,
+  HTMLMotionProps<"div">
+> = chakra(motion.div, {
   shouldForwardProp: (prop) =>
     isValidMotionProp(prop) || shouldForwardProp(prop),
   baseStyle: {
@@ -17,7 +25,11 @@ export const StackScreenMotionContainer = chakra(motion.div, {
   },
 })
 
-export const StackScreenContainer = chakra(motion.div, {
+export type StackScreenContainerProps = HTMLMotionProps<"div">
+export const StackScreenContainer: ChakraComponent<
+  ForwardRefComponent<HTMLDivElement, HTMLMotionProps<"div">>,
+  StackScreenContainerProps
+> = chakra(motion.div, {
   baseStyle: {
     position: "absolute",
     left: 0,

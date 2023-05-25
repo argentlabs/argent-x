@@ -1,5 +1,6 @@
 import { BigNumber } from "ethers"
 import {
+  Account,
   Call,
   EstimateFee,
   TransactionBulk,
@@ -22,18 +23,20 @@ import { analytics } from "../analytics"
 import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
 import { argentMaxFee } from "../utils/argentMaxFee"
+import { getEstimatedFeeForMultisigTx } from "./fees/multisigFeeEstimation"
 import { getEstimatedFees } from "./fees/store"
 import { addTransaction, transactionsStore } from "./store"
 
 export const checkTransactionHash = (
   transactionHash?: number.BigNumberish,
+  account?: WalletAccount,
 ): boolean => {
   try {
     if (!transactionHash) {
       throw Error("transactionHash not defined")
     }
     const bn = number.toBN(transactionHash)
-    if (bn.lte(constants.ZERO)) {
+    if (bn.lte(constants.ZERO) && account?.type !== "multisig") {
       throw Error("transactionHash needs to be >0")
     }
     return true
@@ -99,10 +102,15 @@ export const executeTransactionAction = async (
     !(await isAccountDeployed(selectedAccount, starknetAccount.getClassAt))
   ) {
     if ("estimateFeeBulk" in starknetAccount) {
+      const deployAccountPayload =
+        selectedAccount.type === "multisig"
+          ? await wallet.getMultisigDeploymentPayload(selectedAccount)
+          : await wallet.getAccountDeploymentPayload(selectedAccount)
+
       const bulkTransactions: TransactionBulk = [
         {
           type: "DEPLOY_ACCOUNT",
-          payload: await wallet.getAccountDeploymentPayload(selectedAccount),
+          payload: deployAccountPayload,
         },
         {
           type: "INVOKE_FUNCTION",
@@ -123,7 +131,6 @@ export const executeTransactionAction = async (
     const { account, txHash } = await wallet.deployAccount(selectedAccount, {
       maxFee: maxADFee,
     })
-
     if (!checkTransactionHash(txHash)) {
       throw Error(
         "Deploy Account Transaction could not get added to the sequencer",
@@ -146,6 +153,14 @@ export const executeTransactionAction = async (
         type: "DEPLOY_ACCOUNT",
       },
     })
+  } else if (selectedAccount.type === "multisig") {
+    const { suggestedMaxFee } = await getEstimatedFeeForMultisigTx(
+      selectedAccount,
+      transactions,
+      nonce,
+    )
+
+    maxFee = argentMaxFee(suggestedMaxFee)
   } else {
     if (hasUpgradePending && !preComputedFees?.suggestedMaxFee) {
       const oldStarknetAccount = await wallet.getStarknetAccount(
@@ -167,30 +182,39 @@ export const executeTransactionAction = async (
     }
   }
 
-  const transaction = await starknetAccount.execute(transactions, abis, {
+  const acc =
+    selectedAccount.type === "multisig" && starknetAccount instanceof Account // Multisig uses latest account interface
+      ? wallet.getStarknetAccountOfType(starknetAccount, "multisig")
+      : starknetAccount
+  const transaction = await acc.execute(transactions, abis, {
     ...transactionsDetail,
     nonce,
     maxFee,
   })
 
-  if (!checkTransactionHash(transaction.transaction_hash)) {
+  if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
     throw Error("Transaction could not get added to the sequencer")
   }
 
   const title = nameTransaction(transactions)
 
-  await addTransaction({
-    hash: transaction.transaction_hash,
-    account: selectedAccount,
-    meta: {
-      ...meta,
-      title,
-      transactions,
-      type: "DEPLOY_ACCOUNT",
-    },
-  })
+  // TODO: Remove this conditional as we now fallback to computed transactionHash for multisig
+  // So we can always add the transaction to the queue. The added transaction will have
+  // status "NOT_RECEIVED" until all the owners have signed the transaction
+  if (selectedAccount.type !== "multisig") {
+    await addTransaction({
+      hash: transaction.transaction_hash,
+      account: selectedAccount,
+      meta: {
+        ...meta,
+        title,
+        transactions,
+        type: "INVOKE_FUNCTION",
+      },
+    })
+  }
 
-  if (!nonceWasProvidedByUI) {
+  if (!nonceWasProvidedByUI && selectedAccount.type !== "multisig") {
     await increaseStoredNonce(selectedAccount)
   }
 

@@ -103,4 +103,14 @@ export class KeyValueStorage<
 
     return () => browser.storage.onChanged.removeListener(handler)
   }
+
+  /**
+   * @internal for migration purposes only
+   */
+  public async getStoredKeys(): Promise<string[]> {
+    const items = await this.storageImplementation.get(null)
+    return Object.keys(items)
+      .filter((key) => key.startsWith(this.namespace))
+      .map((key) => key.replace(this.namespace + ":", ""))
+  }
 }

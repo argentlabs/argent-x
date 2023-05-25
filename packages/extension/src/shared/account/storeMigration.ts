@@ -4,7 +4,7 @@ import browser from "webextension-polyfill"
 import { getNetwork } from "../network"
 import { WalletAccount } from "../wallet.model"
 import { accountsEqual } from "../wallet.service"
-import { addAccounts } from "./store"
+import { accountService } from "./service"
 
 export async function migrateWalletAccounts() {
   try {
@@ -19,7 +19,7 @@ export async function migrateWalletAccounts() {
     const oldAccounts: WalletAccount[] = JSON.parse(needsMigration)
     const [newAccounts] = await checkAccountsForMigration(oldAccounts)
 
-    await addAccounts(newAccounts)
+    await accountService.upsert(newAccounts)
     return browser.storage.local.remove("wallet:accounts")
   } catch (e) {
     console.error(e)

@@ -1,5 +1,5 @@
 import { memoize } from "lodash-es"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { swrCacheProvider } from "../../ui/services/swr"
 import { IArrayStorage } from "./array"
@@ -76,13 +76,22 @@ export function useArrayStorage<T>(
     [storage.namespace],
   )
 
+  const selectorRef = useRef(selector)
+
+  useEffect(() => {
+    selectorRef.current = selector
+  }, [selector])
+
   useEffect(() => {
     storage.get().then(set)
     const sub = storage.subscribe(set)
     return () => sub()
-  }, [selector, storage, set])
+  }, [storage, set])
 
-  const filteredValue = useMemo(() => value.filter(selector), [value, selector])
+  const filteredValue = useMemo(
+    () => value.filter((item) => selectorRef.current(item)),
+    [value],
+  )
 
   return filteredValue
 }

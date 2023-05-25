@@ -1,4 +1,4 @@
-import create from "zustand"
+import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 interface State {
@@ -9,6 +9,6 @@ interface State {
   }
 }
 
-export const useRestorationState = create<State>(
+export const useRestorationState = create<State>()(
   persist((_set, _get) => ({}), { name: "restoration" }),
 )

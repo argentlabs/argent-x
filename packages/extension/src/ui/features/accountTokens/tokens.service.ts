@@ -9,6 +9,7 @@ import { getMulticallForNetwork } from "../../../shared/multicall"
 import { getTokenBalanceForAccount } from "../../../shared/token/getTokenBalance"
 import { Token } from "../../../shared/token/type"
 import { getFeeToken } from "../../../shared/token/utils"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { Account } from "../accounts/Account"
 import { TokenDetailsWithBalance, getNetworkFeeToken } from "./tokens.state"
@@ -117,7 +118,7 @@ export type BalancesMap = Record<string, BigNumber | undefined>
 
 export const fetchAllTokensBalance = async (
   tokenAddresses: string[],
-  account: Account,
+  account: BaseWalletAccount,
 ) => {
   const response = await Promise.allSettled(
     tokenAddresses.map((tokenAddress) => {

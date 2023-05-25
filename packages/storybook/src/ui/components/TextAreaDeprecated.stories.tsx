@@ -1,19 +1,17 @@
-import { TextArea } from "@argent-x/extension/src/ui/components/InputText"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
+import { TextArea as TextAreaDeprecated } from "@argent-x/extension/src/ui/components/InputText"
 
 export default {
-  title: "components/TextAreaDeprecated",
-  component: TextArea,
-} as ComponentMeta<typeof TextArea>
+  component: TextAreaDeprecated,
+}
 
-const Template: ComponentStory<typeof TextArea> = (props) => (
-  <TextArea {...props}></TextArea>
-)
+export const Default = {
+  args: {
+    placeholder: "Placeholder",
+  },
+}
 
-export const Default = Template.bind({})
-Default.args = {}
-
-export const Variant = Template.bind({})
-Variant.args = {
-  variant: "neutrals800",
+export const Variant = {
+  args: {
+    variant: "neutrals800",
+  },
 }

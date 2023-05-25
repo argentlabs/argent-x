@@ -3,22 +3,16 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  InputProps,
   InputRightElement,
 } from "@chakra-ui/react"
-import {
-  ComponentProps,
-  FC,
-  FormEvent,
-  useCallback,
-  useRef,
-  useState,
-} from "react"
+import { FC, FormEvent, useCallback, useRef, useState } from "react"
 
 import { useOnClickOutside } from "../../services/useOnClickOutside"
 
 const { EditIcon, TickIcon } = icons
 
-interface AccountNameProps extends ComponentProps<typeof Input> {
+interface AccountNameProps extends InputProps {
   onSubmit: () => void
   onCancel: () => void
 }

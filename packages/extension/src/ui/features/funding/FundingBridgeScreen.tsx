@@ -8,13 +8,14 @@ import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
 import { trackAddFundsService } from "../../services/analytics"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import EthereumSvg from "./ethereum.svg"
 import { Title } from "./FundingScreen"
 import OrbiterSvg from "./orbiter.svg"
 
 export const FundingBridgeScreen: FC = () => {
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
   const navigate = useNavigate()
 
   if (!account) {

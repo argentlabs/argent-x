@@ -128,5 +128,13 @@
     "symbol": "SLF",
     "decimals": "6",
     "network": "goerli-alpha"
+  },
+  {
+    "address": "0x0148f970a06fc95ee0682140e23a980351be8fad26168c5f0465e63940c46514",
+    "name": "Angle agEUR",
+    "symbol": "agEUR",
+    "decimals": "18",
+    "network": "mainnet-alpha",
+    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/ageur.png"
   }
 ]

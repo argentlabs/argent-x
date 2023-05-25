@@ -1,4 +1,4 @@
-import create from "zustand"
+import { create } from "zustand"
 
 import { Network } from "../../../shared/network"
 
@@ -7,7 +7,7 @@ interface State {
   setSelectedNetwork: (selectedNetwork?: Network) => void
 }
 
-const useSelectedNetworkStore = create<State>((set) => ({
+const useSelectedNetworkStore = create<State>()((set) => ({
   selectedNetwork: undefined,
   setSelectedNetwork: (selectedNetwork) =>
     set({

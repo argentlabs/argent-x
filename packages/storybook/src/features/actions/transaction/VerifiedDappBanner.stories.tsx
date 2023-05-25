@@ -1,14 +1,8 @@
 import { VerifiedDappBanner } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/VerifiedDappBanner"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
 
 export default {
-  title: "features/VerifiedDappBanner",
   component: VerifiedDappBanner,
-} as ComponentMeta<typeof VerifiedDappBanner>
-
-const Template: ComponentStory<typeof VerifiedDappBanner> = (props) => (
-  <VerifiedDappBanner {...props}></VerifiedDappBanner>
-)
+}
 
 const jediswap = {
   name: "JediSwap",
@@ -34,7 +28,8 @@ const jediswap = {
   ],
 }
 
-export const Default = Template.bind({})
-Default.args = {
-  dapp: jediswap,
+export const Default = {
+  args: {
+    dapp: jediswap,
+  },
 }

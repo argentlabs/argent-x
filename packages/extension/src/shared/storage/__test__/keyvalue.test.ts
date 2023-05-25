@@ -12,7 +12,7 @@ describe("full storage flow", () => {
   })
   test("throw when storage area is invalid", () => {
     expect(() => {
-      new KeyValueStorage<{ foo: string }>(
+      store = new KeyValueStorage<{ foo: string }>(
         { foo: "bar" },
         { namespace: "test", areaName: "invalid" as any },
       )

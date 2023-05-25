@@ -7,6 +7,7 @@ import { fetcher } from "../../../shared/api/fetcher"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { withPolling } from "../../services/swr"
 import {
+  AspectCollection,
   AspectContract,
   AspectNft,
   AspectNftArraySchema,
@@ -60,7 +61,7 @@ export const fetchNextAspectNftsByUrl = async (
 ): Promise<AspectNft[]> => {
   const response = await fetch(url)
   if (!response.ok) {
-    return []
+    throw new Error("Failed to fetch collection")
   }
 
   const data = await response.json()
@@ -114,7 +115,7 @@ export const fetchNextAspectCollection = async (
 ): Promise<AspectNft[]> => {
   const response = await fetch(url)
   if (!response.ok) {
-    return []
+    throw new Error("Failed to fetch collection")
   }
 
   const data = await response.json()
@@ -132,7 +133,7 @@ export const fetchNextAspectContractAddresses = async (
 ): Promise<string[]> => {
   const response = await fetch(url)
   if (!response.ok) {
-    return []
+    throw new Error("Failed to fetch collection")
   }
 
   const data = await response.json()
@@ -179,6 +180,26 @@ export const useAspectNft = (
     fetcher,
     swrConfig,
   )
+}
+
+/**
+ * Fetch a NFT Collection from Aspect
+ * This is different from useCollection hook which fetches Collection owned by a user
+ * @param contractAddress
+ * @param networkId
+ * @param swrConfig
+ */
+
+export const useAspectCollection = (
+  contractAddress: string | undefined,
+  networkId: string,
+  swrConfig?: SWRConfiguration,
+) => {
+  const url =
+    networkId === "goerli-alpha"
+      ? `https://api-testnet.aspect.co/api/v0/contract/${contractAddress}`
+      : `https://api.aspect.co/api/v0/contract/${contractAddress}`
+  return useSWR<AspectCollection>(contractAddress && url, fetcher, swrConfig)
 }
 
 export const openAspectNft = (

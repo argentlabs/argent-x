@@ -1,3 +1,4 @@
+import { Box } from "@chakra-ui/react"
 import { FC } from "react"
 import styled, { css, keyframes } from "styled-components"
 
@@ -29,20 +30,27 @@ export function mapNetworkStatusToColor(
   }
 }
 
-export const StatusIndicator = styled.span<StatusIndicatorProps>`
-  height: 8px;
-  width: 8px;
-  border-radius: 8px;
-
-  background-color: ${({ color = "transparent" }) =>
-    color === "green"
-      ? "#02BBA8"
-      : color === "orange"
-      ? "#ffa85c"
-      : color === "red"
-      ? "#C12026"
-      : "transparent"};
-`
+export const StatusIndicator = ({
+  color = "transparent",
+}: {
+  color: StatusIndicatorColor
+}) => (
+  <Box
+    height={2}
+    width={2}
+    borderRadius={8}
+    data-testid={`status-indicator-${color}`}
+    backgroundColor={
+      color === "green"
+        ? "#02BBA8"
+        : color === "orange"
+        ? "#ffa85c"
+        : color === "red"
+        ? "#C12026"
+        : "transparent"
+    }
+  />
+)
 
 export const NetworkStatusIndicator: FC<StatusIndicatorProps> = ({
   color = "transparent",

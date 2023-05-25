@@ -1,4 +1,5 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Collapse } from "@mui/material"
 import { FC, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
@@ -15,9 +16,9 @@ import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { makeClickable } from "../../services/a11y"
 import { A, FormError, P } from "../../theme/Typography"
-import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
+import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
+import { useNetworks } from "../networks/hooks/useNetworks"
 import { slugify } from "./slugify"
-import { useYupValidationResolver } from "./useYupValidationResolver"
 
 const ExtendableControl = styled.div`
   display: flex;
@@ -44,15 +45,23 @@ type NetworkSettingsFormScreenProps =
 export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
   props,
 ) => {
+  const allNetworks = useNetworks()
+
   const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
-
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
   const settingsBlockExplorer = defaultBlockExplorers[blockExplorerKey]
 
   const defaultNetwork = useMemo<Network>(() => {
     if (props.mode === "add") {
-      return { id: "", name: "", chainId: "", baseUrl: "" }
+      return {
+        id: "",
+        name: "",
+        chainId: "",
+        baseUrl: "",
+        status: "unknown",
+        accountClassHash: undefined,
+      }
     }
     /** display selected block explorer url from settings for readonly network */
     if (
@@ -70,16 +79,15 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
     // due to an or type we need to check different values depending on the mode
   }, [props.mode === "add" || props.network]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const yupSchemaValidator = useYupValidationResolver(networkSchema)
   const {
-    handleSubmit,
     formState: { errors },
     control,
     watch,
     setValue,
+    handleSubmit,
   } = useForm<Network>({
     defaultValues: defaultNetwork,
-    resolver: yupSchemaValidator,
+    resolver: zodResolver(networkSchema),
   })
 
   useEffect(() => {
@@ -92,23 +100,24 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
     // on mount
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const onSubmit = async (network: Network) => {
+    try {
+      // useAppState.setState({ isLoading: true })
+      await addNetwork(network)
+      navigate(-1)
+    } finally {
+      useAppState.setState({ isLoading: false })
+    }
+  }
+
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
-      <DeprecatedConfirmScreen
+      <ConfirmScreen
         title={props.mode === "add" ? "Add network" : "Edit network"}
         singleButton
         confirmButtonText={props.mode === "add" ? "Create" : "Save"}
-        smallTopPadding
         confirmButtonDisabled={defaultNetwork.readonly}
-        onSubmit={handleSubmit(async (network) => {
-          try {
-            useAppState.setState({ isLoading: true })
-            await addNetwork(network)
-            navigate(-1)
-          } finally {
-            useAppState.setState({ isLoading: false })
-          }
-        })}
+        onSubmit={handleSubmit(onSubmit)}
       >
         <Wrapper>
           <P>Here you can add your own custom network to Argent X.</P>
@@ -191,7 +200,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
                 autoComplete="off"
                 control={control}
                 placeholder="Account class hash"
-                name="accountClassHash.argentAccount"
+                name="accountClassHash.argent"
                 type="text"
                 disabled={defaultNetwork.readonly}
               />
@@ -199,7 +208,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
                 autoComplete="off"
                 control={control}
                 placeholder="Plugin account class hash"
-                name="accountClassHash.argentPluginAccount"
+                name="accountClassHash.plugin"
                 type="text"
                 disabled={defaultNetwork.readonly}
               />
@@ -230,7 +239,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             </FormError>
           )}
         </Wrapper>
-      </DeprecatedConfirmScreen>
+      </ConfirmScreen>
     </NavigationContainer>
   )
 }

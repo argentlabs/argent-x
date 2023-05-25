@@ -1,4 +1,4 @@
-import "@google/model-viewer/lib/model-viewer"
+import "@google/model-viewer/dist/model-viewer"
 
 import { FC } from "react"
 

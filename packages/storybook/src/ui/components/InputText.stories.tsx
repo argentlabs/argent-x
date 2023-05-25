@@ -2,16 +2,14 @@
 import { Button } from "@argent-x/extension/src/ui/components/Button"
 import Column from "@argent-x/extension/src/ui/components/Column"
 import { StyledControlledInput } from "@argent-x/extension/src/ui/components/InputText"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { useCallback } from "react"
+import { ComponentProps, FC, useCallback } from "react"
 import { useForm } from "react-hook-form"
 
 export default {
-  title: "components/InputText",
   component: StyledControlledInput,
-} as ComponentMeta<typeof StyledControlledInput>
+}
 
-const Template: ComponentStory<typeof StyledControlledInput> = (props) => {
+const Template: FC<ComponentProps<typeof StyledControlledInput>> = (props) => {
   const { control, handleSubmit, setValue } = useForm()
 
   const onMaxClicked = useCallback(() => {
@@ -38,23 +36,31 @@ const Template: ComponentStory<typeof StyledControlledInput> = (props) => {
   )
 }
 
-export const Default = Template.bind({})
-Default.args = {
-  variant: "neutrals",
+export const Default = {
+  render: Template,
+  args: {
+    variant: "neutrals",
+  },
 }
 
-export const OnlyNumeric = Template.bind({})
-OnlyNumeric.args = {
-  onlyNumeric: true,
+export const OnlyNumeric = {
+  ...Default,
+  args: {
+    onlyNumeric: true,
+  },
 }
 
-export const OnlyAddressHex = Template.bind({})
-OnlyAddressHex.args = {
-  onlyAddressHex: true,
+export const OnlyAddressHex = {
+  ...Default,
+  args: {
+    onlyAddressHex: true,
+  },
 }
 
-export const Password = Template.bind({})
-Password.args = {
-  variant: "neutrals",
-  type: "password",
+export const Password = {
+  ...Default,
+  args: {
+    variant: "neutrals",
+    type: "password",
+  },
 }

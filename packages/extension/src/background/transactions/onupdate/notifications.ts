@@ -1,9 +1,9 @@
-import { SUCCESS_STATUSES } from "../../../shared/transactions"
+import { FAILED_STATUS, SUCCESS_STATUSES } from "../../../shared/transactions"
 import { decrementTransactionsBeforeReview } from "../../../shared/userReview"
 import {
   addToAlreadyShown,
   hasShownNotification,
-  sentTransactionNotification,
+  sendTransactionNotification,
 } from "../../notification"
 import { TransactionUpdateListener } from "./type"
 
@@ -12,14 +12,14 @@ export const notifyAboutCompletedTransactions: TransactionUpdateListener =
     for (const transaction of transactions) {
       const { hash, status, meta, account } = transaction
       if (
-        (SUCCESS_STATUSES.includes(status) || status === "REJECTED") &&
+        (SUCCESS_STATUSES.includes(status) || FAILED_STATUS.includes(status)) &&
         !(await hasShownNotification(hash))
       ) {
         addToAlreadyShown(hash)
 
         if (!account.hidden && !meta?.isDeployAccount) {
           await decrementTransactionsBeforeReview()
-          sentTransactionNotification(hash, status, meta)
+          sendTransactionNotification(hash, status, meta)
         }
       }
     }

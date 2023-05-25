@@ -14,7 +14,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@chakra-ui/system": ["./node_modules/@chakra-ui/system/"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", ".eslintrc.js", "test"]
 }

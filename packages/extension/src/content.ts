@@ -1,4 +1,5 @@
 import { Relayer, WindowMessenger } from "@argent/x-window"
+import { relay } from "trpc-extension/relay"
 import browser from "webextension-polyfill"
 
 import { ExtensionMessenger } from "./shared/extensionMessenger"
@@ -22,4 +23,9 @@ const portMessenger = new ExtensionMessenger(port)
 const bridge = new Relayer(windowMessenger, portMessenger)
 
 // Please keep this log statement, it is used to detect if the bridge is loaded
-console.log("Bridge ID:", bridge.id)
+console.log("Legacy Bridge ID:", bridge.id)
+
+// NOTE: not used yet, as trpc is only used for UI <-> Background comms atm
+const unsub = relay(window, port)
+// unsub on content script unload
+window.addEventListener("unload", unsub)

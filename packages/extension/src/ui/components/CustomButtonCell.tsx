@@ -1,7 +1,8 @@
 import { Button } from "@argent/ui"
-import { ComponentProps, FC } from "react"
+import { ButtonProps } from "@chakra-ui/react"
+import { FC } from "react"
 
-export interface CustomButtonCellProps extends ComponentProps<typeof Button> {
+export interface CustomButtonCellProps extends ButtonProps {
   highlighted?: boolean
   transparent?: boolean
 }

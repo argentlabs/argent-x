@@ -31,10 +31,8 @@ export class WrappedTokenInfo extends Token {
   }
 }
 
-export type TokenAddressMap = Readonly<
-  {
-    [networkId in SupportedNetworks]: Readonly<{
-      [tokenAddress: string]: WrappedTokenInfo
-    }>
-  }
->
+export type TokenAddressMap = Readonly<{
+  [networkId in SupportedNetworks]: Readonly<{
+    [tokenAddress: string]: WrappedTokenInfo
+  }>
+}>

@@ -1,14 +1,14 @@
 import { some } from "lodash-es"
 
+import { withHiddenSelector } from "../../../shared/account/selectors"
+import { accountService } from "../../../shared/account/service"
 import { defaultNetwork, getNetwork } from "../../../shared/network"
 import { accountsEqual, isDeprecated } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import {
   accountsOnNetwork,
-  getAccounts,
   getLastSelectedAccount,
-  selectAccount,
 } from "../../services/backgroundAccounts"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
 import { mapWalletAccountsToAccounts } from "../accounts/accounts.state"
@@ -34,8 +34,8 @@ export const recover = async ({
     )
     networkId = network.id
 
-    const allAccounts = await getAccounts(true)
-    const walletAccounts = accountsOnNetwork(allAccounts, networkId)
+    const allWalletAccounts = await accountService.get(withHiddenSelector)
+    const walletAccounts = accountsOnNetwork(allWalletAccounts, networkId)
 
     const selectedWalletAccount = walletAccounts.find(
       (account) =>
@@ -48,10 +48,16 @@ export const recover = async ({
       ? selectedWalletAccount
       : firstUnhiddenAccount
 
-    const accounts = mapWalletAccountsToAccounts(walletAccounts)
+    const allAccounts = mapWalletAccountsToAccounts(allWalletAccounts)
+    const allAccountsHasNames = allAccounts.every((account) => account.name)
 
-    setDefaultAccountNames(accounts)
-    await selectAccount(selectedAccount)
+    // FIXME: Remove this when migration is done
+    if (!allAccountsHasNames) {
+      setDefaultAccountNames(allAccounts)
+    }
+    if (selectedAccount) {
+      await accountService.select(selectedAccount)
+    }
     useAppState.setState({ switcherNetworkId: networkId })
 
     // this needs to be after changing the state, otherwise the migration screen would deploy on the network that was selected before the switch

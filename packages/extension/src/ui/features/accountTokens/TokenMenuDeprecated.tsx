@@ -1,9 +1,8 @@
 import { FC, useRef, useState } from "react"
-import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import { ContentCopyIcon, VisibilityOff } from "../../components/Icons/MuiIcons"
+import { VisibilityOff } from "../../components/Icons/MuiIcons"
 import { MoreVertSharp } from "../../components/Icons/MuiIcons"
 import { ViewOnBlockExplorerIcon } from "../../components/Icons/ViewOnBlockExplorerIcon"
 import {
@@ -16,13 +15,12 @@ import {
 } from "../../components/Menu"
 import Row, { RowCentered } from "../../components/Row"
 import { routes } from "../../routes"
-import { normalizeAddress } from "../../services/addresses"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { useOnClickOutside } from "../../services/useOnClickOutside"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
 const StyledMenuContainer = styled(MenuContainer)`
   flex: 1;
@@ -69,7 +67,7 @@ export const TokenMenuDeprecated: FC<TokenMenuProps> = ({
       </Row>
       {isMenuOpen && (
         <StyledMenu>
-          <CopyToClipboard
+          {/* <CopyToClipboard
             text={normalizeAddress(tokenAddress)}
             onCopy={() => setMenuOpen(false)}
           >
@@ -80,7 +78,7 @@ export const TokenMenuDeprecated: FC<TokenMenuProps> = ({
               </MenuItem>
             </MenuItemWrapper>
           </CopyToClipboard>
-          <Separator />
+          <Separator /> */}
           <MenuItemWrapper
             onClick={() =>
               openBlockExplorerAddress(currentNetwork, tokenAddress)

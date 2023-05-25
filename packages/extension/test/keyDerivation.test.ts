@@ -10,7 +10,6 @@ import {
 import { baseDerivationPath } from "../src/shared/wallet.service"
 
 test("generate Stark Pair", () => {
-  // secret is an L1 private key (stored locally in a keystore file)
   const secret =
     "0xe6904d63affe7a13cd30345b000c9b1ffc087832332d7303cf237ffda8a177d0"
 

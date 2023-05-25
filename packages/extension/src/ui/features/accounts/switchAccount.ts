@@ -1,8 +1,8 @@
-import { getAccounts } from "../../../shared/account/store"
+import { withHiddenSelector } from "../../../shared/account/selectors"
+import { accountService } from "../../../shared/account/service"
 import { isEqualWalletAddress } from "../../../shared/wallet.service"
-import { walletStore } from "../../../shared/wallet/walletStore"
+import { old_walletStore } from "../../../shared/wallet/walletStore"
 import { useAppState } from "../../app.state"
-import { selectAccount } from "../../services/backgroundAccounts"
 import { setDefaultAccountNames } from "./accountMetadata.state"
 import { mapWalletAccountsToAccounts } from "./accounts.state"
 
@@ -10,19 +10,21 @@ import { mapWalletAccountsToAccounts } from "./accounts.state"
 
 export const autoSelectAccountOnNetwork = async (networkId: string) => {
   const { switcherNetworkId } = useAppState.getState()
-  const selectedAccount = await walletStore.get("selected")
+  const selectedAccount = await old_walletStore.get("selected")
 
   /** switch network and set default account names */
   if (switcherNetworkId !== networkId) {
-    const allAccountsOnNetwork = await getAccounts((account) => {
-      return account.networkId === networkId
-    })
-    const accounts = mapWalletAccountsToAccounts(allAccountsOnNetwork)
-    setDefaultAccountNames(accounts)
+    const allWalletAccounts = await accountService.get(withHiddenSelector)
+    const allAccounts = mapWalletAccountsToAccounts(allWalletAccounts)
+    const allAccountsHasNames = allAccounts.every((account) => account.name)
+    // FIXME: Remove this when migration is done
+    if (!allAccountsHasNames) {
+      setDefaultAccountNames(allAccounts)
+    }
     useAppState.setState({ switcherNetworkId: networkId })
   }
 
-  const visibleAccountsOnNetwork = await getAccounts((account) => {
+  const visibleAccountsOnNetwork = await accountService.get((account) => {
     return account.networkId === networkId && !account.hidden
   })
 
@@ -35,9 +37,10 @@ export const autoSelectAccountOnNetwork = async (networkId: string) => {
 
     // if the selected account is not on the network, switch to the first visible account
     const account = existingAccountOnNetwork || visibleAccountsOnNetwork[0]
-    selectAccount(account)
+    await accountService.select(account)
     return account
   } else {
-    return selectAccount(undefined)
+    await accountService.select(null)
+    return null
   }
 }

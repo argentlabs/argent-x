@@ -7,7 +7,7 @@ import AppErrorBoundaryFallback from "./AppErrorBoundaryFallback"
 import { AppRoutes } from "./AppRoutes"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { AppDimensions } from "./components/Responsive"
-import { LoadingScreen } from "./features/actions/LoadingScreen"
+import { LoadingScreenContainer } from "./features/actions/LoadingScreenContainer"
 import DevUI from "./features/dev/DevUI"
 import { useAutoEnableArgentShield } from "./features/shield/useArgentShieldEnabled"
 import { useCaptureEntryRouteRestorationState } from "./features/stateRestoration/useRestorationState"
@@ -38,7 +38,7 @@ export const App: FC = () => {
               <AppDimensions>
                 {process.env.SHOW_DEV_UI && <DevUI />}
                 <ErrorBoundary fallback={<AppErrorBoundaryFallback />}>
-                  <Suspense fallback={<LoadingScreen />}>
+                  <Suspense fallback={<LoadingScreenContainer />}>
                     <AppRoutes />
                   </Suspense>
                 </ErrorBoundary>

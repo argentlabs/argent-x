@@ -13,39 +13,49 @@ import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
 import { NftScreen } from "./features/accountNfts/NftScreen"
 import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
 import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
-import { AccountListHiddenScreen } from "./features/accounts/AccountListHiddenScreen"
-import { AccountListScreen } from "./features/accounts/AccountListScreen"
+import { AccountListHiddenScreenContainer } from "./features/accounts/AccountListHiddenScreenContainer"
+import { AccountListScreenContainer } from "./features/accounts/AccountListScreenContainer"
 import { AccountScreen } from "./features/accounts/AccountScreen"
-import { AddNewAccountScreen } from "./features/accounts/AddNewAccountScreen"
-import { HideOrDeleteAccountConfirmScreen } from "./features/accounts/HideOrDeleteAccountConfirmScreen"
-import { UpgradeScreen } from "./features/accounts/UpgradeScreen"
-import { UpgradeScreenV4 } from "./features/accounts/UpgradeScreenV4"
+import { AddNewAccountScreenContainer } from "./features/accounts/AddNewAccountScreenContainer"
+import { HideOrDeleteAccountConfirmScreenContainer } from "./features/accounts/HideOrDeleteAccountConfirmScreenContainer"
+import { MigrationDisclaimerScreenContainer } from "./features/accounts/MigrationDisclaimerScreenContainer"
+import { UpgradeScreenContainer } from "./features/accounts/UpgradeScreenContainer"
+import { UpgradeScreenV4Container } from "./features/accounts/UpgradeScreenV4Container"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
 import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
 import { TokenScreen } from "./features/accountTokens/TokenScreen"
 import { useActions } from "./features/actions/actions.state"
-import { ActionScreen } from "./features/actions/ActionScreen"
-import { AddTokenScreen } from "./features/actions/AddTokenScreen"
-import { ErrorScreen } from "./features/actions/ErrorScreen"
-import { LoadingScreen } from "./features/actions/LoadingScreen"
+import { ActionScreenContainer } from "./features/actions/ActionScreen"
+import { AddTokenScreenContainer } from "./features/actions/AddTokenScreenContainer"
+import { ErrorScreenContainer } from "./features/actions/ErrorScreenContainer"
+import { LoadingScreenContainer } from "./features/actions/LoadingScreenContainer"
 import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { LockScreen } from "./features/lock/LockScreen"
 import { ResetScreen } from "./features/lock/ResetScreen"
-import { NetworkWarningScreen } from "./features/networks/NetworkWarningScreen"
-import { MigrationDisclaimerScreen } from "./features/onboarding/MigrationDisclaimerScreen"
-import { OnboardingDisclaimerScreen } from "./features/onboarding/OnboardingDisclaimerScreen"
-import { OnboardingFinishScreen } from "./features/onboarding/OnboardingFinishScreen"
-import { OnboardingPasswordScreen } from "./features/onboarding/OnboardingPasswordScreen"
-import { OnboardingPrivacyStatementScreen } from "./features/onboarding/OnboardingPrivacyStatementScreen"
-import { OnboardingRestoreBackup } from "./features/onboarding/OnboardingRestoreBackup"
-import { OnboardingRestorePassword } from "./features/onboarding/OnboardingRestorePassword"
-import { OnboardingRestoreSeed } from "./features/onboarding/OnboardingRestoreSeed"
-import { OnboardingStartScreen } from "./features/onboarding/OnboardingStartScreen"
-import { BackupDownloadScreen } from "./features/recovery/BackupDownloadScreen"
+import { CreateMultisigStartScreen } from "./features/multisig/CreateMultisigScreen/CreateMultisigStartScreen"
+import { JoinMultisigScreen } from "./features/multisig/JoinMultisigScreen"
+import { JoinMultisigSettingsScreen } from "./features/multisig/JoinMultisigSettingsScreen"
+import { MultisigAddOwnersScreen } from "./features/multisig/MultisigAddOwnersScreen"
+import { MultisigConfirmationsScreen } from "./features/multisig/MultisigConfirmationsScreen"
+import { MultisigOwnersScreen } from "./features/multisig/MultisigOwnersScreen"
+import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
+import { MultisigRemoveOwnersScreen } from "./features/multisig/MultisigRemoveOwnerScreen"
+import { MultisigTransactionConfirmationsScreen } from "./features/multisig/MultisigTransactionConfirmationsScreen"
+import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
+import { RemovedMultisigSettingsScreenContainer } from "./features/multisig/RemovedMultisigSettingsScreenContainer"
+import { NetworkWarningScreenContainer } from "./features/networks/NetworkWarningScreen/NetworkWarningScreenContainer"
+import { OnboardingDisclaimerScreenContainer } from "./features/onboarding/OnboardingDisclaimerScreenContainer"
+import { OnboardingFinishScreenContainer } from "./features/onboarding/OnboardingFinishScreenContainer"
+import { OnboardingPasswordScreenContainer } from "./features/onboarding/OnboardingPasswordScreenContainer"
+import { OnboardingPrivacyStatementScreenContainer } from "./features/onboarding/OnboardingPrivacyStatementScreenContainer"
+import { OnboardingRestoreBackupScreenContainer } from "./features/onboarding/OnboardingRestoreBackupScreenContainer"
+import { OnboardingRestorePasswordScreenContainer } from "./features/onboarding/OnboardingRestorePasswordScreenContainer"
+import { OnboardingRestoreSeedScreenContainer } from "./features/onboarding/OnboardingRestoreSeedScreenContainer"
+import { OnboardingStartScreenContainer } from "./features/onboarding/OnboardingStartScreenContainer"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
 import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfirmScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
@@ -106,12 +116,12 @@ const ResponsiveRoutes: FC = () => (
 
 const nonWalletRoutes = (
   <>
-    <Route path={routes.error.path} element={<ErrorScreen />} />
+    <Route path={routes.error.path} element={<ErrorScreenContainer />} />
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
     <Route
       path={routes.migrationDisclaimer.path}
-      element={<MigrationDisclaimerScreen />}
+      element={<MigrationDisclaimerScreenContainer />}
     />
   </>
 )
@@ -133,7 +143,7 @@ const walletRoutes = (
     <Route
       presentation="modal"
       path={routes.networkWarning.path}
-      element={<NetworkWarningScreen />}
+      element={<NetworkWarningScreenContainer />}
     />
     <Route
       presentation="push"
@@ -158,12 +168,12 @@ const walletRoutes = (
     <Route
       presentation="modal"
       path={routes.accounts.path}
-      element={<AccountListScreen />}
+      element={<AccountListScreenContainer />}
     />
     <Route
       presentation="modal"
       path={routes.newAccount.path}
-      element={<AddNewAccountScreen />}
+      element={<AddNewAccountScreenContainer />}
     />
     <Route
       presentation="push"
@@ -183,6 +193,11 @@ const walletRoutes = (
           <ShieldAccountStartScreen />
         </WithArgentServicesEnabled>
       }
+    />
+    <Route
+      presentation="push"
+      path={routes.shieldAccountStart.path}
+      element={<ShieldAccountStartScreen />}
     />
     <Route
       presentation="push"
@@ -302,14 +317,14 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.accountHideConfirm.path}
-      element={<HideOrDeleteAccountConfirmScreen mode="hide" />}
+      element={<HideOrDeleteAccountConfirmScreenContainer mode="hide" />}
     />
     <Route
       presentation="push"
       path={routes.accountDeleteConfirm.path}
-      element={<HideOrDeleteAccountConfirmScreen mode="delete" />}
+      element={<HideOrDeleteAccountConfirmScreenContainer mode="delete" />}
     />
-    <Route path={routes.upgrade.path} element={<UpgradeScreen />} />
+    <Route path={routes.upgrade.path} element={<UpgradeScreenContainer />} />
     <Route
       presentation="push"
       path={routes.hideToken.path}
@@ -327,16 +342,16 @@ const walletRoutes = (
     <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route
       path={routes.networkUpgradeV4.path}
-      element={<UpgradeScreenV4 upgradeType={"network"} />}
+      element={<UpgradeScreenV4Container upgradeType={"network"} />}
     />
     <Route
       path={routes.accountUpgradeV4.path}
-      element={<UpgradeScreenV4 upgradeType={"account"} />}
+      element={<UpgradeScreenV4Container upgradeType={"account"} />}
     />
     <Route
       presentation="push"
       path={routes.accountsHidden.path}
-      element={<AccountListHiddenScreen />}
+      element={<AccountListHiddenScreenContainer />}
     />
     <Route
       presentation={"modal"}
@@ -367,7 +382,7 @@ const walletRoutes = (
       element={<SeedRecoverySetupScreen />}
     />
     <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
-    <Route path={routes.newToken.path} element={<AddTokenScreen />} />
+    <Route path={routes.newToken.path} element={<AddTokenScreenContainer />} />
     <Route path={routes.token.path} element={<TokenScreen />} />
     <Route
       presentation="modal"
@@ -375,12 +390,56 @@ const walletRoutes = (
       element={<AddPluginScreen />}
     />
     <Route
-      path={routes.backupDownload.path}
-      element={<BackupDownloadScreen />}
-    />
-    <Route
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
+    />
+
+    {/* Multisig */}
+    <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
+    <Route
+      presentation="push"
+      path={routes.multisigJoin.path}
+      element={<JoinMultisigScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigJoinSettings.path}
+      element={<JoinMultisigSettingsScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigOwners.path}
+      element={<MultisigOwnersScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigConfirmations.path}
+      element={<MultisigConfirmationsScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigAddOwners.path}
+      element={<MultisigAddOwnersScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigRemoveOwners.path}
+      element={<MultisigRemoveOwnersScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigPendingTransactionDetails.path}
+      element={<MultisigPendingTransactionDetailsScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigPendingTransactionConfirmations.path}
+      element={<MultisigTransactionConfirmationsScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigRemovedSettings.path}
+      element={<RemovedMultisigSettingsScreenContainer />}
     />
   </>
 )
@@ -389,40 +448,44 @@ const fullscreenRoutes = (
   <>
     <Route
       path={routes.onboardingStart.path}
-      element={<OnboardingStartScreen />}
+      element={<OnboardingStartScreenContainer />}
     />
     <Route
       path={routes.onboardingDisclaimer.path}
-      element={<OnboardingDisclaimerScreen />}
+      element={<OnboardingDisclaimerScreenContainer />}
     />
     <Route
       path={routes.onboardingPrivacyStatement.path}
-      element={<OnboardingPrivacyStatementScreen />}
+      element={<OnboardingPrivacyStatementScreenContainer />}
     />
     <Route
       path={routes.onboardingPassword.path}
-      element={<OnboardingPasswordScreen />}
+      element={<OnboardingPasswordScreenContainer />}
     />
     <Route
       path={routes.onboardingRestoreBackup.path}
-      element={<OnboardingRestoreBackup />}
+      element={<OnboardingRestoreBackupScreenContainer />}
     />
     <Route
       path={routes.onboardingRestoreSeed.path}
-      element={<OnboardingRestoreSeed />}
+      element={<OnboardingRestoreSeedScreenContainer />}
     />
     <Route
       path={routes.onboardingRestorePassword.path}
-      element={<OnboardingRestorePassword />}
+      element={<OnboardingRestorePasswordScreenContainer />}
     />
     <Route
       path={routes.onboardingFinish.path}
-      element={<OnboardingFinishScreen />}
+      element={<OnboardingFinishScreenContainer />}
     />
     <Route path={routes.userReview.path} element={<ReviewRatingScreen />} />
     <Route
       path={routes.userReviewFeedback.path}
       element={<ReviewFeedbackScreen />}
+    />
+    <Route
+      path={routes.multisigCreate.path}
+      element={<CreateMultisigStartScreen />}
     />
   </>
 )
@@ -449,13 +512,13 @@ export const AppRoutes: FC = () => {
   }, [actions, location.pathname])
 
   if (isLoading) {
-    return <LoadingScreen />
+    return <LoadingScreenContainer />
   }
 
   if (showActions) {
     return (
       <ResponsiveContainer>
-        <ActionScreen />
+        <ActionScreenContainer />
       </ResponsiveContainer>
     )
   }

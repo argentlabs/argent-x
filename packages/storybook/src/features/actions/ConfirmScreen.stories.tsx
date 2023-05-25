@@ -1,36 +1,49 @@
 import { ConfirmScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ConfirmScreen"
+import { P4 } from "@argent/ui"
 import { Center } from "@chakra-ui/layout"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+import { ComponentProps } from "react"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "features/ConfirmScreen",
   component: ConfirmScreen,
-} as ComponentMeta<typeof ConfirmScreen>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof ConfirmScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
+const footer = (
+  <Center bg={"neutrals.500"} rounded={"base"} px={1} py={2}>
+    <P4>Placeholder footer</P4>
+  </Center>
+)
+
+export const Default = {
+  render: (props: ComponentProps<typeof ConfirmScreen>) => (
     <ConfirmScreen {...props}>
-      <Center rounded={"md"} bg={"neutrals.800"} height={800}>
+      <Center rounded={"md"} bg={"neutrals.600"} height={"800px"}>
         Some content in here
       </Center>
     </ConfirmScreen>
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {
-  confirmButtonDisabled: false,
+  ),
+  args: {
+    confirmButtonDisabled: false,
+  },
 }
 
-export const ConfirmWarnHigh = Template.bind({})
-ConfirmWarnHigh.args = {
-  confirmButtonVariant: "warn-high",
-  confirmButtonDisabled: false,
+export const ConfirmDestructive = {
+  ...Default,
+  args: {
+    confirmButtonDisabled: false,
+    destructive: true,
+  },
 }
 
-export const ConfirmDanger = Template.bind({})
-ConfirmDanger.args = {
-  confirmButtonVariant: "danger",
-  confirmButtonDisabled: false,
+export const WithFooter = {
+  ...Default,
+  args: {
+    confirmButtonDisabled: false,
+    footer,
+  },
 }

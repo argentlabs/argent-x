@@ -1,0 +1,18 @@
+import { LoadingScreen } from "@argent-x/extension/src/ui/features/actions/LoadingScreen"
+
+export default {
+  component: LoadingScreen,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
+
+export const Default = {
+  args: {},
+}
+
+export const Progress = {
+  args: {
+    progress: 0.67,
+  },
+}

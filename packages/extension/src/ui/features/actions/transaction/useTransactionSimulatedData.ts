@@ -22,7 +22,7 @@ import { useAspectContractAddresses } from "./../../accountNfts/aspect.service"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useTokensRecord } from "../../accountTokens/tokens.state"
-import { useCurrentNetwork } from "../../networks/useNetworks"
+import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 
 interface CommonSimulationData {
   token: Token

@@ -76,7 +76,7 @@ const MainTransactionIconContainer = styled.div`
   margin-bottom: 8px;
 `
 
-const Date = styled.div`
+const DateContainer = styled.div`
   font-weight: 400;
   font-size: 13px;
   color: ${({ theme }) => theme.text2};
@@ -310,7 +310,9 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
               </TitleAddress>
             </TitleAddressContainer>
           )}
-          <Date>{date ? formatDateTime(date) : "Unknown date"}</Date>
+          <DateContainer>
+            {date ? formatDateTime(date) : "Unknown date"}
+          </DateContainer>
         </>
       }
     >

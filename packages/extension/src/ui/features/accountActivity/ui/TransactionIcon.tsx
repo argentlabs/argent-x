@@ -1,5 +1,5 @@
 import { icons } from "@argent/ui"
-import { Circle, Image } from "@chakra-ui/react"
+import { Circle, Image, SquareProps } from "@chakra-ui/react"
 import { ComponentProps, FC } from "react"
 
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
@@ -23,18 +23,23 @@ const {
   ActivityIcon,
   ArgentShieldIcon,
   ArgentShieldDeactivateIcon,
+  MultisigJoinIcon,
+  MultisigRemoveIcon,
+  FailIcon,
 } = icons
 
-export interface TransactionIconProps
-  extends Omit<ComponentProps<typeof Circle>, "outline"> {
+export interface TransactionIconProps extends Omit<SquareProps, "outline"> {
   transaction: TransformedTransaction
   outline?: boolean
+  isCancelled?: boolean
+  size?: number
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transaction,
   size = 18,
   outline = false,
+  isCancelled = false,
   ...rest
 }) => {
   const badgeSize = Math.min(32, Math.round((size * 16) / 36))
@@ -49,6 +54,13 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     case "GUARDIAN":
       iconComponent =
         action === "ADD" ? <ArgentShieldIcon /> : <ArgentShieldDeactivateIcon />
+      break
+    case "SIGNER":
+      iconComponent =
+        action === "ADD" ? <MultisigJoinIcon /> : <MultisigRemoveIcon />
+      break
+    case "THRESHOLD":
+      iconComponent = <ApproveIcon />
       break
   }
   switch (action) {
@@ -112,7 +124,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       fontSize={iconSize}
       {...rest}
     >
-      {iconComponent}
+      {isCancelled ? <FailIcon /> : iconComponent}
       {badgeComponent && (
         <Circle
           overflow={"hidden"}

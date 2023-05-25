@@ -1,6 +1,6 @@
 {
   "name": "@argent/stack-router",
-  "version": "5.3.21",
+  "version": "6.3.0",
   "license": "MIT",
   "private": true,
   "files": [
@@ -25,14 +25,15 @@
     "example": "cd example && react-scripts start"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.4.6",
-    "@emotion/styled": "^11.10.5",
+    "@chakra-ui/react": "^2.6.1",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
     "framer-motion": "^9.0.3",
     "history": "^5.3.0",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@argent/ui": "^5.3.21",
+    "@argent/ui": "^6.3.0",
     "@types/lodash-es": "^4.17.6",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -42,15 +43,14 @@
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "jsdom": "^21.0.0",
+    "jsdom": "^22.0.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
-    "vite-plugin-dts": "^1.6.6",
+    "vite-plugin-dts": "^2.3.0",
     "vitest": "^0.29.2"
   },
   "peerDependencies": {
-    "@emotion/react": "^11.10.5",
     "colord": "^2.9.2",
     "lodash-es": "^4.17.21",
     "react": "^18.0.0",

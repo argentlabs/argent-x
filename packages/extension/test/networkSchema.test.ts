@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest"
+import { ZodError } from "zod"
 
 import {
   defaultNetwork,
@@ -13,7 +14,7 @@ const defaultLocalhostNetwork = defaultNetworks.find(
 describe("networkSchema", () => {
   describe("when valid", () => {
     test("should allow accountClassHash to be missing", () => {
-      expect(networkSchema.validateSync(defaultLocalhostNetwork)).toEqual(
+      expect(networkSchema.parse(defaultLocalhostNetwork)).toEqual(
         defaultLocalhostNetwork,
       )
     })
@@ -22,27 +23,26 @@ describe("networkSchema", () => {
     })
   })
   describe("when invalid", () => {
-    test("should not allow accountClassHash to be defined with missing argentAccount", () => {
-      expect(() =>
-        networkSchema.validateSync({
-          ...defaultLocalhostNetwork,
-          accountClassHash: {},
-        }),
-      ).toThrowErrorMatchingInlineSnapshot(
-        '"Account class hash is a required field"',
-      )
-    })
     test("should not allow accountClassHash with invalid argentAccount", () => {
-      expect(() =>
-        networkSchema.validateSync({
+      expect(
+        networkSchema.safeParse({
           ...defaultLocalhostNetwork,
           accountClassHash: {
-            argentAccount: "foo",
+            standard: "foo",
           },
         }),
-      ).toThrowErrorMatchingInlineSnapshot(
-        '"Account class hash must match the following: \\"/^0x[a-f0-9]+$/i\\""',
-      )
+      ).toEqual({
+        error: new ZodError([
+          {
+            validation: "regex",
+            code: "invalid_string",
+            message:
+              "Account class hash must match the following: /^0x[a-f0-9]+$/i",
+            path: ["accountClassHash", "standard"],
+          },
+        ]),
+        success: false,
+      })
     })
   })
 })

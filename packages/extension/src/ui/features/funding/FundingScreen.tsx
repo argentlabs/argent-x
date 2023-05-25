@@ -10,7 +10,8 @@ import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
 import { trackAddFundsService, usePageTracking } from "../../services/analytics"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import CardSvg from "./card.svg"
 import CoinbaseSvg from "./coinbase.svg"
 import EthereumSvg from "./ethereum.svg"
@@ -26,7 +27,7 @@ export const Title = styled.h1`
 `
 
 export const FundingScreen: FC = () => {
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
   const navigate = useNavigate()
   const toast = useToast()
   usePageTracking("addFunds", {

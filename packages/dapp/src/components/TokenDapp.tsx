@@ -6,16 +6,16 @@ import { hash } from "starknet5"
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
 import {
-  getErc20TokenAddress,
+  DAITokenAddress,
+  ETHTokenAddress,
   mintToken,
   parseInputAmountToUint256,
   transfer,
 } from "../services/token.service"
 import {
+  addNetwork,
   addToken,
   declare,
-  getExplorerBaseUrl,
-  networkId,
   signMessage,
   waitForTransaction,
 } from "../services/wallet.service"
@@ -55,6 +55,7 @@ export const TokenDapp: FC<{
   const [addTokenError, setAddTokenError] = useState("")
   const [classHash, setClassHash] = useState("")
   const [contract, setContract] = useState<string | undefined>()
+  const [addNetworkError, setAddNetworkError] = useState("")
 
   const [sessionSigner] = useState(genKeyPair())
   const [sessionAccount, setSessionAccount] = useState<
@@ -82,20 +83,19 @@ export const TokenDapp: FC<{
     })()
   }, [transactionStatus, lastTransactionHash])
 
-  const network = networkId()
-  if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
-    return (
-      <>
-        <p>
-          There is no demo token for this network, but you can deploy one and
-          add its address to this file:
-        </p>
-        <div>
-          <pre>packages/dapp/src/token.service.ts</pre>
-        </div>
-      </>
-    )
-  }
+  // if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
+  //   return (
+  //     <>
+  //       <p>
+  //         There is no demo token for this network, but you can deploy one and
+  //         add its address to this file:
+  //       </p>
+  //       <div>
+  //         <pre>packages/dapp/src/token.service.ts</pre>
+  //       </div>
+  //     </>
+  //   )
+  // }
 
   const handleMintSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -103,7 +103,7 @@ export const TokenDapp: FC<{
       setTransactionStatus("approve")
 
       console.log("mint", mintAmount)
-      const result = await mintToken(mintAmount, network)
+      const result = await mintToken(mintAmount)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -119,8 +119,7 @@ export const TokenDapp: FC<{
       e.preventDefault()
       setTransactionStatus("approve")
 
-      console.log("transfer", { transferTo, transferAmount })
-      const result = await transfer(transferTo, transferAmount, network)
+      const result = await transfer(transferTo, transferAmount)
       console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
@@ -156,7 +155,7 @@ export const TokenDapp: FC<{
         expires: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds
         policies: [
           {
-            contractAddress: getErc20TokenAddress(network),
+            contractAddress: ETHTokenAddress,
             selector: "transfer",
           },
         ],
@@ -182,8 +181,8 @@ export const TokenDapp: FC<{
       }
       const erc20Contract = new Contract(
         Erc20Abi as Abi,
-        getErc20TokenAddress(network),
-        sessionAccount,
+        ETHTokenAddress,
+        sessionAccount as any,
       )
 
       const result = await erc20Contract.transfer(
@@ -220,7 +219,14 @@ export const TokenDapp: FC<{
     }
   }
 
-  const tokenAddress = getErc20TokenAddress(network as any)
+  const handleAddNetwork = async () => {
+    await addNetwork({
+      id: "dapp-test",
+      chainId: "SN_DAPP_TEST",
+      chainName: "Test chain name",
+      baseUrl: "http://localhost:5050",
+    })
+  }
 
   return (
     <>
@@ -231,7 +237,7 @@ export const TokenDapp: FC<{
         <h3 style={{ margin: 0 }}>
           Transaction hash:{" "}
           <a
-            href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
+            // href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
             target="_blank"
             rel="noreferrer"
             style={{ color: "blue", margin: "0 0 1em" }}
@@ -394,34 +400,71 @@ export const TokenDapp: FC<{
           <input type="submit" value="Declare" disabled={!classHash} />
         </form>
       </div>
-      <h3 style={{ margin: 0 }}>
-        ETH token address
-        <button
-          className="flat"
-          style={{ marginLeft: ".6em" }}
-          onClick={async () => {
-            try {
-              await addToken(tokenAddress)
-              setAddTokenError("")
-            } catch (error: any) {
-              setAddTokenError(error.message)
-            }
-          }}
-        >
-          Add to wallet
-        </button>
-        <br />
-        <code>
-          <a
-            target="_blank"
-            href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
-            rel="noreferrer"
+      <div className="columns">
+        <div>
+          <h2 className={styles.title}>ERC20</h2>
+          ETH token address
+          <br />
+          <code>
+            <a
+              target="_blank"
+              // href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
+              rel="noreferrer"
+            >
+              {truncateAddress(ETHTokenAddress)}
+            </a>
+          </code>
+          <br />
+          <button
+            className="flat"
+            style={{ marginLeft: ".6em" }}
+            onClick={async () => {
+              try {
+                await addToken(ETHTokenAddress)
+                setAddTokenError("")
+              } catch (error: any) {
+                setAddTokenError(error.message)
+              }
+            }}
           >
-            {truncateAddress(tokenAddress)}
-          </a>
-        </code>
-      </h3>
-      <span className="error-message">{addTokenError}</span>
+            Add ETH token to wallet
+          </button>
+          <br />
+          <button
+            className="flat"
+            style={{ marginLeft: ".6em" }}
+            onClick={async () => {
+              try {
+                await addToken(DAITokenAddress)
+                setAddTokenError("")
+              } catch (error: any) {
+                setAddTokenError(error.message)
+              }
+            }}
+          >
+            Add DAI token to wallet
+          </button>
+          <span className="error-message">{addTokenError}</span>
+        </div>
+        <div>
+          <h2 className={styles.title}>Network</h2>
+          <button
+            className="flat"
+            onClick={async () => {
+              try {
+                await handleAddNetwork()
+                setAddNetworkError("")
+              } catch (error: any) {
+                setAddNetworkError(error.message)
+              }
+            }}
+          >
+            Add network to wallet
+          </button>
+          <br />
+          <span className="error-message">{addNetworkError}</span>
+        </div>
+      </div>
     </>
   )
 }

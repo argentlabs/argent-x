@@ -7,18 +7,15 @@ import {
   Switch,
 } from "@argent/ui"
 import { icons } from "@argent/ui"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
+import { StoryFn } from "@storybook/react"
 
 const { ArgentShieldIcon, TickIcon, MulticallIcon, WalletIcon, PluginIcon } =
   icons
 
 export default {
-  title: "components/CellStack",
   component: CellStack,
   parameters: {
-    viewport: {
-      defaultViewport: "reset",
-    },
+    layout: "fullscreen",
   },
   args: {
     isChecked: true,
@@ -30,9 +27,9 @@ export default {
       },
     },
   },
-} as ComponentMeta<typeof CellStack>
+}
 
-const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
+const render: StoryFn<typeof CellStack> = (props, { args }) => (
   <CellStack {...props}>
     <HeaderCell>HeaderCell</HeaderCell>
     <ButtonCell>ButtonCell</ButtonCell>
@@ -104,5 +101,7 @@ const Template: ComponentStory<typeof CellStack> = (props, { args }) => (
   </CellStack>
 )
 
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {
+  render,
+  args: {},
+}

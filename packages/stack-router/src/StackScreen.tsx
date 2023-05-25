@@ -1,5 +1,5 @@
 import { usePresence, useReducedMotion } from "framer-motion"
-import { ComponentProps, FC, useEffect, useMemo, useRef } from "react"
+import { FC, PropsWithChildren, useEffect, useMemo, useRef } from "react"
 
 import {
   animatedTransition,
@@ -7,14 +7,14 @@ import {
 } from "./presentation/transitions"
 import { useStackContext } from "./StackContext"
 import {
-  StackScreenContainer,
+  StackScreenContainerProps,
   StackScreenMotionContainer,
 } from "./StackScreenContainer"
 import { PresentationDirection } from "./types"
 import { isModalSheetPresentation, isStackedPresentation } from "./utils/is"
 
 export interface StackScreenProps
-  extends ComponentProps<typeof StackScreenContainer> {
+  extends PropsWithChildren<StackScreenContainerProps> {
   /** path specified in `<Route ... />` e.g. `/users/:id` */
   path: string
 }

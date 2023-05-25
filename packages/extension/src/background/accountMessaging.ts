@@ -1,13 +1,10 @@
 import { constants, number } from "starknet"
 
-import { getAccounts, removeAccount } from "../shared/account/store"
-import { tryToMintFeeToken } from "../shared/devnet/mintFeeToken"
+import { accountService } from "../shared/account/service"
 import { AccountMessage } from "../shared/messages/AccountMessage"
 import { isEqualAddress } from "../ui/services/addresses"
-import { deployAccountAction } from "./accountDeploy"
 import { upgradeAccount } from "./accountUpgrade"
 import { sendMessageToUi } from "./activeTabs"
-import { analytics } from "./analytics"
 import { HandleMessage, UnhandledMessage } from "./background"
 import { encryptForUi } from "./crypto"
 import { addTransaction } from "./transactions/store"
@@ -16,80 +13,8 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,
   background: { wallet, actionQueue },
   messagingKeys: { privateKey },
-  respond,
 }) => {
   switch (msg.type) {
-    case "GET_ACCOUNTS": {
-      return sendMessageToUi({
-        type: "GET_ACCOUNTS_RES",
-        data: await getAccounts(msg.data?.showHidden ? () => true : undefined),
-      })
-    }
-
-    case "CONNECT_ACCOUNT": {
-      // Select an Account of BaseWalletAccount type
-      const selectedAccount = await wallet.getSelectedAccount()
-
-      return respond({
-        type: "CONNECT_ACCOUNT_RES",
-        data: selectedAccount,
-      })
-    }
-
-    case "NEW_ACCOUNT": {
-      if (!(await wallet.isSessionOpen())) {
-        throw Error("you need an open session")
-      }
-
-      const network = msg.data
-      try {
-        const account = await wallet.newAccount(network)
-
-        tryToMintFeeToken(account)
-
-        analytics.track("createAccount", {
-          status: "success",
-          networkId: network,
-        })
-
-        const accounts = await getAccounts()
-
-        return sendMessageToUi({
-          type: "NEW_ACCOUNT_RES",
-          data: {
-            account,
-            accounts,
-          },
-        })
-      } catch (exception) {
-        const error = `${exception}`
-
-        analytics.track("createAccount", {
-          status: "failure",
-          networkId: network,
-          errorMessage: error,
-        })
-
-        return sendMessageToUi({
-          type: "NEW_ACCOUNT_REJ",
-          data: { error },
-        })
-      }
-    }
-
-    case "DEPLOY_ACCOUNT": {
-      try {
-        await deployAccountAction({
-          account: msg.data,
-          actionQueue,
-        })
-
-        return sendMessageToUi({ type: "DEPLOY_ACCOUNT_RES" })
-      } catch (e) {
-        return sendMessageToUi({ type: "DEPLOY_ACCOUNT_REJ" })
-      }
-    }
-
     case "GET_SELECTED_ACCOUNT": {
       const selectedAccount = await wallet.getSelectedAccount()
       return sendMessageToUi({
@@ -117,7 +42,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
         const account = msg.data
         const fullAccount = await wallet.getAccount(account)
         const { txHash } = await wallet.redeployAccount(fullAccount)
-        addTransaction({
+        void addTransaction({
           hash: txHash,
           account: fullAccount,
           meta: { title: "Redeploy wallet", type: "DEPLOY_ACCOUNT" },
@@ -136,7 +61,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
 
     case "DELETE_ACCOUNT": {
       try {
-        await removeAccount(msg.data)
+        await accountService.remove(msg.data)
         return sendMessageToUi({ type: "DELETE_ACCOUNT_RES" })
       } catch {
         return sendMessageToUi({ type: "DELETE_ACCOUNT_REJ" })
@@ -149,7 +74,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       }
 
       const encryptedPrivateKey = await encryptForUi(
-        await wallet.exportPrivateKey(msg.data.account),
+        await wallet.getPrivateKey(msg.data.account),
         msg.data.encryptedSecret,
         privateKey,
       )
@@ -161,11 +86,11 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     }
 
     case "GET_PUBLIC_KEY": {
-      const publicKey = await wallet.getPublicKey(msg.data)
+      const { publicKey, account } = await wallet.getPublicKey(msg.data)
 
       return sendMessageToUi({
         type: "GET_PUBLIC_KEY_RES",
-        data: { publicKey },
+        data: { publicKey, account },
       })
     }
 
@@ -186,6 +111,22 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
       })
     }
 
+    case "GET_NEXT_PUBLIC_KEY": {
+      try {
+        const { publicKey } = await wallet.getNextPublicKey(msg.data.networkId)
+
+        return sendMessageToUi({
+          type: "GET_NEXT_PUBLIC_KEY_RES",
+          data: { publicKey },
+        })
+      } catch (e) {
+        console.error(e)
+        return sendMessageToUi({
+          type: "GET_NEXT_PUBLIC_KEY_REJ",
+        })
+      }
+    }
+
     case "DEPLOY_ACCOUNT_ACTION_FAILED": {
       return await actionQueue.remove(msg.data.actionHash)
     }
@@ -193,22 +134,23 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
     case "ACCOUNT_CHANGE_GUARDIAN": {
       try {
         const { account, guardian } = msg.data
+
+        const newGuardian = number.hexToDecimalString(guardian)
+
         await actionQueue.push({
           type: "TRANSACTION",
           payload: {
             transactions: {
               contractAddress: account.address,
               entrypoint: "changeGuardian",
-              calldata: [
-                number.hexToDecimalString(
-                  guardian || constants.ZERO.toString(),
-                ),
-              ],
+              calldata: [newGuardian],
             },
             meta: {
               isChangeGuardian: true,
               title: "Change account guardian",
-              type: "INVOKE_FUNCTION",
+              type: number.toBN(newGuardian).isZero() // if guardian is 0, it's a remove guardian action
+                ? "REMOVE_ARGENT_SHIELD"
+                : "ADD_ARGENT_SHIELD",
             },
           },
         })
@@ -296,7 +238,7 @@ export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
           throw Error("no account selected")
         }
 
-        const publicKey = await wallet.getPublicKey(account)
+        const { publicKey } = await wallet.getPublicKey(account)
 
         if (
           selectedAccount.guardian &&

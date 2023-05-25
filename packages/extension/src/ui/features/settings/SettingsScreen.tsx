@@ -15,8 +15,10 @@ import { isPrivacySettingsEnabled } from "../../../shared/settings"
 import { routes, useCurrentPathnameWithQuery, useReturnTo } from "../../routes"
 import { useStopSession } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
-import { AccountListScreenItem } from "../accounts/AccountListScreenItem"
-import { useAccount, useSelectedAccount } from "../accounts/accounts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
+import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
+import { useAccount } from "../accounts/accounts.state"
 import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { DapplandFooter } from "./DapplandFooter"
 import { SettingsMenuItem } from "./SettingsMenuItem"
@@ -80,7 +82,7 @@ export const SettingsScreen: FC = () => {
   const settingsReturnTo = useReturnTo()
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
-  const selectedAccount = useSelectedAccount()
+  const selectedAccount = useView(selectedAccountView)
   const returnTo = useCurrentPathnameWithQuery()
   const account = useAccount(selectedAccount)
   const navigate = useNavigate()
@@ -101,7 +103,10 @@ export const SettingsScreen: FC = () => {
         <CellStack>
           {account && (
             <>
-              <AccountListScreenItem account={account} clickNavigateSettings />
+              <AccountListScreenItemContainer
+                account={account}
+                clickNavigateSettings
+              />
               <SpacerCell />
             </>
           )}

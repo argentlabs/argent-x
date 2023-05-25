@@ -7,6 +7,7 @@ import type {
   typedData,
 } from "starknet"
 
+import { Network } from "../network"
 import { TransactionMeta } from "../transactions"
 import { BaseWalletAccount } from "../wallet.model"
 
@@ -42,6 +43,10 @@ export type ActionItem =
       payload: BaseWalletAccount
     }
   | {
+      type: "DEPLOY_MULTISIG_ACTION"
+      payload: BaseWalletAccount
+    }
+  | {
       type: "SIGN"
       payload: typedData.TypedData
     }
@@ -56,28 +61,8 @@ export type ActionItem =
       }
     }
   | {
-      type: "REQUEST_ADD_CUSTOM_NETWORK"
-      payload: {
-        id: string
-        name: string
-        chainId: string // A 0x-prefixed hexadecimal string
-        baseUrl: string
-        explorerUrl?: string
-        accountImplementation?: string
-        rpcUrl?: string
-      }
-    }
-  | {
       type: "REQUEST_SWITCH_CUSTOM_NETWORK"
-      payload: {
-        id: string
-        name: string
-        chainId: string // A 0x-prefixed hexadecimal string
-        baseUrl: string
-        explorerUrl?: string
-        accountImplementation?: string
-        rpcUrl?: string
-      }
+      payload: Network
     }
   | {
       type: "DECLARE_CONTRACT_ACTION"

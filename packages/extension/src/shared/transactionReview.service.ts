@@ -29,7 +29,7 @@ export type ApiTransactionReviewAssessmentReason =
 export type ApiTransactionReviewTargettedDapp = {
   name: string
   description: string
-  iconUrl: string
+  logoUrl: string
   links: {
     name: string
     url: string

@@ -1,8 +1,8 @@
 import { ArrayStorage } from "../../../../shared/storage"
+import { WalletAccount } from "../../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
-import { Account } from "../../accounts/Account"
 
-export const getEscapeWarningStoreKey = (account: Account) => {
+export const getEscapeWarningStoreKey = (account: WalletAccount) => {
   const accountIdentifier = getAccountIdentifier(account)
   if (!account.escape) {
     return accountIdentifier

@@ -26,7 +26,7 @@ describe("getAndMergeAccountDetails", () => {
       ): Promise<AccountTypesFromChain[]> => {
         return accounts.map((account) => ({
           ...account,
-          type: account.address === address1 ? "argent" : "argent-plugin",
+          type: account.address === address1 ? "standard" : "plugin",
         }))
       }
       const getAccountGuardiansFromChain = async (
@@ -48,13 +48,13 @@ describe("getAndMergeAccountDetails", () => {
             "address": "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
             "guardian": "0x1",
             "networkId": "goerli-alpha",
-            "type": "argent",
+            "type": "standard",
           },
           {
             "address": "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
             "guardian": "0x2",
             "networkId": "mainnet-alpha",
-            "type": "argent-plugin",
+            "type": "plugin",
           },
         ]
       `)

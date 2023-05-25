@@ -1,6 +1,6 @@
 {
   "name": "@argent/ui",
-  "version": "5.3.21",
+  "version": "6.3.0",
   "license": "MIT",
   "private": true,
   "files": [
@@ -13,50 +13,59 @@
   "exports": {
     ".": {
       "import": "./dist/ui.es.js",
-      "require": "./dist/ui.umd.js"
+      "require": "./dist/ui.umd.js",
+      "types": "./dist/ui.d.ts"
     },
     "./assets/dapplandBannerBackground.png": "./assets/dapplandBannerBackground.png"
   },
   "devDependencies": {
-    "@chakra-ui/cli": "^2.1.8",
+    "@chakra-ui/cli": "^2.4.1",
+    "@chakra-ui/system": "^2.5.7",
     "@svgr/core": "^6.5.0",
-    "@svgr/plugin-jsx": "^6.5.0",
+    "@svgr/plugin-jsx": "^7.0.0",
     "@svgr/plugin-prettier": "^6.5.0",
     "@testing-library/react": "^14.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
+    "@zxcvbn-ts/core": "^2.2.1",
     "eslint": "^8.7.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "jsdom": "^21.0.0",
+    "ethers": "^6.3.0",
+    "jsdom": "^22.0.0",
+    "rollup-plugin-visualizer": "^5.9.0",
+    "ts-custom-error": "^3.3.1",
     "typescript": "^4.9.4",
     "vite": "^4.0.3",
-    "vite-plugin-dts": "^1.6.6",
+    "vite-plugin-dts": "^2.3.0",
     "vitest": "^0.29.2"
   },
   "scripts": {
-    "gen:theme-typings": "chakra-cli tokens ./src/theme",
+    "gen:theme-typings": "chakra-cli tokens ./src/theme/index.tsx",
     "gen:icons": "ts-node ./scripts/generate-icons.ts",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "setup": "yarn gen:theme-typings && vite build",
     "dev": "vite build --watch",
+    "setup": "yarn gen:theme-typings && vite build",
     "build": "vite build",
     "test": "vitest run",
     "test:ci": "vitest run --coverage"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.5.1",
-    "@emotion/styled": "^11.10.4",
+    "@argent/shared": "^6.3.0",
+    "@chakra-ui/react": "^2.6.1",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
     "@ethersproject/wordlists": "^5.7.0",
     "framer-motion": "^9.0.3",
     "popmotion": "^11.0.5"
   },
   "peerDependencies": {
-    "@emotion/react": "^11.10.4",
+    "@zxcvbn-ts/language-common": "^2.0.1",
+    "@zxcvbn-ts/language-en": "^2.1.0",
     "colord": "^2.9.2",
-    "ethers": "^5.5.1",
+    "ethers": "^6.3.0",
     "lodash-es": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

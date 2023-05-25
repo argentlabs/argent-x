@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish, utils } from "ethers"
+import { BigNumberish, formatUnits, toBigInt } from "ethers"
 import { Children, ReactElement, cloneElement } from "react"
 
 export const TextWithAmount = ({
@@ -14,8 +14,8 @@ export const TextWithAmount = ({
   const element = Children.only(children)
 
   try {
-    const convertedAmount = BigNumber.from(amount)
-    dataValue = utils.formatUnits(convertedAmount, decimals)
+    const convertedAmount = toBigInt(amount)
+    dataValue = formatUnits(convertedAmount, decimals)
   } catch (e) {
     // ignore parsing error
   }

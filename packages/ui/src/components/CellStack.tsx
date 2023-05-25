@@ -1,4 +1,4 @@
-import { ChakraComponent, Flex, chakra } from "@chakra-ui/react"
+import { ChakraComponent, Flex, PropsOf, chakra } from "@chakra-ui/react"
 import { ReactNode } from "react"
 
 import { Button } from "./Button"
@@ -32,16 +32,17 @@ export const HeaderCell = chakra(H6, {
   },
 })
 
-export type ButtonCellProps = ChakraComponent<
-  "button",
-  {
-    leftIcon?: ReactNode
-    rightIcon?: ReactNode
-    extendedDescription?: ReactNode
-  }
->
+interface ButtonCellCustomProps {
+  leftIcon?: ReactNode
+  rightIcon?: ReactNode
+  extendedDescription?: ReactNode
+}
 
-export const ButtonCell: ButtonCellProps = ({
+type ButtonCellComponent = ChakraComponent<"button", ButtonCellCustomProps>
+
+export type ButtonCellProps = PropsOf<"button"> & ButtonCellCustomProps
+
+export const ButtonCell: ButtonCellComponent = ({
   extendedDescription,
   leftIcon,
   rightIcon = <ChevronRightIcon />,

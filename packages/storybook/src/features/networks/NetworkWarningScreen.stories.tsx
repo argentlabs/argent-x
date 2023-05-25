@@ -1,17 +1,15 @@
-import { NetworkWarningScreen } from "@argent-x/extension/src/ui/features/networks/NetworkWarningScreen"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+import { NetworkWarningScreen } from "@argent-x/extension/src/ui/features/networks/NetworkWarningScreen/NetworkWarningScreen"
+
+import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  title: "features/NetworkWarningScreen",
   component: NetworkWarningScreen,
-} as ComponentMeta<typeof NetworkWarningScreen>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof NetworkWarningScreen> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
-    <NetworkWarningScreen {...props}></NetworkWarningScreen>
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {}
+export const Default = {
+  args: {},
+}

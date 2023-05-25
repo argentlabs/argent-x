@@ -2,10 +2,6 @@ import { FlowHeader, icons } from "@argent/ui"
 import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../accounts/accountMetadata.state"
 import { ShieldIconRow } from "./ui/ShieldIconRow"
 import { ShieldLearnMoreButton } from "./ui/ShieldLearnMoreButton"
 import { useRouteAccount } from "./useRouteAccount"
@@ -14,10 +10,7 @@ const { InfoIcon, ArgentShieldIcon } = icons
 
 export const ShieldAccountDeactivate: FC = () => {
   const account = useRouteAccount()
-  const { accountNames } = useAccountMetadata()
-  const accountName = account
-    ? getAccountName(account, accountNames)
-    : undefined
+  const accountName = account ? account.name : undefined
 
   return (
     <>

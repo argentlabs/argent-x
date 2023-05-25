@@ -1,28 +1,20 @@
 import { useMemo } from "react"
 
-import {
-  getNetworkSelector,
-  withHiddenSelector,
-  withoutHiddenSelector,
-} from "../../../shared/account/selectors"
-import { accountStore } from "../../../shared/account/store"
-import { defaultNetwork } from "../../../shared/network"
-import {
-  useArrayStorage,
-  useKeyValueStorage,
-} from "../../../shared/storage/hooks"
 import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/wallet.service"
-import { walletStore } from "../../../shared/wallet/walletStore"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { accountFindFamily, selectedAccountView } from "../../views/account"
+import { undefinedView } from "../../views/defaults"
+import { useView } from "../../views/implementation/react"
 import { Account } from "./Account"
 
+// This file is used everywhere
+// TODO: we should get rid of this and use the WalletAccount interface only (renaming it at some point)
 export const mapWalletAccountsToAccounts = (
   walletAccounts: WalletAccount[],
 ): Account[] => {
   return walletAccounts.map(
     (walletAccount) =>
       new Account({
+        name: walletAccount.name,
         address: walletAccount.address,
         network: walletAccount.network,
         signer: walletAccount.signer,
@@ -35,72 +27,31 @@ export const mapWalletAccountsToAccounts = (
   )
 }
 
-export const useAccounts = ({
-  showHidden = false,
-  allNetworks = false,
-} = {}) => {
-  const network = useCurrentNetwork()
-  const accounts = useArrayStorage(accountStore)
-
-  const filteredAccounts = useMemo(
-    () =>
-      accounts
-        .filter((account) => {
-          /** omit if custom network no longer exists */
-          return account.network !== undefined
-        })
-        .filter(
-          allNetworks
-            ? () => true
-            : getNetworkSelector(network.id ?? defaultNetwork.id),
-        )
-        .filter(showHidden ? withHiddenSelector : withoutHiddenSelector),
-    [network.id, showHidden, allNetworks, accounts],
-  )
-
-  return useMemo(() => {
-    return mapWalletAccountsToAccounts(filteredAccounts)
-  }, [filteredAccounts])
-}
-
-export const useAccountsOnNetwork = ({
-  networkId,
-  showHidden = false,
-}: {
-  networkId: string
-  showHidden: boolean
-}) => {
-  const accounts = useArrayStorage(accountStore)
-
-  const filteredAccounts = useMemo(
-    () =>
-      accounts
-        .filter(getNetworkSelector(networkId))
-        .filter(showHidden ? withHiddenSelector : withoutHiddenSelector),
-    [accounts, networkId, showHidden],
-  )
-
-  return useMemo(() => {
-    return mapWalletAccountsToAccounts(filteredAccounts)
-  }, [filteredAccounts])
-}
-
 export const useAccount = (
   account?: BaseWalletAccount,
 ): Account | undefined => {
-  const accounts = useAccounts({ allNetworks: true, showHidden: true })
+  const view = useMemo(() => {
+    return account ? accountFindFamily(account) : undefinedView
+  }, [account])
+
+  const foundAccount = useView(view)
+
   return useMemo(() => {
-    if (!account) {
-      return undefined
-    }
-    return accounts.find((a) => account && accountsEqual(a, account))
-  }, [accounts, account])
+    return !foundAccount
+      ? undefined
+      : mapWalletAccountsToAccounts([foundAccount])[0]
+  }, [foundAccount])
 }
 
-export const isHiddenAccount = (account: Account) => !!account.hidden
+/**
+ * @deprecated use `useView(selectedAccountView)` instead
+ */
+export const useSelectedAccount = (): Account | undefined => {
+  const selectedAccount = useView(selectedAccountView)
 
-// Use selected account from Wallet Store
-export const useSelectedAccount = () => {
-  const baseWalletAccount = useKeyValueStorage(walletStore, "selected")
-  return useAccount(baseWalletAccount ?? undefined)
+  return useMemo(() => {
+    return !selectedAccount
+      ? undefined
+      : mapWalletAccountsToAccounts([selectedAccount])[0]
+  }, [selectedAccount])
 }

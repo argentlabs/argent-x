@@ -11,7 +11,7 @@ import type { ProviderInterface } from "starknet"
 
 import { MessageAccount } from "./account"
 import { userEventHandlers } from "./eventHandlers"
-import { BidirectionalExchange } from "./messages/exchange/bidirectional"
+import { Sender } from "./messages/exchange/bidirectional"
 import { StarknetMethods } from "./types"
 
 export type Variant = "argentX" | "argentWebWallet"
@@ -27,7 +27,7 @@ export interface GetArgentStarknetWindowObject {
 function updateStarknetWindowObject(
   windowObject: StarknetWindowObject,
   provider: ProviderInterface,
-  remoteHandle: BidirectionalExchange<StarknetMethods, {}>,
+  remoteHandle: Sender<StarknetMethods>,
   walletAddress: string,
 ): ConnectedStarknetWindowObject {
   if (windowObject.isConnected) {
@@ -48,15 +48,29 @@ function updateStarknetWindowObject(
   return Object.assign(windowObject, valuesToAssign)
 }
 
+export type WebWalletStarknetWindowObject = StarknetWindowObject & {
+  getLoginStatus(): Promise<
+    | {
+        isLoggedIn: false
+      }
+    | {
+        isLoggedIn: true
+        hasSession: boolean
+        isPreauthorized: boolean
+      }
+  >
+}
+
 export const getArgentStarknetWindowObject = (
   options: GetArgentStarknetWindowObject,
   provider: ProviderInterface,
-  remoteHandle: BidirectionalExchange<StarknetMethods, {}>,
-): StarknetWindowObject => {
-  const wallet: StarknetWindowObject = {
+  remoteHandle: Sender<StarknetMethods>,
+): WebWalletStarknetWindowObject => {
+  const wallet: WebWalletStarknetWindowObject = {
     ...options,
     isConnected: false,
     provider,
+    getLoginStatus: () => remoteHandle.call("getLoginStatus"),
     async request(call) {
       switch (call.type) {
         case "wallet_addStarknetChain": {
@@ -76,11 +90,10 @@ export const getArgentStarknetWindowObject = (
       }
     },
     async enable(ops) {
-      if (ops?.starknetVersion === "v3") {
+      if (ops?.starknetVersion !== "v4") {
         throw Error("not implemented")
       }
       const [selectedAddress] = await remoteHandle.call("enable")
-
       updateStarknetWindowObject(
         wallet,
         provider,

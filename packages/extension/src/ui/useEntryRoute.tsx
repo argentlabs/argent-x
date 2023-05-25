@@ -37,6 +37,14 @@ const determineEntry = async (query: URLSearchParams) => {
     return routes.ledgerEntry()
   }
 
+  if (query.get("goto") === "multisig") {
+    const networkId = query.get("networkId")
+    if (!networkId) {
+      throw new Error("Missing networkId query param")
+    }
+    return routes.multisigCreate(networkId)
+  }
+
   const { initialized } = await isInitialized()
   if (!initialized) {
     return routes.onboardingStart()

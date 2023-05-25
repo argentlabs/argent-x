@@ -1,12 +1,13 @@
 import { icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { FC, Fragment, useMemo } from "react"
+import { FC, Fragment, PropsWithChildren, useMemo } from "react"
 
 import { prettifyTokenAmount } from "../../../../../../shared/token/price"
 import { getTransactionReviewWithType } from "../../../../../../shared/transactionReview.service"
 import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
 import { useAspectNft } from "../../../../accountNfts/aspect.service"
-import { useCurrentNetwork } from "../../../../networks/useNetworks"
+import { useCurrentNetwork } from "../../../../networks/hooks/useCurrentNetwork"
+import { ApproveScreenType } from "../../types"
 import { useERC721Transfers } from "../../useErc721Transfers"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 
@@ -16,13 +17,19 @@ export interface TransactionTitleProps {
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
   fallback?: string
-  declareOrDeployType?: "declare" | "deploy"
+  approveScreenType: ApproveScreenType
 }
+
+const Title: FC<PropsWithChildren> = ({ children }) => (
+  <Flex alignItems="center" gap="1">
+    {children}
+  </Flex>
+)
 
 export const TransactionTitle: FC<TransactionTitleProps> = ({
   transactionReview,
   aggregatedData,
-  declareOrDeployType,
+  approveScreenType,
   fallback = "transaction",
 }) => {
   const nftTransfers = useERC721Transfers(aggregatedData)
@@ -33,21 +40,39 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     [transactionReview],
   )
 
-  if (declareOrDeployType) {
-    return (
-      <Flex alignItems="center" gap="1">
-        {declareOrDeployType === "declare" ? "Declare" : "Deploy"} contract
-      </Flex>
-    )
+  // Check for specific approve screen types
+  switch (approveScreenType) {
+    case ApproveScreenType.DECLARE:
+      return <Title>Declare contract</Title>
+    case ApproveScreenType.DEPLOY:
+      return <Title>Deploy contract</Title>
+    case ApproveScreenType.ACCOUNT_DEPLOY:
+      return <Title>Activate account</Title>
+    case ApproveScreenType.MULTISIG_DEPLOY:
+      return <Title>Activate multisig</Title>
+    case ApproveScreenType.MULTISIG_ADD_SIGNERS:
+      return <Title>Add multisig owner</Title>
+    case ApproveScreenType.MULTISIG_REMOVE_SIGNER:
+      return <Title>Remove multisig owner</Title>
+    case ApproveScreenType.MULTISIG_UPDATE_THRESHOLD:
+      return <Title>Set confirmations</Title>
+    case ApproveScreenType.ADD_ARGENT_SHIELD:
+      return <Title>Add Argent Shield</Title>
+    case ApproveScreenType.REMOVE_ARGENT_SHIELD:
+      return <Title>Remove Argent Shield</Title>
   }
 
+  // Check for specific transaction types
   if (transactionReviewWithType?.type === "swap") {
+    const srcSymbol = transactionReviewWithType.activity?.src?.token.symbol
+    const dstSymbol = transactionReviewWithType.activity?.dst?.token.symbol
+
     return (
-      <Flex alignItems="center" gap="1">
-        Swap {transactionReviewWithType.activity?.src?.token.symbol}
+      <Title>
+        Swap {srcSymbol}
         <ArrowRightIcon width="0.7em" height="0.8em" />
-        {transactionReviewWithType.activity?.dst?.token.symbol}
-      </Flex>
+        {dstSymbol}
+      </Title>
     )
   }
 
@@ -55,18 +80,23 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     transactionReviewWithType?.type === "transfer" &&
     transactionReviewWithType?.activity?.value?.amount
   ) {
+    const amount = transactionReviewWithType.activity.value.amount
+    const decimals = transactionReviewWithType.activity.value.token.decimals
+    const symbol = transactionReviewWithType.activity.value.token.symbol
+
     return (
-      <Flex alignItems="center" gap="1">
+      <Title>
         Send{" "}
         {prettifyTokenAmount({
-          amount: transactionReviewWithType?.activity?.value?.amount,
-          decimals: transactionReviewWithType?.activity?.value?.token.decimals,
+          amount,
+          decimals,
         })}{" "}
-        {transactionReviewWithType?.activity?.value?.token.symbol}
-      </Flex>
+        {symbol}
+      </Title>
     )
   }
 
+  // Display NFT transfers if applicable
   if (hasNftTransfer) {
     return (
       <Flex alignItems="center" textAlign="center">
@@ -91,7 +121,8 @@ export const TransactionTitle: FC<TransactionTitleProps> = ({
     )
   }
 
-  return <>Confirm {fallback}</>
+  // Default to fallback text if nothing else matched
+  return <Title>Confirm {fallback}</Title>
 }
 
 const NftTitle: FC<{

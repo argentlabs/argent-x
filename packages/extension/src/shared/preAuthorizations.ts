@@ -1,7 +1,8 @@
 import { isArray, pick } from "lodash-es"
 import browser from "webextension-polyfill"
 
-import { accountStore } from "./account/store"
+import { withHiddenSelector } from "./account/selectors"
+import { accountService } from "./account/service"
 import { ArrayStorage } from "./storage"
 import { useArrayStorage } from "./storage/hooks"
 import { BaseWalletAccount } from "./wallet.model"
@@ -35,7 +36,7 @@ export const migratePreAuthorizations = async () => {
     const old = await getFromStorage<string[]>("PREAUTHORIZATION:APPROVED")
     if (isArray(old) && old.length > 0) {
       await browser.storage.local.remove("PREAUTHORIZATION:APPROVED")
-      const allAccounts = await accountStore.get()
+      const allAccounts = await accountService.get(withHiddenSelector)
 
       const accountHostCombinations = old.flatMap((h) =>
         allAccounts.map((a) => ({

@@ -3,11 +3,13 @@ const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
 const { DefinePlugin, ProvidePlugin } = require("webpack")
 const Dotenv = require("dotenv-webpack")
-const { ESBuildMinifyPlugin } = require("esbuild-loader")
+const { EsbuildPlugin } = require("esbuild-loader")
 
 const ESLintPlugin = require("eslint-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
 const SentryWebpackPlugin = require("@sentry/webpack-plugin")
+const manifestV2 = require("./manifest/v2.json")
+const manifestV3 = require("./manifest/v3.json")
 
 const htmlPlugin = new HtmlWebPackPlugin({
   template: "./src/ui/index.html",
@@ -16,14 +18,8 @@ const htmlPlugin = new HtmlWebPackPlugin({
 })
 
 const isProd = process.env.NODE_ENV === "production"
-const manifestV3 = process.env.MANIFEST_VERSION === "v3"
+const useManifestV3 = process.env.MANIFEST_VERSION === "v3"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
-const uploadSentrySourcemaps = process.env.UPLOAD_SENTRY_SOURCEMAPS === "true"
-
-// Sentry does not work with scripts ignored
-// we should use the CLI tool directly, without webpack, soon
-// https://github.com/getsentry/sentry-cli/issues/1290
-const disableSentry = true
 
 if (safeEnvVars) {
   console.log("Safe env vars enabled")
@@ -70,7 +66,6 @@ module.exports = {
         test: /\.tsx?$/,
         loader: "esbuild-loader",
         options: {
-          loader: "tsx", // Or 'ts' if you don't need tsx,
           pure: isProd ? ["console.log"] : [],
         },
       },
@@ -82,14 +77,16 @@ module.exports = {
       patterns: [
         { from: "./src/ui/favicon.ico", to: "favicon.ico" },
         {
-          from: `./manifest/${manifestV3 ? "v3" : "v2"}.json`,
+          from: `./manifest/${useManifestV3 ? "v3" : "v2"}.json`,
           to: "manifest.json",
         },
         { from: "./src/assets", to: "assets" },
       ],
     }),
     new DefinePlugin({
-      "process.env.VERSION": JSON.stringify(process.env.npm_package_version),
+      "process.env.VERSION": JSON.stringify(
+        useManifestV3 ? manifestV3.version : manifestV2.version, // doesn't matter much, but why not
+      ),
     }),
     new ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
@@ -109,31 +106,6 @@ module.exports = {
       systemvars: true,
       safe: safeEnvVars,
     }),
-
-    // Only use sentry-sourcemaping on Prod
-    !disableSentry &&
-      isProd &&
-      uploadSentrySourcemaps &&
-      new SentryWebpackPlugin({
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        project: "argent-x",
-        org: "argent",
-        release: process.env.npm_package_version,
-        include: [
-          {
-            paths: ["./dist"],
-            urlPrefix: "~/",
-          },
-          {
-            paths: ["./sourcemaps"],
-            urlPrefix: "~/sourcemaps",
-          },
-        ],
-        debug: true,
-        ignore: ["node_modules"],
-        validate: true,
-        cleanArtifacts: true,
-      }),
   ].filter(Boolean),
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
@@ -146,12 +118,14 @@ module.exports = {
     ? {
         minimize: true,
         minimizer: [
-          new ESBuildMinifyPlugin({
+          new EsbuildPlugin({
             loader: "tsx",
           }),
         ],
         splitChunks: {
-          chunks: "async",
+          chunks(chunk) {
+            return chunk.name === "main"
+          },
         },
       }
     : undefined,

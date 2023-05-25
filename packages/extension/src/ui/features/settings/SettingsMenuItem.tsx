@@ -1,10 +1,10 @@
-import { ButtonCell, icons } from "@argent/ui"
-import { ComponentProps, FC } from "react"
+import { ButtonCell, ButtonCellProps, icons } from "@argent/ui"
+import { FC } from "react"
 import { Link } from "react-router-dom"
 
 const { ChevronRightIcon } = icons
 
-interface SettingsMenuItemProps extends ComponentProps<typeof ButtonCell> {
+interface SettingsMenuItemProps extends ButtonCellProps {
   title: string
   to: string
 }

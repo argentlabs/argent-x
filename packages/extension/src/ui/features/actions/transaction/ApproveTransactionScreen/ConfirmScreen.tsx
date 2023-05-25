@@ -1,18 +1,27 @@
-import { Button, H6, P3, ScrollContainer } from "@argent/ui"
-import { Box, ButtonProps, Flex, ThemingProps, chakra } from "@chakra-ui/react"
-import { FC, PropsWithChildren, ReactNode, useState } from "react"
-import Measure from "react-measure"
-import { useNavigate } from "react-router-dom"
+import {
+  Button,
+  H6,
+  P3,
+  ScrollContainer,
+  StickyGroup,
+  useNavigateBack,
+} from "@argent/ui"
+import { Box, Flex } from "@chakra-ui/react"
+import {
+  FC,
+  FormEvent,
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useState,
+} from "react"
+import Measure, { ContentRect } from "react-measure"
 
 import { formatTruncatedAddress } from "../../../../services/addresses"
 import { Account } from "../../../accounts/Account"
-import {
-  getAccountName,
-  useAccountMetadata,
-} from "../../../accounts/accountMetadata.state"
 
 export interface ConfirmPageProps {
-  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
+  onSubmit?: (e: FormEvent<HTMLFormElement>) => void
   onReject?: () => void
   selectedAccount?: Account
 }
@@ -25,46 +34,20 @@ export interface ConfirmScreenProps
   confirmButtonText?: string
   confirmButtonDisabled?: boolean
   rejectButtonDisabled?: boolean
-  confirmButtonBackgroundColor?: ButtonProps["backgroundColor"]
-  rejectButtonBackgroundColor?: ButtonProps["backgroundColor"]
-  confirmButtonVariant?: ThemingProps<"Button">["variant"]
-  rejectButtonVariant?: ThemingProps<"Button">["variant"]
   singleButton?: boolean
   switchButtonOrder?: boolean
-  buttonGroup?: "horizontal" | "vertical"
-  buttonGap?: string
   showHeader?: boolean
   px?: string
   footer?: ReactNode
+  destructive?: boolean
 }
-
-export const StickyGroup = chakra(Box, {
-  baseStyle: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    // padding: "16px 32px 24px",
-    background:
-      "linear-gradient(180deg, rgba(16, 16, 20, 0) 0%, #101014 66.54%)",
-    zIndex: 100,
-
-    "& > * + *": { marginTop: 3 },
-  },
-})
 
 export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   title,
   confirmButtonText = "Confirm",
   confirmButtonDisabled,
-  confirmButtonBackgroundColor,
-  confirmButtonVariant,
   rejectButtonText = "Reject",
   rejectButtonDisabled,
-  rejectButtonBackgroundColor,
-  rejectButtonVariant,
-  buttonGroup = "horizontal",
-  buttonGap,
   onSubmit,
   onReject,
   selectedAccount,
@@ -73,14 +56,19 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   showHeader = true,
   footer,
   children,
+  destructive,
   ...props
 }) => {
-  const navigate = useNavigate()
-  const { accountNames } = useAccountMetadata()
+  const navigateBack = useNavigateBack()
   const [placeholderHeight, setPlaceholderHeight] = useState(100)
-  onReject ??= () => navigate(-1)
+  onReject ??= () => navigateBack()
 
   const accountHeader = Boolean(selectedAccount && showHeader)
+
+  const onResize = useCallback((contentRect: ContentRect) => {
+    const { height = 100 } = contentRect.bounds || {}
+    setPlaceholderHeight(height)
+  }, [])
 
   return (
     <ScrollContainer>
@@ -104,9 +92,8 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
               justifyContent="center"
               alignItems="center"
               py="18px"
-              gap={1}
             >
-              <H6>{getAccountName(selectedAccount, accountNames)}</H6>
+              <H6>{selectedAccount.name}</H6>
               <P3 color="neutrals.300">
                 ({formatTruncatedAddress(selectedAccount.address)})
               </P3>
@@ -114,76 +101,37 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           )}
           {children}
 
-          <Box w="full" h={placeholderHeight} />
+          <Box w="full" h={`${placeholderHeight}px`} />
 
-          <Measure
-            bounds
-            onResize={(contentRect) => {
-              const { height = 100 } = contentRect.bounds || {}
-              setPlaceholderHeight(height)
-            }}
-          >
+          <Measure bounds onResize={onResize}>
             {({ measureRef }) => (
               <StickyGroup ref={measureRef} p="4">
                 {footer}
-                {buttonGroup === "horizontal" && (
-                  <Flex
-                    flexDirection={switchButtonOrder ? "row-reverse" : "row"}
-                    gap={buttonGap || 2}
-                    w="full"
-                    justifyContent="center"
-                  >
-                    {!singleButton && (
-                      <Button
-                        onClick={onReject}
-                        type="button"
-                        w="full"
-                        isDisabled={rejectButtonDisabled}
-                      >
-                        {rejectButtonText}
-                      </Button>
-                    )}
+                <Flex
+                  flexDirection={switchButtonOrder ? "row-reverse" : "row"}
+                  gap={2}
+                  w="full"
+                  justifyContent="center"
+                >
+                  {!singleButton && (
                     <Button
-                      isDisabled={confirmButtonDisabled}
-                      variant={confirmButtonVariant}
-                      colorScheme="primary"
+                      onClick={onReject}
+                      type="button"
                       w="full"
-                      type="submit"
+                      isDisabled={rejectButtonDisabled}
                     >
-                      {confirmButtonText}
+                      {rejectButtonText}
                     </Button>
-                  </Flex>
-                )}
-
-                {buttonGroup === "vertical" && (
-                  <Flex
-                    flexDirection={
-                      switchButtonOrder ? "column-reverse" : "column"
-                    }
+                  )}
+                  <Button
+                    isDisabled={confirmButtonDisabled}
+                    colorScheme={destructive ? "danger" : "primary"}
+                    w="full"
+                    type="submit"
                   >
-                    {!singleButton && (
-                      <Button
-                        onClick={onReject}
-                        type="button"
-                        backgroundColor={
-                          !rejectButtonDisabled
-                            ? rejectButtonBackgroundColor ?? "neutrals.700"
-                            : undefined
-                        }
-                      >
-                        {rejectButtonText}
-                      </Button>
-                    )}
-                    <Button
-                      isDisabled={confirmButtonDisabled}
-                      colorScheme="primary"
-                      variant={confirmButtonVariant}
-                      type="submit"
-                    >
-                      {confirmButtonText}
-                    </Button>
-                  </Flex>
-                )}
+                    {confirmButtonText}
+                  </Button>
+                </Flex>
               </StickyGroup>
             )}
           </Measure>

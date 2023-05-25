@@ -11,7 +11,7 @@ import { checkPassword } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { StickyGroup } from "../actions/DeprecatedConfirmScreen"
 import { PasswordForm } from "../lock/PasswordForm"
-import { useCurrentNetwork } from "../networks/useNetworks"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { StatusMessageBanner } from "../statusMessage/StatusMessageBanner"
 import { usePrivateKey } from "./usePrivateKey"
 

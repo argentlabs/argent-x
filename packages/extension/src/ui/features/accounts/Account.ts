@@ -8,13 +8,15 @@ import { Network, getNetwork, getProvider } from "../../../shared/network"
 import {
   ArgentAccountType,
   BaseWalletAccount,
+  CreateAccountType,
   WalletAccount,
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { createNewAccount } from "../../services/backgroundAccounts"
+import { clientAccountService } from "../../services/account"
 
 export interface AccountConstructorProps {
+  name: string
   address: string
   network: Network
   signer: WalletAccountSigner
@@ -28,6 +30,7 @@ export interface AccountConstructorProps {
 }
 
 export class Account {
+  name: string
   address: string
   network: Network
   networkId: string
@@ -43,6 +46,7 @@ export class Account {
   needsDeploy?: boolean
 
   constructor({
+    name,
     address,
     network,
     signer,
@@ -54,6 +58,7 @@ export class Account {
     needsDeploy = false,
     contract,
   }: AccountConstructorProps) {
+    this.name = name
     this.address = address
     this.network = network
     this.networkId =
@@ -102,7 +107,7 @@ export class Account {
 
   public async getCurrentImplementation(): Promise<string | undefined> {
     if (this.needsDeploy) {
-      return this.network.accountClassHash?.argentAccount // cuz we always deploy regular accounts
+      return this.network.accountClassHash?.[this.type] // We deploy Standard and Multisig accounts now
     }
 
     const multicall = getMulticallForNetwork(this.network)
@@ -114,12 +119,11 @@ export class Account {
     return stark.makeAddress(number.toHex(number.toBN(implementation)))
   }
 
-  public static async create(networkId: string): Promise<Account> {
-    const result = await createNewAccount(networkId)
-    if (result === "error") {
-      throw new Error(result)
-    }
-
+  public static async create(
+    networkId: string,
+    type?: CreateAccountType,
+  ): Promise<Account> {
+    const account = await clientAccountService.createAccount(networkId, type)
     const network = await getNetwork(networkId)
 
     if (!network) {
@@ -127,18 +131,20 @@ export class Account {
     }
 
     return new Account({
-      address: result.account.address,
+      name: account.name,
+      address: account.address,
       network,
-      signer: result.account.signer,
-      type: result.account.type,
-      guardian: result.account.guardian,
-      escape: result.account.escape,
-      needsDeploy: result.account.needsDeploy,
+      signer: account.signer,
+      type: account.type,
+      guardian: account.guardian,
+      escape: account.escape,
+      needsDeploy: account.needsDeploy,
     })
   }
 
   public toWalletAccount(): WalletAccount {
     const {
+      name,
       networkId,
       address,
       network,
@@ -149,6 +155,7 @@ export class Account {
       needsDeploy,
     } = this
     return {
+      name,
       networkId,
       address,
       network,

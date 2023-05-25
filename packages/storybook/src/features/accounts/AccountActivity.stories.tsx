@@ -2,29 +2,30 @@ import { AccountActivity } from "@argent-x/extension/src/ui/features/accountActi
 import { DailyActivity } from "@argent-x/extension/src/ui/features/accountActivity/useActivity"
 import { Account } from "@argent-x/extension/src/ui/features/accounts/Account"
 import { CellStack } from "@argent/ui"
-import { ComponentMeta, ComponentStory } from "@storybook/react"
-import { MemoryRouter } from "react-router-dom"
+import { ComponentProps } from "react"
 
 import { account } from "../../account"
+import { decorators } from "../../decorators/routerDecorators"
 import { tokensByNetwork } from "../../tokensByNetwork"
 import activity from "./__fixtures__/transactions.json"
 
 export default {
-  title: "accounts/AccountActivity",
   component: AccountActivity,
-} as ComponentMeta<typeof AccountActivity>
+  decorators,
+  parameters: {
+    layout: "fullscreen",
+  },
+}
 
-const Template: ComponentStory<typeof AccountActivity> = (props) => (
-  <MemoryRouter initialEntries={["/"]}>
+export const Default = {
+  render: (props: ComponentProps<typeof AccountActivity>) => (
     <CellStack>
       <AccountActivity {...props}></AccountActivity>
     </CellStack>
-  </MemoryRouter>
-)
-
-export const Default = Template.bind({})
-Default.args = {
-  activity: activity as DailyActivity,
-  account: account as Account,
-  tokensByNetwork,
+  ),
+  args: {
+    activity: activity as DailyActivity,
+    account: account as Account,
+    tokensByNetwork,
+  },
 }

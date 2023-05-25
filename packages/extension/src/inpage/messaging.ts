@@ -13,16 +13,3 @@ export const getIsPreauthorized = async () => {
   }
   return false
 }
-
-export const getNetwork = async (networkId: string) => {
-  try {
-    sendMessage({
-      type: "GET_NETWORK",
-      data: networkId,
-    })
-    return await waitForMessage("GET_NETWORK_RES", 2000)
-  } catch (error) {
-    console.error(`Error getting network: ${error} for networkId: ${networkId}`)
-    throw error
-  }
-}

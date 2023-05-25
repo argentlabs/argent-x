@@ -16,7 +16,7 @@ import { makeClickable } from "../../services/a11y"
 import { useAddressBook } from "../../services/addressBook"
 import { P } from "../../theme/Typography"
 import { AccountListItem } from "../accounts/AccountListItem"
-import { useNetworks } from "../networks/useNetworks"
+import { useNetworks } from "../networks/hooks/useNetworks"
 
 const { SearchIcon } = icons
 
@@ -95,12 +95,11 @@ export const AddressbookSettingsScreen: FC = () => {
                 return (
                   <AccountListItem
                     key={contact.id}
-                    accountType="argent"
+                    accountType="standard"
                     accountAddress={contact.address}
                     networkId={contact.networkId}
                     accountName={contact.name}
                     networkName={networkName}
-                    outlined
                     transparent
                     p={3}
                     {...makeClickable(() =>

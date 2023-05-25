@@ -16,8 +16,8 @@ export default function ({ transaction, result }: ITransactionTransformer) {
         const action = isRemove ? "REMOVE" : "ADD"
         const entity = "GUARDIAN"
         const displayName = isRemove
-          ? "Remove Argent Shield"
-          : "Add Argent Shield"
+          ? "Deactivate Argent Shield"
+          : "Activate Argent Shield"
         result = {
           ...result,
           action,

@@ -1,5 +1,12 @@
-import { Center, Circle, Flex, chakra } from "@chakra-ui/react"
-import { ComponentProps, FC, ReactNode } from "react"
+import {
+  Center,
+  Circle,
+  ComponentWithAs,
+  Flex,
+  PropsOf,
+  chakra,
+} from "@chakra-ui/react"
+import { ReactNode } from "react"
 import { NavLink } from "react-router-dom"
 
 export const TabBarHeight = 16
@@ -61,14 +68,17 @@ export const TabBadge = chakra(Circle, {
   },
 })
 
-export interface TabProps extends ComponentProps<typeof TabContainer> {
+export interface TabCustomProps {
   icon: ReactNode
   label?: string
   badgeLabel?: string | number
   badgeDescription?: string
 }
 
-export const Tab: FC<TabProps> = ({
+type TabComponent = ComponentWithAs<"div", TabCustomProps>
+export type TabProps = PropsOf<TabComponent>
+
+export const Tab: TabComponent = ({
   icon,
   label,
   badgeLabel,

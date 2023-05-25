@@ -1,8 +1,17 @@
-import { ethers } from "ethers"
+import { ethers, utils } from "ethers"
 import { ProgressCallback } from "ethers/lib/utils"
-import { find, memoize, noop, throttle, union } from "lodash-es"
+import {
+  find,
+  isEmpty,
+  memoize,
+  noop,
+  partition,
+  throttle,
+  union,
+} from "lodash-es"
 import {
   Account,
+  DeployAccountContractPayload,
   DeployAccountContractTransaction,
   EstimateFee,
   InvocationsDetails,
@@ -16,7 +25,16 @@ import {
 import { Account as Accountv4 } from "starknet4"
 import browser from "webextension-polyfill"
 
-import { ArgentAccountType } from "./../shared/wallet.model"
+import { updateAccountsWithNames } from "./../shared/account/details/updateAccountsWithNames"
+import { sortByDerivationPath } from "./../shared/utils/accountsMultisigSort"
+import {
+  ArgentAccountType,
+  BaseMultisigWalletAccount,
+  CreateAccountType,
+  CreateWalletAccount,
+  MultisigData,
+  MultisigWalletAccount,
+} from "./../shared/wallet.model"
 import { getAccountEscapeFromChain } from "../shared/account/details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "../shared/account/details/getAccountGuardiansFromChain"
 import { getAccountTypesFromChain } from "../shared/account/details/getAccountTypesFromChain"
@@ -26,6 +44,11 @@ import {
 } from "../shared/account/details/getAndMergeAccountDetails"
 import { withHiddenSelector } from "../shared/account/selectors"
 import { getMulticallForNetwork } from "../shared/multicall"
+import { MultisigAccount } from "../shared/multisig/account"
+import { fetchMultisigDataForSigner } from "../shared/multisig/multisig.service"
+import { MultisigSigner } from "../shared/multisig/signer"
+import { PendingMultisig } from "../shared/multisig/types"
+import { getMultisigAccountFromBaseWallet } from "../shared/multisig/utils/baseMultisig"
 import {
   Network,
   defaultNetwork,
@@ -33,7 +56,6 @@ import {
   getProvider,
 } from "../shared/network"
 import { getProviderv4 } from "../shared/network/provider"
-import { mapArgentAccountTypeToImplementationKey } from "../shared/network/utils"
 import { cosignerSign } from "../shared/shield/backend/account"
 import { ARGENT_SHIELD_ENABLED } from "../shared/shield/constants"
 import { GuardianSelfSigner } from "../shared/shield/GuardianSelfSigner"
@@ -96,11 +118,6 @@ export interface WalletStorageProps {
   selected?: BaseWalletAccount | null
   discoveredOnce?: boolean
 }
-/*
-export const walletStore = new KeyValueStorage<WalletStorageProps>(
-  {},
-  "core:wallet",
-) */
 
 export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
   namespace: "core:wallet:session",
@@ -132,6 +149,8 @@ export class Wallet {
     private readonly store: IKeyValueStorage<WalletStorageProps>,
     private readonly walletStore: IArrayStorage<WalletAccount>,
     private readonly sessionStore: IObjectStorage<WalletSession | null>,
+    private readonly multisigStore: IArrayStorage<BaseMultisigWalletAccount>,
+    private readonly pendingMultisigStore: IArrayStorage<PendingMultisig>,
     private readonly loadContracts: LoadContracts,
     private readonly getNetwork: GetNetwork,
   ) {}
@@ -227,11 +246,10 @@ export class Wallet {
     network: Network,
     accountType: ArgentAccountType,
   ): Promise<string> {
-    if (network.accountClassHash) {
+    if (network.accountClassHash && network.accountClassHash.standard) {
       return (
-        network.accountClassHash[
-          mapArgentAccountTypeToImplementationKey(accountType)
-        ] ?? network.accountClassHash.argentAccount
+        network.accountClassHash[accountType] ??
+        network.accountClassHash.standard
       )
     }
 
@@ -258,13 +276,21 @@ export class Wallet {
 
     const accounts: WalletAccount[] = []
 
-    const networkAccountClassHash = await this.getAccountClassHashForNetwork(
+    const standardAccountClassHash = await this.getAccountClassHashForNetwork(
       network,
-      "argent",
+      "standard",
+    )
+
+    // This will be a standard account hash if multisig is not supported on the network
+    // It will be handled by the union function below
+    const multisigAccountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      "multisig",
     )
 
     const accountClassHashes = union(ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES, [
-      networkAccountClassHash,
+      standardAccountClassHash,
+      multisigAccountClassHash,
     ])
     const proxyClassHashes = PROXY_CONTRACT_CLASS_HASHES
 
@@ -303,21 +329,59 @@ export class Wallet {
             0,
           )
 
+          const account: WalletAccount = {
+            name: "Unnamed Account",
+            address,
+            networkId: network.id,
+            network,
+            signer: {
+              type: "local_secret",
+              derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
+            },
+            type: "standard",
+            needsDeploy: false, // Only deployed accounts will be recovered
+          }
+
           const code = await provider.getCode(address)
 
           if (code.bytecode.length > 0) {
             lastHit = lastCheck
-            accounts.push({
-              address,
-              networkId: network.id,
+            accounts.push(account) // add a standard account
+          } else if (
+            isEqualAddress(accountClassHash, multisigAccountClassHash) // this is required to ensure multisig accounts are only checked on networks that support them
+          ) {
+            // If it's not a standard account, check if the signer is a part of a Multisig
+            const multisigData = await fetchMultisigDataForSigner({
+              signer: starkPub,
               network,
-              signer: {
-                type: "local_secret",
-                derivationPath: getPathForIndex(lastCheck, baseDerivationPath),
-              },
-              type: "argent",
-              needsDeploy: false, // Only deployed accounts will be recovered
             })
+
+            // If the signer is not a part of multisig, the api doesn't throw an error
+            // but returns an empty content array
+            if (!isEmpty(multisigData.content)) {
+              lastHit = lastCheck
+              const {
+                address: multisigAddress,
+                creator,
+                signers,
+                threshold,
+              } = multisigData.content[0]
+
+              accounts.push({
+                ...account,
+                type: "multisig",
+                address: multisigAddress,
+              }) // add a multisig account
+
+              await this.multisigStore.push({
+                address: multisigAddress,
+                networkId: network.id,
+                signers,
+                threshold,
+                creator,
+                publicKey: starkPub,
+              })
+            }
           }
 
           ++lastCheck
@@ -340,7 +404,12 @@ export class Wallet {
         accountDetailFetchers,
       )
 
-      return accountsWithDetails
+      const accountDetailsWithNames =
+        updateAccountsWithNames(accountsWithDetails)
+
+      await this.walletStore.push(accountDetailsWithNames)
+
+      return accountDetailsWithNames
     } catch (error) {
       console.error(
         "Error getting account types or guardians from chain",
@@ -426,7 +495,37 @@ export class Wallet {
     await this.walletStore.push(accounts)
   }
 
-  public async newAccount(networkId: string): Promise<WalletAccount> {
+  public async getDefaultAccountName(
+    networkId: string,
+    type: CreateAccountType,
+  ): Promise<string> {
+    const accounts = await this.walletStore.get(withHiddenSelector)
+    const pendingMultisigs = await this.pendingMultisigStore.get()
+
+    const networkAccounts = accounts.filter(
+      (account) => account.networkId === networkId,
+    )
+
+    const [multisigs, standards] = partition(
+      networkAccounts,
+      (account) => account.type === "multisig",
+    )
+
+    const allMultisigs = [...multisigs, ...pendingMultisigs]
+
+    const defaultAccountName =
+      type === "multisig"
+        ? `Multisig ${allMultisigs.length + 1}`
+        : `Account ${standards.length + 1}`
+
+    return defaultAccountName
+  }
+
+  public async newAccount(
+    networkId: string,
+    type: CreateAccountType = "standard", // Should not be able to create plugin accounts. Default to argent account
+    multisigPayload?: MultisigData,
+  ): Promise<CreateWalletAccount> {
     const session = await this.sessionStore.get()
     if (!this.isSessionOpen() || !session) {
       throw Error("no open session")
@@ -435,20 +534,34 @@ export class Wallet {
     const network = await this.getNetwork(networkId)
 
     const accounts = await this.walletStore.get(withHiddenSelector)
+    const pendingMultisigs = await this.pendingMultisigStore.get()
 
-    const currentPaths = accounts
+    const accountsOrPendingMultisigs = [...accounts, ...pendingMultisigs]
+
+    const currentPaths = accountsOrPendingMultisigs
       .filter(
         (account) =>
           account.signer.type === "local_secret" &&
-          account.network.id === networkId,
+          account.networkId === networkId,
       )
       .map((account) => account.signer.derivationPath)
 
     const index = getNextPathIndex(currentPaths, baseDerivationPath)
 
-    const { addressSalt, constructorCalldata } =
-      await this.getDeployContractPayloadForAccountIndex(index, networkId)
+    let payload
 
+    if (type === "multisig" && multisigPayload) {
+      payload = await this.getDeployContractPayloadForMultisig({
+        index,
+        networkId,
+        ...multisigPayload,
+      })
+    } else {
+      payload = await this.getDeployContractPayloadForAccountIndex(
+        index,
+        networkId,
+      )
+    }
     const proxyClassHash = PROXY_CONTRACT_CLASS_HASHES[0]
 
     const proxyAddress = calculateContractAddressFromHash(
@@ -458,7 +571,10 @@ export class Wallet {
       0,
     )
 
-    const account: WalletAccount = {
+    const defaultAccountName = await this.getDefaultAccountName(networkId, type)
+
+    const account: CreateWalletAccount = {
+      name: defaultAccountName,
       network,
       networkId: network.id,
       address: proxyAddress,
@@ -466,11 +582,22 @@ export class Wallet {
         type: "local_secret" as const,
         derivationPath: getPathForIndex(index, baseDerivationPath),
       },
-      type: "argent",
+      type,
       needsDeploy: true,
     }
 
     await this.walletStore.push([account])
+
+    if (type === "multisig" && multisigPayload) {
+      await this.multisigStore.push({
+        address: account.address,
+        networkId: account.networkId,
+        signers: multisigPayload.signers,
+        threshold: multisigPayload.threshold,
+        creator: multisigPayload.creator,
+        publicKey: multisigPayload.publicKey,
+      })
+    }
 
     await this.selectAccount(account)
 
@@ -487,9 +614,17 @@ export class Wallet {
       throw Error("Cannot deploy old accounts")
     }
 
-    const deployAccountPayload = await this.getAccountDeploymentPayload(
-      walletAccount,
-    )
+    let deployAccountPayload: DeployAccountContractPayload
+
+    if (walletAccount.type === "multisig") {
+      deployAccountPayload = await this.getMultisigDeploymentPayload(
+        walletAccount,
+      )
+    } else {
+      deployAccountPayload = await this.getAccountDeploymentPayload(
+        walletAccount,
+      )
+    }
 
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
@@ -510,9 +645,10 @@ export class Wallet {
       throw Error("Cannot estimate fee to deploy old accounts")
     }
 
-    const deployAccountPayload = await this.getAccountDeploymentPayload(
-      walletAccount,
-    )
+    const deployAccountPayload =
+      walletAccount.type === "multisig"
+        ? await this.getMultisigDeploymentPayload(walletAccount)
+        : await this.getAccountDeploymentPayload(walletAccount)
 
     return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
   }
@@ -530,11 +666,14 @@ export class Wallet {
 
     return { account, txHash: deployTransaction.txHash }
   }
+
   /** Get the Account Deployment Payload
    * Use it in the deployAccount and getAccountDeploymentFee methods
    * @param  {WalletAccount} walletAccount
    */
-  public async getAccountDeploymentPayload(walletAccount: WalletAccount) {
+  public async getAccountDeploymentPayload(
+    walletAccount: WalletAccount,
+  ): Promise<Required<DeployAccountContractPayload>> {
     const starkPair = await this.getKeyPairByDerivationPath(
       walletAccount.signer.derivationPath,
     )
@@ -543,7 +682,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       walletAccount.network,
-      "argent",
+      walletAccount.type,
     )
 
     const constructorCallData = {
@@ -595,7 +734,61 @@ export class Wallet {
     return deployAccountPayload
   }
 
-  private async getDeployContractPayloadForAccountIndex(
+  public async getMultisigDeploymentPayload(
+    walletAccount: WalletAccount,
+  ): Promise<Required<DeployAccountContractPayload>> {
+    const multisigAccount = await getMultisigAccountFromBaseWallet(
+      walletAccount,
+    )
+
+    if (!multisigAccount) {
+      throw new Error("This multisig account does not exist")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      multisigAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      multisigAccount.network,
+      "multisig", // make sure to always use the multisig implementation
+    )
+
+    const constructorCallData = {
+      implementation: accountClassHash,
+      selector: getSelectorFromName("initialize"),
+      calldata: stark.compileCalldata({
+        threshold: multisigAccount.threshold.toString(),
+        signers: multisigAccount.signers,
+      }),
+    }
+
+    const deployMultisigPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      contractAddress: multisigAccount.address,
+      constructorCalldata: stark.compileCalldata(constructorCallData),
+      addressSalt: starkPub,
+    }
+
+    // Mostly we don't need to calculate the address,
+    // but we do it here just to make sure the address is correct
+    const calculatedMultisigAddress = calculateContractAddressFromHash(
+      deployMultisigPayload.addressSalt,
+      deployMultisigPayload.classHash,
+      deployMultisigPayload.constructorCalldata,
+      0,
+    )
+
+    if (!isEqualAddress(calculatedMultisigAddress, multisigAccount.address)) {
+      throw new Error("Calculated address does not match multisig address")
+    }
+
+    return deployMultisigPayload
+  }
+
+  public async getDeployContractPayloadForAccountIndex(
     index: number,
     networkId: string,
   ): Promise<Omit<Required<DeployAccountContractTransaction>, "signature">> {
@@ -616,7 +809,7 @@ export class Wallet {
 
     const accountClassHash = await this.getAccountClassHashForNetwork(
       network,
-      "argent",
+      "standard",
     )
 
     const payload = {
@@ -632,6 +825,54 @@ export class Wallet {
     return payload
   }
 
+  public async getDeployContractPayloadForMultisig({
+    signers,
+    threshold,
+    index,
+    networkId,
+  }: {
+    threshold: number
+    signers: string[]
+    index: number
+    networkId: string
+  }): Promise<Required<DeployAccountContractTransaction>> {
+    const hasSession = await this.isSessionOpen()
+    const session = await this.sessionStore.get()
+    const initialised = await this.isInitialized()
+
+    if (!initialised) {
+      throw Error("wallet is not initialized")
+    }
+    if (!hasSession || !session) {
+      throw Error("no open session")
+    }
+
+    const network = await this.getNetwork(networkId)
+    const starkPair = getStarkPair(index, session?.secret, baseDerivationPath)
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      network,
+      "multisig",
+    )
+
+    const payload = {
+      classHash: accountClassHash,
+      constructorCalldata: stark.compileCalldata({
+        implementation: accountClassHash,
+        selector: getSelectorFromName("initialize"),
+        calldata: stark.compileCalldata({
+          threshold: threshold.toString(),
+          signers,
+        }),
+      }),
+      addressSalt: starkPub,
+      signature: starkPair.getPrivate(),
+    }
+
+    return payload
+  }
+
   public async getAccount(selector: BaseWalletAccount): Promise<WalletAccount> {
     const [hit] = await this.walletStore.get((account) =>
       accountsEqual(account, selector),
@@ -640,6 +881,32 @@ export class Wallet {
       throw Error("account not found")
     }
     return hit
+  }
+
+  public async getMultisigAccount(
+    selector: BaseWalletAccount,
+  ): Promise<MultisigWalletAccount> {
+    const [walletAccount] = await this.walletStore.get(
+      (account) =>
+        accountsEqual(account, selector) && account.type === "multisig",
+    )
+    if (!walletAccount) {
+      throw Error("multisig wallet account not found")
+    }
+
+    const [multisigBaseWalletAccount] = await this.multisigStore.get(
+      (account) => accountsEqual(account, selector),
+    )
+
+    if (!multisigBaseWalletAccount) {
+      throw Error("multisig base wallet account not found")
+    }
+
+    return {
+      ...walletAccount,
+      ...multisigBaseWalletAccount,
+      type: "multisig",
+    }
   }
 
   public async getKeyPairByDerivationPath(derivationPath: string) {
@@ -666,7 +933,19 @@ export class Wallet {
       return new GuardianSignerArgentX(keyPair, cosignerSign)
     }
 
+    // Return Multisig Signer if account is multisig
+    if (account.type === "multisig") {
+      return new MultisigSigner(keyPair)
+    }
+
     return keyPair
+  }
+
+  public getStarknetAccountOfType(account: Account, type: ArgentAccountType) {
+    if (type === "multisig") {
+      return MultisigAccount.fromAccount(account)
+    }
+    return account
   }
 
   public async getStarknetAccount(
@@ -690,7 +969,9 @@ export class Wallet {
     const signer = await this.getSignerForAccount(account)
 
     if (account.needsDeploy || useLatest) {
-      return new Account(provider, account.address, signer)
+      const starknetAccount = new Account(provider, account.address, signer)
+
+      return this.getStarknetAccountOfType(starknetAccount, account.type)
     }
 
     const providerV4 = getProviderv4(
@@ -706,9 +987,11 @@ export class Wallet {
       account,
     )
 
+    const starknetAccount = new Account(provider, account.address, signer)
+
     return isOldAccount
       ? oldAccount
-      : new Account(provider, account.address, signer)
+      : this.getStarknetAccountOfType(starknetAccount, account.type)
   }
 
   public async getCurrentImplementation(
@@ -735,6 +1018,55 @@ export class Wallet {
     }
 
     return this.getStarknetAccount(account)
+  }
+
+  public async getCalculatedMultisigAddress(
+    baseMultisigAccount: BaseMultisigWalletAccount,
+  ): Promise<string> {
+    const multisigAccount = await getMultisigAccountFromBaseWallet(
+      baseMultisigAccount,
+    )
+
+    if (!multisigAccount) {
+      throw new Error("This multisig account does not exist")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      multisigAccount.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    const accountClassHash = await this.getAccountClassHashForNetwork(
+      multisigAccount.network,
+      "multisig", // make sure to always use the multisig implementation
+    )
+
+    const decodedSigners = baseMultisigAccount.signers.map((signer) =>
+      utils.hexlify(utils.base58.decode(signer)),
+    )
+
+    const constructorCallData = {
+      implementation: accountClassHash,
+      selector: getSelectorFromName("initialize"),
+      calldata: stark.compileCalldata({
+        threshold: baseMultisigAccount.threshold.toString(),
+        signers: decodedSigners,
+      }),
+    }
+
+    const deployMultisigPayload = {
+      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      constructorCalldata: stark.compileCalldata(constructorCallData),
+      addressSalt: starkPub,
+    }
+
+    return calculateContractAddressFromHash(
+      deployMultisigPayload.addressSalt,
+      deployMultisigPayload.classHash,
+      deployMultisigPayload.constructorCalldata,
+      0,
+    )
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
@@ -793,25 +1125,7 @@ export class Wallet {
     return { url, filename }
   }
 
-  public async getPublicKey(baseAccount?: BaseWalletAccount): Promise<string> {
-    const account = baseAccount
-      ? await this.getAccount(baseAccount)
-      : await this.getSelectedAccount()
-
-    if (!account) {
-      throw new Error("no selected account")
-    }
-
-    const starkPair = await this.getKeyPairByDerivationPath(
-      account.signer.derivationPath,
-    )
-
-    const starkPub = ec.getStarkKey(starkPair)
-
-    return starkPub
-  }
-
-  public async exportPrivateKey(
+  public async getPrivateKey(
     baseWalletAccount: BaseWalletAccount,
   ): Promise<string> {
     const session = await this.sessionStore.get()
@@ -831,6 +1145,86 @@ export class Wallet {
     )
 
     return starkPair.getPrivate().toString()
+  }
+
+  public async getPublicKey(
+    baseAccount?: BaseWalletAccount,
+  ): Promise<{ publicKey: string; account: BaseWalletAccount }> {
+    const account = baseAccount
+      ? await this.getAccount(baseAccount)
+      : await this.getSelectedAccount()
+
+    if (!account) {
+      throw new Error("no selected account")
+    }
+
+    const starkPair = await this.getKeyPairByDerivationPath(
+      account.signer.derivationPath,
+    )
+
+    const starkPub = ec.getStarkKey(starkPair)
+
+    return { publicKey: starkPub, account }
+  }
+
+  /**
+   * Given networkId, returns the next public key that will be used for a new account
+   * @param networkId
+   * @returns Public key
+   */
+  public async getNextPublicKey(
+    networkId: string,
+  ): Promise<{ derivationPath: string; publicKey: string }> {
+    const session = await this.sessionStore.get()
+
+    if (!session?.secret) {
+      throw Error("session is not open")
+    }
+
+    const accounts = await this.walletStore.get(withHiddenSelector)
+    const pendingMultisigs = await this.pendingMultisigStore.get()
+
+    const accountsOrPendingMultisigs = [...accounts, ...pendingMultisigs]
+
+    const currentPaths = accountsOrPendingMultisigs
+      .filter(
+        (account) =>
+          account.signer.type === "local_secret" &&
+          account.networkId === networkId,
+      )
+      .sort(sortByDerivationPath)
+      .map((account) => account.signer.derivationPath)
+
+    const index = getNextPathIndex(currentPaths, baseDerivationPath)
+
+    const path = getPathForIndex(index, baseDerivationPath)
+    const starkPair = getStarkPair(index, session?.secret, baseDerivationPath)
+
+    return {
+      derivationPath: path,
+      publicKey: ec.getStarkKey(starkPair),
+    }
+  }
+
+  public async newPendingMultisig(networkId: string): Promise<PendingMultisig> {
+    const { derivationPath, publicKey } = await this.getNextPublicKey(networkId)
+
+    const name = await this.getDefaultAccountName(networkId, "multisig")
+
+    const pendingMultisig: PendingMultisig = {
+      name,
+      networkId,
+      signer: {
+        type: "local_secret",
+        derivationPath,
+      },
+      publicKey,
+      type: "multisig",
+    }
+
+    await this.pendingMultisigStore.push(pendingMultisig)
+
+    return pendingMultisig
   }
 
   public static validateBackup(backupString: string): boolean {

@@ -1,8 +1,10 @@
 import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
 import browser from "webextension-polyfill"
-import create from "zustand"
+import { create } from "zustand"
 import { persist } from "zustand/middleware"
+
+import { CreateAccountType } from "./wallet.model"
 
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
@@ -47,13 +49,26 @@ export interface Events {
     | {
         status: "success"
         networkId: string
+        type: CreateAccountType
+      }
+    | {
+        status: "failure"
+        errorMessage: string
+        networkId: string
+        type: CreateAccountType
+      }
+  deployAccount:
+    | {
+        status: "success"
+        trigger: "sign" | "transaction"
+        networkId: string
       }
     | {
         status: "failure"
         errorMessage: string
         networkId: string
       }
-  deployAccount:
+  deployMultisig:
     | {
         status: "success"
         trigger: "sign" | "transaction"
@@ -263,6 +278,10 @@ export function getAnalytics(
   return {
     track: async (event, ...[data]) => {
       if (!SEGMENT_WRITE_KEY) {
+        console.groupCollapsed(`Analytics: ${event}`)
+        console.log("You see this log because no SEGMENT_WRITE_KEY is set")
+        console.log(data)
+        console.groupEnd()
         return
       }
       const payload = {
@@ -316,7 +335,7 @@ interface ActiveStore extends ActiveStoreValues {
   update: (key: keyof ActiveStoreValues) => void
 }
 
-export const activeStore = create<ActiveStore>(
+export const activeStore = create<ActiveStore>()(
   persist(
     (set) => ({
       lastOpened: 0, // defaults to tracking once when no value set yet

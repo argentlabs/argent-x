@@ -11,16 +11,13 @@ import { filter, partition } from "lodash-es"
 import { FC, ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { mapArgentAccountTypeToImplementationKey } from "../../../shared/network/utils"
+import { accountService } from "../../../shared/account/service"
 import { ArgentAccountType } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/wallet.service"
 import { AutoColumn } from "../../components/Column"
 import { routes } from "../../routes"
-import {
-  selectAccount,
-  upgradeAccount,
-} from "../../services/backgroundAccounts"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import { useRouteAccount } from "../shield/useRouteAccount"
 
 const { WalletIcon, PluginIcon, MulticallIcon, TickIcon } = icons
@@ -33,19 +30,19 @@ interface Implementation {
 }
 const implementations: Implementation[] = [
   {
-    id: "argent",
+    id: "standard",
     title: "Default",
     description: "The default Argent account implementation",
     icon: <WalletIcon />,
   },
   {
-    id: "argent-plugin",
+    id: "plugin",
     title: "Plugin",
     description: "The Argent account implementation with plugin support",
     icon: <PluginIcon />,
   },
   {
-    id: "argent-better-multicall",
+    id: "betterMulticall",
     title: "Better multicall",
     description:
       "The Argent account implementation with better multicall support",
@@ -84,7 +81,7 @@ const ImplementationItem: FC<ImplementationItemProps> = ({
 }
 
 export const AccountImplementationScreen: FC = () => {
-  const selectedAccount = useSelectedAccount()
+  const selectedAccount = useView(selectedAccountView)
   const account = useRouteAccount()
   const navigate = useNavigate()
 
@@ -96,19 +93,15 @@ export const AccountImplementationScreen: FC = () => {
 
   const handleImplementationClick = (i: Implementation) => async () => {
     if (!isSelectedAccount) {
-      await selectAccount(account)
+      await accountService.select(account)
     }
-    await upgradeAccount(account, i.id)
+    await accountService.upgrade(account, i.id)
     navigate(routes.accountTokens(), { replace: true })
   }
 
   const [[activeImplementation], otherImplementations] = partition(
     filter(implementations, (i) =>
-      Boolean(
-        account.network.accountClassHash?.[
-          mapArgentAccountTypeToImplementationKey(i.id)
-        ],
-      ),
+      Boolean(account.network.accountClassHash?.[i.id]),
     ),
     (i) => i.id === account.type,
   )

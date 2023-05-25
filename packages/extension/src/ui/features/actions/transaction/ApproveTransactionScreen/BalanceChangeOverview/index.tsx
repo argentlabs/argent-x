@@ -30,10 +30,8 @@ import {
   formatTruncatedAddress,
   normalizeAddress,
 } from "../../../../../services/addresses"
-import {
-  useCurrentNetwork,
-  useIsMainnet,
-} from "../../../../networks/useNetworks"
+import { useCurrentNetwork } from "../../../../networks/hooks/useCurrentNetwork"
+import { useIsMainnet } from "../../../../networks/hooks/useIsMainnet"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 import { UnknownTokenIcon } from "../DappHeader/TransactionIcon/UnknownTokenIcon"
 import { NftDetails } from "./NftDetails"

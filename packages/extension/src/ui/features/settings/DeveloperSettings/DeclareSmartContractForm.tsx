@@ -1,14 +1,12 @@
 import { ErrorMessage, Input, Select } from "@argent/ui"
 import { Box, Flex, Spinner } from "@chakra-ui/react"
-import { get, isEmpty } from "lodash-es"
+import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { hash } from "starknet5"
 
-import { WalletAccount } from "../../../../shared/wallet.model"
+import { accountService } from "../../../../shared/account/service"
 import { useAppState } from "../../../app.state"
-import { isEqualAddress } from "../../../services/addresses"
-import { selectAccount } from "../../../services/backgroundAccounts"
 import { declareContract } from "../../../services/udc.service"
 import { useFormSelects } from "./useFormSelects"
 
@@ -75,7 +73,7 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     setContractClassHashComputed(false)
     setContractClassHashLoading(true)
 
-    const file: File | undefined = get(fileInputRef, "current.files[0]")
+    const file = fileInputRef.current?.files?.[0]
 
     if (file) {
       setValue("contract", (file as File).name)
@@ -105,12 +103,11 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     classHash,
     network,
   }: FieldValues) => {
-    const selectedAccount = accounts.find(
-      (act: WalletAccount) =>
-        isEqualAddress(act.address, account) && act.networkId === network,
-    )
     useAppState.setState({ switcherNetworkId: network })
-    await selectAccount(selectedAccount)
+    await accountService.select({
+      address: account,
+      networkId: network,
+    })
     await declareContract(account, classHash, contractJSON, network)
     clearErrors()
   }
