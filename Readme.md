@@ -42,7 +42,7 @@ The example dapp is also contained in this repository.
 
 ## 🌐 Usage with your dapp
 
-If you want to use this StarkNet Wallet extension with your dapp, the easiest way is to checkout the `@argent/get-starknet` package developed in this repo by running:
+If you want to use this StarkNet Wallet extension with your dapp, the easiest way is to check out the `@argent/get-starknet` package developed in this repository by running:
 
 ```bash
 # starknet.js is a peer dependency
@@ -77,7 +77,7 @@ if(starknet.isConnected) {
 }
 ```
 
-Checkout [starknet.js](https://github.com/0xs34n/starknet.js) to learn more about how to use `Provider` and `Signer`.
+Check out [starknet.js](https://github.com/0xs34n/starknet.js) to learn more about how to use `Provider` and `Signer`.
 
 ## 🚀 Install from sources
 
@@ -111,7 +111,7 @@ Now you need to load the locally built chrome extension into your browser, by lo
 
 To contribute to this repository please read the [contributing guidelines](Contributing.md) first.
 
-To setup the repo on your machine just run:
+To setup the repository on your machine just run:
 
 ```bash
 yarn setup # setup dependencies
