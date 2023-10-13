@@ -1,13 +1,15 @@
+import { isFunction, isUndefined } from "lodash-es"
 import { FC, useEffect, useMemo } from "react"
-import { number } from "starknet"
 
-import { getFeeToken } from "../../../../shared/token/utils"
-import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
+import { useFeeTokenBalance } from "../../accountTokens/useFeeTokenBalance"
+import { useAccount } from "../../accounts/accounts.state"
+import { useAggregatedTxFeesData } from "../transaction/useTransactionSimulatedData"
 import { CombinedFeeEstimation } from "./CombinedFeeEstimation"
+import { ParsedFeeError, getParsedFeeError } from "./feeError"
 import { TransactionsFeeEstimationProps } from "./types"
-import { getParsedError, useMaxFeeEstimation } from "./utils"
+import { useMaxFeeEstimation } from "./utils"
+import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
 
 export const CombinedFeeEstimationContainer: FC<
   TransactionsFeeEstimationProps
@@ -16,7 +18,13 @@ export const CombinedFeeEstimationContainer: FC<
   transactions,
   actionHash,
   onErrorChange,
+  onFeeErrorChange,
   networkId,
+  userClickedAddFunds,
+  transactionSimulation,
+  transactionSimulationFee,
+  transactionSimulationFeeError,
+  transactionSimulationLoading,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
@@ -25,33 +33,32 @@ export const CombinedFeeEstimationContainer: FC<
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
-  const { fee, error } = useMaxFeeEstimation(transactions, actionHash)
+  const { fee: feeSequencer, error } = useMaxFeeEstimation(
+    transactions,
+    actionHash,
+    transactionSimulation,
+    transactionSimulationLoading,
+  )
 
-  const totalFee = useMemo(() => {
-    if (account.needsDeploy && fee?.accountDeploymentFee) {
-      return number.toHex(
-        number.toBN(fee.accountDeploymentFee).add(number.toBN(fee.amount)),
-      )
-    }
-    return fee?.amount
-  }, [account.needsDeploy, fee?.accountDeploymentFee, fee?.amount])
-
-  const totalMaxFee = useMemo(() => {
-    if (account.needsDeploy && fee?.maxADFee) {
-      return number.toHex(
-        number.toBN(fee.maxADFee).add(number.toBN(fee.suggestedMaxFee)),
-      )
-    }
-    return fee?.suggestedMaxFee
-  }, [account.needsDeploy, fee?.maxADFee, fee?.suggestedMaxFee])
-
+  const { fee, totalFee, totalMaxFee } = useAggregatedTxFeesData(
+    transactionSimulation,
+    transactionSimulationFee,
+    feeSequencer,
+    true,
+  )
   const enoughBalance = useMemo(
-    () => Boolean(totalMaxFee && feeTokenBalance?.gte(totalMaxFee)),
+    () =>
+      Boolean(
+        totalMaxFee &&
+          feeTokenBalance &&
+          feeTokenBalance >= BigInt(totalMaxFee),
+      ),
     [feeTokenBalance, totalMaxFee],
   )
 
   const showFeeError = Boolean(fee && feeTokenBalance && !enoughBalance)
-  const showEstimateError = Boolean(error)
+  const showEstimateError =
+    Boolean(error) || Boolean(transactionSimulationFeeError)
   const showError = showFeeError || showEstimateError
 
   const hasError = !fee || !feeTokenBalance || !enoughBalance || showError
@@ -60,10 +67,26 @@ export const CombinedFeeEstimationContainer: FC<
     // only rerun when error changes
   }, [hasError]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const parsedFeeEstimationError = showEstimateError && getParsedError(error)
-  const feeToken = getFeeToken(networkId)
+  useEffect(() => {
+    if (!isFunction(onFeeErrorChange)) {
+      return
+    }
+    onFeeErrorChange(showFeeError)
+  }, [showFeeError, onFeeErrorChange])
+
+  let parsedFeeEstimationError: ParsedFeeError | undefined
+  if (showEstimateError) {
+    if (transactionSimulationFeeError) {
+      parsedFeeEstimationError = getParsedFeeError(
+        transactionSimulationFeeError,
+      )
+    } else if (error) {
+      parsedFeeEstimationError = getParsedFeeError(error)
+    }
+  }
+  const feeToken = useNetworkFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
+    feeToken ?? undefined,
     fee?.amount,
   )
 
@@ -72,7 +95,7 @@ export const CombinedFeeEstimationContainer: FC<
     totalMaxFee,
   )
 
-  const hasTransactions = typeof transactions !== undefined
+  const hasTransactions = !isUndefined(transactions)
 
   if (!hasTransactions) {
     return null
@@ -90,6 +113,7 @@ export const CombinedFeeEstimationContainer: FC<
       showFeeError={showFeeError}
       totalFee={totalFee}
       totalMaxFee={totalMaxFee}
+      userClickedAddFunds={userClickedAddFunds}
       totalMaxFeeCurrencyValue={totalMaxFeeCurrencyValue}
     />
   )

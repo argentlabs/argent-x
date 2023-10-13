@@ -5,51 +5,46 @@
   "repository": "github:argentlabs/argent-x",
   "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
-    "@lavamoat/allow-scripts": "^2.3.0",
+    "@changesets/cli": "^2.26.1",
+    "@lavamoat/allow-scripts": "^2.3.1",
     "@lavamoat/preinstall-always-fail": "^1.0.0",
     "bundlewatch": "^0.3.3",
-    "husky": "^8.0.0",
+    "husky": "^8.0.3",
     "import-sort-style-module": "^6.0.0",
-    "lerna": "^6.4.1",
-    "lint-staged": ">=10",
-    "nx": "^15.6.3",
-    "patch-package": "^6.4.7",
-    "prettier": ">=2",
+    "lint-staged": "^14.0.0",
+    "nx": "^16.2.2",
+    "patch-package": "^8.0.0",
+    "prettier": ">=2.8.8",
     "prettier-plugin-import-sort": "^0.0.7",
-    "ts-node": "^10.8.1"
-  },
-  "workspaces": {
-    "nohoist": [
-      "packages/web",
-      "packages/dapp"
-    ],
-    "packages": [
-      "packages/*"
-    ]
+    "ts-node": "^10.9.1"
   },
   "resolutions": {
-    "@babel/preset-react": "7.17.12",
-    "@babel/plugin-transform-react-jsx": "7.17.12"
+    "@babel/preset-react": "7.22.15",
+    "@babel/plugin-transform-react-jsx": "7.22.15"
   },
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
-    "dev": "NODE_ENV=development lerna run dev --parallel",
-    "dev:ui": "NODE_ENV=development lerna run dev:ui --parallel",
-    "build-storybook": "lerna run build-storybook --",
+    "dev": "NODE_ENV=development pnpm run -r --stream --parallel dev",
+    "dev:ui": "NODE_ENV=development pnpm --parallel run dev:ui ",
+    "dev:extension": "NODE_ENV=development pnpm run --filter @argent-x/extension -r --stream --parallel dev",
+    "build-storybook": "pnpm run --filter @argent-x/storybook build-storybook",
     "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
-    "build": "lerna run build --stream",
-    "build:sourcemaps": "GEN_SOURCE_MAPS=true lerna run build",
-    "lint": "lerna run lint --stream",
-    "test": "lerna run test --stream",
-    "test:watch": "lerna run test:watch --stream",
-    "test:e2e": "yarn workspace @argent-x/e2e run test:e2e",
-    "setup": "yarn install --frozen-lockfile && yarn allow-scripts && husky install && patch-package && lerna run setup --stream",
-    "test:ci": "lerna run test:ci --stream --parallel",
-    "storybook": "cd packages/storybook && yarn storybook",
+    "build": "pnpm run -r --parallel --stream build",
+    "build:extension": "pnpm run --filter @argent-x/extension build",
+    "build:web": "pnpm run --filter @argent/web build",
+    "build:sourcemaps": "GEN_SOURCE_MAPS=true pnpm run build",
+    "lint": "pnpm run -r --parallel lint ",
+    "test": "pnpm run -r --parallel --stream test",
+    "test:watch": "pnpm run -r --paralle; --stream test:watch ",
+    "test:e2e:extension": "pnpm run --filter @argent-x/e2e test:extension",
+    "test:e2e:webwallet": "pnpm run --filter @argent-x/e2e test:webwallet",
+    "setup": "pnpm install --frozen-lockfile && pnpm allow-scripts && husky install && patch-package && pnpm run -r --stream setup",
+    "test:ci": "pnpm run --stream --parallel test:ci  ",
+    "storybook": "cd packages/storybook && pnpm run storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
     "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts",
-    "version": "lerna version --no-push --no-git-tag-version && yarn --cwd packages/extension run version",
-    "export": "lerna run export --scope=@argent/web"
+    "export": "pnpm run --filter=@argent/web export",
+    "export:extension": "pnpm run --filter @argent-x/extension export"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
@@ -77,7 +72,10 @@
       "@lavamoat/preinstall-always-fail": false,
       "nx": false,
       "nx>@parcel/watcher": false,
-      "nx>@swc/core": false
+      "nx>@swc/core": false,
+      "lerna>@nrwl/devkit>nx": false,
+      "lerna>nx": false,
+      "lerna>nx>@nrwl/cli>nx": false
     }
   }
 }

@@ -9,16 +9,16 @@ import {
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
-  KeyPair,
   ProviderInterface,
   ProviderOptions,
   SignerInterface,
   constants,
   hash,
   merkle,
-  number,
+  num,
   stark,
   transaction,
+  CallData,
 } from "starknet"
 
 import {
@@ -34,10 +34,10 @@ export class SessionAccount extends Account implements AccountInterface {
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
-    keyPairOrSigner: KeyPair | SignerInterface,
+    pkOrSigner: Uint8Array | string | SignerInterface,
     public signedSession: SignedSession,
   ) {
-    super(providerOrOptions, address, keyPairOrSigner)
+    super(providerOrOptions, address, pkOrSigner)
     this.merkleTree = createMerkleTreeForPolicies(signedSession.policies)
     assert(signedSession.root === this.merkleTree.root, "Invalid session")
   }
@@ -46,10 +46,12 @@ export class SessionAccount extends Account implements AccountInterface {
     session: SignedSession,
     proofs: string[][],
   ): Promise<Call> {
+    const signature = stark.formatSignature(session.signature)
+
     return {
       contractAddress: this.address,
       entrypoint: "use_plugin",
-      calldata: stark.compileCalldata({
+      calldata: CallData.compile({
         classHash: SESSION_PLUGIN_CLASS_HASH,
         signer: await this.signer.getPubKey(),
         expires: session.expires.toString(),
@@ -66,8 +68,8 @@ export class SessionAccount extends Account implements AccountInterface {
           {},
         ),
 
-        token1: session.signature[0],
-        token2: session.signature[1],
+        token1: signature[0],
+        token2: signature[1],
       }),
     }
   }
@@ -99,16 +101,17 @@ export class SessionAccount extends Account implements AccountInterface {
       Array.isArray(calls) ? calls : [calls],
       this.signedSession,
     )
-    const nonce = number.toBN(providedNonce ?? (await this.getNonce()))
-    const version = number.toBN(hash.feeTransactionVersion)
+    const nonce = num.toBigInt(providedNonce ?? (await this.getNonce()))
+    const version = num.toBigInt(hash.feeTransactionVersion)
     const chainId = await this.getChainId()
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
-      nonce: number.toBN(nonce),
+      nonce: num.toBigInt(nonce),
       maxFee: constants.ZERO,
       version,
       chainId,
+      cairoVersion: "0",
     }
 
     const signature = await this.signer.signTransaction(
@@ -154,10 +157,10 @@ export class SessionAccount extends Account implements AccountInterface {
       Array.isArray(calls) ? calls : [calls],
       this.signedSession,
     )
-    const nonce = number.toBN(
+    const nonce = num.toBigInt(
       transactionsDetail.nonce ?? (await this.getNonce()),
     )
-    let maxFee: number.BigNumberish = "0"
+    let maxFee: num.BigNumberish = "0"
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee
     } else {
@@ -170,14 +173,16 @@ export class SessionAccount extends Account implements AccountInterface {
       maxFee = suggestedMaxFee.toString()
     }
 
-    const version = number.toBN(hash.transactionVersion)
+    const version = num.toBigInt(hash.transactionVersion)
+    const chainId = await this.getChainId()
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
       maxFee,
       version,
-      chainId: this.chainId,
+      chainId,
+      cairoVersion: "0",
     }
 
     const signature = await this.signer.signTransaction(

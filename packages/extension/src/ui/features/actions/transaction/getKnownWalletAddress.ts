@@ -1,5 +1,5 @@
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { accountsEqual } from "../../../../shared/wallet.service"
+import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { Account } from "../../accounts/Account"
 
 // FIXME: change implementation once address book is complete

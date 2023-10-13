@@ -1,4 +1,7 @@
+import { CallSchema } from "@argent/x-window"
 import { z } from "zod"
+import { multisigDataSchema } from "../wallet.model"
+import { pubkeySchema } from "../../ui/features/multisig/hooks/useCreateMultisigForm"
 
 export const ApiMultisigContentSchema = z.object({
   address: z.string(),
@@ -14,11 +17,15 @@ export const ApiMultisigDataForSignerSchema = z.object({
   content: z.array(ApiMultisigContentSchema),
 })
 
-export const ApiMultisigCallSchema = z.object({
-  contractAddress: z.string(),
-  entrypoint: z.string(),
-  calldata: z.array(z.string()).optional(),
+export const ApiMultisigAccountDataSchema = z.object({
+  content: ApiMultisigContentSchema,
 })
+
+export const ApiMultisigDataForSignerBatchSchema = z.array(
+  ApiMultisigDataForSignerSchema,
+)
+
+export const ApiMultisigCallSchema = CallSchema
 
 export const ApiMultisigTransactionSchema = z.object({
   maxFee: z.string(),
@@ -36,7 +43,6 @@ export const ApiMultisigPostRequestTxnSchema = z.object({
   creator: z.string(),
   transaction: ApiMultisigTransactionSchema,
   starknetSignature: ApiMultisigStarknetSignature,
-  signature: ApiMultisigStarknetSignature,
 })
 
 export const ApiMultisigStateSchema = z.union([
@@ -92,6 +98,15 @@ export type ApiMultisigContent = z.infer<typeof ApiMultisigContentSchema>
 export type ApiMultisigDataForSigner = z.infer<
   typeof ApiMultisigDataForSignerSchema
 >
+
+export type ApiMultisigDataForSignerBatch = z.infer<
+  typeof ApiMultisigDataForSignerBatchSchema
+>
+
+export type ApiMultisigAccountData = z.infer<
+  typeof ApiMultisigAccountDataSchema
+>
+
 export type ApiMultisigCall = z.infer<typeof ApiMultisigCallSchema>
 export type ApiMultisigTransaction = z.infer<
   typeof ApiMultisigTransactionSchema
@@ -111,20 +126,46 @@ export type ApiMultisigAddRequestSignature = z.infer<
   typeof ApiMultisigAddRequestSignatureSchema
 >
 
-export type AddOwnerMultisigPayload = {
-  address: string
-  newThreshold: number
-  signersToAdd: string[]
-  currentThreshold?: number
-}
+export const addAccountSchema = multisigDataSchema.extend({
+  networkId: z.string(),
+})
 
-export type RemoveOwnerMultisigPayload = {
-  address: string
-  newThreshold: number
-  signerToRemove: string
-}
+export type AddAccountPayload = z.infer<typeof addAccountSchema>
 
-export type UpdateMultisigThresholdPayload = {
-  newThreshold: number
-  address: string
-}
+export const addOwnerMultisigSchema = z.object({
+  address: z.string(),
+  newThreshold: z.number(),
+  signersToAdd: z.array(z.string()),
+  currentThreshold: z.optional(z.number()),
+})
+
+export type AddOwnerMultisigPayload = z.infer<typeof addOwnerMultisigSchema>
+
+export const removeOwnerMultisigSchema = z.object({
+  address: z.string(),
+  newThreshold: z.number(),
+  signerToRemove: z.string(),
+})
+
+export type RemoveOwnerMultisigPayload = z.infer<
+  typeof removeOwnerMultisigSchema
+>
+
+export const updateMultisigThresholdSchema = z.object({
+  newThreshold: z.number(),
+  address: z.string(),
+})
+
+export type UpdateMultisigThresholdPayload = z.infer<
+  typeof updateMultisigThresholdSchema
+>
+
+export const replaceOwnerMultisigSchema = z.object({
+  address: z.string(),
+  signerToRemove: pubkeySchema,
+  signerToAdd: pubkeySchema,
+})
+
+export type ReplaceOwnerMultisigPayload = z.infer<
+  typeof replaceOwnerMultisigSchema
+>

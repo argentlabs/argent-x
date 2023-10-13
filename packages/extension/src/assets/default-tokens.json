@@ -5,7 +5,7 @@
     "symbol": "ETH",
     "decimals": "18",
     "network": "mainnet-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
     "showAlways": true
   },
   {
@@ -14,7 +14,7 @@
     "symbol": "ETH",
     "decimals": "18",
     "network": "goerli-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
     "showAlways": true
   },
   {
@@ -23,16 +23,7 @@
     "symbol": "ETH",
     "decimals": "18",
     "network": "integration",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-    "showAlways": true
-  },
-  {
-    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-    "name": "Ether",
-    "symbol": "ETH",
-    "decimals": "18",
-    "network": "goerli-alpha-2",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
     "showAlways": true
   },
   {
@@ -41,7 +32,7 @@
     "symbol": "ETH",
     "decimals": "18",
     "network": "localhost",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
     "showAlways": true
   },
   {
@@ -50,7 +41,7 @@
     "symbol": "DAI",
     "decimals": "18",
     "network": "mainnet-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
   },
   {
     "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
@@ -58,7 +49,7 @@
     "symbol": "DAI",
     "decimals": "18",
     "network": "goerli-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
   },
   {
     "address": "0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac",
@@ -66,7 +57,7 @@
     "symbol": "WBTC",
     "decimals": "8",
     "network": "mainnet-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png"
   },
   {
     "address": "0x12d537dc323c439dc65c976fad242d5610d27cfb5f31689a0a319b8be7f3d56",
@@ -74,7 +65,7 @@
     "symbol": "WBTC",
     "decimals": "8",
     "network": "goerli-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png"
   },
   {
     "address": "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
@@ -82,7 +73,7 @@
     "symbol": "USDC",
     "decimals": "6",
     "network": "mainnet-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png"
   },
   {
     "address": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
@@ -90,7 +81,7 @@
     "symbol": "USDC",
     "decimals": "6",
     "network": "goerli-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png"
   },
   {
     "address": "0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8",
@@ -98,7 +89,7 @@
     "symbol": "USDT",
     "decimals": "6",
     "network": "mainnet-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
   },
   {
     "address": "0x386e8d061177f19b3b485c20e31137e6f6bc497cc635ccdfcab96fadf5add6a",
@@ -106,28 +97,7 @@
     "symbol": "USDT",
     "decimals": "6",
     "network": "goerli-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
-  },
-  {
-    "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-    "name": "Test Token",
-    "symbol": "TEST",
-    "decimals": "18",
-    "network": "goerli-alpha"
-  },
-  {
-    "address": "0x06a09ccb1caaecf3d9683efe335a667b2169a409d19c589ba1eb771cd210af75",
-    "name": "Test Token",
-    "symbol": "TEST",
-    "decimals": "18",
-    "network": "mainnet-alpha"
-  },
-  {
-    "address": "0x07a39a50bf689e9430fc81fba0f4d46e245e1657e77455548ed7e32c808cfc10",
-    "name": "SelfService",
-    "symbol": "SLF",
-    "decimals": "6",
-    "network": "goerli-alpha"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
   },
   {
     "address": "0x0148f970a06fc95ee0682140e23a980351be8fad26168c5f0465e63940c46514",
@@ -135,6 +105,22 @@
     "symbol": "agEUR",
     "decimals": "18",
     "network": "mainnet-alpha",
-    "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/ageur.png"
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/ageur.png"
+  },
+  {
+    "address": "0x05ef98e7dc5865f49bcec200df508d27669b3ef7f9d2439decd127350359f291",
+    "name": "Wrapped Lido ETH",
+    "symbol": "wstETH",
+    "decimals": "18",
+    "network": "mainnet-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/steth.png"
+  },
+  {
+    "address": "0x0319111a5037cbec2b3e638cc34a3474e2d2608299f3e62866e9cc683208c610",
+    "name": "Rocket Pool ETH",
+    "symbol": "rETH",
+    "decimals": "18",
+    "network": "mainnet-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/reth.png"
   }
 ]

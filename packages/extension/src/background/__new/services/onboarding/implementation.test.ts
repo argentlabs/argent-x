@@ -10,8 +10,6 @@ describe("OnboardingService", () => {
       closePopup: vi.fn(),
       createTab: vi.fn(),
       focusTab: vi.fn(),
-      getPopup: vi.fn(),
-      getTab: vi.fn(),
       hasPopup: vi.fn(),
       hasTab: vi.fn(),
       setDefaultPopup: vi.fn(),

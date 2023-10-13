@@ -6,21 +6,21 @@ import {
 } from "../src/shared/wallet.model"
 
 const defaultNetwork: Network = {
-  status: "unknown",
   id: "localhost",
   name: "localhostNetwork",
   chainId: "1",
-  baseUrl: "baseUrl",
+  sequencerUrl: "sequencerUrl",
 }
 const defaultSigner: WalletAccountSigner = {
   type: "local_secret",
   derivationPath: "derivationPath",
 }
+const defaultName = "Account 1"
 const defaultAccountType: ArgentAccountType = "standard"
 const defaultAddress = "0x0"
 
-const defaultWalletAccount = {
-  name: undefined,
+const defaultWalletAccount: WalletAccount = {
+  name: defaultName,
   address: defaultAddress,
   network: defaultNetwork,
   networkId: defaultNetwork.id,

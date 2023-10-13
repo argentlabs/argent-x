@@ -8,7 +8,9 @@ import erc20SwapMySwap from "./erc20-swap-my-swap.json"
 import erc20Transfer from "./erc20-transfer.json"
 import erc721MintAspect from "./erc721-mint-aspect.json"
 import erc721Transfer from "./erc721-transfer.json"
-
+import multisigAddOwner from "./multisig-add-owner.json"
+import multisigRemoveOwner from "./multisig-remove-owner.json"
+import multisigReplaceOwner from "./multisig-replace-owner.json"
 export {
   changeGuardianAdd,
   changeGuardianRemove,
@@ -20,4 +22,7 @@ export {
   erc721Transfer,
   erc721MintAspect,
   erc1155Transfer,
+  multisigAddOwner,
+  multisigRemoveOwner,
+  multisigReplaceOwner,
 }

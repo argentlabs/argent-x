@@ -1,67 +1,31 @@
 <script lang="ts">
-  import type { ConnectMethods } from "@argent/x-window"
   import type { StarknetWindowObject } from "get-starknet-core"
   import { onMount } from "svelte"
 
   import type { WalletProviderWithStoreVersion } from "."
 
+  export let chainId: string | number
+  export let projectId: string
   export let enableArgentWebWallet: boolean = true
   export let dappName: string = window.document.title ?? ""
   export let lastWallet: StarknetWindowObject | null = null
   export let installedWallets: StarknetWindowObject[] = []
   export let preAuthorizedWallets: StarknetWindowObject[] = []
   export let discoveryWallets: WalletProviderWithStoreVersion[] = []
+  export let enableArgentMobile: boolean = false
   export let callback: (
     value: StarknetWindowObject | null,
   ) => Promise<void> = async () => {}
   export let theme: "light" | "dark" | null = null
-  export let starknetAppearance: "email_first" | "email_only" | "all" =
-    "email_first"
+  export let starknetAppearance: "email_only" | "all" = "all"
   export let origin: string
 
-  let webWalletLoading: boolean = true
-  let inlineIframe: HTMLIFrameElement | null = null
   let loadingItem: string | false = false
-  let emailClicked: boolean = false
-
-  /* TODO: make this generic and not browser dependent */
-  const { userAgent } = navigator
-
-  const isChrome = Boolean(
-    navigator.vendor &&
-      navigator.vendor.indexOf("Google") === 0 &&
-      (navigator as any).brave === undefined &&
-      !userAgent.match(/Edg/) &&
-      !userAgent.match(/OPR/),
-  )
-
-  const checkIncognitoChrome = async () => {
-    return new Promise((resolve) => {
-      if (!isChrome) {
-        return resolve(false)
-      }
-      try {
-        ;(navigator as any).webkitTemporaryStorage.queryUsageAndQuota(
-          (_: unknown, quota: number) => {
-            resolve(
-              Math.round(quota / (1024 * 1024)) <
-                Math.round(
-                  ((performance as any)?.memory?.jsHeapSizeLimit ??
-                    1073741824) /
-                    (1024 * 1024),
-                ) *
-                  2,
-            )
-          },
-          () => resolve(false),
-        )
-      } catch {
-        resolve(false)
-      }
-    })
-  }
-
-  const isChromeIncognito = checkIncognitoChrome()
+  let starknetMobileArgentX =
+    window?.starknet_argentX as StarknetWindowObject & {
+      isInAppBrowser: boolean
+    }
+  let isInAppBrowser = starknetMobileArgentX?.isInAppBrowser
 
   const setLoadingItem = (item: string | false) => {
     loadingItem = item
@@ -91,67 +55,41 @@
       darkModeControlClass = ""
     }
 
-    if (!isChrome || (await isChromeIncognito)) {
+    if (isInAppBrowser) {
+      try {
+        cb(window?.starknet_argentX)
+      } catch {}
       return
     }
 
-    target = `${origin}/iframes/modal?darkmode=${Boolean(darkModeControlClass)}`
-
-    const { WindowMessenger, Receiver } = await import("@argent/x-window")
-    const { getWebWalletStarknetObject } = await import("@argent/web-sdk")
-    await getWebWalletStarknetObject(origin)
-
-    const listenMessenger = new WindowMessenger(window, { listen: "*" })
-
-    const receiver = new Receiver<ConnectMethods>(listenMessenger, {
-      connect: () => async () => {
-        const starknetWindowObject = await getWebWalletStarknetObject(origin)
-        cb(starknetWindowObject)
-      },
-    })
+    if (starknetAppearance === "email_only") {
+      openPopup()
+    }
   })
 
-  const openPopup = () => {
-    const h = 562
-    const w = 886
-
-    // parent is the window that opened this window; if not detected then it falls back to the current screen
-    const parentWidth =
-      window?.outerWidth ?? window?.innerWidth ?? window?.screen.width ?? 0
-    const parentHeight =
-      window?.outerHeight ?? window?.innerHeight ?? window?.screen.height ?? 0
-    const parentLeft = window?.screenLeft ?? window?.screenX ?? 0
-    const parentTop = window?.screenTop ?? window?.screenY ?? 0
-
-    const y = parentTop + parentHeight / 2 - h / 2
-    const x = parentLeft + parentWidth / 2 - w / 2
-
-    const popup = window.open(
-      `${origin}/interstitialLogin`,
-      undefined,
-      `width=${w},height=${h},top=${y},left=${x},toolbar=no,menubar=no,scrollbars=no,location=no,status=no,popup=1`,
+  const openPopup = async () => {
+    const { trpcProxyClient } = await import("@argent/web-sdk")
+    const { getWebWalletStarknetObject } = await import("@argent/web-sdk")
+    const starknetWindowObject = await getWebWalletStarknetObject(
+      origin,
+      trpcProxyClient({ origin }),
     )
 
-    return import("@argent/web-sdk").then(
-      async ({ getWebWalletStarknetObject }) => {
-        const { WindowMessenger, Sender, Receiver } = await import(
-          "@argent/x-window"
-        )
+    cb(starknetWindowObject)
+  }
 
-        const listenMessenger = new WindowMessenger(window, { listen: "*" })
-        const receiver = new Receiver<ConnectMethods>(listenMessenger, {
-          connect: () => async () => {
-            console.log("POPUP ARGENT_WEB_WALLET::CONNECT")
-            const starknetWindowObject = await getWebWalletStarknetObject(
-              origin,
-              popup,
-            )
+  const argentMobile = async () => {
+    const { getStarknetWindowObject } = await import("./argentMobile")
+    const options = {
+      chainId,
+      name: dappName,
+      projectId,
+    }
 
-            cb(starknetWindowObject)
-          },
-        })
-      },
-    )
+    const starknetWindowObject = await getStarknetWindowObject(options)
+    try {
+      cb(starknetWindowObject)
+    } catch {}
   }
 
   const wallets = [
@@ -161,317 +99,100 @@
   ].filter(Boolean)
 </script>
 
-<div
-  class={"backdrop-blur-sm fixed inset-0 flex items-center justify-center bg-black/25 z-40 " +
-    darkModeControlClass}
-  on:click={() => cb(null)}
-  on:keyup={(e) => {
-    if (e.key === "Escape") {
-      cb(null)
-    }
-  }}
->
-  <main
-    role="dialog"
-    class={"bg-slate-50 rounded-3xl shadow-modal dark:shadow-none w-full max-w-[380px] mx-6 p-6 pb-8 text-center z-50 dark:bg-neutral-900 text-neutral-900 dark:text-white"}
-    on:click={(e) => e.stopPropagation()}
+{#if !isInAppBrowser && starknetAppearance === "all"}
+  <div
+    class={"backdrop-blur-sm fixed inset-0 flex items-center justify-center bg-black/25 z-[9999] " +
+      darkModeControlClass}
+    on:click={() => cb(null)}
     on:keyup={(e) => {
-      e.stopPropagation()
+      if (e.key === "Escape") {
+        cb(null)
+      }
     }}
   >
-    <header class="flex items-center justify-center flex-col mb-2 relative">
-      <h2 class="text-sm text-gray-400 font-semibold">Connect to</h2>
-      <h1
-        class="text-xl font-semibold mb-6 max-w-[240px] overflow-hidden whitespace-nowrap text-ellipsis"
-      >
-        {dappName}
-      </h1>
-      <span
-        class="absolute top-0 right-0 p-2 cursor-pointer rounded-full bg-neutral-100 text-neutral-400 dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
-        role="button"
-        tabindex="0"
-        aria-label="Close"
-        on:click={() => cb(null)}
-        on:keyup={(e) => {
-          if (e.key === "Enter") {
-            cb(null)
-          }
-        }}
-      >
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 12 12"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+    <main
+      role="dialog"
+      class={`bg-slate-50 rounded-3xl shadow-modal dark:shadow-none w-full max-w-[380px] mx-6 p-6 pb-8 text-center z-50 dark:bg-neutral-900 text-neutral-900 dark:text-white`}
+      on:click={(e) => e.stopPropagation()}
+      on:keyup={(e) => {
+        e.stopPropagation()
+      }}
+    >
+      <header class="flex items-center justify-center flex-col mb-2 relative">
+        <h2 class="text-sm text-gray-400 font-semibold">Connect to</h2>
+        <h1
+          class="text-xl font-semibold mb-6 max-w-[240px] overflow-hidden whitespace-nowrap text-ellipsis"
         >
-          <path
-            d="M9.77275 3.02275C9.99242 2.80308 9.99242 2.44692 9.77275 2.22725C9.55308 2.00758 9.19692 2.00758 8.97725 2.22725L6 5.20451L3.02275 2.22725C2.80308 2.00758 2.44692 2.00758 2.22725 2.22725C2.00758 2.44692 2.00758 2.80308 2.22725 3.02275L5.20451 6L2.22725 8.97725C2.00758 9.19692 2.00758 9.55308 2.22725 9.77275C2.44692 9.99242 2.80308 9.99242 3.02275 9.77275L6 6.79549L8.97725 9.77275C9.19692 9.99242 9.55308 9.99242 9.77275 9.77275C9.99242 9.55308 9.99242 9.19692 9.77275 8.97725L6.79549 6L9.77275 3.02275Z"
-            fill="currentColor"
-          />
-        </svg>
-      </span>
-    </header>
+          {dappName}
+        </h1>
+        <span
+          class="absolute top-0 right-0 p-2 cursor-pointer rounded-full bg-neutral-100 text-neutral-400 dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
+          role="button"
+          tabindex="0"
+          aria-label="Close"
+          on:click={() => cb(null)}
+          on:keyup={(e) => {
+            if (e.key === "Enter") {
+              cb(null)
+            }
+          }}
+        >
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9.77275 3.02275C9.99242 2.80308 9.99242 2.44692 9.77275 2.22725C9.55308 2.00758 9.19692 2.00758 8.97725 2.22725L6 5.20451L3.02275 2.22725C2.80308 2.00758 2.44692 2.00758 2.22725 2.22725C2.00758 2.44692 2.00758 2.80308 2.22725 3.02275L5.20451 6L2.22725 8.97725C2.00758 9.19692 2.00758 9.55308 2.22725 9.77275C2.44692 9.99242 2.80308 9.99242 3.02275 9.77275L6 6.79549L8.97725 9.77275C9.19692 9.99242 9.55308 9.99242 9.77275 9.77275C9.99242 9.55308 9.99242 9.19692 9.77275 8.97725L6.79549 6L9.77275 3.02275Z"
+              fill="currentColor"
+            />
+          </svg>
+        </span>
+      </header>
 
-    {#if enableArgentWebWallet}
-      <!-- webwallet -->
-      {#await isChromeIncognito then isIncognito}
-        {#if !isIncognito && isChrome}
-          {#if starknetAppearance !== "all"}
-            <main id="aww__wormhole" class="-m-3 overflow-hidden h-[104px]">
-              {#if webWalletLoading}
-                <!-- Loading -->
-                <div class="p-3">
-                  <li
-                    class="mb-2 flex justify-center items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
-                  >
-                    <div role="status">
-                      <svg
-                        aria-hidden="true"
-                        class="w-8 h-8 text-neutral-300 animate-spin dark:text-neutral-600 fill-neutral-600 dark:fill-neutral-300"
-                        viewBox="0 0 100 101"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                          fill="currentColor"
-                        />
-                        <path
-                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                          fill="currentFill"
-                        />
-                      </svg>
-                      <span class="sr-only">Loading...</span>
-                    </div>
-                  </li>
-
-                  <div class="flex items-center justify-between px-2">
-                    <div />
-                    <div
-                      class="text-xs text-gray-400 inline-flex items-center justify-center gap-[6px] font-medium"
-                      style="line-height: 14px;"
-                    >
-                      <p>Powered by Argent</p>
-                      <!-- ? icon TODO: commented until tooltip is implemented -->
-                      <!-- <div
-                    class="cursor-pointer rounded-full focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
-                    role="button"
-                    tabindex="0"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      ><path
-                        d="M7 11C7 11.5523 7.44772 12 8 12C8.55229 12 9 11.5523 9 11C9 10.4477 8.55229 10 8 10C7.44772 10 7 10.4477 7 11Z"
-                        fill="currentColor"
-                      /><path
-                        d="M8.48773 4.29804C8.00277 4.20157 7.50011 4.25108 7.04329 4.4403C6.58648 4.62952 6.19603 4.94995 5.92133 5.36107C5.64662 5.7722 5.5 6.25555 5.5 6.75C5.5 7.16421 5.83579 7.5 6.25 7.5C6.66421 7.5 7 7.16421 7 6.75C7 6.55222 7.05865 6.35888 7.16853 6.19443C7.27841 6.02998 7.43459 5.90181 7.61732 5.82612C7.80004 5.75043 8.00111 5.73063 8.19509 5.76921C8.38907 5.8078 8.56725 5.90304 8.70711 6.04289C8.84696 6.18275 8.9422 6.36093 8.98079 6.55491C9.01937 6.74889 8.99957 6.94996 8.92388 7.13268C8.84819 7.31541 8.72002 7.47159 8.55557 7.58147C8.39112 7.69135 8.19778 7.75 8 7.75C7.58579 7.75 7.25 8.08579 7.25 8.5C7.25 8.91421 7.58579 9.25 8 9.25C8.49445 9.25 8.9778 9.10338 9.38893 8.82867C9.80005 8.55397 10.1205 8.16352 10.3097 7.70671C10.4989 7.24989 10.5484 6.74723 10.452 6.26227C10.3555 5.77732 10.1174 5.33186 9.76777 4.98223C9.41814 4.6326 8.97268 4.3945 8.48773 4.29804Z"
-                        fill="currentColor"
-                      /><path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M1.25 8C1.25 4.27208 4.27208 1.25 8 1.25C11.7279 1.25 14.75 4.27208 14.75 8C14.75 11.7279 11.7279 14.75 8 14.75C4.27208 14.75 1.25 11.7279 1.25 8ZM8 2.75C5.10051 2.75 2.75 5.10051 2.75 8C2.75 10.8995 5.10051 13.25 8 13.25C10.8995 13.25 13.25 10.8995 13.25 8C13.25 5.10051 10.8995 2.75 8 2.75Z"
-                        fill="currentColor"
-                      /></svg
-                    >
-                  </div> -->
-                    </div>
-                  </div>
-                </div>
-              {/if}
-              <iframe
-                title="Argent Web Wallet"
-                id="aww__wormhole__inline__iframe"
-                src={target}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation allow-popups"
-                class={"border-none rounded-none shadow-none relative top-0 left-0 transform-none block w-full h-[104px] " +
-                  (webWalletLoading ? "hidden" : "")}
-                bind:this={inlineIframe}
-                on:load={() => {
-                  setTimeout(() => {
-                    webWalletLoading = false
-                  }, 200)
-                }}
-              />
-            </main>
-          {/if}
-          {#if starknetAppearance === "all"}
-            <main
-              id="aww__wormhole"
-              class={`overflow-hidden ${
-                !emailClicked ? "h-[0px]" : "h-[104px] -m-3"
-              }`}
-            >
-              {#if webWalletLoading}
-                <!-- Loading -->
-                <div class="p-3">
-                  <li
-                    class="mb-2 flex justify-center items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
-                  >
-                    <div role="status">
-                      <svg
-                        aria-hidden="true"
-                        class="w-8 h-8 text-neutral-300 animate-spin dark:text-neutral-600 fill-neutral-600 dark:fill-neutral-300"
-                        viewBox="0 0 100 101"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                          fill="currentColor"
-                        />
-                        <path
-                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                          fill="currentFill"
-                        />
-                      </svg>
-                      <span class="sr-only">Loading...</span>
-                    </div>
-                  </li>
-
-                  <div class="flex items-center justify-between px-2">
-                    <div />
-                    <div
-                      class="text-xs text-gray-400 inline-flex items-center justify-center gap-[6px] font-medium"
-                      style="line-height: 14px;"
-                    >
-                      <p>Powered by Argent</p>
-                      <!-- ? icon TODO: commented until tooltip is implemented -->
-                      <!-- <div
-                    class="cursor-pointer rounded-full focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
-                    role="button"
-                    tabindex="0"
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      ><path
-                        d="M7 11C7 11.5523 7.44772 12 8 12C8.55229 12 9 11.5523 9 11C9 10.4477 8.55229 10 8 10C7.44772 10 7 10.4477 7 11Z"
-                        fill="currentColor"
-                      /><path
-                        d="M8.48773 4.29804C8.00277 4.20157 7.50011 4.25108 7.04329 4.4403C6.58648 4.62952 6.19603 4.94995 5.92133 5.36107C5.64662 5.7722 5.5 6.25555 5.5 6.75C5.5 7.16421 5.83579 7.5 6.25 7.5C6.66421 7.5 7 7.16421 7 6.75C7 6.55222 7.05865 6.35888 7.16853 6.19443C7.27841 6.02998 7.43459 5.90181 7.61732 5.82612C7.80004 5.75043 8.00111 5.73063 8.19509 5.76921C8.38907 5.8078 8.56725 5.90304 8.70711 6.04289C8.84696 6.18275 8.9422 6.36093 8.98079 6.55491C9.01937 6.74889 8.99957 6.94996 8.92388 7.13268C8.84819 7.31541 8.72002 7.47159 8.55557 7.58147C8.39112 7.69135 8.19778 7.75 8 7.75C7.58579 7.75 7.25 8.08579 7.25 8.5C7.25 8.91421 7.58579 9.25 8 9.25C8.49445 9.25 8.9778 9.10338 9.38893 8.82867C9.80005 8.55397 10.1205 8.16352 10.3097 7.70671C10.4989 7.24989 10.5484 6.74723 10.452 6.26227C10.3555 5.77732 10.1174 5.33186 9.76777 4.98223C9.41814 4.6326 8.97268 4.3945 8.48773 4.29804Z"
-                        fill="currentColor"
-                      /><path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M1.25 8C1.25 4.27208 4.27208 1.25 8 1.25C11.7279 1.25 14.75 4.27208 14.75 8C14.75 11.7279 11.7279 14.75 8 14.75C4.27208 14.75 1.25 11.7279 1.25 8ZM8 2.75C5.10051 2.75 2.75 5.10051 2.75 8C2.75 10.8995 5.10051 13.25 8 13.25C10.8995 13.25 13.25 10.8995 13.25 8C13.25 5.10051 10.8995 2.75 8 2.75Z"
-                        fill="currentColor"
-                      /></svg
-                    >
-                  </div> -->
-                    </div>
-                  </div>
-                </div>
-              {/if}
-              <iframe
-                title="Argent Web Wallet"
-                id="aww__wormhole__inline__iframe"
-                src={target}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-top-navigation allow-popups"
-                class={"border-none rounded-none shadow-none relative top-0 left-0 transform-none block w-full h-[104px] " +
-                  (webWalletLoading ? "hidden" : "") +
-                  (!emailClicked ? "absolute top-0 left-0" : "")}
-                bind:this={inlineIframe}
-                on:load={() => {
-                  setTimeout(() => {
-                    webWalletLoading = false
-                  }, 200)
-                }}
-              />
-            </main>
-          {/if}
-
-          {#if starknetAppearance === "email_first" && (wallets.length > 0 || discoveryWallets.length > 0) && isChrome}
-            <!-- or -->
-            <div class="flex items-center justify-center mt-5 mb-6">
-              <div
-                class="w-full border-b border-gray-200 dark:border-gray-800"
-              />
-              <div class="mx-5 text-xs text-gray-400 uppercase">or</div>
-              <div
-                class="w-full border-b border-gray-200 dark:border-gray-800"
-              />
+      <ul class="flex flex-col gap-3">
+        {#if enableArgentWebWallet}
+          <!-- svelte-ignore a11y-no-noninteractive-element-to-interactive-role -->
+          <li
+            class="flex flex-row-reverse justify-between items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
+            role="button"
+            tabindex="0"
+            on:keyup={(e) => {
+              if (e.key === "Enter") {
+                openPopup()
+              }
+            }}
+            on:click={() => {
+              openPopup()
+            }}
+          >
+            <span class="w-8 h-8" />
+            <div class="flex flex-col justify-center items-center">
+              <p class="font-semibold text-base">Continue with email</p>
+              <p class="l2" style="text-align: center;">Powered by Argent</p>
             </div>
-          {/if}
-        {/if}
-      {/await}
-    {/if}
-
-    {#await isChromeIncognito then isIncognito}
-      {#if starknetAppearance !== "email_only" && !emailClicked}
-        <ul class="flex flex-col gap-3">
-          {#if starknetAppearance !== "email_first" || !isChrome || (isChrome && isIncognito)}
-            <!-- svelte-ignore a11y-no-noninteractive-element-to-interactive-role -->
-            <li
-              class="flex flex-row-reverse justify-between items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
-              role="button"
-              tabindex="0"
-              on:keyup={(e) => {
-                if (e.key === "Enter") {
-                  /* TODO" unify and show popup only for All */
-                  if (isChrome && !isIncognito) {
-                    emailClicked = true
-                  } else {
-                    openPopup()
-                  }
-                }
-              }}
-              on:click={() => {
-                if (isChrome && !isIncognito) {
-                  emailClicked = true
-                } else {
-                  openPopup()
-                }
-              }}
-            >
-              <span class="w-8 h-8" />
-              <div class="flex flex-col justify-center items-center">
-                <p class="font-semibold text-base">Continue with email</p>
-                <p class="l2" style="text-align: center;">Powered by Argent</p>
-              </div>
-              <div style="position: relative;">
-                <svg
-                  width="32"
-                  height="28"
-                  viewBox="0 0 18 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M1.5 0.4375C0.982233 0.4375 0.5625 0.857233 0.5625 1.375V12C0.5625 12.4144 0.72712 12.8118 1.02015 13.1049C1.31317 13.3979 1.7106 13.5625 2.125 13.5625H15.875C16.2894 13.5625 16.6868 13.3979 16.9799 13.1049C17.2729 12.8118 17.4375 12.4144 17.4375 12V1.375C17.4375 0.857233 17.0178 0.4375 16.5 0.4375H1.5ZM2.4375 3.50616V11.6875H15.5625V3.50616L9.63349 8.94108C9.27507 9.26964 8.72493 9.26964 8.36651 8.94108L2.4375 3.50616ZM14.0899 2.3125H3.91013L9 6.97822L14.0899 2.3125Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <!-- TODO: commented until tooltip is implemented -->
-                <!-- <div class="logo-container">
+            <div style="position: relative;">
               <svg
-                width="8"
-                height="7"
-                viewBox="0 0 8 7"
+                width="32"
+                height="28"
+                viewBox="0 0 18 14"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M4.95967 0.122208H3.03823C2.97402 0.122208 2.92258 0.174972 2.92118 0.240558C2.88236 2.08411 1.9383 3.83386 0.313383 5.07323C0.261794 5.11255 0.250041 5.18648 0.287757 5.23972L1.41196 6.82784C1.45021 6.88189 1.52473 6.89409 1.57718 6.85439C2.5932 6.08452 3.41043 5.15578 3.99895 4.12638C4.58747 5.15578 5.40475 6.08452 6.42077 6.85439C6.47318 6.89409 6.54769 6.88189 6.58599 6.82784L7.71019 5.23972C7.74786 5.18648 7.73611 5.11255 7.68457 5.07323C6.0596 3.83386 5.11555 2.08411 5.07677 0.240558C5.07537 0.174972 5.02388 0.122208 4.95967 0.122208Z"
-                  fill="white"
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M1.5 0.4375C0.982233 0.4375 0.5625 0.857233 0.5625 1.375V12C0.5625 12.4144 0.72712 12.8118 1.02015 13.1049C1.31317 13.3979 1.7106 13.5625 2.125 13.5625H15.875C16.2894 13.5625 16.6868 13.3979 16.9799 13.1049C17.2729 12.8118 17.4375 12.4144 17.4375 12V1.375C17.4375 0.857233 17.0178 0.4375 16.5 0.4375H1.5ZM2.4375 3.50616V11.6875H15.5625V3.50616L9.63349 8.94108C9.27507 9.26964 8.72493 9.26964 8.36651 8.94108L2.4375 3.50616ZM14.0899 2.3125H3.91013L9 6.97822L14.0899 2.3125Z"
+                  fill="currentColor"
                 />
               </svg>
-            </div> -->
-              </div>
-            </li>
-          {/if}
+            </div>
+          </li>
+        {/if}
 
-          <!-- {/if} -->
-
+        {#if starknetAppearance === "all" || !enableArgentWebWallet}
           {#each wallets as wallet}
             <!-- svelte-ignore a11y-no-noninteractive-element-to-interactive-role -->
             <li
@@ -515,7 +236,7 @@
                 <img
                   alt={wallet.name}
                   src={wallet.icon}
-                  class="w-8 h-8 rounded-full"
+                  class="w-8 h-8 rounded"
                 />
               {/if}
             </li>
@@ -551,11 +272,38 @@
               </li>
             </a>
           {/each}
-        </ul>
-      {/if}
-    {/await}
-  </main>
-</div>
+          {#if enableArgentMobile}
+            <li
+              class="flex flex-row-reverse justify-between items-center p-3 rounded-md cursor-pointer shadow-list-item dark:shadow-none dark:bg-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-200 dark:focus:ring-neutral-700 transition-colors"
+              on:click={() => {
+                argentMobile()
+              }}
+              on:keyup={(e) => {
+                argentMobile()
+              }}
+            >
+              <span class="w-8 h-8" />
+              <p class="font-semibold text-base">Argent mobile</p>
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 32 32"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect width="32" height="32" rx="8" fill="#FF875B" />
+                <path
+                  d="M18.316 8H13.684C13.5292 8 13.4052 8.1272 13.4018 8.28531C13.3082 12.7296 11.0323 16.9477 7.11513 19.9355C6.99077 20.0303 6.96243 20.2085 7.05335 20.3369L9.76349 24.1654C9.85569 24.2957 10.0353 24.3251 10.1618 24.2294C12.6111 22.3734 14.5812 20.1345 16 17.6529C17.4187 20.1345 19.389 22.3734 21.8383 24.2294C21.9646 24.3251 22.1443 24.2957 22.2366 24.1654L24.9467 20.3369C25.0375 20.2085 25.0092 20.0303 24.885 19.9355C20.9676 16.9477 18.6918 12.7296 18.5983 8.28531C18.5949 8.1272 18.4708 8 18.316 8Z"
+                  fill="white"
+                />
+              </svg>
+            </li>
+          {/if}
+        {/if}
+      </ul>
+    </main>
+  </div>
+{/if}
 
 <style>
   @tailwind utilities;

@@ -1,6 +1,5 @@
 import { FC } from "react"
 
-import { assertNever } from "../../services/assertNever"
 import { AddNetworkScreenContainer } from "./AddNetworkScreen/AddNetworkScreenContainer"
 import { AddTokenActionScreenContainer } from "./AddTokenActionScreenContainer"
 import { ConnectDappScreenContainer } from "./connectDapp/ConnectDappScreenContainer"
@@ -24,8 +23,8 @@ export const ActionScreenContainer: FC = () => {
     case "REQUEST_TOKEN":
       return <AddTokenActionScreenContainer />
 
-    // case "REQUEST_ADD_CUSTOM_NETWORK":
-    //   return <AddNetworkScreenContainer mode="add" />
+    case "REQUEST_ADD_CUSTOM_NETWORK":
+      return <AddNetworkScreenContainer mode="add" />
 
     case "REQUEST_SWITCH_CUSTOM_NETWORK":
       return <AddNetworkScreenContainer mode="switch" />
@@ -49,7 +48,6 @@ export const ActionScreenContainer: FC = () => {
       return <DeployContractActionScreenContainer />
 
     default:
-      assertNever(action)
-      return <></>
+      return null
   }
 }

@@ -1,10 +1,10 @@
-import { Abi, Contract, ProviderInterface, number, stark } from "starknet"
+import { Abi, CairoVersion, Contract, ProviderInterface } from "starknet"
 
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
-import { Escape } from "../../../shared/account/details/getEscape"
-import { getMulticallForNetwork } from "../../../shared/multicall"
-import { Network, getNetwork, getProvider } from "../../../shared/network"
+import { Escape } from "../../../shared/account/details/escape.model"
+import { Network, getProvider } from "../../../shared/network"
+import { networkService } from "../../../shared/network/service"
 import {
   ArgentAccountType,
   BaseWalletAccount,
@@ -14,6 +14,7 @@ import {
 } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { clientAccountService } from "../../services/account"
+import { Address } from "@argent/shared"
 
 export interface AccountConstructorProps {
   name: string
@@ -21,6 +22,8 @@ export interface AccountConstructorProps {
   network: Network
   signer: WalletAccountSigner
   type: ArgentAccountType
+  classHash?: Address
+  cairoVersion?: CairoVersion
   guardian?: string | undefined
   escape?: Escape
   deployTransaction?: string
@@ -36,6 +39,8 @@ export class Account {
   networkId: string
   signer: WalletAccountSigner
   type: ArgentAccountType
+  classHash?: Address
+  cairoVersion?: CairoVersion
   guardian?: string | undefined
   escape?: Escape
   deployTransaction?: string
@@ -51,7 +56,9 @@ export class Account {
     network,
     signer,
     type,
+    classHash,
     guardian,
+    cairoVersion,
     escape,
     deployTransaction,
     hidden,
@@ -68,6 +75,8 @@ export class Account {
     this.deployTransaction = deployTransaction
     this.needsDeploy = needsDeploy
     this.type = type
+    this.classHash = classHash
+    this.cairoVersion = cairoVersion
     this.guardian = guardian
     this.escape = escape
     this.provider = getProvider(network)
@@ -105,18 +114,12 @@ export class Account {
     this.deployTransaction = undefined
   }
 
-  public async getCurrentImplementation(): Promise<string | undefined> {
+  public getCurrentImplementation(): string | undefined {
     if (this.needsDeploy) {
       return this.network.accountClassHash?.[this.type] // We deploy Standard and Multisig accounts now
     }
 
-    const multicall = getMulticallForNetwork(this.network)
-    const [implementation] = await multicall.call({
-      contractAddress: this.address,
-      entrypoint: "get_implementation",
-    })
-
-    return stark.makeAddress(number.toHex(number.toBN(implementation)))
+    return this.classHash
   }
 
   public static async create(
@@ -124,7 +127,7 @@ export class Account {
     type?: CreateAccountType,
   ): Promise<Account> {
     const account = await clientAccountService.createAccount(networkId, type)
-    const network = await getNetwork(networkId)
+    const network = await networkService.getById(networkId)
 
     if (!network) {
       throw new Error(`Network ${networkId} not found`)
@@ -150,6 +153,7 @@ export class Account {
       network,
       signer,
       type,
+      classHash,
       guardian,
       escape,
       needsDeploy,
@@ -161,6 +165,7 @@ export class Account {
       network,
       signer,
       type,
+      classHash,
       guardian,
       escape,
       needsDeploy,

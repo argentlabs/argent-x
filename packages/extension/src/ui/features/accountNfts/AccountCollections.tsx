@@ -1,103 +1,44 @@
-import { H4 } from "@argent/ui"
-import { Flex, SimpleGrid } from "@chakra-ui/react"
-import { FC, Suspense } from "react"
-import { useNavigate } from "react-router-dom"
+import { Collection } from "@argent/shared"
+import { SimpleGrid, SimpleGridProps } from "@chakra-ui/react"
+import { FC } from "react"
 
-import { ErrorBoundary } from "../../components/ErrorBoundary"
-import { ErrorBoundaryFallback } from "../../components/ErrorBoundaryFallback"
-import { Spinner } from "../../components/Spinner"
-import { routes } from "../../routes"
-import { Account } from "../accounts/Account"
-import { Collection } from "./aspect.model"
-import { getNftPicture } from "./aspect.service"
+import { AccountCollection } from "./AccountCollection"
 import { EmptyCollections } from "./EmptyCollections"
-import { NftFigure } from "./NftFigure"
-import { NftItem } from "./NftItem"
-import { useCollections } from "./useCollections"
-import { useNfts } from "./useNfts"
 
-interface AccountCollectionsProps {
-  account: Account
-  withHeader?: boolean
-  customList?: Collection[]
+export interface AccountCollectionsProps
+  extends Omit<SimpleGridProps, "onClick"> {
+  networkId: string
+  collections: Collection[]
   navigateToSend?: boolean
-}
-
-const Collections: FC<AccountCollectionsProps> = ({
-  account,
-  customList,
-  navigateToSend = false,
-}) => {
-  const navigate = useNavigate()
-  const collectibles = useCollections(account)
-
-  return (
-    <>
-      {collectibles.length === 0 && (
-        <EmptyCollections networkId={account.networkId} />
-      )}
-
-      {collectibles.length > 0 && (
-        <SimpleGrid
-          gridTemplateColumns="repeat(auto-fill, 158px)"
-          gap="3"
-          py={4}
-          mx="4"
-        >
-          {(customList || collectibles).map((collectible) => (
-            <NftFigure
-              key={collectible.contractAddress}
-              onClick={() =>
-                navigate(routes.collectionNfts(collectible.contractAddress), {
-                  state: { navigateToSend },
-                })
-              }
-            >
-              <NftItem
-                name={collectible.name}
-                thumbnailSrc={getNftPicture(collectible.nfts[0]) || ""}
-                logoSrc={collectible.imageUri}
-                total={collectible.nfts.length}
-              />
-            </NftFigure>
-          ))}
-        </SimpleGrid>
-      )}
-    </>
-  )
-}
-
-const CollectionsFallback: FC<AccountCollectionsProps> = ({ account }) => {
-  // this is needed to keep swr mounted so it can retry the request
-  useNfts(account, {
-    suspense: false,
-    errorRetryInterval: 30e3 /* 30 seconds */,
-  })
-
-  return <ErrorBoundaryFallback title="Something went wrong..." />
+  onCollectionClick?: (collection: Collection) => void
 }
 
 export const AccountCollections: FC<AccountCollectionsProps> = ({
-  account,
-  withHeader = true,
-  customList,
+  networkId,
   navigateToSend,
+  collections,
+  onCollectionClick,
   ...rest
 }) => {
+  const hasCollectibles = collections.length > 0
+  if (!hasCollectibles) {
+    return <EmptyCollections networkId={networkId} />
+  }
   return (
-    <>
-      {withHeader && <H4 textAlign="center">NFTs</H4>}
-      <Flex direction="column" flex={1} {...rest}>
-        <ErrorBoundary fallback={<CollectionsFallback account={account} />}>
-          <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-            <Collections
-              account={account}
-              customList={customList}
-              navigateToSend={navigateToSend}
-            />
-          </Suspense>
-        </ErrorBoundary>
-      </Flex>
-    </>
+    <SimpleGrid
+      gridTemplateColumns="repeat(auto-fill, minmax(155px, 1fr))"
+      gap="3"
+      p="4"
+      {...rest}
+    >
+      {collections.map((collection: Collection) => (
+        <AccountCollection
+          key={collection.contractAddress}
+          collection={collection}
+          navigateToSend={navigateToSend}
+          onClick={onCollectionClick}
+        />
+      ))}
+    </SimpleGrid>
   )
 }

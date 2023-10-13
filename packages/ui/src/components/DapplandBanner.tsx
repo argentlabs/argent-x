@@ -45,7 +45,7 @@ const CloseButton: FC<CloseButtonProps> = ({ ...props }) => (
     alignItems="center"
     {...props}
   >
-    <CloseIcon fontSize="xs" />
+    <CloseIcon fontSize="xs" data-testid="close-dappland-banner" />
   </Box>
 )
 

@@ -7,7 +7,6 @@ import {
   CustomButtonCell,
   CustomButtonCellProps,
 } from "../../components/CustomButtonCell"
-import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
 import {
   isDeclareContractTransaction,
   isDeployContractTransaction,
@@ -24,6 +23,7 @@ import { SwapAccessory } from "./ui/SwapAccessory"
 import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
+import { PrettyAccountAddressArgentX } from "../accounts/PrettyAccountAddressArgentX"
 
 export interface TransactionListItemProps extends CustomButtonCellProps {
   transactionTransformed: TransformedTransaction
@@ -46,6 +46,10 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   ...props
 }) => {
   const { action, displayName, dapp } = transactionTransformed
+  // console.log(
+  //   "🚀 ~ file: TransactionListItem.tsx:49 ~ displayName:",
+  //   displayName,
+  // )
   const isNFT = isNFTTransaction(transactionTransformed)
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
@@ -70,7 +74,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
             textOverflow="ellipsis"
           >
             {titleShowsTo ? "To: " : "From: "}
-            <PrettyAccountAddress
+            <PrettyAccountAddressArgentX
               accountAddress={titleShowsTo ? toAddress : fromAddress}
               networkId={network.id}
               icon={false}

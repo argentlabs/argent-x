@@ -1,24 +1,16 @@
 import { BarBackButton, NavigationContainer } from "@argent/ui"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { Collapse } from "@mui/material"
-import { FC, useEffect, useMemo, useState } from "react"
-import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router-dom"
+import { FC } from "react"
+import { Control, FieldErrors } from "react-hook-form"
 import styled from "styled-components"
 
-import { Network, addNetwork, networkSchema } from "../../../shared/network"
-import { settingsStore } from "../../../shared/settings"
-import { defaultBlockExplorers } from "../../../shared/settings/defaultBlockExplorers"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import { useAppState } from "../../app.state"
+import { Network } from "../../../shared/network"
 import { IconButton } from "../../components/IconButton"
 import { ArrowBackIosNewIcon } from "../../components/Icons/MuiIcons"
 import { ControlledInputText } from "../../components/InputText"
 import { makeClickable } from "../../services/a11y"
 import { A, FormError, P } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
-import { useNetworks } from "../networks/hooks/useNetworks"
-import { slugify } from "./slugify"
 
 const ExtendableControl = styled.div`
   display: flex;
@@ -33,91 +25,33 @@ const Wrapper = styled.div`
   gap: 8px;
 `
 
-type NetworkSettingsFormScreenProps =
-  | {
-      mode: "add"
-    }
-  | {
-      mode: "edit"
-      network: Network
-    }
+interface NetworkSettingsFormScreenProps {
+  mode: "add" | "edit"
+  defaultNetwork: Network
+  control: Control<Network>
+  expanded: boolean
+  setExpanded: React.Dispatch<React.SetStateAction<boolean>>
+  errors: FieldErrors<Network>
+  onSubmit: ((e: React.FormEvent<HTMLFormElement>) => void) | undefined
+}
 
-export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
-  props,
-) => {
-  const allNetworks = useNetworks()
-
-  const navigate = useNavigate()
-  const [expanded, setExpanded] = useState(false)
-  const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
-  const settingsBlockExplorer = defaultBlockExplorers[blockExplorerKey]
-
-  const defaultNetwork = useMemo<Network>(() => {
-    if (props.mode === "add") {
-      return {
-        id: "",
-        name: "",
-        chainId: "",
-        baseUrl: "",
-        status: "unknown",
-        accountClassHash: undefined,
-      }
-    }
-    /** display selected block explorer url from settings for readonly network */
-    if (
-      props.network.readonly &&
-      (props.network.id === "mainnet-alpha" ||
-        props.network.id === "goerli-alpha")
-    ) {
-      const blockExplorerUrl = settingsBlockExplorer.url[props.network.id]
-      return {
-        ...props.network,
-        blockExplorerUrl,
-      }
-    }
-    return props.network
-    // due to an or type we need to check different values depending on the mode
-  }, [props.mode === "add" || props.network]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const {
-    formState: { errors },
-    control,
-    watch,
-    setValue,
-    handleSubmit,
-  } = useForm<Network>({
-    defaultValues: defaultNetwork,
-    resolver: zodResolver(networkSchema),
-  })
-
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      if (props.mode === "add" && type === "change" && name === "name") {
-        setValue("id", slugify(value.name || ""))
-      }
-    })
-    return subscription.unsubscribe
-    // on mount
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const onSubmit = async (network: Network) => {
-    try {
-      // useAppState.setState({ isLoading: true })
-      await addNetwork(network)
-      navigate(-1)
-    } finally {
-      useAppState.setState({ isLoading: false })
-    }
-  }
-
+export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = ({
+  mode,
+  defaultNetwork,
+  control,
+  expanded,
+  setExpanded,
+  errors,
+  onSubmit,
+}) => {
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
       <ConfirmScreen
-        title={props.mode === "add" ? "Add network" : "Edit network"}
+        title={mode === "add" ? "Add network" : "Edit network"}
         singleButton
-        confirmButtonText={props.mode === "add" ? "Create" : "Save"}
+        confirmButtonText={mode === "add" ? "Create" : "Save"}
         confirmButtonDisabled={defaultNetwork.readonly}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={onSubmit}
       >
         <Wrapper>
           <P>Here you can add your own custom network to Argent X.</P>
@@ -150,8 +84,16 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
           <ControlledInputText
             autoComplete="off"
             control={control}
-            placeholder="Base URL"
-            name="baseUrl"
+            placeholder="RPC URL"
+            name="rpcUrl"
+            type="url"
+            disabled={defaultNetwork.readonly}
+          />
+          <ControlledInputText
+            autoComplete="off"
+            control={control}
+            placeholder="Sequencer URL"
+            name="sequencerUrl"
             type="url"
             disabled={defaultNetwork.readonly}
           />
@@ -170,6 +112,30 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
             <A>Advanced settings</A>
           </ExtendableControl>
           <Collapse in={expanded} timeout="auto">
+            <ControlledInputText
+              autoComplete="off"
+              control={control}
+              placeholder="Account class hash"
+              name="accountClassHash.standard"
+              type="text"
+              disabled={defaultNetwork.readonly}
+            />
+            <ControlledInputText
+              autoComplete="off"
+              control={control}
+              placeholder="Fee Token Address"
+              name="feeTokenAddress"
+              type="text"
+              disabled={defaultNetwork.readonly}
+            />
+            <ControlledInputText
+              autoComplete="off"
+              control={control}
+              placeholder="Multicall Address"
+              name="multicallAddress"
+              type="text"
+              disabled={defaultNetwork.readonly}
+            />
             <Wrapper>
               {/** TODO: Add back when we are not using backend explorer api anymore */}
               {/* <ControlledInputText
@@ -199,32 +165,8 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = (
               <ControlledInputText
                 autoComplete="off"
                 control={control}
-                placeholder="Account class hash"
-                name="accountClassHash.argent"
-                type="text"
-                disabled={defaultNetwork.readonly}
-              />
-              <ControlledInputText
-                autoComplete="off"
-                control={control}
                 placeholder="Plugin account class hash"
                 name="accountClassHash.plugin"
-                type="text"
-                disabled={defaultNetwork.readonly}
-              />
-              <ControlledInputText
-                autoComplete="off"
-                control={control}
-                placeholder="RPC URL"
-                name="rpcUrl"
-                type="url"
-                disabled={defaultNetwork.readonly}
-              />
-              <ControlledInputText
-                autoComplete="off"
-                control={control}
-                placeholder="Multicall Address"
-                name="multicallAddress"
                 type="text"
                 disabled={defaultNetwork.readonly}
               />

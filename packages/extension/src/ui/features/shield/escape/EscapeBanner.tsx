@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import {
   ESCAPE_SECURITY_PERIOD_DAYS,
   ESCAPE_TYPE_GUARDIAN,
-} from "../../../../shared/account/details/getEscape"
+} from "../../../../shared/account/details/escape.model"
 import { routes } from "../../../routes"
 import { Account } from "../../accounts/Account"
 import { useAccountGuardianIsSelf } from "../useAccountGuardian"

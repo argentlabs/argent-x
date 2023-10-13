@@ -8,9 +8,8 @@ test.describe("Network", () => {
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
     await extension.network.ensureAvailableNetworks([
-      "Mainnet\nhttps://alpha-mainnet.starknet.io",
-      "Testnet\nhttps://alpha4.starknet.io",
-      "Testnet 2\nhttps://alpha4-2.starknet.io",
+      "Mainnet\nhttps://cloud.argent-api.com/v1/starknet/mainnet/rpc/v0.4",
+      "Testnet\nhttps://cloud.argent-api.com/v1/starknet/goerli/rpc/v0.4",
       "Localhost 5050\nhttp://localhost:5050",
     ])
   })
@@ -28,7 +27,9 @@ test.describe("Network", () => {
     await extension.developerSettings.addNetwork.click()
     await extension.developerSettings.networkName.fill("My Network")
     await extension.developerSettings.chainId.fill("SN_GOERLI")
-    await extension.developerSettings.baseUrl.fill("https://alpha4.starknet.io")
+    await extension.developerSettings.sequencerUrl.fill(
+      "https://alpha4.starknet.io",
+    )
 
     await extension.navigation.create.click()
     await expect(
@@ -80,7 +81,9 @@ test.describe("Network", () => {
     await extension.developerSettings.addNetwork.click()
     await extension.developerSettings.networkName.fill("My Network")
     await extension.developerSettings.chainId.fill("SN_GOERLI")
-    await extension.developerSettings.baseUrl.fill("https://alpha4.starknet.io")
+    await extension.developerSettings.sequencerUrl.fill(
+      "https://alpha4.starknet.io",
+    )
 
     await extension.navigation.create.click()
     await expect(
@@ -92,7 +95,7 @@ test.describe("Network", () => {
 
     // add account
     await extension.network.selectNetwork("My Network")
-    await extension.account.addAccount({})
+    await extension.account.addAccount({ firstAccount: true })
     await extension.network.selectNetwork("Testnet")
 
     // try to restore networks

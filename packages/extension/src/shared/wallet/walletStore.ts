@@ -7,6 +7,7 @@ export interface WalletStorageProps {
   backup?: string
   selected?: BaseWalletAccount | null
   discoveredOnce?: boolean
+  hasSavedRecoverySeedPhrase?: boolean
 }
 
 export type IWalletStore = IObjectStore<WalletStorageProps>

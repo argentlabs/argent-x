@@ -8,11 +8,12 @@ import {
 } from "@argent/ui"
 import { Box } from "@chakra-ui/react"
 import { FC } from "react"
-import { number } from "starknet"
+import { CallData, num } from "starknet"
 
 import { entryPointToHumanReadable } from "../../../../../shared/transactions"
 import { formatTruncatedAddress } from "../../../../services/addresses"
 import { TransactionActionsType } from "../types"
+import { formatCalldataSafe } from "../../utils"
 
 export interface TransactionActionsProps {
   action: TransactionActionsType
@@ -42,7 +43,7 @@ export const TransactionActions: FC<TransactionActionsProps> = ({ action }) => {
                 <DetailAccordionRow
                   label="Class hash"
                   value={
-                    number.isHex(action.payload.classHash)
+                    num.isHex(action.payload.classHash)
                       ? formatTruncatedAddress(action.payload.classHash)
                       : action.payload.classHash
                   }
@@ -77,33 +78,37 @@ export const TransactionActions: FC<TransactionActionsProps> = ({ action }) => {
 
         {/** Render INVOKE_FUNCTION Calls */}
         {action.type === "INVOKE_FUNCTION" &&
-          action.payload.map((transaction, txIndex) => (
-            <DetailAccordionItem
-              key={txIndex}
-              isDisabled={
-                !transaction.calldata || transaction.calldata?.length === 0
-              }
-            >
-              <DetailAccordionButton
-                label={entryPointToHumanReadable(transaction.entrypoint)}
-                value={formatTruncatedAddress(transaction.contractAddress)}
-              />
-              <DetailAccordionPanel>
-                {transaction.calldata?.map((calldata, cdIndex) => (
-                  <DetailAccordionRow
-                    key={cdIndex}
-                    label={`Calldata ${cdIndex + 1}`}
-                    value={
-                      number.isHex(calldata)
-                        ? formatTruncatedAddress(calldata)
-                        : calldata
-                    }
-                    copyValue={calldata}
-                  />
-                ))}
-              </DetailAccordionPanel>
-            </DetailAccordionItem>
-          ))}
+          action.payload.map((transaction, txIndex) => {
+            return (
+              <DetailAccordionItem
+                key={txIndex}
+                isDisabled={
+                  !transaction.calldata || transaction.calldata?.length === 0
+                }
+              >
+                <DetailAccordionButton
+                  label={entryPointToHumanReadable(transaction.entrypoint)}
+                  value={formatTruncatedAddress(transaction.contractAddress)}
+                />
+                <DetailAccordionPanel>
+                  {CallData.toCalldata(
+                    formatCalldataSafe(transaction.calldata),
+                  ).map((calldata, cdIndex) => (
+                    <DetailAccordionRow
+                      key={cdIndex}
+                      label={`Calldata ${cdIndex + 1}`}
+                      value={
+                        num.isHex(calldata)
+                          ? formatTruncatedAddress(calldata)
+                          : calldata
+                      }
+                      copyValue={calldata}
+                    />
+                  ))}
+                </DetailAccordionPanel>
+              </DetailAccordionItem>
+            )
+          })}
       </DetailAccordion>
     </Box>
   )

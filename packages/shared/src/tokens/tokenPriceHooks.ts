@@ -1,4 +1,3 @@
-import { BigNumberish } from "ethers"
 import { useMemo } from "react"
 
 import { ApiData } from "../http/apiData"
@@ -9,6 +8,7 @@ import {
   lookupTokenPriceDetails,
 } from "./price"
 import { TokenWithBalance } from "./token"
+import { BigNumberish } from "starknet"
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 /** @returns individual price details for the token */

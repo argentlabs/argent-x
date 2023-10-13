@@ -1,7 +1,6 @@
 import { compactDecrypt } from "jose"
 import { z } from "zod"
 
-import { accountService } from "../../../../shared/account/service"
 import { bytesToUft8 } from "../../../../shared/utils/encode"
 import { getMessagingKeys } from "../../../keys/messagingKeys"
 import { extensionOnlyProcedure } from "../permissions"
@@ -10,12 +9,8 @@ const recoverSeedphraseSchema = z.object({
   jwe: z.string(),
 })
 
-const recoverSeedphraseResponseSchema = z.object({
-  isSuccess: z.boolean(),
-})
 export const recoverSeedphraseProcedure = extensionOnlyProcedure
   .input(recoverSeedphraseSchema)
-  .output(recoverSeedphraseResponseSchema)
   .mutation(
     async ({
       input: { jwe },
@@ -35,7 +30,7 @@ export const recoverSeedphraseProcedure = extensionOnlyProcedure
       } = JSON.parse(bytesToUft8(plaintext))
 
       await wallet.restoreSeedPhrase(seedPhrase, newPassword)
-      void transactionTracker.loadHistory(await accountService.get())
+      void transactionTracker.loadHistory()
       return { isSuccess: true }
     },
   )

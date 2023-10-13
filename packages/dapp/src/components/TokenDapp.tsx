@@ -1,7 +1,17 @@
 import { SessionAccount, createSession } from "@argent/x-sessions"
-import { FC, useEffect, useState } from "react"
-import { Abi, AccountInterface, Contract, ec } from "starknet"
-import { hash } from "starknet5"
+import { FC, useEffect, useMemo, useState } from "react"
+import {
+  Abi,
+  AccountInterface,
+  Contract,
+  stark,
+  hash,
+  GatewayError,
+  isSierra,
+  CompiledSierraCasm,
+  DeclareContractPayload,
+  UniversalDeployerContractPayload,
+} from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { truncateAddress, truncateHex } from "../services/address.service"
@@ -16,29 +26,16 @@ import {
   addNetwork,
   addToken,
   declare,
+  deploy,
   signMessage,
   waitForTransaction,
+  declareAndDeploy,
 } from "../services/wallet.service"
 import styles from "../styles/Home.module.css"
-
-const { genKeyPair, getStarkKey } = ec
+import { getStarkKey, utils } from "micro-starknet"
+import { readFileAsString } from "@argent/shared"
 
 type Status = "idle" | "approve" | "pending" | "success" | "failure"
-
-const readFileAsString = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (reader.result) {
-        return resolve(reader.result?.toString())
-      }
-      return reject(new Error("Could not read file"))
-    }
-    reader.onerror = reject
-    reader.onabort = reject.bind(null, new Error("User aborted"))
-    reader.readAsText(file)
-  })
-}
 
 export const TokenDapp: FC<{
   showSession: null | boolean
@@ -54,10 +51,13 @@ export const TokenDapp: FC<{
   const [transactionError, setTransactionError] = useState("")
   const [addTokenError, setAddTokenError] = useState("")
   const [classHash, setClassHash] = useState("")
-  const [contract, setContract] = useState<string | undefined>()
+  const [contract, setContract] = useState<string | null>(null)
+  const [casm, setCasm] = useState<CompiledSierraCasm | null>(null)
+  const [shouldDeploy, setShouldDeploy] = useState(false)
+  const [deployClassHash, setDeployClassHash] = useState("")
   const [addNetworkError, setAddNetworkError] = useState("")
 
-  const [sessionSigner] = useState(genKeyPair())
+  const [sessionSigner] = useState(utils.randomPrivateKey())
   const [sessionAccount, setSessionAccount] = useState<
     SessionAccount | undefined
   >()
@@ -71,11 +71,11 @@ export const TokenDapp: FC<{
         try {
           await waitForTransaction(lastTransactionHash)
           setTransactionStatus("success")
-        } catch (error: any) {
+        } catch (error) {
           setTransactionStatus("failure")
           let message = error ? `${error}` : "No further details"
-          if (error?.response) {
-            message = JSON.stringify(error.response, null, 2)
+          if (error instanceof GatewayError) {
+            message = JSON.stringify(error.message, null, 2)
           }
           setTransactionError(message)
         }
@@ -139,7 +139,7 @@ export const TokenDapp: FC<{
       const result = await signMessage(shortText)
       console.log(result)
 
-      setLastSig(result)
+      setLastSig(stark.formatSignature(result))
       setTransactionStatus("success")
     } catch (e) {
       console.error(e)
@@ -208,9 +208,45 @@ export const TokenDapp: FC<{
       if (!classHash) {
         throw new Error("No class hash")
       }
-      const result = await declare(contract, classHash)
-      console.log(result)
+      const payload: DeclareContractPayload = {
+        contract,
+        classHash,
+      }
+      if (casm) {
+        payload.casm = casm
+        delete payload.classHash
+      }
+      if (shouldDeploy) {
+        const result = await declareAndDeploy(payload)
+        console.log(result)
+        setLastTransactionHash(result.deploy.transaction_hash)
+      } else {
+        const result = await declare(payload)
+        console.log(result)
+        setLastTransactionHash(result.transaction_hash)
+      }
+      setTransactionStatus("pending")
+    } catch (e) {
+      console.error(e)
+      setTransactionStatus("idle")
+    }
+  }
 
+  const contractIsSierra = useMemo(() => {
+    return contract && isSierra(contract)
+  }, [contract])
+
+  const handleDeploy = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault()
+      if (!deployClassHash) {
+        throw new Error("No class hash")
+      }
+      const payload: UniversalDeployerContractPayload = {
+        classHash: deployClassHash,
+      }
+      const result = await deploy(payload)
+      console.log(result)
       setLastTransactionHash(result.transaction_hash)
       setTransactionStatus("pending")
     } catch (e) {
@@ -367,7 +403,7 @@ export const TokenDapp: FC<{
 
       <div className="columns">
         <form onSubmit={handleDeclare}>
-          <h2 className={styles.title}>Declare</h2>
+          <h2 className={styles.title}>Declare (and deploy)</h2>
 
           <label htmlFor="contract">Compiled Cairo contract to declare:</label>
           <input
@@ -375,29 +411,83 @@ export const TokenDapp: FC<{
             name="contract"
             type="file"
             onChange={async (e) => {
-              if (e.target.files) {
-                const file = e.target.files[0]
-                const fileAsString = await readFileAsString(file)
-                setContract(fileAsString)
-
-                const classHash = hash.computeContractClassHash(fileAsString)
-                setClassHash(classHash)
+              if (!e.target.files) {
+                return
               }
+              setCasm(null)
+
+              const file = e.target.files[0]
+              const fileAsString = await readFileAsString(file)
+              setContract(fileAsString)
+
+              const classHash = hash.computeContractClassHash(fileAsString)
+              setClassHash(classHash)
             }}
           />
 
-          <label htmlFor="classHash">ClassHash:</label>
+          <label htmlFor="classHash">
+            ClassHash (calculated automatically):
+          </label>
           <input
+            style={{ width: "100%" }}
             id="classHash"
             name="classHash"
             type="text"
-            onChange={(e) => {
-              setClassHash(e.target.value)
-            }}
             value={classHash}
+            readOnly
           />
 
-          <input type="submit" value="Declare" disabled={!classHash} />
+          {contractIsSierra && (
+            <>
+              <label htmlFor="contract">Compiled CASM to declare:</label>
+              <input
+                id="casm"
+                name="casm"
+                type="file"
+                onChange={async (e) => {
+                  if (!e.target.files) {
+                    return
+                  }
+                  const file = e.target.files[0]
+                  const fileAsString = await readFileAsString(file)
+                  const fileAsJson = JSON.parse(fileAsString)
+                  setCasm(fileAsJson)
+                }}
+              />
+            </>
+          )}
+
+          <input
+            type="checkbox"
+            id="shouldDeploy"
+            name="shouldDeploy"
+            checked={shouldDeploy}
+            onChange={() => setShouldDeploy(!shouldDeploy)}
+          />
+          <label htmlFor="shouldDeploy">Also deploy</label>
+
+          <input
+            type="submit"
+            value={shouldDeploy ? "Declare and Deploy" : "Declare"}
+            disabled={!contract}
+          />
+        </form>
+        <form onSubmit={handleDeploy}>
+          <h2 className={styles.title}>Deploy</h2>
+
+          <label htmlFor="deployClassHash">Class Hash to deploy:</label>
+          <input
+            style={{ width: "100%" }}
+            id="deployClassHash"
+            name="deployClassHash"
+            type="text"
+            onChange={(e) => {
+              setDeployClassHash(e.target.value)
+            }}
+            value={deployClassHash}
+          />
+
+          <input type="submit" value="Deploy" />
         </form>
       </div>
       <div className="columns">
@@ -422,8 +512,8 @@ export const TokenDapp: FC<{
               try {
                 await addToken(ETHTokenAddress)
                 setAddTokenError("")
-              } catch (error: any) {
-                setAddTokenError(error.message)
+              } catch (error) {
+                setAddTokenError((error as any).message)
               }
             }}
           >
@@ -437,8 +527,8 @@ export const TokenDapp: FC<{
               try {
                 await addToken(DAITokenAddress)
                 setAddTokenError("")
-              } catch (error: any) {
-                setAddTokenError(error.message)
+              } catch (error) {
+                setAddTokenError((error as any).message)
               }
             }}
           >
@@ -454,8 +544,8 @@ export const TokenDapp: FC<{
               try {
                 await handleAddNetwork()
                 setAddNetworkError("")
-              } catch (error: any) {
-                setAddNetworkError(error.message)
+              } catch (error) {
+                setAddNetworkError((error as any).message)
               }
             }}
           >

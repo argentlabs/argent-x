@@ -6,20 +6,26 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useEncodedPublicKey } from "../accounts/usePublicKey"
 import { IconWrapper } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
 import { recover } from "../recovery/recovery.service"
+import { usePendingMultisigs } from "./multisig.state"
+import { useAppState } from "../../app.state"
 
 const { CopyIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
+  const { switcherNetworkId: networkId } = useAppState()
 
   const { publicKey } = useParams()
 
   const signerKey = useEncodedPublicKey(publicKey)
 
+  // HACK - this is a workaround to force the pending multisigs to be updated
+  const pendingMultisigs = usePendingMultisigs({ showHidden: true })
+
   const { onCopy, hasCopied, setValue } = useClipboard("", 2000)
 
   const onDone = async () => {
-    navigate(await recover({ showAccountList: true }))
+    navigate(await recover({ networkId, showAccountList: true }))
   }
 
   useEffect(() => {
@@ -43,7 +49,7 @@ export const JoinMultisigScreen: FC = () => {
         <IconWrapper borderRadius="90">
           <ShareIcon height="7" width="7" />
         </IconWrapper>
-        <H5>Share your signer key with the multisig creator</H5>
+        <H5>Share your signer pubkey with the multisig creator</H5>
         <Box
           borderRadius="xl"
           bg="neutrals.800"

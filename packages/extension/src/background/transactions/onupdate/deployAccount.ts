@@ -8,7 +8,7 @@ export const handleDeployAccountTransaction: TransactionUpdateListener = async (
   const deployAccountTxns = transactions.filter(
     (transaction) =>
       transaction.meta?.isDeployAccount &&
-      SUCCESS_STATUSES.includes(transaction.status),
+      SUCCESS_STATUSES.includes(transaction.finalityStatus),
   )
   if (deployAccountTxns.length > 0) {
     await updateAccountDetails(

@@ -11,7 +11,8 @@ import ReactSelect, {
   ValueContainerProps,
 } from "react-select"
 
-import { AccountListItem, AccountListItemProps } from "./AccountListItem"
+import { AccountListItem } from "./AccountListItem"
+import type { AccountListItemProps } from "./accountListItem.model"
 
 const { ChevronDownIcon } = icons
 
@@ -24,7 +25,7 @@ const Control = ({
     <Flex
       {...innerProps}
       backgroundColor={isFocused ? "neutrals.700" : "neutrals.800"}
-      rounded={"xl"}
+      rounded={"lg"}
       _hover={{ bg: "neutrals.700" }}
       transitionProperty={"common"}
       transitionDuration={"fast"}
@@ -47,7 +48,12 @@ const SingleValue = ({ data }: SingleValueProps<AccountListItemProps>) => {
       {...data}
       width={"full"}
       transparent
-      pointerEvents={"none"}
+      rightElementFlexProps={{
+        direction: "row",
+        alignItems: "center",
+        gap: 2,
+      }}
+      connectedTooltipLabel="Account is already connected"
     >
       <ChevronDownIcon />
     </AccountListItem>
@@ -62,7 +68,7 @@ const Menu = ({ children, innerProps }: MenuProps<AccountListItemProps>) => {
   return (
     <Box
       {...innerProps}
-      rounded={"xl"}
+      rounded={"lg"}
       position={"absolute"}
       width={"100%"}
       zIndex={1}
@@ -79,11 +85,12 @@ const MenuList = ({
   return (
     <Box
       {...innerProps}
-      rounded={"xl"}
+      rounded={"lg"}
       maxHeight={"300px"}
       overflowY={"auto"}
       position={"relative"}
       boxShadow={"menu"}
+      mt={2}
     >
       {children}
     </Box>

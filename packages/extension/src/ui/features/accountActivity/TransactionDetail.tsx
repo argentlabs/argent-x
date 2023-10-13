@@ -1,13 +1,11 @@
 import { icons } from "@argent/ui"
-import { BigNumber } from "ethers"
-import { isString } from "lodash-es"
+import { isString, upperCase } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import styled, { useTheme } from "styled-components"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { Network } from "../../../shared/network"
-import { Token } from "../../../shared/token/type"
 import {
   Transaction,
   entryPointToHumanReadable,
@@ -29,7 +27,7 @@ import {
   openBlockExplorerTransaction,
 } from "../../services/blockExplorer.service"
 import { formatDateTime } from "../../services/dates"
-import { PrettyAccountAddress } from "../accounts/PrettyAccountAddress"
+import { PrettyAccountAddressArgentX } from "../accounts/PrettyAccountAddressArgentX"
 import { AccountAddressField } from "../actions/transaction/fields/AccountAddressField"
 import { DappContractField } from "../actions/transaction/fields/DappContractField"
 import { FeeField } from "../actions/transaction/fields/FeeField"
@@ -53,6 +51,8 @@ import { TransactionCallDataBottomSheet } from "./ui/TransactionCallDataBottomSh
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferTitle } from "./ui/TransferTitle"
 import { useTransactionFees } from "./useTransactionFees"
+import { useTransactionNonce } from "./useTransactionNonce"
+import { Token } from "../../../shared/token/__new/types/token.model"
 
 const { ActivityIcon } = icons
 
@@ -166,11 +166,15 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     transactionTransformed,
     network,
   })
+  const txNonce = useTransactionNonce({ hash, network })
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const { action, date, displayName, dapp } = transactionTransformed
+  const isReverted =
+    upperCase(explorerTransaction?.executionStatus) === "REVERTED" ||
+    transaction?.executionStatus === "REVERTED"
   const isRejected =
-    explorerTransaction?.status === "REJECTED" ||
-    transaction?.status === "REJECTED"
+    upperCase(explorerTransaction?.executionStatus) === "REJECTED" ||
+    transaction?.executionStatus === "REJECTED"
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
   const isNFT = isNFTTransaction(transactionTransformed)
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
@@ -236,7 +240,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     if (isSwap) {
       const { fromTokenAddress, toTokenAddress, fromAmount, toAmount } =
         transactionTransformed
-      const negativeFromAmount = BigNumber.from(0).sub(fromAmount)
+      const negativeFromAmount = -BigInt(fromAmount)
       return (
         <>
           <TokenField
@@ -263,20 +267,21 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
     network.id,
     tokensByNetwork,
   ])
+
   const titleShowsTo =
     (isTransfer || isNFTTransfer) &&
     (action === "SEND" || action === "TRANSFER")
   const titleShowsFrom = (isTransfer || isNFTTransfer) && action === "RECEIVE"
   const displayContractAddress =
     !!explorerTransaction &&
+    explorerTransaction.contractAddress &&
     formatTruncatedAddress(explorerTransaction.contractAddress)
   const displayTransactionHash = !!hash && formatTruncatedAddress(hash)
   const calls = explorerTransaction?.calls || transaction?.meta?.transactions
-  const errorMessage =
+  const rejectedErrorMessage =
     isRejected &&
     transaction &&
     getErrorMessageFromErrorDump(transaction.failureReason?.error_message)
-
   return (
     <StyledTransactionDetailWrapper
       scrollContent={transactionTransformed.displayName || "Transaction"}
@@ -298,7 +303,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
                 {titleShowsTo ? "To:" : "From:"}
               </TitleAddressPrefix>
               <TitleAddress>
-                <PrettyAccountAddress
+                <PrettyAccountAddressArgentX
                   accountAddress={
                     titleShowsTo
                       ? transactionTransformed.toAddress
@@ -334,7 +339,8 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
             <FieldValue>
               <StyledCopyIconButton
                 size="s"
-                copyValue={explorerTransaction.contractAddress}
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                copyValue={explorerTransaction.contractAddress!}
                 variant="transparent"
               >
                 {displayContractAddress}
@@ -397,19 +403,27 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
       <FieldGroup>
         <Field>
           <FieldKey>Status</FieldKey>
-          <FieldValue>{isRejected ? "Failed" : "Complete"}</FieldValue>
+          <FieldValue>
+            {isRejected ? "Failed" : isReverted ? "Reverted" : "Complete"}
+          </FieldValue>
         </Field>
-        {errorMessage && (
+        {rejectedErrorMessage && (
           <Field>
             <FieldKey>Reason</FieldKey>
-            <LeftPaddedField>{errorMessage}</LeftPaddedField>
+            <LeftPaddedField>{rejectedErrorMessage}</LeftPaddedField>
           </Field>
         )}
         {dapp && <DappContractField knownContract={dapp} />}
         {additionalFields}
         {txFee && <FeeField fee={txFee} networkId={network.id} />}
+        {txNonce && (
+          <Field>
+            <FieldKey>Nonce</FieldKey>
+            <LeftPaddedField>{txNonce}</LeftPaddedField>
+          </Field>
+        )}
       </FieldGroup>
-      {isRejected && transaction && (
+      {(isRejected || isReverted) && transaction && (
         <FieldGroup>
           <TransactionFailedField clickable>
             <TransactionLogKey>
@@ -417,14 +431,19 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
               <CopyTooltip
                 message="Copied"
                 copyValue={
-                  transaction.failureReason?.error_message || hash || ""
+                  transaction.failureReason?.error_message ||
+                  transaction.revertReason ||
+                  hash ||
+                  ""
                 }
               >
                 <ContentCopyIcon style={{ fontSize: 12 }} />
               </CopyTooltip>
             </TransactionLogKey>
             <TransactionLogMessage style={{ color: theme.text2 }}>
-              {transaction.failureReason?.error_message || "Unknown error"}
+              {transaction.failureReason?.error_message ||
+                transaction.revertReason ||
+                "Unknown error"}
             </TransactionLogMessage>
           </TransactionFailedField>
         </FieldGroup>

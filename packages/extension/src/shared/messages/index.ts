@@ -5,11 +5,9 @@ import { IS_DEV } from "../utils/dev"
 import { AccountMessage } from "./AccountMessage"
 import { ActionMessage } from "./ActionMessage"
 import { MiscenalleousMessage } from "./MiscellaneousMessage"
-import { MultisigMessage } from "./MultisigMessage"
 import { NetworkMessage } from "./NetworkMessage"
 import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
 import { SessionMessage } from "./SessionMessage"
-import { ShieldMessage } from "./ShieldMessage"
 import { TokenMessage } from "./TokenMessage"
 import { TransactionMessage } from "./TransactionMessage"
 import { UdcMessage } from "./UdcMessage"
@@ -24,8 +22,6 @@ export type MessageType =
   | TokenMessage
   | TransactionMessage
   | UdcMessage
-  | ShieldMessage
-  | MultisigMessage
 
 export type WindowMessageType = MessageType & {
   forwarded?: boolean

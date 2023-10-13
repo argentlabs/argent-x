@@ -1,6 +1,6 @@
-import { H3, P3, P4, PreBoxJsonStringify } from "@argent/ui"
+import { H3, P3, PreBoxJsonStringify } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { FC, ReactNode } from "react"
 import { typedData } from "starknet"
 
 import {
@@ -10,14 +10,23 @@ import {
 
 interface ApproveSignatureScreenProps extends ConfirmScreenProps {
   dataToSign: typedData.TypedData
+  actionIsApproving?: boolean
+  footer?: ReactNode
 }
 
 export const ApproveSignatureScreen: FC<ApproveSignatureScreenProps> = ({
   dataToSign,
+  actionIsApproving,
   ...rest
 }) => {
   return (
-    <ConfirmScreen confirmButtonText="Sign" {...rest}>
+    <ConfirmScreen
+      confirmButtonText="Sign"
+      confirmButtonLoadingText="Sign"
+      confirmButtonDisabled={actionIsApproving}
+      confirmButtonIsLoading={actionIsApproving}
+      {...rest}
+    >
       <Flex flexDirection={"column"} flex={1} gap={4}>
         <H3>Sign message</H3>
         <P3>A dapp wants you to sign this message:</P3>

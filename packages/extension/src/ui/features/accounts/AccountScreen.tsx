@@ -2,17 +2,20 @@ import { SupportedNetworks, SwapProvider } from "@argent/x-swap"
 import { FC, ReactNode, useMemo } from "react"
 
 import { getMulticallForNetwork } from "../../../shared/multicall"
-import { assertNever } from "../../services/assertNever"
 import { AccountActivityContainer } from "../accountActivity/AccountActivityContainer"
-import { AccountCollections } from "../accountNfts/AccountCollections"
-import { AccountTokens } from "../accountTokens/AccountTokens"
+import { AccountCollectionsContainer } from "../accountNfts/AccountCollectionsContainer"
+import { AccountTokensContainer } from "../accountTokens/AccountTokensContainer"
 import { StatusMessageFullScreenContainer } from "../statusMessage/StatusMessageFullScreen"
 import { useShouldShowFullScreenStatusMessage } from "../statusMessage/useShouldShowFullScreenStatusMessage"
 import { NoSwap } from "../swap/NoSwap"
 import { Swap } from "../swap/Swap"
 import { AccountContainer } from "./AccountContainer"
-import { useSelectedAccount } from "./accounts.state"
+import { useAccount } from "./accounts.state"
 import { AccountScreenEmptyContainer } from "./AccountScreenEmptyContainer"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
+import { usePendingMultisigs } from "../multisig/multisig.state"
+import { tokenBalancesView } from "../../views/tokenBalances"
 
 interface AccountScreenProps {
   tab: "tokens" | "collections" | "activity" | "swap"
@@ -21,14 +24,19 @@ interface AccountScreenProps {
 /** TODO: refactor: rename 'RootContainer' or similar */
 
 export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
-  const account = useSelectedAccount()
+  const walletAccount = useView(selectedAccountView)
+  const account = useAccount(walletAccount)
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
 
-  const hasAccount = !!account
-  const showEmpty = !hasAccount
+  const hasAccount = account !== undefined
 
   const multicall = account && getMulticallForNetwork(account?.network)
+
+  // HACK - this is a workaround to force the pending multisigs to be updated
+  usePendingMultisigs({ showHidden: true })
+  // HACK: force refresh of token balances
+  useView(tokenBalancesView)
 
   const noSwap = useMemo(
     () =>
@@ -38,20 +46,18 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
     [account?.networkId],
   )
 
-  let body: ReactNode
-  let scrollKey = "accounts/AccountScreen"
-  if (showEmpty) {
-    return <AccountScreenEmptyContainer />
-  } else if (shouldShowFullScreenStatusMessage) {
+  if (shouldShowFullScreenStatusMessage) {
     return <StatusMessageFullScreenContainer />
+  }
+
+  let body: ReactNode
+  if (!hasAccount) {
+    body = <AccountScreenEmptyContainer />
   } else if (tab === "tokens") {
-    scrollKey = "accounts/AccountTokens"
-    body = <AccountTokens account={account} />
+    body = <AccountTokensContainer account={account} />
   } else if (tab === "collections") {
-    scrollKey = "accounts/AccountCollections"
-    body = <AccountCollections account={account} />
+    body = <AccountCollectionsContainer account={account} />
   } else if (tab === "activity") {
-    scrollKey = "accounts/AccountActivityContainer"
     body = <AccountActivityContainer account={account} />
   } else if (tab === "swap") {
     body = noSwap ? (
@@ -62,8 +68,9 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
       </SwapProvider>
     )
   } else {
-    assertNever(tab)
+    tab satisfies never
   }
 
+  const scrollKey = `accounts/account-${tab}`
   return <AccountContainer scrollKey={scrollKey}>{body}</AccountContainer>
 }

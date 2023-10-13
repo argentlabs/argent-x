@@ -31,7 +31,14 @@ export const StackScreen: FC<StackScreenProps> = ({
     onStackClicked,
   } = useStackContext()
   const [isPresent, safeToRemove] = usePresence()
-  const prefersReducedMotion = useReducedMotion()
+
+  /**
+   * FIXME: Currently `prefersReducedMotion = true` hotfix disables animated transitions - re-enable when ui is more performant.
+   *
+   * Note that framer `<MotionConfig reducedMotion="..."` does not affect the `useReducedMotion` hook
+   */
+  // const prefersReducedMotion = useReducedMotion()
+  const prefersReducedMotion = true
 
   const { variant, presentation, zIndex } = presentationByPath[path] || {}
   const { enter, active, exit } = variant || {}

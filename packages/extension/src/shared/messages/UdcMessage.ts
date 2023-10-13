@@ -1,5 +1,3 @@
-import { ContractClass } from "starknet"
-
 import { DeclareContract, DeployContract } from "../udc/type"
 
 export type UdcMessage =
@@ -8,10 +6,6 @@ export type UdcMessage =
   | {
       type: "REQUEST_DECLARE_CONTRACT_REJ"
       data: { actionHash: string; error?: string }
-    }
-  | {
-      type: "DECLARE_CONTRACT"
-      data: { address: string; contract: any }
     }
   | {
       type: "DECLARE_CONTRACT_ACTION_SUBMITTED"
@@ -42,16 +36,4 @@ export type UdcMessage =
   | {
       type: "DEPLOY_CONTRACT_ACTION_FAILED"
       data: { actionHash: string; error: string }
-    }
-  | {
-      type: "FETCH_CONSTRUCTOR_PARAMS"
-      data: { classHash: string; networkId: string }
-    }
-  | {
-      type: "FETCH_CONSTRUCTOR_PARAMS_RES"
-      data: { contract: ContractClass }
-    }
-  | {
-      type: "FETCH_CONSTRUCTOR_PARAMS_REJ"
-      data: { error?: string }
     }

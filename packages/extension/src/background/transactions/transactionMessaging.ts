@@ -1,28 +1,44 @@
 import {
-  Account,
-  InvocationsSignerDetails,
-  TransactionBulk,
+  CallData,
+  Invocations,
+  TransactionType,
   hash,
-  number,
+  num,
   stark,
+  transaction,
 } from "starknet"
 
 import { TransactionMessage } from "../../shared/messages/TransactionMessage"
+import {
+  SimulateDeployAccountRequest,
+  SimulateInvokeRequest,
+} from "../../shared/transactionSimulation/types"
+import { getErrorObject } from "../../shared/utils/error"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
+import { isAccountV5 } from "../../shared/utils/accountv4"
 import { argentMaxFee } from "../utils/argentMaxFee"
-import { getEstimatedFeeForMultisigTx } from "./fees/multisigFeeEstimation"
-import { addEstimatedFees } from "./fees/store"
+import { addEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
+import { transactionCallsAdapter } from "./transactionAdapter"
+import { AccountError } from "../../shared/errors/account"
+import { fetchTransactionBulkSimulation } from "../../shared/transactionSimulation/transactionSimulation.service"
+import { TransactionError } from "../../shared/errors/transaction"
+import { getEstimatedFeeFromSimulation } from "../../shared/transactionSimulation/utils"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
-> = async ({ msg, background: { wallet, actionQueue }, respond: respond }) => {
+> = async ({ msg, origin, background: { wallet, actionService }, respond }) => {
   switch (msg.type) {
     case "EXECUTE_TRANSACTION": {
-      const { meta } = await actionQueue.push({
-        type: "TRANSACTION",
-        payload: msg.data,
-      })
+      const { meta } = await actionService.add(
+        {
+          type: "TRANSACTION",
+          payload: msg.data,
+        },
+        {
+          origin,
+        },
+      )
       return respond({
         type: "EXECUTE_TRANSACTION_RES",
         data: { actionHash: meta.hash },
@@ -31,71 +47,74 @@ export const handleTransactionMessage: HandleMessage<
 
     case "ESTIMATE_TRANSACTION_FEE": {
       const selectedAccount = await wallet.getSelectedAccount()
-      const starknetAccount = await wallet.getSelectedStarknetAccount()
       const transactions = msg.data
+      const oldAccountTransactions = transactionCallsAdapter(transactions)
 
       if (!selectedAccount) {
-        throw Error("no accounts")
+        throw new AccountError({ code: "NOT_FOUND" })
       }
+
+      const starknetAccount = await wallet.getSelectedStarknetAccount()
+
       try {
         let txFee = "0",
           maxTxFee = "0",
           accountDeploymentFee: string | undefined,
           maxADFee: string | undefined
 
-        if (
-          selectedAccount.needsDeploy &&
-          !(await isAccountDeployed(
-            selectedAccount,
-            starknetAccount.getClassAt,
-          ))
-        ) {
+        const isDeployed = await isAccountDeployed(
+          selectedAccount,
+          starknetAccount.getClassAt.bind(starknetAccount),
+        )
+
+        if (!isDeployed) {
           if ("estimateFeeBulk" in starknetAccount) {
-            const bulkTransactions: TransactionBulk = [
+            const bulkTransactions: Invocations = [
               {
-                type: "DEPLOY_ACCOUNT",
+                type: TransactionType.DEPLOY_ACCOUNT,
                 payload: await wallet.getAccountDeploymentPayload(
                   selectedAccount,
                 ),
               },
               {
-                type: "INVOKE_FUNCTION",
+                type: TransactionType.INVOKE,
                 payload: transactions,
               },
             ]
 
             const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
               bulkTransactions,
+              { skipValidate: true },
             )
 
-            accountDeploymentFee = number.toHex(estimateFeeBulk[0].overall_fee)
-            txFee = number.toHex(estimateFeeBulk[1].overall_fee)
+            accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
+            txFee = num.toHex(estimateFeeBulk[1].overall_fee)
 
             maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
             maxTxFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
           }
-        } else if (selectedAccount.type === "multisig") {
-          const { overall_fee, suggestedMaxFee } =
-            await getEstimatedFeeForMultisigTx(selectedAccount, transactions)
-          txFee = number.toHex(overall_fee)
-          maxTxFee = number.toHex(suggestedMaxFee)
         } else {
-          const { overall_fee, suggestedMaxFee } =
-            await starknetAccount.estimateFee(transactions)
+          const { overall_fee, suggestedMaxFee } = isAccountV5(starknetAccount)
+            ? await starknetAccount.estimateFee(transactions, {
+                skipValidate: true,
+              })
+            : await starknetAccount.estimateFee(oldAccountTransactions)
 
-          txFee = number.toHex(overall_fee)
-          maxTxFee = number.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
+          txFee = num.toHex(overall_fee)
+          maxTxFee = num.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
         }
 
         const suggestedMaxFee = argentMaxFee(maxTxFee)
 
-        addEstimatedFees({
-          amount: txFee,
-          suggestedMaxFee,
-          accountDeploymentFee,
-          maxADFee,
+        await addEstimatedFees(
+          {
+            amount: txFee,
+            suggestedMaxFee,
+            accountDeploymentFee,
+            maxADFee,
+          },
           transactions,
-        })
+        )
         return respond({
           type: "ESTIMATE_TRANSACTION_FEE_RES",
           data: {
@@ -106,14 +125,12 @@ export const handleTransactionMessage: HandleMessage<
           },
         })
       } catch (error) {
-        console.error(error)
+        const errorObject = getErrorObject(error, false)
+        console.error("ESTIMATE_TRANSACTION_FEE_REJ", error, errorObject)
         return respond({
           type: "ESTIMATE_TRANSACTION_FEE_REJ",
           data: {
-            error:
-              (error as any)?.message?.toString?.() ??
-              (error as any)?.toString?.() ??
-              "Unkown error",
+            error: errorObject,
           },
         })
       }
@@ -133,14 +150,14 @@ export const handleTransactionMessage: HandleMessage<
         const { overall_fee, suggestedMaxFee } =
           await wallet.getAccountDeploymentFee(account)
 
-        const maxADFee = number.toHex(
+        const maxADFee = num.toHex(
           stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
         )
 
         return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
           data: {
-            amount: number.toHex(overall_fee),
+            amount: num.toHex(overall_fee),
             maxADFee,
           },
         })
@@ -148,36 +165,34 @@ export const handleTransactionMessage: HandleMessage<
         // FIXME: This is a temporary fix for the case where the user has a multisig account.
         // Once starknet 0.11 is released, we can remove this.
         if (account.type === "multisig") {
-          const fallbackPrice = number.toBN(10e14)
+          const fallbackPrice = num.toBigInt(10e14)
           return respond({
             type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
             data: {
-              amount: number.toHex(fallbackPrice),
+              amount: num.toHex(fallbackPrice),
               maxADFee: argentMaxFee(fallbackPrice),
             },
           })
         }
 
-        console.error(error)
+        const errorObject = getErrorObject(error, false)
+        console.error("ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ", error, errorObject)
         return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ",
           data: {
-            error:
-              (error as any)?.message?.toString?.() ??
-              (error as any)?.toString?.() ??
-              "Unkown error",
+            error: errorObject,
           },
         })
       }
     }
 
     case "ESTIMATE_DECLARE_CONTRACT_FEE": {
-      const { classHash, contract, ...restData } = msg.data
+      const { address, networkId, ...rest } = msg.data
 
       const selectedAccount = await wallet.getSelectedAccount()
       const selectedStarknetAccount =
-        "address" in restData
-          ? await wallet.getStarknetAccount(restData)
+        address && networkId
+          ? await wallet.getStarknetAccount({ address, networkId })
           : await wallet.getSelectedStarknetAccount()
 
       if (!selectedStarknetAccount) {
@@ -194,7 +209,7 @@ export const handleTransactionMessage: HandleMessage<
           selectedAccount?.needsDeploy &&
           !(await isAccountDeployed(
             selectedAccount,
-            selectedStarknetAccount.getClassAt,
+            selectedStarknetAccount.getClassAt.bind(selectedStarknetAccount),
           ))
         ) {
           if ("estimateFeeBulk" in selectedStarknetAccount) {
@@ -202,38 +217,38 @@ export const handleTransactionMessage: HandleMessage<
               selectedAccount.type === "multisig"
                 ? await wallet.getMultisigDeploymentPayload(selectedAccount)
                 : await wallet.getAccountDeploymentPayload(selectedAccount)
-            const bulkTransactions: TransactionBulk = [
+            const bulkTransactions: Invocations = [
               {
-                type: "DEPLOY_ACCOUNT",
+                type: TransactionType.DEPLOY_ACCOUNT,
                 payload: deployPayload,
               },
               {
-                type: "DECLARE",
+                type: TransactionType.DECLARE,
                 payload: {
-                  classHash,
-                  contract,
+                  ...rest,
                 },
               },
             ]
 
             const estimateFeeBulk =
-              await selectedStarknetAccount.estimateFeeBulk(bulkTransactions)
+              await selectedStarknetAccount.estimateFeeBulk(bulkTransactions, {
+                skipValidate: true,
+              })
 
-            accountDeploymentFee = number.toHex(estimateFeeBulk[0].overall_fee)
-            txFee = number.toHex(estimateFeeBulk[1].overall_fee)
+            accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
+            txFee = num.toHex(estimateFeeBulk[1].overall_fee)
 
             maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-            maxTxFee = estimateFeeBulk[1].suggestedMaxFee
+            maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
           }
         } else {
           if ("estimateDeclareFee" in selectedStarknetAccount) {
             const { overall_fee, suggestedMaxFee } =
               await selectedStarknetAccount.estimateDeclareFee({
-                classHash,
-                contract,
+                ...rest,
               })
-            txFee = number.toHex(overall_fee)
-            maxTxFee = number.toHex(suggestedMaxFee)
+            txFee = num.toHex(overall_fee)
+            maxTxFee = num.toHex(suggestedMaxFee)
           } else {
             throw Error("estimateDeclareFee not supported")
           }
@@ -284,19 +299,19 @@ export const handleTransactionMessage: HandleMessage<
           selectedAccount?.needsDeploy &&
           !(await isAccountDeployed(
             selectedAccount,
-            selectedStarknetAccount.getClassAt,
+            selectedStarknetAccount.getClassAt.bind(selectedStarknetAccount),
           ))
         ) {
           if ("estimateFeeBulk" in selectedStarknetAccount) {
-            const bulkTransactions: TransactionBulk = [
+            const bulkTransactions: Invocations = [
               {
-                type: "DEPLOY_ACCOUNT",
+                type: TransactionType.DEPLOY_ACCOUNT,
                 payload: await wallet.getAccountDeploymentPayload(
                   selectedAccount,
                 ),
               },
               {
-                type: "DEPLOY",
+                type: TransactionType.DEPLOY,
                 payload: {
                   classHash,
                   salt,
@@ -309,11 +324,11 @@ export const handleTransactionMessage: HandleMessage<
             const estimateFeeBulk =
               await selectedStarknetAccount.estimateFeeBulk(bulkTransactions)
 
-            accountDeploymentFee = number.toHex(estimateFeeBulk[0].overall_fee)
-            txFee = number.toHex(estimateFeeBulk[1].overall_fee)
+            accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
+            txFee = num.toHex(estimateFeeBulk[1].overall_fee)
 
             maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-            maxTxFee = estimateFeeBulk[1].suggestedMaxFee
+            maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
           }
         } else {
           if ("estimateDeployFee" in selectedStarknetAccount) {
@@ -324,8 +339,8 @@ export const handleTransactionMessage: HandleMessage<
                 unique,
                 constructorCalldata,
               })
-            txFee = number.toHex(overall_fee)
-            maxTxFee = number.toHex(suggestedMaxFee)
+            txFee = num.toHex(overall_fee)
+            maxTxFee = num.toHex(suggestedMaxFee)
           } else {
             throw Error("estimateDeployFee not supported")
           }
@@ -361,64 +376,81 @@ export const handleTransactionMessage: HandleMessage<
 
       try {
         const selectedAccount = await wallet.getSelectedAccount()
-        const starknetAccount =
-          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
-
         if (!selectedAccount) {
-          throw Error("no accounts")
+          throw new AccountError({ code: "NOT_FOUND" })
+        }
+        const starknetAccount = await wallet.getSelectedStarknetAccount()
+
+        if (!isAccountV5(starknetAccount)) {
+          // Old accounts are not supported
+          return respond({
+            type: "SIMULATE_TRANSACTION_INVOCATION_RES",
+            data: null,
+          })
         }
 
-        const nonce = await starknetAccount.getNonce()
+        let nonce
 
-        const chainId = starknetAccount.chainId
-
-        const version = number.toHex(hash.feeTransactionVersion)
-
-        const signerDetails: InvocationsSignerDetails = {
-          walletAddress: starknetAccount.address,
-          nonce,
-          maxFee: 0,
-          version,
-          chainId,
+        try {
+          nonce = await starknetAccount.getNonce()
+        } catch {
+          nonce = "0"
         }
 
-        // TODO: Use this when Simulate Transaction allows multiple transaction types
-        // const signerDetailsWithZeroNonce = {
-        //   ...signerDetails,
-        //   nonce: 0,
-        // }
+        const chainId = await starknetAccount.getChainId()
 
-        // const accountDeployPayload = await wallet.getAccountDeploymentPayload(
-        //   selectedAccount,
-        // )
+        const version = num.toHex(hash.feeTransactionVersion)
 
-        // const accountDeployInvocation =
-        //   await starknetAccount.buildAccountDeployPayload(
-        //     accountDeployPayload,
-        //     signerDetailsWithZeroNonce,
-        //   )
+        const calldata = transaction.getExecuteCalldata(
+          transactions,
+          starknetAccount.cairoVersion,
+        )
 
-        const { contractAddress, calldata, signature } =
-          await starknetAccount.buildInvocation(transactions, signerDetails)
+        let accountDeployTransaction: SimulateDeployAccountRequest | null = null
 
-        const invocation = {
-          type: "INVOKE_FUNCTION" as const,
-          contract_address: contractAddress,
+        const isDeployed = await isAccountDeployed(
+          selectedAccount,
+          starknetAccount.getClassAt.bind(starknetAccount),
+        )
+
+        const invokeTransactions: SimulateInvokeRequest = {
+          type: TransactionType.INVOKE,
+          sender_address: selectedAccount.address,
           calldata,
-          signature,
-          nonce,
+          signature: [],
+          nonce: isDeployed ? num.toHex(nonce) : num.toHex(1),
           version,
+        }
+
+        if (!isDeployed) {
+          const accountDeployPayload = await wallet.getAccountDeploymentPayload(
+            selectedAccount,
+          )
+
+          accountDeployTransaction = {
+            type: TransactionType.DEPLOY_ACCOUNT,
+            calldata: CallData.toCalldata(
+              accountDeployPayload.constructorCalldata,
+            ),
+            classHash: num.toHex(accountDeployPayload.classHash),
+            salt: num.toHex(accountDeployPayload.addressSalt || 0),
+            nonce: num.toHex(0),
+            version: num.toHex(version),
+            signature: [],
+          }
         }
 
         return respond({
           type: "SIMULATE_TRANSACTION_INVOCATION_RES",
           data: {
-            invocation,
+            transactions: accountDeployTransaction
+              ? [accountDeployTransaction, invokeTransactions]
+              : [invokeTransactions],
             chainId,
           },
         })
       } catch (error) {
-        console.log(error)
+        console.error("SIMULATE_TRANSACTION_INVOCATION_REJ", error)
         return respond({
           type: "SIMULATE_TRANSACTION_INVOCATION_REJ",
           data: {
@@ -431,41 +463,116 @@ export const handleTransactionMessage: HandleMessage<
       }
     }
 
-    case "TRANSACTION_FAILED": {
-      return await actionQueue.remove(msg.data.actionHash)
-    }
-
-    case "SIMULATE_TRANSACTION_FALLBACK": {
-      const selectedAccount = await wallet.getSelectedAccount()
-      const starknetAccount =
-        (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
-
-      if (!selectedAccount) {
-        throw Error("no accounts")
-      }
-
-      const nonce = await starknetAccount.getNonce()
+    case "SIMULATE_TRANSACTIONS": {
+      const transactions = Array.isArray(msg.data) ? msg.data : [msg.data]
 
       try {
-        const simulated = await starknetAccount.simulateTransaction(msg.data, {
-          nonce,
+        const selectedAccount = await wallet.getSelectedAccount()
+        if (!selectedAccount) {
+          throw new AccountError({ code: "NOT_FOUND" })
+        }
+        const starknetAccount = await wallet.getSelectedStarknetAccount()
+
+        if (!isAccountV5(starknetAccount)) {
+          // Old accounts are not supported
+          return respond({
+            type: "SIMULATE_TRANSACTION_INVOCATION_RES",
+            data: null,
+          })
+        }
+
+        let nonce
+
+        try {
+          nonce = await starknetAccount.getNonce()
+        } catch {
+          nonce = "0"
+        }
+
+        const chainId = await starknetAccount.getChainId()
+
+        const version = num.toHex(hash.feeTransactionVersion)
+
+        const calldata = transaction.getExecuteCalldata(
+          transactions,
+          starknetAccount.cairoVersion,
+        )
+
+        let accountDeployTransaction: SimulateDeployAccountRequest | null = null
+
+        const isDeployed = await isAccountDeployed(
+          selectedAccount,
+          starknetAccount.getClassAt.bind(starknetAccount),
+        )
+
+        const invokeTransactions: SimulateInvokeRequest = {
+          type: TransactionType.INVOKE,
+          sender_address: selectedAccount.address,
+          calldata,
+          signature: [],
+          nonce: isDeployed ? num.toHex(nonce) : num.toHex(1),
+          version,
+        }
+
+        if (!isDeployed) {
+          const accountDeployPayload = await wallet.getAccountDeploymentPayload(
+            selectedAccount,
+          )
+
+          accountDeployTransaction = {
+            type: TransactionType.DEPLOY_ACCOUNT,
+            calldata: CallData.toCalldata(
+              accountDeployPayload.constructorCalldata,
+            ),
+            classHash: num.toHex(accountDeployPayload.classHash),
+            salt: num.toHex(accountDeployPayload.addressSalt || 0),
+            nonce: num.toHex(0),
+            version: num.toHex(version),
+            signature: [],
+          }
+        }
+
+        const invocations = accountDeployTransaction
+          ? [accountDeployTransaction, invokeTransactions]
+          : [invokeTransactions]
+
+        const result = await fetchTransactionBulkSimulation({
+          invocations,
+          chainId,
         })
 
+        const estimatedFee = getEstimatedFeeFromSimulation(result)
+
+        let simulationWithFees = null
+
+        if (result) {
+          await addEstimatedFees(estimatedFee, transactions)
+          simulationWithFees = {
+            simulation: result,
+            feeEstimation: estimatedFee,
+          }
+        }
+
         return respond({
-          type: "SIMULATE_TRANSACTION_FALLBACK_RES",
-          data: simulated,
+          type: "SIMULATE_TRANSACTIONS_RES",
+          data: simulationWithFees,
         })
       } catch (error) {
+        console.error("SIMULATE_TRANSACTIONS_REJ", error)
         return respond({
-          type: "SIMULATE_TRANSACTION_FALLBACK_REJ",
+          type: "SIMULATE_TRANSACTIONS_REJ",
           data: {
-            error:
-              (error as any)?.message?.toString() ??
-              (error as any)?.toString() ??
-              "Unkown error",
+            error: new TransactionError({
+              code: "SIMULATION_ERROR",
+              message: `${error}`,
+            }),
           },
         })
       }
+    }
+
+    case "TRANSACTION_FAILED": {
+      return await actionService.remove(msg.data.actionHash)
     }
   }
   throw new UnhandledMessage()

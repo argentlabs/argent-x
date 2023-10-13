@@ -1,15 +1,17 @@
 import { FC } from "react"
-import { Navigate } from "react-router-dom"
+import { Navigate, useParams } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { NetworkSettingsFormScreen } from "./NetworkSettingsFormScreen"
-import { useSelectedNetwork } from "./selectedNetwork.state"
+import { NetworkSettingsFormScreenContainer } from "./NetworkSettingsFormScreenContainer"
+import { useNetworkOrUndefined } from "../networks/hooks/useNetwork"
 
 export const NetworkSettingsEditScreen: FC = () => {
-  const [selectedCustomNetwork] = useSelectedNetwork()
+  const { networkId } = useParams<"networkId">()
 
-  return selectedCustomNetwork ? (
-    <NetworkSettingsFormScreen mode="edit" network={selectedCustomNetwork} />
+  const network = useNetworkOrUndefined(networkId)
+
+  return network ? (
+    <NetworkSettingsFormScreenContainer mode="edit" network={network} />
   ) : (
     <Navigate to={routes.settingsNetworks.path} />
   )

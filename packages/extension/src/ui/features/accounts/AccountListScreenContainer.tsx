@@ -8,20 +8,23 @@ import { routes, useReturnTo } from "../../routes"
 import { isEqualAddress } from "../../services/addresses"
 import {
   selectedAccountView,
-  visibleAccountsOnNetworkFamily,
+  allAccountsOnNetworkFamily,
 } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { LoadingScreenContainer } from "../actions/LoadingScreenContainer"
 import {
   isHiddenPendingMultisig,
   usePendingMultisigs,
 } from "../multisig/multisig.state"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { useBackupRequired } from "../recovery/backupDownload.state"
 import { recover } from "../recovery/recovery.service"
 import { Account } from "./Account"
 import { AccountListScreen } from "./AccountListScreen"
-import { usePartitionDeprecatedAccounts } from "./upgrade.service"
+import {
+  sortAccountsByDerivationPath,
+  sortMultisigByDerivationPath,
+} from "../../../shared/utils/accountsMultisigSort"
+import { usePartitionDeprecatedAccounts } from "./accountUpgradeCheck"
+import { tokenBalancesView } from "../../views/tokenBalances"
 
 /** TODO: we should be able to retreive all these account collections using queries from storage */
 export const AccountListScreenContainer: FC = () => {
@@ -30,7 +33,8 @@ export const AccountListScreenContainer: FC = () => {
   const { switcherNetworkId } = useAppState()
 
   const selectedAccount = useView(selectedAccountView)
-  const allAccounts = useView(visibleAccountsOnNetworkFamily(switcherNetworkId))
+  const allAccounts = useView(allAccountsOnNetworkFamily(switcherNetworkId))
+
   const [hiddenAccounts, visibleAccounts] = useMemo(
     () => partition(allAccounts, isAccountHidden),
     [allAccounts],
@@ -43,16 +47,17 @@ export const AccountListScreenContainer: FC = () => {
     isHiddenPendingMultisig,
   )
 
-  // TODO: get rid of this global state and have it as an atom
-  const { isBackupRequired } = useBackupRequired()
   // TODO: refactor to use view as soon as network is using views
   const currentNetwork = useCurrentNetwork()
 
   // TODO: make this a property of the account
-  const { data: partitionedAccounts } = usePartitionDeprecatedAccounts(
+  const partitionedAccounts = usePartitionDeprecatedAccounts(
     visibleAccounts,
     currentNetwork,
   )
+
+  // HACK: force refresh of token balances
+  useView(tokenBalancesView)
 
   const accountFromAddress = useCallback(
     (accountAddress: string) => {
@@ -92,36 +97,42 @@ export const AccountListScreenContainer: FC = () => {
   }, [navigate, returnTo])
 
   const onAdd = useCallback(() => {
-    navigate(routes.newAccount())
-  }, [navigate])
+    navigate(routes.newAccount(returnTo))
+  }, [navigate, returnTo])
 
-  if (!fullPartitionedAccounts) {
-    return <LoadingScreenContainer />
-  }
-
-  const [newAccounts, deprecatedAccounts] = fullPartitionedAccounts
+  const [accounts, deprecatedAccounts] = fullPartitionedAccounts || []
 
   const [multisigAccounts, standardAccounts] = partition(
-    newAccounts,
+    accounts,
     (account) => account.type === "multisig",
+  )
+
+  const sortedMultisigAccounts = useMemo(
+    () => [...multisigAccounts].sort(sortMultisigByDerivationPath),
+    [multisigAccounts],
+  )
+
+  const sortedStandardAccounts = useMemo(
+    () => [...standardAccounts].sort(sortAccountsByDerivationPath),
+    [standardAccounts],
   )
 
   const title = `${currentNetwork.name} accounts`
 
   return (
     <AccountListScreen
+      isLoading={!fullPartitionedAccounts}
       deprecatedAccounts={deprecatedAccounts}
       hiddenAccounts={hiddenAccounts}
       hiddenPendingMultisigs={hiddenPendingMultisigs}
-      isBackupRequired={isBackupRequired}
-      multisigAccounts={multisigAccounts}
-      newAccounts={newAccounts}
+      multisigAccounts={sortedMultisigAccounts}
+      accounts={accounts}
       onAdd={onAdd}
       onClose={onClose}
       pendingMultisigs={pendingMultisigs}
       returnTo={returnTo}
       selectedAccount={selectedAccount}
-      standardAccounts={standardAccounts}
+      standardAccounts={sortedStandardAccounts}
       title={title}
       visiblePendingMultisigs={visiblePendingMultisigs}
     />

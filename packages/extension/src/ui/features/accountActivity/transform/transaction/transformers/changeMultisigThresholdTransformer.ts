@@ -9,7 +9,7 @@ export default function ({ transaction, result }: ITransactionTransformer) {
     if (isChangeTresholdMultisigCall(call)) {
       const action = "CHANGE"
       const entity = "THRESHOLD"
-      const displayName = "Set confirmations"
+      const displayName = "Change threshold"
       result = {
         ...result,
         action,

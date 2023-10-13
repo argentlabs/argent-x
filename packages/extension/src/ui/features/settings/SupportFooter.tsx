@@ -6,14 +6,14 @@ import { Link } from "react-router-dom"
 import { routes } from "../../routes"
 
 const { SupportIcon } = icons
-const { Discord, Github } = logos
+const { Discord, Github, Twitter } = logos
 
 const SupportFooter: FC = () => (
   <VStack mt={4} borderTop="solid 1px" borderTopColor="border">
     <P3 color="neutrals.400" pt="6">
       Help, support &amp; suggestions:
     </P3>
-    <SimpleGrid columns={3} gap="2" w="100%" py={4}>
+    <SimpleGrid columns={2} gap="2" w="100%" py={4}>
       <Button
         as={"a"}
         size="sm"
@@ -46,6 +46,17 @@ const SupportFooter: FC = () => (
         target="_blank"
       >
         Github
+      </Button>
+      <Button
+        as="a"
+        size="sm"
+        rounded={"lg"}
+        leftIcon={<Twitter />}
+        href="https://twitter.com/argenthq"
+        title="Follow Argent X on Twitter"
+        target="_blank"
+      >
+        Twitter
       </Button>
     </SimpleGrid>
     <Link to={routes.settingsPrivacyStatement()}>

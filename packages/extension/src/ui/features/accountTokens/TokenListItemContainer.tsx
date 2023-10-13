@@ -1,15 +1,15 @@
 import { FC } from "react"
 
-import { Token } from "../../../shared/token/type"
 import { Account } from "../accounts/Account"
 import { TokenListItem, TokenListItemProps } from "./TokenListItem"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
+import { Token } from "../../../shared/token/__new/types/token.model"
 
 export interface TokenListItemContainerProps
   extends Omit<TokenListItemProps, "currencyValue"> {
   token: Token
-  account: Account
+  account: Pick<Account, "network" | "address" | "networkId">
 }
 
 /**
@@ -21,23 +21,15 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
   account,
   ...rest
 }) => {
-  const { tokenWithBalance, errorMessage, isValidating } =
-    useTokenBalanceForAccount(
-      {
-        token,
-        account,
-        shouldReturnError:
-          true /** using Suspense, causes error to be returned as `balance` instead of throwing */,
-      },
-      {
-        refreshInterval: 60 * 1000 /** 60 seconds */,
-      },
-    )
-
+  const tokenWithBalance = useTokenBalanceForAccount({
+    token,
+    account,
+  })
   const currencyValue = useTokenBalanceToCurrencyValue(tokenWithBalance)
   const shouldShow =
     token.showAlways ||
-    (tokenWithBalance?.balance && tokenWithBalance?.balance.gt(0))
+    token.custom ||
+    (tokenWithBalance?.balance && tokenWithBalance.balance > 0n)
   if (!shouldShow || tokenWithBalance === undefined) {
     return null
   }
@@ -45,8 +37,8 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
     <TokenListItem
       token={tokenWithBalance}
       currencyValue={currencyValue}
-      isLoading={isValidating}
-      errorMessage={errorMessage}
+      isLoading={false}
+      errorMessage={undefined}
       {...rest}
     />
   )

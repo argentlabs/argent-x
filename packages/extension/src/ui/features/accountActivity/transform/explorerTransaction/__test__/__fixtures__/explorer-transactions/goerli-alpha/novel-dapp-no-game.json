@@ -8,6 +8,8 @@
   "maxFee": "0x12a4fccd3f2e",
   "actualFee": "0xc6dfdde2a1f",
   "status": "ACCEPTED_ON_L1",
+  "finalityStatus": "ACCEPTED_ON_L1",
+  "executionStatus": "SUCCESS",
   "statusData": "",
   "events": [
     {

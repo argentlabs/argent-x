@@ -5,11 +5,8 @@ import { FC, useCallback, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
-import {
-  removeNetwork,
-  restoreDefaultCustomNetworks,
-} from "../../../shared/network"
-import { defaultCustomNetworks } from "../../../shared/network/storage"
+import { defaultCustomNetworks } from "../../../shared/network"
+import { networkService } from "../../../shared/network/service"
 import { IconButton } from "../../components/IconButton"
 import { AddIcon, RefreshIcon } from "../../components/Icons/MuiIcons"
 import { ResponsiveFixedBox } from "../../components/Responsive"
@@ -18,11 +15,11 @@ import { routes } from "../../routes"
 import { P } from "../../theme/Typography"
 import { useNetworks } from "../networks/hooks/useNetworks"
 import { DappConnection } from "./DappConnection"
-import { useSelectedNetwork } from "./selectedNetwork.state"
 import {
   validateRemoveNetwork,
   validateRestoreDefaultNetworks,
 } from "./validateRemoveNetwork"
+import { Box } from "@chakra-ui/react"
 
 const IconButtonCenter = styled(IconButton)`
   margin: 0 auto;
@@ -72,7 +69,6 @@ const RestoreDefaultsButtonIcon = styled.div`
 export const NetworkSettingsScreen: FC = () => {
   const allNetworks = useNetworks()
   const navigate = useNavigate()
-  const [, setSelectedCustomNetwork] = useSelectedNetwork()
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
@@ -84,7 +80,7 @@ export const NetworkSettingsScreen: FC = () => {
     try {
       const shouldRemoveNetwork = await validateRemoveNetwork(networkId)
       if (shouldRemoveNetwork) {
-        await removeNetwork(networkId)
+        await networkService.removeById(networkId)
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -101,7 +97,7 @@ export const NetworkSettingsScreen: FC = () => {
     try {
       const shouldRemoveNetwork = await validateRestoreDefaultNetworks()
       if (shouldRemoveNetwork) {
-        await restoreDefaultCustomNetworks()
+        await networkService.restoreDefaults()
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -120,14 +116,8 @@ export const NetworkSettingsScreen: FC = () => {
 
   return (
     <>
-      <AlertDialog
-        isOpen={alertDialogIsOpen}
-        title={"Cannot remove"}
-        message={errorMessage}
-        onCancel={onCancel}
-      />
       <NavigationContainer leftButton={<BarBackButton />} title={"Networks"}>
-        <CellStack>
+        <CellStack pb={2}>
           {!allNetworks ? (
             <Spinner />
           ) : allNetworks.length === 0 ? (
@@ -138,8 +128,7 @@ export const NetworkSettingsScreen: FC = () => {
                 key={network.id}
                 host={network.name}
                 onClick={() => {
-                  setSelectedCustomNetwork(network)
-                  navigate(routes.settingsEditCustomNetwork())
+                  navigate(routes.settingsEditCustomNetwork(network.id))
                 }}
                 hideRemove={network.readonly}
                 onRemoveClick={() => {
@@ -150,11 +139,13 @@ export const NetworkSettingsScreen: FC = () => {
           )}
         </CellStack>
 
-        <Link to={routes.settingsAddCustomNetwork()}>
-          <IconButtonCenter size={48} style={{ marginTop: "32px" }}>
-            <AddIcon fontSize="large" />
-          </IconButtonCenter>
-        </Link>
+        <Box mb={!isDefaultCustomNetworks ? "56px" : "0"}>
+          <Link to={routes.settingsAddCustomNetwork()}>
+            <IconButtonCenter size={48} style={{ marginTop: "32px" }}>
+              <AddIcon fontSize="large" />
+            </IconButtonCenter>
+          </Link>
+        </Box>
 
         {!isDefaultCustomNetworks && (
           <Footer>
@@ -167,6 +158,13 @@ export const NetworkSettingsScreen: FC = () => {
           </Footer>
         )}
       </NavigationContainer>
+
+      <AlertDialog
+        isOpen={alertDialogIsOpen}
+        title={"Cannot remove"}
+        message={errorMessage}
+        onCancel={onCancel}
+      />
     </>
   )
 }

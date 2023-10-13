@@ -1,18 +1,25 @@
-import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
+import {
+  BarBackButton,
+  BarCloseButton,
+  NavigationContainer,
+  logos,
+} from "@argent/ui"
 import { FC } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import { isDeprecated } from "../../../shared/wallet.service"
-import { Option, OptionsWrapper } from "../../components/Options"
+import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
 import { trackAddFundsService } from "../../services/analytics"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import EthereumSvg from "./ethereum.svg"
-import { Title } from "./FundingScreen"
-import OrbiterSvg from "./orbiter.svg"
+import { isFeatureEnabled } from "@argent/shared"
+import { getLayerSwapUrl } from "./utils"
+import { Grid } from "@chakra-ui/react"
+
+const { Ethereum, Orbiter, Layerswap } = logos
 
 export const FundingBridgeScreen: FC = () => {
   const account = useView(selectedAccountView)
@@ -24,7 +31,8 @@ export const FundingBridgeScreen: FC = () => {
 
   const isMainnet = account.networkId === "mainnet-alpha"
 
-  const isOrbiterEnabled = (process.env.FEATURE_ORBITER || "false") === "true"
+  const isOrbiterEnabled = isFeatureEnabled(process.env.FEATURE_ORBITER)
+  const isLayerswapEnabled = isFeatureEnabled(process.env.FEATURE_LAYERSWAP)
   const bridgeUrl = isMainnet
     ? "https://starkgate.starknet.io"
     : account.networkId === "goerli-alpha" &&
@@ -33,6 +41,7 @@ export const FundingBridgeScreen: FC = () => {
   const isDeprecatedAccount = isDeprecated(account) // Here should we check for Deprecated Account or doesn't matter?
 
   const allowOrbiter = isOrbiterEnabled && isMainnet && !isDeprecatedAccount
+  const allowLayerswap = isLayerswapEnabled && isMainnet && !isDeprecatedAccount
 
   return (
     <NavigationContainer
@@ -40,10 +49,10 @@ export const FundingBridgeScreen: FC = () => {
       rightButton={
         <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
       }
+      title="Bridge funds"
     >
       <PageWrapper>
-        <Title>Bridge your assets</Title>
-        <OptionsWrapper>
+        <Grid templateColumns="1fr" gap={4}>
           {bridgeUrl ? (
             <A
               href={bridgeUrl}
@@ -53,18 +62,29 @@ export const FundingBridgeScreen: FC = () => {
               <Option
                 title="StarkGate"
                 description="Bridge trustlessly from Ethereum"
-                icon={<EthereumSvg />}
-                hideArrow
+                icon={<Ethereum width={6} height={6} />}
               />
             </A>
           ) : (
             <Option
               title="Bridge from Ethereum"
               description="Not available for this network"
-              icon={<EthereumSvg />}
+              icon={<Ethereum width={6} height={6} />}
               disabled
-              hideArrow
             />
+          )}
+          {allowLayerswap && (
+            <A
+              href={getLayerSwapUrl(account.address)}
+              targetBlank
+              onClick={trackAddFundsService("layerswap", account.networkId)}
+            >
+              <Option
+                title="Layerswap"
+                description="Bridge from other chains"
+                icon={<Layerswap width={6} height={6} />}
+              />
+            </A>
           )}
           {allowOrbiter && (
             <A
@@ -75,12 +95,11 @@ export const FundingBridgeScreen: FC = () => {
               <Option
                 title="Orbiter.finance"
                 description="Bridge from other chains"
-                icon={<OrbiterSvg />}
-                hideArrow
+                icon={<Orbiter width={6} height={6} />}
               />
             </A>
           )}
-        </OptionsWrapper>
+        </Grid>
       </PageWrapper>
     </NavigationContainer>
   )

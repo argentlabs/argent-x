@@ -3,6 +3,7 @@ module.exports = {
   parserOptions: {
     tsconfigRootDir: __dirname,
   },
+  ignorePatterns: ["scripts", "vitest.config.ts"],
   rules: {
     "@typescript-eslint/ban-types": [
       "error",

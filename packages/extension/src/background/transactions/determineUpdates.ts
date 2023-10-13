@@ -8,6 +8,6 @@ export function getTransactionsStatusUpdate(
     (newTransaction) =>
       oldTransactions.find((oldTransaction) =>
         compareTransactions(oldTransaction, newTransaction),
-      )?.status !== newTransaction.status,
+      )?.finalityStatus !== newTransaction.finalityStatus,
   )
 }

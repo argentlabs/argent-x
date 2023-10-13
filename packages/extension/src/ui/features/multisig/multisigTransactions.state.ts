@@ -9,6 +9,7 @@ import {
 import { useArrayStorage } from "../../../shared/storage/hooks"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useMultisig } from "./multisig.state"
+import { num } from "starknet"
 
 type UseMultisigAccountPendingTransactions = (
   account?: BaseWalletAccount,
@@ -55,6 +56,9 @@ export const useMultisigPendingTransactionsAwaitingConfirmation = (
 
   return useMultisigPendingTransactionsByAccount(account).filter(
     (transaction) =>
-      multisig && transaction.nonApprovedSigners.includes(multisig.publicKey),
+      multisig &&
+      transaction.nonApprovedSigners.some(
+        (signer) => num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
+      ),
   )
 }

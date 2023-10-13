@@ -1,7 +1,9 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { useAspectNft } from "../../accountNfts/aspect.service"
+import { useNft } from "../../accountNfts/nfts.state"
+import { addressSchema } from "@argent/shared"
+import { useRemoteNft } from "../../accountNfts/useRemoteNft"
 
 const Image = styled.img`
   display: block;
@@ -24,11 +26,13 @@ export const NFTTitle: FC<INFTTitle> = ({
   networkId,
   fallback,
 }) => {
-  const { data: nft } = useAspectNft(contractAddress, tokenId, networkId)
-  return nft ? (
+  const nft = useNft(addressSchema.parse(contractAddress ?? ""), tokenId)
+  const { data } = useRemoteNft(contractAddress, tokenId, networkId)
+  const displayNft = nft ?? data
+  return displayNft ? (
     <>
-      <Image src={nft.image_url_copy} />
-      {nft.name}
+      <Image src={displayNft.image_url_copy} />
+      {displayNft.name}
     </>
   ) : (
     <>{fallback}</>

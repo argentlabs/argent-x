@@ -1,26 +1,31 @@
 import { FC, useCallback, useMemo, useState } from "react"
 
 import { accountService } from "../../../../shared/account/service"
-import { waitForMessage } from "../../../../shared/messages"
 import {
   removePreAuthorization,
   useIsPreauthorized,
 } from "../../../../shared/preAuthorizations"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { accountsEqual } from "../../../../shared/wallet.service"
+import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { useAppState } from "../../../app.state"
-import { approveAction } from "../../../services/backgroundActions"
-import {
-  selectedAccountView,
-  visibleAccountsOnNetworkFamily,
-} from "../../../views/account"
+import { visibleAccountsOnNetworkFamily } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { useActionScreen } from "../hooks/useActionScreen"
+import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { ConnectDappScreen } from "./ConnectDappScreen"
+import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
+import { useDisclosure } from "@chakra-ui/react"
+import { NavigationBar } from "@argent/ui"
+import { NetworkSwitcherContainer } from "../../networks/NetworkSwitcher/NetworkSwitcherContainer"
 
 export const ConnectDappScreenContainer: FC = () => {
-  const { action, onReject, closePopupIfLastAction } = useActionScreen()
-  if (action.type !== "CONNECT_DAPP") {
+  const {
+    action,
+    selectedAccount: initiallySelectedAccount,
+    approveAndClose,
+    reject,
+  } = useActionScreen()
+  if (action?.type !== "CONNECT_DAPP") {
     throw new Error(
       "ConnectDappScreenContainer used with incompatible action.type",
     )
@@ -28,7 +33,6 @@ export const ConnectDappScreenContainer: FC = () => {
   const host = action.payload.host
 
   const { switcherNetworkId } = useAppState()
-  const initiallySelectedAccount = useView(selectedAccountView)
   const visibleAccounts = useView(
     visibleAccountsOnNetworkFamily(switcherNetworkId),
   )
@@ -36,6 +40,13 @@ export const ConnectDappScreenContainer: FC = () => {
     BaseWalletAccount | undefined
   >(initiallySelectedAccount)
   const isConnected = useIsPreauthorized(host, initiallySelectedAccount)
+
+  const dappDisplayAttributes = useDappDisplayAttributes(host)
+  const {
+    isOpen: isKnownDappModalOpen,
+    onOpen: onKnownDappModalOpen,
+    onClose: onKnownDappModalClose,
+  } = useDisclosure()
 
   const selectedAccount = useMemo(() => {
     if (connectedAccount) {
@@ -51,36 +62,53 @@ export const ConnectDappScreenContainer: FC = () => {
   }, [])
 
   const onConnect = useCallback(async () => {
-    // selectedAccount && onConnectProp(selectedAccount)
     if (selectedAccount) {
-      useAppState.setState({ isLoading: true })
-      await accountService.select(selectedAccount)
       // continue with approval with selected account
-      await approveAction(action)
-      await waitForMessage("CONNECT_DAPP_RES")
-      useAppState.setState({ isLoading: false })
+      await accountService.select(selectedAccount)
     }
-    closePopupIfLastAction()
-  }, [action, closePopupIfLastAction, selectedAccount])
+    await approveAndClose()
+  }, [approveAndClose, selectedAccount])
 
   const onDisconnect = useCallback(async () => {
     if (selectedAccount) {
       await removePreAuthorization(action.payload.host, selectedAccount)
-      await onReject()
     }
-    closePopupIfLastAction()
-  }, [action.payload.host, closePopupIfLastAction, onReject, selectedAccount])
+    await reject()
+  }, [action.payload.host, reject, selectedAccount])
+
+  const networkNavigationBar = (
+    <NavigationBar
+      rightButton={
+        <NetworkSwitcherContainer
+          disabled
+          _disabled={{ opacity: 1 }}
+          cursor="auto"
+          _hover={{}}
+          _active={{}}
+        />
+      }
+      py="3"
+      px="4"
+    />
+  )
 
   return (
     <ConnectDappScreen
       isConnected={isConnected}
-      onConnect={onConnect}
-      onDisconnect={onDisconnect}
-      onReject={onReject}
+      onConnect={() => void onConnect()}
+      onDisconnect={() => void onDisconnect()}
+      onReject={() => void reject()}
+      onKnownDappModalClose={onKnownDappModalClose}
+      onKnownDappModalOpen={onKnownDappModalOpen}
+      isKnownDappModalOpen={isKnownDappModalOpen}
       host={host}
       accounts={visibleAccounts}
+      dappDisplayAttributes={dappDisplayAttributes}
       selectedAccount={connectedAccount}
       onSelectedAccountChange={onSelectedAccountChange}
+      actionIsApproving={Boolean(action.meta.startedApproving)}
+      navigationBar={networkNavigationBar}
+      footer={<WithActionScreenErrorFooter />}
     />
   )
 }

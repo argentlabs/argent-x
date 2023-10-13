@@ -9,8 +9,9 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
     privacyErrorReporting: Boolean(process.env.SENTRY_DSN), // use SENRY_DSN to enable error reporting
     privacyAutomaticErrorReporting: false,
     experimentalAllowChooseAccount: false,
-    experimentalEnableArgentShield: false,
     blockExplorerKey: defaultBlockExplorerKey,
+    betaFeatureMultisig: false,
+    betaFeatureRpcProvider: false,
   },
   "core:settings",
 )

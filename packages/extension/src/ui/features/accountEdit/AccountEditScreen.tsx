@@ -6,27 +6,24 @@ import {
 } from "@argent/ui"
 import { Center, Flex, Image } from "@chakra-ui/react"
 import React, { FC, useCallback, useState } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { useReturnTo } from "../../routes"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import { useAccount } from "../accounts/accounts.state"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { AccountEditButtons } from "./AccountEditButtons"
 import { AccountEditButtonsMultisig } from "./AccountEditButtonsMultisig"
 import { AccountEditName } from "./AccountEditName"
+import { useRouteAccount } from "../shield/useRouteAccount"
 
 export const AccountEditScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
+  const account = useRouteAccount()
+  const accountAddress = account?.address ?? ""
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
   const accountName = account ? account.name : "Not found"
 
   const [liveEditingAccountName, setLiveEditingAccountName] =

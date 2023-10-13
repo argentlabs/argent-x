@@ -9,13 +9,13 @@ import {
 import { Flex, Link } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 
+import { ZENDESK_LINK } from "../userReview/ReviewFeedbackScreen"
+import { useShieldTracking } from "./useShieldTracking"
 import {
   SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
   SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
   ShieldValidationErrorMessage,
-} from "../../../shared/shield/validation"
-import { ZENDESK_LINK } from "../userReview/ReviewFeedbackScreen"
-import { useShieldTracking } from "./useShieldTracking"
+} from "../../../shared/errors/argentAccount"
 
 const { AlertIcon } = icons
 
@@ -36,7 +36,7 @@ export const ShieldValidationErrorScreen: FC<
   })
 
   const onDoneClick = useCallback(() => {
-    trackSuccess()
+    void trackSuccess()
     onDone()
   }, [onDone, trackSuccess])
 

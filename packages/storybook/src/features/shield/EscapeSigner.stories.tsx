@@ -1,4 +1,4 @@
-import { ESCAPE_TYPE_SIGNER } from "@argent-x/extension/src/shared/account/details/getEscape"
+import { ESCAPE_TYPE_SIGNER } from "@argent-x/extension/src/shared/account/details/escape.model"
 import { EscapeSigner } from "@argent-x/extension/src/ui/features/shield/escape/EscapeSigner"
 import { getActiveFromNow } from "@argent-x/extension/src/ui/features/shield/escape/useAccountEscape"
 

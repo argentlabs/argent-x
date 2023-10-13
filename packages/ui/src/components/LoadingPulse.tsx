@@ -17,7 +17,7 @@ export interface LoadingPulseProps extends BoxProps {
   isLoading?: boolean
 }
 
-const LoadingPulse: FC<LoadingPulseProps> = ({ isLoading, ...rest }) => {
+export const LoadingPulse: FC<LoadingPulseProps> = ({ isLoading, ...rest }) => {
   return (
     <Box
       animation={isLoading ? `${PulseAnimation} 1.5s infinite` : undefined}
@@ -25,5 +25,3 @@ const LoadingPulse: FC<LoadingPulseProps> = ({ isLoading, ...rest }) => {
     />
   )
 }
-
-export { LoadingPulse }

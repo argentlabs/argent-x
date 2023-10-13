@@ -16,8 +16,8 @@ describe("tokenPriceHooks", () => {
   describe("when API data is available", () => {
     const useMockPriceAndTokenData = () => {
       return {
-        pricesData: mockApiPricesData,
-        tokenData: mockApiTokenData,
+        pricesData: mockApiPricesData as any,
+        tokenData: mockApiTokenData as any,
       }
     }
 
@@ -30,6 +30,9 @@ describe("tokenPriceHooks", () => {
           ),
         )
         expect(result.current).toEqual({
+          address:
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          networkId: "goerli-alpha",
           ccyDayChange: "0.001484",
           ccyValue: "1102.594564",
           ethDayChange: "0",

@@ -2,7 +2,7 @@ import { FieldGroup } from "@argent-x/extension/src/ui/components/Fields"
 import { TokenField } from "@argent-x/extension/src/ui/features/actions/transaction/fields/TokenField"
 import { ComponentProps } from "react"
 
-import { tokensByNetwork } from "../../../tokensByNetwork"
+import { tokensByNetwork } from "../../../tokens"
 
 export default {
   component: TokenField,

@@ -7,7 +7,7 @@ import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { useAspectContractAddresses } from "../accountNfts/aspect.service"
+import { useContractAddresses } from "../accountNfts/nfts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { LoadingScreenContainer } from "../actions/LoadingScreenContainer"
@@ -32,7 +32,7 @@ export const TransactionDetailScreen: FC = () => {
   const account = useView(selectedAccountView)
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
-  const { data: nftContractAddresses } = useAspectContractAddresses()
+  const nftContractAddresses = useContractAddresses()
 
   const { transactions } = useAccountTransactions(account)
 

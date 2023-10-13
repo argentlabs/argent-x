@@ -6,6 +6,18 @@ import dts from "vite-plugin-dts"
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    rollupOptions: {
+      external: ["starknet"],
+      onwarn(warning, warn) {
+        if (
+          warning.code === "MODULE_LEVEL_DIRECTIVE" &&
+          warning.message.includes(`"use client"`)
+        ) {
+          return
+        }
+        warn(warning)
+      },
+    },
     emptyOutDir: false,
     target: "es2020",
     lib: {

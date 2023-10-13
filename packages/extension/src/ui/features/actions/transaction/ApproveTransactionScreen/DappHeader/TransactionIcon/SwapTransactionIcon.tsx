@@ -42,13 +42,13 @@ export const SwapTransactionIcon = ({
   return (
     <Center data-testid="swap-transaction-icon">
       <Box height="14" width="14" position="relative">
-        {srcToken?.image ? (
-          <Image src={srcToken.image} sx={token1Styling} />
+        {srcToken?.iconUrl ? (
+          <Image src={srcToken.iconUrl} sx={token1Styling} />
         ) : (
           <UnknownTokenIcon sx={token1Styling} />
         )}
-        {dstToken?.image ? (
-          <Image src={dstToken.image} sx={token2Styling} />
+        {dstToken?.iconUrl ? (
+          <Image src={dstToken.iconUrl} sx={token2Styling} />
         ) : (
           <UnknownTokenIcon sx={token2Styling} />
         )}

@@ -1,17 +1,22 @@
-import { B2, H4, H6, P3, icons } from "@argent/ui"
-import { Box, Button, Divider, Flex, IconButton } from "@chakra-ui/react"
+import { B2, H4, P3, icons } from "@argent/ui"
+import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { formatTruncatedSignerKey } from "../../services/addresses"
 import { Account } from "../accounts/Account"
-import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
+import { usePublicKey } from "../accounts/usePublicKey"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisig } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
+import { num } from "starknet"
+import { MultisigOwner } from "./MultisigOwner"
+import { creatorMultisigMetadataView } from "../../views/multisig"
+import { useView } from "../../views/implementation/react"
+import { isEqualAddress } from "@argent/shared"
+import { multisigService } from "../../services/multisig"
 
-const { MultisigJoinIcon, MinusIcon } = icons
+const { MultisigJoinIcon } = icons
 
 export const MultisigOwnersScreen: FC = () => {
   const account = useRouteAccount()
@@ -26,16 +31,24 @@ export const MultisigOwnersScreen: FC = () => {
 const MultisigOwners = ({ account }: { account: Account }) => {
   const multisig = useMultisig(account)
 
-  const signerKey = useSignerKey()
-  const signerKeys = useEncodedPublicKeys(multisig?.signers ?? [])
+  const ownerPublicKey = usePublicKey()
   const navigate = useNavigate()
+
+  const multisigMetadata = useView(creatorMultisigMetadataView(multisig))
 
   const handleAddOwnerClick = () => {
     navigate(routes.multisigAddOwners(account.address))
   }
 
-  const handleRemoveOwnerClick = (signerToRemove: string) => {
-    navigate(routes.multisigRemoveOwners(account.address, signerToRemove))
+  const onUpdateAccountName = (key: string | undefined, name: string) => {
+    if (!multisig?.creator || !key) {
+      return
+    }
+
+    void multisigService.updateSignerMetadata(multisig?.creator, {
+      key,
+      name,
+    })
   }
 
   return (
@@ -51,48 +64,43 @@ const MultisigOwners = ({ account }: { account: Account }) => {
           <P3 color="neutrals.300" mb={1}>
             Me
           </P3>
-          <Box
-            borderRadius="lg"
-            backgroundColor="neutrals.800"
-            px={4}
-            py={6}
-            mb={3}
-          >
-            {signerKey && (
-              <H6 color="white">{formatTruncatedSignerKey(signerKey)}</H6>
-            )}
-          </Box>
+          {ownerPublicKey && (
+            <MultisigOwner
+              owner={ownerPublicKey}
+              signerMetadata={multisigMetadata?.signers?.find(
+                (signerMetadata) =>
+                  isEqualAddress(ownerPublicKey, signerMetadata.key),
+              )}
+              onUpdate={(name) => onUpdateAccountName(ownerPublicKey, name)}
+              hasEdit
+              hasCopy
+            />
+          )}
           <P3 color="neutrals.300" mb={1}>
             Other owners
           </P3>
-          {signerKeys
-            .filter((signer) => signer !== signerKey)
-            .map((signer) => {
-              return (
-                <Flex
-                  borderRadius="lg"
-                  backgroundColor="neutrals.800"
-                  p={4}
-                  key={signer}
-                  my={2}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <H6 color="white">{formatTruncatedSignerKey(signer)}</H6>
-                  <IconButton
-                    backgroundColor="neutrals.900"
-                    onClick={() => handleRemoveOwnerClick(signer)}
-                    aria-label={"Remove owner"}
-                    icon={<MinusIcon />}
-                    h="auto"
-                    minH={0}
-                    minW={0}
-                    p={1.5}
-                    borderRadius="full"
-                  />
-                </Flex>
-              )
-            })}
+          {multisig?.signers
+            .filter((signer) => {
+              if (!multisig?.publicKey) {
+                return false
+              }
+              return num.toBigInt(signer) !== num.toBigInt(multisig.publicKey)
+            })
+            .map((signer) => (
+              <MultisigOwner
+                account={account}
+                owner={signer}
+                key={signer}
+                onUpdate={(name) => onUpdateAccountName(signer, name)}
+                signerMetadata={multisigMetadata?.signers?.find(
+                  (signerMetadata) =>
+                    isEqualAddress(signer, signerMetadata.key),
+                )}
+                hasEdit
+                hasUpdate
+                hasCopy
+              />
+            ))}
         </Box>
         {!account.needsDeploy && (
           <Button

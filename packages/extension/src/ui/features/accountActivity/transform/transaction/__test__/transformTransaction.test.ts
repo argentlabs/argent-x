@@ -1,4 +1,4 @@
-import { Call } from "starknet"
+import { Call, TransactionFinalityStatus } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import { Transaction } from "../../../../../../shared/transactions"
@@ -15,6 +15,9 @@ import {
   erc20Transfer,
   erc721MintAspect,
   erc721Transfer,
+  multisigAddOwner,
+  multisigRemoveOwner,
+  multisigReplaceOwner,
 } from "./__fixtures__/transaction-calls/goerli-alpha"
 
 const accountAddress =
@@ -31,7 +34,7 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
           standard:
             "0x389a968f62e344b2e08a50e091987797a74b34840840022fd797769230a9d3f",
         },
-        baseUrl: "https://alpha4.starknet.io",
+        sequencerUrl: "https://alpha4.starknet.io",
         chainId: "SN_GOERLI",
         explorerUrl: "https://goerli.voyager.online",
         id: "goerli-alpha",
@@ -39,7 +42,6 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
           "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
         name: "Goerli Testnet",
         readonly: true,
-        status: "unknown",
       },
       networkId: "goerli-alpha",
       signer: {
@@ -51,7 +53,7 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
     meta: {
       transactions,
     },
-    status: "ACCEPTED_ON_L2",
+    finalityStatus: TransactionFinalityStatus.ACCEPTED_ON_L2,
     timestamp: 1662047260,
   }
 }
@@ -79,7 +81,7 @@ describe("transformTransaction", () => {
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -106,14 +108,6 @@ describe("transformTransaction", () => {
           "displayName": "Mint",
           "entity": "TOKEN",
           "toAddress": "0x05F1f0a38429dcaB9FFD8A786c0d827e84C1CBd8f60243E6d25d066A13aF4a25",
-          "token": {
-            "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-            "decimals": 18,
-            "name": "Test Token",
-            "network": "goerli-alpha",
-            "networkId": "goerli-alpha",
-            "symbol": "TEST",
-          },
           "tokenAddress": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
         }
       `)
@@ -247,6 +241,45 @@ describe("transformTransaction", () => {
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Deactivate Argent Shield",
           "entity": "GUARDIAN",
+        }
+      `)
+
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(multisigAddOwner),
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "ADD",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Add signers",
+          "entity": "SIGNER",
+        }
+      `)
+
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(multisigRemoveOwner),
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "REMOVE",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Remove signers",
+          "entity": "SIGNER",
+        }
+      `)
+
+      expect(
+        transformTransaction({
+          transaction: makeTransaction(multisigReplaceOwner),
+        }),
+      ).toMatchInlineSnapshot(`
+        {
+          "action": "REPLACE",
+          "date": "2022-09-01T15:47:40.000Z",
+          "displayName": "Replace signer",
+          "entity": "SIGNER",
         }
       `)
     })

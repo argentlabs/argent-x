@@ -1,23 +1,17 @@
-import { ShieldBaseEmailScreen } from "@argent-x/extension/src/ui/features/shield/ShieldBaseEmailScreen"
+import { ArgentAccountBaseEmailScreen } from "@argent-x/extension/src/ui/features/argentAccount/ArgentAccountBaseEmailScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 
 export default {
-  component: ShieldBaseEmailScreen,
+  component: ArgentAccountBaseEmailScreen,
   decorators,
   parameters: {
-    layout: "fullscreen",
+    flow: "argentAccount",
   },
 }
 
-export const HasGuardian = {
+export const ThroughShield = {
   args: {
-    hasGuardian: true,
-  },
-}
-
-export const NoGuardian = {
-  args: {
-    hasGuardian: false,
+    flow: "shield",
   },
 }

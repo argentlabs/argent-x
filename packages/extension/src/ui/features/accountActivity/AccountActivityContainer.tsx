@@ -1,7 +1,8 @@
+import { FC, useCallback, useMemo } from "react"
+import { get } from "lodash-es"
+import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
 import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/ui"
 import { Center, Skeleton } from "@chakra-ui/react"
-import { get } from "lodash-es"
-import { FC, useCallback, useMemo } from "react"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
@@ -9,7 +10,7 @@ import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { formatDate } from "../../services/dates"
-import { useAspectContractAddresses } from "../accountNfts/aspect.service"
+import { useContractAddresses } from "../accountNfts/nfts.state"
 import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
@@ -59,7 +60,8 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   const { pendingTransactions } = useAccountTransactions(account)
   const { switcherNetworkId } = useAppState()
   const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
-  const { data: nftContractAddresses } = useAspectContractAddresses()
+  const nftContractAddresses = useContractAddresses()
+
   const pendingMultisigTransactions =
     useMultisigPendingTransactionsByAccount(account)
 
@@ -89,7 +91,10 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     // RECEIVED transactions are already shown as pending
     return transactions.filter(
       (transaction) =>
-        transaction.status !== "RECEIVED" && !transaction.meta?.isDeployAccount,
+        (transaction.finalityStatus !== TransactionFinalityStatus.RECEIVED ||
+          transaction.executionStatus ===
+            TransactionExecutionStatus.REJECTED) &&
+        !transaction.meta?.isDeployAccount,
     )
   }, [transactions])
   const mergedTransactions = useMemo(() => {
@@ -160,11 +165,14 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     for (const transaction of transactions) {
       const date = new Date(transaction.timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
-      mergedActivity[dateLabel] ||= []
+      if (!mergedActivity[dateLabel]) {
+        mergedActivity[dateLabel] = []
+      }
       if (isVoyagerTransaction(transaction)) {
-        const { hash, meta, status } = transaction
-        const isRejected = status === "REJECTED"
-        const isCancelled = status === "CANCELLED"
+        const { hash, meta, finalityStatus, executionStatus } = transaction
+        const isRejected =
+          executionStatus === "REJECTED" || executionStatus === "REVERTED"
+        const isCancelled = finalityStatus === "CANCELLED"
         const activityTransaction: ActivityTransaction = {
           hash,
           date,
@@ -175,7 +183,9 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
         mergedActivity[dateLabel].push(activityTransaction)
       } else {
         mergedActivity[dateLabel].push(transaction)
-        lastExplorerTransactionHash = transaction.transactionHash
+        if (transaction.transactionHash) {
+          lastExplorerTransactionHash = transaction.transactionHash
+        }
       }
     }
 
@@ -192,6 +202,7 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
           .transactionHash,
       )
     }
+
     return {
       mergedActivity,
       loadMoreHashes,

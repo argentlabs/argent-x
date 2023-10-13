@@ -3,11 +3,11 @@ import { Center, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network } from "../../../shared/network"
-import { Token } from "../../../shared/token/type"
 import { Transaction } from "../../../shared/transactions"
 import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
 import { TransactionListItem } from "./TransactionListItem"
 import { transformTransaction } from "./transform"
+import { Token } from "../../../shared/token/__new/types/token.model"
 
 interface PendingTransactionsProps {
   pendingTransactions: Transaction[]

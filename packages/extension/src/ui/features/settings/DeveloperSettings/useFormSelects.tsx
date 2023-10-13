@@ -1,4 +1,3 @@
-import { SelectOption } from "@argent/ui"
 import { useMemo } from "react"
 
 import { Network } from "../../../../shared/network/type"
@@ -18,8 +17,7 @@ const useFormSelects = (selectedNetwork: string) => {
   const networkOptions = useMemo(
     () =>
       networks.map((network: Network) => ({
-        label: <SelectOption label={network.name} />,
-        labelSelected: network.name,
+        label: network.name,
         value: network.id,
       })),
     [networks],

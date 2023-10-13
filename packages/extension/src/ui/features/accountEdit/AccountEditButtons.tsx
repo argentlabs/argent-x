@@ -1,7 +1,7 @@
 import { ButtonCell, P4, SpacerCell, Switch, icons } from "@argent/ui"
 import { Spinner } from "@chakra-ui/react"
 import { useMemo } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
 import { settingsStore } from "../../../shared/settings"
@@ -13,36 +13,30 @@ import {
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { Account } from "../accounts/Account"
-import { useAccount } from "../accounts/accounts.state"
-import { useFeeTokenBalance } from "../accountTokens/tokens.service"
+import { useFeeTokenBalance } from "../accountTokens/useFeeTokenBalance"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { useArgentShieldEnabled } from "../shield/useArgentShieldEnabled"
 import {
   ChangeGuardian,
   useLiveAccountGuardianState,
 } from "../shield/usePendingChangingGuardian"
+import { useRouteAccount } from "../shield/useRouteAccount"
 
 const { ExpandIcon, ArgentShieldIcon } = icons
 
 export const AccountEditButtons = () => {
   const currentNetwork = useCurrentNetwork()
-  const { accountAddress = "" } = useParams<{ accountAddress: string }>()
   const navigate = useNavigate()
-  const account = useAccount({
-    address: accountAddress,
-    networkId: currentNetwork.id,
-  })
+  const account = useRouteAccount()
+  const accountAddress = account?.address ?? ""
   const blockExplorerTitle = useBlockExplorerTitle()
   const liveAccountGuardianState = useLiveAccountGuardianState(account)
 
   const { feeTokenBalance } = useFeeTokenBalance(account)
 
   const canDeployAccount = useMemo(
-    () => account?.needsDeploy && feeTokenBalance?.gt(0),
+    () => account?.needsDeploy && feeTokenBalance && feeTokenBalance > 0n,
     [account?.needsDeploy, feeTokenBalance],
   )
-
-  const argentShieldEnabled = useArgentShieldEnabled()
 
   const experimentalAllowChooseAccount = useKeyValueStorage(
     settingsStore,
@@ -84,39 +78,35 @@ export const AccountEditButtons = () => {
   }
   return (
     <>
-      {argentShieldEnabled && (
-        <>
-          <ButtonCell
-            as={Link}
-            to={routes.shieldAccountStart(accountAddress)}
-            leftIcon={
-              <ArgentShieldIcon
-                fontSize={"xl"}
-                opacity={!shieldIsLoading ? 1 : 0.6}
-              />
-            }
-            rightIcon={
-              shieldIsLoading ? (
-                <Spinner size={"sm"} />
-              ) : (
-                <Switch
-                  size={"lg"}
-                  isChecked={Boolean(shieldIsLoading ? isAdding : hasGuardian)}
-                  onChange={() =>
-                    navigate(routes.shieldAccountStart(accountAddress))
-                  }
-                />
-              )
-            }
-          >
-            <>Argent Shield</>
-            <P4 color="neutrals.300" fontWeight={"normal"}>
-              {accountSubtitle}
-            </P4>
-          </ButtonCell>
-          <SpacerCell />
-        </>
-      )}
+      <ButtonCell
+        as={Link}
+        to={routes.shieldAccountStart(accountAddress)}
+        leftIcon={
+          <ArgentShieldIcon
+            fontSize={"xl"}
+            opacity={!shieldIsLoading ? 1 : 0.6}
+          />
+        }
+        rightIcon={
+          shieldIsLoading ? (
+            <Spinner size={"sm"} />
+          ) : (
+            <Switch
+              size={"lg"}
+              isChecked={Boolean(shieldIsLoading ? isAdding : hasGuardian)}
+              onChange={() =>
+                navigate(routes.shieldAccountStart(accountAddress))
+              }
+            />
+          )
+        }
+      >
+        <>Argent Shield</>
+        <P4 color="neutrals.300" fontWeight={"normal"}>
+          {accountSubtitle}
+        </P4>
+      </ButtonCell>
+      <SpacerCell />
       {account && !account.needsDeploy && (
         <ButtonCell
           onClick={() =>
@@ -130,13 +120,23 @@ export const AccountEditButtons = () => {
       <ButtonCell onClick={() => account && handleHideOrDeleteAccount(account)}>
         {showDelete ? "Delete account" : "Hide account"}
       </ButtonCell>
-      {experimentalAllowChooseAccount && account && (
+      {/* TODO:  Add me back when we support account implementations in Cairo 1 */}
+      {/* {experimentalAllowChooseAccount && account && (
         <ButtonCell
           onClick={() => {
             navigate(routes.accountImplementations(account.address))
           }}
         >
           Change account implementation
+        </ButtonCell>
+      )} */}
+      {account && (
+        <ButtonCell
+          onClick={() => {
+            navigate(routes.accountImplementation(account.address))
+          }}
+        >
+          Account implementation
         </ButtonCell>
       )}
       {canDeployAccount && (

@@ -14,6 +14,9 @@ export default class Account extends Navigation {
   constructor(page: Page) {
     super(page)
   }
+  accountName1 = "Account 1"
+  accountName2 = "Account 2"
+
   get noAccountBanner() {
     return this.page.locator(`div h5:text-is("${lang.account.noAccounts}")`)
   }
@@ -36,8 +39,18 @@ export default class Account extends Navigation {
     )
   }
 
+  get accountAddressFromAssetsView() {
+    return this.page.locator('[data-testid="account-tokens"] button').first()
+  }
+
   get send() {
     return this.page.locator(`button:text-is("${lang.account.send}")`)
+  }
+
+  get deployAccount() {
+    return this.page.locator(
+      `button :text-is("${lang.settings.deployAccount}")`,
+    )
   }
 
   token(tkn: TokenName) {
@@ -65,11 +78,11 @@ export default class Account extends Navigation {
   }
 
   get sendMax() {
-    return this.page.locator('button:text-is("MAX")')
+    return this.page.locator('button:text-is("Max")')
   }
 
-  get recepientAddress() {
-    return this.page.locator('[name="recipient"]')
+  get recipientAddressQuery() {
+    return this.page.locator('[name="query"]')
   }
 
   account(accountName: string) {
@@ -80,12 +93,31 @@ export default class Account extends Navigation {
     return this.page.locator('[data-testid="tokenBalance"]')
   }
 
-  currentBalance(tkn: "ETH") {
-    return this.page.locator(` //button//h6[contains(text(), '${tkn}')]`)
+  currentBalance(tkn: "Ethereum") {
+    return this.page.locator(
+      ` //button//h6[contains(text(), '${tkn}')]/following::p`,
+    )
+  }
+
+  currentBalanceDevNet(tkn: "ETH") {
+    return this.page.locator(`//button//h6[contains(text(), '${tkn}')]`)
   }
 
   get accountName() {
     return this.page.locator('[data-testid="account-tokens"] h2')
+  }
+
+  async addAccountMainnet({ firstAccount = true }: { firstAccount?: boolean }) {
+    if (firstAccount) {
+      await this.createAccount.click()
+    } else {
+      await this.accountListSelector.click()
+      await this.addANewccountFromAccountList.click()
+    }
+    await this.addStandardAccountFromNewAccountScreen.click()
+
+    await this.account("").last().click()
+    await expect(this.accountListSelector).toBeVisible()
   }
 
   async addAccount({ firstAccount = true }: { firstAccount?: boolean }) {
@@ -119,7 +151,7 @@ export default class Account extends Navigation {
     if (currentAccount != accountName) {
       await this.selectAccount(accountName)
     }
-    await expect(this.accountName).toHaveText(accountName)
+    await expect(this.accountListSelector).toHaveText(accountName)
   }
 
   async assets(accountName: string) {
@@ -136,12 +168,14 @@ export default class Account extends Navigation {
     }
     return assetsList
   }
-
-  async ensureAsset(accountName: string, name: "ETH", value: string) {
+  ////*[text() = 'Ethereum']/following-sibling::div
+  async ensureAsset(accountName: string, name: "Ethereum", value: string) {
     await this.ensureSelectedAccount(accountName)
     await expect(
-      this.page.locator(`button :text("${value} ${name}")`),
-    ).toBeVisible()
+      this.page.locator(
+        `//*[text() = '${name}']/following-sibling::div/p[text() = '${value}']`,
+      ),
+    ).toBeVisible({ timeout: 90000 })
   }
 
   async getTotalFeeValue() {
@@ -157,27 +191,40 @@ export default class Account extends Navigation {
   }
   async transfer({
     originAccountName,
-    recepientAddress,
+    recipientAddress,
     tokenName,
     amount,
+    fillRecipientAddress = "paste",
+    submit = true,
   }: {
     originAccountName: string
-    recepientAddress: string
+    recipientAddress: string
     tokenName: TokenName
     amount: number | "MAX"
+    fillRecipientAddress?: "typing" | "paste"
+    submit?: boolean
   }) {
     await this.ensureSelectedAccount(originAccountName)
     await this.token(tokenName).click()
-    await this.send.last().click()
+    fillRecipientAddress === "paste"
+      ? await this.recipientAddressQuery.fill(recipientAddress)
+      : await this.recipientAddressQuery.type(recipientAddress)
+    if (recipientAddress.endsWith("stark")) {
+      await this.page.click(`button:has-text("${recipientAddress}")`)
+    } else {
+      await this.recipientAddressQuery.focus()
+      await this.page.keyboard.press("Enter")
+    }
     if (amount === "MAX") {
+      await expect(this.balance).toBeVisible()
+      await expect(this.sendMax).toBeVisible()
       await this.sendMax.click()
     } else {
       await this.amount.fill(amount.toString())
     }
-    await this.recepientAddress.fill(recepientAddress)
 
-    await this.next.click()
-    await this.approve.click()
+    await this.reviewSend.click()
+    submit ?? (await this.approve.click())
   }
 
   async ensureTokenBalance({
@@ -207,7 +254,19 @@ export default class Account extends Navigation {
 
   get setUpAccountRecovery() {
     return this.page.locator(
-      `button :text-is("${lang.account.accountRecovery}")`,
+      `button:text-is("${lang.account.accountRecovery}")`,
+    )
+  }
+
+  get showAccountRecovery() {
+    return this.page.locator(
+      `button:text-is("${lang.account.showAccountRecovery}")`,
+    )
+  }
+
+  get confirmTheSeedPhrase() {
+    return this.page.locator(
+      `p:text-is("${lang.account.confirmTheSeedPhrase}")`,
     )
   }
 
@@ -228,8 +287,12 @@ export default class Account extends Navigation {
     return this.page.locator(`button:text-is("${lang.account.saveAddress}")`)
   }
 
-  get contact() {
-    return this.page.locator("div h5")
+  get copyAddress() {
+    return this.page.locator('[data-testid="account-tokens"] button').first()
+  }
+
+  contact(label: string) {
+    return this.page.locator(`div h6:text-is("${label}")`)
   }
 
   get dappsBanner() {
@@ -238,5 +301,50 @@ export default class Account extends Navigation {
 
   get dappsBannerClose() {
     return this.page.locator('[title="Dappland"] svg')
+  }
+
+  async saveRecoveryPhrase() {
+    const nextModal = await this.next.isVisible({ timeout: 60 })
+    if (nextModal) {
+      await Promise.all([
+        expect(
+          this.page.locator(
+            `h3:has-text("${lang.settings.beforeYouContinue}")`,
+          ),
+        ).toBeVisible(),
+        expect(
+          this.page.locator(`p:has-text("${lang.settings.seedWarning}")`),
+        ).toBeVisible(),
+      ])
+      await this.next.click()
+    }
+    await this.page
+      .locator(`span:has-text("${lang.settings.revealSeedPhrase}")`)
+      .click()
+    const pos = Array.from({ length: 12 }, (_, i) => i + 1)
+    const seed = await Promise.all(
+      pos.map(async (index) => {
+        return this.page
+          .locator(`//*[normalize-space() = '${index}']/parent::*`)
+          .textContent()
+          .then((text) => text?.replace(/[0-9]/g, ""))
+      }),
+    ).then((result) => result.join(" "))
+
+    await Promise.all([
+      this.page.locator(`button:has-text("${lang.settings.copy}")`).click(),
+      expect(
+        this.page.locator(`button:has-text("${lang.settings.copied}")`),
+      ).toBeVisible(),
+    ])
+    await this.page
+      .locator(`p:has-text("${lang.settings.confirmRecovery}")`)
+      .click()
+    await this.done.click()
+    const seedPhraseCopied = await this.page.evaluate(
+      `navigator.clipboard.readText();`,
+    )
+    expect(seed).toBe(seedPhraseCopied)
+    return seedPhraseCopied
   }
 }

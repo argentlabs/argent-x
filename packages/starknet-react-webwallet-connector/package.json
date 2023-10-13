@@ -1,6 +1,6 @@
 {
   "name": "@argent/starknet-react-webwallet-connector",
-  "version": "6.3.0",
+  "version": "6.6.0",
   "repository": "github:argentlabs/argent-x",
   "private": false,
   "browser": {
@@ -32,21 +32,22 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "setup": "yarn build"
+    "setup": "pnpm run build"
   },
   "dependencies": {
-    "@argent/web-sdk": "^6.3.0",
-    "@starknet-react/core": "^0.17.0"
+    "@argent/web-sdk": "^6.4.1",
+    "@argent/x-window": "^6.4.0",
+    "@starknet-react/core": "2.0.0-next.0"
   },
   "devDependencies": {
-    "get-starknet-core": "^2.0.0",
-    "starknet": "next",
-    "typescript": "^4.9.3",
-    "vite": "^3.0.0",
-    "vite-plugin-dts": "^1.4.0"
+    "@tsconfig/svelte": "^5.0.0",
+    "get-starknet-core": "^3.1.0",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8",
+    "vite-plugin-dts": "^3.0.0"
   },
   "peerDependencies": {
-    "starknet": "next"
+    "starknet": "5.18.0"
   },
   "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"
 }

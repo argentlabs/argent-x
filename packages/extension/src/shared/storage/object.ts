@@ -1,4 +1,4 @@
-import { isPlainObject, merge } from "lodash-es"
+import { cloneDeep, isPlainObject, merge } from "lodash-es"
 
 import { KeyValueStorage } from "./keyvalue"
 import { StorageOptions, StorageOptionsOrNameSpace } from "./options"
@@ -45,7 +45,7 @@ export class ObjectStorage<T> implements IObjectStorage<T> {
     const passThrough = (value: any) => value
     function defaultMerge(oldValue: T, newValue: T) {
       if (isPlainObject(oldValue) && isPlainObject(newValue)) {
-        return merge(oldValue, newValue)
+        return cloneDeep(merge(oldValue, newValue))
       }
       return newValue
     }

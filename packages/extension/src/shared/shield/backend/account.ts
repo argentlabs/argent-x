@@ -13,12 +13,17 @@ import { isFetcherError } from "../../api/fetcher"
 import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
 import { jwtFetcher } from "../jwtFetcher"
+import { BaseError } from "../../errors/baseError"
 
 export const requestEmailAuthentication = async (
   email: string,
   locale = "en-EN",
 ) => {
   try {
+    if (!ARGENT_API_BASE_URL) {
+      throw new BaseError({ message: "Argent API base url is not set" })
+    }
+
     const json = await jwtFetcher(
       urlJoin(ARGENT_API_BASE_URL, `account/requestEmailAuthentication`),
       {
@@ -32,19 +37,21 @@ export const requestEmailAuthentication = async (
     )
     return json
   } catch (error) {
-    throw new Error("failed to request email verification")
+    throw new BaseError({ message: "failed to request email verification" })
   }
 }
 
-const emailVerificationStatus = [
+export const emailVerificationStatusSchema = z.enum([
   "expired",
   "maxAttemptsReached",
   "unverified",
   "verified",
   "notRequested",
-] as const
+])
 
-export type EmailVerificationStatus = (typeof emailVerificationStatus)[number]
+export type EmailVerificationStatus = z.infer<
+  typeof emailVerificationStatusSchema
+>
 
 export const emailVerificationStatusErrorSchema = z.object({
   name: z.string(),
@@ -53,7 +60,7 @@ export const emailVerificationStatusErrorSchema = z.object({
   statusText: z.string(),
   responseText: z.string(),
   responseJson: z.object({
-    status: z.enum(emailVerificationStatus),
+    status: emailVerificationStatusSchema,
   }),
 })
 
@@ -68,7 +75,7 @@ export const getEmailVerificationStatus = async () => {
     )
     return json.status
   } catch (error) {
-    throw new Error("Failed to get email verification status")
+    throw new BaseError({ message: "Failed to get email verification status" })
   }
 }
 
@@ -103,10 +110,10 @@ export const register = async () => {
       async (bail) => {
         const registerStatus = await getRegistrationStatus()
         if (registerStatus === "registering") {
-          throw new Error("not registered yet")
+          throw new BaseError({ message: "not registered yet" })
         }
         if (registerStatus !== "registered") {
-          bail(new Error("failed to register"))
+          bail(new BaseError({ message: "failed to register" }))
         }
         // registered!
       },
@@ -121,7 +128,7 @@ export const register = async () => {
     return json
   } catch (error) {
     IS_DEV && console.warn(coerceErrorToString(error))
-    throw new Error("Failed to register")
+    throw new BaseError({ message: "Failed to register" })
   }
 }
 
@@ -156,7 +163,7 @@ export const getRegistrationStatus = async () => {
     )
     return json.status
   } catch (error) {
-    throw new Error("Failed to get registration status")
+    throw new BaseError({ message: "Failed to get registration status" })
   }
 }
 
@@ -197,7 +204,7 @@ export const getBackendAccounts = async () => {
     )
     return json.accounts
   } catch (error) {
-    throw new Error("Failed to get accounts")
+    throw new BaseError({ message: "Failed to get accounts" })
   }
 }
 
@@ -231,7 +238,11 @@ export const addBackendAccount = async (
     )
     return json
   } catch (error) {
-    throw new Error("Failed to add account")
+    if (isFetcherError(error) && error.responseJson.status) {
+      throw new BaseError({ message: error.responseJson.status })
+    } else {
+      throw new BaseError({ message: "Failed to add account" })
+    }
   }
 }
 
@@ -254,11 +265,11 @@ export const cosignerSign: Cosigner = async (
     return json
   } catch (error) {
     if (isFetcherError(error) && error.responseJson?.status) {
-      throw new Error(
-        `Argent Shield failed to co-sign - status:${error.responseJson?.status}`,
-      )
+      throw new BaseError({
+        message: `Argent Shield failed to co-sign - status:${error.responseJson?.status}`,
+      })
     } else {
-      throw new Error("Argent Shield failed to co-sign")
+      throw new BaseError({ message: "Argent Shield failed to co-sign" })
     }
   }
 }

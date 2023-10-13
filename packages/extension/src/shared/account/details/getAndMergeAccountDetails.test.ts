@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 
 import { WalletAccount } from "../../wallet.model"
-import { AccountTypesFromChain } from "./getAccountTypesFromChain"
+import { AccountClassHashFromChain } from "./getAccountClassHashFromChain"
 import { getAndMergeAccountDetails } from "./getAndMergeAccountDetails"
 
 describe("getAndMergeAccountDetails", () => {
@@ -23,7 +23,7 @@ describe("getAndMergeAccountDetails", () => {
       ] as WalletAccount[]
       const getAccountTypesFromChain = async (
         accounts: WalletAccount[],
-      ): Promise<AccountTypesFromChain[]> => {
+      ): Promise<AccountClassHashFromChain[]> => {
         return accounts.map((account) => ({
           ...account,
           type: account.address === address1 ? "standard" : "plugin",
@@ -31,7 +31,7 @@ describe("getAndMergeAccountDetails", () => {
       }
       const getAccountGuardiansFromChain = async (
         accounts: WalletAccount[],
-      ): Promise<AccountTypesFromChain[]> => {
+      ): Promise<AccountClassHashFromChain[]> => {
         return accounts.map((account) => ({
           ...account,
           guardian: account.address === address1 ? "0x1" : "0x2",

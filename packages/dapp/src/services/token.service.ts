@@ -1,6 +1,5 @@
-import { connect } from "@argent/get-starknet"
-import { utils } from "ethers"
-import { Abi, Contract, number, uint256 } from "starknet"
+import { bigDecimal } from "@argent/shared"
+import { Abi, Contract, num, uint256 } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"
 import { windowStarknet } from "./wallet.service"
@@ -11,15 +10,15 @@ export const ETHTokenAddress =
 export const DAITokenAddress =
   "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3"
 
-function getUint256CalldataFromBN(bn: number.BigNumberish) {
-  return { type: "struct" as const, ...uint256.bnToUint256(bn) }
+function getUint256CalldataFromBN(bn: num.BigNumberish) {
+  return uint256.bnToUint256(bn)
 }
 
 export function parseInputAmountToUint256(
   input: string,
   decimals: number = 18,
 ) {
-  return getUint256CalldataFromBN(utils.parseUnits(input, decimals).toString())
+  return getUint256CalldataFromBN(bigDecimal.parseUnits(input, decimals))
 }
 
 export const mintToken = async (mintAmount: string): Promise<any> => {

@@ -1,8 +1,6 @@
-
-FROM shardlabs/starknet-devnet:0.4.6
+FROM shardlabs/starknet-devnet:0.6.3
 RUN addgroup -S localuser \
     && adduser -S localuser -G localuser
-
 USER localuser
-COPY ./packages/extension/e2e/network-setup /network-setup
-ENTRYPOINT [ "starknet-devnet", "--host", "0.0.0.0", "--port", "5050", "--seed", "0", "--lite-mode", "--load-path", "/network-setup/dump.pkl" ]
+COPY ./packages/e2e/extension/network-setup /network-setup
+ENTRYPOINT [ "starknet-devnet", "--host", "0.0.0.0", "--port", "5050", "--seed", "0", "--lite-mode" ]

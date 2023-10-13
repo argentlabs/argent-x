@@ -19,6 +19,8 @@ function excludeWallets<T extends { id: string }>(
 }
 
 export default async function show({
+  chainId,
+  projectId,
   discoveryWallets,
   installedWallets,
   lastWallet,
@@ -27,8 +29,11 @@ export default async function show({
   modalOptions,
   dappName,
   enableArgentWebWallet,
+  enableArgentMobile,
   webWalletUrl,
 }: {
+  chainId?: "SN_GOERLI" | "SN_GOERLI2" | "SN_MAINNET"
+  projectId?: string
   webWalletUrl: string
   lastWallet?: StarknetWindowObject
   installedWallets?: StarknetWindowObject[]
@@ -39,10 +44,11 @@ export default async function show({
   ) => Promise<ConnectedStarknetWindowObject | null>
   modalOptions?: {
     theme?: "light" | "dark" | "system"
-    starknetAppearance?: "email_first" | "email_only" | "all"
+    starknetAppearance?: "email_only" | "all"
   }
   dappName?: string
   enableArgentWebWallet?: boolean
+  enableArgentMobile?: boolean
 }): Promise<StarknetWindowObject | null> {
   return new Promise((resolve) => {
     // make sure wallets are not shown twice
@@ -61,10 +67,12 @@ export default async function show({
     const modal = new Modal({
       target: document.body,
       props: {
+        projectId,
+        chainId,
         enableArgentWebWallet,
+        enableArgentMobile,
         dappName,
         origin: webWalletUrl,
-
         callback: async (value: StarknetWindowObject | null) => {
           try {
             const enabledValue = (await enable?.(value)) ?? value

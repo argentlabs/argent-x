@@ -1,12 +1,11 @@
-import { CombinedFeeEstimation } from "@argent-x/extension/src/ui/features/actions/feeEstimation/CombinedFeeEstimation"
-
 import {
   combinedFeeEstimationFixture1,
   combinedFeeEstimationFixture2,
   combinedFeeEstimationFixture3,
   combinedFeeEstimationFixture4,
   combinedFeeEstimationFixture5,
-} from "./__fixtures__/fees/combinedFeeEstimationFixtures"
+} from "@argent-x/extension/src/ui/features/actions/feeEstimation/__fixtures__"
+import { CombinedFeeEstimation } from "@argent-x/extension/src/ui/features/actions/feeEstimation/CombinedFeeEstimation"
 
 export default {
   component: CombinedFeeEstimation,

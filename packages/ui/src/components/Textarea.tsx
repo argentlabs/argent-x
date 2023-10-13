@@ -72,6 +72,15 @@ const sizes = {
     minHeight: "14",
     h: "initial",
   },
+  sm: defineStyle({
+    px: "3",
+    py: "3.5",
+    fontSize: "base",
+    fontWeight: "semibold",
+    borderRadius: "lg",
+    minHeight: "12",
+    h: "10" /** also defines the width of InputLeftElement and InputRightElement... */,
+  }),
 }
 
 export const textareaTheme = defineStyleConfig({

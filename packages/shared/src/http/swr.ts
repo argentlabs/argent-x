@@ -48,3 +48,12 @@ export function useConditionallyEnabledSWR<Data = any, Error = any>(
   }, [enabled])
   return result
 }
+
+export const swrRefetchDisabledConfig: SWRConfiguration = {
+  revalidateOnFocus: false,
+  revalidateOnMount: true,
+  revalidateOnReconnect: false,
+  refreshWhenOffline: false,
+  refreshWhenHidden: false,
+  refreshInterval: 0,
+}

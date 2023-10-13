@@ -76,7 +76,9 @@ export const getDisplayWarnAndReasonForTransactionReview = (
   if (!transactionReview) {
     return {}
   }
-  const warn = transactionReview.assessment === "warn"
+  const warn =
+    transactionReview.assessment === "warn" &&
+    transactionReview.reason !== "contract_is_not_verified"
   const suffix = transactionReview.reason
     ? ` (Reason: ${lowerCase(transactionReview.reason)})`
     : ""

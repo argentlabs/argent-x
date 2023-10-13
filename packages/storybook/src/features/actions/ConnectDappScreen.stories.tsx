@@ -1,7 +1,7 @@
+import { accounts } from "@argent-x/extension/src/ui/features/actions/__fixtures__"
 import { ConnectDappScreen } from "@argent-x/extension/src/ui/features/actions/connectDapp/ConnectDappScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
-import { accounts } from "./__fixtures__/accounts"
 
 export default {
   component: ConnectDappScreen,

@@ -1,24 +1,24 @@
 import { FC, Suspense } from "react"
-import { useNavigate } from "react-router-dom"
 
-import { Token } from "../../../shared/token/type"
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
-import { routes, useCurrentPathnameWithQuery } from "../../routes"
-import { useSelectedAccount } from "../accounts/accounts.state"
+import { useCurrentPathnameWithQuery } from "../../routes"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import { NewTokenButton } from "./NewTokenButton"
 import { TokenListItemVariant } from "./TokenListItem"
 import { TokenListItemContainer } from "./TokenListItemContainer"
 import { useTokensInNetwork } from "./tokens.state"
+import { useAddFundsDialogSend } from "./useAddFundsDialog"
+import { Token } from "../../../shared/token/__new/types/token.model"
 
 interface TokenListProps {
   tokenList?: Token[]
   showNewTokenButton?: boolean
   showTokenSymbol?: boolean
   variant?: TokenListItemVariant
-  navigateToSend?: boolean
-  onItemClick?: () => void
+  onItemClick?: (token: Token) => void
 }
 
 export const TokenList: FC<TokenListProps> = ({
@@ -26,14 +26,24 @@ export const TokenList: FC<TokenListProps> = ({
   showNewTokenButton = true,
   showTokenSymbol = false,
   variant,
-  navigateToSend = false,
   onItemClick,
 }) => {
-  const navigate = useNavigate()
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
   const { switcherNetworkId } = useAppState()
   const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
   const returnTo = useCurrentPathnameWithQuery()
+  const addFundsDialogSend = useAddFundsDialogSend()
+
+  const onClick = (token: Token) => {
+    if (onItemClick) {
+      return onItemClick(token)
+    }
+
+    addFundsDialogSend({
+      tokenAddress: token.address,
+      returnTo,
+    })
+  }
 
   if (!account) {
     return null
@@ -55,17 +65,7 @@ export const TokenList: FC<TokenListProps> = ({
             token={token}
             variant={variant}
             showTokenSymbol={showTokenSymbol}
-            onClick={() => {
-              if (onItemClick) {
-                return onItemClick()
-              }
-
-              navigate(
-                navigateToSend
-                  ? routes.sendToken(token.address, returnTo)
-                  : routes.token(token.address),
-              )
-            }}
+            onClick={() => onClick(token)}
           />
         ))}
         {showNewTokenButton && <NewTokenButton />}

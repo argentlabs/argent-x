@@ -1,5 +1,5 @@
 import { validateAndParseAddress } from "starknet"
-import { number } from "starknet"
+import { num } from "starknet"
 import invariant from "tiny-invariant"
 
 import { SupportedNetworks } from "../constants"
@@ -45,10 +45,10 @@ export class Token extends Currency {
   public sortsBefore(other: Token): boolean {
     invariant(this.networkId === other.networkId, "CHAIN_IDS")
     invariant(this.address !== other.address, "ADDRESSES")
-    const thisAddress = number.toBN(this.address)
-    const otherAddress = number.toBN(other.address)
+    const thisAddress = num.toBigInt(this.address)
+    const otherAddress = num.toBigInt(other.address)
 
-    return thisAddress.lt(otherAddress)
+    return thisAddress < otherAddress
   }
 }
 

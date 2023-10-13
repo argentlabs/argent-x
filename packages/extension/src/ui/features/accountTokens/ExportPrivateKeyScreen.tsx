@@ -7,13 +7,13 @@ import { Button } from "../../components/Button"
 import { CopyTooltip } from "../../components/CopyTooltip"
 import { Paragraph } from "../../components/Page"
 import { routes, useRouteAccountAddress } from "../../routes"
-import { checkPassword } from "../../services/backgroundSessions"
 import { H2 } from "../../theme/Typography"
 import { StickyGroup } from "../actions/DeprecatedConfirmScreen"
 import { PasswordForm } from "../lock/PasswordForm"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { StatusMessageBanner } from "../statusMessage/StatusMessageBanner"
 import { usePrivateKey } from "./usePrivateKey"
+import { sessionService } from "../../services/session"
 
 const Container = styled.div`
   display: flex;
@@ -76,8 +76,8 @@ export const ExportPrivateKeyScreen: FC = () => {
 
   const privateKey = usePrivateKey(accountAddress, network.id)
 
-  const handleVerifyPassword = async (password: any) => {
-    const isValid = await checkPassword(password)
+  const handleVerifyPassword = async (password: string) => {
+    const isValid = await sessionService.checkPassword(password)
     setPasswordValid(isValid)
     return isValid
   }

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react"
-import { Call, RawArgs, stark, uint256 } from "starknet"
+import { Call, CallData, RawArgs, uint256 } from "starknet"
 
 import {
   CurrencyAmount,
@@ -48,10 +48,10 @@ export function useApprovalCall(
 
     const approveArgs: RawArgs = {
       spender,
-      amount: { type: "struct", ...uint256AmountToApprove },
+      amount: uint256AmountToApprove,
     }
 
-    const approveCalldata = stark.compileCalldata(approveArgs)
+    const approveCalldata = CallData.compile(approveArgs)
 
     const approveCall: Call = {
       contractAddress: token.address,

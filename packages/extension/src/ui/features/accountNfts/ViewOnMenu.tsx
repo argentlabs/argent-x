@@ -10,11 +10,11 @@ import {
 import { FC, useRef } from "react"
 
 import { useOnClickOutside } from "../../services/useOnClickOutside"
-import { openAspectNft } from "./aspect.service"
-import { openMintSquareNft } from "./mint-square.service"
+import { openNftOnFlex, openNftOnUnframed } from "@argent/shared"
+import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 
 const { ViewIcon } = icons
-const { Aspect, Mintsquare } = logos
+const { Unframed, Flex: FlexLogo } = logos
 
 export interface TokenMenuProps {
   contractAddress: string
@@ -29,6 +29,7 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const ref = useRef<HTMLDivElement>(null)
+  const isMainnet = useIsMainnet()
 
   useOnClickOutside(ref, () => onClose())
   return (
@@ -45,6 +46,7 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
           as={Button}
           bg="neutrals.700"
           _hover={{ bg: "neutrals.600" }}
+          isDisabled={!isMainnet}
         >
           <Flex justifyContent="center" alignItems="center" gap="2">
             <ViewIcon />
@@ -62,25 +64,25 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
             gap="2"
             my="1"
             w="100%"
-            onClick={() => openAspectNft(contractAddress, tokenId, networkId)}
-            bg="neutrals.700"
-            _hover={{ bg: "neutrals.600" }}
-          >
-            <Aspect />
-            <B3>Aspect</B3>
-          </Button>
-          <Button
-            w="100%"
-            gap="2"
-            my="1"
             onClick={() =>
-              openMintSquareNft(contractAddress, tokenId, networkId)
+              openNftOnUnframed(contractAddress, tokenId, networkId)
             }
             bg="neutrals.700"
             _hover={{ bg: "neutrals.600" }}
           >
-            <Mintsquare />
-            <B3>MintSquare</B3>
+            <Unframed />
+            <B3>Unframed</B3>
+          </Button>
+          <Button
+            gap="2"
+            my="1"
+            w="100%"
+            onClick={() => openNftOnFlex(contractAddress, tokenId, networkId)}
+            bg="neutrals.700"
+            _hover={{ bg: "neutrals.600" }}
+          >
+            <FlexLogo />
+            <B3>Flex</B3>
           </Button>
         </MenuList>
       </Menu>

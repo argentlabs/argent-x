@@ -1,9 +1,18 @@
-export interface AddressBookContactNoId {
-  name: string
-  networkId: string
-  address: string
-}
+import { z } from "zod"
 
-export interface AddressBookContact extends AddressBookContactNoId {
-  id: string
+import {
+  addressBookContactNoIdSchema,
+  addressBookContactSchema,
+} from "./schema"
+
+export type AddressBookContact = z.infer<typeof addressBookContactSchema>
+
+export type AddressBookContactNoId = z.infer<
+  typeof addressBookContactNoIdSchema
+>
+
+export const isAddressBookContact = (
+  contact?: AddressBookContactNoId | AddressBookContact,
+): contact is AddressBookContact => {
+  return Boolean(contact && "id" in contact)
 }

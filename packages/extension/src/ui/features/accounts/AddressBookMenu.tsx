@@ -11,9 +11,9 @@ import {
 } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 
-import { AddressBookContact } from "../../../shared/addressBook"
+import type { AddressBookContact } from "../../../shared/addressBook/type"
 import { WalletAccount } from "../../../shared/wallet.model"
-import { AddressBook } from "../../services/addressBook"
+import { AddressBook } from "../../hooks/useAddressBook"
 import { AccountListItem } from "./AccountListItem"
 
 const StyledTab = ({ children, ...rest }: TabProps) => (
@@ -63,7 +63,7 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
             transparent
             onClick={() => onAddressSelect(account)}
             width={"full"}
-            avatarSize={10}
+            avatarSize={9}
             _hover={{ bg: "neutrals.600" }}
             rounded={"none"}
           />

@@ -1,5 +1,6 @@
 import { Call } from "starknet"
 
+import { Address } from "../chains"
 import { ApiData } from "../http/apiData"
 
 export interface ApiTransactionReview {
@@ -31,6 +32,7 @@ export type ApiTransactionReviewAssessmentReason =
   | "spender_is_black_listed"
   | "operator_is_black_listed"
   | "src_token_black_listed"
+  | "contract_is_not_verified"
   | "unknown_token"
 
 export interface IUseTransactionReview {
@@ -42,7 +44,7 @@ export interface IUseTransactionReview {
 }
 
 export interface ApiTransactionReviewToken {
-  address: string
+  address: Address
   name?: string
   symbol?: string
   decimals: number
@@ -77,7 +79,7 @@ export interface ApiTransactionReviewActivity {
     slippage: ApiTransactionReviewSlippageType
   }
   dapp?: {
-    address: string
+    address: Address
     name: string
   }
   src?: {

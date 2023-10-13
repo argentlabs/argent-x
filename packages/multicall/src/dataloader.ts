@@ -1,5 +1,5 @@
 import DataLoader from "dataloader"
-import { Call, ProviderInterface, hash, number } from "starknet"
+import { Call, CallData, ProviderInterface, hash, num } from "starknet"
 
 import { aggregate } from "./aggregate"
 
@@ -28,12 +28,10 @@ export const getDataLoader = (
       },
       cacheKeyFn(call) {
         const { contractAddress, entrypoint, calldata = [] } = call
-        const cacheKeyContractAddress = number.toHex(
-          number.toBN(contractAddress),
-        )
+        const cacheKeyContractAddress = num.toHexString(contractAddress)
         const cacheKeyEntrypoint = hash.getSelector(entrypoint)
-        const cacheKeyCalldata = calldata
-          .map((c) => number.toHex(number.toBN(c)))
+        const cacheKeyCalldata = CallData.toCalldata(calldata)
+          .map((c) => num.toHexString(c))
           .join("-")
         return `${cacheKeyContractAddress}--${cacheKeyEntrypoint}--${cacheKeyCalldata}`
       },

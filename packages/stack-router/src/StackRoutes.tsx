@@ -5,6 +5,7 @@ import { Routes, useLocation } from "react-router-dom"
 
 import { getWrappedChildrenAndPresentation } from "./presentation/getWrappedChildrenAndPresentation"
 import { StackContextProvider } from "./StackContext"
+import { useStackRoutesConfig } from "./StackRoutesConfig"
 import { getMatchingPath } from "./utils/getMatchingPath"
 
 export const StackRoutes: FC<ComponentProps<typeof Flex>> = ({
@@ -12,6 +13,7 @@ export const StackRoutes: FC<ComponentProps<typeof Flex>> = ({
   ...rest
 }) => {
   const location = useLocation()
+  const stackRoutesConfig = useStackRoutesConfig()
   const { wrappedChildren, declaredPresentationByPath, paths } = useMemo(
     () => getWrappedChildrenAndPresentation(children),
     [children],
@@ -30,7 +32,10 @@ export const StackRoutes: FC<ComponentProps<typeof Flex>> = ({
         height={"100%"}
         {...rest}
       >
-        <AnimatePresence initial={false}>
+        <AnimatePresence
+          initial={false}
+          onExitComplete={stackRoutesConfig?.onExitComplete}
+        >
           <Routes location={location} key={path}>
             {wrappedChildren}
           </Routes>

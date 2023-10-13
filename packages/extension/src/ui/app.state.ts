@@ -3,8 +3,8 @@ import { create } from "zustand"
 
 import { messageStream } from "../shared/messages"
 import { defaultNetwork } from "../shared/network"
-import { useResetAll } from "./services/background"
-import { useStopSession } from "./services/backgroundSessions"
+import { useResetAll } from "./hooks/useResetAll"
+import { useStopSession } from "./services/useStopSession"
 
 interface State {
   switcherNetworkId: string

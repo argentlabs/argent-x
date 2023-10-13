@@ -1,0 +1,68 @@
+name: Bootstrap Release
+
+on:
+  push:
+    branches:
+      - release/next
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  create-release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          token: ${{ secrets.ARGENTBOT_GITHUB_PAT }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create Release Pull Request
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: bash ./scripts/version.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.ARGENTBOT_GITHUB_PAT }}
+
+      - name: Tag
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        # replace GITHUB_TOKEN with PAT to allow CI to run on tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.ARGENTBOT_GITHUB_PAT }}
+        # You can do something when a publish should happen.
+        run: |
+          # check if tags already exists
+          pnpm changeset tag
+          git push --follow-tags origin ${{ github.ref }}

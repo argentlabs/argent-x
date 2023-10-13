@@ -1,5 +1,4 @@
-import { screen } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
+import { fireEvent, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 
 import { renderWithLegacyProviders } from "../../test/utils"
@@ -18,7 +17,7 @@ describe("AccountScreenEmpty", () => {
     )
 
     await screen.findByText("Create account")
-    userEvent.click(screen.getByText("Create account"))
+    fireEvent.click(screen.getByText("Create account"))
     expect(onCreate).toHaveBeenCalled()
   })
 })

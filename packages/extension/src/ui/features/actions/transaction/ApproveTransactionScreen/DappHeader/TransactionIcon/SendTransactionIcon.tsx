@@ -44,7 +44,7 @@ export const SendTransactionIcon = ({
               right="-1"
               bottom="-1"
             >
-              <Image src={srcToken?.image} height="5" width="5" zIndex="2" />
+              <Image src={srcToken?.iconUrl} height="5" width="5" zIndex="2" />
             </Center>
           ) : (
             <UnknownTokenIcon

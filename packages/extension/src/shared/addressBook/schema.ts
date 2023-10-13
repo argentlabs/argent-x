@@ -1,24 +1,20 @@
-import * as yup from "yup"
+import { addressOrStarknetIdInputSchema } from "@argent/shared"
+import { z } from "zod"
 
-import { addressSchema } from "./../../ui/services/addresses"
-import { AddressBookContact, AddressBookContactNoId } from "./type"
+export const addressBookContactSchema = z.object({
+  id: z.string(),
+  name: z.string().trim().min(1, { message: "Contact Name is required" }),
+  networkId: z
+    .string()
+    .trim()
+    .min(1, { message: "Contact Network is required" }),
+  address: z
+    .string()
+    .trim()
+    .min(1, { message: "Address is required" })
+    .pipe(addressOrStarknetIdInputSchema),
+})
 
-export const addressBookContactNoIdSchema: yup.Schema<AddressBookContactNoId> =
-  yup
-    .object()
-    .required()
-    .shape({
-      name: yup.string().required("Contact Name is required"),
-      networkId: yup.string().required("Contact Network is required"),
-      address: addressSchema,
-    })
-
-export const addressBookContactSchema: yup.Schema<AddressBookContact> = yup
-  .object()
-  .required("Contact is required")
-  .shape({
-    id: yup.string().required(),
-    name: yup.string().required("Contact Name is required"),
-    networkId: yup.string().required("Contact Network is required"),
-    address: addressSchema,
-  })
+export const addressBookContactNoIdSchema = addressBookContactSchema.omit({
+  id: true,
+})

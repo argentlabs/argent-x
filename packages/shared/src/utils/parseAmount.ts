@@ -1,20 +1,19 @@
-import { BigNumber, utils } from "ethers"
-import { number, uint256 } from "starknet"
+import { uint256, BigNumberish } from "starknet"
 
 import { isNumeric } from "./number"
+import { parseUnits } from "../bigdecimal"
 
-export const parseAmount = (
+export const parseAmountValue = (
   amount: string,
-  decimals: number.BigNumberish = 18,
+  decimals: BigNumberish = 18,
 ) => {
   const amountNoComma = amount.replace(",", ".")
-  if (!isNumeric(amountNoComma)) {
-    return BigNumber.from(0)
+  if (!amount || !isNumeric(amountNoComma)) {
+    return 0n
   }
 
-  return utils.parseUnits(amountNoComma, number.toBN(decimals).toNumber())
+  return parseUnits(amountNoComma, Number(decimals))
 }
-export const getUint256CalldataFromBN = (bn: BigNumber) => ({
-  type: "struct" as const,
-  ...uint256.bnToUint256(bn.toHexString()),
-})
+export function getUint256CalldataFromBN(bn: BigNumberish) {
+  return uint256.bnToUint256(bn)
+}

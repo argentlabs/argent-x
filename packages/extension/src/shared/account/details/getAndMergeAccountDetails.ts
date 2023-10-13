@@ -1,13 +1,17 @@
 import { WalletAccount } from "../../wallet.model"
-import { accountsEqual } from "../../wallet.service"
+import { accountsEqual } from "../../utils/accountsEqual"
 import { getAccountEscapeFromChain } from "./getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "./getAccountGuardiansFromChain"
-import { getAccountTypesFromChain } from "./getAccountTypesFromChain"
+import { getAccountClassHashFromChain } from "./getAccountClassHashFromChain"
+import { getAccountDeployStatusFromChain } from "./getAccountDeployStatusFromChain"
+import { getAccountCairoVersionFromChain } from "./getAccountCairoVersionFromChain"
 
 export type DetailFetchers =
-  | typeof getAccountTypesFromChain
+  | typeof getAccountDeployStatusFromChain
+  | typeof getAccountClassHashFromChain
   | typeof getAccountGuardiansFromChain
   | typeof getAccountEscapeFromChain
+  | typeof getAccountCairoVersionFromChain
 
 /** Use Promise.all allows multicall to batch all calls to get account deatils on chain */
 

@@ -3,7 +3,7 @@ import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
 const { NftIcon } = icons
-const { Aspect, Briq, Mintsquare } = logos
+const { Briq, Unframed, Flex: FlexLogo } = logos
 
 const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
   icon,
@@ -60,40 +60,22 @@ const EmptyCollections: FC<{ networkId: string }> = ({ networkId }) => (
         Discover NFTs on StarkNet
       </P3>
 
-      <SimpleGrid columns={networkId === "goerli-alpha" ? 3 : 2} gap="2" mx="8">
-        {networkId === "goerli-alpha" && (
-          <>
-            <ButtonLink
-              title="Aspect"
-              icon={<Aspect />}
-              href="https://testnet.aspect.co"
-            />
-            <ButtonLink
-              title="Mintsquare"
-              icon={<Mintsquare />}
-              href="https://mintsquare.io/starknet-testnet"
-            />
-            <ButtonLink
-              title="Briq"
-              icon={<Briq />}
-              href="https://briq.construction/"
-            />
-          </>
-        )}
-        {networkId === "mainnet-alpha" && (
-          <>
-            <ButtonLink
-              title="Aspect"
-              icon={<Aspect />}
-              href="https://aspect.co"
-            />
-            <ButtonLink
-              title="Mintsquare"
-              icon={<Mintsquare />}
-              href="https://mintsquare.io/starknet"
-            />
-          </>
-        )}
+      <SimpleGrid columns={3} gap="2" mx="8">
+        <ButtonLink
+          title="Unframed"
+          icon={<Unframed />}
+          href="https://unframed.co/"
+        />
+        <ButtonLink
+          title="Flex"
+          icon={<FlexLogo />}
+          href="https://flexing.gg/"
+        />
+        <ButtonLink
+          title="Briq"
+          icon={<Briq />}
+          href="https://briq.construction/"
+        />
       </SimpleGrid>
     </Flex>
   </Flex>

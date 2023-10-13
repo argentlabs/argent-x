@@ -1,38 +1,26 @@
-import { B3, Button, FieldError, H2, icons } from "@argent/ui"
+import { B3, H2 } from "@argent/ui"
 import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { prettifyCurrencyValue } from "../../../shared/token/price"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { AddressCopyButton } from "../../components/AddressCopyButton"
 import { useStarknetId } from "../../services/useStarknetId"
-import { AccountStatus } from "../accounts/accounts.service"
 import { useMultisig } from "../multisig/multisig.state"
 import { StarknetIdCopyButton } from "./StarknetIdCopyButton"
-import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
-import { useTokensWithBalance } from "./tokens.state"
-
-const { DeployIcon } = icons
+import { usePrettyAccountBalance } from "./usePrettyAccountBalance"
 
 interface AccountSubheaderProps {
-  status: AccountStatus
   account: BaseWalletAccount
   accountName?: string
-  onRedeploy: () => void
 }
 
 export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
-  status,
   account,
   accountName,
-  onRedeploy,
 }) => {
-  const { tokenDetails } = useTokensWithBalance(account)
-  const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokenDetails)
+  const prettyAccountBalance = usePrettyAccountBalance(account)
   const accountAddress = account.address
   const multisig = useMultisig(account) // This will be undefined if the account is not a multisig
-
-  const { data: starknetId } = useStarknetId(account)
 
   const { data: starknetId } = useStarknetId(account)
 
@@ -52,11 +40,7 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
           </B3>
         </Center>
       )}
-      {sumCurrencyValue !== undefined ? (
-        <H2>{prettifyCurrencyValue(sumCurrencyValue)}</H2>
-      ) : (
-        <H2>{accountName}</H2>
-      )}
+      <H2>{prettyAccountBalance || accountName}</H2>
       {starknetId ? (
         <StarknetIdCopyButton
           starknetId={starknetId}
@@ -64,14 +48,6 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
         />
       ) : (
         <AddressCopyButton address={accountAddress} />
-      )}
-      {status.code === "ERROR" && (
-        <VStack spacing={2} pt={2}>
-          <FieldError>{status.text}</FieldError>
-          <Button size="2xs" onClick={onRedeploy} leftIcon={<DeployIcon />}>
-            Redeploy
-          </Button>
-        </VStack>
       )}
     </VStack>
   )

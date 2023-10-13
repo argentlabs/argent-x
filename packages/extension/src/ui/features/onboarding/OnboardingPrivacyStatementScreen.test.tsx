@@ -27,7 +27,7 @@ describe("OnboardingPrivacyStatementScreen", () => {
     ).toBeInTheDocument()
   })
 
-  it("renders the back button and calls onBack when clicked", () => {
+  it("renders the back button and calls onBack when clicked", async () => {
     const onBack = vi.fn()
     const screen = renderComponent({
       onBack,
@@ -36,7 +36,7 @@ describe("OnboardingPrivacyStatementScreen", () => {
     const backButton = screen.getByText("Back")
     expect(backButton).toBeInTheDocument()
 
-    userEvent.click(backButton)
+    await userEvent.click(backButton)
     expect(onBack).toHaveBeenCalledTimes(1)
   })
 })

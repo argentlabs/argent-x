@@ -7,6 +7,8 @@
   "actualFee": "0x0",
   "blockGasPrice": "3025969",
   "status": "ACCEPTED_ON_L2",
+  "finalityStatus": "ACCEPTED_ON_L2",
+  "executionStatus": "SUCCESS",
   "statusData": "",
   "events": []
 }

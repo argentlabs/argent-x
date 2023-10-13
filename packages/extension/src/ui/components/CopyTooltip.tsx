@@ -21,6 +21,8 @@ interface CopyTooltipProps {
   "data-testid"?: string
 }
 
+/** @deprecated Use `CopyTooltip` from `@argent/ui` instead */
+
 export const CopyTooltip: FC<CopyTooltipProps> = ({
   copyValue,
   message,

@@ -9,7 +9,7 @@ export const handleUpgradeTransaction: TransactionUpdateListener = async (
   )
   if (upgrades.length > 0) {
     await updateAccountDetails(
-      "type",
+      "implementation",
       upgrades.map((transaction) => transaction.account),
     )
   }

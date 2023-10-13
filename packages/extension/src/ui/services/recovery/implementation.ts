@@ -10,9 +10,6 @@ export class RecoveryService implements IRecoveryService {
   async bySeedPhrase(seedPhrase: string, newPassword: string) {
     const message = JSON.stringify({ seedPhrase, newPassword })
     const jwe = await encryptForBackground(message)
-    const { isSuccess } = await messageClient.recovery.recoverSeedPhrase.mutate(
-      { jwe },
-    )
-    return isSuccess
+    await messageClient.recovery.recoverSeedPhrase.mutate({ jwe })
   }
 }

@@ -1,30 +1,34 @@
-import { stark } from "starknet"
+import { CallData } from "starknet"
 
-import { ActionItem } from "../shared/actionQueue/types"
-import { getNetwork } from "../shared/network"
+import { networkService } from "../shared/network/service"
 import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
-import { Queue } from "./actionQueue"
+import { IBackgroundActionService } from "./__new/services/action/interface"
 import { Wallet } from "./wallet"
+import { isAccountV5 } from "../shared/utils/accountv4"
+import { AccountError } from "../shared/errors/account"
 
 export interface IUpgradeAccount {
   account: BaseWalletAccount
   wallet: Wallet
-  actionQueue: Queue<ActionItem>
+  actionService: IBackgroundActionService
   targetImplementationType?: ArgentAccountType
 }
 
 export const upgradeAccount = async ({
   account,
   wallet,
-  actionQueue,
+  actionService,
   targetImplementationType,
 }: IUpgradeAccount) => {
   const fullAccount = await wallet.getAccount(account)
+  if (!fullAccount) {
+    throw new AccountError({ code: "NOT_FOUND" })
+  }
   const starknetAccount = await wallet.getStarknetAccount(account)
 
   const accountType = targetImplementationType ?? fullAccount.type
 
-  const { accountClassHash: newImplementation } = await getNetwork(
+  const { accountClassHash: newImplementation } = await networkService.getById(
     fullAccount.network.id,
   )
 
@@ -32,19 +36,23 @@ export const upgradeAccount = async ({
     throw "Cannot upgrade account without a new contract implementation"
   }
 
+  const accountTypeWithCairo0Check =
+    accountType === "standardCairo0" ? "standard" : accountType
   const implementationClassHash =
-    newImplementation[accountType] ?? newImplementation.standard
+    newImplementation[accountTypeWithCairo0Check] ?? newImplementation.standard
 
-  const calldata = stark.compileCalldata({
-    implementation: implementationClassHash,
-  })
-
-  if ("estimateAccountDeployFee" in starknetAccount) {
-    // new starknet accounts have a new upgrade interface to allow for transactions right after upgrade
-    calldata.push("0")
+  if (!isAccountV5(starknetAccount)) {
+    throw new AccountError({ code: "UPGRADE_NOT_SUPPORTED" })
   }
 
-  await actionQueue.push({
+  const upgradeCalldata = {
+    implementation: implementationClassHash,
+    // new starknet accounts have a new upgrade interface to allow for transactions right after upgrade
+    calldata: [0],
+  }
+
+  const calldata = CallData.compile(upgradeCalldata)
+  await actionService.add({
     type: "TRANSACTION",
     payload: {
       transactions: {

@@ -3,6 +3,10 @@ import { describe, expect, it } from "vitest"
 
 import { OnboardingDisclaimerScreen } from "./OnboardingDisclaimerScreen"
 
+/**
+ * @vitest-environment jsdom
+ */
+
 describe("OnboardingDisclaimerScreen", () => {
   it("onContinue does not work until boxes are checked", async () => {
     const onContinue = vi.fn()

@@ -5,10 +5,10 @@ import { withGuardianSelector } from "../../../shared/account/selectors"
 import { WalletAccount } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { isEqualAddress } from "../../services/addresses"
-import { getPublicKey } from "../../services/backgroundAccounts"
-import { withPolling } from "../../services/swr"
+import { withPolling } from "../../services/swr.service"
 import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
+import { accountMessagingService } from "../../services/accountMessaging"
 
 export const useAccountsWithGuardian = () => {
   const allAccounts = useView(allAccountsView)
@@ -30,7 +30,7 @@ export const useAccountGuardianIsSelf = (account?: WalletAccount) => {
         return false
       }
       if (!publicKey.current) {
-        publicKey.current = await getPublicKey(account)
+        publicKey.current = await accountMessagingService.getPublicKey(account)
       }
       const accountGuardianIsSelf = isEqualAddress(
         account.guardian,

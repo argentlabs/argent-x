@@ -1,3 +1,4 @@
+import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
 import { MultisigPendingTransaction } from "../../../../../../shared/multisig/pendingTransactionsStore"
 import { Transaction } from "../../../../../../shared/transactions"
 import { WalletAccount } from "../../../../../../shared/wallet.model"
@@ -13,7 +14,7 @@ export const getTransactionFromPendingMultisigTransaction = (
       transactions: transaction.calls,
     },
     timestamp,
-    status: "NOT_RECEIVED",
+    finalityStatus: TransactionFinalityStatus.NOT_RECEIVED,
     hash: pendingMultisigTransaction.transactionHash,
   }
 }

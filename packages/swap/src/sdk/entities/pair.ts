@@ -19,11 +19,11 @@ import {
   InsufficientInputAmountError,
   InsufficientReservesError,
 } from "../errors"
-import { calculateContractAddressFromHash, pedersen } from "../hash"
 import { parseBigintIsh, sqrt } from "../utils"
 import { Price } from "./fractions/price"
 import { TokenAmount } from "./fractions/tokenAmount"
 import { Token } from "./token"
+import { hash, ec } from "starknet"
 
 let PAIR_ADDRESS_CACHE: {
   [token0Address: string]: { [token1Address: string]: string }
@@ -38,7 +38,7 @@ export class Pair {
       ? [tokenA, tokenB]
       : [tokenB, tokenA] // does safety checks
 
-    const salt = pedersen([tokens[0].address, tokens[1].address])
+    const salt = ec.starkCurve.pedersen(tokens[0].address, tokens[1].address)
 
     const contructorCalldata = [
       PAIR_CLASS_HASH,
@@ -54,7 +54,7 @@ export class Pair {
         ...PAIR_ADDRESS_CACHE,
         [tokens[0].address]: {
           ...PAIR_ADDRESS_CACHE?.[tokens[0].address],
-          [tokens[1].address]: calculateContractAddressFromHash(
+          [tokens[1].address]: hash.calculateContractAddressFromHash(
             salt,
             PAIR_PROXY_CLASS_HASH,
             contructorCalldata,

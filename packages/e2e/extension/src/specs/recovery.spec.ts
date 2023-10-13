@@ -7,22 +7,17 @@ test.describe("Recovery Wallet", () => {
   test("User should be able to recover wallet using seed phrase", async ({
     extension,
   }) => {
-    await extension.open()
-    await extension.wallet.restoreExistingWallet.click()
-    await extension.setClipBoardContent(config.wallets[1].seed)
-    await extension.paste()
-    await extension.navigation.continue.click()
-
-    await extension.wallet.password.fill(config.password)
-    await extension.wallet.repeatPassword.fill(config.password)
-
-    await extension.navigation.continue.click()
-    await expect(extension.wallet.finish.first()).toBeVisible({
-      timeout: 180000,
+    const { seed } = await extension.setupWallet({
+      accountsToSetup: [
+        {
+          initialBalance: 0.0005,
+          deploy: true,
+        },
+      ],
     })
 
-    await extension.open()
-    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.resetExtension()
+    await extension.recoverWallet(seed)
   })
 
   test("Set up account recovery banner should not be visible after user copy phrase", async ({
@@ -31,10 +26,12 @@ test.describe("Recovery Wallet", () => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
-    await extension.account.setUpAccountRecovery.click()
-    await extension.account.saveTheRecoveryPhrase.click()
-    await extension.navigation.continue.click()
-    await extension.navigation.yes.click()
+    await extension.network.selectNetwork("Mainnet")
+    await extension.account.addAccountMainnet({ firstAccount: true })
+    await expect(extension.account.showAccountRecovery).toBeVisible()
+    await extension.account.showAccountRecovery.click()
+    await extension.account.confirmTheSeedPhrase.click()
+    await extension.navigation.done.click()
     await expect(extension.account.setUpAccountRecovery).toBeHidden()
   })
 
@@ -42,25 +39,40 @@ test.describe("Recovery Wallet", () => {
     extension,
   }) => {
     await extension.open()
-    await extension.wallet.restoreExistingWallet.click()
-    await extension.setClipBoardContent(config.wallets[2].seed)
-    await extension.paste()
-    await extension.navigation.continue.click()
+    await extension.recoverWallet(config.testNetSeed1!)
+    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.network.selectNetwork("Testnet")
+    await extension.account.selectAccount("Account 33")
+    await expect(extension.account.currentBalance("Ethereum")).toContainText(
+      "0.0000097 ETH",
+    )
+  })
 
-    await extension.wallet.password.fill(config.password)
-    await extension.wallet.repeatPassword.fill(config.password)
-
-    await extension.navigation.continue.click()
-    await expect(extension.wallet.finish.first()).toBeVisible({
-      timeout: 180000,
-    })
-
+  test("Copy phrase from account view when creating new wallet", async ({
+    extension,
+  }) => {
+    await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
-    await extension.network.selectNetwork("Localhost 5050")
-    await extension.account.selectAccount("Account 32")
-    await expect(extension.account.currentBalance("ETH")).toContainText(
-      "0.9991 ETH",
-    )
+    await extension.account.accountAddressFromAssetsView.click()
+    await extension.account.saveRecoveryPhrase()
+    await extension.account.copyAddress.click()
+    const accountAddress = await extension.getClipboard()
+    expect(accountAddress).toMatch(/^0x0/)
+  })
+
+  test("Save your recovery phrase banner", async ({ extension }) => {
+    await extension.wallet.newWalletOnboarding()
+    await extension.open()
+    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.network.selectNetwork("Mainnet")
+    await extension.account.addAccountMainnet({ firstAccount: true })
+
+    await extension.account.showAccountRecovery.click()
+    await extension.account.saveRecoveryPhrase()
+    await extension.account.copyAddress.click()
+    const accountAddress = await extension.getClipboard()
+    expect(accountAddress).toMatch(/^0x0/)
+    await expect(extension.account.showAccountRecovery).toBeHidden()
   })
 })

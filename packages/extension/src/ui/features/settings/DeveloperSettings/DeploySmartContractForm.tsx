@@ -1,47 +1,41 @@
-import { Alert, CellStack, ErrorMessage, Input, P4, Select } from "@argent/ui"
-import { Box } from "@chakra-ui/react"
-import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useEffect, useState } from "react"
+
+import {
+  Alert,
+  CellStack,
+  ErrorMessage,
+  Input,
+  Select,
+  SpacerCell,
+  icons,
+} from "@argent/ui"
+import { Box, chakra } from "@chakra-ui/react"
+import { isEmpty } from "lodash-es"
 import {
   Controller,
   FormProvider,
   SubmitHandler,
   useForm,
 } from "react-hook-form"
-import { AbiEntry, number, uint256 } from "starknet"
+import { AbiEntry, num, uint256 } from "starknet"
 
 import { accountService } from "../../../../shared/account/service"
 import { Transaction } from "../../../../shared/transactions"
 import { useAppState } from "../../../app.state"
+import { udcService } from "../../../services/udc"
 import {
+  DeployContractServicePayload,
   deployContract,
-  fetchConstructorParams,
 } from "../../../services/udc.service"
+
 import { ClassHashInputActions } from "./ClassHashInputActions"
 import { DeploySmartContractParameters } from "./DeploySmartContractParameters"
 import { useLastDeclaredContracts } from "./udc.state"
 import { useFormSelects } from "./useFormSelects"
+import { useAutoFocusInputRef } from "../../../hooks/useAutoFocusInputRef"
+import { FieldValues, ParameterField } from "./deploySmartContractForm.model"
 
-export type ParameterField =
-  | {
-      name: string
-      type: `felt` | `Uint256`
-      value: string
-    }
-  | {
-      name: string
-      type: `felt*`
-      value: string[]
-    }
-
-interface FieldValues {
-  account: string
-  classHash: string
-  network: string
-  parameters: ParameterField[]
-  salt: string
-  unique: boolean
-}
+const { AlertIcon } = icons
 
 interface DeploySmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
@@ -102,14 +96,14 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     const constructorCalldata = parameters.flatMap<string>((param, i) => {
       try {
         if (param.type === "felt") {
-          return [number.toHex(number.toBN(param.value))]
+          return [num.toHex(param.value)]
         }
         if (param.type === "felt*") {
-          return param.value.map((value) => number.toHex(number.toBN(value)))
+          return param.value.map((value) => num.toHex(value))
         }
         if (param.type === "Uint256") {
-          const { low, high } = uint256.bnToUint256(number.toBN(param.value))
-          return [low, high]
+          const { low, high } = uint256.bnToUint256(num.toBigInt(param.value))
+          return [low, high].map(num.toHex)
         }
         setError(`parameters.${i}`, {
           type: "manual",
@@ -127,14 +121,18 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     })
 
     clearErrors()
-    await deployContract({
+
+    const payload: DeployContractServicePayload = {
       address: account,
-      classHash,
       networkId: network,
+      classHash,
       constructorCalldata,
-      salt,
       unique,
-    })
+    }
+    if (salt !== "") {
+      payload.salt = salt
+    }
+    await deployContract(payload)
   }
 
   const resetAbiFields = useCallback(() => {
@@ -150,9 +148,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   ) => {
     setIsLoading(true)
     try {
-      const { abi } = await fetchConstructorParams(
-        currentClassHash,
+      const { abi } = await udcService.getConstructorParams(
         currentNetwork,
+        currentClassHash,
       )
       const constructorAbi = abi?.find((item) => item.type === "constructor")
       setParameterFields(
@@ -205,14 +203,27 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentClassHash, currentNetwork])
 
+  const inputRef = useAutoFocusInputRef<HTMLInputElement>()
+  const { ref, ...classHashInputRest } = register("classHash", {
+    required: true,
+  })
+
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CellStack pb="24">
+      <chakra.form
+        display={"flex"}
+        flexDirection={"column"}
+        flex={1}
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <CellStack pt={0} flex={1}>
           <Box position="relative">
             <Input
-              {...register("classHash", { required: true })}
-              autoFocus
+              {...classHashInputRest}
+              ref={(e) => {
+                ref(e)
+                inputRef.current = e
+              }}
               placeholder="Contract classhash"
               isInvalid={!isEmpty(errors.classHash)}
             />
@@ -233,6 +244,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
               <ErrorMessage message={errors.classHash.message ?? ""} />
             )
           )}
+          <SpacerCell />
 
           <Controller
             name="network"
@@ -241,7 +253,8 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
             defaultValue=""
             render={({ field: { onChange, name, value } }) => (
               <Select
-                placeholder="Network"
+                label="Network"
+                placeholder="Select network"
                 maxH="45vh"
                 name={name}
                 isInvalid={!isEmpty(errors.network)}
@@ -262,8 +275,9 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
             defaultValue=""
             render={({ field: { onChange, name, value } }) => (
               <Select
-                disabled={!currentNetwork}
-                placeholder="Account"
+                isDisabled={!currentNetwork}
+                label="Account"
+                placeholder="Select account"
                 emptyMessage="No accounts available on this network"
                 maxH="45vh"
                 name={name}
@@ -279,19 +293,24 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
           )}
 
           {fetchError && (
-            <Box mx="4">
-              <Alert backgroundColor="error.900" mt="6">
-                <P4 color="error.500">{fetchError}</P4>
-              </Alert>
-            </Box>
+            <>
+              <SpacerCell />
+              <Alert
+                icon={<AlertIcon />}
+                colorScheme={"error"}
+                description={fetchError}
+              />
+            </>
           )}
+          <SpacerCell />
+
           <DeploySmartContractParameters
             isLoading={isLoading}
             constructorParameters={parameterFields}
           />
           {children?.({ isDirty, isSubmitting })}
         </CellStack>
-      </form>
+      </chakra.form>
     </FormProvider>
   )
 }

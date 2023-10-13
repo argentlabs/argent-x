@@ -1,35 +1,24 @@
-import { ErrorMessage, Input, Select } from "@argent/ui"
-import { Box, Flex, Spinner } from "@chakra-ui/react"
+import { CellStack, ErrorMessage, P3, Select, SpacerCell } from "@argent/ui"
 import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { hash } from "starknet5"
+import { CompiledSierraCasm, hash, isSierra } from "starknet"
+import { chakra } from "@chakra-ui/react"
 
+import { readFileAsString } from "@argent/shared"
 import { accountService } from "../../../../shared/account/service"
+import { DeclareContract } from "../../../../shared/udc/type"
 import { useAppState } from "../../../app.state"
 import { declareContract } from "../../../services/udc.service"
+import { FileNameWithClassHash } from "./ui/ContractWithClassHash"
+import { FileInputButton } from "./ui/FileInputButton"
 import { useFormSelects } from "./useFormSelects"
 
 interface FieldValues {
+  contractJson: string
+  contractCasm: string
   account: string
-  classHash: string
-  contract: string
   network: string
-}
-
-const readFileAsString = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (reader.result) {
-        return resolve(reader.result?.toString())
-      }
-      return reject(new Error("Could not read file"))
-    }
-    reader.onerror = reject
-    reader.onabort = reject.bind(null, new Error("User aborted"))
-    reader.readAsText(file)
-  })
 }
 
 interface DeclareSmartContractFormProps {
@@ -41,9 +30,16 @@ interface DeclareSmartContractFormProps {
   }) => ReactNode
 }
 
-const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
+/** TODO: refactor into container pattern and extract logic into service(s) */
+
+export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   children,
 }) => {
+  const contractJsonRef = useRef<string | null>(null)
+  const contractJsonFileInputRef = useRef<HTMLInputElement | null>(null)
+  const contractCasmRef = useRef<CompiledSierraCasm | null>(null)
+  const contractCasmFileInputRef = useRef<HTMLInputElement | null>(null)
+
   const {
     control,
     formState,
@@ -58,139 +54,235 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
   const { errors, isDirty, isSubmitting } = formState
   const selectedNetwork = watch("network")
 
-  const [contractJSON, setContractJSON] = useState("")
+  const { accountOptions, networkOptions } = useFormSelects(selectedNetwork)
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const { accounts, accountOptions, networkOptions } =
-    useFormSelects(selectedNetwork)
-
-  const [contractClassHashLoading, setContractClassHashLoading] =
+  const [contractClassHash, setContractClassHash] = useState<string | null>(
+    null,
+  )
+  const [contractClassHashIsLoading, setContractClassHashIsLoading] =
     useState(false)
-  const [contractClassHashComputed, setContractClassHashComputed] =
+  const [contractJsonIsSierra, setContractJsonIsSierra] = useState<
+    boolean | null
+  >(null)
+  const [contractCasmClassHash, setContractCasmClassHash] = useState<
+    string | null
+  >(null)
+  const [contractCasmClassHashIsLoading, setContractCasmClassHashIsLoading] =
     useState(false)
 
-  const uploadFile = useCallback(async () => {
-    setContractClassHashComputed(false)
-    setContractClassHashLoading(true)
-
-    const file = fileInputRef.current?.files?.[0]
-
-    if (file) {
-      setValue("contract", (file as File).name)
-      clearErrors("contract")
-      try {
-        const contractContent = await readFileAsString(file)
-        setContractJSON(contractContent)
-
-        const classHash = hash.computeContractClassHash(contractContent)
-        setValue("classHash", classHash)
-
-        setContractClassHashComputed(true)
-      } catch (error) {
-        setError("contract", {
-          type: "invalid",
-          message: "Invalid JSON file",
-        })
-        setValue("classHash", "")
-      }
+  const onChangeContractJson = useCallback(async () => {
+    const file = contractJsonFileInputRef.current?.files?.[0]
+    if (!file) {
+      return
     }
+    try {
+      setContractClassHashIsLoading(true)
 
-    setContractClassHashLoading(false)
+      setValue("contractJson", file.name)
+      clearErrors("contractJson")
+      setValue("contractCasm", "")
+      clearErrors("contractCasm")
+
+      setContractJsonIsSierra(null)
+      setContractClassHash(null)
+      setContractCasmClassHash(null)
+      contractJsonRef.current = null
+      contractCasmRef.current = null
+
+      const contractContent = await readFileAsString(file)
+      contractJsonRef.current = contractContent
+
+      setContractJsonIsSierra(isSierra(contractContent))
+
+      const classHash = hash.computeContractClassHash(contractContent)
+      setContractClassHash(classHash)
+    } catch (error) {
+      setContractClassHash(null)
+      setError("contractJson", {
+        type: "invalid",
+        message: "Invalid JSON file",
+      })
+    } finally {
+      setContractClassHashIsLoading(false)
+    }
+  }, [clearErrors, setError, setValue])
+
+  const onChangeContractCasm = useCallback(async () => {
+    const file = contractCasmFileInputRef.current?.files?.[0]
+    if (!file) {
+      return
+    }
+    try {
+      setContractCasmClassHashIsLoading(true)
+
+      setValue("contractCasm", file.name)
+      clearErrors("contractCasm")
+      setContractCasmClassHash(null)
+
+      contractCasmRef.current = null
+
+      const contractContent = await readFileAsString(file)
+
+      const contractContentJson = JSON.parse(contractContent)
+      const contractCasmClassHash =
+        hash.computeCompiledClassHash(contractContentJson)
+      if (!contractCasmClassHash) {
+        throw new Error("Invalid casm")
+      }
+      contractCasmRef.current = contractContentJson
+
+      setContractCasmClassHash(contractCasmClassHash)
+    } catch (error) {
+      setError("contractCasm", {
+        type: "invalid",
+        message: "Invalid JSON file",
+      })
+    } finally {
+      setContractCasmClassHashIsLoading(false)
+    }
   }, [clearErrors, setError, setValue])
 
   const onSubmit: SubmitHandler<FieldValues> = async ({
     account,
-    classHash,
     network,
   }: FieldValues) => {
+    if (!contractClassHash) {
+      return
+    }
+    if (!contractJsonRef.current) {
+      return
+    }
     useAppState.setState({ switcherNetworkId: network })
     await accountService.select({
       address: account,
       networkId: network,
     })
-    await declareContract(account, classHash, contractJSON, network)
+    const payload: DeclareContract = {
+      address: account,
+      contract: contractJsonRef.current,
+      networkId: network,
+      classHash: contractClassHash,
+    }
+    if (contractJsonIsSierra) {
+      if (!contractCasmClassHash) {
+        throw new Error("Contract casm class hash is missing")
+      }
+      // can supply either the casm file or its compiledClassHash here
+      // payload.casm = contractCasmRef.current
+      payload.compiledClassHash = contractCasmClassHash
+    }
+
+    await declareContract(payload)
     clearErrors()
   }
 
+  const hasContractJsonError = Boolean(errors.contractJson)
+  const hasContractCasmError = Boolean(errors.contractCasm)
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Flex direction="column" mx="4" gap={1}>
+    <chakra.form
+      display={"flex"}
+      flexDirection={"column"}
+      flex={1}
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <CellStack pt={0} flex={1}>
         <Controller
-          name="contract"
+          name="contractJson"
           control={control}
           rules={{
             required: true,
             validate: () =>
-              !(errors.contract?.type === "invalid") || "Invalid JSON file",
+              !(errors.contractJson?.type === "invalid") || "Invalid JSON file",
           }}
           defaultValue=""
           render={({ field: { ref, value, onChange, ...inputProps } }) => (
             <>
               <input
+                ref={contractJsonFileInputRef}
                 type="file"
                 accept="application/json"
-                ref={fileInputRef}
                 {...inputProps}
-                onChange={uploadFile}
+                onChange={() => void onChangeContractJson()}
                 style={{ display: "none" }}
-              ></input>
-              <Input
-                _placeholder={{ color: "white" }}
-                placeholder={value || "Click to upload contract JSON"}
-                isInvalid={!isEmpty(errors.contract)}
-                onClick={() => fileInputRef?.current?.click()}
-                cursor="pointer"
-                readOnly
               />
+              <FileInputButton
+                value={value}
+                isInvalid={hasContractJsonError}
+                isLoading={contractClassHashIsLoading}
+                onClick={() => contractJsonFileInputRef?.current?.click()}
+              >
+                {value ? (
+                  <FileNameWithClassHash
+                    fileName={value}
+                    classHash={contractClassHash}
+                  />
+                ) : (
+                  <P3>Click to upload contract JSON</P3>
+                )}
+              </FileInputButton>
             </>
           )}
         />
-        {!isEmpty(errors.contract) && (
+        {errors.contractJson && (
           <ErrorMessage
             message={
-              errors.contract.type === "required"
+              errors.contractJson.type === "required"
                 ? "A contract is required"
                 : "Invalid contract file"
             }
           />
         )}
-
-        <Box position="relative">
+        {contractJsonIsSierra && (
           <Controller
-            name="classHash"
+            name="contractCasm"
             control={control}
-            rules={{ required: true }}
+            rules={{
+              required: true,
+              validate: () =>
+                !(errors.contractCasm?.type === "invalid") ||
+                "Invalid JSON file",
+            }}
             defaultValue=""
-            render={({ field: { ref, ...field } }) => (
-              <Input
-                readOnly={contractClassHashComputed}
-                disabled={contractClassHashLoading}
-                placeholder="Contract classhash"
-                {...field}
-                isInvalid={!isEmpty(errors.classHash)}
-              />
+            render={({ field: { ref, value, onChange, ...inputProps } }) => (
+              <>
+                <input
+                  ref={contractCasmFileInputRef}
+                  type="file"
+                  accept="application/json"
+                  {...inputProps}
+                  onChange={() => void onChangeContractCasm()}
+                  style={{ display: "none" }}
+                />
+                <FileInputButton
+                  value={value}
+                  isInvalid={hasContractCasmError}
+                  isLoading={contractCasmClassHashIsLoading}
+                  onClick={() => contractCasmFileInputRef?.current?.click()}
+                >
+                  {value ? (
+                    <FileNameWithClassHash
+                      fileName={value}
+                      classHash={contractCasmClassHash}
+                    />
+                  ) : (
+                    <P3>Click to upload casm JSON</P3>
+                  )}
+                </FileInputButton>
+              </>
             )}
           />
-          {contractClassHashLoading && (
-            <Box
-              position="absolute"
-              top="0"
-              right="0"
-              bottom="0"
-              left="0"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              backdropFilter="blur(2px)"
-              borderRadius="lg"
-            >
-              <Spinner size="sm" />
-            </Box>
-          )}
-        </Box>
-        {!isEmpty(errors.classHash) && (
-          <ErrorMessage message="Classhash is required" />
         )}
+        {errors.contractCasm && (
+          <ErrorMessage
+            message={
+              errors.contractCasm.type === "required"
+                ? "A contract is required"
+                : "Invalid casm file"
+            }
+          />
+        )}
+        <SpacerCell />
 
         <Controller
           name="network"
@@ -199,7 +291,8 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           defaultValue=""
           render={({ field: { onChange, name, value } }) => (
             <Select
-              placeholder="Network"
+              label="Network"
+              placeholder="Select network"
               maxH="45vh"
               name={name}
               isInvalid={!isEmpty(errors.network)}
@@ -220,8 +313,9 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
           defaultValue=""
           render={({ field: { onChange, name, value } }) => (
             <Select
-              disabled={!selectedNetwork}
-              placeholder="Account"
+              isDisabled={!selectedNetwork}
+              label="Account"
+              placeholder="Select account"
               emptyMessage="No accounts available on this network"
               maxH="33vh"
               name={name}
@@ -239,12 +333,10 @@ const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
         {children?.({
           isDirty,
           isSubmitting,
-          isBusy: contractClassHashLoading,
-          hasInvalidFile: !isEmpty(errors.contract),
+          isBusy: contractClassHashIsLoading,
+          hasInvalidFile: !isEmpty(errors.contractJson),
         })}
-      </Flex>
-    </form>
+      </CellStack>
+    </chakra.form>
   )
 }
-
-export { DeclareSmartContractForm }

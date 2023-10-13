@@ -3,7 +3,6 @@
  *
  * This is used to match known transaction types in the transformer
  */
-
 import { IExplorerTransaction } from "../../../../../shared/explorer/type"
 
 export const getPreExecutionEventNames = (
@@ -20,7 +19,11 @@ export const getPreExecutionEventNames = (
   if (Array.isArray(explorerTransaction.events)) {
     events = []
     for (const event of explorerTransaction.events) {
-      if (event.name === "transaction_executed") {
+      if (
+        !event.name ||
+        event.name === "transaction_executed" ||
+        event.name === "TransactionExecuted"
+      ) {
         break
       }
       events.push(event.name)

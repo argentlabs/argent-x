@@ -1,25 +1,24 @@
-import { ec } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import {
   getNextPathIndex,
   getStarkPair,
-  grindKey,
   pathHash,
+  grindKey,
 } from "../src/background/keys/keyDerivation"
-import { baseDerivationPath } from "../src/shared/wallet.service"
+import { STANDARD_DERIVATION_PATH } from "../src/shared/wallet.service"
 
 test("generate Stark Pair", () => {
   const secret =
     "0xe6904d63affe7a13cd30345b000c9b1ffc087832332d7303cf237ffda8a177d0"
 
-  const starkPair5 = getStarkPair(5, secret, baseDerivationPath)
-  expect(ec.getStarkKey(starkPair5)).toBe(
+  const starkPair5 = getStarkPair(5, secret, STANDARD_DERIVATION_PATH)
+  expect(starkPair5.pubKey).toBe(
     "0x05c7c65bfda7a85af0681c85c9c440f0aa6825feef6f9c96e55fb2ce08c8d4bc",
   )
 
-  const starkPair7 = getStarkPair(7, secret, baseDerivationPath)
-  expect(ec.getStarkKey(starkPair7)).toBe(
+  const starkPair7 = getStarkPair(7, secret, STANDARD_DERIVATION_PATH)
+  expect(starkPair7.pubKey).toBe(
     "0x0605d5a0ece3b316f0d72221228acb7f01dcb34db74e0c02790db156741f5a86",
   )
 })
@@ -44,7 +43,7 @@ describe("getNextPathIndex", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/1", "m/44'/9004'/0'/0/2"],
-        baseDerivationPath,
+        STANDARD_DERIVATION_PATH,
       ),
     ).toBe(3)
   })
@@ -53,7 +52,7 @@ describe("getNextPathIndex", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/1", "m/44'/9004'/0'/0/3"],
-        baseDerivationPath,
+        STANDARD_DERIVATION_PATH,
       ),
     ).toBe(2)
   })
@@ -62,7 +61,7 @@ describe("getNextPathIndex", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/4", "m/44'/9004'/0'/0/11"],
-        baseDerivationPath,
+        STANDARD_DERIVATION_PATH,
       ),
     ).toBe(1)
   })
@@ -71,7 +70,7 @@ describe("getNextPathIndex", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/3", "m/44'/9004'/0'/0/1"],
-        baseDerivationPath,
+        STANDARD_DERIVATION_PATH,
       ),
     ).toBe(0)
   })
@@ -83,7 +82,7 @@ describe("getNextPathIndex", () => {
           "m/2645'/1195502025'/1148870696'/0'/0'/0",
           "m/2645'/1195502025'/1148870696'/0'/0'/1",
         ],
-        baseDerivationPath,
+        STANDARD_DERIVATION_PATH,
       ),
     ).toBe(0)
   })
@@ -104,6 +103,6 @@ describe("getNextPathIndex", () => {
   })
 
   test("empty array", () => {
-    expect(getNextPathIndex([], baseDerivationPath)).toBe(0)
+    expect(getNextPathIndex([], STANDARD_DERIVATION_PATH)).toBe(0)
   })
 })

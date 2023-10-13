@@ -1,7 +1,6 @@
 import { AlertButton } from "@argent/ui"
 import { icons } from "@argent/ui"
 import { Spinner } from "@chakra-ui/react"
-import { BigNumber } from "ethers"
 import { FC, useCallback, useMemo } from "react"
 
 import { accountService } from "../../../shared/account/service"
@@ -12,13 +11,16 @@ const { MultisigIcon } = icons
 
 export const MultisigBanner: FC<{
   multisig: Multisig
-  feeTokenBalance?: BigNumber
+  feeTokenBalance?: bigint
 }> = ({ multisig, feeTokenBalance }) => {
   const isMultisigDeploying = useIsMultisigDeploying(multisig)
 
   const showActivateMultisigBanner = useMemo(
     () =>
-      !isMultisigDeploying && multisig.needsDeploy && feeTokenBalance?.gt(0),
+      !isMultisigDeploying &&
+      multisig.needsDeploy &&
+      feeTokenBalance &&
+      feeTokenBalance > 0n,
     [feeTokenBalance, isMultisigDeploying, multisig.needsDeploy],
   )
 
@@ -46,8 +48,8 @@ export const MultisigBanner: FC<{
     return (
       <AlertButton
         colorScheme={"warning"}
-        title={"Deploying multisig"}
-        description="Waiting for the multisig to be deployed"
+        title="Activating multisig"
+        description="Waiting for the multisig to be activated"
         size="lg"
         icon={<Spinner />}
       />

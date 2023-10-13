@@ -9,6 +9,7 @@ interface CopyTooltipProps extends PropsWithChildren {
   prompt?: string
   message?: string
   autoDismiss?: boolean
+  onClick?: () => void
 }
 
 export const CopyTooltip: FC<CopyTooltipProps> = ({
@@ -17,6 +18,7 @@ export const CopyTooltip: FC<CopyTooltipProps> = ({
   message = "Copied",
   autoDismiss = true,
   children,
+  onClick,
 }) => {
   const [visible, setVisible] = useState(false)
   const timeoutIdRef = useRef<ReturnType<typeof setTimeout>>()
@@ -33,14 +35,15 @@ export const CopyTooltip: FC<CopyTooltipProps> = ({
   }, [autoDismiss, visible])
 
   return (
-    <>
-      <Tooltip label={visible ? message : prompt} isOpen={visible || undefined}>
-        <Box ref={clickOutsideRef}>
+    <Tooltip label={visible ? message : prompt} isOpen={visible || undefined}>
+      <Box ref={clickOutsideRef}>
+        {!onClick && (
           <CopyToClipboard text={copyValue} onCopy={() => setVisible(true)}>
             {children}
           </CopyToClipboard>
-        </Box>
-      </Tooltip>
-    </>
+        )}
+        {onClick && <Box onClick={onClick}>{children}</Box>}
+      </Box>
+    </Tooltip>
   )
 }

@@ -1,6 +1,5 @@
-import { BigNumber } from "ethers"
 import { useMemo } from "react"
-import { stark } from "starknet"
+import { CallData } from "starknet"
 
 import { TokenWithBalance } from "../tokens/token"
 import { getUint256CalldataFromBN } from "../utils/parseAmount"
@@ -16,9 +15,9 @@ const useMaxAmountTransaction = (
             {
               contractAddress: token.address,
               entrypoint: "transfer",
-              calldata: stark.compileCalldata({
+              calldata: CallData.compile({
                 recipient,
-                amount: getUint256CalldataFromBN(BigNumber.from(token.balance)),
+                amount: getUint256CalldataFromBN(token.balance),
               }),
             },
           ]

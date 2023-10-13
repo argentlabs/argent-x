@@ -24,7 +24,7 @@ export default class Activity extends Navigation {
 
   checkActivity(nbr: number) {
     return Promise.all([
-      this.menuPendingTransationsIndicator.click(),
+      this.menuPendingTransactionsIndicator.click(),
       this.ensurePendingTransactions(nbr),
     ])
   }

@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "Esnext",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "module": "commonjs",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "noImplicitAny": true,
@@ -13,7 +13,8 @@
     "inlineSources": true,
     "inlineSourceMap": true,
     "composite": true,
-    "types": ["node"]
+    "types": ["node"],
+    "noEmit": true
   },
   "include": ["**/src"],
   "exclude": ["node_modules"]

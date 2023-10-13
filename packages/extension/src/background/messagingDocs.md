@@ -1,147 +1,70 @@
 # Messaging
 
-Direct communication from frontend and background service is not allowed and it's done through `messages`.
+Direct communication from frontend and background service is not allowed and it's done through `messages`. We use [trpc](https://trpc.io/) alongside the [trpc-chrome](https://github.com/jlalmes/trpc-chrome) dependency to make these messages type-safe and keep the architecture clean and modular.
 
-The React component will call a function defined into a `service` first (located in `/src/ui/services`)
+## Mutations / writes
 
 ```js
 const Component = () => {
-useEffect(() => {
-	serviceFunction(argument)
-}, [])
-
-const onClick = () => {
-	serviceFunction2(argument)
-}
-
-return <button onClick={onClick} />
-}
-```
-
-The service called will then send the messages to communicate with the background service with the use of `sendMessage`.
-
-The service will then need to wait for the response (that's another message) using `waitForMessage`.
-
-```js
-const serviceFunction = async () => {
-    sendMessage({type: "A_MESSAGE", data: { param: "param"}})
-    try {
-    await Promise.race([
-      waitForMessage("A_MESSAGE_RES"), // background OK response
-      waitForMessage("A_MESSAGE_REJ").then(() => { // background FAILURE response
-        throw new Error("Rejected")
-      }),
-    ])
-  } catch {
-    throw Error("Could not declare contract")
+  const onClick = () => {
+    someService.doSomethingInTheBackground(argument)
   }
+
+  return <button onClick={onClick} />
 }
 ```
 
-These messages will be then managed by messaging handlers. When a new handler is added, in order to be handled, it need to be added to the `messageStream` in `/src/background/index.ts`
-
-When the service send a message, the handler will will check the `type` of the message and, if there is a match, it will execute the related code.
-
-- Handlers are located in `/src/background/aMessaging.ts`.
-- Message types: `/src/shared/messages`
-- Action queue types `/src/shared/actionQueue`
+We usually recommend using trpc `mutations` to cover this message flow.
 
 ```js
-export const handleAMessaging: HandleMessage<AMessage> = async ({
-  msg,
-  background,
-  respond,
-}) => {
-  const { actionQueue, wallet } = background
-  const { type } = msg
-
-  switch (type) {
-    case "A_MESSAGE": {
-      const { data } = msg
-      const { address, networkId, classHash, contract } = data
-      await wallet.selectAccount({ address, networkId })
-
-        /* This is not mandatory, depends if an action is needed */
-      const action = await actionQueue.push({
-        type: "ACTION_TYPE",
-        payload: {},
-      })
-
-      try {
-        await doSomething()
-      } catch {
-        return respond({
-        type: "A_MESSAGE_REJ",
-        data: {
-          actionHash: action.meta.hash,
-        },
-      })
-      }
-
-      return respond({
-        type: "A_MESSAGE_RES",
-        data: {
-          actionHash: action.meta.hash,
-        },
-      })
+import { messageClient } from "...."
+class SomeService implements ISomeService {
+  async doSomethingInTheBackground() {
+    try {
+      messageClient.someBackgroundService.doSomething.mutate()
+    } catch (e) {
+      throw Error(`doSomethingInTheBackground failed with: ${e}`)
     }
   }
-
-  throw new UnhandledMessage()
 }
 ```
 
-Actions messages are handled in the same way and defined in `/src/background/actionHandlers.ts`.
+These messages will be then managed by the correct router in the background. `router.ts` is where the different routers are implemented. We have one router for each service and we try to inject dependencies into trpc rather than import them in the `procedures`.
 
-Action message types are defined into `/src/shared/actionQueue/types.ts`
+Once routed, this message lands with its payload in the correct procedure, in this case we would have `doSomethingProcedure` that is mapped to `doSomething`.
 
-### messaging flows
+#### Make sure to preserve separation of concerns between the UI and the background. Utils that can be used by both should be in shared, everything else should live in the right folder.
 
-Basic messaging flow
+Each procedure then acts in a similar way to a middleware, doing the following:
 
-```mermaid
+- Input and output validation with zod
+- Dependency injection
+- Service calls
 
-sequenceDiagram
-Frontend->> Service: request method
+Use background services in the procedures rather than having the logic there directly
 
-Service ->> Background: sendMessage({ type, payload})
-Service ->> Service: Promise.race([ waitForMessage(msgOK), waitForMessage(msgFail) ])
-
-Background ->> Background: execute
-
-Background ->> Service: respond({type, payload})
-
-Service ->> Service: resolve Promise.race
-
-Service ->> Frontend: send data (or empty)
-
-
+```js
+export const doSomethingProcedure = extensionOnlyProcedure
+  .input(myInputValidationSchema)
+  .ouput(myOutputValidationSchema)
+  .mutation(
+    async ({
+      input,
+      ctx: {
+        // these are the injected services if necessary
+        services
+      }
+    }) => {
+      try {
+        const result = await backgroundService.doSomething(input)
+        return result
+      } catch (e) {
+        throw new Error(
+          `Something failed in doSomethingProcedure: ${e}`
+        )
+      }
+    }
+  )
 ```
 
-action queue types `/src/shared/actionQueue`
-
-With action queue flow
-
-```mermaid
-
-sequenceDiagram
-Frontend->> Service: request method
-
-Service ->> Background: sendMessage({ type, payload})
-Service ->> Service: Promise.race([ waitForMessage(msgOK), waitForMessage(msgFail) ])
-
-Background ->> Background: push actionQueue
-Note right of Background: action is saved into store and used by AppRoute
-
-Background ->> Service: respond({type, data: actionHash})
-Service ->> Service: resolve Promise.race
-Service ->> Frontend: send data (or empty)
-
-AppRoute ->> ActionScreen: display actionHash screen (based on type)
-
-ActionScreen ->> ActionScreen: user perform action
-ActionScreen ->> Background-ActionHandlers: perform action with OK/KO result
-Background-ActionHandlers ->> ActionScreen: updateApp state or reroute based on result
-
-
-```
+#### ⚠️ Important: the messaging system should be used primarily to mutate data. When reading reading data, the general rule of thumb is to first rely on the shared storage between background and UI, and only if necessary rely on trpc `queries`.

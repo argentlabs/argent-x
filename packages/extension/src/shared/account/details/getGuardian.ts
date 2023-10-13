@@ -1,9 +1,8 @@
-import { Call, constants, number, uint256 } from "starknet"
+import { Call, constants, num } from "starknet"
 
 import { getMulticallForNetwork } from "../../multicall"
-import { getNetwork } from "../../network"
+import { networkService } from "../../network/service"
 import { BaseWalletAccount } from "../../wallet.model"
-import { getIsCurrentImplementation } from "./getImplementation"
 
 /**
  * Get guardian address of account, or undefined if getGuardian returns `0x0` or account is not current implementation
@@ -12,28 +11,23 @@ import { getIsCurrentImplementation } from "./getImplementation"
 export const getGuardianForAccount = async (
   account: BaseWalletAccount,
 ): Promise<string | undefined> => {
-  /**
-   * Skip older implementations which may use 'get_guardian'
-   */
-  const isCurrent = await getIsCurrentImplementation(account)
-  if (!isCurrent) {
-    return
-  }
-  const network = await getNetwork(account.networkId)
+  const network = await networkService.getById(account.networkId)
+  // Prioritize Cairo 1 get_guardian over cairo 0 get_guardian
   const call: Call = {
     contractAddress: account.address,
-    entrypoint: "getGuardian",
+    entrypoint: "get_guardian",
   }
   const multicall = getMulticallForNetwork(network)
-  const response = await multicall.call(call)
-  return shapeResponse(response)
-}
+  let response: string[] = []
 
-const shapeResponse = (response: string[]) => {
-  const [low, high] = response
-  const guardian = uint256.uint256ToBN({ low, high })
-  if (guardian.eq(constants.ZERO)) {
-    return
+  try {
+    response = await multicall.call(call)
+  } catch {
+    call.entrypoint = "getGuardian"
+    response = await multicall.call(call)
   }
-  return number.toHexString(guardian)
+  // if guardian is 0, return undefined
+  return num.toHex(response[0]) === num.toHex(constants.ZERO)
+    ? undefined
+    : response[0]
 }

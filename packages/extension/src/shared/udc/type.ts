@@ -3,12 +3,10 @@ import type {
   UniversalDeployerContractPayload,
 } from "starknet"
 
-export type DeclareContract =
-  | ({
-      address: string
-      networkId: string
-    } & DeclareContractPayload)
-  | DeclareContractPayload
+export type DeclareContract = {
+  address?: string
+  networkId?: string
+} & DeclareContractPayload
 
 export type DeployContract = {
   address: string

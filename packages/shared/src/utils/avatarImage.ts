@@ -1,8 +1,8 @@
 import { ethers } from "ethers"
 import { isString, upperCase } from "lodash-es"
-import { number } from "starknet"
+import { num } from "starknet"
 
-const { toBN } = number
+const { toBigInt } = num
 
 export const getInitials = (name: string, alphanumeric = false) => {
   if (!isString(name)) {
@@ -65,7 +65,7 @@ export const getColor = (name: string) => {
 
 export const stripAddressZeroPadding = (accountAddress: string) => {
   try {
-    return number.toHex(toBN(number.hexToDecimalString(accountAddress)))
+    return num.toHex(toBigInt(num.hexToDecimalString(accountAddress)))
   } catch {
     // ignore parsing errors
   }

@@ -9,7 +9,7 @@ import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
 import {
   addWalletChangeListener,
-  chainId,
+  getChainId,
   connectWallet,
   removeWalletChangeListener,
   silentConnectWallet,
@@ -27,7 +27,8 @@ const Home: NextPage = () => {
     const handler = async () => {
       const wallet = await silentConnectWallet()
       setAddress(wallet?.selectedAddress)
-      setChain(chainId(wallet?.provider as any))
+      const chainId = await getChainId(wallet?.provider as any)
+      setChain(chainId)
       setConnected(!!wallet?.isConnected)
       if (wallet?.account) {
         setAccount(wallet.account as any)
@@ -66,7 +67,8 @@ const Home: NextPage = () => {
       async () => {
         const wallet = await connectWallet(enableWebWallet)
         setAddress(wallet?.selectedAddress)
-        setChain(chainId(wallet?.provider as any))
+        const chainId = await getChainId(wallet?.provider as any)
+        setChain(chainId)
         setConnected(!!wallet?.isConnected)
         if (wallet?.account) {
           setAccount(wallet.account as any)

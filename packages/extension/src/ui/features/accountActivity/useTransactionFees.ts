@@ -12,13 +12,20 @@ export const useTransactionFees = ({
   transactionTransformed: TransformedTransaction
   hash?: string
 }) => {
-  const getFeeFromStarknetJs = async () => {
+  const getFeeFromStarknetJs = async (hash?: string) => {
+    if (!hash) {
+      return
+    }
     const receipt = await getProvider(network).getTransactionReceipt(hash)
-    return transactionTransformed.actualFee ?? receipt.actual_fee
+
+    const transactionFees =
+      "actual_fee" in receipt ? receipt.actual_fee : undefined
+
+    return transactionTransformed.actualFee ?? transactionFees
   }
 
   const { data: txFee } = useSWR(
-    [hash, network, transactionTransformed.actualFee],
+    [hash, network.id, transactionTransformed.actualFee, "fee"],
     getFeeFromStarknetJs,
   )
 

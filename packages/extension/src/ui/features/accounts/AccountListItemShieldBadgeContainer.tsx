@@ -1,7 +1,7 @@
 import { FC } from "react"
 
 import { useLiveAccountEscape } from "../shield/escape/useAccountEscape"
-import { AccountListItemProps } from "./AccountListItem"
+import { AccountListItemProps } from "./accountListItem.model"
 import { AccountListItemShieldBadge } from "./AccountListItemShieldBadge"
 import { useAccount } from "./accounts.state"
 

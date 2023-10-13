@@ -1,13 +1,16 @@
 const path = require("path")
+const fs = require("fs")
 const HtmlWebPackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
-const { DefinePlugin, ProvidePlugin } = require("webpack")
-const Dotenv = require("dotenv-webpack")
+const {
+  DefinePlugin,
+  ProvidePlugin,
+  SourceMapDevToolPlugin,
+} = require("webpack")
+const DotenvWebPack = require("dotenv-webpack")
+const dotenv = require("dotenv")
 const { EsbuildPlugin } = require("esbuild-loader")
-
-const ESLintPlugin = require("eslint-webpack-plugin")
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin")
-const SentryWebpackPlugin = require("@sentry/webpack-plugin")
 const manifestV2 = require("./manifest/v2.json")
 const manifestV3 = require("./manifest/v3.json")
 
@@ -20,6 +23,23 @@ const htmlPlugin = new HtmlWebPackPlugin({
 const isProd = process.env.NODE_ENV === "production"
 const useManifestV3 = process.env.MANIFEST_VERSION === "v3"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
+function safeGetCommitHash() {
+  const dotenvPath = path.resolve(__dirname, ".env")
+  if (fs.existsSync(dotenvPath)) {
+    const dotenvRaw = fs.readFileSync(dotenvPath, "utf8")
+    const config = dotenv.parse(dotenvRaw)
+    if ("COMMIT_HASH_OVERRIDE" in config) {
+      return config.COMMIT_HASH_OVERRIDE
+    }
+  }
+  try {
+    const hash = require("child_process").execSync("git rev-parse HEAD")
+    return hash.toString().trim()
+  } catch (e) {
+    return "unknown"
+  }
+}
+const commitHash = safeGetCommitHash()
 
 if (safeEnvVars) {
   console.log("Safe env vars enabled")
@@ -38,7 +58,6 @@ module.exports = {
   performance: {
     hints: false,
   },
-  devtool: isProd ? "source-map" : "inline-source-map",
   mode: isProd ? "production" : "development",
   module: {
     rules: [
@@ -67,6 +86,7 @@ module.exports = {
         loader: "esbuild-loader",
         options: {
           pure: isProd ? ["console.log"] : [],
+          target: "es2020",
         },
       },
     ],
@@ -87,26 +107,27 @@ module.exports = {
       "process.env.VERSION": JSON.stringify(
         useManifestV3 ? manifestV3.version : manifestV2.version, // doesn't matter much, but why not
       ),
+      "process.env.COMMIT_HASH": JSON.stringify(commitHash),
     }),
     new ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
       React: "react",
     }),
 
-    !isProd && // eslint should run before the build starts
-      new ESLintPlugin({
-        extensions: ["ts", "tsx"],
-        fix: true,
-        threads: true,
-      }),
+    isProd &&
+      new SourceMapDevToolPlugin({
+        filename: "../sourcemaps/[file].map",
+        append: `\n//# sourceMappingURL=[file].map`,
+      }), // For development, we use the devtool option instead
 
     new ForkTsCheckerWebpackPlugin(), // does the type checking in a separate process (non-blocking in dev) as esbuild is skipping type checking
 
-    new Dotenv({
+    new DotenvWebPack({
       systemvars: true,
       safe: safeEnvVars,
     }),
   ].filter(Boolean),
+  devtool: isProd ? false : "inline-cheap-module-source-map",
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     fallback: { buffer: require.resolve("buffer/") },
@@ -120,6 +141,7 @@ module.exports = {
         minimizer: [
           new EsbuildPlugin({
             loader: "tsx",
+            target: "es2020",
           }),
         ],
         splitChunks: {
@@ -132,6 +154,5 @@ module.exports = {
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "dist"),
-    sourceMapFilename: "../sourcemaps/[file].map",
   },
 }

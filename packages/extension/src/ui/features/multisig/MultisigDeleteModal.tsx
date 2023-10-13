@@ -36,7 +36,7 @@ export const MultisigHideModal: FC<MultisigHideModalProps> = ({
             {multisigType === "pending" && (
               <>
                 The multisig owner can still add you to the multisig if you
-                shared your signer key with them
+                shared your signer pubkey with them
               </>
             )}
             {multisigType === "active" && (

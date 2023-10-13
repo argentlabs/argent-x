@@ -1,14 +1,16 @@
-import CurrencyConversionNumber from "bignumber.js"
-import { BigNumber, BigNumberish, utils } from "ethers"
-import { uint256 } from "starknet"
+import { uint256, BigNumberish } from "starknet"
 
-import { TokenDetailsWithBalance } from "../../ui/features/accountTokens/tokens.state"
 import {
   isNumeric,
   prettifyCurrencyNumber,
   prettifyTokenNumber,
 } from "../utils/number"
-import { BaseToken } from "./type"
+import { bigDecimal } from "@argent/shared"
+import { TokenPriceDetails } from "./__new/types/tokenPrice.model"
+import { BaseToken, Token } from "./__new/types/token.model"
+import { equalToken } from "./__new/utils"
+import { TokenWithOptionalBigIntBalance } from "./__new/types/tokenBalance.model"
+import { isArray, isUndefined } from "lodash-es"
 
 const { UINT_256_MAX } = uint256
 
@@ -40,9 +42,9 @@ export interface ILookupTokenPriceDetails {
   /** the token to query */
   token: BaseToken
   /** reponse from `/tokens/prices` endpoint */
-  pricesData: ApiPriceDataResponse
+  pricesData: TokenPriceDetails[] | undefined
   /** reponse from `/tokens/info` endpoint */
-  tokenData: ApiTokenDataResponse
+  tokenData: Token[] | undefined
 }
 
 /**
@@ -50,33 +52,38 @@ export interface ILookupTokenPriceDetails {
  */
 
 export const lookupTokenPriceDetails = ({
-  token,
+  token: baseToken,
   pricesData,
   tokenData,
 }: ILookupTokenPriceDetails) => {
-  if (!tokenData?.tokens) {
+  if (
+    !tokenData ||
+    !isArray(tokenData) ||
+    !pricesData ||
+    !isArray(pricesData)
+  ) {
     return
   }
   /** find token from tokenData by matching address */
-  const tokenInPriceData = tokenData.tokens.find(
-    ({ address }) => address.toLowerCase() === token.address.toLowerCase(),
+  const tokenInPriceData = tokenData.find((token) =>
+    equalToken(baseToken, token),
   )
-  if (tokenInPriceData) {
-    /** find token price details from pricesData by matching priceId */
-    const priceDetails = pricesData.prices.find(
-      ({ pricingId }) => pricingId === tokenInPriceData.pricingId,
-    )
-    return priceDetails
+  if (!tokenInPriceData) {
+    return
   }
+  /** find token price details from pricesData by matching priceId */
+  return pricesData.find(
+    ({ pricingId }) => pricingId === tokenInPriceData.pricingId,
+  )
 }
 
 export interface ISumTokenBalancesToCurrencyValue {
   /** the tokens to sum */
-  tokens: TokenDetailsWithBalance[]
+  tokens: TokenWithOptionalBigIntBalance[]
   /** reponse from `/tokens/prices` endpoint */
-  pricesData: ApiPriceDataResponse
+  pricesData: TokenPriceDetails[]
   /** reponse from `/tokens/info` endpoint */
-  tokenData: ApiTokenDataResponse
+  tokenData: Token[]
 }
 
 export const sumTokenBalancesToCurrencyValue = ({
@@ -84,7 +91,7 @@ export const sumTokenBalancesToCurrencyValue = ({
   pricesData,
   tokenData,
 }: ISumTokenBalancesToCurrencyValue) => {
-  let sumTokenBalance = new CurrencyConversionNumber(0)
+  let sumTokenBalance = BigInt(0)
   let didGetValidConversion = false
   tokens.forEach((token) => {
     const priceDetails = lookupTokenPriceDetails({
@@ -92,9 +99,12 @@ export const sumTokenBalancesToCurrencyValue = ({
       pricesData,
       tokenData,
     })
-    if (!priceDetails || !token.balance || !token.decimals) {
-      // missing data - don't add it
-    } else {
+    if (
+      priceDetails &&
+      // 0n is considered false otherwise
+      !isUndefined(token.balance) &&
+      !isUndefined(token.decimals)
+    ) {
       const currencyValue = convertTokenAmountToCurrencyValue({
         amount: token.balance,
         decimals: token.decimals,
@@ -103,7 +113,8 @@ export const sumTokenBalancesToCurrencyValue = ({
       /** zero is a valid value here */
       if (currencyValue !== undefined) {
         didGetValidConversion = true
-        sumTokenBalance = sumTokenBalance.plus(currencyValue)
+        sumTokenBalance =
+          sumTokenBalance + bigDecimal.parseUnits(currencyValue, 6)
       }
     }
   })
@@ -112,7 +123,7 @@ export const sumTokenBalancesToCurrencyValue = ({
     return
   }
   /** keep as string to avoid loss of precision elsewhere */
-  return sumTokenBalance.toString()
+  return bigDecimal.formatUnits(sumTokenBalance, 6)
 }
 
 export interface IConvertTokenAmountToCurrencyValue {
@@ -140,19 +151,15 @@ export const convertTokenAmountToCurrencyValue = ({
   ) {
     return
   }
+
+  /** decimal is numeric, hence can be converted to Number */
   const decimalsNumber = Number(decimals)
-  /** amount to divide by to take amount to unit value */
-  const unitDivideBy = Math.pow(10, decimalsNumber)
-  /** take amount to unit value */
-  const amountDecimal = new CurrencyConversionNumber(
-    amount.toString(),
-  ).dividedBy(unitDivideBy)
+
   /** multiply to convert to currency */
-  const currencyValue = amountDecimal.multipliedBy(
-    new CurrencyConversionNumber(unitCurrencyValue),
-  )
+  const currencyValue =
+    BigInt(amount) * bigDecimal.parseUnits(unitCurrencyValue.toString(), 6)
   /** keep as string to avoid loss of precision elsewhere */
-  return currencyValue.toString()
+  return bigDecimal.formatUnits(currencyValue, decimalsNumber + 6)
 }
 
 /**
@@ -178,7 +185,7 @@ export const prettifyCurrencyValue = (
  */
 
 export const prettifyTokenBalance = (
-  token: TokenDetailsWithBalance,
+  token: TokenWithOptionalBigIntBalance,
   withSymbol = true,
 ) => {
   const { balance, decimals, symbol } = token
@@ -224,12 +231,12 @@ export const prettifyTokenAmount = ({
     prettyValue = unlimitedText
   } else {
     const decimalsNumber = Number(decimals)
-    const balanceBn = BigNumber.from(amount)
-    isPositiveValue = balanceBn.gt(0)
+    const balance = BigInt(amount)
+    isPositiveValue = balance > 0n
     const balanceFullString =
       decimalsNumber > 0
-        ? utils.formatUnits(balanceBn, decimalsNumber)
-        : balanceBn.toString()
+        ? bigDecimal.formatUnits(balance, decimalsNumber)
+        : balance.toString()
     prettyValue =
       decimalsNumber > 0
         ? prettifyTokenNumber(balanceFullString)
@@ -278,13 +285,10 @@ export const convertTokenUnitAmountWithDecimals = ({
   ) {
     return
   }
+
+  /** decimal is numeric, hence can be converted to Number */
   const decimalsNumber = Number(decimals)
-  /** amount to multipy by to take unit amount to token value */
-  const unitMultiplyBy = Math.pow(10, decimalsNumber)
-  /** take unit amount to token amount, enforcing integer */
-  const amount = new CurrencyConversionNumber(unitAmount.toString())
-    .multipliedBy(unitMultiplyBy)
-    .integerValue()
-  /** keep as string to avoid loss of precision elsewhere */
-  return amount.toString()
+
+  // keep as string to avoid loss of precision elsewhere
+  return bigDecimal.parseUnits(unitAmount.toString(), decimalsNumber).toString()
 }

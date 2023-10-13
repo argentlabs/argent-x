@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
-import { Escape } from "../../../../shared/account/details/getEscape"
+import { Escape } from "../../../../shared/account/details/escape.model"
 import { accountService } from "../../../../shared/account/service"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
 import { isNumeric } from "../../../../shared/utils/number"
@@ -12,7 +12,7 @@ import {
 } from "../../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { routes } from "../../../routes"
-import { withPolling } from "../../../services/swr"
+import { withPolling } from "../../../services/swr.service"
 import { allAccountsWithEscapeView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { useAccountTransactions } from "../../accounts/accountTransactions.state"
@@ -20,9 +20,6 @@ import {
   escapeWarningStore,
   getEscapeWarningStoreKey,
 } from "./escapeWarningStore"
-
-export const accountHasEscape = (account: WalletAccount) =>
-  Boolean(account.escape)
 
 const pluralise = (value: number, unit: string) => {
   return `${value} ${unit}${value === 1 ? "" : "s"}`

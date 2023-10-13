@@ -1,16 +1,21 @@
 import { describe, expect, it, vi } from "vitest"
 
-import { defaultNetwork } from "../../network/defaults"
+import { Network } from "../../network"
+import { defaultNetworks } from "../../network/defaults"
 import type { StoredWalletAccount, WalletAccount } from "../../wallet.model"
-import { deserialize, serialize } from "./serialize"
+import { deserializeFactory, migrateAccount, serialize } from "./serialize"
+
+const defaultNetwork = defaultNetworks[1]
 
 // Mock getNetwork function
-vi.mock("../../network", () => ({
-  getNetwork: vi.fn((networkId) => {
-    expect(networkId).toEqual("goerli-alpha")
-    return Promise.resolve(defaultNetwork)
-  }),
-}))
+const getNetwork = vi.fn(async (networkId): Promise<Network> => {
+  if (networkId !== defaultNetwork.id) {
+    return undefined as unknown as Network
+  }
+  return defaultNetwork
+})
+
+const deserialize = deserializeFactory(getNetwork)
 
 const mockAccounts: WalletAccount[] = [
   {
@@ -42,5 +47,38 @@ describe("Wallet Account Serialization and Deserialization", () => {
   it("Should correctly deserialize stored wallet accounts", async () => {
     const deserializedAccounts = await deserialize(mockStoredAccounts)
     expect(deserializedAccounts).toEqual(mockAccounts)
+  })
+
+  it("Should filter out accounts with invalid networkId", async () => {
+    const invalidStoredAccounts: StoredWalletAccount[] = [
+      ...mockStoredAccounts,
+      {
+        name: "Account2",
+        type: "standard",
+        address: "0x2",
+        signer: { derivationPath: "1", type: "local_secret" },
+        networkId: "goerli-beta",
+      },
+    ]
+
+    const deserializedAccounts = await deserialize(invalidStoredAccounts)
+    expect(deserializedAccounts).toEqual(mockAccounts)
+  })
+})
+
+describe("Wallet Account Migration", () => {
+  it("Should correctly migrate argent accounts to standard accounts", () => {
+    const argentAccount: WalletAccount = {
+      name: "Account1",
+      // @ts-expect-error This is a migration, so we can ignore the type error
+      type: "argent",
+      address: "0x1",
+      signer: { derivationPath: "1", type: "local_secret" },
+      networkId: "goerli-alpha",
+      network: defaultNetwork,
+    }
+
+    const migratedAccount = migrateAccount(argentAccount)
+    expect(migratedAccount.type).toEqual("standard")
   })
 })

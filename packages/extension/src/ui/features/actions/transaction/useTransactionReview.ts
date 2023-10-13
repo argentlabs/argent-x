@@ -3,40 +3,25 @@ import { Call } from "starknet"
 
 import { ARGENT_TRANSACTION_REVIEW_API_ENABLED } from "../../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
-import {
-  isPrivacySettingsEnabled,
-  settingsStore,
-} from "../../../../shared/settings"
-import { useKeyValueStorage } from "../../../../shared/storage/hooks"
 import { fetchTransactionReview } from "../../../../shared/transactionReview.service"
+import { WalletAccount } from "../../../../shared/wallet.model"
 import { argentApiFetcher } from "../../../services/argentApiFetcher"
-import { useConditionallyEnabledSWR } from "../../../services/swr"
-import { Account } from "../../accounts/Account"
+import { useConditionallyEnabledSWR } from "../../../services/swr.service"
 
 export interface IUseTransactionReview {
-  account?: Account
+  account?: WalletAccount
   transactions: Call | Call[]
-  actionHash: string
+  actionHash?: string
 }
 
 export const useTransactionReviewEnabled = () => {
-  const privacyUseArgentServicesEnabled = useKeyValueStorage(
-    settingsStore,
-    "privacyUseArgentServices",
-  )
-  /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
-  if (!isPrivacySettingsEnabled) {
-    return ARGENT_TRANSACTION_REVIEW_API_ENABLED
-  }
-  return (
-    ARGENT_TRANSACTION_REVIEW_API_ENABLED && privacyUseArgentServicesEnabled
-  )
+  return ARGENT_TRANSACTION_REVIEW_API_ENABLED
 }
 
 export const useTransactionReview = ({
   account,
   transactions,
-  actionHash,
+  actionHash = "",
 }: IUseTransactionReview) => {
   const transactionReviewEnabled = useTransactionReviewEnabled()
   const transactionReviewFetcher = useCallback(async () => {
@@ -56,6 +41,7 @@ export const useTransactionReview = ({
     })
     // TODO: come back - dont rerender when fetcher reference changes
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return useConditionallyEnabledSWR(
     Boolean(transactionReviewEnabled),
     [actionHash, "transactionReview"],

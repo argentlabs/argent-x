@@ -1,42 +1,60 @@
-import { BigNumber, utils } from "ethers"
+import { bigDecimal, useConditionallyEnabledSWR } from "@argent/shared"
 import { Call, UniversalDeployerContractPayload } from "starknet"
 import useSWR from "swr"
 
+import { DeployAccountEstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
 import { DeclareContract } from "../../../../shared/udc/type"
+import { ErrorObject } from "../../../../shared/utils/error"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import {
   getAccountDeploymentEstimatedFee,
   getDeclareContractEstimatedFee,
   getDeployContractEstimatedFee,
-  getEstimatedFee,
+  getEstimatedFeeFromSequencer,
 } from "../../../services/backgroundTransactions"
+import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
+import { RefreshInterval } from "../../../../shared/config"
 
+interface UseMaxFeeEstimationReturnProps {
+  fee: EstimatedFees | undefined
+  error: ErrorObject | undefined
+}
 export const useMaxFeeEstimation = (
   transactions: Call | Call[],
   actionHash: string,
-) => {
-  const { data: fee, error } = useSWR(
+  transactionSimulation?: ApiTransactionBulkSimulationResponse,
+  isSimulationLoading?: boolean,
+): UseMaxFeeEstimationReturnProps => {
+  const { data: fee, error } = useConditionallyEnabledSWR(
+    !isSimulationLoading &&
+      (!transactionSimulation || transactionSimulation.length === 0),
     [actionHash, "feeEstimation"],
-    () => transactions && getEstimatedFee(transactions),
+    () => transactions && getEstimatedFeeFromSequencer(transactions),
     {
       suspense: false,
-      refreshInterval: 20 * 1000, // 20 seconds
+      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
   return { fee, error }
 }
 
+interface UseMaxAccountDeploymentFeeEstimationReturnProps {
+  fee: DeployAccountEstimateFeeResponse | undefined
+  error: ErrorObject | undefined
+}
+
 export const useMaxAccountDeploymentFeeEstimation = (
   account: BaseWalletAccount | undefined,
   actionHash: string,
-) => {
+): UseMaxAccountDeploymentFeeEstimationReturnProps => {
   const { data: fee, error } = useSWR(
     [actionHash, "accountDeploymentFeeEstimation"],
     () => getAccountDeploymentEstimatedFee(account),
     {
       suspense: false,
-      refreshInterval: 20 * 1000, // 20 seconds
+      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
@@ -52,7 +70,7 @@ export const useMaxDeclareContractFeeEstimation = (
     () => getDeclareContractEstimatedFee(declareContractPayload),
     {
       suspense: false,
-      refreshInterval: 20 * 1000, // 20 seconds
+      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
@@ -68,28 +86,18 @@ export const useMaxDeployContractFeeEstimation = (
     () => getDeployContractEstimatedFee(declareContractPayload),
     {
       suspense: false,
-      refreshInterval: 20 * 1000, // 20 seconds
+      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
   return { fee, error }
 }
 
-export const getParsedError = (errorTxt: string) => {
-  try {
-    const regex = new RegExp("Error in the called contract", "g")
-    const matchAll = [...errorTxt.matchAll(regex)]
-    return errorTxt.slice(matchAll[1].index)
-  } catch {
-    return errorTxt
-  }
-}
-
 type FeeStatus = "loading" | "error" | "success"
 
 export function getCombinedFeeTooltipText(
-  maxFee?: string,
-  feeTokenBalance?: BigNumber,
+  maxFee?: bigint,
+  feeTokenBalance?: bigint,
 ): {
   status: FeeStatus
   message: string
@@ -100,7 +108,7 @@ export function getCombinedFeeTooltipText(
       message: "Network fee is still loading.",
     }
   }
-  if (feeTokenBalance.gte(maxFee)) {
+  if (feeTokenBalance >= maxFee) {
     return {
       status: "success",
       message:
@@ -109,20 +117,20 @@ export function getCombinedFeeTooltipText(
   }
   return {
     status: "error",
-    message: `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
-      BigNumber.from(maxFee).sub(feeTokenBalance),
+    message: `Insufficient balance to pay network fees. You need at least ${bigDecimal.formatEther(
+      maxFee - feeTokenBalance,
     )} ETH more.`,
   }
 }
 
-export function getTooltipText(maxFee?: string, feeTokenBalance?: BigNumber) {
+export function getTooltipText(maxFee?: bigint, feeTokenBalance?: bigint) {
   if (!maxFee || !feeTokenBalance) {
     return "Network fee is still loading."
   }
-  if (feeTokenBalance.gte(maxFee)) {
+  if (feeTokenBalance >= maxFee) {
     return "Network fees are paid to the network to include transactions in blocks"
   }
-  return `Insufficient balance to pay network fees. You need at least ${utils.formatEther(
-    BigNumber.from(maxFee).sub(feeTokenBalance),
+  return `Insufficient balance to pay network fees. You need at least ${bigDecimal.formatEther(
+    maxFee - feeTokenBalance,
   )} ETH more.`
 }

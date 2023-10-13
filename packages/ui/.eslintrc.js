@@ -1,19 +1,10 @@
 module.exports = {
-  extends: ["../extension/.eslintrc.js"],
+  extends: ["../extension/.eslintrc.base.js"],
   parserOptions: {
     tsconfigRootDir: __dirname,
   },
-  ignorePatterns: ["scripts"],
+  ignorePatterns: ["scripts", "vitest.config.ts"],
   rules: {
     "react/prop-types": "off",
-    "@typescript-eslint/ban-types": [
-      "error",
-      {
-        types: {
-          "{}": false /** Empty type in 'dist' build from chakra-ui */,
-        },
-        extendDefaults: true,
-      },
-    ],
   },
 }

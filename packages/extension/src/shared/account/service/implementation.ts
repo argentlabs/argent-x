@@ -1,40 +1,42 @@
 import { Account } from "../../../ui/features/accounts/Account"
 import { Multisig } from "../../../ui/features/multisig/Multisig"
-import { deployNewMultisig } from "../../../ui/services/backgroundAccounts"
 import { messageClient } from "../../../ui/services/messaging/trpc"
+import { IChainService } from "../../chain/service/interface"
 import type { AllowArray, SelectorFn } from "../../storage/__new/interface"
-import type {
-  ArgentAccountType,
-  BaseWalletAccount,
-  CreateAccountType,
-  MultisigData,
-  WalletAccount,
+import {
+  baseWalletAccountSchema,
+  type ArgentAccountType,
+  type BaseWalletAccount,
+  type CreateAccountType,
+  type MultisigData,
+  type WalletAccount,
 } from "../../wallet.model"
-import { accountsEqual } from "../../wallet.service"
+import { accountsEqual } from "../../utils/accountsEqual"
 import type { IWalletStore } from "../../wallet/walletStore"
 import { withoutHiddenSelector } from "../selectors"
 import type { IAccountRepo } from "../store"
 import type { IAccountService } from "./interface"
+import { IMultisigService } from "../../multisig/service/messaging/interface"
 
 // TODO: once the data presentation of account changes, this should be updated and tests should be added
 // TODO: once the messaging is trpc, we should add tests
 export class AccountService implements IAccountService {
   constructor(
+    private readonly chainService: IChainService,
     private readonly accountRepo: IAccountRepo,
     private readonly walletStore: IWalletStore,
     private readonly trpcClient: typeof messageClient,
+    private readonly multisigService: IMultisigService,
   ) {}
 
   async select(baseAccount: BaseWalletAccount | null): Promise<void> {
-    return this.walletStore.set({
-      selected: baseAccount
-        ? {
-            // pick values from baseAccount to avoid leaking additional data into storage
-            address: baseAccount.address,
-            networkId: baseAccount.networkId,
-          }
-        : null,
-    })
+    let parsedAccount = baseAccount
+
+    if (parsedAccount) {
+      parsedAccount = baseWalletAccountSchema.parse(baseAccount)
+    }
+
+    return this.trpcClient.account.select.mutate(parsedAccount)
   }
 
   async create(
@@ -84,8 +86,7 @@ export class AccountService implements IAccountService {
     }
 
     if (account.type === "multisig") {
-      // TODO refactor this when multisig is stable
-      await deployNewMultisig(account)
+      await this.multisigService.deploy(account)
     } else {
       await this.trpcClient.account.deploy.mutate(account)
     }
@@ -93,11 +94,13 @@ export class AccountService implements IAccountService {
 
   // TODO: make isomorphic
   async upgrade(
-    baseAccount: BaseWalletAccount,
+    baseWalletAccount: BaseWalletAccount,
     targetImplementationType?: ArgentAccountType | undefined,
   ): Promise<void> {
+    const account = baseWalletAccountSchema.parse(baseWalletAccount)
+
     return this.trpcClient.account.upgrade.mutate({
-      account: baseAccount,
+      account,
       targetImplementationType,
     })
   }
@@ -148,5 +151,9 @@ export class AccountService implements IAccountService {
       (account) => accountsEqual(account, baseAccount),
       (account) => ({ ...account, name }),
     )
+  }
+
+  async getDeployed(baseAccount: BaseWalletAccount): Promise<boolean> {
+    return this.chainService.getDeployed(baseAccount)
   }
 }

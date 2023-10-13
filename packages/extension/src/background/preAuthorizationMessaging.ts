@@ -1,12 +1,13 @@
 import { difference } from "lodash-es"
 import browser from "webextension-polyfill"
 
+import { uiService } from "../shared/__new/services/ui"
 import { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
 import { isPreAuthorized, preAuthorizeStore } from "../shared/preAuthorizations"
+import { Opened, backgroundUIService } from "./__new/services/ui"
 import { addTab, sendMessageToHost } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
-import { openUi } from "./openUi"
 
 export function getOriginFromSender(
   sender: browser.runtime.MessageSender,
@@ -34,12 +35,12 @@ export const handlePreAuthorizationMessage: HandleMessage<
 > = async ({
   msg,
   sender,
+  origin,
   port,
-  background: { wallet, actionQueue },
+  background: { wallet, actionService },
   respond,
 }) => {
   async function addSenderTab() {
-    const origin = getOriginFromSender(sender)
     if (sender.tab?.id && port) {
       await addTab({
         id: sender.tab?.id,
@@ -51,30 +52,66 @@ export const handlePreAuthorizationMessage: HandleMessage<
 
   switch (msg.type) {
     case "CONNECT_DAPP": {
-      const selectedAccount = await wallet.getSelectedAccount()
+      let selectedAccount = await wallet.getSelectedAccount()
+      let didOpenProgramatically = false
+
       if (!selectedAccount) {
-        openUi()
-        return
+        didOpenProgramatically = true
+        const openAndUnlocked = await backgroundUIService.openUiAndUnlock()
+        selectedAccount = await wallet.getSelectedAccount()
+        if (!openAndUnlocked || !selectedAccount) {
+          return respond({
+            type: "REJECT_PREAUTHORIZATION",
+          })
+        }
       }
-      const origin = getOriginFromSender(sender)
+
       const isAuthorized = await isPreAuthorized(selectedAccount, origin)
       await addSenderTab()
 
       if (!isAuthorized) {
-        await actionQueue.push({
-          type: "CONNECT_DAPP",
-          payload: { host: origin },
+        /** Prompt user to connect to dapp */
+        const action = await actionService.add(
+          {
+            type: "CONNECT_DAPP",
+            payload: { host: origin },
+          },
+          {
+            origin,
+          },
+        )
+        didOpenProgramatically = true
+        const openAndUnlocked = await backgroundUIService.openUiAndUnlock()
+        if (!openAndUnlocked) {
+          return respond({
+            type: "REJECT_PREAUTHORIZATION",
+          })
+        }
+        /** Special case for CONNECT_DAPP - treat closing extension as rejection, in order to cleanly reset dapp */
+        void backgroundUIService.emitter.once(Opened).then(() => {
+          if (!backgroundUIService.opened) {
+            void actionService.reject(action.meta.hash)
+          }
         })
       }
 
       if (isAuthorized && selectedAccount?.address) {
+        if (didOpenProgramatically) {
+          /** user unlocked, close the ui */
+          if (await uiService.hasFloatingWindow()) {
+            await uiService.closeFloatingWindow()
+          }
+          if (uiService.hasPopup()) {
+            uiService.closePopup()
+          }
+        }
         return respond({
           type: "CONNECT_DAPP_RES",
           data: selectedAccount,
         })
       }
 
-      return openUi()
+      return
     }
 
     case "IS_PREAUTHORIZED": {
@@ -85,7 +122,6 @@ export const handlePreAuthorizationMessage: HandleMessage<
         return respond({ type: "IS_PREAUTHORIZED_RES", data: false })
       }
 
-      const origin = getOriginFromSender(sender)
       const valid = await isPreAuthorized(selectedAccount, origin)
 
       return respond({ type: "IS_PREAUTHORIZED_RES", data: valid })

@@ -7,103 +7,109 @@ import {
   MenuList,
   Text,
 } from "@chakra-ui/react"
+import { isString } from "lodash-es"
 import { FC, ReactElement, ReactNode, useMemo } from "react"
 
 import { ChevronDownIcon } from "./icons"
 import { Input } from "./Input"
 import { H6 } from "./Typography"
 
-type Option = {
+export interface SelectOption {
   icon?: ReactElement
-  label: string | ReactNode
-  labelSelected: string
+  label: ReactNode
+  labelSelected?: string
   value: string
 }
 
+export type SelectOptions = SelectOption[]
+
 interface SelectProps {
-  disabled?: boolean
   emptyMessage?: string
+  isDisabled?: boolean
   isInvalid?: boolean
+  label?: string
   maxH?: string
-  name: string
+  name?: string
   onChange: (e: string) => void
+  options: SelectOptions
   placeholder: string
-  options: Option[]
   value: string
 }
 
 const Select: FC<SelectProps> = ({
-  disabled,
   emptyMessage,
+  isDisabled,
   isInvalid,
+  label,
   maxH,
   name,
+  onChange,
   options,
   placeholder,
-  onChange,
   value,
 }) => {
-  const selectedOption = useMemo(() => {
-    return options.find((option) => option.value === value)?.labelSelected || ""
+  const selectedOptionLabel = useMemo(() => {
+    const option = options.find((option) => option.value === value)
+    if (option && isString(option.label)) {
+      return option.label
+    }
   }, [options, value])
 
+  const selectedOptionLabelSelected = useMemo(() => {
+    const option = options.find((option) => option.value === value)
+    return option?.labelSelected ?? option?.label
+  }, [options, value])
+
+  const hasLabel = Boolean(label)
+
   return (
-    <Menu
-      matchWidth
-      gutter={0}
-      flip={false}
-      placement="bottom"
-      preventOverflow={false}
-    >
+    <Menu matchWidth gutter={0}>
       <MenuButton
         aria-label={placeholder}
         w="100%"
         type="button"
-        disabled={disabled}
+        disabled={isDisabled}
       >
         <InputGroup>
           <Input
-            name={name}
-            _placeholder={{ color: "white" }}
-            colorScheme={"neutrals"}
-            placeholder={placeholder}
             isInvalid={isInvalid}
+            variant={"filled"}
+            isDisabled={isDisabled}
+            value={hasLabel ? label : selectedOptionLabel}
+            placeholder={placeholder}
+            name={name}
           />
           <InputRightElement
-            h="100%"
             w="auto"
             gap={2}
             mr="3"
             display="flex"
             alignItems="center"
             zIndex={0}
+            color={isDisabled ? "neutrals.600" : "neutrals.200"}
           >
-            <H6 color="neutrals.200">{selectedOption || ""}</H6>
-            <Text color="neutrals.200">
+            {hasLabel && <H6>{selectedOptionLabelSelected ?? placeholder}</H6>}
+            <Text>
               <ChevronDownIcon />
             </Text>
           </InputRightElement>
         </InputGroup>
       </MenuButton>
 
-      <MenuList borderRadius={0} overflow="auto" maxH={maxH || "100%"}>
+      <MenuList overflow="auto" maxH={maxH || "100%"}>
         {options.map(({ icon, label, value: optionValue }) => (
           <MenuItem
-            icon={icon || undefined}
+            icon={icon}
             key={optionValue}
             onClick={() => onChange(optionValue)}
-            bgColor={optionValue === value ? "neutrals.600" : ""}
+            bgColor={optionValue === value ? "neutrals.600" : undefined}
             data-group
           >
             {label}
           </MenuItem>
         ))}
         {emptyMessage && options?.length < 1 && (
-          <MenuItem disabled>
-            <H6 color='"neutrals.100"' py={3}>
-              {emptyMessage}
-            </H6>
-          </MenuItem>
+          <MenuItem disabled>{emptyMessage}</MenuItem>
         )}
       </MenuList>
     </Menu>

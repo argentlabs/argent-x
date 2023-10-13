@@ -1,6 +1,7 @@
 import useSWR from "swr"
 
 import { PluginAccount } from "./PluginAccount"
+import { RefreshInterval } from "../../../shared/config"
 
 export const getIsPlugin = async (
   pluginAccount: PluginAccount,
@@ -22,7 +23,7 @@ export const useIsPlugin = (
     () => getIsPlugin(pluginAccount, pluginClassHash),
     {
       suspense: false,
-      refreshInterval: 20 * 1000, // 20 seconds
+      refreshInterval: RefreshInterval.SLOW * 1000,
       shouldRetryOnError: false,
     },
   )

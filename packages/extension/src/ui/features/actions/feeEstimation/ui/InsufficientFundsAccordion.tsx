@@ -20,7 +20,10 @@ export const InsufficientFundsAccordion: FC<FeeEstimationTextProps> = (
       defaultIndex={[0]}
       size="sm"
       colorScheme="error"
-      boxShadow={"menu"}
+      rounded={"lg"}
+      _dark={{
+        boxShadow: "menu",
+      }}
     >
       <AccordionItem>
         <AccordionButton sx={{ pointerEvents: "none" }}>

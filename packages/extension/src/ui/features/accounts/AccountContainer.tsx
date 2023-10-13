@@ -1,13 +1,14 @@
 import {
   L1,
+  NavigationBarSkeleton,
   ScrollContainer,
   Tab,
   TabBar,
   icons,
   useScrollRestoration,
 } from "@argent/ui"
-import { Center } from "@chakra-ui/react"
-import { ComponentProps, FC, PropsWithChildren } from "react"
+import { Center, Flex } from "@chakra-ui/react"
+import { ComponentProps, FC, PropsWithChildren, Suspense } from "react"
 import { NavLink } from "react-router-dom"
 
 import { routes } from "../../routes"
@@ -45,15 +46,14 @@ export const AccountContainer: FC<AccountContainerProps> = (props) => {
   const showMultisigBanner =
     multisig && (showActivateBanner || showSignerIsRemovedBanner)
 
-  if (!account) {
-    return null
-  }
+  const showTabs = Boolean(account)
 
   const totalPendingTransactions =
     pendingTransactions.length + pendingMultisigTransactions.length
 
   return (
     <RootTabs
+      showTabs={showTabs}
       activityBadgeLabel={totalPendingTransactions}
       showMultisigBanner={showMultisigBanner}
       showActivateBanner={showActivateBanner}
@@ -67,6 +67,7 @@ export interface RootTabsProps extends PropsWithChildren {
   activityBadgeLabel: ComponentProps<typeof Tab>["badgeLabel"]
   showMultisigBanner?: boolean
   showActivateBanner: boolean
+  showTabs: boolean
 }
 
 export const RootTabs: FC<RootTabsProps> = ({
@@ -74,14 +75,19 @@ export const RootTabs: FC<RootTabsProps> = ({
   scrollKey,
   showMultisigBanner,
   showActivateBanner,
+  showTabs = true,
   children,
 }) => {
   const { scrollRef, scroll } = useScrollRestoration(scrollKey)
 
   return (
     <WithEscapeWarning>
-      <AccountNavigationBarContainer scroll={scroll} />
-      <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
+      <Suspense fallback={<NavigationBarSkeleton />}>
+        <AccountNavigationBarContainer scroll={scroll} />
+      </Suspense>
+      <Suspense fallback={<Flex flex={1} />}>
+        <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
+      </Suspense>
       {showMultisigBanner ? (
         <Center backgroundColor="warning.500" width="full" p="13px 10px">
           <L1 color="neutrals.700">
@@ -92,7 +98,7 @@ export const RootTabs: FC<RootTabsProps> = ({
             )}
           </L1>
         </Center>
-      ) : (
+      ) : showTabs ? (
         <TabBar>
           <Tab
             as={NavLink}
@@ -125,7 +131,7 @@ export const RootTabs: FC<RootTabsProps> = ({
             label="Activity"
           />
         </TabBar>
-      )}
+      ) : null}
     </WithEscapeWarning>
   )
 }

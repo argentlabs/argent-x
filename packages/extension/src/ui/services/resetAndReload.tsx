@@ -8,7 +8,6 @@ import React, {
 } from "react"
 import browser from "webextension-polyfill"
 
-import { ARGENT_SHIELD_ENABLED } from "../../shared/shield/constants"
 import { resetDevice } from "../../shared/shield/jwt"
 import { delay } from "../../shared/utils/delay"
 import { IS_DEV } from "../../shared/utils/dev"
@@ -63,7 +62,7 @@ export const hardReload = (resetRoute = true) => {
   window.location.href = shouldResetRoute
     ? url
     : `${url}?initialHardReloadRoute=${encodeURIComponent(
-        window.location.pathname,
+        `${window.location.pathname}${window.location.search}`,
       )}`
 }
 
@@ -88,9 +87,7 @@ export const useResetCache = () => {
       (key) => !RESET_CACHE_OMIT_KEYS.includes(key),
     )
     clearKeys.forEach((key) => localStorage.removeItem(key))
-    if (ARGENT_SHIELD_ENABLED) {
-      await resetDevice()
-    }
+    await resetDevice()
   }, [])
 }
 

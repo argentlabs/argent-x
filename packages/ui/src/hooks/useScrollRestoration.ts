@@ -1,5 +1,6 @@
 import { useLayoutEffect } from "react"
-import { NavigationType, useNavigationType } from "react-router-dom"
+import { useNavigationType } from "react-router-dom"
+import { Action as NavigationType } from "history"
 
 import { ScrollProps, useScroll } from "./useScroll"
 

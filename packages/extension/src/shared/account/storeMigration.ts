@@ -1,9 +1,9 @@
 import { uniqWith } from "lodash-es"
 import browser from "webextension-polyfill"
 
-import { getNetwork } from "../network"
+import { networkService } from "../network/service"
 import { WalletAccount } from "../wallet.model"
-import { accountsEqual } from "../wallet.service"
+import { accountsEqual } from "../utils/accountsEqual"
 import { accountService } from "./service"
 
 export async function migrateWalletAccounts() {
@@ -39,7 +39,7 @@ async function checkAccountsForMigration(accounts: WalletAccount[]) {
       }> => {
         let needMigration = false
         try {
-          const network = await getNetwork(
+          const network = await networkService.getById(
             account.networkId || account.network?.id,
           )
           if (!network) {

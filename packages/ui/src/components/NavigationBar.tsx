@@ -1,5 +1,14 @@
-import { Button, Fade, Flex, chakra } from "@chakra-ui/react"
-import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
+import {
+  Button,
+  Center,
+  Fade,
+  Flex,
+  FlexProps,
+  SkeletonCircle,
+  SkeletonText,
+  chakra,
+} from "@chakra-ui/react"
+import { ComponentProps, FC, ReactNode } from "react"
 
 import { ScrollProps, useNavigateBack } from "../hooks"
 import { AbsoluteFlex } from "./Absolute"
@@ -40,7 +49,7 @@ const TitleContainer = chakra(AbsoluteFlex, {
   },
 })
 
-export interface NavigationBarProps extends PropsWithChildren {
+export interface NavigationBarProps extends Omit<FlexProps, "title"> {
   isAbsolute?: boolean
   leftButton?: ReactNode
   title?: ReactNode
@@ -106,6 +115,7 @@ export const NavigationBar: FC<NavigationBarProps> = ({
   scroll,
   children,
   scrollContent,
+  ...rest
 }) => {
   const scrollTop = scroll?.scrollTop ?? 0
   const isTransparent = scrollTop <= 16
@@ -115,15 +125,17 @@ export const NavigationBar: FC<NavigationBarProps> = ({
       bg={isTransparent ? "transparent" : "neutrals.700"}
       boxShadow={isTransparent ? "none" : "menu"}
       position={isAbsolute ? "absolute" : "relative"}
-      w="100%"
+      w="full"
+      {...rest}
     >
       {title && (
-        <TitleContainer>
+        <TitleContainer px={14}>
           <H6
-            maxW="200px"
+            w="full"
             overflow="hidden"
             textOverflow="ellipsis"
             whiteSpace="nowrap"
+            textAlign={"center"}
           >
             {title}
           </H6>
@@ -146,5 +158,25 @@ export const NavigationBar: FC<NavigationBarProps> = ({
       )}
       {children}
     </Container>
+  )
+}
+
+export const NavigationBarSkeleton: FC = () => {
+  return (
+    <Flex
+      alignItems={"center"}
+      justifyContent={"space-between"}
+      px={3}
+      py={2}
+      height={NavigationBarHeight}
+    >
+      <Center w={8} h={8}>
+        <SkeletonCircle w={5} h={5} />
+      </Center>
+      <SkeletonText h={2} w={"33.3%"} noOfLines={1} />
+      <Center w={8} h={8}>
+        <SkeletonCircle w={5} h={5} />
+      </Center>
+    </Flex>
   )
 }

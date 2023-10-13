@@ -4,15 +4,7 @@ import { FC } from "react"
 
 import { formatFullAddress } from "../../services/addresses"
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
-import { HideOrDeleteAccountConfirmScreenContainerProps } from "./HideOrDeleteAccountConfirmScreenContainer"
-
-interface HideOrDeleteAccountConfirmScreenProps
-  extends HideOrDeleteAccountConfirmScreenContainerProps {
-  accountName: string
-  accountAddress: string
-  onSubmit: () => void
-  onReject: () => void
-}
+import { HideOrDeleteAccountConfirmScreenProps } from "./hideOrDeleteAccountConfirmScreen.model"
 
 export const HideOrDeleteAccountConfirmScreen: FC<
   HideOrDeleteAccountConfirmScreenProps

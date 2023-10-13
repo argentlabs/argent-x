@@ -1,27 +1,25 @@
 import type {
   Abi,
+  AllowArray,
   Call,
   InvocationsDetails,
-  Sequencer,
-  TransactionSimulation,
   UniversalDeployerContractPayload,
-  constants,
 } from "starknet"
 
 import { Transaction } from "../transactions"
+import {
+  SimulateTransactionsRequest,
+  TransactionSimulationWithFees,
+} from "../transactionSimulation/types"
 import { DeclareContract } from "../udc/type"
+import { ErrorObject } from "../utils/error"
 import { BaseWalletAccount } from "../wallet.model"
-
-export interface EstimateFeeResponse {
-  amount: string
-  suggestedMaxFee: string
-  accountDeploymentFee?: string
-  maxADFee?: string
-}
+import { TransactionError } from "../errors/transaction"
+import { EstimatedFees } from "../transactionSimulation/fees/fees.model"
 
 export interface DeployAccountEstimateFeeResponse
   extends Omit<
-    EstimateFeeResponse,
+    EstimatedFees,
     "suggestedMaxFee" | "accountDeploymentFee" | "theme"
   > {
   maxADFee: string
@@ -49,13 +47,19 @@ export type TransactionMessage =
       data: { actionHash: string; error?: string }
     }
   | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
-  | { type: "ESTIMATE_TRANSACTION_FEE_REJ"; data: { error: string } }
+  | {
+      type: "ESTIMATE_TRANSACTION_FEE_REJ"
+      data: { error: ErrorObject | undefined }
+    }
   | {
       type: "ESTIMATE_TRANSACTION_FEE_RES"
-      data: EstimateFeeResponse
+      data: EstimatedFees
     }
   | { type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE"; data?: BaseWalletAccount }
-  | { type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ"; data: { error: string } }
+  | {
+      type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ"
+      data: { error: ErrorObject | undefined }
+    }
   | {
       type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES"
       data: DeployAccountEstimateFeeResponse
@@ -64,7 +68,7 @@ export type TransactionMessage =
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES"
-      data: EstimateFeeResponse
+      data: EstimatedFees
     }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE"
@@ -73,7 +77,7 @@ export type TransactionMessage =
   | { type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES"
-      data: EstimateFeeResponse
+      data: EstimatedFees
     }
   | {
       type: "SIMULATE_TRANSACTION_INVOCATION"
@@ -82,23 +86,23 @@ export type TransactionMessage =
   | {
       type: "SIMULATE_TRANSACTION_INVOCATION_RES"
       data: {
-        invocation: Sequencer.SimulateTransaction
-        chainId: constants.StarknetChainId
-      }
+        transactions: SimulateTransactionsRequest
+        chainId: string
+      } | null
     }
   | {
       type: "SIMULATE_TRANSACTION_INVOCATION_REJ"
       data: { error: string }
     }
   | {
-      type: "SIMULATE_TRANSACTION_FALLBACK"
-      data: Call | Call[]
+      type: "SIMULATE_TRANSACTIONS"
+      data: AllowArray<Call>
     }
   | {
-      type: "SIMULATE_TRANSACTION_FALLBACK_RES"
-      data: TransactionSimulation
+      type: "SIMULATE_TRANSACTIONS_RES"
+      data: TransactionSimulationWithFees | null
     }
   | {
-      type: "SIMULATE_TRANSACTION_FALLBACK_REJ"
-      data: { error: string }
+      type: "SIMULATE_TRANSACTIONS_REJ"
+      data: { error: TransactionError }
     }

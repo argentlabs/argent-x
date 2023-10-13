@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Center,
+  Flex,
   Input,
   InputGroup,
   InputRightElement,
@@ -14,11 +15,15 @@ import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 
 const { CloseIcon, AddIcon } = icons
 
+interface AddOwnerFormProps {
+  nextOwnerIndex: number
+  isNewMultisig?: boolean
+}
+
 export const AddOwnersForm = ({
   nextOwnerIndex,
-}: {
-  nextOwnerIndex: number
-}) => {
+  isNewMultisig = true,
+}: AddOwnerFormProps) => {
   const {
     control,
     formState: { errors },
@@ -39,45 +44,52 @@ export const AddOwnersForm = ({
     if (fields.length === 0) {
       addOwner()
     }
-  }, [addOwner, fields.length])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addOwner])
 
   return (
-    <>
-      {fields.map((field, index) => {
-        return (
-          <Box key={field.id} my="2" width="100%">
-            <P3 mb="1">Owner {nextOwnerIndex + index}</P3>
-            <InputGroup display="flex" alignItems="center">
-              <Input
-                isInvalid={Boolean(errors?.signerKeys?.[index]?.key)}
-                placeholder="Signer key..."
-                {...register(`signerKeys.${index}.key` as const, {
-                  required: true,
-                })}
-              />
-              <InputRightElement my="auto">
-                <RoundButton
-                  onClick={() => remove(index)}
-                  height="5"
-                  size="xs"
-                  mr="2"
-                  my="0"
-                  mt="1em"
-                  pb="0"
-                  variant="link"
-                >
-                  <CloseIcon />
-                </RoundButton>
-              </InputRightElement>
-            </InputGroup>
-            {errors.signerKeys && (
-              <FieldError>
-                {errors.signerKeys?.[index]?.key?.message}
-              </FieldError>
-            )}
-          </Box>
-        )
-      })}
+    <Flex direction="column" justifyContent="space-between" w="100%">
+      <Box maxHeight={300} overflowY="auto">
+        {fields.map((field, index) => {
+          return (
+            <Box key={field.id} my="2" width="100%">
+              <P3 mb="1">Owner {nextOwnerIndex + index}</P3>
+              <InputGroup display="flex" alignItems="center">
+                <Input
+                  isInvalid={Boolean(errors?.signerKeys?.[index]?.key)}
+                  placeholder="Signer pubkey..."
+                  {...register(`signerKeys.${index}.key` as const, {
+                    required: true,
+                  })}
+                />
+                <InputRightElement my="auto">
+                  <RoundButton
+                    onClick={() => {
+                      if (!isNewMultisig && fields.length === 1) {
+                        addOwner()
+                      }
+                      remove(index)
+                    }}
+                    height="5"
+                    size="xs"
+                    mr="2"
+                    my="0"
+                    pb="0"
+                    variant="link"
+                  >
+                    <CloseIcon />
+                  </RoundButton>
+                </InputRightElement>
+              </InputGroup>
+              {errors.signerKeys && (
+                <FieldError>
+                  {errors.signerKeys?.[index]?.key?.message}
+                </FieldError>
+              )}
+            </Box>
+          )
+        })}
+      </Box>
       {errors.signerKeys?.message && (
         <FieldError>{errors.signerKeys?.message}</FieldError>
       )}
@@ -91,6 +103,6 @@ export const AddOwnersForm = ({
           Add another owner
         </Button>
       </Center>
-    </>
+    </Flex>
   )
 }

@@ -2,7 +2,7 @@ import { act, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 
-import { AddressBook } from "../../services/addressBook"
+import { AddressBook } from "../../hooks/useAddressBook"
 import { AddressBookMenu } from "./AddressBookMenu"
 
 describe("AddressBookMenu", () => {
@@ -21,13 +21,14 @@ describe("AddressBookMenu", () => {
         ],
         contacts: [
           {
+            id: "123",
             name: "Contact 1",
             address:
               "0x7f14339f5d364946ae5e27eccbf60757a5c496bf45baf35ddf2ad30b583541a",
             networkId: "goerli-alpha",
           },
         ],
-      } as AddressBook
+      } as unknown as AddressBook
 
       render(
         <AddressBookMenu
@@ -41,18 +42,18 @@ describe("AddressBookMenu", () => {
 
       expect(screen.getByText("Contact 1")).toBeInTheDocument()
       await act(async () => {
-        userEvent.click(screen.getByText("Contact 1"))
+        await userEvent.click(screen.getByText("Contact 1"))
       })
       expect(onAddressSelect).toHaveBeenCalledWith(addressBook.contacts[0])
 
       await act(async () => {
-        userEvent.click(screen.getByText("My accounts"))
+        await userEvent.click(screen.getByText("My accounts"))
       })
 
       expect(screen.getByText("Account 1")).toBeInTheDocument()
 
       await act(async () => {
-        userEvent.click(screen.getByText("Account 1"))
+        await userEvent.click(screen.getByText("Account 1"))
       })
       expect(onAddressSelect).toHaveBeenCalledWith(addressBook.userAccounts[0])
     })
@@ -85,7 +86,7 @@ describe("AddressBookMenu", () => {
       expect(screen.getByText("Account 1")).toBeInTheDocument()
 
       await act(async () => {
-        userEvent.click(screen.getByText("Account 1"))
+        await userEvent.click(screen.getByText("Account 1"))
       })
       expect(onAddressSelect).toHaveBeenCalledWith(addressBook.userAccounts[0])
     })

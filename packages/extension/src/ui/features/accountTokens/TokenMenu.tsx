@@ -5,7 +5,6 @@ import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 
 import { VisibilityOff } from "../../components/Icons/MuiIcons"
-import { IconWrapper } from "../../components/Menu"
 import { routes } from "../../routes"
 import { normalizeAddress } from "../../services/addresses"
 import {
@@ -50,7 +49,7 @@ export const TokenMenu: FC<TokenMenuProps> = ({
           </CopyToClipboard>
           <MenuItem
             onClick={() =>
-              openBlockExplorerAddress(currentNetwork, tokenAddress)
+              void openBlockExplorerAddress(currentNetwork, tokenAddress)
             }
           >
             View on {blockExplorerTitle}
@@ -59,10 +58,8 @@ export const TokenMenu: FC<TokenMenuProps> = ({
             <>
               <MenuItem
                 onClick={() => navigate(routes.hideToken(tokenAddress))}
+                icon={<VisibilityOff fontSize="inherit" htmlColor="white" />}
               >
-                <IconWrapper>
-                  <VisibilityOff fontSize="inherit" htmlColor="white" />
-                </IconWrapper>
                 Hide this token
               </MenuItem>
             </>

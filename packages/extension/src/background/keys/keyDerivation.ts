@@ -1,23 +1,93 @@
-import { BigNumber, BigNumberish, utils } from "ethers"
-import { isNumber } from "lodash-es"
-import { KeyPair, ec, number } from "starknet"
+import { Hex, bytesToHex, hexToBytes } from "@noble/curves/abstract/utils"
+import { sha256 } from "@noble/hashes/sha256"
+import { HDKey } from "@scure/bip32"
+import { isFunction, isNumber } from "lodash-es"
+import { encode, num } from "starknet"
+import { getStarkKey, grindKey as microGrindKey } from "micro-starknet"
+
+const { addHexPrefix } = encode
+
+export interface KeyPair {
+  pubKey: string
+  getPrivate: () => string
+}
+
+export interface KeyPairWithIndex extends KeyPair {
+  index: number
+}
+
+export interface PublicKeyWithIndex {
+  pubKey: string
+  index: number
+}
 
 export function getStarkPair<T extends number | string>(
   indexOrPath: T,
-  secret: BigNumberish,
+  secret: string,
   ...[baseDerivationPath]: T extends string ? [] : [string]
 ): KeyPair {
-  const masterNode = utils.HDNode.fromSeed(BigNumber.from(secret).toHexString())
+  const hex = encode.removeHexPrefix(num.toHex(secret))
+
+  // Bytes must be a multiple of 2 and default is multiple of 8
+  // sanitizeHex should not be used because of leading 0x
+  const sanitized = encode.sanitizeBytes(hex, 2)
+
+  const masterNode = HDKey.fromMasterSeed(hexToBytes(sanitized))
 
   // baseDerivationPath will never be undefined because of the extends statement below,
   // but somehow TS doesnt get this. As this will be removed in the near future I didnt bother
   const path: string = isNumber(indexOrPath)
     ? getPathForIndex(indexOrPath, baseDerivationPath ?? "")
     : indexOrPath
-  const childNode = masterNode.derivePath(path)
+  const childNode = masterNode.derive(path)
+
+  if (!childNode.privateKey) {
+    throw "childNode.privateKey is undefined"
+  }
+
   const groundKey = grindKey(childNode.privateKey)
-  const starkPair = ec.getKeyPair(groundKey)
-  return starkPair
+
+  return {
+    pubKey: encode.sanitizeHex(getStarkKey(groundKey)),
+    getPrivate: () => encode.sanitizeHex(groundKey),
+  }
+}
+
+/**
+ * Grinds a private key to a valid StarkNet private key
+ * @param privateKey
+ * @returns Unsantized hex string
+ */
+export function grindKey(privateKey: Hex): string {
+  return addHexPrefix(microGrindKey(privateKey))
+}
+
+export function generateStarkKeyPairs(
+  secret: string,
+  start: number,
+  numberOfPairs: number,
+  baseDerivationPath: string,
+): KeyPairWithIndex[] {
+  const keyPairs: KeyPairWithIndex[] = []
+  for (let index = start; index < start + numberOfPairs; index++) {
+    keyPairs.push({ ...getStarkPair(index, secret, baseDerivationPath), index })
+  }
+  return keyPairs
+}
+
+export function generatePublicKeys(
+  secret: string,
+  start: number,
+  numberOfPairs: number,
+  baseDerivationPath: string,
+): PublicKeyWithIndex[] {
+  const keyPairs = generateStarkKeyPairs(
+    secret,
+    start,
+    numberOfPairs,
+    baseDerivationPath,
+  )
+  return keyPairs.map(({ pubKey, index }) => ({ pubKey, index }))
 }
 
 export function getPathForIndex(
@@ -47,41 +117,15 @@ export function getNextPathIndex(
   return paths.length
 }
 
-// inspired/copied from https://github.com/authereum/starkware-monorepo/blob/51c5df19e7f98399a2f7e63d564210d761d138d1/packages/starkware-crypto/src/keyDerivation.ts#L85
-export function grindKey(keySeed: string): string {
-  const keyValueLimit = ec.ec.n
-  if (!keyValueLimit) {
-    return keySeed
-  }
-  const sha256EcMaxDigest = number.toBN(
-    "1 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000",
-    16,
-  )
-  const maxAllowedVal = sha256EcMaxDigest.sub(
-    sha256EcMaxDigest.mod(keyValueLimit),
-  )
-
-  // Make sure the produced key is devided by the Stark EC order,
-  // and falls within the range [0, maxAllowedVal).
-  let i = 0
-  let key
-  do {
-    key = hashKeyWithIndex(keySeed, i)
-    i++
-  } while (!key.lt(maxAllowedVal))
-
-  return "0x" + key.umod(keyValueLimit).toString("hex")
-}
-
-function hashKeyWithIndex(key: string, index: number) {
-  const payload = utils.concat([utils.arrayify(key), utils.arrayify(index)])
-  const hash = utils.sha256(payload)
-  return number.toBN(hash)
-}
-
 export function pathHash(name: string): number {
-  return number
-    .toBN(utils.sha256(utils.toUtf8Bytes(name)))
-    .maskn(31)
-    .toNumber()
+  const bigHash = BigInt.asUintN(
+    31,
+    BigInt(addHexPrefix(bytesToHex(sha256(name)))),
+  )
+
+  return Number(bigHash)
+}
+
+export function isKeyPair(val: any): val is KeyPair {
+  return val && val.pubKey && isFunction(val.getPrivate)
 }

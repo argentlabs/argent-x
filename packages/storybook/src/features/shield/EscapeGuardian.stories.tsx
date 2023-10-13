@@ -1,4 +1,4 @@
-import { ESCAPE_TYPE_GUARDIAN } from "@argent-x/extension/src/shared/account/details/getEscape"
+import { ESCAPE_TYPE_GUARDIAN } from "@argent-x/extension/src/shared/account/details/escape.model"
 import { EscapeGuardian } from "@argent-x/extension/src/ui/features/shield/escape/EscapeGuardian"
 import { getActiveFromNow } from "@argent-x/extension/src/ui/features/shield/escape/useAccountEscape"
 

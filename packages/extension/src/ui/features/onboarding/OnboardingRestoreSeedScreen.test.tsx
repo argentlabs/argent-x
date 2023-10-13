@@ -5,6 +5,10 @@ import { describe, expect, it } from "vitest"
 
 import { OnboardingRestoreSeedScreen } from "./OnboardingRestoreSeedScreen"
 
+/**
+ * @vitest-environment jsdom
+ */
+
 describe("OnboardingRestoreSeedScreen", async () => {
   it("onRestore is called with the seed input", async () => {
     const onRestore = vi.fn()
@@ -24,9 +28,7 @@ describe("OnboardingRestoreSeedScreen", async () => {
     const passwordElements = container.querySelectorAll(
       `input[type="password"]`,
     )
-    if (passwordElements.length !== 12) {
-      throw new Error("12 seed inputs not found")
-    }
+    expect(passwordElements.length).toBe(12)
 
     passwordElements.forEach((passwordElement, index) => {
       const value = seedSplit[index]

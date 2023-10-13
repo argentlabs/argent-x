@@ -2,9 +2,9 @@ import {
   Call,
   GatewayError,
   ProviderInterface,
-  number,
-  stark,
+  num,
   transaction,
+  CallData,
 } from "starknet"
 
 const partitionResponses = (responses: string[]): string[][] => {
@@ -13,7 +13,7 @@ const partitionResponses = (responses: string[]): string[][] => {
   }
 
   const [responseLength, ...restResponses] = responses
-  const responseLengthInt = number.toBN(responseLength).toNumber()
+  const responseLengthInt = Number(num.toBigInt(responseLength))
   const response = restResponses.slice(0, responseLengthInt)
   const remainingResponses = restResponses.slice(responseLengthInt)
 
@@ -44,7 +44,7 @@ const fallbackAggregate = async (
         .callContract({
           contractAddress: call.contractAddress,
           entrypoint: call.entrypoint,
-          calldata: stark.compileCalldata(call.calldata ?? []),
+          calldata: CallData.toCalldata(call.calldata),
         })
         .then((res) => res.result),
     ),
@@ -56,6 +56,20 @@ const fallbackAggregate = async (
     }
     return result.reason
   })
+}
+
+const shouldFallbackToProvider = (e: unknown) => {
+  if (
+    e instanceof GatewayError &&
+    e.errorCode === "StarknetErrorCode.UNINITIALIZED_CONTRACT"
+  ) {
+    return true
+  }
+  if (e instanceof Error && e.toString().includes("-32603")) {
+    // RPC ERROR
+    return true
+  }
+  return false
 }
 
 export const aggregate = async (
@@ -81,10 +95,7 @@ export const aggregate = async (
       throw e
     }
 
-    if (
-      e instanceof GatewayError &&
-      e.errorCode === "StarknetErrorCode.UNINITIALIZED_CONTRACT"
-    ) {
+    if (shouldFallbackToProvider(e)) {
       return fallbackAggregate(provider, calls)
     }
 

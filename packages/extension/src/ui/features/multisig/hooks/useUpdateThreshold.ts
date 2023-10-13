@@ -16,7 +16,7 @@ const getFormSchema = (signerKeysLength?: number) =>
         }
       },
       {
-        message: "Confirmations should be less than or equal to signer keys",
+        message: "Confirmations should be less than or equal to signer pubkeys",
         path: ["confirmations"],
       },
     )

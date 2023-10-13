@@ -1,11 +1,8 @@
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { atomWithStorage } from "jotai/utils"
 
 interface State {
   /** temporarily persist unverified email submitted for OTP verification, allows UI to restore on OTP screen */
   unverifiedEmail?: string
 }
 
-export const useShieldState = create<State>()(
-  persist((_set, _get) => ({}), { name: "shield" }),
-)
+export const shieldStateAtom = atomWithStorage<State>("shield", {})

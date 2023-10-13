@@ -1,18 +1,20 @@
-import type {
+import {
   Abi,
   Call,
+  CallData,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
-  KeyPair,
   Signature,
+  stark,
 } from "starknet"
 import {
   Signer,
   addAddressPadding,
-  number,
+  num,
   transaction,
   typedData,
+  CairoVersion,
 } from "starknet"
 
 import type {
@@ -24,8 +26,12 @@ import type {
 export class GuardianSigner extends Signer {
   public cosigner: Cosigner
 
-  constructor(keyPair: KeyPair, cosignerImpl: Cosigner) {
-    super(keyPair)
+  constructor(
+    pk: Uint8Array | string,
+    cosignerImpl: Cosigner,
+    private cairoVersion: CairoVersion = "0",
+  ) {
+    super(pk)
     this.cosigner = cosignerImpl
   }
 
@@ -36,8 +42,8 @@ export class GuardianSigner extends Signer {
     const response = await this.cosigner(cosignerMessage, isOffchainMessage)
 
     const signature = [
-      number.toBN(response.signature.r).toString(),
-      number.toBN(response.signature.s).toString(),
+      num.toBigInt(response.signature.r).toString(),
+      num.toBigInt(response.signature.s).toString(),
     ]
 
     return signature
@@ -56,7 +62,9 @@ export class GuardianSigner extends Signer {
 
     const cosignerSignature = await this.cosignMessage(cosignerMessage, true)
 
-    return [...signatures, ...cosignerSignature]
+    return [signatures, cosignerSignature].flatMap(
+      stark.signatureToDecimalArray,
+    )
   }
 
   public async signTransaction(
@@ -70,15 +78,18 @@ export class GuardianSigner extends Signer {
       abis,
     )
 
-    const calldata = transaction.fromCallsToExecuteCalldata(transactions)
+    const calldata = transaction.getExecuteCalldata(
+      transactions,
+      this.cairoVersion,
+    )
 
     const cosignerMessage = {
       contractAddress: addAddressPadding(transactionsDetail.walletAddress),
-      version: number.toBN(transactionsDetail.version).toString(10),
-      calldata: calldata.map((data) => number.toHex(number.toBN(data))),
-      maxFee: number.toBN(transactionsDetail.maxFee).toString(10),
-      chainId: number.toBN(transactionsDetail.chainId).toString(10),
-      nonce: number.toBN(transactionsDetail.nonce).toString(10),
+      version: num.toBigInt(transactionsDetail.version).toString(10),
+      calldata: calldata.map((data) => num.toHex(num.toBigInt(data))),
+      maxFee: num.toBigInt(transactionsDetail.maxFee).toString(10),
+      chainId: num.toBigInt(transactionsDetail.chainId).toString(10),
+      nonce: num.toBigInt(transactionsDetail.nonce).toString(10),
     }
 
     const cosignerSignature = await this.cosignMessage({
@@ -86,7 +97,9 @@ export class GuardianSigner extends Signer {
       type: "starknet",
     })
 
-    return [...signatures, ...cosignerSignature]
+    return [signatures, cosignerSignature].flatMap(
+      stark.signatureToDecimalArray,
+    )
   }
 
   public async signDeployAccountTransaction({
@@ -113,12 +126,12 @@ export class GuardianSigner extends Signer {
     const cosignerMessage = {
       classHash,
       salt: addressSalt,
-      calldata: constructorCalldata.map((data) =>
-        number.toHex(number.toBN(data)),
+      calldata: CallData.compile(constructorCalldata).map((data) =>
+        num.toHex(num.toBigInt(data)),
       ),
-      maxFee: number.toBN(maxFee).toString(10),
-      chainId: number.toBN(chainId).toString(10),
-      version: number.toBN(version).toString(10),
+      maxFee: num.toBigInt(maxFee).toString(10),
+      chainId: num.toBigInt(chainId).toString(10),
+      version: num.toBigInt(version).toString(10),
     }
 
     const cosignerSignature = await this.cosignMessage({
@@ -126,7 +139,9 @@ export class GuardianSigner extends Signer {
       type: "starknetDeploy",
     })
 
-    return [...signatures, ...cosignerSignature]
+    return [signatures, cosignerSignature].flatMap(
+      stark.signatureToDecimalArray,
+    )
   }
 
   public async signDeclareTransaction({

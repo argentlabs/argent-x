@@ -1,5 +1,6 @@
 import { DeepPick } from "../../../types/deepPick"
-import type { IUIService } from "./interface"
+import { UI_SERVICE_CONNECT_ID } from "./constants"
+import { IUIService } from "./interface"
 
 type MinimalBrowser = DeepPick<
   typeof chrome,
@@ -10,10 +11,15 @@ type MinimalBrowser = DeepPick<
   | "tabs.query"
   | "tabs.update"
   | "windows.update"
+  | "windows.remove"
+  | "windows.getAll"
 >
 
 export default class UIService implements IUIService {
-  constructor(private browser: MinimalBrowser) {}
+  constructor(
+    private browser: MinimalBrowser,
+    readonly connectId = UI_SERVICE_CONNECT_ID,
+  ) {}
 
   setDefaultPopup(popup = "index.html") {
     return this.browser.browserAction.setPopup({ popup })
@@ -66,6 +72,25 @@ export default class UIService implements IUIService {
       await this.browser.tabs.update(tab.id, {
         active: true,
       })
+    }
+  }
+
+  async getFloatingWindow() {
+    const [floatingWindow] = await this.browser.windows.getAll({
+      windowTypes: ["popup"],
+    })
+    return floatingWindow
+  }
+
+  async hasFloatingWindow() {
+    const floatingWindow = await this.getFloatingWindow()
+    return Boolean(floatingWindow)
+  }
+
+  async closeFloatingWindow() {
+    const floatingWindow = await this.getFloatingWindow()
+    if (floatingWindow?.id) {
+      await this.browser.windows.remove(floatingWindow.id)
     }
   }
 }

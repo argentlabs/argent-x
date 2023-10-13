@@ -1,4 +1,4 @@
-import { Button, MenuButton } from "@chakra-ui/react"
+import { Button, ButtonProps, MenuButton } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network, NetworkStatus } from "../../../../shared/network"
@@ -7,7 +7,7 @@ import {
   mapNetworkStatusToColor,
 } from "../../../components/StatusIndicator"
 
-interface NetworkSwitcherButtonProps {
+interface NetworkSwitcherButtonProps extends ButtonProps {
   disabled?: boolean
   currentNetworkStatus: NetworkStatus
   currentNetwork: Network
@@ -17,6 +17,7 @@ export const NetworkSwitcherButton: FC<NetworkSwitcherButtonProps> = ({
   disabled,
   currentNetworkStatus,
   currentNetwork,
+  ...rest
 }) => {
   return (
     <MenuButton
@@ -31,6 +32,7 @@ export const NetworkSwitcherButton: FC<NetworkSwitcherButtonProps> = ({
           color={mapNetworkStatusToColor(currentNetworkStatus)}
         />
       }
+      {...rest}
     >
       {currentNetwork.name}
     </MenuButton>

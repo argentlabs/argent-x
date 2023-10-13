@@ -1,5 +1,5 @@
+import { isAddress } from "@argent/shared"
 import { Token as SwapToken } from "@argent/x-swap"
-import { BigNumberish } from "ethers"
 import { useMemo } from "react"
 
 import {
@@ -8,11 +8,6 @@ import {
   ARGENT_API_TOKENS_PRICES_URL,
 } from "../../../shared/api/constants"
 import {
-  isPrivacySettingsEnabled,
-  settingsStore,
-} from "../../../shared/settings"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
   convertTokenAmountToCurrencyValue,
@@ -20,26 +15,30 @@ import {
   lookupTokenPriceDetails,
   sumTokenBalancesToCurrencyValue,
 } from "../../../shared/token/price"
-import { Token } from "../../../shared/token/type"
 import { isNumeric } from "../../../shared/utils/number"
 import { argentApiFetcher } from "../../services/argentApiFetcher"
-import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
-import { useIsMainnet } from "../networks/hooks/useIsMainnet"
-import { TokenDetailsWithBalance } from "./tokens.state"
+import {
+  useConditionallyEnabledSWR,
+  withPolling,
+} from "../../services/swr.service"
+import { useIsDefaultNetwork } from "../networks/hooks/useIsDefaultNetwork"
+import { BigNumberish } from "starknet"
+import { RefreshInterval } from "../../../shared/config"
+import { useView } from "../../views/implementation/react"
+import { tokenPricesView } from "../../views/tokenPrices"
+import { allTokensView } from "../../views/token"
+import { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
+import {
+  BaseTokenSchema,
+  Token,
+} from "../../../shared/token/__new/types/token.model"
 
 /** @returns true if API is enabled, app is on mainnet and the user has enabled Argent services */
 
 export const useCurrencyDisplayEnabled = () => {
-  const isMainnet = useIsMainnet()
-  const privacyUseArgentServicesEnabled = useKeyValueStorage(
-    settingsStore,
-    "privacyUseArgentServices",
-  )
-  /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
-  if (!isPrivacySettingsEnabled) {
-    return ARGENT_API_ENABLED && isMainnet
-  }
-  return ARGENT_API_ENABLED && isMainnet && privacyUseArgentServicesEnabled
+  const isDefaultNetwork = useIsDefaultNetwork()
+
+  return ARGENT_API_ENABLED && isDefaultNetwork
 }
 
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
@@ -50,14 +49,32 @@ export const usePriceAndTokenDataFromApi = () => {
     !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
     argentApiFetcher,
-    withPolling(60 * 1000) /** 60 seconds */,
+    withPolling(RefreshInterval.MEDIUM * 1000) /** 60 seconds */,
   )
   const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
     !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
     argentApiFetcher,
-    withPolling(5 * 60 * 1000) /** 5 minutes */,
+    withPolling(RefreshInterval.SLOW * 1000) /** 5 minutes */,
   )
+  return {
+    pricesData,
+    tokenData,
+  }
+}
+
+export const usePriceAndTokenDataFromRepo = () => {
+  const currencyDisplayEnabled = useCurrencyDisplayEnabled()
+  const pricesData = useView(tokenPricesView)
+  const tokenData = useView(allTokensView)
+
+  if (!currencyDisplayEnabled) {
+    return {
+      pricesData: undefined,
+      tokenData: undefined,
+    }
+  }
+
   return {
     pricesData,
     tokenData,
@@ -72,22 +89,23 @@ export const usePriceAndTokenDataDisabled = () => {
 }
 
 export const usePriceAndTokenData = ARGENT_API_ENABLED
-  ? usePriceAndTokenDataFromApi
+  ? usePriceAndTokenDataFromRepo
   : usePriceAndTokenDataDisabled
 
 /** @returns individual price details for the token */
 
 export const useTokenPriceDetails = (
-  token?: Token | TokenDetailsWithBalance | SwapToken,
+  token?: Token | TokenWithOptionalBigIntBalance | SwapToken,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   const { pricesData, tokenData } = usePriceAndTokenDataImpl()
   return useMemo(() => {
-    if (!token || !pricesData || !tokenData) {
+    if (!token || !pricesData || !tokenData || !isAddress(token.address)) {
       return
     }
+    const parsedToken = BaseTokenSchema.parse(token)
     return lookupTokenPriceDetails({
-      token,
+      token: parsedToken,
       pricesData,
       tokenData,
     })
@@ -103,7 +121,7 @@ export const useTokenPriceDetails = (
  */
 
 export const useTokenUnitAmountToCurrencyValue = (
-  token?: Token | TokenDetailsWithBalance | SwapToken,
+  token?: Token | TokenWithOptionalBigIntBalance | SwapToken,
   unitAmount?: BigNumberish,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
@@ -125,7 +143,7 @@ export const useTokenUnitAmountToCurrencyValue = (
  */
 
 export const useTokenAmountToCurrencyValue = (
-  token?: Token | TokenDetailsWithBalance | SwapToken,
+  token?: Token | TokenWithOptionalBigIntBalance | SwapToken,
   amount?: BigNumberish,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
@@ -156,7 +174,7 @@ export const useTokenAmountToCurrencyValue = (
  */
 
 export const useTokenBalanceToCurrencyValue = (
-  token?: TokenDetailsWithBalance,
+  token?: TokenWithOptionalBigIntBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   return useTokenAmountToCurrencyValue(
@@ -173,7 +191,7 @@ export const useTokenBalanceToCurrencyValue = (
  */
 
 export const useSumTokenBalancesToCurrencyValue = (
-  tokens: TokenDetailsWithBalance[],
+  tokens: TokenWithOptionalBigIntBalance[],
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   const { pricesData, tokenData } = usePriceAndTokenDataImpl()

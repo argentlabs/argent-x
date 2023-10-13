@@ -1,5 +1,4 @@
-import { BigNumber } from "ethers"
-import { RawArgs, stark, uint256 } from "starknet"
+import { BigNumberish, CallData, RawArgs, uint256 } from "starknet"
 
 import { executeTransaction } from "./backgroundTransactions"
 
@@ -9,19 +8,17 @@ interface TransactionRequest {
   calldata: RawArgs
 }
 
-export const sendTransaction = (data: TransactionRequest) => {
-  executeTransaction({
+export const sendTransaction = async (data: TransactionRequest) => {
+  return executeTransaction({
     transactions: {
       contractAddress: data.to,
       entrypoint: data.method,
-      calldata: stark.compileCalldata(data.calldata || {}),
+      calldata: CallData.toCalldata(data.calldata),
     },
   })
 }
 
-export function getUint256CalldataFromBN(bn: BigNumber) {
-  return {
-    type: "struct" as const,
-    ...uint256.bnToUint256(bn.toHexString()),
-  }
+// TODO: Remove ethers__BigNumber dependencies
+export function getUint256CalldataFromBN(bn: BigNumberish) {
+  return uint256.bnToUint256(bn)
 }

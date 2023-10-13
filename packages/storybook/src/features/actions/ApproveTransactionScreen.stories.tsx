@@ -1,12 +1,15 @@
+import {
+  aspect,
+  jediswap,
+  jediswapUnsafe,
+  transfer,
+} from "@argent-x/extension/src/ui/features/actions/__fixtures__"
 import { ApproveTransactionScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ApproveTransactionScreen"
 import { P4 } from "@argent/ui"
 import { Center } from "@chakra-ui/layout"
 
 import { account } from "../../account"
 import { decorators } from "../../decorators/routerDecorators"
-import aspect from "./__fixtures__/aspect"
-import jediswap from "./__fixtures__/jediswap"
-import transfer from "./__fixtures__/transfer"
 
 export default {
   component: ApproveTransactionScreen,
@@ -25,7 +28,7 @@ const footer = (
 export const Jediswap = {
   args: {
     ...jediswap,
-    disableConfirm: true,
+    disableConfirm: false,
     isMainnet: true,
     isSimulationLoading: false,
     selectedAccount: account,
@@ -35,12 +38,8 @@ export const Jediswap = {
 
 export const JediswapUnsafe = {
   args: {
-    ...jediswap,
-    aggregatedData: jediswap.aggregatedData.map((data) => ({
-      ...data,
-      safe: false,
-    })),
-    disableConfirm: true,
+    ...jediswapUnsafe,
+    disableConfirm: false,
     isMainnet: true,
     isSimulationLoading: false,
     selectedAccount: account,
@@ -51,7 +50,7 @@ export const JediswapUnsafe = {
 export const Transfer = {
   args: {
     ...transfer,
-    disableConfirm: true,
+    disableConfirm: false,
     isMainnet: true,
     isSimulationLoading: false,
     selectedAccount: account,
@@ -62,10 +61,24 @@ export const Transfer = {
 export const Aspect = {
   args: {
     ...aspect,
-    disableConfirm: true,
+    disableConfirm: false,
     isMainnet: true,
     isSimulationLoading: false,
     selectedAccount: account,
     footer,
+  } as any,
+}
+
+export const AspectIsApproving = {
+  args: {
+    ...Aspect.args,
+    actionIsApproving: true,
+  } as any,
+}
+
+export const AspectErrorApproving = {
+  args: {
+    ...Aspect.args,
+    actionErrorApproving: "Lorem ipsum dolor sit amet",
   } as any,
 }

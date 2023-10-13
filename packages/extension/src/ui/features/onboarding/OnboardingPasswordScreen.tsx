@@ -6,13 +6,19 @@ import { z } from "zod"
 
 import { AllowPromise } from "../../../shared/storage/types"
 import { ControlledInput } from "../../components/ControlledInput"
-import { passwordSchema } from "../recovery/seedRecovery.state"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
+import { PasswordStrengthIndicator } from "@argent/ui"
 
+const MIN_PASSWORD_LENGTH = 8
 const setPasswordFormSchema = z
   .object({
-    password: passwordSchema,
+    password: z
+      .string()
+      .min(
+        MIN_PASSWORD_LENGTH,
+        `Must contain at least ${MIN_PASSWORD_LENGTH} characters`,
+      ),
     repeatPassword: z.string(), // not using passwordSchema here, as we want to show a different error message
   })
   .refine((data) => data.password === data.repeatPassword, {
@@ -43,6 +49,7 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
     control,
     handleSubmit,
     setError,
+    watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<PasswordForm>({
     criteriaMode: "firstError",
@@ -94,6 +101,7 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
           placeholder="Password"
           isDisabled={isSubmitting}
         />
+        <PasswordStrengthIndicator password={watch("password")} />
         <ControlledInput
           name="repeatPassword"
           control={control}

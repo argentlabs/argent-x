@@ -24,11 +24,14 @@ export interface IAccountService {
   ): Promise<void>
 
   // Repo methods
-  get(selector: SelectorFn<WalletAccount>): Promise<WalletAccount[]>
+  get(selector?: SelectorFn<WalletAccount>): Promise<WalletAccount[]>
   upsert(account: AllowArray<WalletAccount>): Promise<void>
   remove(baseAccount: BaseWalletAccount): Promise<void>
 
   // mutations/updates
   setHide(hidden: boolean, baseAccount: BaseWalletAccount): Promise<void>
   setName(name: string, baseAccount: BaseWalletAccount): Promise<void>
+
+  // getters
+  getDeployed(baseAccount: BaseWalletAccount): Promise<boolean>
 }

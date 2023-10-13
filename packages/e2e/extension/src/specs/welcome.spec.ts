@@ -36,5 +36,8 @@ test.describe("Welcome screen", () => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
+    await expect(extension.network.networkSelector).toHaveText(
+      extension.network.getDefaultNetworkName(),
+    )
   })
 })

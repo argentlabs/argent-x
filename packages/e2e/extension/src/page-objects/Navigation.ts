@@ -20,8 +20,16 @@ export default class Navigation {
     return this.page.locator(`button:text-is("${lang.common.confirm}")`)
   }
 
+  get confirm() {
+    return this.page.locator(`button:text-is("${lang.common.confirm}")`)
+  }
+
   get next() {
     return this.page.locator(`button:text-is("${lang.common.next}")`)
+  }
+
+  get reviewSend() {
+    return this.page.locator(`button:text-is("${lang.common.reviewSend}")`)
   }
 
   get done() {
@@ -51,7 +59,7 @@ export default class Navigation {
   }
 
   get lockWallet() {
-    return this.page.locator(`button:text-is("${lang.common.lockWallet}")`)
+    return this.page.locator(`[aria-label="${lang.common.lockWallet}"]`)
   }
 
   get reset() {
@@ -62,7 +70,7 @@ export default class Navigation {
     return this.page.locator(`button:text-is("${lang.common.confirmReset}")`)
   }
 
-  get menuPendingTransationsIndicator() {
+  get menuPendingTransactionsIndicator() {
     return this.page.locator('[aria-label="Pending transactions"]')
   }
 

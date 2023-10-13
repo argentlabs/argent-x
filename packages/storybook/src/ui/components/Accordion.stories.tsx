@@ -29,12 +29,27 @@ const children = (
       veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
       commodo consequat.
     </AccordionPanel>
+    <AccordionPanel>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+      commodo consequat.
+    </AccordionPanel>
   </AccordionItem>
 )
 
 export const Default = {
   args: {
     allowToggle: true,
+    children,
+  },
+}
+
+export const ColorSchemeNeutrals = {
+  args: {
+    allowToggle: true,
+    size: "sm",
+    colorScheme: "neutrals",
     children,
   },
 }

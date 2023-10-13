@@ -10,10 +10,8 @@ export const provider = new SequencerProvider({
   baseUrl: BASE_URL,
 })
 
-const keyPair = ec.getKeyPair(pkOnlyForLocalTesting)
-
 export const testAccount = new Account(
   provider,
   fromAddressOnlyForLocalTesting,
-  keyPair,
+  pkOnlyForLocalTesting,
 )

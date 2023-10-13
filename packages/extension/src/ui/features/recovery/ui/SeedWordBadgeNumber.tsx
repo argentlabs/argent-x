@@ -8,9 +8,9 @@ export const SeedWordBadgeNumber: FC<PropsWithChildren> = ({
   return (
     <Box
       fontWeight="600"
-      borderRadius="20px"
+      borderRadius="10px"
       color="neutrals.400"
-      backgroundColor="white"
+      backgroundColor="neutrals.800"
       marginRight="4px"
       lineHeight="18px"
       width="18px"

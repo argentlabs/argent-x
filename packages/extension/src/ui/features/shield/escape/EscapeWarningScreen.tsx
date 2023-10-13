@@ -9,16 +9,11 @@ import { Center } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useMemo, useRef } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
-import { ESCAPE_TYPE_GUARDIAN } from "../../../../shared/account/details/getEscape"
+import { ESCAPE_TYPE_GUARDIAN } from "../../../../shared/account/details/escape.model"
 import { IS_DEV } from "../../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../../shared/utils/error"
 import { routes } from "../../../routes"
 import { analytics } from "../../../services/analytics"
-import {
-  accounTriggerEscapeGuardian,
-  accountCancelEscape,
-  accountEscapeAndChangeGuardian,
-} from "../../../services/backgroundAccounts"
 import { useAccountGuardianIsSelf } from "../useAccountGuardian"
 import { usePendingChangeGuardian } from "../usePendingChangingGuardian"
 import { useRouteAccount } from "../useRouteAccount"
@@ -30,6 +25,7 @@ import {
   useAccountHasPendingCancelEscape,
   useLiveAccountEscape,
 } from "./useAccountEscape"
+import { accountMessagingService } from "../../../services/accountMessaging"
 
 const { ArgentShieldIcon } = icons
 
@@ -87,7 +83,7 @@ export const EscapeWarningScreen: FC = () => {
     }
     await hideEscapeWarning(account)
     try {
-      await accountCancelEscape(account)
+      await accountMessagingService.cancelEscape(account)
     } catch (error) {
       IS_DEV && console.warn(coerceErrorToString(error))
       toast({
@@ -110,7 +106,7 @@ export const EscapeWarningScreen: FC = () => {
     })
     await hideEscapeWarning(account)
     try {
-      await accounTriggerEscapeGuardian(account)
+      await accountMessagingService.triggerEscapeGuardian(account)
     } catch (error) {
       IS_DEV && console.warn(coerceErrorToString(error))
       toast({
@@ -136,7 +132,7 @@ export const EscapeWarningScreen: FC = () => {
 
     await hideEscapeWarning(account)
     try {
-      await accountEscapeAndChangeGuardian(account)
+      await accountMessagingService.escapeAndChangeGuardian(account)
     } catch (error) {
       IS_DEV && console.warn(coerceErrorToString(error))
       toast({

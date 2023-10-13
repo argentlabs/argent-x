@@ -1,5 +1,6 @@
 import { FunctionInvocation, hash, uint256 } from "starknet"
 
+import { addressSchema } from "../chains"
 import {
   TransactionSimulationApproval,
   TransactionSimulationTransfer,
@@ -26,7 +27,7 @@ export const findTransfersAndApprovals = (
       for (const key of event.keys) {
         if (key === EventsBySelector.Approval) {
           approvals.push({
-            tokenAddress: internalCall.contract_address,
+            tokenAddress: addressSchema.parse(internalCall.contract_address),
             owner: event.data[0],
             spender: event.data[1],
             value: uint256
@@ -36,7 +37,7 @@ export const findTransfersAndApprovals = (
         }
         if (key === EventsBySelector.Transfer) {
           transfers.push({
-            tokenAddress: internalCall.contract_address,
+            tokenAddress: addressSchema.parse(internalCall.contract_address),
             from: event.data[0],
             to: event.data[1],
             value: uint256

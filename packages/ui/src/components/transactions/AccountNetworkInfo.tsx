@@ -1,9 +1,11 @@
-import { formatTruncatedAddress } from "@argent/shared"
 import { Flex, VStack, useColorMode } from "@chakra-ui/react"
-import { useMemo } from "react"
+import { useMemo, FC } from "react"
 
 import { P4 } from "../Typography"
-import { PrettyAccountAddress } from "./PrettyAccountAddress"
+import {
+  PrettyAccountAddress as DefaultPrettyAccountAddress,
+  PrettyAccountAddressProps,
+} from "./PrettyAccountAddress"
 
 interface AccountNetworkInfoProps {
   accountAddress: string
@@ -11,6 +13,7 @@ interface AccountNetworkInfoProps {
   networkId: string
   networkName: string
   to?: string
+  PrettyAccountAddress?: FC<PrettyAccountAddressProps>
 }
 
 export const AccountNetworkInfo = ({
@@ -19,6 +22,7 @@ export const AccountNetworkInfo = ({
   networkId,
   networkName,
   to,
+  PrettyAccountAddress = DefaultPrettyAccountAddress,
 }: AccountNetworkInfoProps) => {
   const { colorMode } = useColorMode()
   const isDark = useMemo(() => colorMode === "dark", [colorMode])

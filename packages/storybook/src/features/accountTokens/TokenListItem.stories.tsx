@@ -1,43 +1,24 @@
-import { Token } from "@argent-x/extension/src/shared/token/type"
-import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/utils"
 import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens/TokenListItem"
 import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { CellStack } from "@argent/ui"
-import { BigNumber } from "ethers"
 import { ComponentProps } from "react"
+import { tokenWithBalance, tokenWithSymbol } from "../../tokens"
 
 export default {
   component: TokenListItem,
-}
-
-const tokenWithSymbol = (symbol: string): Token => {
-  const token = parsedDefaultTokens.find((token) => token.symbol === symbol)
-  if (!token) {
-    throw `No token found for symbol ${symbol}`
-  }
-  return token
-}
-
-const ethToken = tokenWithSymbol("ETH")
-const testToken = tokenWithSymbol("TEST")
-
-const tokenWithBalance = (
-  balance?: number | string,
-  token = ethToken,
-): TokenDetailsWithBalance => {
-  return {
-    ...token,
-    balance: balance ? BigNumber.from(balance) : undefined,
-  }
-}
-
-export const Default = {
+  parameters: {
+    layout: "fullscreen",
+  },
   render: (props: ComponentProps<typeof TokenListItem>) => (
     <CellStack>
       <TokenListItem {...props}></TokenListItem>
     </CellStack>
   ),
+}
 
+const longNameToken = tokenWithSymbol("wstETH")
+
+export const Default = {
   args: {
     isLoading: false,
     token: tokenWithBalance("1000000000000000000"),
@@ -46,7 +27,6 @@ export const Default = {
 }
 
 export const Thousands = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance("1234000000000000000000"),
@@ -55,7 +35,6 @@ export const Thousands = {
 }
 
 export const HighLongBalance = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance("12345678000000000000000000"),
@@ -64,7 +43,6 @@ export const HighLongBalance = {
 }
 
 export const LowLongBalance = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance("100000000000000"),
@@ -73,7 +51,6 @@ export const LowLongBalance = {
 }
 
 export const DustLongBalance = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance("892308777860895"),
@@ -82,7 +59,6 @@ export const DustLongBalance = {
 }
 
 export const MissingCurrencyValue = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance("100000000000000"),
@@ -91,7 +67,6 @@ export const MissingCurrencyValue = {
 }
 
 export const MissingBalance = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance(),
@@ -99,7 +74,6 @@ export const MissingBalance = {
 }
 
 export const MissingBalanceAndError = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance(),
@@ -112,7 +86,6 @@ export const MissingBalanceAndError = {
 }
 
 export const NoCurrencyVariant = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance("12345678000000000000000000"),
@@ -122,7 +95,6 @@ export const NoCurrencyVariant = {
 }
 
 export const MissingCurrencyValueNoCurrencyVariant = {
-  ...Default,
   args: {
     isLoading: false,
     token: tokenWithBalance("100000000000000"),
@@ -132,10 +104,9 @@ export const MissingCurrencyValueNoCurrencyVariant = {
 }
 
 export const LongTokenNameAndBalance = {
-  ...Default,
   args: {
     isLoading: false,
-    token: tokenWithBalance("400", testToken),
+    token: tokenWithBalance("400", longNameToken),
     currencyValue: undefined,
     variant: "no-currency",
   },

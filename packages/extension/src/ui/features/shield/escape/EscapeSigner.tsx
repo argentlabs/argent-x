@@ -2,7 +2,7 @@ import { Button, FlowHeader, P4, icons } from "@argent/ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/getEscape"
+import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/escape.model"
 import { analytics } from "../../../services/analytics"
 import { ZENDESK_LINK } from "../../userReview/ReviewFeedbackScreen"
 import {

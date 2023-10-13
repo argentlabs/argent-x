@@ -15,7 +15,6 @@ export async function getAccountGuardiansFromChain(
       return getGuardianForAccount(account)
     }),
   )
-
   const accountsWithGuardians = accounts.map((account, index) => {
     const guardianResult = guardianResults[index]
     const guardian =

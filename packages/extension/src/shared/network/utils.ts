@@ -1,9 +1,10 @@
-import { constants } from "starknet5"
+import { constants } from "starknet"
 
 import { isEqualAddress } from "../../ui/services/addresses"
 import { ArgentAccountType } from "../wallet.model"
-import { Network } from "./type"
+import { DefaultNetworkId, Network } from "./type"
 
+// LEGACY ⬇️
 export function mapImplementationToArgentAccountType(
   implementation: string,
   network: Network,
@@ -35,28 +36,76 @@ export function getChainIdFromNetworkId(
     case "goerli-alpha":
       return constants.StarknetChainId.SN_GOERLI
 
-    case "goerli-alpha-2":
-      return constants.StarknetChainId.SN_GOERLI2
-
     default:
       throw new Error(`Unknown networkId: ${networkId}`)
   }
 }
 
-export function getChainIdFromNetworkId(
-  networkId: string,
-): constants.StarknetChainId {
-  switch (networkId) {
-    case "mainnet-alpha":
-      return constants.StarknetChainId.SN_MAIN
+export function getNetworkIdFromChainId(
+  encodedChainId: string,
+): "mainnet-alpha" | "goerli-alpha" {
+  switch (encodedChainId) {
+    case constants.StarknetChainId.SN_MAIN:
+      return "mainnet-alpha"
 
-    case "goerli-alpha":
-      return constants.StarknetChainId.SN_GOERLI
-
-    case "goerli-alpha-2":
-      return constants.StarknetChainId.SN_GOERLI2
+    case constants.StarknetChainId.SN_GOERLI:
+      return "goerli-alpha"
 
     default:
-      throw new Error(`Unknown networkId: ${networkId}`)
+      throw new Error(`Unknown chainId: ${encodedChainId}`)
   }
+}
+
+export function getDefaultNetwork(defaultNetworks: Network[]): Network {
+  const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
+  let defaultNetworkId: DefaultNetworkId
+
+  if (!argentXEnv) {
+    throw new Error("ARGENT_X_ENVIRONMENT not set")
+  }
+
+  switch (argentXEnv.toLowerCase()) {
+    case "prod":
+    case "staging":
+      defaultNetworkId = "mainnet-alpha"
+      break
+
+    case "hydrogen":
+    case "test":
+      defaultNetworkId = "goerli-alpha"
+      break
+
+    default:
+      throw new Error(`Unknown ARGENTX_ENVIRONMENT: ${argentXEnv}`)
+  }
+
+  const defaultNetwork = defaultNetworks.find(
+    (dn) => dn.id === defaultNetworkId,
+  )
+
+  if (!defaultNetwork) {
+    throw new Error(`Unknown default network: ${defaultNetworkId}`)
+  }
+
+  return defaultNetwork
+}
+
+export const getNetworkUrl = (network: Network) => {
+  if (network.rpcUrl) {
+    return network.rpcUrl
+  } else if (network.sequencerUrl) {
+    return network.sequencerUrl
+  } else if (
+    "baseUrl" in network &&
+    network.baseUrl &&
+    typeof network.baseUrl === "string"
+  ) {
+    return network.baseUrl
+  } else {
+    throw new Error("No network URL found")
+  }
+}
+
+export function isArgentNetwork(network: Network) {
+  return network.id === "mainnet-alpha" || network.id === "goerli-alpha"
 }

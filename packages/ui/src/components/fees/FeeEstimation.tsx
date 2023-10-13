@@ -25,9 +25,7 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
   const { colorMode } = useColorMode()
   const isDark = useMemo(() => colorMode === "dark", [colorMode])
 
-  const showFeeError = Boolean(
-    executionFees && feeTokenWithBalance && !enoughBalance,
-  )
+  const showFeeError = Boolean(feeTokenWithBalance && !enoughBalance)
   const showEstimateError = Boolean(error)
   const showError = showFeeError || showEstimateError
 
@@ -154,7 +152,13 @@ export const FeeEstimation: FC<TransactionsFeeEstimationProps> = ({
             Error
           </P4>
         ) : (
-          <LoadingPulse />
+          <Flex flex={0.5}>
+            <LoadingPulse
+              isLoading={!executionFees && !showEstimateError}
+              bg="neutrals.100"
+              w="100%"
+            />
+          </Flex>
         )}
       </Flex>
 

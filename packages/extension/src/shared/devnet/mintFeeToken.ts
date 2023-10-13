@@ -1,12 +1,20 @@
 import urlJoin from "url-join"
 
-import { getNetwork } from "../network"
+import { networkService as argentNetworkService } from "../network/service"
+import { getNetworkUrl } from "../network/utils"
 import { BaseWalletAccount } from "../wallet.model"
+import { INetworkService } from "../network/service/interface"
 
-export const tryToMintFeeToken = async (account: BaseWalletAccount) => {
+export const tryToMintFeeToken = async (
+  account: BaseWalletAccount,
+  networkService?: Pick<INetworkService, "getById">, // This is required for testing
+) => {
   try {
-    const network = await getNetwork(account.networkId)
-    await fetch(urlJoin(network.baseUrl, "mint"), {
+    const network = await (networkService || argentNetworkService).getById(
+      account.networkId,
+    )
+    const networkUrl = getNetworkUrl(network)
+    await fetch(urlJoin(networkUrl, "mint"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

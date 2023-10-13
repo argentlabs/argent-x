@@ -1,55 +1,41 @@
 import objectHash from "object-hash"
-import { useCallback } from "react"
-import { useMemo } from "react"
-import { Account, Call, InvocationsSignerDetails, hash, number } from "starknet"
+import { useCallback, useMemo } from "react"
+import {
+  Account,
+  Call,
+  CallData,
+  DeployAccountContractPayload,
+  InvocationsSignerDetails,
+  TransactionType,
+  hash,
+  num,
+} from "starknet"
 import urlJoin from "url-join"
 
 import { fetchData } from "../http/fetcher"
-import { useConditionallyEnabledSWR } from "../http/swr"
+import {
+  swrRefetchDisabledConfig,
+  useConditionallyEnabledSWR,
+} from "../http/swr"
 import { isContractDeployed } from "../utils/isContractDeployed"
-import { findTransfersAndApprovals } from "./findTransfersAndApprovals"
 import {
   ApiTransactionSimulationResponse,
   IUseTransactionSimulation,
-  TransactionSimulationApproval,
-  TransactionSimulationTransfer,
+  SimulateDeployAccountRequest,
+  SimulateInvokeRequest,
+  SimulationError,
 } from "./transactionSimulationTypes"
 
 type ISimulateTransactionInvocation = {
   account: Account
   transactions: Call | Call[]
-}
-
-const doTransactionSimulation = async ({
-  account,
-  transactions,
-}: ISimulateTransactionInvocation) => {
-  const nonce = await account.getNonce()
-  let simulated = null
-  const transfers: TransactionSimulationTransfer[] = []
-  const approvals: TransactionSimulationApproval[] = []
-
-  try {
-    simulated = await account.simulateTransaction(transactions, {
-      nonce,
-    })
-  } catch (error) {
-    console.error(error)
-    return { transfers, approvals }
-  }
-  const internalCalls = simulated.trace.function_invocation?.internal_calls
-
-  if (!internalCalls) {
-    return { transfers, approvals }
-  }
-
-  findTransfersAndApprovals(internalCalls, approvals, transfers)
-  return { transfers, approvals }
+  accountDeployPayload?: DeployAccountContractPayload
 }
 
 const simulateTransactionInvocation = async ({
   account,
   transactions,
+  accountDeployPayload,
 }: ISimulateTransactionInvocation) => {
   try {
     if (!account) {
@@ -57,8 +43,8 @@ const simulateTransactionInvocation = async ({
     }
 
     const nonce = await account.getNonce()
-    const chainId = account.chainId
-    const version = number.toHex(hash.feeTransactionVersion)
+    const chainId = await account.getChainId()
+    const version = num.toHex(hash.feeTransactionVersion)
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: account.address,
@@ -66,25 +52,49 @@ const simulateTransactionInvocation = async ({
       maxFee: 0,
       version,
       chainId,
+      cairoVersion: account.cairoVersion,
     }
 
-    const { contractAddress, calldata, signature } =
-      await account.buildInvocation(
-        Array.isArray(transactions) ? transactions : [transactions],
-        signerDetails,
-      )
+    let accountDeployTransaction: SimulateDeployAccountRequest | null = null
 
-    const invocation = {
-      type: "INVOKE_FUNCTION" as const,
-      contract_address: contractAddress,
-      calldata,
-      signature,
-      nonce,
+    const { contractAddress, calldata } = await account.buildInvocation(
+      Array.isArray(transactions) ? transactions : [transactions],
+      signerDetails,
+    )
+
+    const invokeTransactions: SimulateInvokeRequest = {
+      type: TransactionType.INVOKE,
+      sender_address: contractAddress,
+      calldata: CallData.toCalldata(calldata),
+      signature: [],
+      nonce: !accountDeployPayload ? num.toHex(nonce) : num.toHex(1),
       version,
     }
 
+    // account is not deployed
+    if (accountDeployPayload) {
+      const accountDeployInvocation = await account.buildAccountDeployPayload(
+        accountDeployPayload,
+        signerDetails,
+      )
+
+      accountDeployTransaction = {
+        type: TransactionType.DEPLOY_ACCOUNT as const,
+        calldata: CallData.toCalldata(
+          accountDeployInvocation.constructorCalldata,
+        ),
+        classHash: num.toHex(accountDeployInvocation.classHash),
+        salt: num.toHex(accountDeployInvocation.addressSalt || 0),
+        nonce: num.toHex(0),
+        version: num.toHex(version),
+        signature: [],
+      }
+    }
+
     return {
-      invocation,
+      transactions: accountDeployTransaction
+        ? [accountDeployTransaction, invokeTransactions]
+        : [invokeTransactions],
       chainId,
     }
   } catch (error) {
@@ -100,6 +110,7 @@ const simulateTransactionInvocation = async ({
 export const useTransactionSimulation = ({
   apiData,
   account,
+  accountDeployPayload,
   transactions,
   provider,
   transactionSimulationEnabled = true,
@@ -110,10 +121,6 @@ export const useTransactionSimulation = ({
     }
 
     const isDeployed = await isContractDeployed(provider, account.address)
-    if (!isDeployed) {
-      // TODO: handle account deployment
-      return
-    }
 
     try {
       const { apiBaseUrl, apiHeaders } = apiData
@@ -123,13 +130,19 @@ export const useTransactionSimulation = ({
 
       const ARGENT_TRANSACTION_SIMULATION_URL = urlJoin(
         apiBaseUrl,
-        "starknet/simulate",
+        "starknet/bulkSimulate",
       )
 
-      const { invocation, chainId } = await simulateTransactionInvocation({
-        account,
-        transactions,
-      })
+      // pass deploy payload only if the account is not deployed
+      const conditionalAccountDeployPayload =
+        !isDeployed && accountDeployPayload ? accountDeployPayload : undefined
+
+      const { transactions: invocation, chainId } =
+        await simulateTransactionInvocation({
+          account,
+          transactions,
+          accountDeployPayload: conditionalAccountDeployPayload,
+        })
 
       const backendSimulation = await fetchData(
         ARGENT_TRANSACTION_SIMULATION_URL,
@@ -141,28 +154,81 @@ export const useTransactionSimulation = ({
             ...apiHeaders,
           },
           body: JSON.stringify({
-            ...invocation,
+            transactions: invocation,
             chainId,
           }),
         },
       )
-      return backendSimulation
+      return backendSimulation.simulationResults
     } catch (e) {
-      console.error("Failed to fetch transaction simulation from backend", e)
-      console.warn("Falling back to client-side simulation")
-
-      return doTransactionSimulation({ account, transactions })
+      /** Disable client-side simulation
+      // console.error("Failed to fetch transaction simulation from backend", e)
+      // console.warn("Falling back to client-side simulation")
+      // return doTransactionSimulation({ account, transactions })
+      */
+      if ((e as SimulationError).status >= 500) {
+        console.error("Failed to fetch transaction simulation from backend", e)
+        console.warn("Falling back to client-side simulation")
+        return undefined
+      }
+      throw new Error(
+        `Failed to fetch transaction simulation from backend: ${e} `,
+      )
     }
   }, [account, transactions])
 
   const hash = useMemo(() => objectHash({ transactions }), [transactions])
 
-  return useConditionallyEnabledSWR<ApiTransactionSimulationResponse>(
+  return useConditionallyEnabledSWR<
+    ApiTransactionSimulationResponse[] | undefined
+  >(
     Boolean(transactionSimulationEnabled),
     [hash, "transactionSimulation"],
     transactionSimulationFetcher,
-    {
-      revalidateOnFocus: false,
-    },
+    swrRefetchDisabledConfig,
   )
+}
+
+export const useTxFeesPreprocessor = (
+  transactionSimulation?: ApiTransactionSimulationResponse[],
+) => {
+  return useMemo(() => {
+    if (!transactionSimulation) {
+      return null
+    }
+
+    const { feeEstimation } = transactionSimulation.reduce<
+      Pick<ApiTransactionSimulationResponse, "feeEstimation">
+    >(
+      (acc, tx) => {
+        const gasPrice =
+          num.toBigInt(acc.feeEstimation?.gasPrice ?? 0) +
+          num.toBigInt(tx.feeEstimation?.gasPrice ?? 0)
+        const gasUsage =
+          num.toBigInt(acc.feeEstimation?.gasUsage ?? 0) +
+          num.toBigInt(tx.feeEstimation?.gasUsage ?? 0)
+        const overallFee =
+          num.toBigInt(acc.feeEstimation?.overallFee ?? 0) +
+          num.toBigInt(tx.feeEstimation?.overallFee ?? 0)
+
+        return {
+          feeEstimation: {
+            gasPrice,
+            gasUsage,
+            overallFee,
+            unit: tx.feeEstimation?.unit ?? "wei",
+          },
+        }
+      },
+      {
+        feeEstimation: {
+          gasPrice: num.toBigInt(0),
+          gasUsage: num.toBigInt(0),
+          overallFee: num.toBigInt(0),
+          unit: "wei",
+        },
+      },
+    )
+    return feeEstimation
+  }, [transactionSimulation])
 }

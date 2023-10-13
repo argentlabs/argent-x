@@ -1,9 +1,11 @@
 import { isBoolean, isPlainObject } from "lodash-es"
 import browser from "webextension-polyfill"
 
-import { Wallet } from "../../background/wallet"
+import { WalletBackupService } from "../../background/wallet/backup/backup.service"
 import { old_walletStore } from "../../shared/wallet/walletStore"
 import { migrateWalletAccounts } from "../account/storeMigration"
+
+/** TODO: refactor and check - This method is called for every message at the beginning of `handleMessage` */
 
 export async function migrateWallet() {
   await Promise.allSettled([
@@ -25,7 +27,7 @@ export async function migrateBackup() {
     }
 
     const oldWallet = JSON.parse(needsMigration)
-    if (!Wallet.validateBackup(oldWallet)) {
+    if (!WalletBackupService.validateBackup(oldWallet)) {
       throw new Error("Invalid backup")
     }
     await old_walletStore.set("backup", oldWallet)

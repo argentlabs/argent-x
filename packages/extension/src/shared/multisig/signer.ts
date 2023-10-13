@@ -3,15 +3,14 @@ import {
   Call,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
-  KeyPair,
   Signature,
   Signer,
-  number,
+  stark,
 } from "starknet"
 
 export class MultisigSigner extends Signer {
-  constructor(keyPair: KeyPair) {
-    super(keyPair)
+  constructor(pk: Uint8Array | string) {
+    super(pk)
   }
 
   public async signDeployAccountTransaction(
@@ -21,9 +20,11 @@ export class MultisigSigner extends Signer {
       deployAccountSignerDetails,
     )
 
+    const formattedSignatures = stark.signatureToDecimalArray(signatures)
+
     const publicSigner = await this.getPubKey()
 
-    return [number.toFelt(publicSigner), ...signatures]
+    return [publicSigner, ...formattedSignatures] // Intentionally publicSigner is hex and signatures are decimal. Backend should be able to handle this
   }
 
   public async signTransaction(
@@ -37,8 +38,10 @@ export class MultisigSigner extends Signer {
       abis,
     )
 
+    const formattedSignatures = stark.signatureToDecimalArray(signatures)
+
     const publicSigner = await this.getPubKey()
 
-    return [number.toFelt(publicSigner), ...signatures]
+    return [publicSigner, ...formattedSignatures]
   }
 }

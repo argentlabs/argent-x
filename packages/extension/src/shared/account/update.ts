@@ -1,32 +1,31 @@
-import {
-  BaseMultisigWalletAccount,
-  MultisigWalletAccount,
-  WalletAccount,
-} from "./../wallet.model"
-import { fetchMultisigAccountData } from "../multisig/multisig.service"
-import { multisigBaseWalletStore } from "../multisig/store"
+import { accountsEqual, accountsEqualByChainId } from "../utils/accountsEqual"
+import { BaseMultisigWalletAccount, WalletAccount } from "./../wallet.model"
 import { getMultisigAccounts } from "../multisig/utils/baseMultisig"
-import { ARGENT_SHIELD_ENABLED } from "../shield/constants"
 import { BaseWalletAccount } from "../wallet.model"
-import { accountsEqual } from "../wallet.service"
 import { getAccountEscapeFromChain } from "./details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "./details/getAccountGuardiansFromChain"
-import { getAccountTypesFromChain } from "./details/getAccountTypesFromChain"
+import { getAccountClassHashFromChain } from "./details/getAccountClassHashFromChain"
 import {
   DetailFetchers,
   getAndMergeAccountDetails,
 } from "./details/getAndMergeAccountDetails"
 import { accountService } from "./service"
+import { multisigBaseWalletRepo } from "../multisig/repository"
+import { Multicall } from "@argent/x-multicall"
+import { getProvider } from "../network"
+import { networkService } from "../network/service"
+import { MultisigEntryPointType } from "../multisig/types"
+import { getAccountCairoVersionFromChain } from "./details/getAccountCairoVersionFromChain"
 
-type UpdateScope = "all" | "type" | "deploy" | "guardian"
+type UpdateScope = "all" | "implementation" | "deploy" | "guardian"
 
 // TODO: move into worker instead of calling it explicitly
 export async function updateAccountDetails(
   scope: UpdateScope,
-  accounts?: BaseWalletAccount[],
+  accounts?: WalletAccount[],
 ) {
   const allAccounts = await accountService.get((a) =>
-    accounts ? accounts.some((a2) => accountsEqual(a, a2)) : true,
+    accounts ? accounts.some((a2) => accountsEqualByChainId(a, a2)) : true,
   )
 
   const accountDetailFetchers: DetailFetchers[] = []
@@ -40,15 +39,14 @@ export async function updateAccountDetails(
     }))
   }
 
-  if (scope === "type" || scope === "all") {
-    accountDetailFetchers.push(getAccountTypesFromChain)
+  if (scope === "implementation" || scope === "all") {
+    accountDetailFetchers.push(getAccountClassHashFromChain)
+    accountDetailFetchers.push(getAccountCairoVersionFromChain)
   }
 
-  if (ARGENT_SHIELD_ENABLED) {
-    if (scope === "guardian" || scope === "all") {
-      accountDetailFetchers.push(getAccountGuardiansFromChain)
-      accountDetailFetchers.push(getAccountEscapeFromChain)
-    }
+  if (scope === "guardian" || scope === "all") {
+    accountDetailFetchers.push(getAccountGuardiansFromChain)
+    accountDetailFetchers.push(getAccountEscapeFromChain)
   }
 
   const deployedAccounts = allAccounts
@@ -62,6 +60,12 @@ export async function updateAccountDetails(
   )
 
   await accountService.upsert(newAccountsWithDetails) // handles deduplication and updates
+
+  const updatedAccounts = await accountService.get((a) =>
+    newAccountsWithDetails.some((a2) => accountsEqual(a, a2)),
+  )
+
+  return updatedAccounts
 }
 
 export async function updateMultisigAccountDetails(
@@ -71,25 +75,35 @@ export async function updateMultisigAccountDetails(
     accounts ? accounts.some((a2) => accountsEqual(a, a2)) : true,
   )
 
-  const updater = async ({
-    address,
-    networkId,
-    publicKey,
-  }: MultisigWalletAccount): Promise<BaseMultisigWalletAccount> => {
-    const { content } = await fetchMultisigAccountData({
-      address,
-      networkId,
-    })
+  const entrypoints = [
+    MultisigEntryPointType.GET_SIGNERS,
+    MultisigEntryPointType.GET_THRESHOLD,
+  ]
 
-    return {
-      ...content,
-      address,
-      networkId,
-      publicKey,
-    }
-  }
+  const promises: Promise<BaseMultisigWalletAccount>[] = multisigAccounts.map(
+    async (multisigAccount) => {
+      const [signers, threshold] = await Promise.all(
+        entrypoints.map(async (entrypoint) => {
+          const { address, networkId } = multisigAccount
+          const network = await networkService.getById(networkId)
+          const provider = getProvider(network)
+          const multicall = new Multicall(provider, network.multicallAddress)
+          return multicall.call({
+            contractAddress: address,
+            entrypoint,
+          })
+        }),
+      )
+      return {
+        ...multisigAccount,
+        signers: signers.slice(1), // remove first element which is the length of the signers array. eg: ["0x2", "0x123", "0x456"]
+        threshold: parseInt(threshold[0], 16),
+        updatedAt: Date.now(),
+      }
+    },
+  )
 
-  const updated = await Promise.all(multisigAccounts.map(updater))
+  const updated = await Promise.all(promises)
 
-  await multisigBaseWalletStore.push(updated) // handles deduplication and updates
+  await multisigBaseWalletRepo.upsert(updated) // handles deduplication and updates
 }

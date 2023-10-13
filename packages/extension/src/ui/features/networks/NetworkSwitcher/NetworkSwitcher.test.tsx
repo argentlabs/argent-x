@@ -6,29 +6,29 @@ import { Network, NetworkStatus } from "../../../../shared/network"
 import { mapNetworkStatusToColor } from "../../../components/StatusIndicator"
 import { NetworkSwitcherList } from "./NetworkSwitcherList"
 
-const mockNetworks = [
+export const mockNetworks = [
   {
     id: "1",
     name: "Mainnet",
-    baseUrl: "https://mainnet.infura.io",
+    sequencerUrl: "https://mainnet.infura.io",
     chainId: "chainId",
     status: "ok",
   },
   {
     id: "2",
     name: "Rinkeby",
-    baseUrl: "https://rinkeby.infura.io",
+    sequencerUrl: "https://rinkeby.infura.io",
     chainId: "chainId",
     status: "error",
   },
   {
     id: "3",
     name: "Kovan",
-    baseUrl: "https://kovan.infura.io",
+    sequencerUrl: "https://kovan.infura.io",
     chainId: "chainId",
     status: "degraded",
   },
-] as Network[]
+] as (Network & { status: NetworkStatus })[]
 
 const mockNetworkStatuses = {
   "1": "ok",
@@ -56,7 +56,7 @@ describe("NetworkSwitcherList", () => {
     })
   })
 
-  it("calls onChangeNetwork when a network is clicked", () => {
+  it("calls onChangeNetwork when a network is clicked", async () => {
     const handleChangeNetwork = vi.fn()
 
     render(
@@ -72,7 +72,7 @@ describe("NetworkSwitcherList", () => {
     const networkToSelect = mockNetworks[1]
     const networkMenuItemToSelect = screen.getByTestId(networkToSelect.name)
 
-    userEvent.click(networkMenuItemToSelect)
+    await userEvent.click(networkMenuItemToSelect)
 
     expect(handleChangeNetwork).toHaveBeenCalledWith(networkToSelect.id)
   })
@@ -120,9 +120,13 @@ describe("NetworkSwitcherList", () => {
 
     const menuItem = screen.getByTestId(selectedNetwork.name)
     const nameElement = within(menuItem).getByText(selectedNetwork.name)
-    const baseUrlElement = within(menuItem).getByText(selectedNetwork.baseUrl)
 
+    if (selectedNetwork.sequencerUrl) {
+      const baseUrlElement = within(menuItem).getByText(
+        selectedNetwork.sequencerUrl,
+      )
+      expect(baseUrlElement).toBeInTheDocument()
+    }
     expect(nameElement).toBeInTheDocument()
-    expect(baseUrlElement).toBeInTheDocument()
   })
 })

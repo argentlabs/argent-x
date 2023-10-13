@@ -13,13 +13,16 @@ export default function ({
 }: IExplorerTransactionTransformer) {
   const eventNames = getPreExecutionEventNames(explorerTransaction)
   const callNames = getCallNames(explorerTransaction)
-  let names: string[] = ["Contract interaction"]
+
+  let displayName = transactionNamesToTitle("Contract interaction") // default state
+
   if (callNames?.length) {
-    names = callNames
-  } else if (eventNames?.length) {
-    names = eventNames
+    displayName = transactionNamesToTitle(callNames) // Check if transforming the call name will actually produce a title
   }
-  const displayName = transactionNamesToTitle(names)
+  if (!displayName && eventNames?.length) {
+    displayName = transactionNamesToTitle(eventNames)
+  }
+
   result = {
     ...result,
     displayName,

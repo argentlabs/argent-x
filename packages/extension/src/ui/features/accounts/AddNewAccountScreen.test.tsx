@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 
 import { renderWithLegacyProviders } from "../../test/utils"
 import { AddNewAccountScreen } from "./AddNewAccountScreen"
-import { AccountType, AccountTypeId } from "./AddNewAccountScreenContainer"
+import { AccountType, AccountTypeId } from "./AddNewAccountScreen"
 
 describe("AddNewAccountScreen", () => {
   it("Calls expected methods when buttons are clicked", async () => {

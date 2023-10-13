@@ -20,7 +20,7 @@ import { MultisigHideModal } from "./MultisigDeleteModal"
 
 export const JoinMultisigSettingsScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
-  const { publicKey = "" } = useParams<{ publicKey: string }>()
+  const { publicKey = "" } = useParams<"publicKey">()
   const navigate = useNavigate()
   const returnTo = useReturnTo()
   const pendingMultisig = usePendingMultisig({

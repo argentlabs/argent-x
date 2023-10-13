@@ -3,13 +3,8 @@ import { FC, useCallback } from "react"
 import { accountService } from "../../../shared/account/service"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { ConfirmPageProps } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { DeployAccountScreen } from "./DeployAccountScreen"
-
-export type DeployAccountScreenContainerProps = Omit<
-  ConfirmPageProps,
-  "onSubmit"
->
+import { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
 
 export const DeployAccountScreenContainer: FC<
   DeployAccountScreenContainerProps

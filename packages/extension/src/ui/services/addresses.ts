@@ -1,12 +1,7 @@
 import { memoize } from "lodash-es"
-import {
-  constants,
-  getChecksumAddress,
-  number,
-  validateAndParseAddress,
-  validateChecksumAddress,
-} from "starknet"
-import * as yup from "yup"
+import { getChecksumAddress, num } from "starknet"
+
+// TODO remove this file and use the shared one
 
 export const normalizeAddress = (address: string) => getChecksumAddress(address)
 
@@ -32,73 +27,28 @@ export const formatFullAddress = memoize((address: string) => {
   return `${hex} ${parts.join(" ")}`
 })
 
-const isChecksumAddress = memoize((address: string) => {
-  if (/^0x[0-9a-f]{63,64}$/.test(address)) {
-    return false
-  }
-  return true
-})
-
-export const isStarknetId = (address: string) => {
-  const starkNetIdRegex = /^[a-zA-Z0-9]+\.stark$/
-  return starkNetIdRegex.test(address)
-}
-
-export const isStarknetId = (address: string) => {
-  const starkNetIdRegex = /^[a-zA-Z0-9]+\.stark$/
-  return starkNetIdRegex.test(address)
-}
-
-export const addressSchema = yup
-  .string()
-  .trim()
-  .required("Address is required")
-  .test((address, ctx) => {
-    if (!address) {
-      return ctx.createError({ message: "Address is required" })
-    }
-    try {
-      if (isStarknetId(address)) {
-        // If the StarknetId is not resolved to any address, it's an error
-        return ctx.createError({ message: "Starknet ID does not exist" })
-      }
-
-      if (!/^0x[0-9a-fA-F]+$/.test(address) && !isStarknetId(address)) {
-        return ctx.createError({ message: "Address should be hexadecimal" })
-      }
-
-      if (!/^0x[0-9a-fA-F]{63,64}$/.test(address)) {
-        return ctx.createError({
-          message: "Address should be between 63 and 64 characters long",
-        })
-      }
-
-      const parsedAddress = validateAndParseAddress(address)
-      if (number.toBN(parsedAddress).eq(constants.ZERO)) {
-        return ctx.createError({ message: "Zero address not allowed" })
-      }
-
-      if (isChecksumAddress(address) && !validateChecksumAddress(address)) {
-        return ctx.createError({ message: "Invalid checksum address" })
-      }
-    } catch {
-      return ctx.createError({ message: "Invalid address" })
-    }
-
-    return true
-  })
-
-export const isValidAddress = (address: string) =>
-  addressSchema.isValidSync(address)
-
 export const isEqualAddress = (a: string, b?: string) => {
   try {
     if (!b) {
       return false
     }
-    return number.hexToDecimalString(a) === number.hexToDecimalString(b)
+    return num.hexToDecimalString(a) === num.hexToDecimalString(b)
   } catch {
     // ignore parsing error
   }
   return false
 }
+
+export const formatTruncatedString = memoize(
+  (string: string, targetLength: number) => {
+    if (string.length < targetLength) {
+      return string
+    }
+
+    const startEndLength = Math.floor((targetLength - 1) / 2)
+    const start = string.slice(0, startEndLength)
+    const end = string.slice(-startEndLength)
+
+    return `${start}…${end}`
+  },
+)

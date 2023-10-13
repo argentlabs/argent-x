@@ -2,11 +2,12 @@ import { BarCloseButton, NavigationContainer, icons } from "@argent/ui"
 import { FC } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
-import { Option, OptionsWrapper } from "../../components/Options"
+import { Option } from "../../components/Options"
 import { PageWrapper, Paragraph, Title } from "../../components/Page"
 import { routes, useReturnTo } from "../../routes"
 import { CircleIconContainer } from "./ui/CircleIconContainer"
 import { ComingSoonIcon } from "./ui/ComingSoonIcon"
+import { Grid } from "@chakra-ui/react"
 
 const { RestoreIcon } = icons
 
@@ -27,7 +28,7 @@ export const RecoverySetupScreen: FC = () => {
           Choose one or more of the methods below to ensure you can access your
           accounts.
         </Paragraph>
-        <OptionsWrapper>
+        <Grid templateColumns="1fr" gap={4}>
           <Option
             title="With Argent guardian"
             description="Coming soon"
@@ -44,7 +45,7 @@ export const RecoverySetupScreen: FC = () => {
               }
             />
           </Link>
-        </OptionsWrapper>
+        </Grid>
       </PageWrapper>
     </NavigationContainer>
   )

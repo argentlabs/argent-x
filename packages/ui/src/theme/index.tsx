@@ -19,11 +19,13 @@ import { listTheme } from "../components/List"
 import { pinInputTheme } from "../components/PinInput"
 import { progressTheme } from "../components/Progress"
 import { switchTheme } from "../components/Switch"
+import { tabsTheme } from "../components/Tabs"
 import { breakpoints } from "./breakpoints"
 import { colors } from "./colors"
 import { semanticTokens } from "./semanticTokens"
 import { shadows } from "./shadows"
 import { sizes } from "./sizes"
+import { skeletonTheme } from "./skeleton"
 import { spacing } from "./spacing"
 import { typography } from "./typography"
 
@@ -59,10 +61,12 @@ const extendedTheme = extendTheme({
     List: listTheme,
     Menu: menuTheme,
     PinInput: pinInputTheme,
+    Progress: progressTheme,
+    Skeleton: skeletonTheme,
+    Switch: switchTheme,
+    Tabs: tabsTheme,
     Textarea: textareaTheme,
     Tooltip: tooltipTheme,
-    Switch: switchTheme,
-    Progress: progressTheme,
   },
 })
 

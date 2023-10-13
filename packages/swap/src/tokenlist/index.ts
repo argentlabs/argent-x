@@ -7,7 +7,6 @@ import { TokenAddressMap, TokenInfoList, WrappedTokenInfo } from "./types"
 const EMPTY_LIST: TokenAddressMap = {
   "mainnet-alpha": {},
   "goerli-alpha": {},
-  "goerli-alpha-2": {},
 }
 
 export function useTokenList(): TokenInfoList {

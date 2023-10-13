@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js"
 import { Account } from "starknet"
 
 import { Token } from "../tokens/token"
@@ -12,13 +11,13 @@ export type IUseAggregatedSimData = {
   networkId: string
   account: Account
   tokens: Token[]
-  transactionSimulation?: ApiTransactionSimulationResponse
+  transactionSimulation?: ApiTransactionSimulationResponse[]
 }
 
 interface CommonSimulationData {
   token: Token
-  amount: BigNumber
-  usdValue?: BigNumber
+  amount: bigint
+  usdValue?: string
 }
 
 export interface ApprovalSimulationData extends CommonSimulationData {
@@ -28,8 +27,8 @@ export interface ApprovalSimulationData extends CommonSimulationData {
 
 export interface Recipient {
   address: string
-  amount: BigNumber
-  usdValue?: BigNumber
+  amount: bigint
+  usdValue?: string
 }
 
 export interface TokenWithType extends Token {

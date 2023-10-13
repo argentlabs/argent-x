@@ -1,51 +1,64 @@
-import {
-  BarBackButton,
-  H4,
-  H6,
-  NavigationContainer,
-  P3,
-  icons,
-} from "@argent/ui"
-import { Box, Divider, Flex } from "@chakra-ui/react"
+import { BarBackButton, H4, NavigationContainer, P3 } from "@argent/ui"
+import { Box, Divider } from "@chakra-ui/react"
 import { useMemo } from "react"
 
-import { useRouteRequestId } from "../../routes"
-import { formatTruncatedSignerKey } from "../../services/addresses"
+import { routes, useRouteRequestId } from "../../routes"
 import { transformTransaction } from "../accountActivity/transform"
 import { getTransactionFromPendingMultisigTransaction } from "../accountActivity/transform/transaction/transformers/pendingMultisigTransactionAdapter"
 import { Account } from "../accounts/Account"
-import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
+import {
+  useEncodedPublicKey,
+  useEncodedPublicKeys,
+  usePublicKey,
+} from "../accounts/usePublicKey"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisig } from "./multisig.state"
 import { useMultisigPendingTransaction } from "./multisigTransactions.state"
-
-const { TickIcon } = icons
+import { num } from "starknet"
+import { isEqualAddress } from "@argent/shared"
+import { MultisigOwner } from "./MultisigOwner"
+import { useView } from "../../views/implementation/react"
+import { creatorMultisigMetadataView } from "../../views/multisig"
+import { Navigate } from "react-router-dom"
 
 export const MultisigTransactionConfirmationsScreen = () => {
   const selectedAccount = useRouteAccount()
 
   const requestId = useRouteRequestId()
   const pendingTransaction = useMultisigPendingTransaction(requestId)
-  const signerKey = useSignerKey()
+  const publicKey = usePublicKey()
+  const encodedPubKey = useEncodedPublicKey(publicKey)
+
+  const multisig = useMultisig(selectedAccount)
+  const multisigMetadata = useView(creatorMultisigMetadataView(multisig))
 
   const transactionTransformed = useMemo(() => {
-    if (pendingTransaction && selectedAccount) {
-      return transformTransaction({
-        transaction: getTransactionFromPendingMultisigTransaction(
-          pendingTransaction,
-          selectedAccount,
-        ),
-        accountAddress: selectedAccount.address,
-      })
+    if (!pendingTransaction || !selectedAccount) {
+      return
     }
+
+    return transformTransaction({
+      transaction: getTransactionFromPendingMultisigTransaction(
+        pendingTransaction,
+        selectedAccount,
+      ),
+      accountAddress: selectedAccount.address,
+    })
   }, [pendingTransaction, selectedAccount])
   const approvedSignersPublicKey = useEncodedPublicKeys(
     pendingTransaction?.approvedSigners ?? [],
   )
 
-  const nonApprovedSignersPublicKey = useEncodedPublicKeys(
-    pendingTransaction?.nonApprovedSigners ?? [],
-  )
+  if (!selectedAccount || !requestId) {
+    return <Navigate to={routes.accounts()} />
+  }
+
+  if (!pendingTransaction) {
+    // This means that there was a requestId with pendingTransaction in the past, but now it's submitted.
+    // In this case, we should redirect to the account activity screen.
+    return <Navigate to={routes.accountActivity()} />
+  }
+
   return (
     <NavigationContainer
       leftButton={<BarBackButton />}
@@ -64,52 +77,53 @@ export const MultisigTransactionConfirmationsScreen = () => {
         <P3 color="neutrals.300" mb={3}>
           Me
         </P3>
-        <Box borderRadius="lg" backgroundColor="neutrals.800" p={4} mb={3}>
-          {signerKey && (
-            <Flex alignItems="center" justifyContent="space-between">
-              <H6 color="white">{formatTruncatedSignerKey(signerKey)} </H6>
-              {approvedSignersPublicKey.some((key) => key === signerKey) && (
-                <TickIcon color="primary.500" />
-              )}
-            </Flex>
-          )}
-        </Box>
+        {publicKey && (
+          <MultisigOwner
+            owner={publicKey}
+            signerMetadata={multisigMetadata?.signers?.find((signerMetadata) =>
+              isEqualAddress(publicKey, signerMetadata.key),
+            )}
+            approved={approvedSignersPublicKey.some(
+              (key) => key === encodedPubKey,
+            )}
+          />
+        )}
         <P3 color="neutrals.300" mb={3}>
           Other owners
         </P3>
-        {approvedSignersPublicKey
-          .filter((signer) => signer !== signerKey)
-          .map((signer) => {
-            return (
-              <Box
-                borderRadius="lg"
-                backgroundColor="neutrals.800"
-                p={4}
-                key={signer}
-                my={1}
-              >
-                <Flex alignItems="center" justifyContent="space-between">
-                  <H6 color="white">{formatTruncatedSignerKey(signer)}</H6>
-                  <TickIcon color="primary.500" fontSize="md" />
-                </Flex>
-              </Box>
-            )
-          })}
-        {nonApprovedSignersPublicKey
-          .filter((signer) => signer !== signerKey)
-          .map((signer) => {
-            return (
-              <Box
-                borderRadius="lg"
-                backgroundColor="neutrals.800"
-                p={4}
-                key={signer}
-                my={1}
-              >
-                <H6 color="white">{formatTruncatedSignerKey(signer)}</H6>
-              </Box>
-            )
-          })}
+        {pendingTransaction?.approvedSigners
+          .filter((signer) => {
+            if (!publicKey) {
+              return false
+            }
+            return num.toBigInt(signer) !== num.toBigInt(publicKey)
+          })
+          .map((signer) => (
+            <MultisigOwner
+              owner={signer}
+              key={signer}
+              signerMetadata={multisigMetadata?.signers?.find(
+                (signerMetadata) => isEqualAddress(signer, signerMetadata.key),
+              )}
+              approved
+            />
+          ))}
+        {pendingTransaction?.nonApprovedSigners
+          .filter((signer) => {
+            if (!publicKey) {
+              return false
+            }
+            return num.toBigInt(signer) !== num.toBigInt(publicKey)
+          })
+          .map((signer) => (
+            <MultisigOwner
+              owner={signer}
+              key={signer}
+              signerMetadata={multisigMetadata?.signers?.find(
+                (signerMetadata) => isEqualAddress(signer, signerMetadata.key),
+              )}
+            />
+          ))}
       </Box>
     </NavigationContainer>
   )

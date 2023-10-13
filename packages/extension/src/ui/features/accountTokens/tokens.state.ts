@@ -1,85 +1,59 @@
-import { BigNumber } from "ethers"
-import { memoize } from "lodash-es"
-import { useEffect, useMemo, useRef } from "react"
-import { number } from "starknet"
-import useSWR from "swr"
+import { keyBy } from "lodash-es"
+import { useMemo } from "react"
+import { num } from "starknet"
 
-import { useArrayStorage } from "../../../shared/storage/hooks"
-import { tokenStore } from "../../../shared/token/storage"
-import { BaseToken, Token } from "../../../shared/token/type"
-import { equalToken } from "../../../shared/token/utils"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { getAccountIdentifier } from "../../../shared/wallet.service"
+import { useView } from "../../views/implementation/react"
+import {
+  allTokensOnNetworkFamily,
+  allTokensView,
+  networkFeeTokenOnNetworkFamily,
+  tokenFindFamily,
+} from "../../views/token"
 import { useAccount } from "../accounts/accounts.state"
-import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { fetchAllTokensBalance } from "./tokens.service"
+import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
+import { tokenBalanceForAccountView } from "../../views/tokenBalances"
+import { tokenRepo } from "../../../shared/token/__new/repository/token"
+import { networkRepo } from "../../../shared/network/store"
 
-export interface TokenDetailsWithBalance extends Token {
-  balance?: BigNumber
-}
-
-interface UseTokensWithBalance {
-  tokenDetails: TokenDetailsWithBalance[]
-  tokenDetailsIsInitialising: boolean
-  isValidating: boolean
-  error?: any
-}
-
-const networkIdSelector = memoize(
-  (networkId: string) => (token: Token) => token.networkId === networkId,
-)
-
-const feeTokenSelector = memoize(
-  (networkId: string) => (token: Token) =>
-    token.networkId === networkId && token.symbol === "ETH",
-)
-
-export const getNetworkFeeToken = async (networkId: string) => {
-  const [feeToken] = await tokenStore.get(feeTokenSelector(networkId))
+export async function getNetworkFeeToken(networkId?: string) {
+  if (!networkId) {
+    return null
+  }
+  const [network] = await networkRepo.get((n) => n.id === networkId)
+  if (!network) {
+    return null
+  }
+  const [feeToken] = await tokenRepo.get(
+    (token) =>
+      token.address === network.feeTokenAddress &&
+      token.networkId === network.id,
+  )
   return feeToken ?? null
 }
 
 export const useNetworkFeeToken = (networkId?: string) => {
-  const [feeToken] = useArrayStorage(
-    tokenStore,
-    networkId ? feeTokenSelector(networkId) : () => false,
-  )
-  return feeToken ?? null
+  const feeToken = useView(networkFeeTokenOnNetworkFamily(networkId))
+  return feeToken
 }
-
-const tokenSelector = memoize(
-  (baseToken: BaseToken) => (token: Token) => equalToken(token, baseToken),
-  (baseToken) => getAccountIdentifier(baseToken),
-)
 
 export const useTokensInNetwork = (networkId: string) =>
-  useArrayStorage(tokenStore, networkIdSelector(networkId))
+  useView(allTokensOnNetworkFamily(networkId))
 
-export const useToken = (baseToken: BaseToken): Token | undefined => {
-  const [token] = useArrayStorage(tokenStore, tokenSelector(baseToken))
-  return token
-}
-
-export const useTokens = (baseTokens: BaseToken[]) => {
-  const tokens = useArrayStorage(tokenStore, (tokenInList) =>
-    baseTokens.some((baseToken) => equalToken(tokenInList, baseToken)),
-  )
-  return useMemo(
-    () => baseTokens.map((baseToken) => tokens.find((t) => t === baseToken)),
-    [baseTokens, tokens],
-  )
+export const useToken = (baseToken?: BaseToken): Token | undefined => {
+  return useView(tokenFindFamily(baseToken))
 }
 
 export type TokensRecord = Record<string, Token>
 
 export const useTokensRecord = ({ cleanHex = false }) => {
-  const tokens = useArrayStorage(tokenStore)
+  const tokens = useView(allTokensView)
 
   return useMemo(
     () =>
       tokens.reduce<TokensRecord>((acc, token) => {
         const tokenAddress = cleanHex
-          ? number.cleanHex(token.address)
+          ? num.cleanHex(token.address)
           : token.address
 
         return {
@@ -91,99 +65,27 @@ export const useTokensRecord = ({ cleanHex = false }) => {
   )
 }
 
-/** error codes to suppress - will not bubble error up to parent */
-const SUPPRESS_ERROR_STATUS = [429]
-
-export const useTokensWithBalance = (
-  account?: BaseWalletAccount,
-): UseTokensWithBalance => {
+export const useTokensWithBalance = (account?: BaseWalletAccount) => {
   const selectedAccount = useAccount(account)
-  const { pendingTransactions } = useAccountTransactions(account)
-  const pendingTransactionsLengthRef = useRef(pendingTransactions.length)
-
   const networkId = useMemo(() => {
     return selectedAccount?.networkId ?? ""
   }, [selectedAccount?.networkId])
-
   const tokensInNetwork = useTokensInNetwork(networkId)
+  const balances = useView(tokenBalanceForAccountView(account))
 
-  const tokenAddresses = useMemo(
-    () => tokensInNetwork.map((t) => t.address),
-    [tokensInNetwork],
+  const balancesMap = useMemo(
+    () => (balances ? keyBy(balances, "address") : {}),
+    [balances],
   )
 
-  const {
-    data,
-    isValidating,
-    error: maybeSuppressError,
-    mutate,
-  } = useSWR(
-    // skip if no account selected
-    selectedAccount && [
-      getAccountIdentifier(selectedAccount),
-      "accountTokenBalances",
-    ],
-    async () => {
-      if (!selectedAccount) {
-        return
-      }
-
-      const balances = await fetchAllTokensBalance(
-        tokensInNetwork.map((t) => t.address),
-        selectedAccount,
-      )
-
-      return balances
-    },
-    {
-      refreshInterval: 30000,
-      shouldRetryOnError: (error) => {
-        const errorCode = error?.status || error?.errorCode
-        const suppressError =
-          errorCode && SUPPRESS_ERROR_STATUS.includes(errorCode)
-        return suppressError
-      },
-    },
-  )
-
-  const error = useMemo(() => {
-    const errorCode =
-      maybeSuppressError?.status || maybeSuppressError?.errorCode
-    if (!SUPPRESS_ERROR_STATUS.includes(errorCode)) {
-      return maybeSuppressError
-    }
-  }, [maybeSuppressError])
-
-  const tokenDetailsIsInitialising = !error && !data
-
-  // refetch when number of pending transactions goes down
-  useEffect(() => {
-    if (pendingTransactionsLengthRef.current > pendingTransactions.length) {
-      mutate()
-    }
-    pendingTransactionsLengthRef.current = pendingTransactions.length
-  }, [mutate, pendingTransactions.length])
-
-  // refetch balances on token edit (token was added or removed)
-  useEffect(() => {
-    mutate()
-  }, [mutate, tokenAddresses])
-
-  const tokenDetails = useMemo(() => {
+  return useMemo(() => {
     return tokensInNetwork
       .map((token) => ({
         ...token,
-        balance: data?.[token.address] ?? BigNumber.from(0),
+        balance: BigInt(balancesMap[token.address]?.balance ?? 0n),
       }))
       .filter(
-        (token) => token.showAlways || (token.balance && token.balance.gt(0)),
+        (token) => token.showAlways || (token.balance && token.balance > 0n),
       )
-  }, [tokensInNetwork, data])
-
-  return {
-    tokenDetails,
-    tokenDetailsIsInitialising,
-    isValidating,
-    error,
-  }
+  }, [tokensInNetwork, balancesMap])
 }

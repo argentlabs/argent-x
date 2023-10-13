@@ -1,7 +1,7 @@
 import { BarBackButton, Button, NavigationContainer } from "@argent/ui"
 import { FC } from "react"
 
-import { StickyGroup } from "../../actions/DeprecatedConfirmScreen"
+import { Flex } from "@chakra-ui/react"
 import { DeclareSmartContractForm } from "./DeclareSmartContractForm"
 
 const DeclareSmartContractScreen: FC = () => {
@@ -12,18 +12,17 @@ const DeclareSmartContractScreen: FC = () => {
     >
       <DeclareSmartContractForm>
         {({ isDirty, isSubmitting, hasInvalidFile, isBusy }) => (
-          <StickyGroup>
+          <>
+            <Flex flex="1" />
             <Button
-              gap="2"
+              w="full"
               colorScheme="primary"
               type="submit"
               disabled={!isDirty || isSubmitting || hasInvalidFile || isBusy}
-              width="100%"
-              loadingText="Unlocking"
             >
               Declare
             </Button>
-          </StickyGroup>
+          </>
         )}
       </DeclareSmartContractForm>
     </NavigationContainer>

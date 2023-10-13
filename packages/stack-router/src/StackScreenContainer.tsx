@@ -20,7 +20,7 @@ export const StackScreenMotionContainer: ChakraComponent<
     top: 0,
     right: 0,
     bottom: 0,
-    transformOrigin: "50% 0",
+    transform: "50% 0",
     bg: "bg",
   },
 })

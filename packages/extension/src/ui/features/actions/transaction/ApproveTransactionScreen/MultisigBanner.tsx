@@ -1,21 +1,24 @@
 import { P4, SplitProgress, icons } from "@argent/ui"
 import { Box, Flex, Progress } from "@chakra-ui/react"
 
-import { Account } from "../../../accounts/Account"
+import { WalletAccount } from "../../../../../shared/wallet.model"
 import { useMultisig } from "../../../multisig/multisig.state"
 
 const { MultisigIcon, ChevronRightIcon } = icons
+
+export interface MultisigBannerProps {
+  confirmations?: number
+  account: WalletAccount
+  onClick?: () => void
+}
 
 export const MultisigBanner = ({
   confirmations = 0,
   account,
   onClick,
-}: {
-  confirmations?: number
-  account: Account
-  onClick?: () => void
-}) => {
+}: MultisigBannerProps) => {
   const multisig = useMultisig(account)
+
   return (
     <Box
       backgroundColor="neutrals.700"
@@ -41,7 +44,10 @@ export const MultisigBanner = ({
         <Flex alignItems="center">
           {multisig?.threshold && (
             <P4 color="neutrals.400">
-              {multisig.threshold - confirmations} more required
+              {multisig.threshold - confirmations > 0
+                ? multisig.threshold - confirmations
+                : 0}{" "}
+              more required
             </P4>
           )}
           {onClick ? (

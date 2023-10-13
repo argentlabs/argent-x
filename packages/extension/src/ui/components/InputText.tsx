@@ -118,6 +118,7 @@ export const InputText = styled(
     className,
     style,
     inputRef,
+    readonly,
     ...props
   }) => {
     const id = useId()
@@ -132,6 +133,7 @@ export const InputText = styled(
           autoFocus={autoFocus}
           disabled={disabled}
           ref={inputRef}
+          readOnly={readonly}
           {...props}
         />
         <Label>{placeholder}</Label>

@@ -6,18 +6,21 @@ import { IS_DEV } from "../shared/utils/dev"
 import { useAppState } from "./app.state"
 import { recover } from "./features/recovery/recovery.service"
 import { routes } from "./routes"
-import { hasActiveSession, isInitialized } from "./services/backgroundSessions"
 import { getInitialHardReloadRoute } from "./services/resetAndReload"
+import { useView } from "./views/implementation/react"
+import { isPasswordSetView, isBackupStoredView } from "./views/session"
 
 export const useEntryRoute = () => {
   const navigate = useNavigate()
   const { isFirstRender } = useAppState()
+  const isBackupStored = useView(isBackupStoredView)
+  const isPasswordSet = useView(isPasswordSetView)
 
   useEffect(() => {
     ;(async () => {
       if (isFirstRender) {
         const query = new URLSearchParams(window.location.search)
-        const entry = await determineEntry(query)
+        const entry = await determineEntry(query, isBackupStored, isPasswordSet)
         useAppState.setState({ isLoading: false, isFirstRender: false })
         navigate(entry, { replace: true })
         if (IS_DEV) {
@@ -29,10 +32,14 @@ export const useEntryRoute = () => {
         }
       }
     })()
-  }, [isFirstRender, navigate])
+  }, [isFirstRender, navigate, isBackupStored, isPasswordSet])
 }
 
-const determineEntry = async (query: URLSearchParams) => {
+const determineEntry = async (
+  query: URLSearchParams,
+  isBackupStored: boolean,
+  isPasswordSet: boolean,
+) => {
   if (query.get("goto") === "ledger") {
     return routes.ledgerEntry()
   }
@@ -45,13 +52,11 @@ const determineEntry = async (query: URLSearchParams) => {
     return routes.multisigCreate(networkId)
   }
 
-  const { initialized } = await isInitialized()
-  if (!initialized) {
+  if (!isBackupStored) {
     return routes.onboardingStart()
   }
 
-  const hasSession = await hasActiveSession()
-  if (hasSession) {
+  if (isPasswordSet) {
     return recover()
   }
   return routes.lockScreen()

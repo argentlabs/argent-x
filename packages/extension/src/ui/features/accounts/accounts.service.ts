@@ -2,19 +2,20 @@
  * All of this file should probably go into the data model for accounts, either as a field which gets updated from a worker, or as a computed field, if we have such a concept.
  */
 import { ethers } from "ethers"
-import { number } from "starknet"
+import { num } from "starknet"
 import useSWR from "swr"
 
 import { updateAccountDetails } from "../../../shared/account/update"
-import { generateAvatarImage } from "../../../shared/avatarImage"
+import { generateAvatarImage } from "@argent/shared"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/wallet.service"
-import { withPolling } from "../../services/swr"
+import { accountsEqual } from "../../../shared/utils/accountsEqual"
+import { withPolling } from "../../services/swr.service"
 import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { Account } from "./Account"
+import { RefreshInterval } from "../../../shared/config"
 
-const { toBN } = number
+const { toBigInt } = num
 
 const argentColorsArray = [
   "02BBA8",
@@ -46,7 +47,7 @@ export const getAccountImageUrl = (
 
 export const stripAddressZeroPadding = (accountAddress: string) => {
   try {
-    return number.toHex(toBN(number.hexToDecimalString(accountAddress)))
+    return num.toHex(toBigInt(num.hexToDecimalString(accountAddress)))
   } catch {
     // ignore parsing errors
   }
@@ -105,8 +106,8 @@ export const useUpdateAccountsOnChainEscapeState = () => {
     },
     {
       ...withPolling(
-        60 * 1000,
-      ) /** 60 seconds, or will refresh next time extension is opened */,
+        RefreshInterval.SLOW * 1000,
+      ) /** 5 minutes, or will refresh next time extension is opened */,
     },
   )
 }

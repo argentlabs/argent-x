@@ -2,32 +2,31 @@ import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
 
 import { routes } from "../../../routes"
-import { usePageTracking } from "../../../services/analytics"
 import { DeployAccountFeeEstimation } from "../feeEstimation/DeployAccountFeeEstimation"
-import { AccountNetworkInfo } from "./ApproveTransactionScreen/AccountNetworkInfo"
+import { AccountNetworkInfoArgentX } from "./ApproveTransactionScreen/AccountNetworkInfoArgentX"
 import {
   ConfirmPageProps,
   ConfirmScreen,
 } from "./ApproveTransactionScreen/ConfirmScreen"
-import { DappHeader } from "./ApproveTransactionScreen/DappHeader"
+import { DappHeaderArgentX } from "./ApproveTransactionScreen/DappHeader/DappHeaderArgentX"
 import { TransactionActions } from "./ApproveTransactionScreen/TransactionActions"
+import { WithActionScreenErrorFooter } from "./ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { ApproveScreenType } from "./types"
 
 interface ApproveDeployMultisigScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
   onSubmit: () => void
+  actionIsApproving?: boolean
 }
 
 export const ApproveDeployMultisig: FC<ApproveDeployMultisigScreenProps> = ({
   selectedAccount,
   actionHash,
   onSubmit,
+  actionIsApproving,
   ...rest
 }) => {
-  usePageTracking("signTransaction", {
-    networkId: selectedAccount?.networkId || "unknown",
-  })
   const [disableConfirm, setDisableConfirm] = useState(true)
 
   if (!selectedAccount) {
@@ -36,24 +35,29 @@ export const ApproveDeployMultisig: FC<ApproveDeployMultisigScreenProps> = ({
 
   return (
     <ConfirmScreen
-      confirmButtonText="Confirm"
       rejectButtonText="Cancel"
-      confirmButtonDisabled={disableConfirm}
+      confirmButtonDisabled={disableConfirm || actionIsApproving}
+      confirmButtonIsLoading={actionIsApproving}
       selectedAccount={selectedAccount}
       onSubmit={onSubmit}
       showHeader={true}
       footer={
-        <DeployAccountFeeEstimation
-          accountAddress={selectedAccount.address}
-          actionHash={actionHash}
-          networkId={selectedAccount.networkId}
-          onErrorChange={setDisableConfirm}
-        />
+        <WithActionScreenErrorFooter isTransaction>
+          <DeployAccountFeeEstimation
+            accountAddress={selectedAccount.address}
+            actionHash={actionHash}
+            networkId={selectedAccount.networkId}
+            onErrorChange={setDisableConfirm}
+            transactionSimulationLoading={false}
+          />
+        </WithActionScreenErrorFooter>
       }
       {...rest}
     >
       {/** Use Transaction Review to get DappHeader */}
-      <DappHeader approveScreenType={ApproveScreenType.MULTISIG_DEPLOY} />
+      <DappHeaderArgentX
+        approveScreenType={ApproveScreenType.MULTISIG_DEPLOY}
+      />
 
       <TransactionActions
         action={{
@@ -67,7 +71,7 @@ export const ApproveDeployMultisig: FC<ApproveDeployMultisigScreenProps> = ({
         }}
       />
 
-      <AccountNetworkInfo account={selectedAccount} />
+      <AccountNetworkInfoArgentX account={selectedAccount} />
     </ConfirmScreen>
   )
 }

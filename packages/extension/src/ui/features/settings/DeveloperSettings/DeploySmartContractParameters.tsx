@@ -20,8 +20,7 @@ import { get, isEmpty } from "lodash-es"
 import { FC, Fragment, useCallback, useEffect } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 import { stark } from "starknet"
-
-import { ParameterField } from "./DeploySmartContractForm"
+import { ParameterField } from "./deploySmartContractForm.model"
 
 const { randomAddress } = stark
 

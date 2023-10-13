@@ -20,7 +20,9 @@ describe("UIService", () => {
         update: vi.fn(),
       },
       windows: {
+        getAll: vi.fn(),
         update: vi.fn(),
+        remove: vi.fn(),
       },
     }
     const uiService = new UIService(browser)

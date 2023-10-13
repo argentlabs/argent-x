@@ -108,6 +108,7 @@ export const SeedInput: FC<SeedInputProps> = ({
             </Box>
           </InputLeftAddon>
           <Input
+            data-testid={`seed-input-${i}`}
             variant={"filled"}
             autoFocus={i === 0}
             value={word}

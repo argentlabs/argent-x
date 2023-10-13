@@ -87,8 +87,6 @@ const Swap = () => {
   const [rotate, setRotate] = useState(false)
   const { userSlippageTolerance } = useUserState()
 
-  analytics.page("swap", { networkId })
-
   const {
     isOpen: isPISopen,
     onOpen: onPISopen,

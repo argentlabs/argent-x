@@ -2,14 +2,17 @@ import { expect } from "@playwright/test"
 
 import config from "../config"
 import test from "../test"
+import { lang } from "../languages"
 
 test.describe("Account settings", () => {
   test("User should be able to edit account name", async ({ extension }) => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
-    await extension.network.selectNetwork("Localhost 5050")
-    const [accountName1] = await extension.account.addAccount({})
+    await extension.network.selectNetwork("Testnet")
+    const [accountName1] = await extension.account.addAccount({
+      firstAccount: false,
+    })
 
     await extension.navigation.showSettings.click()
     await extension.settings.account(accountName1!).click()
@@ -27,8 +30,10 @@ test.describe("Account settings", () => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
-    await extension.network.selectNetwork("Localhost 5050")
-    const [accountName1] = await extension.account.addAccount({})
+    await extension.network.selectNetwork("Testnet")
+    const [accountName1] = await extension.account.addAccount({
+      firstAccount: false,
+    })
 
     await extension.navigation.showSettings.click()
     await extension.settings.account(accountName1!).click()
@@ -52,38 +57,23 @@ test.describe("Account settings", () => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
-    await extension.network.selectNetwork("Testnet 2")
-    const [accountName1] = await extension.account.addAccount({})
+    await extension.network.selectNetwork("Testnet")
+    const [accountName2] = await extension.account.addAccount({
+      firstAccount: false,
+    })
 
     await extension.navigation.showSettings.click()
-    await extension.settings.account(accountName1!).click()
+    await extension.settings.account(accountName2!).click()
     await extension.settings.hideAccount.click()
     await extension.settings.confirmHide.click()
 
-    await expect(extension.account.account(accountName1!)).toBeHidden()
+    await expect(extension.account.account(accountName2!)).toBeHidden()
 
     await extension.settings.hiddenAccounts.click()
-    await extension.settings.unhideAccount(accountName1!).click()
+    await extension.settings.unhideAccount(accountName2!).click()
+    await extension.navigation.back.click()
     await expect(extension.settings.hiddenAccounts).toBeHidden()
-    await expect(extension.account.account(accountName1!)).toBeVisible()
-  })
-
-  test("User should be able to delete an account on local network", async ({
-    extension,
-  }) => {
-    await extension.wallet.newWalletOnboarding()
-    await extension.open()
-    await expect(extension.network.networkSelector).toBeVisible()
-    await extension.network.selectNetwork("Localhost 5050")
-    const [accountName1] = await extension.account.addAccount({})
-
-    await extension.navigation.showSettings.click()
-    await extension.settings.account(accountName1!).click()
-    await extension.settings.deleteAccount.click()
-    await extension.settings.confirmDelete.click()
-
-    await expect(extension.account.account(accountName1!)).toBeHidden()
-    await expect(extension.settings.hiddenAccounts).toBeHidden()
+    await expect(extension.account.account(accountName2!)).toBeVisible()
   })
 
   test("User should be able unlock wallet using password", async ({
@@ -98,5 +88,22 @@ test.describe("Account settings", () => {
     await extension.account.password.fill(config.password)
     await extension.navigation.unlock.click()
     await expect(extension.network.networkSelector).toBeVisible()
+  })
+
+  test("User should not be able unlock wallet using wrong password", async ({
+    extension,
+  }) => {
+    await extension.wallet.newWalletOnboarding()
+    await extension.open()
+    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.navigation.showSettings.click()
+    await extension.navigation.lockWallet.click()
+
+    await extension.account.password.fill("wrongpassword123!")
+    await extension.navigation.unlock.click()
+    await expect(
+      extension.page.locator(`label:text-is("${lang.account.wrongPassword}")`),
+    ).toBeVisible()
+    await expect(extension.account.password).toBeVisible()
   })
 })

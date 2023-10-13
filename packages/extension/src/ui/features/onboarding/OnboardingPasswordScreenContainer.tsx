@@ -8,15 +8,12 @@ import { routes } from "../../routes"
 import { clientAccountService } from "../../services/account"
 import {
   analytics,
-  usePageTracking,
   useTimeSpentWithSuccessTracking,
 } from "../../services/analytics"
-import { extensionService } from "../../services/extension"
 import { OnboardingPasswordScreen } from "./OnboardingPasswordScreen"
+import { sessionService } from "../../services/session"
 
 export const OnboardingPasswordScreenContainer: FC = () => {
-  usePageTracking("createWallet")
-
   const { trackSuccess } = useTimeSpentWithSuccessTracking(
     "onboardingStepFinished",
     { stepId: "newWalletPassword" },
@@ -33,11 +30,13 @@ export const OnboardingPasswordScreenContainer: FC = () => {
   const handleDeploy = useCallback(
     async (password: string) => {
       try {
-        await extensionService.unlock(password)
+        await sessionService.startSession(password)
+
         const newAccount = await clientAccountService.createAccount(
           networkId,
           "standard",
         )
+
         await accountService.select(newAccount)
 
         // TBD: duplication of "createAccount" which comes from BG?

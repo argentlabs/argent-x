@@ -22,7 +22,7 @@ import {
 import { ComponentProps } from "react"
 
 import { decorators } from "../../decorators/routerDecorators"
-import { tokensByNetwork } from "../../tokensByNetwork"
+import { tokensByNetwork } from "../../tokens"
 import { TransactionDetailWrapped } from "./TransactionDetailWrapped"
 
 export default {

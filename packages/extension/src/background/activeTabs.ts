@@ -1,52 +1,52 @@
 import browser from "webextension-polyfill"
 
 import { MessageType, sendMessage } from "../shared/messages"
-import { ArrayStorage } from "../shared/storage"
+import { UniqueSet } from "./utils/uniqueSet"
 
 interface Tab {
   id: number
   host: string
   port: browser.runtime.Port
 }
-const activeTabs = new ArrayStorage<Tab>([], {
-  namespace: "core:activeTabs",
-  areaName: "session",
-  compare(a, b) {
-    return a.id === b.id
-  },
-})
+
+// do not store the port in any storage, like ArrayStorage.
+// it is not serializable and will cause errors
+// ports also get closed when the background worker is reloaded, and they should automatically reconnect
+const activeTabs = new UniqueSet<Tab, number>((t) => t.id)
 
 browser.tabs.onRemoved.addListener(removeTab)
 
 export async function addTab(tab: Tab) {
   if (tab.id !== undefined) {
-    return activeTabs.push(tab)
+    return activeTabs.add(tab)
   }
 }
 
 export function removeTab(tabId?: number) {
-  return activeTabs.remove((tab) => tab.id === tabId)
+  if (tabId === undefined) {
+    return false
+  }
+  return activeTabs.delete(tabId)
 }
 
 export async function hasTab(tabId?: number) {
   if (tabId === undefined) {
     return false
   }
-  const [hit] = await activeTabs.get((tab) => tab.id === tabId)
-  return Boolean(hit)
+  return activeTabs.has(tabId)
 }
 
-export async function getTabIdsOfHost(host: string) {
-  const hits = await activeTabs.get((tab) => tab.host === host)
-  return hits ? hits.map((tab) => tab.id) : []
+async function getTabsOfHost(host: string) {
+  const allTabs = activeTabs.getAll()
+  const hits = allTabs.filter((tab) => tab.host === host)
+  return hits
 }
 
 export async function sendMessageToHost(
   message: MessageType,
   host: string,
 ): Promise<void> {
-  const tabIds = await getTabIdsOfHost(host)
-  const tabs = await activeTabs.get((tab) => tabIds.includes(tab.id))
+  const tabs = await getTabsOfHost(host)
 
   for (const tab of tabs) {
     try {
@@ -60,7 +60,7 @@ export async function sendMessageToHost(
 export async function sendMessageToActiveTabs(
   message: MessageType,
 ): Promise<void> {
-  const tabs = await activeTabs.get()
+  const tabs = activeTabs.getAll()
 
   for (const tab of tabs) {
     try {

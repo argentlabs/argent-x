@@ -1,6 +1,14 @@
-import { H6, L2, P3, P4, icons } from "@argent/ui"
-import { Center, Circle, Flex, List, ListItem } from "@chakra-ui/react"
-import { FC } from "react"
+import { H5, H6, L2, P4, icons } from "@argent/ui"
+import {
+  Box,
+  Center,
+  Flex,
+  List,
+  ListIcon,
+  ListItem,
+  Text,
+} from "@chakra-ui/react"
+import { FC, ReactNode } from "react"
 
 import {
   BaseWalletAccount,
@@ -9,19 +17,28 @@ import {
 import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
 import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
 import { DappIcon } from "./DappIcon"
-import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
+import { DappDisplayAttributes } from "./useDappDisplayAttributes"
+import { upperFirst } from "lodash-es"
+import { KnownDappModal } from "./KnownDappModal"
 
-const { LinkIcon } = icons
+const { LinkIcon, TickIcon, VerifiedIcon } = icons
 
-interface ConnectDappScreenProps {
+export interface ConnectDappScreenProps {
   isConnected: boolean
   onConnect: () => void
   onDisconnect: () => void
   onReject?: () => void
+  onKnownDappModalOpen: () => void
+  onKnownDappModalClose: () => void
+  isKnownDappModalOpen: boolean
   host: string
   accounts: WalletAccount[]
   selectedAccount?: BaseWalletAccount
   onSelectedAccountChange: (account: BaseWalletAccount) => void
+  actionIsApproving?: boolean
+  footer?: ReactNode
+  dappDisplayAttributes?: DappDisplayAttributes
+  navigationBar?: ReactNode
 }
 
 export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
@@ -29,53 +46,115 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
   onConnect,
   onDisconnect,
   onReject,
+  isKnownDappModalOpen = false,
+  onKnownDappModalOpen,
+  onKnownDappModalClose,
   host,
   accounts,
+  dappDisplayAttributes,
   selectedAccount,
   onSelectedAccountChange,
+  actionIsApproving,
+  navigationBar,
+  footer,
 }) => {
-  const dappDisplayAttributes = useDappDisplayAttributes(host)
+  const confirmButtonText = isConnected ? "Continue" : "Connect"
+  const rejectButtonText = isConnected ? "Disconnect" : "Reject"
+
+  const hostName = new URL(host).hostname
+
   return (
-    <ConfirmScreen
-      confirmButtonText={isConnected ? "Continue" : "Connect"}
-      rejectButtonText={isConnected ? "Disconnect" : "Reject"}
-      onSubmit={onConnect}
-      onReject={isConnected ? onDisconnect : onReject}
-    >
-      <Center flexDirection={"column"} textAlign={"center"} gap={1}>
-        <Circle size={16}>
-          <DappIcon host={host} />
-        </Circle>
-        <H6 mt={4}>Connect to {dappDisplayAttributes?.title}</H6>
-        <P4 color={"neutrals.300"}>{host}</P4>
-      </Center>
-      <Flex my={4} borderTop={"1px solid"} borderTopColor={"neutrals.600"} />
-      <P4>Select the account to connect:</P4>
-      <Flex mt={4} w={"full"} flexDirection={"column"}>
-        <ConnectDappAccountSelect
-          accounts={accounts}
-          selectedAccount={selectedAccount}
-          onSelectedAccountChange={onSelectedAccountChange}
-          host={host}
-        />
-        {isConnected && (
-          <Flex gap={1} color={"info.300"} alignItems={"center"} mt={2}>
-            <L2>
-              <LinkIcon transform={"rotate(-45deg)"} display={"inline-block"} />{" "}
-              This account is already connected
-            </L2>
+    <>
+      <ConfirmScreen
+        confirmButtonText={confirmButtonText}
+        rejectButtonText={rejectButtonText}
+        onSubmit={onConnect}
+        onReject={isConnected ? onDisconnect : onReject}
+        confirmButtonIsLoading={actionIsApproving}
+        confirmButtonLoadingText={confirmButtonText}
+        navigationBar={navigationBar}
+        footer={footer}
+      >
+        <Center flexDirection={"column"} textAlign={"center"} gap={1}>
+          <DappIcon dappDisplayAttributes={dappDisplayAttributes} />
+          <H5 mt={4}>Connect to {dappDisplayAttributes?.title ?? "dapp"}</H5>
+          <Flex gap="2" align="flex-end">
+            <P4 fontWeight="bold" color={"neutrals.300"}>
+              {hostName}
+            </P4>
+            {dappDisplayAttributes?.isKnown && (
+              <Box
+                p="1px"
+                color="success.500"
+                fontSize="sm"
+                cursor="pointer"
+                onClick={onKnownDappModalOpen}
+              >
+                <VerifiedIcon />
+              </Box>
+            )}
           </Flex>
-        )}
-      </Flex>
-      <Flex my={4} borderTop={"1px solid"} borderTopColor={"neutrals.600"} />
-      <P4>This dapp will be able to:</P4>
-      <P3 as={List} stylePosition={"inside"} listStyleType={"disc"} mt={2}>
-        <ListItem>Read your wallet address</ListItem>
-        <ListItem>Request transactions</ListItem>
-        <P4 as={"span"} ml={5} color={"neutrals.300"}>
-          You will still need to sign any new transaction
-        </P4>
-      </P3>
-    </ConfirmScreen>
+        </Center>
+        <Flex mt={4} w={"full"} flexDirection={"column"}>
+          <ConnectDappAccountSelect
+            accounts={accounts}
+            selectedAccount={selectedAccount}
+            onSelectedAccountChange={onSelectedAccountChange}
+            host={host}
+          />
+          {isConnected && (
+            <Flex gap={1} color={"info.300"} alignItems={"center"} mt={2}>
+              <L2>
+                <LinkIcon
+                  transform={"rotate(-45deg)"}
+                  display={"inline-block"}
+                />
+                This account is already connected
+              </L2>
+            </Flex>
+          )}
+        </Flex>
+        <Flex my={6} borderTop={"1px solid"} borderTopColor={"neutrals.800"} />
+        <H6 color="neutrals.400">This dapp will be able to:</H6>
+        <Box
+          border="1px solid"
+          borderColor="neutrals.700"
+          borderRadius="xl"
+          gap="2"
+          mt={3}
+          p={4}
+        >
+          <List spacing={2}>
+            <ListItem display="flex" alignItems="center">
+              <ListIcon
+                as={TickIcon}
+                color="green.500"
+                marginInlineEnd="3"
+                fontSize="16"
+              />
+              <P4>Read your wallet address</P4>
+            </ListItem>
+
+            <ListItem display="flex" alignItems="center">
+              <ListIcon
+                as={TickIcon}
+                color="green.500"
+                marginInlineEnd="3"
+                fontSize="16"
+              />
+              <P4>Request transactions</P4>
+            </ListItem>
+          </List>
+
+          <Text ml={7} lineHeight="4" mt="1" color={"neutrals.300"}>
+            You will still need to sign any new transaction
+          </Text>
+        </Box>
+      </ConfirmScreen>
+      <KnownDappModal
+        isOpen={isKnownDappModalOpen}
+        onClose={onKnownDappModalClose}
+      />
+    </>
   )
 }

@@ -1,1 +1,1 @@
-cairo_lang==0.8.1
+cairo_lang==0.12.2

@@ -1,17 +1,15 @@
 import { useCallback, useState } from "react"
 
-import { createNewPendingMultisig } from "../../../services/backgroundMultisigs"
+import { multisigService } from "../../../services/multisig"
 
 export function useCreatePendingMultisig() {
   const [isError, setIsError] = useState(false)
 
   const createPendingMultisig = useCallback(async (networkId: string) => {
-    const result = await createNewPendingMultisig(networkId)
-
-    if (result === "error") {
+    try {
+      return await multisigService.addPendingAccount(networkId)
+    } catch (error) {
       setIsError(true)
-    } else {
-      return result
     }
   }, [])
 

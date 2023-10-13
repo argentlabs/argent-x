@@ -1,18 +1,20 @@
-{
-  "prices": [
-    {
-      "pricingId": 1,
-      "ethValue": "1",
-      "ccyValue": "1102.594564",
-      "ethDayChange": "0",
-      "ccyDayChange": "0.001484"
-    },
-    {
-      "pricingId": 25,
-      "ethValue": "0.00090908",
-      "ccyValue": "1.002",
-      "ethDayChange": "-0.002619109197904908",
-      "ccyDayChange": "0.001992"
-    }
-  ]
-}
+[
+  {
+    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+    "networkId": "goerli-alpha",
+    "pricingId": 1,
+    "ethValue": "1",
+    "ccyValue": "1102.594564",
+    "ethDayChange": "0",
+    "ccyDayChange": "0.001484"
+  },
+  {
+    "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+    "networkId": "goerli-alpha",
+    "pricingId": 25,
+    "ethValue": "0.00090908",
+    "ccyValue": "1.002",
+    "ethDayChange": "-0.002619109197904908",
+    "ccyDayChange": "0.001992"
+  }
+]

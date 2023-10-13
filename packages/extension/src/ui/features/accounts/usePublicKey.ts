@@ -1,16 +1,16 @@
-import { utils } from "ethers"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import {
-  getNextPublicKey,
-  getPublicKey,
-} from "../../services/backgroundAccounts"
+import { accountMessagingService } from "../../services/accountMessaging"
+import { encodeBase58 } from "@argent/shared"
 
 export const usePublicKey = (account?: BaseWalletAccount) => {
   const [pubKey, setPubKey] = useState<string>()
 
-  const getPubKeyCallback = useCallback(() => getPublicKey(account), [account])
+  const getPubKeyCallback = useCallback(
+    () => accountMessagingService.getPublicKey(account),
+    [account],
+  )
 
   useEffect(() => {
     // on mount
@@ -29,7 +29,7 @@ export const useNextPublicKey = (networkId: string) => {
   const [pubKey, setPubKey] = useState<string>()
 
   const getNextPubKeyCallback = useCallback(
-    () => getNextPublicKey(networkId),
+    () => accountMessagingService.getNextPublicKeyForMultisig(networkId),
     [networkId],
   )
   useEffect(() => {
@@ -45,14 +45,11 @@ export const useNextPublicKey = (networkId: string) => {
 }
 
 export const useEncodedPublicKey = (pubKey: string | undefined) => {
-  return useMemo(() => pubKey && utils.base58.encode(pubKey), [pubKey])
+  return useMemo(() => pubKey && encodeBase58(pubKey), [pubKey])
 }
 
 export const useEncodedPublicKeys = (pubKeys: string[]) => {
-  return useMemo(
-    () => pubKeys.map((key) => utils.base58.encode(key)),
-    [pubKeys],
-  )
+  return useMemo(() => pubKeys.map((key) => encodeBase58(key)), [pubKeys])
 }
 /**
  *

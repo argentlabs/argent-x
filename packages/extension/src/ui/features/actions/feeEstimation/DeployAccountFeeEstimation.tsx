@@ -1,13 +1,19 @@
 import { FC, useEffect, useMemo } from "react"
 
-import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { useFeeTokenBalance } from "../../accountTokens/tokens.service"
 import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
+import { useFeeTokenBalance } from "../../accountTokens/useFeeTokenBalance"
+import { getParsedFeeError } from "./feeError"
 import { FeeEstimation } from "./FeeEstimation"
-import { DeployAccountFeeEstimationProps } from "./types"
-import { getParsedError, useMaxAccountDeploymentFeeEstimation } from "./utils"
+import { TransactionsFeeEstimationProps } from "./types"
+import { useMaxAccountDeploymentFeeEstimation } from "./utils"
+import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+
+type DeployAccountFeeEstimationProps = Omit<
+  TransactionsFeeEstimationProps,
+  "transactions"
+>
 
 export const DeployAccountFeeEstimation: FC<
   DeployAccountFeeEstimationProps
@@ -24,7 +30,7 @@ export const DeployAccountFeeEstimation: FC<
     actionHash,
   )
 
-  const deployAccountFeeToEstimateFeeResponse: EstimateFeeResponse | undefined =
+  const deployAccountFeeToEstimateFeeResponse: EstimatedFees | undefined =
     useMemo(() => {
       if (!fee) {
         return undefined
@@ -40,9 +46,9 @@ export const DeployAccountFeeEstimation: FC<
     () =>
       Boolean(
         deployAccountFeeToEstimateFeeResponse?.suggestedMaxFee &&
-          feeTokenBalance?.gte(
-            deployAccountFeeToEstimateFeeResponse.suggestedMaxFee,
-          ),
+          feeTokenBalance &&
+          feeTokenBalance >=
+            BigInt(deployAccountFeeToEstimateFeeResponse.suggestedMaxFee),
       ),
     [feeTokenBalance, deployAccountFeeToEstimateFeeResponse],
   )
@@ -56,29 +62,35 @@ export const DeployAccountFeeEstimation: FC<
     onErrorChange?.(hasError)
   }, [hasError, onErrorChange])
 
-  const parsedFeeEstimationError = showEstimateError && getParsedError(error)
+  const parsedFeeEstimationError = showEstimateError
+    ? getParsedFeeError(error)
+    : undefined
   const feeToken = useNetworkFeeToken(networkId)
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
+    feeToken || undefined,
     fee?.amount,
   )
 
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken,
+    feeToken || undefined,
     deployAccountFeeToEstimateFeeResponse?.suggestedMaxFee,
   )
 
   return (
-    <FeeEstimation
-      amountCurrencyValue={amountCurrencyValue}
-      fee={deployAccountFeeToEstimateFeeResponse}
-      feeToken={feeToken}
-      feeTokenBalance={feeTokenBalance}
-      parsedFeeEstimationError={parsedFeeEstimationError}
-      showError={showError}
-      showEstimateError={showEstimateError}
-      showFeeError={showFeeError}
-      suggestedMaxFeeCurrencyValue={suggestedMaxFeeCurrencyValue}
-    />
+    <>
+      {feeToken && (
+        <FeeEstimation
+          amountCurrencyValue={amountCurrencyValue}
+          fee={deployAccountFeeToEstimateFeeResponse}
+          feeToken={feeToken}
+          feeTokenBalance={feeTokenBalance}
+          parsedFeeEstimationError={parsedFeeEstimationError}
+          showError={showError}
+          showEstimateError={showEstimateError}
+          showFeeError={showFeeError}
+          suggestedMaxFeeCurrencyValue={suggestedMaxFeeCurrencyValue}
+        />
+      )}
+    </>
   )
 }

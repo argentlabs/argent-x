@@ -1,8 +1,8 @@
 import { ExtQueueItem } from "../shared/actionQueue/types"
 import { BaseWalletAccount } from "../shared/wallet.model"
-import { BackgroundService } from "./background"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
+import { Wallet } from "./wallet"
 
 type DeployAccountAction = ExtQueueItem<{
   type: "DEPLOY_ACCOUNT_ACTION"
@@ -11,14 +11,14 @@ type DeployAccountAction = ExtQueueItem<{
 
 export const accountDeployAction = async (
   { payload: baseAccount }: DeployAccountAction,
-  { wallet }: BackgroundService,
+  wallet: Wallet,
 ) => {
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
   const selectedAccount = await wallet.getAccount(baseAccount)
 
-  const accountNeedsDeploy = selectedAccount.needsDeploy
+  const accountNeedsDeploy = selectedAccount?.needsDeploy
 
   if (!accountNeedsDeploy) {
     throw Error("Account already deployed")

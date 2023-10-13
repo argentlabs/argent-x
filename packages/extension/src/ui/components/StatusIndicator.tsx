@@ -20,13 +20,15 @@ export function mapNetworkStatusToColor(
       return "red"
     case "degraded":
       return "orange"
-    case "ok": // network status shows green by default and has no transparent state
-    case "unknown":
-    case undefined:
+    case "ok":
       return "green"
+    case "unknown":
+      return "transparent"
+    case undefined:
+      return "transparent"
     default:
       assertNever(status)
-      return "green"
+      return "transparent"
   }
 }
 

@@ -1,9 +1,8 @@
 import { TextWithAmount } from "@argent/ui"
-import { BigNumberish } from "ethers"
+import { BigNumberish } from "starknet"
 import { FC } from "react"
 
 import { prettifyTokenAmount } from "../../../../../shared/token/price"
-import { Token } from "../../../../../shared/token/type"
 import {
   Field,
   FieldKey,
@@ -12,6 +11,7 @@ import {
 } from "../../../../components/Fields"
 import { isEqualAddress } from "../../../../services/addresses"
 import { TokenIcon } from "../../../accountTokens/TokenIcon"
+import { Token } from "../../../../../shared/token/__new/types/token.model"
 
 interface TokenFieldProps {
   label: string
@@ -43,7 +43,7 @@ export const TokenField: FC<TokenFieldProps> = ({
     <Field>
       <FieldKey>{label}</FieldKey>
       <FieldValue>
-        {token && <TokenIcon url={token.image} name={token.name} size={6} />}
+        {token && <TokenIcon url={token.iconUrl} name={token.name} size={6} />}
         <TextWithAmount amount={amount.toString()} decimals={token?.decimals}>
           <LeftPaddedField>{displayAmount}</LeftPaddedField>
         </TextWithAmount>

@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers"
+import { Address } from "@argent/shared"
 import { uint256 } from "starknet"
 import { describe, expect, test } from "vitest"
 
@@ -11,22 +11,23 @@ import {
   prettifyTokenAmount,
   sumTokenBalancesToCurrencyValue,
 } from "../src/shared/token/price"
-import { TokenDetailsWithBalance } from "../src/ui/features/accountTokens/tokens.state"
 import mockApiPricesDataInvalid from "./__fixtures__/argent-api-prices-invalid.mock.json"
 import mockApiPricesData from "./__fixtures__/argent-api-prices.mock.json"
 import mockApiTokenDataInvalid from "./__fixtures__/argent-api-tokens-invalid.mock.json"
 import mockApiTokenData from "./__fixtures__/argent-api-tokens.mock.json"
 import mockTokensWithBalanceRaw from "./__fixtures__/tokens-with-balance.mock.json"
+import { TokenWithOptionalBigIntBalance } from "../src/shared/token/__new/types/tokenBalance.model"
 
 const { UINT_256_MAX } = uint256
 
 /** convert to expected types */
-export const mockTokensWithBalance: TokenDetailsWithBalance[] =
+export const mockTokensWithBalance: TokenWithOptionalBigIntBalance[] =
   mockTokensWithBalanceRaw.map((token) => {
     return {
       ...token,
+      address: token.address as Address,
       decimals: Number(token.decimals),
-      balance: BigNumber.from(token.balance),
+      balance: BigInt(token.balance),
     }
   })
 
@@ -70,7 +71,7 @@ describe("convertTokenAmountToCurrencyValue()", () => {
       expect(
         convertTokenAmountToCurrencyValue({
           amount: "30000000000",
-          decimals: BigNumber.from("10"),
+          decimals: 10,
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           unitCurrencyValue: null,
@@ -99,10 +100,13 @@ describe("lookupTokenPriceDetails()", () => {
       const token = mockTokensWithBalance[0]
       const price = lookupTokenPriceDetails({
         token,
-        pricesData: mockApiPricesData,
-        tokenData: mockApiTokenData,
+        pricesData: mockApiPricesData as any,
+        tokenData: mockApiTokenData as any,
       })
       expect(price).toEqual({
+        address:
+          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        networkId: "goerli-alpha",
         ccyDayChange: "0.001484",
         ccyValue: "1102.594564",
         ethDayChange: "0",
@@ -140,8 +144,8 @@ describe("sumTokenBalancesToCurrencyValue()", () => {
     test("should sum an array of tokens to currency value", () => {
       const result = sumTokenBalancesToCurrencyValue({
         tokens: mockTokensWithBalance,
-        pricesData: mockApiPricesData,
-        tokenData: mockApiTokenData,
+        pricesData: mockApiPricesData as any,
+        tokenData: mockApiTokenData as any,
       })
       expect(result).toEqual("1103.596564")
     })

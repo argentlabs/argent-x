@@ -1,6 +1,6 @@
 {
   "name": "@argent/get-starknet",
-  "version": "6.3.0",
+  "version": "6.4.7",
   "repository": "github:argentlabs/argent-x",
   "private": false,
   "browser": {
@@ -33,31 +33,38 @@
     "build": "vite build",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "dev": "vite build --watch",
-    "setup": "yarn build"
+    "setup": "pnpm build"
   },
   "dependencies": {
-    "@argent/web-sdk": "^6.3.0",
-    "@argent/x-window": "^6.3.0",
+    "@argent/web-sdk": "^6.4.1",
+    "@argent/x-window": "^6.4.0",
     "bowser": "^2.11.0",
-    "get-starknet-core": "^2.0.0",
+    "get-starknet-core": "^3.1.0",
     "lodash-es": "^4.17.21",
     "svelte-forms": "^2.3.1"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.1.1",
-    "@tsconfig/svelte": "^3.0.0",
+    "@sveltejs/vite-plugin-svelte": "^2.2.0",
+    "@tsconfig/svelte": "^5.0.0",
     "@types/async-retry": "^1.4.5",
+    "@walletconnect/ethereum-provider": "^2.7.7",
+    "@walletconnect/sign-client": "^2.7.7",
+    "@walletconnect/signer-connection": "^2.7.7",
+    "@walletconnect/types": "^2.7.7",
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
-    "starknet": "^4.21.0",
-    "svelte": "^3.49.0",
+    "svelte": "^4.0.0",
     "svelte-check": "^3.3.2",
-    "svelte-preprocess": "^4.10.7",
+    "svelte-preprocess": "^5.0.3",
     "tailwindcss": "^3.1.6",
     "tslib": "^2.4.0",
-    "typescript": "^4.9.3",
-    "vite": "^3.0.0",
-    "vite-plugin-dts": "^1.4.0"
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8",
+    "vite-plugin-dts": "^3.0.0",
+    "ws": "^8.8.1"
+  },
+  "peerDependencies": {
+    "starknet": "5.18.0"
   },
   "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"
 }

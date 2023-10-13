@@ -2,12 +2,12 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { BrowserRouter } from "react-router-dom"
 
-import { initUiExtensionCloseListener } from "../shared/analytics"
 import {
   ARGENT_API_ENABLED,
   ARGENT_TRANSACTION_REVIEW_API_ENABLED,
 } from "../shared/api/constants"
 import { App } from "./App"
+import { clientUIService } from "./services/ui"
 
 const container = document.getElementById("root")
 
@@ -27,7 +27,7 @@ if (!ARGENT_TRANSACTION_REVIEW_API_ENABLED && isDev) {
   )
 }
 
-initUiExtensionCloseListener()
+clientUIService.registerUIProcess()
 
 const root = createRoot(container)
 

@@ -8,43 +8,51 @@ import { AccountListItem } from "./AccountListItem"
 
 interface AccountListHiddenScreenProps {
   onBack: ReactEventHandler
-  hiddenAccounts: WalletAccount[]
-  hiddenPendingMultisigAccounts: PendingMultisig[]
-  onUnhideAccount: (account: WalletAccount) => void
-  onUnhidePendingMultisig: (pendingMultisig: PendingMultisig) => void
+  accounts: WalletAccount[]
+  pendingMultisigAccounts: PendingMultisig[]
+  onToggleHiddenAccount: (account: WalletAccount, hidden: boolean) => void
+  onToggleHiddenPendingMultisig: (
+    pendingMultisig: PendingMultisig,
+    hidden: boolean,
+  ) => void
 }
 
 export const AccountListHiddenScreen: FC<AccountListHiddenScreenProps> = ({
   onBack,
-  hiddenAccounts = [],
-  hiddenPendingMultisigAccounts = [],
-  onUnhideAccount,
-  onUnhidePendingMultisig,
+  accounts = [],
+  pendingMultisigAccounts = [],
+  onToggleHiddenAccount,
+  onToggleHiddenPendingMultisig,
 }) => {
   return (
     <NavigationContainer
-      title={"Hidden Accounts"}
+      title="Hidden Accounts"
       leftButton={<BarBackButton onClick={onBack} />}
     >
       <CellStack>
-        {hiddenAccounts.map((account) => (
+        {accounts.map((account) => (
           <AccountListItem
             key={account.address}
             accountName={account.name}
             accountAddress={account.address}
             networkId={account.networkId}
-            hidden
-            onClick={() => onUnhideAccount(account)}
+            hidden={account.hidden ?? false}
+            onClick={() => onToggleHiddenAccount(account, !account.hidden)}
           />
         ))}
-        {hiddenPendingMultisigAccounts.map((pendingMultisig) => (
+        {pendingMultisigAccounts.map((pendingMultisig) => (
           <PendingMultisigListItem
             key={pendingMultisig.publicKey}
             accountName={pendingMultisig.name}
             publicKey={pendingMultisig.publicKey}
             networkId={pendingMultisig.networkId}
-            hidden
-            onClick={() => onUnhidePendingMultisig(pendingMultisig)}
+            hidden={pendingMultisig.hidden ?? false}
+            onClick={() =>
+              onToggleHiddenPendingMultisig(
+                pendingMultisig,
+                !pendingMultisig.hidden,
+              )
+            }
           />
         ))}
       </CellStack>

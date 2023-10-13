@@ -1,22 +1,22 @@
-import { Call, validateAndParseAddress } from "starknet"
-import { number, uint256 } from "starknet"
+import { Call, constants, validateAndParseAddress } from "starknet"
+import { num, uint256 } from "starknet"
 
 import { normalizeAddress } from "../../ui/services/addresses"
 
-const { toBN } = number
+const { toBigInt } = num
 const { isUint256, uint256ToBN } = uint256
 
 export interface Erc20Call extends Call {
   calldata: [
     /** recipient address as decimal e.g. 2007141710004580612847837172790366058109710402280793820610123055421682225678 */
-    recipientAddressDecimal: string,
+    string,
     /**
      * amount as 2-part low and high felt
      * @see https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts
      * @see https://www.cairo-lang.org/docs/hello_cairo/intro.html#field-element
      */
-    amountLowFelt: number.BigNumberish,
-    amountHighFelt: number.BigNumberish,
+    num.BigNumberish,
+    num.BigNumberish,
   ]
 }
 
@@ -35,7 +35,7 @@ export const validateERC20Call = (call: Erc20Call) => {
     }
     const amount = uint256ToBN(amountUint256)
     /** final check for valid Unit256 that is > 0 */
-    if (isUint256(amount) && toBN(amount).gt(toBN(0))) {
+    if (isUint256(amount) && amount > constants.ZERO) {
       return true
     }
   } catch (e) {

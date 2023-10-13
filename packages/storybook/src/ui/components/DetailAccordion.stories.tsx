@@ -28,7 +28,9 @@ const Inner = () => (
         />
         <DetailAccordionRow
           label={"Label 3"}
-          value={"Value 3"}
+          value={
+            "LongValue012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+          }
           copyValue={"Copy value 3"}
         />
       </DetailAccordionPanel>
@@ -48,13 +50,20 @@ const Inner = () => (
         />
         <DetailAccordionRow
           label={"Label 3"}
-          value={"Value 3"}
+          value={
+            "LongValue012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+          }
           copyValue={"Copy value 3"}
         />
       </DetailAccordionPanel>
     </DetailAccordionItem>
     <DetailAccordionItem>
-      <DetailAccordionButton label={"Label"} value={"Value"} />
+      <DetailAccordionButton
+        label={"Label"}
+        value={
+          "LongValue012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+        }
+      />
       <DetailAccordionPanel>
         <DetailAccordionRow
           label={"Label 1"}
@@ -68,7 +77,9 @@ const Inner = () => (
         />
         <DetailAccordionRow
           label={"Label 3"}
-          value={"Value 3"}
+          value={
+            "LongValue012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
+          }
           copyValue={"Copy value 3"}
         />
       </DetailAccordionPanel>

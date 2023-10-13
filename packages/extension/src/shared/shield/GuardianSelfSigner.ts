@@ -1,10 +1,11 @@
-import type {
+import {
   Abi,
   Call,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
+  stark,
 } from "starknet"
 import { Signer, typedData } from "starknet"
 
@@ -26,7 +27,8 @@ export class GuardianSelfSigner extends Signer {
     accountAddress: string,
   ): Promise<Signature> {
     const signatures = await super.signMessage(typedData, accountAddress)
-    return [...signatures, ...signatures]
+    const formattedSignatures = stark.signatureToDecimalArray(signatures)
+    return [...formattedSignatures, ...formattedSignatures]
   }
 
   public async signTransaction(
@@ -39,7 +41,8 @@ export class GuardianSelfSigner extends Signer {
       transactionsDetail,
       abis,
     )
-    return [...signatures, ...signatures]
+    const formattedSignatures = stark.signatureToDecimalArray(signatures)
+    return [...formattedSignatures, ...formattedSignatures]
   }
 
   public async signDeployAccountTransaction({
@@ -62,7 +65,8 @@ export class GuardianSelfSigner extends Signer {
       chainId,
       nonce,
     })
-    return [...signatures, ...signatures]
+    const formattedSignatures = stark.signatureToDecimalArray(signatures)
+    return [...formattedSignatures, ...formattedSignatures]
   }
 
   public async signDeclareTransaction({
@@ -81,6 +85,7 @@ export class GuardianSelfSigner extends Signer {
       version,
       nonce,
     })
-    return [...signatures, ...signatures]
+    const formattedSignatures = stark.signatureToDecimalArray(signatures)
+    return [...formattedSignatures, ...formattedSignatures]
   }
 }

@@ -6,9 +6,16 @@ import { extensionOnlyProcedure } from "../permissions"
 export const deployAccountProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
   .input(baseWalletAccountSchema)
-  .mutation(async ({ input: data, ctx: { services } }) => {
-    await deployAccountAction({
-      account: data,
-      actionQueue: services.actionQueue,
-    })
-  })
+  .mutation(
+    async ({
+      input,
+      ctx: {
+        services: { actionService },
+      },
+    }) => {
+      await deployAccountAction({
+        account: input,
+        actionService,
+      })
+    },
+  )

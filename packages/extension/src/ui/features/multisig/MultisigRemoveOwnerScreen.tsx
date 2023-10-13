@@ -3,7 +3,6 @@ import { FormProvider, useFormContext } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
 import { routes, useRouteSignerToRemove } from "../../routes"
-import { removeMultisigOwner } from "../../services/backgroundMultisigs"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import {
@@ -13,6 +12,7 @@ import {
 import { useMultisig } from "./multisig.state"
 import { BaseMultisigConfirmations } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
+import { multisigService } from "../../services/multisig"
 
 export const MultisigRemoveOwnersScreen: FC = () => {
   const account = useRouteAccount()
@@ -43,6 +43,15 @@ const MultisigRemoveOwnerAccountWrapper = ({
     () => (multisig?.signers.length ? multisig.signers.length - 1 : undefined),
     [multisig?.signers],
   )
+
+  const newThreshold = useMemo(
+    () =>
+      newTotalSigners &&
+      multisig?.threshold &&
+      Math.max(Math.min(newTotalSigners, multisig?.threshold), 1),
+    [newTotalSigners, multisig?.threshold],
+  )
+
   const methods = useUpdateThresholdForm(newTotalSigners)
 
   return (
@@ -51,6 +60,7 @@ const MultisigRemoveOwnerAccountWrapper = ({
         account={account}
         signerToRemove={signerToRemove}
         totalSigners={newTotalSigners}
+        newThreshold={newThreshold}
       />
     </FormProvider>
   )
@@ -60,10 +70,12 @@ const MultisigRemove = ({
   account,
   signerToRemove,
   totalSigners,
+  newThreshold,
 }: {
   account: Account
   signerToRemove: string
   totalSigners?: number
+  newThreshold?: number
 }) => {
   const { trigger, getValues } = useFormContext<FieldValuesThresholdForm>()
 
@@ -73,7 +85,7 @@ const MultisigRemove = ({
     const isValid = await trigger()
     const newThreshold = getValues("confirmations")
     if (isValid && signerToRemove && account?.address) {
-      await removeMultisigOwner({
+      await multisigService.removeOwner({
         signerToRemove,
         newThreshold,
         address: account?.address,
@@ -87,6 +99,7 @@ const MultisigRemove = ({
       account={account}
       handleNextClick={handleSubmit}
       totalSigners={totalSigners}
+      threshold={newThreshold}
     />
   )
 }

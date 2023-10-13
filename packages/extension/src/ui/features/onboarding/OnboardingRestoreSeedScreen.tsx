@@ -1,3 +1,4 @@
+import { seedphraseSchema } from "@argent/shared"
 import { Alert, B3, FieldError, SeedInput, icons } from "@argent/ui"
 import { Flex, chakra } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -5,7 +6,6 @@ import { FC, MouseEventHandler } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { seedphraseSchema } from "../../../shared/schemas/seedphrase"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 

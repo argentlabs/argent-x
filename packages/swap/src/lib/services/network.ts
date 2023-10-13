@@ -7,10 +7,10 @@ export function getNetworkIdFromChainId(
   chainId?: SupportedChainIds,
 ): SupportedNetworks | undefined {
   switch (chainId) {
-    case constants.StarknetChainId.MAINNET:
+    case constants.StarknetChainId.SN_MAIN:
       return SupportedNetworks.MAINNET
 
-    case constants.StarknetChainId.TESTNET:
+    case constants.StarknetChainId.SN_GOERLI:
       return SupportedNetworks.TESTNET
 
     // case ChainId.TESTNET2:

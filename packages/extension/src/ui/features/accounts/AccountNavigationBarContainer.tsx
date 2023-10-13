@@ -1,4 +1,3 @@
-import { NavigationBarProps } from "@argent/ui"
 import { FC, useCallback } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -8,12 +7,7 @@ import { useView } from "../../views/implementation/react"
 import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
 import { useMultisig } from "../multisig/multisig.state"
 import { AccountNavigationBar } from "./AccountNavigationBar"
-
-export interface AccountNavigationBarContainerProps
-  extends Pick<NavigationBarProps, "scroll"> {
-  showAccountButton?: boolean
-  showNetworkSwitcher?: boolean
-}
+import { AccountNavigationBarContainerProps } from "./accountNavigationBar.model"
 
 export const AccountNavigationBarContainer: FC<
   AccountNavigationBarContainerProps
@@ -23,6 +17,8 @@ export const AccountNavigationBarContainer: FC<
   const returnTo = useCurrentPathnameWithQuery()
 
   const account = useView(selectedAccountView)
+  const hasAccount = Boolean(account)
+
   // TODO: refactor multisig to use services and views
   const multisig = useMultisig(account)
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
@@ -45,6 +41,7 @@ export const AccountNavigationBarContainer: FC<
 
   return (
     <AccountNavigationBar
+      showAccountButton={hasAccount}
       accountName={accountName}
       isShield={isShield}
       isMultisig={isMultisig}

@@ -2,7 +2,7 @@ import { Button, FlowHeader, P3, icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/getEscape"
+import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/escape.model"
 
 const { ArgentShieldDeactivateIcon } = icons
 

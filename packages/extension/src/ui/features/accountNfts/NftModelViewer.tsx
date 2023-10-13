@@ -2,8 +2,7 @@ import "@google/model-viewer/dist/model-viewer"
 
 import { FC } from "react"
 
-import { AspectNft } from "./aspect.model"
-import { getNftPicture } from "./aspect.service"
+import { NftItem, getNftPicture } from "@argent/shared"
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {
@@ -15,7 +14,7 @@ declare global {
 }
 
 interface NftModelViewerProps {
-  nft: AspectNft
+  nft: NftItem
 }
 
 const NftModelViewer: FC<NftModelViewerProps> = ({ nft }) => (

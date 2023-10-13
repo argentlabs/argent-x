@@ -26,14 +26,14 @@ for file in packages/*/package.json; do
     # look for starknet in the dependencies, devDependencies and peerDependencies:
     if jq -e '.dependencies.starknet' $file >/dev/null; then
         # update the starknet dependency:
-        yarn --cwd packages/$(basename $(dirname $file)) add starknet@next
+        pnpm --cwd packages/$(basename $(dirname $file)) add starknet@next
     fi
     if jq -e '.devDependencies.starknet' $file >/dev/null; then
         # update the starknet devDependency:
-        yarn --cwd packages/$(basename $(dirname $file)) add -D starknet@next
+        pnpm --cwd packages/$(basename $(dirname $file)) add -D starknet@next
     fi
     if jq -e '.peerDependencies.starknet' $file >/dev/null; then
         # update the starknet peerDependency:
-        yarn --cwd packages/$(basename $(dirname $file)) add -P starknet@next
+        pnpm --cwd packages/$(basename $(dirname $file)) add -P starknet@next
     fi
 done

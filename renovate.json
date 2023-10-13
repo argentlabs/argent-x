@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "schedule": ["every 2 weeks on Monday"],
+  "timezone": "Europe/London",
+  "rebaseWhen": "never",
+  "ignoreDeps": ["starknet4-deprecated", "starknet4"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch-updates"
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 import { z } from "zod"
 
-import { escapeSchema } from "./account/details/getEscape"
+import { escapeSchema } from "./account/details/escape.model"
 import { networkSchema } from "./network"
+import { addressSchema } from "@argent/shared"
 
 export const argentAccountTypeSchema = z.enum([
   "standard",
@@ -9,6 +10,7 @@ export const argentAccountTypeSchema = z.enum([
   "multisig",
   "betterMulticall",
   "argent5MinuteEscapeTestingAccount",
+  "standardCairo0",
 ])
 export const createAccountTypeSchema = argentAccountTypeSchema.exclude([
   "plugin",
@@ -32,8 +34,11 @@ export const walletAccountSchema = z
     name: z.string(),
     network: networkSchema,
     type: argentAccountTypeSchema,
+    classHash: addressSchema.optional(),
+    cairoVersion: z.union([z.literal("0"), z.literal("1")]).optional(),
     hidden: z.boolean().optional(),
     needsDeploy: z.boolean().optional(),
+    showBlockingDeprecated: z.boolean().optional(),
     guardian: z.string().optional(),
     escape: escapeSchema.optional(),
   })
@@ -49,7 +54,9 @@ export const multisigDataSchema = z.object({
   signers: z.array(z.string()),
   threshold: z.number(),
   creator: z.string().optional(), // Creator is the public key of the account that created the multisig account
+  updatedAt: z.number(),
 })
+
 export const baseMultisigWalletAccountSchema =
   baseWalletAccountSchema.merge(multisigDataSchema)
 export const multisigWalletAccountSchema = z

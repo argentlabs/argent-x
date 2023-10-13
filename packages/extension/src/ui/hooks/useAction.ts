@@ -19,6 +19,7 @@ export function useAction<T extends (...args: any[]) => any>(
     try {
       const result = await action(...args)
       setResult(result)
+      return result
     } catch (error) {
       setError(
         error instanceof Error

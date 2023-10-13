@@ -1,10 +1,10 @@
 import { PendingMultisig } from "../../../shared/multisig/types"
-import { getNetwork } from "../../../shared/network"
+import { networkService } from "../../../shared/network/service"
 import {
   BaseMultisigWalletAccount,
   MultisigData,
 } from "../../../shared/wallet.model"
-import { createNewMultisigAccount } from "../../services/backgroundMultisigs"
+import { multisigService } from "../../services/multisig"
 import { Account, AccountConstructorProps } from "../accounts/Account"
 
 export interface MultisigConstructorProps extends AccountConstructorProps {
@@ -12,6 +12,7 @@ export interface MultisigConstructorProps extends AccountConstructorProps {
   threshold: number
   creator?: string // Creator is the public key of the account that created the multisig account
   publicKey: string
+  updatedAt?: number
 }
 
 export const ZERO_MULTISIG: MultisigData = {
@@ -19,6 +20,7 @@ export const ZERO_MULTISIG: MultisigData = {
   threshold: 0,
   creator: undefined,
   publicKey: "0x0",
+  updatedAt: Date.now(),
 }
 
 export class Multisig extends Account {
@@ -26,6 +28,7 @@ export class Multisig extends Account {
   threshold: number
   creator?: string
   publicKey: string
+  updatedAt: number
 
   constructor(props: MultisigConstructorProps) {
     super(props)
@@ -33,6 +36,7 @@ export class Multisig extends Account {
     this.threshold = props.threshold
     this.creator = props.creator
     this.publicKey = props.publicKey
+    this.updatedAt = props.updatedAt || Date.now()
   }
 
   // Create Method Overload
@@ -65,12 +69,12 @@ export class Multisig extends Account {
   ): Promise<Multisig> {
     const multisigPayload = providedMultisigData || ZERO_MULTISIG
 
-    const result = await createNewMultisigAccount(networkId, multisigPayload)
-    if (result === "error") {
-      throw new Error(result)
-    }
+    const result = await multisigService.addAccount({
+      ...multisigPayload,
+      networkId,
+    })
 
-    const network = await getNetwork(networkId)
+    const network = await networkService.getById(networkId)
 
     if (!network) {
       throw new Error(`Network ${networkId} not found`)
@@ -93,13 +97,16 @@ export class Multisig extends Account {
   }
 
   public toBaseMultisigAccount(): BaseMultisigWalletAccount {
-    const { networkId, address, signers, threshold, publicKey } = this
+    const { networkId, address, signers, threshold, publicKey, updatedAt } =
+      this
+
     return {
       networkId,
       address,
       signers,
       threshold,
       publicKey,
+      updatedAt,
     }
   }
 

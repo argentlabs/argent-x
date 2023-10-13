@@ -104,7 +104,7 @@ const variants = {
   flat: variantFlat,
 }
 
-export const sizes = {
+export const size = {
   md: defineStyle({
     px: "5",
     py: "4.5",
@@ -112,6 +112,15 @@ export const sizes = {
     fontWeight: "semibold",
     borderRadius: "lg",
     minHeight: "14",
+  }),
+  sm: defineStyle({
+    px: "3",
+    py: "3.5",
+    fontSize: "base",
+    fontWeight: "semibold",
+    borderRadius: "lg",
+    minHeight: "12",
+    h: "10" /** also defines the width of InputLeftElement and InputRightElement... */,
   }),
   pill: defineStyle({
     px: "4",
@@ -124,21 +133,37 @@ export const sizes = {
   }),
 }
 
-const partsStyleSizes = {
+const sizes = {
   md: definePartsStyle({
-    field: sizes.md,
-    addon: sizes.md,
+    field: size.md,
+    addon: size.md,
+    element: defineStyle({
+      ...size.md,
+      px: undefined,
+    }),
+  }),
+  sm: definePartsStyle({
+    field: size.sm,
+    addon: size.sm,
+    element: defineStyle({
+      ...size.sm,
+      px: undefined,
+    }),
   }),
   pill: definePartsStyle({
-    field: sizes.pill,
-    addon: sizes.pill,
+    field: size.pill,
+    addon: size.pill,
+    element: defineStyle({
+      ...size.pill,
+      px: undefined,
+    }),
   }),
 }
 
 export const inputTheme = defineMultiStyleConfig({
   baseStyle,
   variants,
-  sizes: partsStyleSizes,
+  sizes,
   defaultProps: {
     size: "md",
     variant: "outline",

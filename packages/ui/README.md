@@ -34,7 +34,7 @@ You can use primitives and components from chakra - see [chakra components](http
 Custom components and examples unique to this package are in storybook
 
 ```bash
-yarn storybook
+pnpm storybook
 ```
 
 ### Icons
@@ -44,5 +44,5 @@ The icons in `/src/components/icons` are generated from master artwork in Figma.
 You can get that access token from: https://www.figma.com/developers/api#access-tokens
 
 ```bash
-yarn gen:icons
+pnpm gen:icons
 ```

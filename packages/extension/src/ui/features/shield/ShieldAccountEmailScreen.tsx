@@ -2,15 +2,12 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes, useRouteAccountAddress } from "../../routes"
-import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"
-import { useRouteAccount } from "./useRouteAccount"
 import { useShieldOnboardingTracking } from "./useShieldTracking"
+import { ArgentAccountBaseEmailScreen } from "../argentAccount/ArgentAccountBaseEmailScreen"
 
 export const ShieldAccountEmailScreen: FC = () => {
-  const account = useRouteAccount()
   const accountAddress = useRouteAccountAddress()
   const navigate = useNavigate()
-  const hasGuardian = Boolean(account?.guardian)
 
   const { trackSuccess } = useShieldOnboardingTracking({
     stepId: "enterEmail",
@@ -22,17 +19,19 @@ export const ShieldAccountEmailScreen: FC = () => {
 
   const onEmailRequested = useCallback(
     (email: string) => {
-      trackSuccess()
-      navigate(routes.shieldAccountOTP(accountAddress, email))
+      void trackSuccess()
+      if (accountAddress) {
+        navigate(routes.shieldAccountOTP(accountAddress, email, "shield"))
+      }
     },
     [accountAddress, navigate, trackSuccess],
   )
 
   return (
-    <ShieldBaseEmailScreen
+    <ArgentAccountBaseEmailScreen
       onBack={onBack}
       onEmailRequested={onEmailRequested}
-      hasGuardian={hasGuardian}
+      flow={"shield"}
     />
   )
 }

@@ -1,4 +1,4 @@
-import { constants, number } from "starknet"
+import { constants, num, CallData } from "starknet"
 
 import { isChangeGuardianCall } from "../../../../../../shared/call/changeGuardianCall"
 import { ChangeGuardianTransaction } from "../../type"
@@ -9,10 +9,10 @@ export default function ({ transaction, result }: ITransactionTransformer) {
   const calls = getCallsFromTransaction(transaction)
   for (const call of calls) {
     if (isChangeGuardianCall(call)) {
-      const guardianAddressCalldata = call.calldata?.[0]
+      const guardianAddressCalldata = CallData.toCalldata(call.calldata)[0]
       if (guardianAddressCalldata !== undefined) {
-        const guardianAddress = number.toBN(guardianAddressCalldata)
-        const isRemove = guardianAddress.eq(constants.ZERO)
+        const guardianAddress = num.toBigInt(guardianAddressCalldata)
+        const isRemove = guardianAddress === constants.ZERO
         const action = isRemove ? "REMOVE" : "ADD"
         const entity = "GUARDIAN"
         const displayName = isRemove

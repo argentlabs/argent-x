@@ -1,92 +1,45 @@
-import { BarBackButton, H3, H4, H6, NavigationContainer, P4 } from "@argent/ui"
-import { Box, Flex, Image, SimpleGrid } from "@chakra-ui/react"
-import { ethers } from "ethers"
-import { get } from "lodash-es"
-import React, { FC, useMemo } from "react"
-import { Location, useLocation, useNavigate, useParams } from "react-router-dom"
+import { Collection, NftItem, bigDecimal, getNftPicture } from "@argent/shared"
+import {
+  BarBackButton,
+  H4,
+  H6,
+  NavigationContainer,
+  NavigationContainerProps,
+  P4,
+} from "@argent/ui"
+import { Flex, Image, SimpleGrid } from "@chakra-ui/react"
+import React, { FC, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { Spinner } from "../../components/Spinner"
 import { routes } from "../../routes"
-import { selectedAccountView } from "../../views/account"
-import { useView } from "../../views/implementation/react"
 import { UnknownDappIcon } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/UnknownDappIcon"
-import { getNftPicture } from "./aspect.service"
-import { NftFallback } from "./NftFallback"
 import { NftFigure } from "./NftFigure"
-import { NftItem } from "./NftItem"
-import { NftZodError, ParsedError, useCollection } from "./useCollections"
+import { NftItem as NftItemComponent } from "./NftItem"
 
-interface LocationWithState extends Location {
-  state: {
-    navigateToSend?: boolean
-  }
+interface CollectionNftsProps extends NavigationContainerProps {
+  nfts: NftItem[]
+  collection?: Collection
+  onNftClick?: (nft: NftItem) => void
 }
 
-export const CollectionNfts: FC = () => {
-  const { contractAddress } = useParams<{ contractAddress: string }>()
-  const account = useView(selectedAccountView)
+export const CollectionNfts: FC<CollectionNftsProps> = ({
+  nfts,
+  collection,
+  onNftClick,
+  ...rest
+}) => {
   const navigate = useNavigate()
-  const { state } = useLocation() as LocationWithState
-
-  const navigateToSend = state?.navigateToSend || false
-  const { collectible, error } = useCollection(contractAddress, account)
-
-  const errorMap: ParsedError | null = useMemo(() => {
-    if (!error) {
-      return null
-    }
-    try {
-      const parsedError = (error && JSON.parse(error)) || []
-      return parsedError.reduce((a: ParsedError[], e: NftZodError) => {
-        return {
-          ...a,
-          [e.path[0]]: e.code,
-        }
-      }, {})
-    } catch {
-      // error is not a json
-      return {
-        message: error.message,
+  const onClick = useCallback(
+    (nft: NftItem) => {
+      if (onNftClick) {
+        onNftClick(nft)
+      } else {
+        navigate(routes.accountNft(nft.contract_address, nft.token_id))
       }
-    }
-  }, [error])
-
-  // if no collectibles or no contract address, display generic error
-  if ((error && !collectible) || !contractAddress) {
-    return (
-      <NavigationContainer
-        leftButton={
-          <BarBackButton
-            onClick={() => navigate(routes.accountCollections())}
-          />
-        }
-      >
-        <H3 mt="4" textAlign="center">
-          Error loading nfts
-        </H3>
-        <Flex position="relative">
-          <NftFallback />
-        </Flex>
-      </NavigationContainer>
-    )
-  }
-
-  if (errorMap?.message) {
-    return (
-      <NavigationContainer
-        leftButton={
-          <BarBackButton
-            onClick={() => navigate(routes.accountCollections())}
-          />
-        }
-      >
-        <H3 mt="4" textAlign="center">
-          {errorMap.message}
-        </H3>
-      </NavigationContainer>
-    )
-  }
-
+    },
+    [navigate, onNftClick],
+  )
   return (
     <NavigationContainer
       leftButton={
@@ -97,14 +50,15 @@ export const CollectionNfts: FC = () => {
           <Image
             w="28px"
             h="28px"
-            src={collectible?.imageUri ?? undefined}
+            src={collection?.imageUri ?? undefined}
             borderRadius="lg"
           />
-          <H6>{collectible?.name}</H6>
+          <H6>{collection?.name}</H6>
         </>
       }
+      {...rest}
     >
-      {collectible ? (
+      {collection ? (
         <>
           <Flex
             gap="2"
@@ -112,81 +66,38 @@ export const CollectionNfts: FC = () => {
             direction="column"
             alignItems="center"
           >
-            {collectible.imageUri ? (
+            {collection.imageUri ? (
               <Image
                 w={16}
                 h={16}
-                src={collectible.imageUri}
+                src={collection.imageUri}
                 backgroundColor={"neutrals.300"}
                 borderRadius="lg"
               />
             ) : (
               <UnknownDappIcon />
             )}
-            <H4>{collectible?.name || "Loading..."}</H4>
-            {collectible.floorPrice && (
+            <H4>{collection?.name || "Loading..."}</H4>
+            {!!collection.floorPrice && (
               <P4 color="neutrals.300">
-                Floor price: {ethers.utils.formatEther(collectible.floorPrice)}{" "}
-                ETH
+                Floor price: {bigDecimal.formatEther(collection.floorPrice)} ETH
               </P4>
             )}
           </Flex>
           <SimpleGrid
-            gridTemplateColumns="repeat(auto-fill, 158px)"
+            gridTemplateColumns="repeat(auto-fill, minmax(155px, 1fr))"
             gap="3"
             mx="4"
             py={6}
           >
-            {collectible.nfts.map((nft, index) => (
+            {nfts.map((nft) => (
               <React.Fragment key={`${nft.contract_address}-${nft.token_id}`}>
-                {!get(errorMap, index) && (
-                  <NftFigure
-                    onClick={() =>
-                      navigate(
-                        navigateToSend
-                          ? routes.sendNft(nft.contract_address, nft.token_id)
-                          : routes.accountNft(
-                              nft.contract_address,
-                              nft.token_id,
-                            ),
-                      )
-                    }
-                  >
-                    <NftItem
-                      thumbnailSrc={getNftPicture(nft) || ""}
-                      name={
-                        nft.name ||
-                        nft.contract.name_custom ||
-                        nft.contract.name ||
-                        "Untitled"
-                      }
-                    />
-                  </NftFigure>
-                )}
-                {errorMap && errorMap[index] && (
-                  // eslint-disable-next-line @typescript-eslint/no-empty-function
-                  <Box
-                    w="160px"
-                    h="192px"
-                    position="relative"
-                    as="figure"
-                    bg="neutrals.800"
-                    display="inline-block"
-                    overflow="hidden"
-                    borderRadius="lg"
-                    p="2"
-                  >
-                    <NftItem
-                      thumbnailSrc={""}
-                      name={`${
-                        nft.name ||
-                        nft.contract.name_custom ||
-                        nft.contract.name ||
-                        "Untitled"
-                      } not loaded`}
-                    />
-                  </Box>
-                )}
+                <NftFigure onClick={() => onClick(nft)}>
+                  <NftItemComponent
+                    thumbnailSrc={getNftPicture(nft) || ""}
+                    name={nft.name || collection.name || "Untitled"}
+                  />
+                </NftFigure>
               </React.Fragment>
             ))}
           </SimpleGrid>

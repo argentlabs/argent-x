@@ -67,6 +67,16 @@ const variants = {
       },
     }
   }),
+  info: definePartsStyle(() => ({
+    container: {
+      border: "1px solid",
+      borderColor: "white30",
+    },
+    title: {
+      color: "neutrals.300",
+      margin: 0,
+    },
+  })),
   solid: definePartsStyle((props) => {
     const { colorScheme: c, as } = props
     const isButton = as === AsAlertButton
@@ -97,6 +107,17 @@ const sizes = {
       px: 3,
       py: 3,
       rounded: "base",
+    },
+  }),
+  sm: definePartsStyle({
+    container: {
+      p: 3,
+      rounded: "lg",
+    },
+    title: {
+      fontSize: "13px",
+      fontWeight: 400,
+      lineHeight: 4,
     },
   }),
   md: definePartsStyle({

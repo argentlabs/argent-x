@@ -1,4 +1,4 @@
-import { Button, chakra, defineStyleConfig } from "@chakra-ui/react"
+import { Button, defineStyleConfig } from "@chakra-ui/react"
 import { mode } from "@chakra-ui/theme-tools"
 
 import { typographyStyles } from "./Typography"
@@ -135,11 +135,5 @@ export const buttonTheme = defineStyleConfig({
     size: "md",
     variant: "solid",
     colorScheme: "neutrals",
-  },
-})
-
-export const ButtonRect = chakra(Button, {
-  baseStyle: {
-    rounded: "base",
   },
 })

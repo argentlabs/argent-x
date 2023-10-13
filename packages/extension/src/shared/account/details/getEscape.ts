@@ -1,48 +1,37 @@
-import { Call, number } from "starknet"
-import { z } from "zod"
+import { Call, num } from "starknet"
 
 import { getMulticallForNetwork } from "../../multicall"
-import { getNetwork } from "../../network"
+import { networkService } from "../../network/service"
 import { BaseWalletAccount } from "../../wallet.model"
-import { getIsCurrentImplementation } from "./getImplementation"
 
-/** https://github.com/argentlabs/argent-contracts-starknet/blob/main/contracts/account/library.cairo#L249-L250 */
-
-export const ESCAPE_TYPE_GUARDIAN = 1
-export const ESCAPE_TYPE_SIGNER = 2
-
-export const ESCAPE_SECURITY_PERIOD_DAYS = 7
-
-export const escapeSchema = z.object({
-  /** Time stamp escape will be active, in seconds */
-  activeAt: z.number(),
-  type: z.union([
-    z.literal(ESCAPE_TYPE_GUARDIAN),
-    z.literal(ESCAPE_TYPE_SIGNER),
-  ]),
-})
-
-export type Escape = z.infer<typeof escapeSchema>
+import {
+  ESCAPE_TYPE_GUARDIAN,
+  ESCAPE_TYPE_SIGNER,
+  Escape,
+} from "./escape.model"
 
 /**
  * Get escape state from account
  */
 
 export const getEscapeForAccount = async (account: BaseWalletAccount) => {
-  /**
-   * Skip older implementations which may use 'get_escape'
-   */
-  const isCurrent = await getIsCurrentImplementation(account)
-  if (!isCurrent) {
-    return
-  }
-  const network = await getNetwork(account.networkId)
+  const network = await networkService.getById(account.networkId)
+
+  // Prioritize Cairo 1 get_escape over cairo 0 getEscape
   const call: Call = {
     contractAddress: account.address,
-    entrypoint: "getEscape",
+    entrypoint: "get_escape",
   }
   const multicall = getMulticallForNetwork(network)
-  const response = await multicall.call(call)
+  let response: string[] = []
+
+  try {
+    response = await multicall.call(call)
+  } catch {
+    call.entrypoint = "getEscape"
+    response = await multicall.call(call)
+  }
+
   return shapeResponse(response)
 }
 
@@ -67,8 +56,8 @@ const shapeResponse = (response: string[]) => {
     return
   }
   const [activeAtHex, typeHex] = response
-  const activeAt = Number(number.hexToDecimalString(activeAtHex))
-  const type = Number(number.hexToDecimalString(typeHex))
+  const activeAt = Number(num.hexToDecimalString(activeAtHex))
+  const type = Number(num.hexToDecimalString(typeHex))
   if (
     activeAt === 0 ||
     (type !== ESCAPE_TYPE_GUARDIAN && type !== ESCAPE_TYPE_SIGNER)

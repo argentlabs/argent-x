@@ -1,13 +1,10 @@
-import { useMemo } from "react"
-
-import { defaultNetwork } from "../../../../shared/network"
-import { useNetworks } from "./useNetworks"
+import { useView } from "../../../views/implementation/react"
+import { networkOrDefaultView, networkView } from "../../../views/network"
 
 export const useNetwork = (networkId: string) => {
-  const networks = useNetworks()
-  return useMemo(
-    () =>
-      networks.find((network) => network.id === networkId) || defaultNetwork,
-    [networks, networkId],
-  )
+  return useView(networkOrDefaultView(networkId))
+}
+
+export const useNetworkOrUndefined = (networkId?: string) => {
+  return useView(networkView(networkId))
 }

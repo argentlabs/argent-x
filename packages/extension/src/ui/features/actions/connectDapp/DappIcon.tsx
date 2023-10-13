@@ -1,25 +1,24 @@
-import { Circle, SquareProps } from "@chakra-ui/react"
+import { Box, SquareProps } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
+import { DappDisplayAttributes } from "./useDappDisplayAttributes"
 
 interface DappIconProps extends SquareProps {
-  host: string
-  useDappDisplayAttributesImpl?: typeof useDappDisplayAttributes
+  dappDisplayAttributes?: DappDisplayAttributes
 }
 
 export const DappIcon: FC<DappIconProps> = ({
-  host,
-  useDappDisplayAttributesImpl = useDappDisplayAttributes,
+  dappDisplayAttributes,
   ...rest
 }) => {
-  const dappDisplayAttributes = useDappDisplayAttributesImpl(host)
   return (
-    <Circle
-      size={"full"}
-      backgroundSize={"cover"}
-      /** https://github.com/chakra-ui/chakra-ui/issues/7548 */
-      background={
+    <Box
+      borderRadius="xl"
+      size="full"
+      backgroundSize="cover"
+      h="14"
+      w="14"
+      backgroundImage={
         dappDisplayAttributes?.iconUrl
           ? `url(${dappDisplayAttributes.iconUrl})`
           : "none"

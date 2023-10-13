@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { FeeEstimationProps } from "../FeeEstimation"
+import { FeeEstimationProps } from "../feeEstimation.model"
 import { CopyErrorIcon } from "./CopyErrorIcon"
 
 const { AlertIcon } = icons
@@ -16,13 +16,25 @@ const { AlertIcon } = icons
 export const TransactionFailureAccordion: FC<
   Pick<FeeEstimationProps, "parsedFeeEstimationError">
 > = ({ parsedFeeEstimationError }) => {
+  if (!parsedFeeEstimationError) {
+    return null
+  }
+  const { title, message } = parsedFeeEstimationError
   return (
-    <Accordion allowToggle size="sm" colorScheme="error" boxShadow={"menu"}>
+    <Accordion
+      allowToggle
+      size="sm"
+      colorScheme="error"
+      rounded={"lg"}
+      _dark={{
+        boxShadow: "menu",
+      }}
+    >
       <AccordionItem>
         <AccordionButton>
           <Flex flex="auto" textAlign="left" alignItems={"center"}>
             <AlertIcon display={"inline-block"} fontSize={"base"} mr={1} />
-            Transaction failure predicted
+            {title || "Transaction failure predicted"}
           </Flex>
           <Flex ml={1} gap={3}>
             <CopyErrorIcon
@@ -38,7 +50,7 @@ export const TransactionFailureAccordion: FC<
           }}
         >
           <P4 color="errorText" whiteSpace="pre-wrap">
-            {parsedFeeEstimationError}
+            {message}
           </P4>
         </AccordionPanel>
       </AccordionItem>

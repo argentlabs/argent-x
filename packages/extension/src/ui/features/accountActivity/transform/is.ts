@@ -84,12 +84,7 @@ export const isActivityTransaction = (
 export const isVoyagerTransaction = (
   transaction: any,
 ): transaction is Transaction => {
-  return !!(
-    transaction.hash &&
-    transaction.timestamp &&
-    transaction.account &&
-    transaction.status
-  )
+  return !!(transaction.hash && transaction.timestamp && transaction.account)
 }
 
 export const isExplorerTransaction = (

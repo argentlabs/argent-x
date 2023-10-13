@@ -1,12 +1,18 @@
-import BigNumber from "bignumber.js"
 import type { Dictionary } from "lodash"
-import { flatten, groupBy, orderBy, partition, reduce } from "lodash-es"
+import {
+  flatten,
+  groupBy,
+  isEmpty,
+  orderBy,
+  partition,
+  reduce,
+} from "lodash-es"
 import { useMemo } from "react"
-import { Account, number } from "starknet"
+import { Account, num } from "starknet"
 
-import { useAspectContractAddresses } from "../nfts/aspect"
+import { Address, isEqualAddress } from "../chains"
+/* import { useAspectContractAddresses } from "../nfts/aspect" */
 import { Token } from "../tokens/token"
-import { isEqualAddress } from "../utils/addresses"
 import {
   AggregatedSimData,
   ApprovalSimulationData,
@@ -17,11 +23,15 @@ import {
   ValidatedTokenApproval,
   ValidatedTokenTransfer,
 } from "./aggregatedSimDataTypes"
-import { TokenDetails } from "./transactionSimulationTypes"
+import {
+  ApiTransactionSimulationResponse,
+  TokenDetails,
+} from "./transactionSimulationTypes"
 import { TransactionSimulationTransfer } from "./transactionSimulationTypes"
+import { absBigInt, formatCurrency, parseCurrency } from "../bigdecimal"
 
 function partitionIncomingOutgoingTransfers(transfers: AggregatedSimData[]) {
-  return partition(transfers, (t) => t.amount.isGreaterThan(0))
+  return partition(transfers, (t) => t.amount > 0n)
 }
 
 function orderAggregatedSimData(
@@ -54,20 +64,45 @@ function orderAggregatedSimData(
   ])
 }
 
+export const useSimulationPreprocessor = (
+  transactionSimulation: ApiTransactionSimulationResponse[],
+) => {
+  return useMemo(
+    () =>
+      transactionSimulation.reduce<ApiTransactionSimulationResponse>(
+        (acc, t) => {
+          return {
+            approvals: [...acc.approvals, ...t.approvals],
+            transfers: [...acc.transfers, ...t.transfers],
+          }
+        },
+        {
+          approvals: [],
+          transfers: [],
+        },
+      ),
+    [transactionSimulation],
+  )
+}
+
+const DEFAULT_TRANSACTION_SIMULATION = [
+  {
+    approvals: [],
+    transfers: [],
+  },
+]
+
 export const useAggregatedSimData = ({
   account,
   networkId,
   tokens,
-  transactionSimulation = {
-    transfers: [],
-    approvals: [],
-  },
+  transactionSimulation = DEFAULT_TRANSACTION_SIMULATION,
 }: IUseAggregatedSimData) => {
   // Need to clean hex because the API returns addresses with unpadded 0s
   const erc20TokensRecord = useMemo(
     () =>
       tokens?.reduce<TokensRecord>((acc, token) => {
-        const tokenAddress = number.cleanHex(token.address)
+        const tokenAddress = num.cleanHex(token.address)
         return {
           ...acc,
           [tokenAddress]: token,
@@ -76,9 +111,14 @@ export const useAggregatedSimData = ({
     [tokens],
   )
 
-  const { data: nftContracts } = useAspectContractAddresses()
+  /*
+  TODO: need endpoint to get all NFT contracts
+  const { data: nftContracts } = useAspectContractAddresses() */
+  const nftContracts: any = []
 
-  const { transfers, approvals } = transactionSimulation
+  const { transfers, approvals } = useSimulationPreprocessor(
+    transactionSimulation,
+  )
 
   const aggregatedData = useMemo(() => {
     const filteredTransfers = transfers.filter(
@@ -153,18 +193,20 @@ export const useAggregatedSimData = ({
       keyForGrouping,
     )
 
-    const ZERO = BigNumber(0)
-    const ONE = BigNumber(1)
+    const ZERO = 0n
+    const ONE = 1n
 
     return reduce<
       Dictionary<(ValidatedTokenTransfer | ValidatedTokenApproval)[]>,
       Record<string, AggregatedSimData>
     >(
       mergedRecords,
-      (acc, transfers, key) => {
+      (acc, _, key) => {
         const approvalsForTokens: ValidatedTokenApproval[] =
           approvalsRecord[key]
-        const transfersExist = Boolean(transfersRecord[key])
+
+        const transfers: ValidatedTokenTransfer[] = transfersRecord[key]
+        const noTransfers = isEmpty(transfers)
 
         const approvals: ApprovalSimulationData[] =
           approvalsForTokens
@@ -172,50 +214,52 @@ export const useAggregatedSimData = ({
               token: a.token,
               owner: a.owner,
               spender: a.spender,
-              amount: BigNumber(a.value ?? 1),
-              usdValue: a.usdValue ? BigNumber(a.usdValue) : undefined,
+              amount: BigInt(a.value ?? 1),
+              usdValue: a.usdValue ?? undefined,
             }))
             .filter((a) => a.owner === account?.address) ?? []
 
-        if (approvalsForTokens && !transfersExist) {
+        if (!isEmpty(approvalsForTokens) && noTransfers) {
           return {
             ...acc,
             [key]: {
               token: approvalsForTokens[0].token,
               approvals,
               amount: ZERO,
-              usdValue: undefined,
+              usdValue: "0",
               recipients: [],
               safe: false,
             },
           }
         }
 
-        const amount = transfers.reduce<BigNumber>((acc, t) => {
+        const amount = transfers.reduce<bigint>((acc, t) => {
           const isTokenTranfer = checkIsTokenTransfer(t)
           if (isTokenTranfer && isEqualAddress(t.from, account?.address)) {
-            return acc.minus(t.value ?? ONE.toFixed())
+            return acc - BigInt(t.value ?? ONE) // This works because ERC721 tokens have value undefined and the amount is always 1
           }
-          return acc.plus(t.value ?? ONE)
+          return acc + BigInt(t.value ?? ONE)
         }, ZERO)
 
-        const usdValue = transfers.reduce<BigNumber>((acc, t) => {
+        const usdValueBigInt = transfers.reduce<bigint>((acc, t) => {
           if (!t.usdValue) {
             return acc
           }
           const isTokenTranfer = checkIsTokenTransfer(t)
 
           if (isTokenTranfer && t.from === account?.address) {
-            return acc.minus(t.usdValue)
+            return acc - parseCurrency(t.usdValue)
           }
 
-          return acc.plus(t.usdValue)
+          return acc + parseCurrency(t.usdValue)
         }, ZERO)
 
-        const recipients = transfers.reduce<Recipient[]>((acc, t) => {
-          const amount = BigNumber(t.value ?? 1)
+        const usdValue = formatCurrency(usdValueBigInt)
 
-          const negated = amount.negated()
+        const recipients = transfers.reduce<Recipient[]>((acc, t) => {
+          const amount = BigInt(t.value ?? 1)
+
+          const negated = -amount
           const isTokenTranfer = checkIsTokenTransfer(t)
           if (!isTokenTranfer) {
             return []
@@ -225,17 +269,17 @@ export const useAggregatedSimData = ({
             {
               address: t.to,
               amount: t.to === account?.address ? amount : negated,
-              usdValue: t.usdValue ? BigNumber(t.usdValue) : undefined,
+              usdValue: t.usdValue ?? undefined,
             },
           ]
         }, [])
 
-        const totalApprovalAmount = approvals.reduce<BigNumber>(
-          (acc, a) => acc.plus(a.amount),
+        const totalApprovalAmount = approvals.reduce<bigint>(
+          (acc, a) => acc + a.amount,
           ZERO,
         )
 
-        const safe = totalApprovalAmount.lte(amount.abs()) && transfersExist
+        const safe = totalApprovalAmount <= absBigInt(amount) && !noTransfers
 
         return {
           ...acc,
@@ -281,7 +325,7 @@ export function apiTokenDetailsToToken({
   tokenId,
   nftContracts = [],
 }: {
-  tokenAddress: string
+  tokenAddress: Address
   details?: TokenDetails
   networkId: string
   tokenId?: string

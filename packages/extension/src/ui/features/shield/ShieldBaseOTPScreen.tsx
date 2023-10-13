@@ -8,35 +8,31 @@ import {
   useToast,
 } from "@argent/ui"
 import { Center, HStack, PinInputField } from "@chakra-ui/react"
-import { FC, MouseEvent, useCallback, useMemo, useRef, useState } from "react"
+import { FC, MouseEvent, useCallback, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import * as yup from "yup"
 import { z } from "zod"
 
+import { ShieldValidationErrorMessage } from "../../../shared/errors/argentAccount"
 import {
   EmailVerificationStatus,
   emailVerificationStatusErrorSchema,
   getVerificationErrorMessage,
 } from "../../../shared/shield/backend/account"
-import {
-  confirmEmail,
-  requestEmail,
-  shieldAddAccount,
-  shieldValidateAccount,
-} from "../../../shared/shield/register"
-import {
-  ShieldValidationErrorMessage,
-  getShieldValidationErrorFromBackendError,
-} from "../../../shared/shield/validation"
+import { getAddBackendAccountErrorFromBackendError } from "../../../shared/shield/validation/addBackendAccount"
+import { getShieldValidationErrorFromBackendError } from "../../../shared/shield/validation/validateAccount"
+import { getVerificationErrorFromBackendError } from "../../../shared/shield/validation/verification"
 import { updateVerifiedEmail } from "../../../shared/shield/verifiedEmail"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { ControlledPinInput } from "../../components/ControlledPinInput"
+import { useRouteFlow } from "../../routes"
+import { argentAccountService } from "../../services/argentAccount"
 import { useYupValidationResolver } from "../settings/useYupValidationResolver"
 import { ShieldValidationErrorScreen } from "./ShieldValidationErrorScreen"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
-const { EmailIcon, ResendIcon, ArgentShieldIcon } = icons
+const { EmailIcon, ResendIcon } = icons
 
 const schema = yup
   .object()
@@ -67,7 +63,7 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
   const toast = useToast()
   const [shieldValdationError, setShieldValdationError] =
     useState<ShieldValidationErrorMessage | null>(null)
-
+  const flow = useRouteFlow()
   const onShieldValdationErrorDone = useCallback(() => {
     onOTPReEnterEmail()
   }, [onOTPReEnterEmail])
@@ -79,7 +75,7 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
         return
       }
       try {
-        await requestEmail(email)
+        await argentAccountService.requestEmail(email)
         toast({
           icon: <EmailIcon />,
           title: "A new code has been sent to your email",
@@ -97,16 +93,6 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
     },
     [email, toast],
   )
-
-  const obfuscatedEmail = useMemo(() => {
-    if (!email) {
-      return ""
-    }
-    const elements = email.split("@")
-    const firstLetter = elements[0].substring(0, 1)
-    elements[0] = `${firstLetter}*****`
-    return elements.join("@")
-  }, [email])
 
   const { handleSubmit, formState, setError, control } = useForm({
     defaultValues: {
@@ -128,12 +114,11 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
   return (
     <NavigationContainer
       leftButton={onBack ? <BarBackButton onClick={onBack} /> : null}
-      title={"Argent Shield"}
     >
       <FlowHeader
         icon={EmailIcon}
         title={"Check your email"}
-        subtitle={`If you signed up for the beta we have sent a verification code to ${obfuscatedEmail}`}
+        subtitle={`We’ve sent a verification code to ${email}`}
       />
       {verifiedEmail === null ? (
         <></> /** initialising */
@@ -146,23 +131,46 @@ export const ShieldBaseOTPScreen: FC<ShieldBaseOTPScreenProps> = ({
                 e.preventDefault()
                 void handleSubmit(async ({ otp }) => {
                   try {
-                    await confirmEmail(otp)
+                    await argentAccountService.confirmEmail(otp)
 
                     /** always check the account can be used and exists in backend */
-                    await shieldValidateAccount()
-                    await shieldAddAccount()
+                    await argentAccountService.validateAccount()
+                    if (flow === "shield") {
+                      await argentAccountService.addAccount()
+                    }
 
                     /** successfully verifified and added account with backend - persist this email in the local db */
                     await updateVerifiedEmail(email)
 
                     onOTPConfirmed()
                   } catch (e) {
-                    /** Email validation error */
-                    const shieldError =
-                      getShieldValidationErrorFromBackendError(e)
-                    if (shieldError) {
-                      return setShieldValdationError(shieldError)
+                    /** OTP verification error */
+                    const verificationError =
+                      getVerificationErrorFromBackendError(e)
+                    if (verificationError) {
+                      return setError("otp", {
+                        type: "manual",
+                        message: verificationError,
+                      })
                     }
+
+                    /** Email validation error */
+                    const shieldValidationError =
+                      getShieldValidationErrorFromBackendError(e)
+                    if (shieldValidationError) {
+                      return setShieldValdationError(shieldValidationError)
+                    }
+
+                    /** Add account error */
+                    const addBackendAccountError =
+                      getAddBackendAccountErrorFromBackendError(e)
+                    if (addBackendAccountError) {
+                      return setError("otp", {
+                        type: "manual",
+                        message: addBackendAccountError,
+                      })
+                    }
+
                     /** Other possible error status from backend */
                     try {
                       const errorObject = z

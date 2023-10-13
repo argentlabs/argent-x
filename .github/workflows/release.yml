@@ -2,19 +2,23 @@ name: Release
 
 on:
   push:
+    branches:
+      - release/*
     tags:
-      - "extension/*"
+      # - "@argent-x/extension@*"
+      - "**"
 
 env:
   FEATURE_PRIVACY_SETTINGS: "true"
-  FEATURE_EXPERIMENTAL_SETTINGS: "true"
+  FEATURE_EXPERIMENTAL_SETTINGS: "false"
+  FEATURE_BETA_FEATURES: "true"
   FEATURE_BANXA: "true"
   FEATURE_LAYERSWAP: "true"
   FEATURE_ORBITER: "true"
   FEATURE_VERIFIED_DAPPS: "true"
-  FEATURE_ARGENT_SHIELD: "true"
   ARGENT_SHIELD_NETWORK_ID: "mainnet-alpha"
-  FEATURE_MULTISIG: "false"
+  FEATURE_MULTISIG: "true"
+  SENTRY_ENVIRONMENT: "production"
   NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
   SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -26,47 +30,55 @@ env:
   ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ vars.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
   ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
   ARGENT_EXPLORER_BASE_URL: ${{ vars.ARGENT_EXPLORER_BASE_URL }}
+  ARGENT_X_ENVIRONMENT: "prod"
+  MULTICALL_MAX_BATCH_SIZE: 20
+  FAST: 20 # 20s
+  MEDIUM: 60 # 60s
+  SLOW: 60 * 5 # 5m
+  VERY_SLOW: 24 * 60 * 60 # 1d
 
 jobs:
   build:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'extension') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 8
+          run_install: false
+
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
-          cache: "yarn"
-      - run: yarn setup
-      - run: yarn build --ignore @argent/web
+          node-version: "18.x"
+          cache: "pnpm"
+      - run: pnpm run setup
+      - run: pnpm --filter=\!@argent/web build
 
-      - name: Release npm packages
-        # if flow is triggered by a tag, publish to npm
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
-          cp Readme.md ./packages/get-starknet/README.md
-          yarn --cwd packages/get-starknet publish --access public || exit 0
-          yarn --cwd packages/sessions publish --access public || exit 0
-
-      - run: yarn --cwd packages/dapp export
+      - run: pnpm --filter @argent-x/dapp export
 
       - name: Check bundlesize for chrome
-        run: yarn run bundlewatch
+        run: pnpm bundlewatch
 
       - name: Create chrome zip
         run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME }}-chrome.zip" .)
 
       - name: Build Firefox version
-        run: MANIFEST_VERSION=v2 yarn --cwd packages/extension build
+        run: MANIFEST_VERSION=v2 pnpm --filter @argent-x/extension build
 
       - name: Create firefox zip
         run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME }}-firefox.zip" .)
 
       - name: Check bundlesize for firefox
-        run: yarn run bundlewatch
+        run: pnpm bundlewatch
 
       - name: Upload artifacts for chrome
         uses: actions/upload-artifact@v3
@@ -84,10 +96,6 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
       - name: Get Extension version
         id: package-version
         run: |
@@ -99,10 +107,11 @@ jobs:
           ls -l ./packages/extension
           if [ ! -d "./packages/extension/sourcemaps" ]; then
             echo "No sourcemaps found"
-            exit 0
+            exit 1
           fi
 
       - name: Create Sentry release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: getsentry/action-release@v1
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -110,17 +119,36 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
           SENTRY_LOG_LEVEL: debug
         with:
-          environment: production
-          sourcemaps: "./packages/extension/sourcemaps"
-          url_prefix: "~/sourcemaps"
+          environment: ${{ env.SENTRY_ENVIRONMENT }}
+          sourcemaps: "./packages/extension/dist ./packages/extension/sourcemaps"
+          url_prefix: "~/"
           version: ${{ steps.package-version.outputs.current-version }}
           ignore_missing: true
+
+      # TODO: include all packages
+      - name: Release npm packages
+        # if flow is triggered by a tag, publish to npm
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
+          cp Readme.md ./packages/get-starknet/README.md
+          pnpm --filter @argent/get-starknet publish --no-git-checks --access public || exit 0
+          pnpm --filter @argent/web-sdk publish --no-git-checks --access public || exit 0
+          pnpm --filter @argent/starknet-react-webwallet-connector publish --no-git-checks --access public || exit 0
+          pnpm --filter @argent-x/sessions publish --no-git-checks --access public || exit 0
+
+      - name: Get product version
+        id: product-version
+        run: |
+          PRODUCT_VERSION=$(cat ./packages/extension/dist/manifest.json | jq -r '.version')
+          echo "current-version=${PRODUCT_VERSION}" >> $GITHUB_OUTPUT
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
+          title: extension@${{ steps.product-version.outputs.current-version }}
           files: |
             ${{ env.FILENAME }}-chrome.zip
             ${{ env.FILENAME }}-firefox.zip

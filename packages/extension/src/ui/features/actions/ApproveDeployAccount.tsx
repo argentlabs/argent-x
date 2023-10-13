@@ -2,29 +2,33 @@ import { FC, useState } from "react"
 import { Navigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { usePageTracking } from "../../services/analytics"
 import { DeployAccountFeeEstimation } from "./feeEstimation/DeployAccountFeeEstimation"
-import { AccountNetworkInfo } from "./transaction/ApproveTransactionScreen/AccountNetworkInfo"
+import { AccountNetworkInfoArgentX } from "./transaction/ApproveTransactionScreen/AccountNetworkInfoArgentX"
 import {
   ConfirmPageProps,
   ConfirmScreen,
 } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
-import { DappHeader } from "./transaction/ApproveTransactionScreen/DappHeader"
+import { DappHeaderArgentX } from "./transaction/ApproveTransactionScreen/DappHeader/DappHeaderArgentX"
 import { TransactionActions } from "./transaction/ApproveTransactionScreen/TransactionActions"
+import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { ApproveScreenType } from "./transaction/types"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit"> {
   actionHash: string
   onSubmit: () => void
+  actionIsApproving?: boolean
 }
 
 export const ApproveDeployAccountScreen: FC<
   ApproveDeployAccountScreenProps
-> = ({ selectedAccount, actionHash, onSubmit, ...props }) => {
-  usePageTracking("signTransaction", {
-    networkId: selectedAccount?.networkId || "unknown",
-  })
+> = ({
+  selectedAccount,
+  actionHash,
+  onSubmit,
+  actionIsApproving,
+  ...props
+}) => {
   const [disableConfirm, setDisableConfirm] = useState(false)
 
   if (!selectedAccount) {
@@ -34,23 +38,27 @@ export const ApproveDeployAccountScreen: FC<
   return (
     <ConfirmScreen
       title="Review activation"
-      confirmButtonText="Approve"
-      confirmButtonDisabled={disableConfirm}
+      rejectButtonText="Cancel"
+      confirmButtonIsLoading={actionIsApproving}
+      confirmButtonDisabled={disableConfirm || actionIsApproving}
       selectedAccount={selectedAccount}
       onSubmit={onSubmit}
       showHeader={true}
       footer={
-        <DeployAccountFeeEstimation
-          onErrorChange={setDisableConfirm}
-          accountAddress={selectedAccount.address}
-          networkId={selectedAccount.networkId}
-          actionHash={actionHash}
-        />
+        <WithActionScreenErrorFooter isTransaction>
+          <DeployAccountFeeEstimation
+            onErrorChange={setDisableConfirm}
+            accountAddress={selectedAccount.address}
+            networkId={selectedAccount.networkId}
+            actionHash={actionHash}
+            transactionSimulationLoading={false}
+          />
+        </WithActionScreenErrorFooter>
       }
       {...props}
     >
       {/** Use Transaction Review to get DappHeader */}
-      <DappHeader approveScreenType={ApproveScreenType.ACCOUNT_DEPLOY} />
+      <DappHeaderArgentX approveScreenType={ApproveScreenType.ACCOUNT_DEPLOY} />
 
       <TransactionActions
         action={{
@@ -64,7 +72,7 @@ export const ApproveDeployAccountScreen: FC<
         }}
       />
 
-      <AccountNetworkInfo account={selectedAccount} />
+      <AccountNetworkInfoArgentX account={selectedAccount} />
     </ConfirmScreen>
   )
 }

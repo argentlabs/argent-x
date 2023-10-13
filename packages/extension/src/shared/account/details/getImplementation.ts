@@ -1,9 +1,12 @@
-import { Call, number } from "starknet"
+import { Call, num } from "starknet"
+import { accountsEqual } from "../../utils/accountsEqual"
 
 import { getMulticallForNetwork } from "../../multicall"
-import { getNetwork } from "../../network"
+import { getProvider } from "../../network"
+import { STANDARD_ACCOUNT_CLASS_HASH } from "../../network/constants"
+import { networkService } from "../../network/service"
 import { BaseWalletAccount } from "../../wallet.model"
-import { uint256ToHexString } from "./util"
+import { IAccountService } from "../service/interface"
 
 /**
  * Get implementation class hash of account
@@ -11,15 +14,36 @@ import { uint256ToHexString } from "./util"
 
 export const getImplementationForAccount = async (
   account: BaseWalletAccount,
-) => {
-  const network = await getNetwork(account.networkId)
-  const call: Call = {
-    contractAddress: account.address,
-    entrypoint: "get_implementation",
+  accountService: IAccountService,
+): Promise<string> => {
+  const network = await networkService.getById(account.networkId)
+  try {
+    // Implementation Class Hash for Cairo 0 accounts
+    const call: Call = {
+      contractAddress: account.address,
+      entrypoint: "get_implementation",
+    }
+    const multicall = getMulticallForNetwork(network)
+    const response = await multicall.call(call)
+    return response[0]
+  } catch {
+    try {
+      // If it fails, get implementation Class Hash for Cairo 1 accounts
+      const provider = getProvider(network)
+
+      const classHash = await provider.getClassHashAt(account.address)
+      return classHash
+    } catch {
+      const [walletAccount] = await accountService.get((acc) =>
+        accountsEqual(acc, account),
+      )
+
+      return (
+        walletAccount.network.accountClassHash?.[walletAccount.type] ??
+        STANDARD_ACCOUNT_CLASS_HASH
+      )
+    }
   }
-  const multicall = getMulticallForNetwork(network)
-  const response = await multicall.call(call)
-  return uint256ToHexString(response)
 }
 
 /**
@@ -28,13 +52,19 @@ export const getImplementationForAccount = async (
 
 export const getIsCurrentImplementation = async (
   account: BaseWalletAccount,
+  accountService: IAccountService,
 ) => {
-  const network = await getNetwork(account.networkId)
+  const network = await networkService.getById(account.networkId)
   const currentImplementations = Object.values(network.accountClassHash || {})
-  const accountImplementation = await getImplementationForAccount(account)
+  const accountImplementation = await getImplementationForAccount(
+    account,
+    accountService,
+  )
+
   const isCurrentImplementation = currentImplementations.some(
     (currentImplementation) =>
-      number.toBN(currentImplementation).eq(number.toBN(accountImplementation)),
+      num.toBigInt(currentImplementation) ===
+      num.toBigInt(accountImplementation),
   )
   return isCurrentImplementation
 }

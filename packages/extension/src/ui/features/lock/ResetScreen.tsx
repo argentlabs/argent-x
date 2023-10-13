@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { useTheme } from "styled-components"
 
-import { useResetAll } from "../../services/background"
+import { useResetAll } from "../../hooks/useResetAll"
 import { P } from "../../theme/Typography"
 import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
 

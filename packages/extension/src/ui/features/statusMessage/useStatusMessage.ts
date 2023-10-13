@@ -4,16 +4,16 @@ import {
   ARGENT_X_STATUS_ENABLED,
   ARGENT_X_STATUS_URL,
 } from "../../../shared/api/constants"
-import {
-  isPrivacySettingsEnabled,
-  settingsStore,
-} from "../../../shared/settings"
 import { statusMessageStore } from "../../../shared/statusMessage/storage"
 import { IStatusMessage } from "../../../shared/statusMessage/types"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { argentApiFetcher } from "../../services/argentApiFetcher"
-import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
+import {
+  useConditionallyEnabledSWR,
+  withPolling,
+} from "../../services/swr.service"
 import { getMessageForVersion } from "./statusMessageVisibility"
+import { RefreshInterval } from "../../../shared/config"
 
 export const useLastDismissedMessageId = () =>
   useKeyValueStorage(statusMessageStore, "lastDismissedMessageId")
@@ -22,15 +22,7 @@ export const useLastFullScreenMessageClosedId = () =>
   useKeyValueStorage(statusMessageStore, "lastFullScreenMessageClosedId")
 
 export const useStatusMessageEnabled = () => {
-  const privacyUseArgentServices = useKeyValueStorage(
-    settingsStore,
-    "privacyUseArgentServices",
-  )
-  /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
-  if (!isPrivacySettingsEnabled) {
-    return ARGENT_X_STATUS_ENABLED
-  }
-  return ARGENT_X_STATUS_ENABLED && privacyUseArgentServices
+  return ARGENT_X_STATUS_ENABLED
 }
 
 export const useStatusMessage = () => {
@@ -41,7 +33,7 @@ export const useStatusMessage = () => {
     statusMessageEnabled,
     ARGENT_X_STATUS_URL,
     argentApiFetcher,
-    withPolling(5 * 60 * 60 * 1000) /** 5 minutes */,
+    withPolling(RefreshInterval.SLOW * 1000) /** 5 minutes */,
   )
   const statusMessage = useMemo(() => {
     return getMessageForVersion({ statusMessage: data })

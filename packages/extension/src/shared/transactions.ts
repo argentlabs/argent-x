@@ -1,31 +1,50 @@
-import { lowerCase, upperFirst } from "lodash-es"
-import { Call, Status, TransactionType, number } from "starknet"
+import { lowerCase, uniq, upperFirst } from "lodash-es"
+import {
+  Call,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
+  TransactionType,
+  num,
+} from "starknet"
 
 import { WalletAccount } from "./wallet.model"
+import {
+  MultisigEntryPointType,
+  MultisigTransactionType,
+} from "./multisig/types"
 
-export type ExtendedTransactionStatus = Status | "CANCELLED"
+export type ExtendedTransactionStatus =
+  | TransactionFinalityStatus
+  | "PENDING" // For backward compatibility on mainnet
+  | "REJECTED" // For backward compatibility on mainnet
+  | "CANCELLED"
 
 // Global Constants for Transactions
 export const SUCCESS_STATUSES: ExtendedTransactionStatus[] = [
-  "ACCEPTED_ON_L1",
-  "ACCEPTED_ON_L2",
-  "PENDING",
+  "PENDING", // For backward compatibility on mainnet
+  TransactionFinalityStatus.ACCEPTED_ON_L2,
+  TransactionFinalityStatus.ACCEPTED_ON_L1,
 ]
 
-export const FAILED_STATUS: ExtendedTransactionStatus[] = [
-  "REJECTED",
+export const FAILED_STATUS: (
+  | TransactionExecutionStatus
+  | ExtendedTransactionStatus
+)[] = [
+  TransactionExecutionStatus.REJECTED,
+  TransactionExecutionStatus.REVERTED,
   "CANCELLED",
 ]
 
 export const TRANSACTION_STATUSES_TO_TRACK: ExtendedTransactionStatus[] = [
-  "RECEIVED",
-  "NOT_RECEIVED",
+  TransactionFinalityStatus.RECEIVED,
+  TransactionFinalityStatus.NOT_RECEIVED,
 ]
+
+export type StarknetTransactionTypes = keyof typeof TransactionType
+
 export type ExtendedTransactionType =
-  | TransactionType
-  | "MULTISIG_ADD_SIGNERS"
-  | "MULTISIG_UPDATE_THRESHOLD"
-  | "MULTISIG_REMOVE_SIGNER"
+  | StarknetTransactionTypes
+  | MultisigTransactionType
   | "ADD_ARGENT_SHIELD"
   | "REMOVE_ARGENT_SHIELD"
 
@@ -53,8 +72,10 @@ export interface TransactionRequest extends TransactionBase {
 }
 
 export interface Transaction extends TransactionRequest {
-  status: ExtendedTransactionStatus
+  finalityStatus: ExtendedTransactionStatus
+  executionStatus?: TransactionExecutionStatus
   failureReason?: { code: string; error_message: string }
+  revertReason?: string
   timestamp: number
 }
 
@@ -75,9 +96,11 @@ export const getInFlightTransactions = (
   transactions: Transaction[],
 ): Transaction[] =>
   transactions.filter(
-    ({ status, meta }) =>
-      TRANSACTION_STATUSES_TO_TRACK.includes(status) ||
-      (meta?.isDeployAccount && status === "PENDING"),
+    ({ finalityStatus, meta }) =>
+      finalityStatus &&
+      (TRANSACTION_STATUSES_TO_TRACK.includes(finalityStatus) ||
+        (meta?.isDeployAccount &&
+          finalityStatus === TransactionFinalityStatus.ACCEPTED_ON_L2)),
   )
 
 export function nameTransaction(calls: Call | Call[]) {
@@ -93,8 +116,10 @@ export function transactionNamesToTitle(
     names = [names]
   }
   /** backend returns hex selectors for unknown names - filter them out */
-  const nonHexNames = names.filter((name) => !number.isHex(name))
-  const entrypointNames = nonHexNames.map((name) => lowerCase(name))
+  const nonHexNames = names.filter((name) => !num.isHex(name))
+
+  /** dedupe entrypoints to avoid "Transfer, Transfer bug".  */
+  const entrypointNames = uniq(nonHexNames.map((name) => lowerCase(name)))
   const lastName = entrypointNames.pop()
   const title = entrypointNames.length
     ? `${entrypointNames.join(", ")} and ${lastName}`
@@ -103,17 +128,23 @@ export function transactionNamesToTitle(
 }
 
 export function transformEntrypointName(entryPoint: string) {
-  if (entryPoint === "changeThreshold") {
-    return "setConfirmations"
-  } else if (entryPoint === "addSigners") {
-    return "addOwner"
-  } else {
-    return entryPoint
+  switch (entryPoint) {
+    case MultisigEntryPointType.CHANGE_THRESHOLD:
+      return "setConfirmations"
+    case MultisigEntryPointType.ADD_SIGNERS:
+      return "addOwner"
+    case MultisigEntryPointType.REMOVE_SIGNERS:
+      return "removeOwner"
+    case MultisigEntryPointType.REPLACE_SIGNER:
+      return "replaceOwner"
+    default:
+      return entryPoint
   }
 }
 
 export const MULTISG_TXN_TYPES: ExtendedTransactionType[] = [
-  "MULTISIG_ADD_SIGNERS",
-  "MULTISIG_UPDATE_THRESHOLD",
-  "MULTISIG_REMOVE_SIGNER",
+  MultisigTransactionType.MULTISIG_ADD_SIGNERS,
+  MultisigTransactionType.MULTISIG_REMOVE_SIGNERS,
+  MultisigTransactionType.MULTISIG_CHANGE_THRESHOLD,
+  MultisigTransactionType.MULTISIG_REPLACE_SIGNER,
 ]

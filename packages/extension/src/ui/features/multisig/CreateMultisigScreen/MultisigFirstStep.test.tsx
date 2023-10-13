@@ -48,7 +48,7 @@ test("renders the MultisigFirstStep component", () => {
     fireEvent.click(addOwnerButton)
 
     // Fill out the owner 2 input with a valid value
-    const owner2Input = screen.getByPlaceholderText("Signer key...")
+    const owner2Input = screen.getByPlaceholderText("Signer pubkey...")
     expect(owner2Input).not.toBeNull()
   })
   describe("it should match the snapshots", () => {

@@ -8,7 +8,7 @@ import { ComponentProps, FC, ReactNode } from "react"
 import { TokenIcon } from "../TokenIcon"
 import { P4 } from "../Typography"
 
-interface PrettyAccountAddressProps
+export interface PrettyAccountAddressProps
   extends Pick<ComponentProps<typeof TokenIcon>, "size"> {
   accountAddress: string
   networkId: string

@@ -17,6 +17,7 @@ export interface ILanguage {
     create: string
     cancel: string
     privacyStatement: string
+    reviewSend: string
   }
   account: {
     noAccounts: string
@@ -31,6 +32,9 @@ export interface ILanguage {
     pendingTransactions: string
     recipientAddress: string
     saveAddress: string
+    confirmTheSeedPhrase: string
+    showAccountRecovery: string
+    wrongPassword: string
   }
   wallet: {
     //first screen
@@ -70,6 +74,12 @@ export interface ILanguage {
     hiddenAccounts: string
     delete: string
     copy: string
+    copied: string
+    confirmRecovery: string
+    revealSeedPhrase: string
+    beforeYouContinue: string
+    seedWarning: string
+    deployAccount: string
   }
   developerSettings: {
     manageNetworks: string
@@ -83,5 +93,11 @@ export interface ILanguage {
     addressRequired: string
     removeAddress: string
     delete: string
+    addressBook: string
+  }
+  dapps: {
+    connect: string
+    reject: string
+    resetAll: string
   }
 }

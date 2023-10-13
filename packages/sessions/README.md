@@ -9,7 +9,7 @@ The user is guaranteed that the dapp can only execute transactions that comply t
 ```bash
 npm install @argent/x-sessions
 # or
-yarn add @argent/x-sessions
+pnpm add @argent/x-sessions
 # or
 pnpm add @argent/x-sessions
 ```
@@ -90,7 +90,7 @@ const tx = sessionAccount.execute({
   contractAddress: "0x...",
   selector: "transfer",
   calldata: [
-    "0x...",
+    "0x..."
     // ...
   ]
 })

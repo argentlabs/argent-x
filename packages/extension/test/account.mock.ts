@@ -13,8 +13,7 @@ const defaultNetwork: Network = {
   id: "localhost",
   name: "localhostNetwork",
   chainId: "1",
-  baseUrl: "baseUrl",
-  status: "unknown",
+  sequencerUrl: "sequencerUrl",
 }
 const defaultSigner: WalletAccountSigner = {
   type: "local_secret",
@@ -22,7 +21,6 @@ const defaultSigner: WalletAccountSigner = {
 }
 const defaultAccountType: ArgentAccountType = "standard"
 const defaultFn = () => undefined
-const defaultPromise = () => Promise.resolve("")
 const defaultNeedsDeploy = false
 const defaultAddress = "0x0"
 const defaultHidden = false
@@ -52,7 +50,7 @@ const defaultAccount: Account = {
   getDeployTransactionStorageKey: () => "key",
   updateDeployTx: defaultFn,
   completeDeployTx: defaultFn,
-  getCurrentImplementation: defaultPromise,
+  getCurrentImplementation: defaultFn,
   toWalletAccount: () => ({
     name: defaultName,
     networkId: defaultNetwork.id,

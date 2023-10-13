@@ -1,4 +1,4 @@
-import { Abi, Call, Contract, hash, number } from "starknet"
+import { Abi, Call, CallData, Contract, hash, num } from "starknet"
 
 import ArgentPluginCompiledContractAbi from "../../../abis/ArgentPluginAccount.json"
 import { executeTransaction } from "../../services/backgroundTransactions"
@@ -26,10 +26,11 @@ export class PluginAccount extends ArgentXAccount {
   }
 
   public async isPlugin(pluginClassHash: string): Promise<boolean> {
-    const [result] = await this.contract.call("isPlugin", [
-      number.hexToDecimalString(pluginClassHash),
-    ])
-    return !result.isZero()
+    const classHash = num.hexToDecimalString(pluginClassHash)
+
+    const result = await this.contract.isPlugin(classHash)
+
+    return result.success !== 0n
   }
 
   public addPlugin(pluginClassHash: string) {
@@ -37,7 +38,7 @@ export class PluginAccount extends ArgentXAccount {
       transactions: {
         contractAddress: this.address,
         entrypoint: "addPlugin",
-        calldata: [number.hexToDecimalString(pluginClassHash)],
+        calldata: [num.hexToDecimalString(pluginClassHash)],
       },
     })
   }
@@ -47,7 +48,7 @@ export class PluginAccount extends ArgentXAccount {
       transactions: {
         contractAddress: this.address,
         entrypoint: "removePlugin",
-        calldata: [number.hexToDecimalString(pluginClassHash)],
+        calldata: [num.hexToDecimalString(pluginClassHash)],
       },
     })
   }
@@ -64,7 +65,9 @@ export class PluginAccount extends ArgentXAccount {
           pluginClassHash,
           hash.getSelectorFromName(call.entrypoint),
           call.calldata?.length ?? 0,
-          ...number.bigNumberishArrayToDecimalStringArray(call.calldata ?? []),
+          ...num.bigNumberishArrayToDecimalStringArray(
+            CallData.toCalldata(call.calldata),
+          ),
         ],
       },
     })

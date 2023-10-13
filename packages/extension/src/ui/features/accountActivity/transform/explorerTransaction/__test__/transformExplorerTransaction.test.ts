@@ -52,7 +52,7 @@ describe("transformExplorerTransaction", () => {
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -84,7 +84,7 @@ describe("transformExplorerTransaction", () => {
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -116,7 +116,7 @@ describe("transformExplorerTransaction", () => {
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -148,7 +148,7 @@ describe("transformExplorerTransaction", () => {
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -179,7 +179,7 @@ describe("transformExplorerTransaction", () => {
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "mainnet-alpha",
             "networkId": "mainnet-alpha",
@@ -205,14 +205,6 @@ describe("transformExplorerTransaction", () => {
           "fromAddress": "0x6edf9f7045ae05ba00bee5fbc3224d526735b7f10351a51f4c295f3c5b6da21",
           "maxFee": "23357551558110",
           "toAddress": "0x1530359354ca4c9d2584cd45ff21fb8a257b90dc1abdd593172b2fb9c223e94",
-          "token": {
-            "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-            "decimals": 18,
-            "name": "Test Token",
-            "network": "goerli-alpha",
-            "networkId": "goerli-alpha",
-            "symbol": "TEST",
-          },
           "tokenAddress": "0x7394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
         }
       `)
@@ -245,7 +237,7 @@ describe("transformExplorerTransaction", () => {
           "token": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "mainnet-alpha",
             "networkId": "mainnet-alpha",
@@ -272,14 +264,6 @@ describe("transformExplorerTransaction", () => {
           "displayName": "Mint",
           "entity": "TOKEN",
           "maxFee": "7529250015058",
-          "token": {
-            "address": "0x07394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-            "decimals": 18,
-            "name": "Test Token",
-            "network": "goerli-alpha",
-            "networkId": "goerli-alpha",
-            "symbol": "TEST",
-          },
           "tokenAddress": "0x7394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
         }
       `)
@@ -467,7 +451,7 @@ describe("transformExplorerTransaction", () => {
           "fromToken": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -505,7 +489,7 @@ describe("transformExplorerTransaction", () => {
           "fromToken": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -518,7 +502,7 @@ describe("transformExplorerTransaction", () => {
           "toToken": {
             "address": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
             "decimals": 6,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
             "name": "USD Coin",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -553,7 +537,7 @@ describe("transformExplorerTransaction", () => {
           "fromToken": {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",
@@ -566,7 +550,7 @@ describe("transformExplorerTransaction", () => {
           "toToken": {
             "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
             "decimals": 18,
-            "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png",
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png",
             "name": "DAI",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",

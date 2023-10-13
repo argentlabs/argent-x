@@ -36,6 +36,7 @@ interface ButtonCellCustomProps {
   leftIcon?: ReactNode
   rightIcon?: ReactNode
   extendedDescription?: ReactNode
+  disabled?: boolean
 }
 
 type ButtonCellComponent = ChakraComponent<"button", ButtonCellCustomProps>
@@ -46,6 +47,7 @@ export const ButtonCell: ButtonCellComponent = ({
   extendedDescription,
   leftIcon,
   rightIcon = <ChevronRightIcon />,
+  disabled,
   children,
   ...rest
 }) => {
@@ -57,6 +59,7 @@ export const ButtonCell: ButtonCellComponent = ({
       p={4}
       justifyContent={"flex-start"}
       textAlign={"left"}
+      isDisabled={disabled}
       {...rest}
     >
       <Flex

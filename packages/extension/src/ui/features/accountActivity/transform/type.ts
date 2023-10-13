@@ -1,5 +1,5 @@
 import { KnownDapp } from "../../../../shared/knownDapps"
-import { Token } from "../../../../shared/token/type"
+import { Token } from "../../../../shared/token/__new/types/token.model"
 
 export type TransformedTransactionAction =
   | "UNKNOWN"
@@ -17,6 +17,7 @@ export type TransformedTransactionAction =
   | "ADD"
   | "REMOVE"
   | "CHANGE"
+  | "REPLACE"
 
 export type TransformedTransactionEntity =
   | "UNKNOWN"
@@ -112,7 +113,7 @@ export interface ChangeGuardianTransaction extends BaseTransformedTransaction {
 
 export interface ChangeMultisigSignerTransaction
   extends BaseTransformedTransaction {
-  action: "ADD" | "REMOVE"
+  action: "ADD" | "REMOVE" | "REPLACE"
   entity: "SIGNER"
 }
 

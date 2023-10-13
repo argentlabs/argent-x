@@ -1,9 +1,8 @@
 import { icons } from "@argent/ui"
 import { Circle, Image, SquareProps } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import { FC } from "react"
 
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
-import { DappIcon } from "../../actions/connectDapp/DappIcon"
 import {
   isSwapTransaction,
   isTokenApproveTransaction,
@@ -11,6 +10,7 @@ import {
   isTokenTransferTransaction,
 } from "../transform/is"
 import { TransformedTransaction } from "../transform/type"
+import { DappIconContainer } from "../../actions/connectDapp/DappIconContainer"
 
 const {
   DocumentIcon,
@@ -25,6 +25,7 @@ const {
   ArgentShieldDeactivateIcon,
   MultisigJoinIcon,
   MultisigRemoveIcon,
+  MultisigReplaceIcon,
   FailIcon,
 } = icons
 
@@ -57,7 +58,13 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       break
     case "SIGNER":
       iconComponent =
-        action === "ADD" ? <MultisigJoinIcon /> : <MultisigRemoveIcon />
+        action === "ADD" ? (
+          <MultisigJoinIcon />
+        ) : action === "REMOVE" ? (
+          <MultisigRemoveIcon />
+        ) : (
+          <MultisigReplaceIcon />
+        )
       break
     case "THRESHOLD":
       iconComponent = <ApproveIcon />
@@ -97,7 +104,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     const { token } = transaction
     if (token) {
       const src = getTokenIconUrl({
-        url: token.image,
+        url: token.iconUrl,
         name: token.name,
       })
       badgeComponent = <Image src={src} />
@@ -106,14 +113,14 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     const { toToken } = transaction
     if (toToken) {
       const src = getTokenIconUrl({
-        url: toToken.image,
+        url: toToken.iconUrl,
         name: toToken.name,
       })
       badgeComponent = <Image src={src} />
     }
   }
   if (dapp && !badgeComponent) {
-    badgeComponent = <DappIcon host={dapp.hosts[0]} />
+    badgeComponent = <DappIconContainer host={dapp.hosts[0]} />
   }
   return (
     <Circle

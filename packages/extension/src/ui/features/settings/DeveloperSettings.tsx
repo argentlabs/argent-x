@@ -2,7 +2,10 @@ import { BarBackButton, CellStack, NavigationBar } from "@argent/ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { isExperimentalSettingsEnabled } from "../../../shared/settings"
+import {
+  isExperimentalSettingsEnabled,
+  isBetaFeaturesEnabled,
+} from "../../../shared/settings"
 import { routes } from "../../routes"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 
@@ -25,6 +28,13 @@ const DeveloperSettings: FC = () => {
           to={routes.settingsBlockExplorer()}
           title="Block explorer"
         />
+
+        {isBetaFeaturesEnabled && (
+          <SettingsMenuItem
+            to={routes.settingsBetaFeatures()}
+            title="Beta features"
+          />
+        )}
 
         <SettingsMenuItem
           to={routes.settingsSmartContractDevelopment()}

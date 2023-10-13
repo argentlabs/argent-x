@@ -1,53 +1,69 @@
 import { FC } from "react"
 import type { typedData } from "starknet"
 
-import { usePageTracking } from "../../services/analytics"
-import { useAccountTransactions } from "../accounts/accountTransactions.state"
+import { useAccount } from "../accounts/accounts.state"
 import { DeployAccountScreenContainer } from "../accounts/DeployAccountScreenContainer"
-import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
-import { UpgradeScreenV4Container } from "../accounts/UpgradeScreenV4Container"
-import { useFeeTokenBalance } from "../accountTokens/tokens.service"
 import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
 import { useMultisig } from "../multisig/multisig.state"
 import { RemovedMultisigWarningScreen } from "../multisig/RemovedMultisigWarningScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
-import { ConfirmPageProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
+import { MultisigSignatureScreenWarning } from "../multisig/MultisigSignatureScreenWarning"
+import { ExecuteFromOutsideScreen } from "./ExecuteFromOutsideScreen"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 
 interface ApproveSignatureScreenContainerProps
-  extends Omit<ConfirmPageProps, "onSubmit"> {
+  extends Omit<ConfirmScreenProps, "onSubmit"> {
   dataToSign: typedData.TypedData
   onSubmit: (data: typedData.TypedData) => void
   onReject: () => void
+  onRejectWithoutClose?: () => void
+  actionIsApproving?: boolean
 }
 
 export const ApproveSignatureScreenContainer: FC<
   ApproveSignatureScreenContainerProps
-> = ({ dataToSign, onSubmit, selectedAccount, ...props }) => {
-  usePageTracking("signMessage")
-
-  const { needsUpgrade = false } = useCheckUpgradeAvailable(selectedAccount)
-  const { feeTokenBalance } = useFeeTokenBalance(selectedAccount)
-  const { pendingTransactions = [] } = useAccountTransactions(selectedAccount)
+> = ({
+  dataToSign,
+  onSubmit,
+  selectedAccount,
+  onRejectWithoutClose,
+  ...props
+}) => {
   const multisig = useMultisig(selectedAccount)
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
-
-  const hasUpgradeTransactionPending = pendingTransactions.some(
-    (t) => t.meta?.isUpgrade,
-  )
-  const shouldShowUpgrade = Boolean(
-    needsUpgrade && feeTokenBalance?.gt(0) && !hasUpgradeTransactionPending,
-  )
-
-  if (selectedAccount?.needsDeploy && !selectedAccount.deployTransaction) {
+  const accountWithDeployState = useAccount(selectedAccount)
+  const isMainnet = useIsMainnet()
+  if (
+    selectedAccount?.needsDeploy &&
+    !accountWithDeployState?.deployTransaction
+  ) {
     return <DeployAccountScreenContainer {...props} />
   }
 
   if (multisig && !signerIsInMultisig) {
-    return <RemovedMultisigWarningScreen />
+    return <RemovedMultisigWarningScreen onReject={onRejectWithoutClose} />
   }
 
-  if (shouldShowUpgrade) {
-    return <UpgradeScreenV4Container upgradeType="account" {...props} />
+  if (multisig) {
+    return (
+      <MultisigSignatureScreenWarning
+        selectedAccount={selectedAccount}
+        {...props}
+      />
+    )
+  }
+
+  if (
+    // For now we don't support off-chain signatures for meta transactions
+    dataToSign.domain.name === "Account.execute_from_outside" &&
+    isMainnet
+  ) {
+    return (
+      <ExecuteFromOutsideScreen selectedAccount={selectedAccount} {...props} />
+    )
   }
 
   return (
@@ -56,6 +72,7 @@ export const ApproveSignatureScreenContainer: FC<
       onSubmit={() => {
         onSubmit(dataToSign)
       }}
+      footer={<WithActionScreenErrorFooter />}
       {...props}
     />
   )

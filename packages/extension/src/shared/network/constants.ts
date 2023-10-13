@@ -1,0 +1,24 @@
+export const FEE_TOKEN_ADDRESS_ETH =
+  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+
+// This should always be the latest. If you need to use the old or custom one, don't use this constant.
+export const STANDARD_ACCOUNT_CLASS_HASH =
+  "0x1a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003"
+
+export const STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH =
+  "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+
+export const PLUGIN_ACCOUNT_CLASS_HASH =
+  "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091"
+
+export const MULTISIG_ACCOUNT_CLASS_HASH =
+  "0x0737ee2f87ce571a58c6c8da558ec18a07ceb64a6172d5ec46171fbc80077a48"
+
+export const BETTER_MULTICAL_ACCOUNT_CLASS_HASH =
+  "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede"
+
+export const ARGENT_5_MINUTE_ESCAPE_TESTING_ACCOUNT_CLASS_HASH =
+  "0x058a42e2553e65e301b7f22fb89e4a2576e9867c1e20bb1d32746c74ff823639"
+
+export const MULTICALL_CONTRACT_ADDRESS =
+  "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4"

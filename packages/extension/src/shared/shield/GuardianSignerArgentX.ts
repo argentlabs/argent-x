@@ -1,7 +1,6 @@
 import { CosignerOffchainMessage, GuardianSigner } from "@argent/guardian"
 import type { CosignerMessage } from "@argent/guardian"
-import { Signature, hash } from "starknet"
-import { number } from "starknet"
+import { Signature, hash, num } from "starknet"
 
 import { isEqualAddress } from "../../ui/services/addresses"
 import { isTokenExpired } from "./backend/account"
@@ -43,8 +42,8 @@ export class GuardianSignerArgentX extends GuardianSigner {
     const response = await this.cosigner(cosignerMessage, isOffchainMessage)
 
     const signature = [
-      number.toBN(response.signature.r).toString(),
-      number.toBN(response.signature.s).toString(),
+      num.toBigInt(response.signature.r).toString(),
+      num.toBigInt(response.signature.s).toString(),
     ]
 
     return signature

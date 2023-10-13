@@ -1,5 +1,5 @@
 import { createTRPCProxyClient } from "@trpc/client"
-import { windowLink } from "trpc-extension/link"
+import { windowLink } from "trpc-browser/link"
 
 import { AppRouter } from "../background/__new/router"
 

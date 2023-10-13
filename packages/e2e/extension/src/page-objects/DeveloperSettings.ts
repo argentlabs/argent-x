@@ -42,8 +42,8 @@ export default class DeveloperSettings {
     return this.page.locator('[name="chainId"]')
   }
 
-  get baseUrl() {
-    return this.page.locator('[name="baseUrl"]')
+  get sequencerUrl() {
+    return this.page.locator('[name="sequencerUrl"]')
   }
 
   get create() {

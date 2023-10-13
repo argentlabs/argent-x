@@ -1,5 +1,5 @@
 import { Relayer, WindowMessenger } from "@argent/x-window"
-import { relay } from "trpc-extension/relay"
+import { relay } from "trpc-browser/relay"
 import browser from "webextension-polyfill"
 
 import { ExtensionMessenger } from "./shared/extensionMessenger"

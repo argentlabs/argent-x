@@ -1,4 +1,4 @@
-import { SequencerProvider } from "starknet"
+import { SequencerProvider, constants } from "starknet"
 import { uint256 } from "starknet"
 import { beforeAll, describe, expect, test } from "vitest"
 
@@ -55,7 +55,7 @@ describe.each([
       for (const result of results) {
         const [low, high] = result
         const balance = uint256.uint256ToBN({ low, high })
-        expect(balance.gt(0)).toBeTruthy()
+        expect(balance > constants.ZERO).toBeTruthy()
       }
     })
     test("should partially error with a single error", async () => {
@@ -79,7 +79,7 @@ describe.each([
         }),
       ])
 
-      expect(results.map((x) => x.status)).toMatchInlineSnapshot(`
+      expect(results.map((x) => x.status)).toMatchSnapshot(`
       [
         "fulfilled",
         "rejected",
@@ -115,7 +115,7 @@ describe.each([
         }),
       ])
 
-      expect(results.map((x) => x.status)).toMatchInlineSnapshot(`
+      expect(results.map((x) => x.status)).toMatchSnapshot(`
       [
         "rejected",
         "fulfilled",
@@ -144,7 +144,7 @@ describe.each([
         }),
       ])
 
-      expect(results.map((x) => x.status)).toMatchInlineSnapshot(`
+      expect(results.map((x) => x.status)).toMatchSnapshot(`
       [
         "rejected",
         "rejected",

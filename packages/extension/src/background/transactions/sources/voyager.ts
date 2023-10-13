@@ -1,5 +1,3 @@
-import { Status } from "starknet"
-
 import { ARGENT_EXPLORER_BASE_URL } from "../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../shared/api/fetcher"
 import { Network } from "../../../shared/network"
@@ -9,16 +7,7 @@ import { WalletAccount } from "../../../shared/wallet.model"
 import { stripAddressZeroPadding } from "../../../ui/features/accounts/accounts.service"
 import { fetchWithTimeout } from "../../utils/fetchWithTimeout"
 import { mapVoyagerTransactionToTransaction } from "../transformers"
-
-export interface VoyagerTransaction {
-  blockId: string
-  blockNumber: number
-  hash: string
-  index: number
-  timestamp: number
-  type: string
-  status: Status
-}
+import { VoyagerTransaction } from "./voyager.model"
 
 export const fetchVoyagerTransactions = async (
   address: string,

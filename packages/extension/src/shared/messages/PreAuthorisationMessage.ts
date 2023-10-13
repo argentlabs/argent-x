@@ -7,5 +7,5 @@ export type PreAuthorisationMessage =
   | { type: "IS_PREAUTHORIZED_RES"; data: boolean }
   | {
       type: "REJECT_PREAUTHORIZATION"
-      data: { host: string; actionHash: string }
+      data?: { host: string; actionHash: string }
     }

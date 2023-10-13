@@ -9,8 +9,6 @@ import {
 import { FC, useCallback, useState } from "react"
 
 import { settingsStore } from "../../../shared/settings"
-import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
-import { resetDevice } from "../../../shared/shield/jwt"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { WalletAccount } from "../../../shared/wallet.model"
 import { useAccountsWithGuardian } from "../shield/useAccountGuardian"
@@ -32,7 +30,6 @@ export const PrivacyExperimentalSettings: FC = () => {
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
 
   const accountsWithGuardian = useAccountsWithGuardian()
-  const hasAccountsWithGuardian = accountsWithGuardian.length > 0
   const accountGuardianNames = formatAccountNames(accountsWithGuardian)
 
   const experimentalAllowChooseAccount = useKeyValueStorage(
@@ -40,28 +37,9 @@ export const PrivacyExperimentalSettings: FC = () => {
     "experimentalAllowChooseAccount",
   )
 
-  const experimentalEnableArgentShield = useKeyValueStorage(
-    settingsStore,
-    "experimentalEnableArgentShield",
-  )
-
   const onCancel = useCallback(() => {
     setAlertDialogIsOpen(false)
   }, [])
-
-  const toggleEnableArgentShield = useCallback(async () => {
-    if (experimentalEnableArgentShield) {
-      if (hasAccountsWithGuardian) {
-        setAlertDialogIsOpen(true)
-        return
-      }
-      await resetDevice()
-    }
-    settingsStore.set(
-      "experimentalEnableArgentShield",
-      !experimentalEnableArgentShield,
-    )
-  }, [experimentalEnableArgentShield, hasAccountsWithGuardian])
 
   return (
     <NavigationContainer leftButton={<BarBackButton />} title={"Experimental"}>
@@ -88,17 +66,6 @@ export const PrivacyExperimentalSettings: FC = () => {
           >
             Change account implementation
           </ButtonCell>
-          {ARGENT_SHIELD_ENABLED && (
-            <ButtonCell
-              onClick={toggleEnableArgentShield}
-              rightIcon={<Switch isChecked={experimentalEnableArgentShield} />}
-              extendedDescription={
-                "Add extra protection to your Argent X accounts with two-factor security. You need to have been added to the whitelist to use this feature while it’s in beta"
-              }
-            >
-              Argent Shield (2FA)
-            </ButtonCell>
-          )}
         </CellStack>
       </SettingsScreenWrapper>
     </NavigationContainer>

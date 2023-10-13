@@ -6,7 +6,7 @@ import {
 import { Flex, Text, Tooltip, useColorMode } from "@chakra-ui/react"
 import { AnimatePresence } from "framer-motion"
 import { FC, useEffect, useMemo } from "react"
-import { number } from "starknet"
+import { num } from "starknet"
 
 import { InfoIcon } from "../icons"
 import { LoadingPulse } from "../LoadingPulse"
@@ -57,9 +57,7 @@ export const CombinedFeeEstimation: FC<
   )
   const totalFee = useMemo(() => {
     if (deploymentFees?.needsDeploy && executionFees?.fee) {
-      return number.toHex(
-        number.toBN(deploymentFees.fee).add(number.toBN(executionFees.fee)),
-      )
+      return num.toHex(deploymentFees.fee + executionFees.fee)
     }
     return executionFees?.fee
   }, [executionFees, deploymentFees])
@@ -189,7 +187,13 @@ export const CombinedFeeEstimation: FC<
             Error
           </P4>
         ) : (
-          <LoadingPulse />
+          <Flex flex={0.5}>
+            <LoadingPulse
+              isLoading={!executionFees && !showEstimateError}
+              bg="neutrals.100"
+              w="100%"
+            />
+          </Flex>
         )}
       </Flex>
 

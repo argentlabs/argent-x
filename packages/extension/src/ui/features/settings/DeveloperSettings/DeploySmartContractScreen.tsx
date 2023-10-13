@@ -1,10 +1,10 @@
 import { BarBackButton, Button, NavigationContainer } from "@argent/ui"
 import { FC, useState } from "react"
 
-import { StickyGroup } from "../../actions/DeprecatedConfirmScreen"
+import { Flex } from "@chakra-ui/react"
 import { DeploySmartContractForm } from "./DeploySmartContractForm"
 
-const DeploySmartContractScreen: FC = () => {
+export const DeploySmartContractScreen: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   return (
@@ -17,23 +17,21 @@ const DeploySmartContractScreen: FC = () => {
         setIsLoading={setIsLoading}
       >
         {({ isDirty, isSubmitting }) => (
-          <StickyGroup>
+          <>
+            <Flex flex="1" />
             <Button
-              gap="2"
+              w="full"
               colorScheme="primary"
               type="submit"
               disabled={!isDirty || isSubmitting || isLoading}
-              width="100%"
               isLoading={isLoading}
               loadingText="Loading constructor fields"
             >
               Deploy
             </Button>
-          </StickyGroup>
+          </>
         )}
       </DeploySmartContractForm>
     </NavigationContainer>
   )
 }
-
-export { DeploySmartContractScreen }

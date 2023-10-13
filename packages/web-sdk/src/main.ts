@@ -1,86 +1,72 @@
-import { getArgentStarknetWindowObject } from "@argent/x-window"
-import type { WebWalletStarknetWindowObject } from "@argent/x-window"
+import type { CreateTRPCProxyClient } from "@trpc/client"
 import memo from "lodash-es/memoize"
-import { SequencerProvider } from "starknet"
+import { SequencerProvider, constants } from "starknet"
 
-import { createModal, getConnection } from "./wormhole"
+import type { WebWalletStarknetWindowObject } from "./argentStarknetWindowObject"
+import { getArgentStarknetWindowObject } from "./argentStarknetWindowObject"
+import { trpcProxyClient } from "./trpc"
+import type { AppRouter } from "./trpc"
 
-type NetworkName = "mainnet-alpha" | "goerli-alpha" | "goerli-alpha-2"
-const DEVELOPMENT_NETWORK: NetworkName = "goerli-alpha"
-/**
- * Map a target URL to a network ID
- * https://web.dev.argent47.net -> goerli-alpha-2
- * https://web.hydrogen.argent47.net -> goerli-alpha
- * https://web.staging.argent47.net -> mainnet-alpha
- * https://web.argent.xyz -> mainnet-alpha
- */
-function mapTargetUrlToNetworkId(target: string): NetworkName {
+const { NetworkName } = constants
+
+// Using NetworkName as a value.
+const Network: typeof NetworkName = NetworkName
+
+const DEVELOPMENT_NETWORK = Network.SN_GOERLI
+
+function mapTargetUrlToNetworkId(target: string): constants.NetworkName {
   try {
     const { origin } = new URL(target)
     if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
       return DEVELOPMENT_NETWORK
     }
     if (origin.includes("hydrogen")) {
-      return "goerli-alpha"
+      return Network.SN_GOERLI
     }
     if (origin.includes("staging")) {
-      return "mainnet-alpha"
+      return Network.SN_MAIN
     }
     if (origin.includes("dev")) {
-      return "goerli-alpha-2"
+      return Network.SN_GOERLI2
     }
     if (origin.includes("argent.xyz")) {
-      return "mainnet-alpha"
+      return Network.SN_MAIN
     }
   } catch (e) {
     console.warn(
       "Could not determine network from target URL, defaulting to mainnet-alpha",
     )
   }
-  return "mainnet-alpha"
+  return Network.SN_MAIN
 }
 
 export const getWebWalletStarknetObject = memo(
   async (
     target: string,
-    popup?: Window,
+    proxyLink: CreateTRPCProxyClient<AppRouter>,
   ): Promise<WebWalletStarknetWindowObject> => {
     const globalWindow = typeof window !== "undefined" ? window : undefined
     if (!globalWindow) {
       throw new Error("window is not defined")
     }
 
-    let starknetWindowObject: WebWalletStarknetWindowObject
     const network = mapTargetUrlToNetworkId(target)
     const defaultProvider = new SequencerProvider({ network })
-    if (popup) {
-      starknetWindowObject = getArgentStarknetWindowObject(
-        {
-          host: globalWindow.location.origin,
-          id: "argentWebWallet",
-          icon: "https://www.argent.xyz/favicon.ico",
-          name: "Argent Web Wallet",
-          version: "1.0.0",
-        },
-        defaultProvider,
-        await getConnection({ popup }, target),
-      )
-    } else {
-      const { iframe, modal } = await createModal(target, false)
-      starknetWindowObject = getArgentStarknetWindowObject(
-        {
-          host: globalWindow.location.origin,
-          id: "argentWebWallet",
-          icon: "https://www.argent.xyz/favicon.ico",
-          name: "Argent Web Wallet",
-          version: "1.0.0",
-        },
-        defaultProvider,
-        await getConnection({ iframe, modal }),
-      )
-    }
+    const starknetWindowObject = getArgentStarknetWindowObject(
+      {
+        host: globalWindow.location.origin,
+        id: "argentWebWallet",
+        icon: "https://www.argent.xyz/favicon.ico",
+        name: "Argent Web Wallet",
+        version: "1.0.0",
+      },
+      defaultProvider,
+      proxyLink,
+    )
 
     return starknetWindowObject
   },
-  (target, popup) => `${target}-${popup ? "popup" : "iframe"}`,
+  (target) => `${target}`,
 )
+
+export { trpcProxyClient }

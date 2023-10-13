@@ -1,20 +1,23 @@
-import { Button, H2, NavigationContainer } from "@argent/ui"
-import { Box, Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import {
+  Button,
+  CellStack,
+  FieldError,
+  HeaderCell,
+  NavigationContainer,
+} from "@argent/ui"
+import { Flex, FormControl, Input } from "@chakra-ui/react"
+import { FC, ReactNode } from "react"
 
 import { Network } from "../../../../shared/network"
-import { InputText } from "../../../components/InputText"
-import { FormError } from "../../accountTokens/SendTokenScreen"
 
 export interface AddNetworkScreenProps {
   requestedNetwork: Network
-  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => Promise<void>
+  onSubmit?: (e: React.FormEvent<HTMLDivElement>) => Promise<void>
   onReject?: () => void
   error?: string
   mode?: "add" | "switch"
+  footer?: ReactNode
 }
-
-/** TODO: refactor: should use ConfirmScreen layout and shared UI form components */
 
 export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
   requestedNetwork,
@@ -22,94 +25,65 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
   onReject,
   error,
   mode = "add",
+  footer,
 }) => {
   return (
-    <NavigationContainer>
-      <Box
-        display="flex"
+    <NavigationContainer title={`${mode === "add" ? "Add" : "Switch"} Network`}>
+      <FormControl
+        as="form"
+        display={"flex"}
+        flexDirection={"column"}
         flex={1}
-        flexDirection="column"
-        paddingTop={0}
-        paddingRight={8}
-        paddingBottom={12}
-        paddingLeft={8}
+        onSubmit={onSubmit}
       >
-        <H2>{mode === "add" ? "Add" : "Switch"} Network</H2>
-
-        <form onSubmit={onSubmit}>
-          <Box width="100%" display="flex" flexDirection="column" gap={4}>
-            {requestedNetwork && (
-              <>
-                <InputText
-                  placeholder="Network ID"
-                  type="text"
-                  value={requestedNetwork.id}
-                  readonly
-                />
-                <InputText
-                  placeholder="Name"
-                  type="text"
-                  value={requestedNetwork.name}
-                  readonly
-                />
-                <InputText
-                  placeholder="Chain ID"
-                  type="text"
-                  value={requestedNetwork.chainId}
-                  readonly
-                />
-                <InputText
-                  placeholder="Base URL"
-                  type="text"
-                  value={requestedNetwork.baseUrl}
-                  readonly
-                />
-                {/*** Show Optional Fields only if the value is provided */}
-                {requestedNetwork.explorerUrl && (
-                  <InputText
-                    placeholder="Explorer URL"
-                    type="text"
-                    value={requestedNetwork.explorerUrl}
-                    readonly
-                  />
-                )}
-                {requestedNetwork.blockExplorerUrl && (
-                  <InputText
-                    placeholder="Explorer redirect URL"
-                    type="text"
-                    value={requestedNetwork.blockExplorerUrl}
-                    readonly
-                  />
-                )}
-                {requestedNetwork.rpcUrl && (
-                  <InputText
-                    placeholder="RPC URL"
-                    type="text"
-                    value={requestedNetwork.rpcUrl}
-                    readonly
-                  />
-                )}
-              </>
-            )}
-            {error && <FormError>{error}</FormError>}
-            <Flex>
-              {onReject && (
-                <Button
-                  onClick={onReject}
-                  type="button"
-                  marginTop={16}
-                  data-testid="reject-button"
-                >
-                  Reject
-                </Button>
-              )}
-              <Button type="submit" marginTop={16} data-testid="submit-button">
-                {mode === "add" ? "Add" : "Switch"} Network
+        <CellStack pt={0} flex={1}>
+          <HeaderCell>Network ID</HeaderCell>
+          <Input isReadOnly value={requestedNetwork.id} />
+          <HeaderCell>Name</HeaderCell>
+          <Input isReadOnly value={requestedNetwork.name} />
+          <HeaderCell>Chain ID</HeaderCell>
+          <Input isReadOnly value={requestedNetwork.chainId} />
+          <HeaderCell>Base URL</HeaderCell>
+          <Input isReadOnly value={requestedNetwork.sequencerUrl} />
+          {/*** Show Optional Fields only if the value is provided */}
+          {requestedNetwork.explorerUrl && (
+            <>
+              <HeaderCell>Explorer URL</HeaderCell>
+              <Input isReadOnly value={requestedNetwork.explorerUrl} />
+            </>
+          )}
+          {requestedNetwork.blockExplorerUrl && (
+            <>
+              <HeaderCell>Explorer redirect URL</HeaderCell>
+              <Input isReadOnly value={requestedNetwork.blockExplorerUrl} />
+            </>
+          )}
+          {requestedNetwork.rpcUrl && (
+            <>
+              <HeaderCell>RPC URL</HeaderCell>
+              <Input isReadOnly value={requestedNetwork.rpcUrl} />
+            </>
+          )}
+          {error && <FieldError>{error}</FieldError>}
+          <Flex flex={1} />
+          {footer}
+          <Flex gap={1} flex={1}>
+            {onReject && (
+              <Button onClick={onReject} w="full" data-testid="reject-button">
+                Reject
               </Button>
-            </Flex>
-          </Box>
-        </form>
-      </Box>
+            )}
+            <Button
+              w="full"
+              colorScheme={"primary"}
+              type="submit"
+              data-testid="submit-button"
+            >
+              {mode === "add" ? "Add" : "Switch"} Network
+            </Button>
+          </Flex>
+        </CellStack>
+      </FormControl>
     </NavigationContainer>
   )
 }

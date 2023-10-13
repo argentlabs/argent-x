@@ -1,4 +1,5 @@
-import { Box, Flex, chakra } from "@chakra-ui/react"
+import { Flex, Box, chakra } from "@chakra-ui/react"
+import * as _ from "@chakra-ui/layout" /** Fixes 'cannot be named without a reference' type error */
 
 export const AbsoluteBox = chakra(Box, {
   baseStyle: {

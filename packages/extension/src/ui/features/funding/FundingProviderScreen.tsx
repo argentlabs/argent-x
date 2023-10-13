@@ -1,4 +1,9 @@
-import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
+import {
+  BarBackButton,
+  BarCloseButton,
+  NavigationContainer,
+  logos,
+} from "@argent/ui"
 import { isString } from "@sentry/utils"
 import { colord } from "colord"
 // import { colord } from "colord"
@@ -7,7 +12,7 @@ import { Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { urlWithQuery } from "../../../shared/utils/url"
-import { Option, OptionsWrapper } from "../../components/Options"
+import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
@@ -16,17 +21,10 @@ import { trackAddFundsService } from "../../services/analytics"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
-import BanxaSvg from "./banxa.svg"
-import RampSvg from "./ramp.svg"
+import { isFeatureEnabled } from "@argent/shared"
+import { Grid } from "@chakra-ui/react"
 
-const Title = styled.h1`
-  font-style: normal;
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 25px;
-  text-align: center;
-  margin: 0 0 36px 0;
-`
+const { Ramp, Banxa } = logos
 
 // Can be used to highlight a specific option with a recommended badge
 const RecommendedText = styled.span`
@@ -48,7 +46,7 @@ const showRecommended = () => {
   return today >= start && today <= end
 }
 
-const BANXA_ENABLED = (process.env.FEATURE_BANXA || "false") === "true"
+const BANXA_ENABLED = isFeatureEnabled(process.env.FEATURE_BANXA)
 const RAMP_ENABLED =
   isString(process.env.RAMP_API_KEY) && process.env.RAMP_API_KEY.length > 0
 
@@ -69,7 +67,7 @@ export const FundingProviderScreen: FC = () => {
     walletAddress: normalizedAddress,
   })
 
-  const rampUrl = urlWithQuery("https://buy.ramp.network/", {
+  const rampUrl = urlWithQuery("https://app.ramp.network/", {
     hostApiKey: process.env.RAMP_API_KEY as string,
     hostLogoUrl: "https://www.argent.xyz/icons/icon-512x512.png",
     swapAsset: "STARKNET_*",
@@ -82,10 +80,10 @@ export const FundingProviderScreen: FC = () => {
       rightButton={
         <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
       }
+      title="Choose provider"
     >
       <PageWrapper>
-        <Title>Choose provider</Title>
-        <OptionsWrapper>
+        <Grid templateColumns="1fr" gap={4}>
           {RAMP_ENABLED && (
             <A
               href={rampUrl}
@@ -102,7 +100,7 @@ export const FundingProviderScreen: FC = () => {
                   </>
                 }
                 description="Card or bank transfer"
-                icon={<RampSvg />}
+                icon={<Ramp width={6} height={6} />}
               />
             </A>
           )}
@@ -115,11 +113,11 @@ export const FundingProviderScreen: FC = () => {
               <Option
                 title="Banxa"
                 description="Card or bank transfer"
-                icon={<BanxaSvg />}
+                icon={<Banxa width={6} height={6} />}
               />
             </A>
           )}
-        </OptionsWrapper>
+        </Grid>
       </PageWrapper>
     </NavigationContainer>
   )

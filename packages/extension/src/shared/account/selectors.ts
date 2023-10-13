@@ -1,7 +1,7 @@
 import { memoize } from "lodash-es"
 
 import { BaseWalletAccount, StoredWalletAccount } from "../wallet.model"
-import { accountsEqual } from "../wallet.service"
+import { accountsEqual } from "../utils/accountsEqual"
 
 export const getAccountSelector = memoize(
   (baseAccount: BaseWalletAccount) => (account: StoredWalletAccount) =>

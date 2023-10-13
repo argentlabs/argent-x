@@ -1,8 +1,12 @@
-import React, { FC } from "react"
+import React, { FC, PropsWithChildren } from "react"
 
 import { useScroll } from "../hooks"
 import { useScrollRestoration } from "../hooks/useScrollRestoration"
-import { NavigationBar, NavigationBarProps } from "./NavigationBar"
+import {
+  NavigationBar,
+  NavigationBarProps,
+  NavigationBarSkeleton,
+} from "./NavigationBar"
 import { ScrollContainer } from "./ScrollContainer"
 
 type BaseNavigationContainerProps = Omit<NavigationBarProps, "scroll">
@@ -58,6 +62,19 @@ const ScrollRestorationNavigationContainer: FC<
     <>
       <NavigationBar scroll={scroll} {...rest} />
       <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
+    </>
+  )
+}
+
+/** Skeleton */
+
+export const NavigationContainerSkeleton: FC<PropsWithChildren> = ({
+  children,
+}) => {
+  return (
+    <>
+      <NavigationBarSkeleton />
+      <>{children}</>
     </>
   )
 }

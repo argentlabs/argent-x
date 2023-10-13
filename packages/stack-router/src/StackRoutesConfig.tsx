@@ -4,6 +4,7 @@ import { Presentation } from "./types"
 
 interface StackRoutesConfigProps {
   defaultPresentation: Presentation
+  onExitComplete?: () => void
 }
 
 const StackRoutesConfigContext = createContext<StackRoutesConfigProps | null>(
@@ -19,12 +20,14 @@ interface StackContextProviderProps
 
 export const StackRoutesConfig: FC<StackContextProviderProps> = ({
   defaultPresentation,
+  onExitComplete,
   children,
 }) => {
   return (
     <StackRoutesConfigContext.Provider
       value={{
         defaultPresentation,
+        onExitComplete,
       }}
     >
       {children}

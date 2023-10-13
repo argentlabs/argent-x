@@ -17,6 +17,7 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
   },
+  ignorePatterns: ["node_modules/**", "storybook-static/**"],
   plugins: ["react", "react-hooks", "@typescript-eslint"],
   rules: {
     "react/jsx-no-target-blank": "off",

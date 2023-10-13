@@ -1,6 +1,6 @@
+import { Address, NftItem, bigDecimal, getNftPicture } from "@argent/shared"
 import {
   B3,
-  BarBackButton,
   BarCloseButton,
   Button,
   CellStack,
@@ -17,66 +17,40 @@ import {
   AccordionPanel,
   Box,
   Flex,
-  Image,
   SimpleGrid,
 } from "@chakra-ui/react"
-import { ethers } from "ethers"
-import { FC, lazy } from "react"
-import { Navigate, useNavigate, useParams } from "react-router-dom"
-import { Schema, object } from "yup"
+import { FC, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { addressSchema, isEqualAddress } from "../../services/addresses"
-import { selectedAccountView } from "../../views/account"
-import { useView } from "../../views/implementation/react"
 import { TokenMenu } from "../accountTokens/TokenMenu"
-import { getNftPicture } from "./aspect.service"
-import { useNfts } from "./useNfts"
+import { NftImage } from "./NftImage"
 import { ViewOnMenu } from "./ViewOnMenu"
-
-const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))
 
 const { SendIcon } = icons
 
-export interface SendNftInput {
-  recipient: string
+interface NftScreenProps {
+  contractAddress: Address
+  networkId: string
+  tokenId: string
+  nft: NftItem
 }
-export const SendNftSchema: Schema<SendNftInput> = object().required().shape({
-  recipient: addressSchema,
-})
 
-export const NftScreen: FC = () => {
+export const NftScreen: FC<NftScreenProps> = ({
+  contractAddress,
+  networkId,
+  tokenId,
+  nft,
+}) => {
   const navigate = useNavigate()
-  const { contractAddress, tokenId } = useParams()
-  const account = useView(selectedAccountView)
-
-  const { nfts = [] } = useNfts(account)
-  const nft = nfts
-    .filter(Boolean)
-    .find(
-      ({ contract_address, token_id }) =>
-        contractAddress &&
-        isEqualAddress(contract_address, contractAddress) &&
-        token_id === tokenId,
+  const onClick = useCallback(() => {
+    navigate(
+      routes.sendRecipientScreen({
+        tokenAddress: contractAddress,
+        tokenId,
+      }),
     )
-
-  if (!account || !contractAddress || !tokenId) {
-    return <Navigate to={routes.accounts()} />
-  }
-
-  if (!nft) {
-    return (
-      <NavigationContainer
-        leftButton={
-          <BarBackButton
-            onClick={() => navigate(routes.accountCollections())}
-          />
-        }
-        title="Not found"
-      />
-    )
-  }
-
+  }, [contractAddress, navigate, tokenId])
   return (
     <>
       <NavigationContainer
@@ -96,7 +70,7 @@ export const NftScreen: FC = () => {
             alignItems="center"
           >
             <Box
-              backgroundImage={getNftPicture(nft)}
+              backgroundImage={getNftPicture(nft) || ""}
               backgroundPosition="center"
               backgroundSize="cover"
               backgroundRepeat="no-repeat"
@@ -107,18 +81,7 @@ export const NftScreen: FC = () => {
               right="0"
               bottom="25%"
             />
-            {nft.animation_uri ? (
-              <LazyNftModelViewer nft={nft} />
-            ) : (
-              <Image
-                position="relative"
-                border="solid 2px"
-                borderColor="transparent"
-                borderRadius="lg"
-                alt={nft.name ?? "NFT"}
-                src={getNftPicture(nft)}
-              />
-            )}
+            <NftImage nft={nft} />
           </Box>
           <H5 py="6" textAlign="center">
             {nft.name}
@@ -147,7 +110,9 @@ export const NftScreen: FC = () => {
             <P4 color="neutrals.300">Best Offer</P4>
             <P4>
               {nft.best_bid_order?.payment_amount
-                ? ethers.utils.formatEther(nft.best_bid_order?.payment_amount)
+                ? bigDecimal.formatEther(
+                    BigInt(nft.best_bid_order?.payment_amount),
+                  )
                 : "0"}{" "}
               ETH
             </P4>
@@ -169,12 +134,12 @@ export const NftScreen: FC = () => {
           <ViewOnMenu
             contractAddress={contractAddress}
             tokenId={tokenId}
-            networkId={account.networkId}
+            networkId={networkId}
           />
           <Button
             w="100%"
             type="button"
-            onClick={() => navigate(routes.sendNft(contractAddress, tokenId))}
+            onClick={onClick}
             leftIcon={<SendIcon />}
             bg="neutrals.700"
             _hover={{ bg: "neutrals.600" }}

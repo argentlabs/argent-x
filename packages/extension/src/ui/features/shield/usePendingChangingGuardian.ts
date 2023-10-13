@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react"
-import { Call, constants, number } from "starknet"
+import { Call, CallData, constants, num } from "starknet"
 
 import { Transaction } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
@@ -26,9 +26,11 @@ export const changeGuardianCallDataToType = (transactions?: Call | Call[]) => {
   const calldata = Array.isArray(transactions)
     ? transactions[0].calldata
     : transactions?.calldata
-  if (calldata?.[0]) {
-    const guardianAddress = number.toBN(calldata[0])
-    if (guardianAddress.eq(constants.ZERO)) {
+
+  const compiledCalldata = CallData.toCalldata(calldata)
+  if (compiledCalldata?.[0]) {
+    const guardianAddress = num.toBigInt(compiledCalldata[0])
+    if (guardianAddress === constants.ZERO) {
       return ChangeGuardian.REMOVING
     } else {
       return ChangeGuardian.ADDING

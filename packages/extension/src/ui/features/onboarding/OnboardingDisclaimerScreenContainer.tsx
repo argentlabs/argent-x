@@ -3,14 +3,10 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import {
-  usePageTracking,
-  useTimeSpentWithSuccessTracking,
-} from "../../services/analytics"
+import { useTimeSpentWithSuccessTracking } from "../../services/analytics"
 import { OnboardingDisclaimerScreen } from "./OnboardingDisclaimerScreen"
 
 export const OnboardingDisclaimerScreenContainer: FC = () => {
-  usePageTracking("disclaimer")
   const { trackSuccess } = useTimeSpentWithSuccessTracking(
     "onboardingStepFinished",
     { stepId: "disclaimer" },

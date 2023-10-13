@@ -2,14 +2,10 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import {
-  usePageTracking,
-  useTimeSpentWithSuccessTracking,
-} from "../../services/analytics"
+import { useTimeSpentWithSuccessTracking } from "../../services/analytics"
 import { OnboardingStartScreen } from "./OnboardingStartScreen"
 
 export const OnboardingStartScreenContainer: FC = () => {
-  usePageTracking("welcome")
   const { trackSuccess } = useTimeSpentWithSuccessTracking(
     "onboardingStepFinished",
     { stepId: "welcome" },

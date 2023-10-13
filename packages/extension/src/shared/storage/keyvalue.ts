@@ -22,11 +22,15 @@ export interface IKeyValueStorage<
   ): () => void
 }
 
+export const isMockStorage = (storage: StorageArea): storage is MockStorage => {
+  return storage instanceof MockStorage
+}
+
 export class KeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
 > implements IKeyValueStorage<T>
 {
-  private storageImplementation: StorageArea
+  private storageImplementation: StorageArea | browser.storage.StorageArea
   public namespace: string
   public areaName: AreaName
 
@@ -87,12 +91,32 @@ export class KeyValueStorage<
   ): () => void {
     const storageKey = this.getStorageKey(key)
 
-    const handler = async (
+    /** storage for manifest v2 */
+    if (isMockStorage(this.storageImplementation)) {
+      const handler = (changes: Record<string, StorageChange>) => {
+        if (changes[storageKey]) {
+          void callback(
+            changes[storageKey].newValue ?? this.defaults[key], // if newValue is undefined, it means the value was deleted from storage, so we use the default value
+            changes[storageKey],
+          )
+        }
+      }
+
+      this.storageImplementation.onChanged.addListener(handler)
+
+      return () => {
+        if (isMockStorage(this.storageImplementation)) {
+          this.storageImplementation.onChanged.removeListener(handler)
+        }
+      }
+    }
+
+    const handler = (
       changes: Record<string, StorageChange>,
       areaName: browser.storage.AreaName,
     ) => {
       if (this.areaName === areaName && changes[storageKey]) {
-        callback(
+        void callback(
           changes[storageKey].newValue ?? this.defaults[key], // if newValue is undefined, it means the value was deleted from storage, so we use the default value
           changes[storageKey],
         )

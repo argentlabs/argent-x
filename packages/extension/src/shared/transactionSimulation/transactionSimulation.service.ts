@@ -1,44 +1,28 @@
-import { Call } from "starknet"
-
-import { ARGENT_TRANSACTION_SIMULATION_URL } from "../api/constants"
+import { ARGENT_TRANSACTION_BULK_SIMULATION_URL } from "../api/constants"
 import { fetcher } from "../api/fetcher"
-import { sendMessage, waitForMessage } from "../messages"
-import { findTransfersAndApprovals } from "./findTransferAndApproval"
+import { TransactionError } from "../errors/transaction"
 import {
-  ApiTransactionSimulationResponse,
-  IFetchTransactionSimulation,
-  TransactionSimulationApproval,
-  TransactionSimulationTransfer,
+  ApiTransactionSimulationResponseUnparsed,
+  IFetchTransactionSimulationBulk,
+  ApiTransactionBulkSimulationResponse,
 } from "./types"
 
-export const fetchTransactionSimulation = async ({
-  transactions,
+export const fetchTransactionBulkSimulation = async ({
+  invocations,
+  chainId,
   fetcher: fetcherImpl = fetcher,
-}: IFetchTransactionSimulation) => {
-  if (!ARGENT_TRANSACTION_SIMULATION_URL) {
-    throw "Transaction simulation endpoint is not defined"
+}: IFetchTransactionSimulationBulk): Promise<
+  ApiTransactionBulkSimulationResponse | undefined
+> => {
+  if (!ARGENT_TRANSACTION_BULK_SIMULATION_URL) {
+    throw new TransactionError({
+      code: "SIMULATION_DISABLED",
+    })
   }
-
-  sendMessage({
-    type: "SIMULATE_TRANSACTION_INVOCATION",
-    data: transactions,
-  })
-
-  const data = await Promise.race([
-    waitForMessage("SIMULATE_TRANSACTION_INVOCATION_RES"),
-    waitForMessage("SIMULATE_TRANSACTION_INVOCATION_REJ"),
-  ])
-
-  if ("error" in data) {
-    throw data.error
-  }
-
   try {
-    const { invocation, chainId } = data
-
     const backendSimulation =
-      await fetcherImpl<ApiTransactionSimulationResponse>(
-        ARGENT_TRANSACTION_SIMULATION_URL,
+      await fetcherImpl<ApiTransactionSimulationResponseUnparsed>(
+        ARGENT_TRANSACTION_BULK_SIMULATION_URL,
         {
           method: "POST",
           headers: {
@@ -46,42 +30,22 @@ export const fetchTransactionSimulation = async ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            ...invocation,
             chainId,
+            transactions: invocations,
           }),
         },
       )
-    return backendSimulation
+
+    return backendSimulation.simulationResults
   } catch (e) {
-    console.error("Failed to fetch transaction simulation from backend", e)
-    console.warn("Falling back to client-side simulation")
-
-    return doTransactionSimulation(transactions)
+    /** Disable client-side simulation
+     */
+    // if ((e as SimulationError).status >= 500) {
+    //   console.error("Failed to fetch transaction simulation from backend", e)
+    //   console.warn("Falling back to client-side simulation")
+    //   return undefined
+    // }
+    // throw e
+    return undefined
   }
-}
-
-export const doTransactionSimulation = async (transactions: Call | Call[]) => {
-  sendMessage({ type: "SIMULATE_TRANSACTION_FALLBACK", data: transactions })
-
-  const data = await Promise.race([
-    waitForMessage("SIMULATE_TRANSACTION_FALLBACK_RES"),
-    waitForMessage("SIMULATE_TRANSACTION_FALLBACK_REJ"),
-  ])
-
-  if ("error" in data) {
-    throw data.error
-  }
-
-  const internalCalls = data.trace.function_invocation?.internal_calls
-
-  const transfers: TransactionSimulationTransfer[] = []
-  const approvals: TransactionSimulationApproval[] = []
-
-  if (!internalCalls) {
-    return { transfers, approvals }
-  }
-
-  findTransfersAndApprovals(internalCalls, approvals, transfers)
-
-  return { transfers, approvals }
 }

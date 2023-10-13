@@ -1,7 +1,7 @@
 import { Circle, Image, ImageProps, SquareProps } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { generateAvatarImage } from "../../../shared/avatarImage"
+import { generateAvatarImage } from "@argent/shared"
 import { getColor } from "../accounts/accounts.service"
 
 export interface TokenIconProps extends Pick<SquareProps, "size">, ImageProps {

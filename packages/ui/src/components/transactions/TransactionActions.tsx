@@ -13,7 +13,7 @@ import {
   useColorMode,
 } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
-import { Call, number } from "starknet"
+import { Call, num, CallData } from "starknet"
 
 import { CopyTooltip } from "../CopyTooltip"
 import { P4 } from "../Typography"
@@ -44,7 +44,7 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
         backgroundColor={isDark ? "neutrals.300" : "white"}
         borderBottomRadius="xl"
       >
-        {transactions.map((transaction, txIndex) => (
+        {transactions?.map((transaction, txIndex) => (
           <AccordionItem
             key={txIndex}
             border="none"
@@ -105,40 +105,42 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                 >
                   <Divider color="black" opacity="1" />
                   <Flex flexDirection="column" gap="12px" py="3.5">
-                    {transaction.calldata?.map((calldata, cdIndex) => (
-                      <Flex
-                        key={cdIndex}
-                        justifyContent="space-between"
-                        gap="2"
-                      >
-                        <P4 fontWeight="bold" color="text">
-                          Calldata {cdIndex + 1}
-                        </P4>
+                    {CallData.toCalldata(transaction.calldata).map(
+                      (calldata, cdIndex) => (
+                        <Flex
+                          key={cdIndex}
+                          justifyContent="space-between"
+                          gap="2"
+                        >
+                          <P4 fontWeight="bold" color="text">
+                            Calldata {cdIndex + 1}
+                          </P4>
 
-                        <CopyTooltip copyValue={calldata} prompt={calldata}>
-                          <Box
-                            _hover={{
-                              backgroundColor: isDark
-                                ? "neutrals.700"
-                                : "gray.50",
-                              color: "text",
-                              cursor: "pointer",
-                            }}
-                            color="text"
-                            whiteSpace="nowrap"
-                            textOverflow="ellipsis"
-                            overflow="hidden"
-                            minWidth="0"
-                          >
-                            <P4 fontWeight="bold" maxWidth="70%">
-                              {number.isHex(calldata)
-                                ? formatTruncatedAddress(calldata)
-                                : calldata}
-                            </P4>
-                          </Box>
-                        </CopyTooltip>
-                      </Flex>
-                    ))}
+                          <CopyTooltip copyValue={calldata} prompt={calldata}>
+                            <Box
+                              _hover={{
+                                backgroundColor: isDark
+                                  ? "neutrals.700"
+                                  : "gray.50",
+                                color: "text",
+                                cursor: "pointer",
+                              }}
+                              color="text"
+                              whiteSpace="nowrap"
+                              textOverflow="ellipsis"
+                              overflow="hidden"
+                              minWidth="0"
+                            >
+                              <P4 fontWeight="bold" maxWidth="70%">
+                                {num.isHex(calldata)
+                                  ? formatTruncatedAddress(calldata)
+                                  : calldata}
+                              </P4>
+                            </Box>
+                          </CopyTooltip>
+                        </Flex>
+                      ),
+                    )}
                   </Flex>
                 </AccordionPanel>
               </>

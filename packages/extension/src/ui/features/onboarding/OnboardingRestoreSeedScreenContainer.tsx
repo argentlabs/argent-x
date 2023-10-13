@@ -2,17 +2,12 @@ import { useNavigateBack } from "@argent/ui"
 import { FC, useCallback } from "react"
 
 import { routes } from "../../routes"
-import {
-  usePageTracking,
-  useTimeSpentWithSuccessTracking,
-} from "../../services/analytics"
+import { useTimeSpentWithSuccessTracking } from "../../services/analytics"
 import { useCustomNavigate } from "../recovery/hooks/useCustomNavigate"
 import { useSeedRecovery } from "../recovery/seedRecovery.state"
 import { OnboardingRestoreSeedScreen } from "./OnboardingRestoreSeedScreen"
 
 export const OnboardingRestoreSeedScreenContainer: FC = () => {
-  usePageTracking("restoreWallet")
-
   const { trackSuccess } = useTimeSpentWithSuccessTracking(
     "onboardingStepFinished",
     { stepId: "restoreSeedphrase" },

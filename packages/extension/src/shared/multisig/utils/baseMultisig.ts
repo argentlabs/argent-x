@@ -9,13 +9,14 @@ import {
   MultisigWalletAccount,
   WalletAccount,
 } from "../../wallet.model"
-import { accountsEqual } from "../../wallet.service"
-import { multisigBaseWalletStore } from "../store"
+import { accountsEqual } from "../../utils/accountsEqual"
+import { multisigBaseWalletRepo } from "../repository"
+import { MULTISIG_ACCOUNT_CLASS_HASH } from "../../network/constants"
 
 export async function getBaseMultisigAccounts(): Promise<
   BaseMultisigWalletAccount[]
 > {
-  return multisigBaseWalletStore.get()
+  return multisigBaseWalletRepo.get()
 }
 
 export async function getMultisigAccounts(
@@ -67,20 +68,48 @@ export async function getMultisigAccountFromBaseWallet(
 export async function addBaseMultisigAccounts(
   account: AllowArray<BaseMultisigWalletAccount>,
 ): Promise<void> {
-  await multisigBaseWalletStore.push(account)
+  await multisigBaseWalletRepo.upsert(account)
 }
 
-export async function addMultisigAccounts(
-  account: AllowArray<MultisigWalletAccount>,
+export async function addMultisigAccount(
+  account: MultisigWalletAccount,
 ): Promise<void> {
-  await accountService.upsert(account)
-  await addBaseMultisigAccounts(account)
+  await accountService.upsert({
+    address: account.address,
+    name: account.name,
+    network: account.network,
+    networkId: account.networkId,
+    signer: account.signer,
+    type: account.type,
+    escape: account.escape,
+    hidden: account.hidden,
+    guardian: account.guardian,
+    needsDeploy: account.needsDeploy,
+    classHash: MULTISIG_ACCOUNT_CLASS_HASH,
+    cairoVersion: "1",
+  })
+
+  await addBaseMultisigAccounts({
+    address: account.address,
+    networkId: account.networkId,
+    publicKey: account.publicKey,
+    signers: account.signers,
+    threshold: account.threshold,
+    creator: account.creator,
+    updatedAt: Date.now(),
+  })
+}
+
+export async function hideMultisig(
+  baseAccount: BaseMultisigWalletAccount,
+): Promise<void> {
+  await accountService.setHide(true, baseAccount)
 }
 
 export async function updateBaseMultisigAccount(
   baseAccount: BaseMultisigWalletAccount,
 ) {
-  await multisigBaseWalletStore.push(baseAccount)
+  await multisigBaseWalletRepo.upsert(baseAccount)
 
   return getMultisigAccountFromBaseWallet(baseAccount)
 }
@@ -88,15 +117,9 @@ export async function updateBaseMultisigAccount(
 export async function removeMultisigAccount(
   baseAccount: BaseMultisigWalletAccount,
 ): Promise<void> {
-  await multisigBaseWalletStore.remove((account) =>
+  await multisigBaseWalletRepo.remove((account) =>
     accountsEqual(account, baseAccount),
   )
 
   await accountService.remove(baseAccount)
-}
-
-export async function hideMultisig(
-  baseAccount: BaseMultisigWalletAccount,
-): Promise<void> {
-  await accountService.setHide(true, baseAccount)
 }

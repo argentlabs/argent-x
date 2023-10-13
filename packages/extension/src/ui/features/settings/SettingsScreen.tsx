@@ -1,19 +1,20 @@
 import {
   BarCloseButton,
+  BarIconButton,
   Button,
   CellStack,
   NavigationContainer,
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Center } from "@chakra-ui/react"
-import { FC } from "react"
+import { Box, Center } from "@chakra-ui/react"
+import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
 import { routes, useCurrentPathnameWithQuery, useReturnTo } from "../../routes"
-import { useStopSession } from "../../services/backgroundSessions"
+import { useStopSession } from "../../services/useStopSession"
 import { H2 } from "../../theme/Typography"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
@@ -23,6 +24,11 @@ import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
 import { DapplandFooter } from "./DapplandFooter"
 import { SettingsMenuItem } from "./SettingsMenuItem"
 import { SupportFooter } from "./SupportFooter"
+import { useShieldVerifiedEmail } from "../shield/useShieldVerifiedEmail"
+import { useArgentAccountTokenExpired } from "../argentAccount/hooks/useArgentAccountTokenExpired"
+import { formatTruncatedString } from "../../services/addresses"
+import { ClickableShieldBanner } from "../accounts/ClickableShieldBanner"
+import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
 
 const {
   LockIcon,
@@ -33,6 +39,8 @@ const {
   LinkIcon,
   PasswordIcon,
   ShieldIcon,
+  EmailIcon,
+  ChevronRightIcon,
 } = icons
 
 export const Title = styled.h3`
@@ -79,7 +87,7 @@ export const SettingsScreenWrapper = styled.div`
 `
 
 export const SettingsScreen: FC = () => {
-  const settingsReturnTo = useReturnTo()
+  const onBack = useNavigateReturnToOrBack()
   const openExtensionInTab = useOpenExtensionInTab()
   const extensionIsInTab = useExtensionIsInTab()
   const selectedAccount = useView(selectedAccountView)
@@ -87,26 +95,56 @@ export const SettingsScreen: FC = () => {
   const account = useAccount(selectedAccount)
   const navigate = useNavigate()
   const stopSession = useStopSession()
+  const verifiedEmail = useShieldVerifiedEmail()
+  const { data: isArgentAccountTokenExpired } = useArgentAccountTokenExpired()
+
+  const isSignedIn = verifiedEmail && !isArgentAccountTokenExpired
+  const handleSignin = () => {
+    navigate(
+      routes.argentAccountEmail(
+        selectedAccount?.address,
+        "argentAccount",
+        returnTo,
+      ),
+    )
+  }
+  const navigateToAccount = () => {
+    navigate(routes.argentAccountLoggedIn(selectedAccount?.address))
+  }
+
+  const shouldDisplayGuardianBanner =
+    account && !account.guardian && account.type !== "multisig"
+
   return (
     <>
       <NavigationContainer
-        rightButton={
-          <BarCloseButton
-            onClick={() =>
-              settingsReturnTo ? navigate(settingsReturnTo) : navigate(-1)
-            }
-          />
-        }
+        rightButton={<BarCloseButton onClick={onBack} />}
         title={"Settings"}
+        leftButton={
+          <BarIconButton
+            onClick={() => void stopSession(true)}
+            aria-label="Lock wallet"
+          >
+            <LockIcon />
+          </BarIconButton>
+        }
         scrollKey={"settings/SettingsScreen"}
       >
         <CellStack>
           {account && (
             <>
-              <AccountListScreenItemContainer
-                account={account}
-                clickNavigateSettings
-              />
+              <Box w={"full"}>
+                <AccountListScreenItemContainer
+                  account={account}
+                  clickNavigateSettings
+                  borderBottomRadius={
+                    shouldDisplayGuardianBanner ? 0 : "undefined"
+                  }
+                />
+                {shouldDisplayGuardianBanner && (
+                  <ClickableShieldBanner address={account.address} />
+                )}
+              </Box>
               <SpacerCell />
             </>
           )}
@@ -119,10 +157,23 @@ export const SettingsScreen: FC = () => {
               title="Extended view"
             />
           )}
+          <SettingsMenuItem
+            leftIcon={<EmailIcon />}
+            to={
+              isSignedIn
+                ? routes.argentAccountEmailPreferences(returnTo)
+                : routes.argentAccountEmail(
+                    selectedAccount?.address,
+                    "emailPreferences",
+                    returnTo,
+                  )
+            }
+            title="Email notifications"
+          />
 
           <SettingsMenuItem
             leftIcon={<AddressBookIcon />}
-            to={routes.settingsAddressbook()}
+            to={routes.settingsAddressBook()}
             title="Address book"
           />
 
@@ -135,7 +186,7 @@ export const SettingsScreen: FC = () => {
           <SettingsMenuItem
             leftIcon={<PasswordIcon />}
             to={routes.settingsSeed(returnTo)}
-            title="Show recovery phrase"
+            title="Recovery phrase"
           />
 
           <SettingsMenuItem
@@ -155,25 +206,52 @@ export const SettingsScreen: FC = () => {
           <SupportFooter />
         </CellStack>
       </NavigationContainer>
-      <Center
-        height={16}
-        borderTop="1px solid"
-        borderTopColor="border"
-        background="bg"
-        boxShadow="menu"
-      >
-        <Button
-          onClick={() => {
-            stopSession(true)
-          }}
-          size="sm"
-          colorScheme="transparent"
-          color="white50"
-          leftIcon={<LockIcon />}
+      {isSignedIn ? (
+        <Center
+          borderTop="1px solid"
+          borderTopColor="border"
+          background="bg"
+          boxShadow="menu"
         >
-          Lock wallet
-        </Button>
-      </Center>
+          <Button
+            onClick={navigateToAccount}
+            size="md"
+            colorScheme="transparent"
+            color="white"
+            w="xl"
+            bgColor="neutrals.800"
+            borderRadius="lg"
+            margin={4}
+            leftIcon={<EmailIcon />}
+            rightIcon={<ChevronRightIcon />}
+            textOverflow={"ellipsis"}
+            overflow={"hidden"}
+          >
+            {formatTruncatedString(verifiedEmail, 28)}
+          </Button>
+        </Center>
+      ) : (
+        <Center
+          borderTop="1px solid"
+          borderTopColor="border"
+          background="bg"
+          boxShadow="menu"
+        >
+          <Button
+            onClick={handleSignin}
+            size="md"
+            colorScheme="transparent"
+            color="white"
+            w="xl"
+            bgColor="neutrals.800"
+            borderRadius="lg"
+            margin={4}
+            leftIcon={<EmailIcon />}
+          >
+            {verifiedEmail ? "Log in to Argent" : "Sign in to Argent"}
+          </Button>
+        </Center>
+      )}
     </>
   )
 }

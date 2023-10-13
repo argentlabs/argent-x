@@ -5,8 +5,8 @@
     "lib": ["DOM", "ESNext"],
     "useDefineForClassFields": true,
     "module": "ESNext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "moduleResolution": "node",
     "baseUrl": ".",
     /**
      * Typecheck JS in `.svelte` and `.js` files by default.
@@ -16,8 +16,7 @@
      */
     "allowJs": true,
     "checkJs": true,
-    "declaration": true,
-    "isolatedModules": true
+    "declaration": true
   },
   "include": ["src"]
 }

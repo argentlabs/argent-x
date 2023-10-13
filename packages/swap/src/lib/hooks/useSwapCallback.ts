@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Call, RawArgs, stark, uint256 } from "starknet"
+import { Call, CallData, RawArgs, uint256 } from "starknet"
 
 import {
   JSBI,
@@ -9,7 +9,7 @@ import {
   Trade,
   TradeType,
 } from "../../sdk"
-import { ROUTER_ADDRESS } from "../../sdk/constants"
+import { ROUTER_ADDRESS, SupportedNetworks } from "../../sdk/constants"
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from "../constants"
 import { useSwapProvider } from "../providers"
 // import useENS from './useENS'
@@ -45,7 +45,10 @@ function useSwapCallArguments(
 
   const deadline = useTransactionDeadline()
 
-  const routerAddress = networkId && ROUTER_ADDRESS[networkId]
+  const routerAddress =
+    networkId &&
+    Object.values(SupportedNetworks).includes(networkId) &&
+    ROUTER_ADDRESS[networkId]
 
   return useMemo(() => {
     if (!trade || !recipient || !deadline || !routerAddress) {
@@ -129,14 +132,14 @@ export function useSwapCallback(
         const uint256AmountOut = uint256.bnToUint256(amountOut as string)
 
         const swapArgs: RawArgs = {
-          amountIn: { type: "struct", ...uint256AmountIn },
-          amountOutMin: { type: "struct", ...uint256AmountOut },
+          amountIn: uint256AmountIn,
+          amountOutMin: uint256AmountOut,
           path,
           to,
           deadline,
         }
 
-        const swapCalldata = stark.compileCalldata(swapArgs)
+        const swapCalldata = CallData.compile(swapArgs)
 
         const swapCall: Call = {
           contractAddress: routerAddress,

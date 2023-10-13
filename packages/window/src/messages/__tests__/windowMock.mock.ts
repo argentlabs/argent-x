@@ -1,10 +1,11 @@
-import mitt, { Handler } from "mitt"
 import { vi } from "vitest"
+
+import { Handler, mittx } from "../../utils/mittx"
 
 // Mock the window object
 export const getMockWindow = (origin: string): Window => {
   const window = {} as Window
-  const emitter = mitt<{ message: { data: unknown; origin: string } }>()
+  const emitter = mittx<{ message: { data: unknown; origin: string } }>()
   const listeners = new Map<
     EventListener,
     Handler<{

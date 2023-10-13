@@ -32,7 +32,7 @@ export const SwapTransactionIcon: FC<SwapTransactionIconProps> = ({
       {fromToken && (
         <TokenIcon
           name={fromToken?.name || "?"}
-          url={fromToken?.image}
+          url={fromToken?.iconUrl}
           size={fromIconSize}
           position={"absolute"}
           left={0}
@@ -41,7 +41,7 @@ export const SwapTransactionIcon: FC<SwapTransactionIconProps> = ({
       )}
       <TokenIcon
         name={toToken?.name || "?"}
-        url={toToken?.image}
+        url={toToken?.iconUrl}
         size={toIconSize}
         position={"absolute"}
         right={0}

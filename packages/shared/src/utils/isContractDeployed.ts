@@ -1,7 +1,7 @@
-import { SequencerProvider } from "starknet"
+import { ProviderInterface } from "starknet"
 
 export const isContractDeployed = async (
-  provider: SequencerProvider,
+  provider: ProviderInterface,
   contractAddress: string,
 ): Promise<boolean> => {
   try {

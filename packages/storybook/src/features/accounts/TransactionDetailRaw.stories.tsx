@@ -16,14 +16,14 @@ import { Call } from "starknet"
 
 import { account, accountAddress } from "../../account"
 import { decorators } from "../../decorators/routerDecorators"
-import { tokensByNetwork } from "../../tokensByNetwork"
+import { tokensByNetwork } from "../../tokens"
 import { TransactionDetailWrapped } from "./TransactionDetailWrapped"
 
 const network = defaultNetwork
 
 const makeTransaction = (transactions?: Call | Call[]): Transaction => {
   return {
-    account: account as Account,
+    account: account as unknown as Account,
     hash: "0x535aa7c68e99011c090d3a2d277005dd9fe073ab6dc354a0c5d67f12505a5fc",
     meta: {
       transactions,
@@ -139,6 +139,21 @@ export const Failed = {
   Unknown location (pc=0:802)
   Unknown location (pc=0:655)`,
       },
+    },
+    accountAddress,
+    network,
+    tokensByNetwork,
+  },
+}
+
+export const Reverted = {
+  ...Default,
+  args: {
+    transaction: {
+      ...makeTransaction(erc20Transfer),
+      status: "REVERTED",
+      revertReason:
+        'Error in the called contract (0x03b1b7a7ae9a136a327b01b89ddfee24a474c74bf76032876b5754e44cd7040b):\nError at pc=0:32:\nGot an exception while executing a hint: Custom Hint Error: Requested contract address ContractAddress(PatriciaKey(StarkFelt("0x0000000000000000000000000000000000000000000000000000000000000042"))) is not deployed.\nCairo traceback (most recent call last):\nUnknown location (pc=0:557)\nUnknown location (pc=0:519)\nUnknown location (pc=0:625)\n',
     },
     accountAddress,
     network,

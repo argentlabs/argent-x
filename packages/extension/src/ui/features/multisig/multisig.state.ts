@@ -1,10 +1,6 @@
 import { useMemo } from "react"
 
 import {
-  multisigBaseWalletStore,
-  pendingMultisigStore,
-} from "../../../shared/multisig/store"
-import {
   BasePendingMultisig,
   PendingMultisig,
 } from "../../../shared/multisig/types"
@@ -12,17 +8,20 @@ import {
   withHiddenPendingMultisig,
   withoutHiddenPendingMultisig,
 } from "../../../shared/multisig/utils/selectors"
-import { useArrayStorage } from "../../../shared/storage/hooks"
 import {
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   MultisigWalletAccount,
 } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/wallet.service"
+import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { Multisig } from "./Multisig"
+import {
+  multisigBaseWalletView,
+  pendingMultisigsView,
+} from "../../../shared/multisig/view"
 
 export const mapMultisigWalletAccountsToMultisig = (
   walletAccounts: MultisigWalletAccount[],
@@ -48,7 +47,7 @@ export const mapMultisigWalletAccountsToMultisig = (
 }
 
 export function useBaseMultisigAccounts() {
-  return useArrayStorage(multisigBaseWalletStore)
+  return useView(multisigBaseWalletView)
 }
 
 export function useMultisigAccounts() {
@@ -123,7 +122,7 @@ export function usePendingMultisigs({
   allNetworks = false,
 } = {}) {
   const network = useCurrentNetwork()
-  const pendingMultisigs = useArrayStorage(pendingMultisigStore)
+  const pendingMultisigs = useView(pendingMultisigsView)
 
   return useMemo(
     () =>
@@ -151,7 +150,7 @@ export const usePendingMultisigsOnNetwork = ({
   networkId: string
   showHidden: boolean
 }) => {
-  const accounts = useArrayStorage(pendingMultisigStore)
+  const accounts = useView(pendingMultisigsView)
 
   return useMemo(
     () =>

@@ -58,7 +58,7 @@ export const AlertDialog: FC<AlertDialogProps> = ({
         <AlertDialogContent
           p={6}
           bg="neutrals.700"
-          rounded="lg"
+          rounded="2xl"
           maxWidth={[pxToRem(320), pxToRem(480)]}
         >
           <AlertDialogBody>

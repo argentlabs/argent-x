@@ -5,6 +5,7 @@
     "lib": ["DOM", "ESNext"],
     "useDefineForClassFields": true,
     "module": "ESNext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "baseUrl": ".",
     /**
@@ -16,7 +17,7 @@
     "allowJs": true,
     "checkJs": true,
     "declaration": true,
-    "isolatedModules": true
+    "declarationDir": "dist"
   },
   "include": ["src"]
 }

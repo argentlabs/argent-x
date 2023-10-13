@@ -1,61 +1,60 @@
+import { swrRefetchDisabledConfig } from "@argent/shared"
 import { useCallback } from "react"
 import { Call } from "starknet"
 
+import { sendMessage, waitForMessage } from "../../../../shared/messages"
+import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
+import { WalletAccount } from "../../../../shared/wallet.model"
+import { useConditionallyEnabledSWR } from "../../../services/swr.service"
 import { ARGENT_TRANSACTION_SIMULATION_API_ENABLED } from "./../../../../shared/api/constants"
-import {
-  isPrivacySettingsEnabled,
-  settingsStore,
-} from "../../../../shared/settings"
-import { useKeyValueStorage } from "../../../../shared/storage/hooks"
-import { fetchTransactionSimulation } from "../../../../shared/transactionSimulation/transactionSimulation.service"
-import { argentApiFetcher } from "../../../services/argentApiFetcher"
-import { useConditionallyEnabledSWR } from "../../../services/swr"
-import { Account } from "../../accounts/Account"
 
 export interface IUseTransactionSimulation {
-  account?: Account
+  account?: WalletAccount
   transactions: Call | Call[]
-  actionHash: string
+  actionHash?: string
 }
 
 export const useTransactionSimulationEnabled = () => {
-  const privacyUseArgentServicesEnabled = useKeyValueStorage(
-    settingsStore,
-    "privacyUseArgentServices",
-  )
-
-  /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
-  if (!isPrivacySettingsEnabled) {
-    return ARGENT_TRANSACTION_SIMULATION_API_ENABLED
-  }
-  return (
-    ARGENT_TRANSACTION_SIMULATION_API_ENABLED && privacyUseArgentServicesEnabled
-  )
+  return ARGENT_TRANSACTION_SIMULATION_API_ENABLED
 }
 
 export const useTransactionSimulation = ({
   account,
   transactions,
-  actionHash,
+  actionHash = "",
 }: IUseTransactionSimulation) => {
   const transactionSimulationEnabled = useTransactionSimulationEnabled()
   const transactionSimulationFetcher = useCallback(async () => {
-    if (!account || account.needsDeploy) {
-      // TODO: handle account deployment
+    if (!account) {
       return
     }
-    return fetchTransactionSimulation({
-      transactions,
-      fetcher: argentApiFetcher,
-    })
+
+    void sendMessage({ type: "SIMULATE_TRANSACTIONS", data: transactions })
+
+    const result = await Promise.race([
+      waitForMessage("SIMULATE_TRANSACTIONS_RES"),
+      waitForMessage("SIMULATE_TRANSACTIONS_REJ"),
+    ])
+
+    if (result === null) {
+      console.warn(
+        "Old Account detected. Falling back to client-side simulation",
+      )
+      return undefined
+    }
+
+    if ("error" in result) {
+      throw result.error
+    }
+
+    return result.simulation
   }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
-  return useConditionallyEnabledSWR(
-    Boolean(transactionSimulationEnabled),
+  return useConditionallyEnabledSWR<
+    ApiTransactionBulkSimulationResponse | undefined
+  >(
+    Boolean(actionHash) && transactionSimulationEnabled,
     [actionHash, "transactionSimulation"],
     transactionSimulationFetcher,
-    {
-      revalidateOnFocus: false,
-      refreshInterval: 15e3,
-    },
+    swrRefetchDisabledConfig,
   )
 }

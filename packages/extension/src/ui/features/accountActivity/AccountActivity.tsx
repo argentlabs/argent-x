@@ -3,7 +3,7 @@ import { FC, Fragment } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
-import { Token } from "../../../shared/token/type"
+
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { routes } from "../../routes"
@@ -14,6 +14,7 @@ import { transformExplorerTransaction, transformTransaction } from "./transform"
 import { isActivityTransaction, isExplorerTransaction } from "./transform/is"
 import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
 import { ActivityTransaction } from "./useActivity"
+import { Token } from "../../../shared/token/__new/types/token.model"
 
 interface AccountActivityBaseProps {
   account: Account

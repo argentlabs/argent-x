@@ -1,14 +1,14 @@
 import { memoize } from "lodash-es"
-import { Account, AccountInterface, ec } from "starknet"
-import { hash } from "starknet5"
+import { Account, AccountInterface, hash } from "starknet"
 import urlJoin from "url-join"
 
 import { Network, getProvider } from "../../shared/network"
-import { LoadContracts } from "../accounts"
+import { LoadContracts } from "../wallet/loadContracts"
 import {
   ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
   PROXY_CONTRACT_CLASS_HASHES,
-} from "../wallet"
+} from "../wallet/starknet.constants"
+import { getNetworkUrl } from "../../shared/network/utils"
 
 interface PreDeployedAccount {
   address: string
@@ -20,8 +20,10 @@ export const getPreDeployedAccount = async (
   index = 0,
 ): Promise<AccountInterface | null> => {
   try {
+    const networkUrl = getNetworkUrl(network)
+
     const preDeployedAccounts = await fetch(
-      urlJoin(network.baseUrl, "predeployed_accounts"),
+      urlJoin(networkUrl, "predeployed_accounts"),
     ).then((x) => x.json() as Promise<PreDeployedAccount[]>)
 
     const preDeployedAccount = preDeployedAccounts[index]
@@ -30,8 +32,13 @@ export const getPreDeployedAccount = async (
     }
 
     const provider = getProvider(network)
-    const keypair = ec.getKeyPair(preDeployedAccount.private_key)
-    return new Account(provider, preDeployedAccount.address, keypair)
+
+    return new Account(
+      provider,
+      preDeployedAccount.address,
+      preDeployedAccount.private_key,
+      "0", // Devnet is currently supporting only cairo 0
+    )
   } catch (e) {
     console.warn(`Failed to get pre-deployed account: ${e}`)
     return null
@@ -69,7 +76,9 @@ export const declareContracts = memoize(
         contract: proxyContract,
       })
 
-      await deployAccount.waitForTransaction(proxy.transaction_hash, 1e3)
+      await deployAccount.waitForTransaction(proxy.transaction_hash, {
+        retryInterval: 1e3,
+      })
 
       proxyClassHash = proxy.class_hash
     }
@@ -80,7 +89,9 @@ export const declareContracts = memoize(
         contract: accountContract,
       })
 
-      await deployAccount.waitForTransaction(account.transaction_hash, 1e3)
+      await deployAccount.waitForTransaction(account.transaction_hash, {
+        retryInterval: 1e3,
+      })
 
       accountClassHash = account.class_hash
     }
@@ -90,7 +101,7 @@ export const declareContracts = memoize(
       accountClassHash: accountClassHash ?? computedAccountClassHash,
     }
   },
-  (network) => `${network.baseUrl}`,
+  (network) => `${network.sequencerUrl}`,
 )
 
 export const checkIfClassIsDeclared = async (

@@ -1,3 +1,4 @@
+import { addressSchema } from "@argent/shared"
 import { TokenButton } from "@argent/ui"
 import {
   Currency,
@@ -8,7 +9,6 @@ import {
   useCurrencyBalance,
   wrappedCurrency,
 } from "@argent/x-swap"
-import { BigNumber } from "ethers"
 import { FC } from "react"
 
 import {
@@ -19,7 +19,7 @@ import { selectedAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { TokenDetailsWithBalance } from "../../accountTokens/tokens.state"
+import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
 
 interface OwnedTokenProps {
   currency: Currency
@@ -52,14 +52,14 @@ const OwnedToken: FC<OwnedTokenProps> = ({ onClick, currency }) => {
       ? ETH_LOGO_URL
       : undefined
 
-  const tokenDetailsWithBalance: TokenDetailsWithBalance = {
+  const tokenDetailsWithBalance: TokenWithOptionalBigIntBalance = {
     name: token.name || "",
     symbol: token.symbol || "",
     decimals: token.decimals,
-    address: token.address,
+    address: addressSchema.parse(token.address),
     networkId: token.networkId,
-    image: tokenImage,
-    balance: BigNumber.from(balance?.raw.toString() || "0"),
+    iconUrl: tokenImage,
+    balance: BigInt(balance?.raw.toString() || "0"),
   }
 
   const displayBalance = prettifyTokenBalance(tokenDetailsWithBalance)
@@ -69,7 +69,7 @@ const OwnedToken: FC<OwnedTokenProps> = ({ onClick, currency }) => {
     <TokenButton
       onClick={onClick}
       name={tokenDetailsWithBalance.name}
-      image={tokenDetailsWithBalance.image || ""}
+      image={tokenDetailsWithBalance.iconUrl || ""}
       getTokenIconUrl={getTokenIconUrl}
       symbol={tokenDetailsWithBalance.symbol}
       showTokenSymbol

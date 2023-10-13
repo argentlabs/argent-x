@@ -1,4 +1,4 @@
-import { addAddressPadding } from "starknet"
+import { addAddressPadding, constants, shortString } from "starknet"
 import urlJoin from "url-join"
 
 import { Network } from "../../shared/network"
@@ -8,6 +8,7 @@ import {
   defaultBlockExplorers,
 } from "../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../../shared/storage/hooks"
+import { getNetworkIdFromChainId } from "../../shared/network/utils"
 
 export const useBlockExplorerTitle = () => {
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
@@ -21,11 +22,20 @@ export const getBlockExplorerUrlForNetwork = async (network: Network) => {
   if (
     network.id === "mainnet-alpha" ||
     network.id === "goerli-alpha" ||
-    network.id === "goerli-alpha-2" ||
     network.id === "localhost"
   ) {
     return settingsBlockExplorer.url[network.id]
   }
+
+  const encodedChainId = shortString.encodeShortString(network.chainId)
+
+  if (
+    Object.values(constants.StarknetChainId).includes(encodedChainId as any)
+  ) {
+    const blockExprorerNetworkId = getNetworkIdFromChainId(encodedChainId)
+    return settingsBlockExplorer.url[blockExprorerNetworkId]
+  }
+
   return defaultBlockExplorers[defaultBlockExplorerKey].url["mainnet-alpha"]
 }
 

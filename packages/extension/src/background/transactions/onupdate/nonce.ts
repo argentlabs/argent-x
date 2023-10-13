@@ -6,7 +6,7 @@ export const checkResetStoredNonce: TransactionUpdateListener = async (
 ) => {
   for (const transaction of transactions) {
     // on error remove stored (increased) nonce
-    if (transaction.account && transaction.status === "REJECTED") {
+    if (transaction.account && transaction.executionStatus === "REJECTED") {
       await resetStoredNonce(transaction.account)
     }
   }

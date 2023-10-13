@@ -2,24 +2,26 @@ import {
   Box,
   ButtonProps,
   Circle,
+  Fade,
   Flex,
   Image,
   Tooltip,
 } from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import { FC, ReactNode, useState } from "react"
 
 import { Button } from "./Button"
 import { AlertIcon } from "./icons"
 import { LoadingPulse } from "./LoadingPulse"
 import { FieldError, H6, P4 } from "./Typography"
 
-export interface TokenListItemProps extends ButtonProps {
+export interface TokenButtonProps extends ButtonProps {
   name: string
   symbol: string
   image: string
   bigFont?: boolean
   getTokenIconUrl: ({ name, url }: { name: string; url: string }) => string
   subtitle?: string | ReactNode
+  hoverButton?: ReactNode
   valueLabelPrimary: string | ReactNode
   valueLabelSecondary?: string | ReactNode | undefined
   isLoading?: boolean
@@ -30,11 +32,12 @@ export interface TokenListItemProps extends ButtonProps {
   }
 }
 
-const TokenButton: FC<TokenListItemProps> = ({
+const TokenButton: FC<TokenButtonProps> = ({
   name,
   symbol,
   image,
   getTokenIconUrl,
+  hoverButton,
   valueLabelPrimary,
   valueLabelSecondary,
   subtitle,
@@ -45,6 +48,14 @@ const TokenButton: FC<TokenListItemProps> = ({
   ...rest
 }) => {
   const src = getTokenIconUrl({ name, url: image })
+  const [isHovering, setHovering] = useState(false)
+
+  const handleMouseEnter = () => {
+    setHovering(true)
+  }
+  const handleMouseLeave = () => {
+    setHovering(false)
+  }
 
   return (
     <Button
@@ -55,6 +66,9 @@ const TokenButton: FC<TokenListItemProps> = ({
       fontWeight={"initial"}
       colorScheme="neutrals"
       rounded={"xl"}
+      cursor={hoverButton ? "default" : "pointer"}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       {...rest}
     >
       <Circle position={"relative"} overflow={"hidden"} size={9}>
@@ -75,11 +89,12 @@ const TokenButton: FC<TokenListItemProps> = ({
         gap={2}
         overflow={"hidden"}
       >
-        <Flex direction={"column"} overflow="hidden" gap={bigFont ? "1.5" : 0}>
+        <Flex direction={"column"} overflow="hidden" gap="0.5">
           <H6
             overflow="hidden"
             textOverflow={"ellipsis"}
             fontSize={bigFont ? "2xl" : "base"}
+            pb={"1.5"}
           >
             {name === "Ether" ? "Ethereum" : name}
           </H6>
@@ -122,24 +137,30 @@ const TokenButton: FC<TokenListItemProps> = ({
               </Tooltip>
             ) : (
               <>
-                <H6
-                  overflow="hidden"
-                  textOverflow={"ellipsis"}
-                  textAlign="end"
-                  fontSize={bigFont ? "2xl" : "base"}
-                >
-                  {valueLabelPrimary}
-                </H6>
-                {valueLabelSecondary && (
-                  <Box
-                    color="neutrals.400"
-                    fontWeight="semibold"
-                    textOverflow={"ellipsis"}
-                    textAlign="end"
-                    fontSize="xs"
-                  >
-                    {valueLabelSecondary}
-                  </Box>
+                {isHovering && hoverButton ? (
+                  <Fade in={isHovering}>{hoverButton}</Fade>
+                ) : (
+                  <>
+                    <H6
+                      overflow="hidden"
+                      textOverflow={"ellipsis"}
+                      textAlign="end"
+                      fontSize={bigFont ? "2xl" : "base"}
+                    >
+                      {valueLabelPrimary}
+                    </H6>
+                    {valueLabelSecondary && (
+                      <Box
+                        color="neutrals.400"
+                        fontWeight="semibold"
+                        textOverflow={"ellipsis"}
+                        textAlign="end"
+                        fontSize="xs"
+                      >
+                        {valueLabelSecondary}
+                      </Box>
+                    )}
+                  </>
                 )}
               </>
             )}

@@ -1,4 +1,4 @@
-export * from "./aspect"
-export * from "./aspect.model"
+export * from "./argent"
+export * from "./interface"
 export * from "./useNfts"
 export * from "./utils"

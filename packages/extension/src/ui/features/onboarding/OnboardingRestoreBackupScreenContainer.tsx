@@ -5,15 +5,12 @@ import { useNavigate } from "react-router-dom"
 
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
-import { usePageTracking } from "../../services/analytics"
 import { fileToString } from "../../services/files"
 import { recoveryService } from "../../services/recovery"
 import { useOnboardingScreen } from "./hooks/useOnboardingScreen"
 import { OnboardingRestoreBackupScreen } from "./OnboardingRestoreBackupScreen"
 
 export const OnboardingRestoreBackupScreenContainer: FC = () => {
-  usePageTracking("restoreWalletWithFile")
-
   const navigate = useNavigate()
   const onBack = useNavigateBack()
 

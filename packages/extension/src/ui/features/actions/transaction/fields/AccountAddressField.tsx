@@ -1,31 +1,24 @@
-import { FC, ReactNode } from "react"
+import { FC } from "react"
 
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
-import { PrettyAccountAddress } from "../../../accounts/PrettyAccountAddress"
+import {
+  PrettyAccountAddressArgentX,
+  PrettyAccountAddressArgentXProps,
+} from "../../../accounts/PrettyAccountAddressArgentX"
 
-interface AccountAddressFieldProps {
+interface AccountAddressFieldProps extends PrettyAccountAddressArgentXProps {
   title: string
-  accountAddress: string
-  networkId: string
-  fallbackValue?: (accountAddress: string) => ReactNode
 }
 
 export const AccountAddressField: FC<AccountAddressFieldProps> = ({
   title,
-  accountAddress,
-  networkId,
-  fallbackValue,
+  ...rest
 }) => {
   return (
     <Field>
       <FieldKey>{title}</FieldKey>
       <LeftPaddedField>
-        <PrettyAccountAddress
-          size={6}
-          accountAddress={accountAddress}
-          networkId={networkId}
-          fallbackValue={fallbackValue}
-        />
+        <PrettyAccountAddressArgentX size={6} {...rest} />
       </LeftPaddedField>
     </Field>
   )

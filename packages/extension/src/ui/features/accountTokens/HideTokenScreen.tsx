@@ -1,81 +1,52 @@
-import { FC, useState } from "react"
-import { Navigate, useNavigate, useParams } from "react-router-dom"
-import styled from "styled-components"
+import { Flex, Text } from "@chakra-ui/react"
+import { FC } from "react"
 
-import { removeToken } from "../../../shared/token/storage"
-import { useAppState } from "../../app.state"
-import { Alert } from "../../components/Alert"
-import { routes } from "../../routes"
-import { FormError, P } from "../../theme/Typography"
-import { DeprecatedConfirmScreen } from "../actions/DeprecatedConfirmScreen"
+import { FormError } from "../../theme/Typography"
+import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { TokenIcon } from "./TokenIcon"
-import { toTokenView } from "./tokens.service"
-import { useToken } from "./tokens.state"
 
-export const HideTokenAlert = styled(Alert)`
-  padding-top: 32px;
-  padding-bottom: 32px;
-  margin-bottom: 20px;
-`
-
-export const TokenTitle = styled.header`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-`
-
-export const TokenName = styled.h3`
-  font-style: normal;
-  font-weight: 600;
-  font-size: 15px;
-  line-height: 20px;
-  color: ${({ theme }) => theme.text1};
-`
-
-export const HideTokenScreen: FC = () => {
-  const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const { tokenAddress } = useParams()
-  const token = useToken({
-    address: tokenAddress || "0x0",
-    networkId: switcherNetworkId || "Unknown",
-  })
-  const [error, setError] = useState("")
-
-  if (!token) {
-    return <Navigate to={routes.accountTokens()} />
-  }
-
-  const { name, image } = toTokenView(token)
-
-  const handleSubmit = () => {
-    try {
-      removeToken(token)
-      navigate(routes.accountTokens())
-    } catch {
-      setError("Token not hidden")
-    }
-  }
-
+interface HideTokenScreenProps {
+  error: string
+  name: string
+  image?: string
+  handleSubmit: () => void
+}
+export const HideTokenScreen: FC<HideTokenScreenProps> = ({
+  error,
+  name,
+  image,
+  handleSubmit,
+}) => {
   return (
-    <DeprecatedConfirmScreen
+    <ConfirmScreen
       title="Hide token"
       confirmButtonText="Confirm"
       rejectButtonText="Cancel"
       onSubmit={handleSubmit}
     >
-      <TokenTitle>
+      <Flex flexDirection="column" alignItems="center" gap="5px">
         <TokenIcon url={image} name={name} size={12} />
-        <TokenName>{name}</TokenName>
-      </TokenTitle>
+        <Text fontSize="medium">{name}</Text>
+      </Flex>
       {error && <FormError>{error}</FormError>}
-      <HideTokenAlert>
-        <P>
+
+      <Flex
+        paddingTop={8}
+        paddingBottom={8}
+        marginBottom={5}
+        flexDirection="column"
+        justifyContent="space-between"
+        alignItems="center"
+        padding={4}
+        background="rgba(255, 255, 255, 0.15)"
+        borderRadius="md"
+        marginX={5}
+      >
+        <Text fontSize="medium">
           To see this token again, you will need to add the token to your
           account.
-        </P>
-      </HideTokenAlert>
-    </DeprecatedConfirmScreen>
+        </Text>
+      </Flex>
+    </ConfirmScreen>
   )
 }

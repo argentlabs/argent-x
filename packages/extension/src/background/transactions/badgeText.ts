@@ -14,15 +14,17 @@ import {
   BaseWalletAccount,
   MultisigWalletAccount,
 } from "../../shared/wallet.model"
-import { accountsEqual } from "../../shared/wallet.service"
+import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { old_walletStore } from "../../shared/wallet/walletStore"
 import { transactionsStore } from "./store"
+import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
 
 // selects transactions that are pending and match the provided account
 
 export const pendingAccountTransactionsSelector = memoize(
   (account: BaseWalletAccount) => (transaction: Transaction) =>
-    transaction.status === "RECEIVED" &&
+    transaction.finalityStatus === TransactionFinalityStatus.RECEIVED &&
+    transaction.executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
     !transaction.meta?.isDeployAccount &&
     accountsEqual(account, transaction.account),
 )
@@ -30,12 +32,7 @@ export const pendingAccountTransactionsSelector = memoize(
 export const multisigPendingTransactionSelector = memoize(
   (multisig: MultisigWalletAccount) =>
     (transaction: MultisigPendingTransaction) => {
-      const transactionAccount = {
-        address: transaction.address,
-        networkId: transaction.networkId,
-      }
-
-      return accountsEqual(multisig, transactionAccount) && transaction.notify
+      return accountsEqual(multisig, transaction.account) && transaction.notify
     },
 )
 

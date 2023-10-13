@@ -1,10 +1,29 @@
 import { Page, expect } from "@playwright/test"
-type NetworkName =
-  | "Localhost 5050"
-  | "Testnet"
-  | "Testnet 2"
-  | "Mainnet"
-  | "My Network"
+type NetworkName = "Localhost 5050" | "Testnet" | "Mainnet" | "My Network"
+export function getDefaultNetwork() {
+  const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
+
+  if (!argentXEnv) {
+    throw new Error("ARGENT_X_ENVIRONMENT not set")
+  }
+  let defaultNetworkId: string
+  switch (argentXEnv.toLowerCase()) {
+    case "prod":
+    case "staging":
+      defaultNetworkId = "mainnet-alpha"
+      break
+
+    case "hydrogen":
+    case "test":
+      defaultNetworkId = "goerli-alpha"
+      break
+
+    default:
+      throw new Error(`Unknown ARGENTX_ENVIRONMENT: ${argentXEnv}`)
+  }
+
+  return defaultNetworkId
+}
 export default class Network {
   constructor(private page: Page) {}
   get networkSelector() {
@@ -26,5 +45,17 @@ export default class Network {
       .locator('[role="menu"] button')
       .allInnerTexts()
     return networks.map((net) => expect(availableNetworks).toContain(net))
+  }
+
+  getDefaultNetworkName() {
+    const defaultNetworkId = getDefaultNetwork()
+    switch (defaultNetworkId.toLowerCase()) {
+      case "mainnet-alpha":
+        return "Mainnet"
+      case "goerli-alpha":
+        return "Testnet"
+      default:
+        throw new Error(`Unknown ARGENTX_Network: ${defaultNetworkId}`)
+    }
   }
 }

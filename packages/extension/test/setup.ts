@@ -1,10 +1,17 @@
-import "@testing-library/jest-dom/extend-expect"
+import "@testing-library/jest-dom"
 
 import fetch, { Headers, Request, Response } from "cross-fetch"
+import dotenv from "dotenv"
 import { noop } from "lodash-es"
 import { vi } from "vitest"
 
 import { chromeStorageMock } from "../src/shared/storage/__test__/chrome-storage.mock"
+
+Node.prototype.isSameNode = function (otherNode) {
+  return otherNode === null ? false : this === otherNode
+}
+
+dotenv.config()
 
 vi.stubGlobal("fetch", fetch)
 vi.stubGlobal("Headers", Headers)
@@ -14,6 +21,9 @@ vi.stubGlobal("chrome", {
   runtime: {
     id: "test",
     connect: noop,
+    onConnect: {
+      addListener: noop,
+    },
     sendMessage: noop,
   },
   storage: chromeStorageMock,

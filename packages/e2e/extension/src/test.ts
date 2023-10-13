@@ -1,6 +1,8 @@
 import * as fs from "fs"
 import path from "path"
+import dotenv from "dotenv"
 
+dotenv.config()
 import {
   ChromiumBrowserContext,
   Page,
@@ -8,13 +10,15 @@ import {
   chromium,
   test as testBase,
 } from "@playwright/test"
+import { v4 as uuid } from "uuid"
 
 import config from "./config"
 import type { TestExtensions } from "./fixtures"
 import ExtensionPage from "./page-objects/ExtensionPage"
 
+const isCI = Boolean(process.env.CI)
 const isExtensionURL = (url: string) => url.startsWith("chrome-extension://")
-
+let browserCtx: ChromiumBrowserContext
 const closePages = async (browserContext: ChromiumBrowserContext) => {
   const pages = browserContext?.pages() || []
   for (const page of pages) {
@@ -54,17 +58,18 @@ const keepArtifacts = async (testInfo: TestInfo, page: Page) => {
     }
   }
 }
-const initBrowserWithExtension = async (testInfo: TestInfo) => {
-  const userDataDir = `/tmp/test-user-data-${Math.round(
-    new Date().getTime() / 1000,
-  )}-${(Math.random() + 1).toString(36).substring(7)}-${testInfo.workerIndex}`
-  const browserContext = (await chromium.launchPersistentContext(userDataDir, {
+
+const createBrowserContext = () => {
+  const userDataDir = `/tmp/test-user-data-${uuid()}`
+  return chromium.launchPersistentContext(userDataDir, {
     headless: false,
     args: [
+      `${isCI ? "--headless=new" : ""}`,
       "--disable-dev-shm-usage",
       "--ipc=host",
       `--disable-extensions-except=${config.distDir}`,
       `--load-extension=${config.distDir}`,
+      "--disable-gp",
     ],
     recordVideo: {
       dir: config.artifactsDir,
@@ -73,8 +78,11 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
         height: 600,
       },
     },
-  })) as ChromiumBrowserContext
+  })
+}
 
+const initBrowserWithExtension = async (testInfo: TestInfo) => {
+  const browserContext = await createBrowserContext()
   // save video
   browserContext.on("page", async (page) => {
     page.on("load", async (page) => {
@@ -156,14 +164,23 @@ function createExtension() {
     const extension = new ExtensionPage(page, extensionURL)
     await keepArtifacts(testInfo, page)
     await closePages(browserContext)
+    browserCtx = browserContext
     await use(extension)
     await browserContext.close()
   }
 }
+
+function getContext() {
+  return async ({}, use: any, _testInfo: TestInfo) => {
+    await use(browserCtx)
+  }
+}
+
 let pageId = 0
 const test = testBase.extend<TestExtensions>({
   extension: createExtension(),
   secondExtension: createExtension(),
+  browserContext: getContext(),
 })
 
 export default test

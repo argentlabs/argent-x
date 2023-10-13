@@ -20,10 +20,10 @@ describe("NetworkWarningScreen", () => {
     expect(buttonElement).toBeInTheDocument()
   })
 
-  it("calls the onClick function when the button is clicked", () => {
+  it("calls the onClick function when the button is clicked", async () => {
     render(<NetworkWarningScreen onClick={onClickMock} />)
     const buttonElement = screen.getByRole("button", { name: /I understand/i })
-    userEvent.click(buttonElement)
+    await userEvent.click(buttonElement)
     expect(onClickMock).toHaveBeenCalled()
   })
 })

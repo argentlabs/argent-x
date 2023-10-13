@@ -14,15 +14,24 @@ import {
 import { useMultisig } from "./multisig.state"
 import { MultisigConfirmationsWithOwners } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
+import { useNavigate } from "react-router-dom"
 
 export const MultisigAddOwnersScreen: FC = () => {
   const account = useRouteAccount()
   const signerKey = useSignerKey()
   const methods = useCreateMultisigForm(signerKey)
+  const navigate = useNavigate()
   const [step, setStep] = useState(0)
   const [goBack, setGoBack] = useState<undefined | (() => void)>(undefined)
   const goNext = () => {
-    setGoBack(() => () => setStep((step) => step - 1))
+    setGoBack(() => () => {
+      setStep((step) => {
+        if (step === 0) {
+          navigate(-1)
+        }
+        return step - 1
+      })
+    })
     setStep((step) => step + 1)
   }
 
@@ -68,13 +77,17 @@ const MultisigAddOwners = ({
           <H4>Add owners</H4>
           <P3 color="neutrals.300">
             Ask your co-owners to go to “Join existing multisig” in Argent X and
-            send you their signer key
+            send you their signer pubkey
           </P3>
           <P3 color="primary.400" mt="3">
-            A signer key is NOT an account address
+            For security reasons each owner should have their own Argent X
+            wallet. Never add 2 signer pubkeys from the same Argent X wallet.
           </P3>
           <Divider my={4} color="neutrals.800" mt="4" />
-          <AddOwnersForm nextOwnerIndex={signerKeys.length + 1} />
+          <AddOwnersForm
+            nextOwnerIndex={signerKeys.length + 1}
+            isNewMultisig={false}
+          />
         </Flex>
         <Button
           colorScheme="primary"

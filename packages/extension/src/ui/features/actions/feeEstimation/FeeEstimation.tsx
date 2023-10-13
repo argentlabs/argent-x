@@ -1,30 +1,18 @@
 import { TextWithAmount } from "@argent/ui"
-import { BigNumber } from "ethers"
 import { FC, useMemo } from "react"
 
-import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
+import { isUndefined } from "lodash-es"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { Token } from "../../../../shared/token/type"
 import { FeeEstimationBox } from "./ui/FeeEstimationBox"
 import { FeeEstimationText } from "./ui/FeeEstimationText"
 import { InsufficientFundsAccordion } from "./ui/InsufficientFundsAccordion"
 import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
+import { WaitingForFunds } from "./ui/WaitingForFunds"
 import { getTooltipText } from "./utils"
-
-export interface FeeEstimationProps {
-  amountCurrencyValue?: string
-  fee?: EstimateFeeResponse
-  feeToken: Token
-  feeTokenBalance?: BigNumber
-  parsedFeeEstimationError: string | false
-  showError: boolean
-  showEstimateError: boolean
-  showFeeError: boolean
-  suggestedMaxFeeCurrencyValue?: string
-}
+import { FeeEstimationProps } from "./feeEstimation.model"
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
   amountCurrencyValue,
@@ -35,10 +23,12 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   showError,
   showFeeError,
   suggestedMaxFeeCurrencyValue,
+  userClickedAddFunds,
 }) => {
   const tooltipText = useMemo(() => {
     if (fee) {
-      return getTooltipText(fee.suggestedMaxFee, feeTokenBalance)
+      const suggestedMaxFeeBN = BigInt(fee.suggestedMaxFee)
+      return getTooltipText(suggestedMaxFeeBN, feeTokenBalance)
     }
   }, [fee, feeTokenBalance])
   const primaryText = useMemo(() => {
@@ -90,7 +80,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
       )
     }
   }, [fee, feeToken, suggestedMaxFeeCurrencyValue])
-  const isLoading = !fee || !feeTokenBalance
+  const isLoading = !fee || isUndefined(feeTokenBalance) // because 0n is a valid balance but falsy
   if (!showError) {
     return (
       <FeeEstimationBox>
@@ -102,6 +92,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
         />
       </FeeEstimationBox>
     )
+  }
+  if (userClickedAddFunds) {
+    return <WaitingForFunds />
   }
   if (showFeeError) {
     return (

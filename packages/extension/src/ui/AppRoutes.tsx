@@ -2,35 +2,30 @@ import { Route, Routes, RoutesConfig } from "@argent/stack-router"
 import { chakra } from "@chakra-ui/react"
 import { FC, ReactNode, isValidElement, useMemo } from "react"
 // import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
-import { Outlet, useLocation } from "react-router-dom"
+import { Location, Outlet, useLocation } from "react-router-dom"
 
 import { useAppState, useMessageStreamHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
 import { AccountImplementationScreen } from "./features/accountEdit/AccountImplementationScreen"
-import { CollectionNfts } from "./features/accountNfts/CollectionNfts"
-import { NftScreen } from "./features/accountNfts/NftScreen"
-import { SendNftScreen } from "./features/accountNfts/SendNftScreen"
+import { CollectionNftsContainer } from "./features/accountNfts/CollectionNftsContainer"
+import { NftScreenContainer } from "./features/accountNfts/NftScreenContainer"
 import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
+import { AccountDeprecatedModal } from "./features/accounts/AccountDeprecatedModal"
 import { AccountListHiddenScreenContainer } from "./features/accounts/AccountListHiddenScreenContainer"
 import { AccountListScreenContainer } from "./features/accounts/AccountListScreenContainer"
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { AddNewAccountScreenContainer } from "./features/accounts/AddNewAccountScreenContainer"
 import { HideOrDeleteAccountConfirmScreenContainer } from "./features/accounts/HideOrDeleteAccountConfirmScreenContainer"
-import { MigrationDisclaimerScreenContainer } from "./features/accounts/MigrationDisclaimerScreenContainer"
-import { UpgradeScreenContainer } from "./features/accounts/UpgradeScreenContainer"
-import { UpgradeScreenV4Container } from "./features/accounts/UpgradeScreenV4Container"
 import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
-import { HideTokenScreen } from "./features/accountTokens/HideTokenScreen"
-import { SendTokenScreen } from "./features/accountTokens/SendTokenScreen"
-import { TokenScreen } from "./features/accountTokens/TokenScreen"
-import { useActions } from "./features/actions/actions.state"
+import { HideTokenScreenContainer } from "./features/accountTokens/HideTokenScreenContainer"
 import { ActionScreenContainer } from "./features/actions/ActionScreen"
 import { AddTokenScreenContainer } from "./features/actions/AddTokenScreenContainer"
 import { ErrorScreenContainer } from "./features/actions/ErrorScreenContainer"
 import { LoadingScreenContainer } from "./features/actions/LoadingScreenContainer"
 import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
+import { FundingFaucetFallbackScreen } from "./features/funding/FundingFaucetFallbackScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
 import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
@@ -42,7 +37,6 @@ import { JoinMultisigSettingsScreen } from "./features/multisig/JoinMultisigSett
 import { MultisigAddOwnersScreen } from "./features/multisig/MultisigAddOwnersScreen"
 import { MultisigConfirmationsScreen } from "./features/multisig/MultisigConfirmationsScreen"
 import { MultisigOwnersScreen } from "./features/multisig/MultisigOwnersScreen"
-import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
 import { MultisigRemoveOwnersScreen } from "./features/multisig/MultisigRemoveOwnerScreen"
 import { MultisigTransactionConfirmationsScreen } from "./features/multisig/MultisigTransactionConfirmationsScreen"
 import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
@@ -57,38 +51,56 @@ import { OnboardingRestorePasswordScreenContainer } from "./features/onboarding/
 import { OnboardingRestoreSeedScreenContainer } from "./features/onboarding/OnboardingRestoreSeedScreenContainer"
 import { OnboardingStartScreenContainer } from "./features/onboarding/OnboardingStartScreenContainer"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
-import { SeedRecoveryConfirmScreen } from "./features/recovery/SeedRecoveryConfirmScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
-import { SendScreen } from "./features/send/SendScreen"
-import { AddressbookAddOrEditScreen } from "./features/settings/AddressbookAddOrEditScreen"
-import { AddressbookSettingsScreen } from "./features/settings/AddressbookSettingsScreen"
+import { SendAmountAndAssetScreenContainer } from "./features/send/SendAmountAndAssetScreenContainer"
+import { SendAssetScreen } from "./features/send/SendAssetScreen"
+import { SendCollectionNftsScreenContainer } from "./features/send/SendCollectionNftsScreenContainer"
+import { SendRecipientScreenContainer } from "./features/send/SendRecipientScreenContainer"
+import { AddressBookAddOrEditScreenContainer } from "./features/settings/AddressBookAddOrEditScreenContainer"
+import { AddressBookSettingsScreenContainer } from "./features/settings/AddressBookSettingsScreenContainer"
+import { BeforeYouContinueScreen } from "./features/settings/BeforeYouContinueScreen"
 import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
 import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
 import { DeveloperSettings } from "./features/settings/DeveloperSettings"
-import { DeclareOrDeployContractSuccess } from "./features/settings/DeveloperSettings/DeclareOrDeployContractSuccess"
+import { DeclareOrDeployContractSuccessScreenContainer } from "./features/settings/DeveloperSettings/DeclareOrDeployContractSuccessScreenContainer"
 import { DeclareSmartContractScreen } from "./features/settings/DeveloperSettings/DeclareSmartContractScreen"
 import { DeploySmartContractScreen } from "./features/settings/DeveloperSettings/DeploySmartContractScreen"
 import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
 import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
-import { NetworkSettingsFormScreen } from "./features/settings/NetworkSettingsFormScreen"
+import { NetworkSettingsFormScreenContainer } from "./features/settings/NetworkSettingsFormScreenContainer"
 import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
 import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen"
 import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SettingsScreen } from "./features/settings/SettingsScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
-import { WithArgentServicesEnabled } from "./features/settings/WithArgentServicesEnabled"
 import { EscapeWarningScreen } from "./features/shield/escape/EscapeWarningScreen"
 import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
-import { ShieldAccountEmailScreen } from "./features/shield/ShieldAccountEmailScreen"
 import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
 import { ShieldAccountOTPScreen } from "./features/shield/ShieldAccountOTPScreen"
 import { ShieldAccountStartScreen } from "./features/shield/ShieldAccountStartScreen"
 import { WithArgentShieldVerified } from "./features/shield/WithArgentShieldVerified"
 import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
+import { useOnAppRoutesAnimationComplete } from "./hooks/useOnAppRoutesAnimationComplete"
 import { routes } from "./routes"
 import { useEntryRoute } from "./useEntryRoute"
+import { hasActionsView } from "./views/actions"
+import { useView } from "./views/implementation/react"
+import { ArgentAccountEmailScreen } from "./features/argentAccount/ArgentAccountEmailScreen"
+import { ArgentAccountLoggedInScreenContainer } from "./features/argentAccount/ArgentAccountLoggedInScreenContainer"
+import { ArgentAccountEmailNotificationsScreenContainer } from "./features/argentAccount/ArgentAccountEmailNotificationsScreenContainer"
+import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
+import { SuspenseScreen } from "./components/SuspenseScreen"
+import { BetaFeaturesSettings } from "./features/settings/BetaFeatureSettings"
+import { ChangeAccountImplementationScreen } from "./features/accountEdit/ChangeAccountImplementationScreen"
+import { MultisigReplaceOwnerScreen } from "./features/multisig/MultisigReplaceOwnerScreen"
+
+interface LocationWithState extends Location {
+  state: {
+    showOnTop?: boolean // flag to indicate a particular route will be shown on top of actions
+  }
+}
 
 const ResponsiveContainer = chakra(ResponsiveBox, {
   baseStyle: {
@@ -116,13 +128,10 @@ const ResponsiveRoutes: FC = () => (
 
 const nonWalletRoutes = (
   <>
+    <Route path={"/index.html"} element={null} />
     <Route path={routes.error.path} element={<ErrorScreenContainer />} />
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
-    <Route
-      path={routes.migrationDisclaimer.path}
-      element={<MigrationDisclaimerScreenContainer />}
-    />
   </>
 )
 
@@ -133,12 +142,20 @@ const walletRoutes = (
     <Route
       presentation="modal"
       path={routes.accountNft.path}
-      element={<NftScreen />}
+      element={
+        <SuspenseScreen>
+          <NftScreenContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
       path={routes.collectionNfts.path}
-      element={<CollectionNfts />}
+      element={
+        <SuspenseScreen>
+          <CollectionNftsContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="modal"
@@ -168,7 +185,11 @@ const walletRoutes = (
     <Route
       presentation="modal"
       path={routes.accounts.path}
-      element={<AccountListScreenContainer />}
+      element={
+        <SuspenseScreen list>
+          <AccountListScreenContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="modal"
@@ -182,17 +203,13 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
-      path={routes.accountImplementations.path}
-      element={<AccountImplementationScreen />}
+      path={routes.changeAccountImplementations.path}
+      element={<ChangeAccountImplementationScreen />}
     />
     <Route
       presentation="push"
-      path={routes.shieldAccountStart.path}
-      element={
-        <WithArgentServicesEnabled>
-          <ShieldAccountStartScreen />
-        </WithArgentServicesEnabled>
-      }
+      path={routes.accountImplementation.path}
+      element={<AccountImplementationScreen />}
     />
     <Route
       presentation="push"
@@ -201,8 +218,31 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
-      path={routes.shieldAccountEmail.path}
-      element={<ShieldAccountEmailScreen />}
+      path={routes.shieldAccountStart.path}
+      element={<ShieldAccountStartScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.argentAccountEmail.path}
+      element={<ArgentAccountEmailScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.argentAccountLoggedIn.path}
+      element={
+        <SuspenseScreen>
+          <ArgentAccountLoggedInScreenContainer />
+        </SuspenseScreen>
+      }
+    />
+    <Route
+      presentation="push"
+      path={routes.argentAccountEmailPreferences.path}
+      element={
+        <SuspenseScreen>
+          <ArgentAccountEmailNotificationsScreenContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
@@ -226,7 +266,11 @@ const walletRoutes = (
     <Route
       presentation="modal"
       path={routes.settings.path}
-      element={<SettingsScreen />}
+      element={
+        <SuspenseScreen>
+          <SettingsScreen />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
@@ -236,7 +280,7 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.settingsAddCustomNetwork.path}
-      element={<NetworkSettingsFormScreen mode="add" />}
+      element={<NetworkSettingsFormScreenContainer mode="add" />}
     />
     <Route
       presentation="push"
@@ -256,18 +300,23 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
-      path={routes.settingsAddressbook.path}
-      element={<AddressbookSettingsScreen />}
+      path={routes.settingsAddressBook.path}
+      element={
+        /** TODO: Suspense here prevents fallback while views initialise - refactor to use shared default fallback */
+        <SuspenseScreen>
+          <AddressBookSettingsScreenContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
-      path={routes.settingsAddressbookAdd.path}
-      element={<AddressbookAddOrEditScreen />}
-    />
-    <Route
-      presentation="push"
-      path={routes.settingsAddressbookEdit.path}
-      element={<AddressbookAddOrEditScreen />}
+      path={routes.settingsAddressBookAddOrEdit.path}
+      element={
+        /** TODO: Suspense here prevents fallback while views initialise - refactor to use shared default  fallback */
+        <SuspenseScreen>
+          <AddressBookAddOrEditScreenContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
@@ -292,12 +341,17 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.settingsSmartContractDeclareOrDeploySuccess.path}
-      element={<DeclareOrDeployContractSuccess />}
+      element={<DeclareOrDeployContractSuccessScreenContainer />}
     />
     <Route
       presentation="push"
       path={routes.settingsExperimental.path}
       element={<PrivacyExperimentalSettings />}
+    />
+    <Route
+      presentation="push"
+      path={routes.settingsBetaFeatures.path}
+      element={<BetaFeaturesSettings />}
     />
     <Route
       presentation="push"
@@ -324,29 +378,53 @@ const walletRoutes = (
       path={routes.accountDeleteConfirm.path}
       element={<HideOrDeleteAccountConfirmScreenContainer mode="delete" />}
     />
-    <Route path={routes.upgrade.path} element={<UpgradeScreenContainer />} />
     <Route
       presentation="push"
       path={routes.hideToken.path}
-      element={<HideTokenScreen />}
+      element={<HideTokenScreenContainer />}
     />
-    <Route path={routes.sendScreen.path} element={<SendScreen />} />
     <Route
-      path={routes.sendToken.path}
+      presentation="push"
+      path={routes.sendRecipientScreen.path}
       element={
-        <WithArgentShieldVerified>
-          <SendTokenScreen />
-        </WithArgentShieldVerified>
+        <SuspenseScreen>
+          <SendRecipientScreenContainer />
+        </SuspenseScreen>
       }
     />
-    <Route path={routes.sendNft.path} element={<SendNftScreen />} />
     <Route
-      path={routes.networkUpgradeV4.path}
-      element={<UpgradeScreenV4Container upgradeType={"network"} />}
+      presentation="push"
+      path={routes.sendAmountAndAssetScreen.path}
+      element={
+        <SuspenseScreen>
+          <WithArgentShieldVerified>
+            <SendAmountAndAssetScreenContainer />
+          </WithArgentShieldVerified>
+        </SuspenseScreen>
+      }
     />
     <Route
-      path={routes.accountUpgradeV4.path}
-      element={<UpgradeScreenV4Container upgradeType={"account"} />}
+      presentation="modal"
+      path={routes.sendAssetScreen.path}
+      element={
+        <SuspenseScreen>
+          <SendAssetScreen />
+        </SuspenseScreen>
+      }
+    />
+    <Route
+      presentation="push"
+      path={routes.sendCollectionsNftsScreen.path}
+      element={
+        <SuspenseScreen>
+          <SendCollectionNftsScreenContainer />
+        </SuspenseScreen>
+      }
+    />
+    <Route
+      presentation="modal"
+      path={routes.accountDeprecated.path}
+      element={<AccountDeprecatedModal />}
     />
     <Route
       presentation="push"
@@ -374,16 +452,20 @@ const walletRoutes = (
       element={<FundingProviderScreen />}
     />
     <Route
-      path={routes.confirmSeedRecovery.path}
-      element={<SeedRecoveryConfirmScreen />}
+      presentation="push"
+      path={routes.fundingFaucetFallback.path}
+      element={<FundingFaucetFallbackScreen />}
     />
     <Route
       path={routes.setupSeedRecovery.path}
       element={<SeedRecoverySetupScreen />}
     />
     <Route path={routes.setupRecovery.path} element={<RecoverySetupScreen />} />
-    <Route path={routes.newToken.path} element={<AddTokenScreenContainer />} />
-    <Route path={routes.token.path} element={<TokenScreen />} />
+    <Route
+      presentation="push"
+      path={routes.newToken.path}
+      element={<AddTokenScreenContainer />}
+    />
     <Route
       presentation="modal"
       path={routes.addPlugin.path}
@@ -393,7 +475,6 @@ const walletRoutes = (
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreen />}
     />
-
     {/* Multisig */}
     <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
     <Route
@@ -428,6 +509,11 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
+      path={routes.multisigReplaceOwner.path}
+      element={<MultisigReplaceOwnerScreen />}
+    />
+    <Route
+      presentation="push"
       path={routes.multisigPendingTransactionDetails.path}
       element={<MultisigPendingTransactionDetailsScreen />}
     />
@@ -440,6 +526,11 @@ const walletRoutes = (
       presentation="push"
       path={routes.multisigRemovedSettings.path}
       element={<RemovedMultisigSettingsScreenContainer />}
+    />
+    <Route
+      presentation="push"
+      path={routes.beforeYouContinue.path}
+      element={<BeforeYouContinueScreen />}
     />
   </>
 )
@@ -501,15 +592,18 @@ export const AppRoutes: FC = () => {
   useEntryRoute()
   useMessageStreamHandler()
   const location = useLocation()
+  const { state, pathname } = location as LocationWithState
+  const onAppRoutesAnimationComplete = useOnAppRoutesAnimationComplete()
 
   const { isLoading } = useAppState()
-  const actions = useActions()
+  const hasActions = useView(hasActionsView)
 
+  /** TODO: refactor: this should maybe be invoked by service + worker pattern */
   const showActions = useMemo(() => {
-    const hasActions = !!actions[0]
-    const isNonWalletRoute = nonWalletPaths.includes(location.pathname)
+    const isNonWalletRoute =
+      nonWalletPaths.includes(pathname) || state?.showOnTop
     return hasActions && !isNonWalletRoute
-  }, [actions, location.pathname])
+  }, [hasActions, pathname, state])
 
   if (isLoading) {
     return <LoadingScreenContainer />
@@ -524,7 +618,10 @@ export const AppRoutes: FC = () => {
   }
 
   return (
-    <RoutesConfig defaultPresentation="replace">
+    <RoutesConfig
+      defaultPresentation="replace"
+      onExitComplete={onAppRoutesAnimationComplete}
+    >
       <Routes>
         <Route element={<ResponsiveRoutes />}>
           {nonWalletRoutes}

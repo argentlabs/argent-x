@@ -50,4 +50,7 @@ const baseStyle = definePartsStyle({
 export const menuTheme = defineMultiStyleConfig({
   baseStyle,
   sizes,
+  defaultProps: {
+    size: "2xs",
+  },
 })

@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js"
+import { addressSchema } from "@argent/shared"
 import type { Dictionary } from "lodash"
 import {
   flatten,
@@ -10,24 +10,30 @@ import {
 } from "lodash-es"
 import { useMemo } from "react"
 
-import { TransactionSimulationApproval } from "./../../../../shared/transactionSimulation/types"
-import { Token } from "../../../../shared/token/type"
+import {
+  ApiTransactionBulkSimulationResponse,
+  TransactionSimulationApproval,
+} from "./../../../../shared/transactionSimulation/types"
 import {
   ApiTransactionSimulationResponse,
   TokenDetails,
   TransactionSimulationTransfer,
 } from "../../../../shared/transactionSimulation/types"
 import { isEqualAddress } from "../../../services/addresses"
-import { useAspectContractAddresses } from "./../../accountNfts/aspect.service"
+import { useContractAddresses } from "../../accountNfts/nfts.state"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useTokensRecord } from "../../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
+import { bigDecimal } from "@argent/shared"
+import { num } from "starknet"
+import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+import { Token } from "../../../../shared/token/__new/types/token.model"
 
 interface CommonSimulationData {
   token: Token
-  amount: BigNumber
-  usdValue?: BigNumber
+  amount: bigint
+  usdValue?: string
 }
 
 interface ApprovalSimulationData extends CommonSimulationData {
@@ -37,8 +43,8 @@ interface ApprovalSimulationData extends CommonSimulationData {
 
 interface Recipient {
   address: string
-  amount: BigNumber
-  usdValue?: BigNumber
+  amount: bigint
+  usdValue?: string
 }
 
 export interface TokenWithType extends Token {
@@ -74,7 +80,7 @@ export type ValidatedTokenApproval = Omit<
 }
 
 function partitionIncomingOutgoingTransfers(transfers: AggregatedSimData[]) {
-  return partition(transfers, (t) => t.amount.isGreaterThan(0))
+  return partition(transfers, (t) => t.amount > 0n)
 }
 
 function orderAggregatedSimData(
@@ -107,20 +113,126 @@ function orderAggregatedSimData(
   ])
 }
 
-export const useAggregatedSimData = (
-  transactionSimulation: ApiTransactionSimulationResponse = {
-    transfers: [],
+export const useSimulationPreprocessor = (
+  transactionSimulations: ApiTransactionBulkSimulationResponse,
+) => {
+  return useMemo(() => {
+    if (!Array.isArray(transactionSimulations)) {
+      return {
+        approvals: [],
+        transfers: [],
+      }
+    }
+    return transactionSimulations.reduce<
+      Omit<ApiTransactionSimulationResponse, "feeEstimation">
+    >(
+      (acc, t) => {
+        return {
+          approvals: [...acc.approvals, ...t.approvals],
+          transfers: [...acc.transfers, ...t.transfers],
+        }
+      },
+      {
+        approvals: [],
+        transfers: [],
+      },
+    )
+  }, [transactionSimulations])
+}
+
+export const useAggregatedTxFeesData = (
+  transactionSimulation?: ApiTransactionBulkSimulationResponse,
+  feeSimulation?: EstimatedFees,
+  feeSequencer?: EstimatedFees,
+  needsDeploy?: boolean,
+) => {
+  const totalFee = useMemo(() => {
+    if (needsDeploy && feeSequencer?.accountDeploymentFee) {
+      return num.toHex(
+        num.toBigInt(feeSequencer.accountDeploymentFee) +
+          num.toBigInt(feeSequencer.amount),
+      )
+    }
+    return feeSequencer?.amount
+  }, [needsDeploy, feeSequencer?.accountDeploymentFee, feeSequencer?.amount])
+
+  const totalMaxFee = useMemo(() => {
+    if (needsDeploy && feeSequencer?.maxADFee) {
+      return num.toHex(
+        num.toBigInt(feeSequencer.maxADFee) +
+          num.toBigInt(feeSequencer.suggestedMaxFee),
+      )
+    }
+    return feeSequencer?.suggestedMaxFee
+  }, [needsDeploy, feeSequencer?.maxADFee, feeSequencer?.suggestedMaxFee])
+
+  if (!transactionSimulation || transactionSimulation.length === 0) {
+    return {
+      fee: feeSequencer,
+      totalFee,
+      totalMaxFee,
+    }
+  }
+
+  if (!feeSimulation) {
+    return {
+      fee: feeSequencer,
+      totalFee,
+      totalMaxFee,
+    }
+  }
+
+  const { amount } = feeSimulation
+
+  const suggestedMaxFee = BigInt(amount) * BigInt(3) //.toString() // add 3x overhead
+  let maxADFee = num.toBigInt(0)
+  let accountDeploymentFee = num.toBigInt(0)
+
+  if (needsDeploy && transactionSimulation[0].feeEstimation) {
+    accountDeploymentFee = num.toBigInt(
+      transactionSimulation[0].feeEstimation.overallFee,
+    )
+    maxADFee = BigInt(accountDeploymentFee.valueOf()) * BigInt(3) // add 3x overhead
+  }
+
+  return {
+    fee: {
+      amount: amount.toString(),
+      suggestedMaxFee: suggestedMaxFee.toString(),
+      accountDeploymentFee: maxADFee.toString(),
+      maxADFee: maxADFee.toString(),
+    },
+    totalFee: amount.toString(),
+    totalMaxFee: suggestedMaxFee.toString(),
+  }
+}
+
+const DEFAULT_TRANSACTION_SIMULATION = [
+  {
     approvals: [],
+    transfers: [],
+    feeEstimation: {
+      gasPrice: 0,
+      gasUsage: 0,
+      overallFee: 0,
+      unit: "wei",
+    },
   },
+]
+
+export const useAggregatedSimData = (
+  transactionSimulations: ApiTransactionBulkSimulationResponse = DEFAULT_TRANSACTION_SIMULATION,
 ) => {
   const network = useCurrentNetwork()
   const account = useSelectedAccount()
 
   // Need to clean hex because the API returns addresses with unpadded 0s
   const erc20TokensRecord = useTokensRecord({ cleanHex: true })
-  const { data: nftContracts } = useAspectContractAddresses()
+  const nftContracts = useContractAddresses()
 
-  const { transfers, approvals } = transactionSimulation
+  const { transfers, approvals } = useSimulationPreprocessor(
+    transactionSimulations,
+  )
 
   const aggregatedData = useMemo(() => {
     const filteredTransfers = transfers.filter(
@@ -195,8 +307,8 @@ export const useAggregatedSimData = (
       keyForGrouping,
     )
 
-    const ZERO = BigNumber(0)
-    const ONE = BigNumber(1)
+    const ZERO = 0n
+    const ONE = 1n
 
     return reduce<
       Dictionary<(ValidatedTokenTransfer | ValidatedTokenApproval)[]>,
@@ -217,8 +329,8 @@ export const useAggregatedSimData = (
               token: a.token,
               owner: a.owner,
               spender: a.spender,
-              amount: BigNumber(a.value ?? 1),
-              usdValue: a.usdValue ? BigNumber(a.usdValue) : undefined,
+              amount: BigInt(a.value ?? 1),
+              usdValue: a.usdValue ?? undefined,
             }))
             .filter((a) => a.owner === account?.address) ?? []
 
@@ -229,39 +341,41 @@ export const useAggregatedSimData = (
               token: approvalsForTokens[0].token,
               approvals,
               amount: ZERO,
-              usdValue: ZERO,
+              usdValue: "0",
               recipients: [],
               safe: false,
             },
           }
         }
 
-        const amount = transfers.reduce<BigNumber>((acc, t) => {
+        const amount = transfers.reduce<bigint>((acc, t) => {
           const isTokenTranfer = checkIsTokenTransfer(t)
           if (isTokenTranfer && t.from === account?.address) {
-            return acc.minus(t.value ?? ONE) // This works because ERC721 tokens have value undefined and the amount is always 1
+            return acc - BigInt(t.value ?? ONE) // This works because ERC721 tokens have value undefined and the amount is always 1
           }
 
-          return acc.plus(t.value ?? ONE)
+          return acc + BigInt(t.value ?? ONE)
         }, ZERO)
 
-        const usdValue = transfers.reduce<BigNumber>((acc, t) => {
+        const usdValueBigInt = transfers.reduce<bigint>((acc, t) => {
           if (!t.usdValue) {
             return acc
           }
           const isTokenTranfer = checkIsTokenTransfer(t)
 
           if (isTokenTranfer && t.from === account?.address) {
-            return acc.minus(t.usdValue)
+            return acc - bigDecimal.parseCurrency(t.usdValue)
           }
 
-          return acc.plus(t.usdValue)
+          return acc + bigDecimal.parseCurrency(t.usdValue)
         }, ZERO)
 
-        const recipients = transfers.reduce<Recipient[]>((acc, t) => {
-          const amount = BigNumber(t.value ?? 1)
+        const usdValue = bigDecimal.formatCurrency(usdValueBigInt)
 
-          const negated = amount.negated()
+        const recipients = transfers.reduce<Recipient[]>((acc, t) => {
+          const amount = BigInt(t.value ?? 1)
+
+          const negated = -amount
           const isTokenTranfer = checkIsTokenTransfer(t)
           if (!isTokenTranfer) {
             return []
@@ -271,17 +385,18 @@ export const useAggregatedSimData = (
             {
               address: t.to,
               amount: t.to === account?.address ? amount : negated,
-              usdValue: t.usdValue ? BigNumber(t.usdValue) : undefined,
+              usdValue: t.usdValue ?? undefined,
             },
           ]
         }, [])
 
-        const totalApprovalAmount = approvals.reduce<BigNumber>(
-          (acc, a) => acc.plus(a.amount),
+        const totalApprovalAmount = approvals.reduce<bigint>(
+          (acc, a) => acc + a.amount,
           ZERO,
         )
 
-        const safe = totalApprovalAmount.lte(amount.abs()) && !noTransfers
+        const safe =
+          totalApprovalAmount <= bigDecimal.absBigInt(amount) && !noTransfers
 
         return {
           ...acc,
@@ -351,7 +466,7 @@ export function apiTokenDetailsToToken({
   // If the token is not in the tokensRecord, try to get it from the details
   if (details) {
     const token = {
-      address: tokenAddress,
+      address: addressSchema.parse(tokenAddress),
       name: details.name,
       symbol: details.symbol,
       decimals: parseInt(details.decimals ?? "0"),
@@ -381,12 +496,12 @@ export function apiTokenDetailsToToken({
   // Check if the token is an NFT
   if (isKnownNftContract) {
     return {
-      address: tokenAddress,
+      address: addressSchema.parse(tokenAddress),
       name: "NFT",
       symbol: "NFT",
       decimals: 0,
       networkId: networkId,
-      image: undefined,
+      iconUrl: undefined,
       type: "erc721",
       tokenId,
     }

@@ -1,3 +1,4 @@
+import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
 import { TransactionMeta } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { formatDate } from "../../services/dates"
@@ -17,13 +18,22 @@ export type DailyActivity = Record<string, ActivityTransaction[]>
 export function useActivity(account: BaseWalletAccount): DailyActivity {
   const { transactions } = useAccountTransactions(account)
   const activity: DailyActivity = {}
-  for (const { hash, timestamp, meta, status } of transactions) {
+  for (const {
+    hash,
+    timestamp,
+    meta,
+    finalityStatus,
+    executionStatus,
+  } of transactions) {
     // RECEIVED transactions are already shown as pending
-    if (status !== "RECEIVED") {
+    if (
+      finalityStatus !== TransactionFinalityStatus.RECEIVED ||
+      executionStatus === TransactionExecutionStatus.REJECTED
+    ) {
       const date = new Date(timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
-      const isRejected = status === "REJECTED"
-      const isCancelled = status === "CANCELLED"
+      const isRejected = executionStatus === "REJECTED"
+      const isCancelled = finalityStatus === "CANCELLED"
       activity[dateLabel] ||= []
       activity[dateLabel].push({
         hash,

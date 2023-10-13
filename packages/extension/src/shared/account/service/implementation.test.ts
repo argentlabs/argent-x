@@ -1,4 +1,5 @@
 import { messageClient } from "../../../ui/services/messaging/trpc"
+import { mockChainService } from "../../chain/service/__test__/mock"
 import {
   MockFnObjectStore,
   MockFnRepository,
@@ -6,16 +7,32 @@ import {
 import type { BaseWalletAccount, WalletAccount } from "../../wallet.model"
 import type { IWalletStore } from "../../wallet/walletStore"
 import { AccountService } from "./implementation"
+import { IMultisigService } from "../../multisig/service/messaging/interface"
 
 describe("AccountService", () => {
   let accountRepo: MockFnRepository<WalletAccount>
   let walletStore: IWalletStore
   let accountService: AccountService
+  let multisigService: IMultisigService
+  const mutateMock = vi.fn()
+  const messageClientMock = {
+    account: {
+      select: {
+        mutate: mutateMock,
+      },
+    },
+  } as unknown as jest.Mocked<typeof messageClient>
 
   beforeEach(() => {
     accountRepo = new MockFnRepository()
     walletStore = new MockFnObjectStore()
-    accountService = new AccountService(accountRepo, walletStore, messageClient)
+    accountService = new AccountService(
+      mockChainService,
+      accountRepo,
+      walletStore,
+      messageClientMock,
+      multisigService,
+    )
   })
 
   describe("select", () => {
@@ -23,23 +40,13 @@ describe("AccountService", () => {
       const baseAccount: BaseWalletAccount = {
         address: "0x123",
         networkId: "0x1",
-        // @ts-expect-error extraValue is not part of BaseWalletAccount
-        extraValue: "extraValue",
       }
       await accountService.select(baseAccount)
 
-      expect(walletStore.set).toHaveBeenCalledWith({
-        selected: {
-          address: baseAccount.address,
-          networkId: baseAccount.networkId,
-        },
+      expect(mutateMock).toHaveBeenCalledWith({
+        address: baseAccount.address,
+        networkId: baseAccount.networkId,
       })
-    })
-
-    it("should set selected account to null if baseAccount is null", async () => {
-      await accountService.select(null)
-
-      expect(walletStore.set).toHaveBeenCalledWith({ selected: null })
     })
   })
 
@@ -77,6 +84,17 @@ describe("AccountService", () => {
       await accountService.remove(baseAccount)
 
       expect(accountRepo.remove).toHaveBeenCalled()
+    })
+  })
+
+  describe("getDeployed", () => {
+    it("should return mock value", async () => {
+      const result = await accountService.getDeployed({
+        address: "0x123",
+        networkId: "0x1",
+      })
+
+      expect(result).toEqual(true)
     })
   })
 })

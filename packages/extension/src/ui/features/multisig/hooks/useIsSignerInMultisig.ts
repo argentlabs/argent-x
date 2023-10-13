@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 
 import { Multisig } from "../Multisig"
+import { num } from "starknet"
 
 /**
  * This hook checks if the current signer is in the list of signers of a multisig account
@@ -15,6 +16,8 @@ export function useIsSignerInMultisig(multisig?: Multisig) {
     if (!multisig) {
       return false
     }
-    return multisig.signers.includes(multisig.publicKey)
+    return multisig.signers.some(
+      (signer) => num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
+    )
   }, [multisig])
 }

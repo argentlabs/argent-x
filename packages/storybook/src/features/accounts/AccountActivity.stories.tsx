@@ -6,7 +6,7 @@ import { ComponentProps } from "react"
 
 import { account } from "../../account"
 import { decorators } from "../../decorators/routerDecorators"
-import { tokensByNetwork } from "../../tokensByNetwork"
+import { tokensByNetwork } from "../../tokens"
 import activity from "./__fixtures__/transactions.json"
 
 export default {

@@ -8,7 +8,6 @@ import { CopyIconButton } from "../../components/CopyIconButton"
 import { PageWrapper } from "../../components/Page"
 import { routes } from "../../routes"
 import { formatFullAddress, normalizeAddress } from "../../services/addresses"
-import { usePageTracking } from "../../services/analytics"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { QrCode } from "./QrCode"
@@ -27,9 +26,6 @@ export const FundingQrCodeScreen: FC = () => {
   const navigate = useNavigate()
   const addressRef = useRef<HTMLParagraphElement | null>(null)
   const account = useView(selectedAccountView)
-  usePageTracking("addFundsFromOtherAccount", {
-    networkId: account?.networkId || "unknown",
-  })
   const copyAccountAddress = account ? normalizeAddress(account.address) : ""
 
   /** Intercept 'copy' event and replace fragmented address with plain text address */

@@ -1,19 +1,21 @@
-import { BigNumber } from "ethers"
-import { Call, number, stark } from "starknet"
+import { Call, CallData, num, stark, uint256 } from "starknet"
 import useSWR from "swr"
 
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { getEstimatedFee } from "../../services/backgroundTransactions"
-import { getUint256CalldataFromBN } from "../../services/transactions"
+import {
+  getEstimatedFeeFromSequencer,
+  getSimulationEstimatedFee,
+} from "../../services/backgroundTransactions"
 import { Account } from "../accounts/Account"
-import { getNetworkFeeToken } from "./tokens.state"
+import { useNetworkFeeToken } from "./tokens.state"
+import { swrRefetchDisabledConfig } from "@argent/shared"
 
-const { compileCalldata, estimatedFeeToMaxFee: addOverheadToFee } = stark
+const { estimatedFeeToMaxFee: addOverheadToFee } = stark
 
 export const useMaxFeeEstimateForTransfer = (
   tokenAddress?: string,
-  balance?: BigNumber,
-  account?: Account,
+  balance?: bigint,
+  account?: Pick<Account, "address" | "networkId" | "needsDeploy">,
 ): {
   maxFee?: string
   error?: any
@@ -23,6 +25,8 @@ export const useMaxFeeEstimateForTransfer = (
     account && balance && tokenAddress
       ? [getAccountIdentifier(account), "maxEthTransferEstimate"]
       : null
+
+  const feeToken = useNetworkFeeToken(account?.networkId)
 
   const {
     data: estimatedFee,
@@ -34,7 +38,6 @@ export const useMaxFeeEstimateForTransfer = (
       if (!account || !balance || !tokenAddress) {
         return
       }
-      const feeToken = await getNetworkFeeToken(account.networkId)
 
       if (feeToken?.address !== tokenAddress) {
         return {
@@ -46,18 +49,26 @@ export const useMaxFeeEstimateForTransfer = (
       const call: Call = {
         contractAddress: tokenAddress,
         entrypoint: "transfer",
-        calldata: compileCalldata({
-          recipient: account.address,
-          amount: getUint256CalldataFromBN(balance),
+        calldata: CallData.compile({
+          // We are using a dummy address (ETH here) as recipient to estimate the fee given we don't have a receipient yet
+          recipient: feeToken.address,
+          amount: uint256.bnToUint256(balance),
         }),
       }
 
-      const estimatedFee = await getEstimatedFee(call)
-      return estimatedFee
+      const estimatedFeeFromSimulation = await getSimulationEstimatedFee(call)
+
+      if (!estimatedFeeFromSimulation) {
+        const estimatedFeeFromSequencer = await getEstimatedFeeFromSequencer(
+          call,
+        )
+
+        return estimatedFeeFromSequencer
+      }
+
+      return estimatedFeeFromSimulation
     },
-    {
-      refreshInterval: 15 * 1000 /** 15 seconds */,
-    },
+    swrRefetchDisabledConfig,
   )
 
   if (error) {
@@ -70,13 +81,13 @@ export const useMaxFeeEstimateForTransfer = (
 
     const totalMaxFee =
       account.needsDeploy && maxADFee
-        ? number.toHex(number.toBN(maxADFee).add(number.toBN(suggestedMaxFee)))
+        ? num.toHex(num.toBigInt(maxADFee) + num.toBigInt(suggestedMaxFee))
         : suggestedMaxFee
 
     const maxFee = addOverheadToFee(totalMaxFee, 0.2)
 
     return {
-      maxFee: number.toHex(maxFee),
+      maxFee: num.toHex(maxFee),
       error: undefined,
       loading: isValidating,
     }

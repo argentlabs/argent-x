@@ -48,7 +48,7 @@ If you want to use this StarkNet Wallet extension with your dapp, the easiest wa
 
 ```bash
 # starknet.js is a peer dependency
-yarn add @argent/get-starknet starknet
+pnpm add @argent/get-starknet starknet
 ```
 
 The package is a light wrapper around [starknet.js](https://github.com/0xs34n/starknet.js) to interact with the wallet extension. You can then use it like the following:
@@ -86,8 +86,8 @@ Checkout [starknet.js](https://github.com/0xs34n/starknet.js) to learn more abou
 First clone this repository on your machine then run:
 
 ```bash
-yarn setup  # setup dependencies
-yarn build  # run build process for all packages
+pnpm run setup  # setup dependencies
+pnpm build  # run build process for all packages
 ```
 
 Now you need to load the locally built chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
@@ -116,8 +116,8 @@ To contribute to this repository please read the [contributing guidelines](Contr
 To setup the repo on your machine just run:
 
 ```bash
-yarn setup # setup dependencies
-yarn dev   # run build process for all packages in watch mode
+pnpm run setup # setup dependencies
+pnpm dev   # run build process for all packages in watch mode
 ```
 
 This project contains 3 packages:
@@ -155,8 +155,8 @@ For convenience this service can be started with [Docker desktop](https://www.do
 ### Run tests
 
 ```bash
-yarn test      # run unit tests for all packages
-yarn test:e2e  # run end-to-end tests for all packages
+pnpm test      # run unit tests for all packages
+pnpm test:e2e  # run end-to-end tests for all packages
 ```
 
 ### Tools to help with testing
@@ -177,4 +177,4 @@ One more thank you to the StarkWare Team.
 
 [Argent](https://github.com/argentlabs) and [contributors](https://github.com/argentlabs/argent-x/graphs/contributors).
 
-GNU General Public License V3, see the included [License.md](License.md) file.
+See the included [License.md](License.md) file.

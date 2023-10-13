@@ -2,12 +2,12 @@ import { isEmpty } from "lodash-es"
 import { FC, useMemo } from "react"
 
 import { PendingMultisig } from "../../../shared/multisig/types"
-import { multisigAndAccountSort } from "../../../shared/utils/accountsMultisigSort"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { Account } from "../accounts/Account"
 import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
 import { multisigIsPending } from "./Multisig"
 import { PendingMultisigListScreenItem } from "./PendingMultisigListScreenItem"
+import { multisigAndPendingMultisigSort } from "../../../shared/utils/accountsMultisigSort"
 
 export interface MultisigListAccountsProps {
   accounts: Account[]
@@ -24,7 +24,7 @@ export const MultisigListAccounts: FC<MultisigListAccountsProps> = ({
 }) => {
   const multisigsOrAccounts = useMemo(() => {
     if (pendingMultisigs && !isEmpty(pendingMultisigs)) {
-      return multisigAndAccountSort(pendingMultisigs, accounts)
+      return multisigAndPendingMultisigSort(pendingMultisigs, accounts)
     }
     return accounts
   }, [accounts, pendingMultisigs])

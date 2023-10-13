@@ -54,7 +54,7 @@ describe("OnboardingFinishScreen", () => {
     expect(discordButton.closest("a")).toHaveAttribute("target", "_blank")
   })
 
-  it("renders the finish button and calls onFinishClick when clicked", () => {
+  it("renders the finish button and calls onFinishClick when clicked", async () => {
     const onFinish = vi.fn()
     const screen = renderComponent({
       onFinish,
@@ -63,7 +63,7 @@ describe("OnboardingFinishScreen", () => {
     const finishButton = screen.getByText("Finish")
     expect(finishButton).toBeInTheDocument()
 
-    userEvent.click(finishButton)
+    await userEvent.click(finishButton)
     expect(onFinish).toHaveBeenCalledTimes(1)
   })
 

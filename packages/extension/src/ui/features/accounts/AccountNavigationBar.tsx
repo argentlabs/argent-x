@@ -1,19 +1,11 @@
 import { BarIconButton, NavigationBar, icons } from "@argent/ui"
 import { Button, Flex, Text } from "@chakra-ui/react"
-import { FC, ReactEventHandler } from "react"
+import { FC } from "react"
 
 import { NetworkSwitcherContainer } from "../networks/NetworkSwitcher/NetworkSwitcherContainer"
-import { AccountNavigationBarContainerProps } from "./AccountNavigationBarContainer"
+import { AccountNavigationBarProps } from "./accountNavigationBar.model"
 
 const { SettingsIcon, DropdownDownIcon, ArgentShieldIcon, MultisigIcon } = icons
-
-interface AccountNavigationBarProps extends AccountNavigationBarContainerProps {
-  accountName?: string
-  isShield?: boolean
-  isMultisig?: boolean
-  onAccountList?: ReactEventHandler
-  onSettings?: ReactEventHandler
-}
 
 export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   accountName,
@@ -24,6 +16,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   scroll,
   showAccountButton = true,
   showNetworkSwitcher = true,
+  showSettingsButton = true,
 }) => {
   return (
     <NavigationBar scroll={scroll}>
@@ -54,14 +47,16 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
       )}
       <Flex ml={"auto"}>
         {showNetworkSwitcher && <NetworkSwitcherContainer />}
-        <BarIconButton
-          ml={1}
-          aria-label="Show settings"
-          onClick={onSettings}
-          colorScheme={"neutrals"}
-        >
-          <SettingsIcon />
-        </BarIconButton>
+        {showSettingsButton && (
+          <BarIconButton
+            ml={1}
+            aria-label="Show settings"
+            onClick={onSettings}
+            colorScheme={"neutrals"}
+          >
+            <SettingsIcon />
+          </BarIconButton>
+        )}
       </Flex>
     </NavigationBar>
   )

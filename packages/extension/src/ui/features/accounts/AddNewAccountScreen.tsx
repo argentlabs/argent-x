@@ -1,9 +1,30 @@
-import { BarCloseButton, H6, NavigationContainer, P4 } from "@argent/ui"
+import {
+  BarCloseButton,
+  CellStack,
+  H6,
+  NavigationContainer,
+  P4,
+} from "@argent/ui"
 import { Center, Flex, Spinner } from "@chakra-ui/react"
 import { FC, ReactEventHandler } from "react"
 
 import { CustomButtonCell } from "../../components/CustomButtonCell"
-import { AccountType, AccountTypeId } from "./AddNewAccountScreenContainer"
+import { CreateAccountType } from "../../../shared/wallet.model"
+
+export enum AccountTypeId {
+  STANDARD,
+  MULTISIG,
+  // LEDGER,
+}
+
+export interface AccountType {
+  id: AccountTypeId
+  type: CreateAccountType
+  title: string
+  subtitle?: string
+  icon?: React.ReactNode
+  enabled?: boolean
+}
 
 interface AddNewAccountScreenProps {
   onClose: ReactEventHandler
@@ -23,7 +44,7 @@ export const AddNewAccountScreen: FC<AddNewAccountScreenProps> = ({
       rightButton={<BarCloseButton onClick={onClose} />}
       title="Add a new account"
     >
-      <Flex p={4} gap={2} direction="column">
+      <CellStack pt={0}>
         {accountTypes.map(({ id, title, subtitle, icon }) => (
           <CustomButtonCell
             key={`account-type-${id}`}
@@ -61,7 +82,7 @@ export const AddNewAccountScreen: FC<AddNewAccountScreenProps> = ({
             {isAccountTypeLoading(id) && <Spinner w={4} h={4} />}
           </CustomButtonCell>
         ))}
-      </Flex>
+      </CellStack>
     </NavigationContainer>
   )
 }

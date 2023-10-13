@@ -1,4 +1,11 @@
-import { FieldError, H6, P4, TextWithAmount, icons } from "@argent/ui"
+import {
+  FieldError,
+  H6,
+  LoadingPulse,
+  P4,
+  TextWithAmount,
+  icons,
+} from "@argent/ui"
 import { ButtonProps, Flex, Skeleton, Tooltip } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -7,17 +14,16 @@ import {
   prettifyTokenBalance,
 } from "../../../shared/token/price"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
-import { LoadingPulse } from "../../components/LoadingPulse"
+import { tokenService } from "../../services/tokens"
 import { TokenIcon } from "./TokenIcon"
-import { toTokenView } from "./tokens.service"
-import { TokenDetailsWithBalance } from "./tokens.state"
+import { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
 
 const { AlertIcon } = icons
 
 export type TokenListItemVariant = "default" | "no-currency"
 
 export interface TokenListItemProps extends ButtonProps {
-  token: TokenDetailsWithBalance
+  token: TokenWithOptionalBigIntBalance
   variant?: TokenListItemVariant
   isLoading?: boolean
   currencyValue: string | undefined
@@ -37,46 +43,51 @@ export const TokenListItem: FC<TokenListItemProps> = ({
   errorMessage,
   ...rest
 }) => {
-  const { name, image, symbol } = toTokenView(token)
+  const { name, iconUrl, symbol } = tokenService.toTokenView(token)
   const displayBalance = prettifyTokenBalance(token)
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
   const isNoCurrencyVariant = variant === "no-currency"
+  const tokenName = name === "Ether" ? "Ethereum" : name
+
   if (token.balance === undefined && !errorMessage) {
     return <Skeleton height={17} rounded={"xl"} />
   }
+
   return (
-    <CustomButtonCell {...rest}>
-      <TokenIcon size={9} url={image} name={name} />
+    <CustomButtonCell w="full" {...rest}>
+      <TokenIcon size={9} url={iconUrl} name={name} />
       <Flex
         flexGrow={1}
         alignItems="center"
         justifyContent={"space-between"}
-        gap={2}
+        gap={4}
         overflow={"hidden"}
       >
-        <Flex direction={"column"} overflow="hidden">
-          <H6 overflow="hidden" textOverflow={"ellipsis"}>
-            {name === "Ether" ? "Ethereum" : name}
-          </H6>
-          {!isNoCurrencyVariant && (
-            <LoadingPulse isLoading={isLoading}>
-              <P4
-                color="neutrals.300"
-                fontWeight={"semibold"}
-                overflow="hidden"
-                textOverflow={"ellipsis"}
-              >
-                {displayBalance}
+        <Tooltip label={tokenName} openDelay={1500} placement="top">
+          <Flex direction={"column"} overflow="hidden">
+            <H6 overflow="hidden" textOverflow={"ellipsis"}>
+              {tokenName}
+            </H6>
+            {!isNoCurrencyVariant && (
+              <LoadingPulse isLoading={isLoading}>
+                <P4
+                  color="neutrals.300"
+                  fontWeight={"semibold"}
+                  overflow="hidden"
+                  textOverflow={"ellipsis"}
+                >
+                  {displayBalance}
+                </P4>
+              </LoadingPulse>
+            )}
+            {showTokenSymbol && (
+              <P4 color="neutrals.400" fontWeight={"semibold"}>
+                {symbol}
               </P4>
-            </LoadingPulse>
-          )}
-          {showTokenSymbol && (
-            <P4 color="neutrals.400" fontWeight={"semibold"}>
-              {symbol}
-            </P4>
-          )}
-        </Flex>
-        <Flex direction={"column"} overflow="hidden">
+            )}
+          </Flex>
+        </Tooltip>
+        <Flex direction={"column"} overflow="hidden" flex="0 0 auto">
           <LoadingPulse isLoading={isLoading}>
             {errorMessage ? (
               <Tooltip label={errorMessage.description}>
@@ -95,7 +106,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
                 amount={token.balance?.toString() ?? 0}
                 decimals={token.decimals}
               >
-                <H6 overflow="hidden" textOverflow={"ellipsis"}>
+                <H6>
                   {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
                 </H6>
               </TextWithAmount>

@@ -1,4 +1,4 @@
-import { number, stark } from "starknet"
+import { num, stark } from "starknet"
 
 /**
  *
@@ -8,5 +8,5 @@ import { number, stark } from "starknet"
  * @returns argentMaxFee: fee calculated by argent x overhead. argentMaxFee = suggestedMaxFee * 2 = overall_fee * 3
  *
  *  */
-export const argentMaxFee = (suggestedMaxFee: number.BigNumberish) =>
-  number.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+export const argentMaxFee = (suggestedMaxFee: num.BigNumberish) =>
+  num.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))

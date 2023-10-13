@@ -69,6 +69,12 @@ export const AccountEditButtonsMultisig = ({
       >
         Hide account
       </ButtonCell>
+      <ButtonCell
+        color={"error.500"}
+        onClick={() => navigate(routes.exportPrivateKey(account.address))}
+      >
+        Export private key
+      </ButtonCell>
     </>
   )
 }

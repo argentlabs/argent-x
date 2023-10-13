@@ -1,13 +1,15 @@
 import {
   AccountInterface,
+  CallData,
   ProviderInterface,
   Signature,
+  constants,
   hash,
   merkle,
-  number,
-  stark,
+  num,
   typedData,
 } from "starknet"
+import { ProviderInterface as ProviderInterfaceV4 } from "starknet4"
 
 export interface Policy {
   contractAddress: string
@@ -37,14 +39,14 @@ const POLICY_TYPE_HASH =
 
 export async function supportsSessions(
   address: string,
-  provider: ProviderInterface,
+  provider: ProviderInterface | ProviderInterfaceV4,
 ): Promise<boolean> {
   const { result } = await provider.callContract({
     contractAddress: address,
     entrypoint: "isPlugin",
-    calldata: stark.compileCalldata({ classHash: SESSION_PLUGIN_CLASS_HASH }),
+    calldata: CallData.compile({ classHash: SESSION_PLUGIN_CLASS_HASH }),
   })
-  return !number.toBN(result[0]).isZero()
+  return num.toBigInt(result[0]) !== constants.ZERO
 }
 
 export function preparePolicy({ contractAddress, selector }: Policy): string {
@@ -71,6 +73,7 @@ export async function createSession(
   account: AccountInterface,
 ): Promise<SignedSession> {
   const { expires, key, policies, root } = prepareSession(session)
+  const chainId = await account.getChainId()
   const signature = await account.signMessage({
     primaryType: "Session",
     types: {
@@ -86,7 +89,7 @@ export async function createSession(
       StarkNetDomain: [{ name: "chainId", type: "felt" }],
     },
     domain: {
-      chainId: account.chainId,
+      chainId,
     },
     message: {
       key,

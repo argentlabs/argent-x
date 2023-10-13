@@ -13,8 +13,7 @@ const defaultNetwork: Network = {
   id: "localhost",
   name: "localhostNetwork",
   chainId: "1",
-  baseUrl: "baseUrl",
-  status: "unknown",
+  sequencerUrl: "sequencerUrl",
 }
 const defaultSigner: WalletAccountSigner = {
   type: "local_secret",
@@ -22,7 +21,6 @@ const defaultSigner: WalletAccountSigner = {
 }
 const defaultMultisigType: ArgentAccountType = "multisig"
 const defaultFn = () => undefined
-const defaultPromise = () => Promise.resolve("")
 const defaultNeedsDeploy = false
 const defaultAddress = "0x0"
 const defaultHidden = false
@@ -52,7 +50,7 @@ const defaultMultisig: Multisig = {
     defaultAddress,
     getProvider(defaultNetwork),
   ),
-  getCurrentImplementation: defaultPromise,
+  getCurrentImplementation: defaultFn,
   toWalletAccount: () => ({
     name: defaultName,
     networkId: defaultNetwork.id,
@@ -74,9 +72,11 @@ const defaultMultisig: Multisig = {
     threshold: 2,
     networkId: defaultNetwork.id,
     publicKey: "0x0",
+    updatedAt: Date.now(),
   }),
   publicKey: "0x0",
   isZeroMultisig: () => false,
+  updatedAt: Date.now(),
 }
 
 export const getMockMultisig = (overrides: Partial<Multisig>) => ({

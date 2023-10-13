@@ -28,5 +28,5 @@ export const RootRoutes: FC = () => {
 Run from the folder of this package
 
 ```bash
-yarn example
+pnpm example
 ```

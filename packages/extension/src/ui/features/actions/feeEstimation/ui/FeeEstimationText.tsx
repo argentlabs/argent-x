@@ -45,6 +45,7 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
                 fontSize={"2xs"}
                 cursor="pointer"
                 _hover={{ color: "white" }}
+                aria-label={`Information about ${title}`}
               >
                 <InfoIcon />
               </Text>

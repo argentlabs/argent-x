@@ -1,31 +1,34 @@
+import { bigDecimal } from "@argent/shared"
 import { L1, P4, TextWithAmount } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
-import { BigNumber, utils } from "ethers"
 import { FC, useMemo } from "react"
 
-import { EstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
 import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { Token } from "../../../../shared/token/type"
+import { ParsedFeeError } from "./feeError"
 import { FeeEstimationBox } from "./ui/FeeEstimationBox"
 import { FeeEstimationText } from "./ui/FeeEstimationText"
 import { InsufficientFundsAccordion } from "./ui/InsufficientFundsAccordion"
 import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
+import { WaitingForFunds } from "./ui/WaitingForFunds"
+import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+import { Token } from "../../../../shared/token/__new/types/token.model"
 
 export interface CombinedFeeEstimationProps {
   amountCurrencyValue?: string
-  fee?: EstimateFeeResponse
+  fee?: EstimatedFees
   feeToken?: Token
-  feeTokenBalance?: BigNumber
-  parsedFeeEstimationError: string | false
+  feeTokenBalance?: bigint
+  parsedFeeEstimationError?: ParsedFeeError
   showError: boolean
   showEstimateError: boolean
   showFeeError: boolean
   totalFee?: string
   totalMaxFee?: string
   totalMaxFeeCurrencyValue?: string
+  userClickedAddFunds?: boolean
 }
 
 export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
@@ -40,6 +43,7 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
   totalFee,
   totalMaxFee,
   totalMaxFeeCurrencyValue,
+  userClickedAddFunds,
 }) => {
   const tooltipText = useMemo(() => {
     if (feeToken) {
@@ -122,6 +126,9 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
       </FeeEstimationBox>
     )
   }
+  if (userClickedAddFunds) {
+    return <WaitingForFunds />
+  }
   if (showFeeError) {
     return (
       <InsufficientFundsAccordion
@@ -145,7 +152,7 @@ interface FeeEstimationTooltipProps {
   maxNetworkFee?: string
   maxAccountDeploymentFee?: string
   totalMaxFee?: string
-  feeTokenBalance?: BigNumber
+  feeTokenBalance?: bigint
 }
 
 const TooltipText: FC<FeeEstimationTooltipProps> = ({
@@ -167,7 +174,7 @@ const TooltipText: FC<FeeEstimationTooltipProps> = ({
       </P4>
     )
   }
-  if (feeTokenBalance.gte(totalMaxFee)) {
+  if (feeTokenBalance >= BigInt(totalMaxFee)) {
     return (
       <Flex flexDirection="column" gap={3} px={1} py={2}>
         <P4 color="neutrals.300" fontWeight={"normal"}>
@@ -211,8 +218,7 @@ const TooltipText: FC<FeeEstimationTooltipProps> = ({
   return (
     <P4 color="neutrals.500">
       Insufficient balance to pay network fees. You need at least $
-      {utils.formatEther(BigNumber.from(totalMaxFee).sub(feeTokenBalance))} ETH
-      more.
+      {bigDecimal.formatEther(BigInt(totalMaxFee) - feeTokenBalance)} ETH more.
     </P4>
   )
 }

@@ -20,7 +20,8 @@ export function useAllPairs() {
   )
 
   if (error) {
-    throw new Error(error)
+    console.warn("Call get_all_pairs failed", error)
+    return []
   }
 
   return result?.map((r) => validateAndParseAddress(r)) ?? []

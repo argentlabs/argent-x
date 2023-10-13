@@ -1,6 +1,6 @@
 import { Transaction } from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
-import { VoyagerTransaction } from "./sources/voyager"
+import { VoyagerTransaction } from "./sources/voyager.model"
 
 export const mapVoyagerTransactionToTransaction = (
   transaction: VoyagerTransaction,
@@ -10,6 +10,6 @@ export const mapVoyagerTransactionToTransaction = (
   hash: transaction.hash,
   account,
   meta,
-  status: transaction.status,
+  finalityStatus: transaction.status as any,
   timestamp: transaction.timestamp,
 })

@@ -23,7 +23,7 @@ describe("useTransactionFees", () => {
       transactionTransformed: {
         actualFee: "1",
       } as TransformedTransaction,
-      hash: undefined,
+      hash: "0x123", // use this to prevent early return
     }
     const { result } = renderHook(() => useTransactionFees(payload))
     await waitFor(() => expect(result?.current).toBe("1"))
@@ -34,7 +34,7 @@ describe("useTransactionFees", () => {
       transactionTransformed: {
         actualFee: undefined,
       } as TransformedTransaction,
-      hash: undefined,
+      hash: "0x123",
     }
     const { result } = renderHook(() => useTransactionFees(payload))
     await waitFor(() => expect(result?.current).toBe("0"))

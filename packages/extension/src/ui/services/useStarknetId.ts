@@ -1,12 +1,12 @@
-import { Call, stark } from "starknet"
-import { starknetId } from "starknet5"
+import { Call, constants, num, starknetId } from "starknet"
 import useSWR from "swr"
 
 import { getMulticallForNetwork } from "../../shared/multicall"
-import { getNetwork } from "../../shared/network"
+import { networkService } from "../../shared/network/service"
 import { getChainIdFromNetworkId } from "../../shared/network/utils"
 import { BaseWalletAccount } from "../../shared/wallet.model"
 import { getAccountIdentifier } from "../../shared/wallet.service"
+import { isValidAddress, normalizeAddress } from "@argent/shared"
 
 export function useStarknetId(account?: BaseWalletAccount) {
   return useSWR(
@@ -21,7 +21,7 @@ export function useStarknetId(account?: BaseWalletAccount) {
 }
 
 export async function getStarknetId(account: BaseWalletAccount) {
-  const network = await getNetwork(account.networkId)
+  const network = await networkService.getById(account.networkId)
   const chainId = getChainIdFromNetworkId(network.id)
 
   const multicall = getMulticallForNetwork(network)
@@ -51,27 +51,46 @@ export async function getAddressFromStarkName(
   starkName: string,
   networkId: string,
 ) {
-  const network = await getNetwork(networkId)
+  const network = await networkService.getById(networkId)
   const chainId = getChainIdFromNetworkId(network.id)
 
   const multicall = getMulticallForNetwork(network)
 
   const starknetIdContractAddress = starknetId.getStarknetIdContract(chainId)
 
+  const sanitisedStarkName = starkName.replace(".stark", "")
+
   const call: Call = {
     contractAddress: starknetIdContractAddress,
     entrypoint: "domain_to_address",
-    calldata: stark.compileCalldata({
-      domain: [
-        starknetId.useEncoded(starkName.replace(".stark", "")).toString(10),
-      ],
-    }),
+    calldata: {
+      domain: sanitisedStarkName
+        .split(".")
+        .map((element) => starknetId.useEncoded(element).toString(10)),
+    },
   }
 
+  let response, starkNameAddress
   try {
-    const response = await multicall.call(call)
-    return response[0]
+    response = await multicall.call(call)
+    starkNameAddress = response[0]
   } catch (error) {
     throw Error("Could not get address from stark name")
   }
+
+  const isZero = num.toBigInt(starkNameAddress) === constants.ZERO
+  if (isZero) {
+    /** service returned but not found */
+    throw new Error(`${starkName} not found`)
+  }
+
+  const isValid = isValidAddress(starkNameAddress)
+  if (!isValid) {
+    /** service returned but not a valid address */
+    throw new Error(
+      `${starkName} resolved to an invalid address (${starkNameAddress})`,
+    )
+  }
+
+  return normalizeAddress(starkNameAddress)
 }

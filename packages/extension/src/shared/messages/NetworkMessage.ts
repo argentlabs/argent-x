@@ -3,7 +3,7 @@ import { WalletAccount } from "../wallet.model"
 
 export type NetworkMessage =
   // - used by dapps to request addition of custom network
-  // | { type: "REQUEST_ADD_CUSTOM_NETWORK"; data: Network }
+  | { type: "REQUEST_ADD_CUSTOM_NETWORK"; data: Network }
   | { type: "REQUEST_ADD_CUSTOM_NETWORK_RES"; data: { actionHash: string } }
   | {
       type: "REQUEST_ADD_CUSTOM_NETWORK_REJ"

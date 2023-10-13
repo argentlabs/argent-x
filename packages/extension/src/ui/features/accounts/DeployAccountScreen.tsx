@@ -1,7 +1,7 @@
 import { Button, P3, icons } from "@argent/ui"
 import { FC, ReactEventHandler } from "react"
 
-import { DeployAccountScreenContainerProps } from "./DeployAccountScreenContainer"
+import { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
 import { StarknetAccountMessage } from "./ui/StarknetAccountMessage"
 
 const { DeployIcon } = icons

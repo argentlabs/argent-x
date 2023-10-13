@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom/extend-expect"
+import "@testing-library/jest-dom"
 
 import fetch from "cross-fetch"
 import { noop } from "lodash-es"

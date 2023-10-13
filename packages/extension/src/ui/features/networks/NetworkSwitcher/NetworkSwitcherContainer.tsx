@@ -1,31 +1,35 @@
-import { Menu } from "@chakra-ui/react"
+import { ButtonProps, Menu, Portal } from "@chakra-ui/react"
 import { FC, useCallback, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { NetworkStatus } from "../../../../shared/network"
 import { routes } from "../../../routes"
 import { autoSelectAccountOnNetwork } from "../../accounts/switchAccount"
-import { useCurrentNetwork } from "../hooks/useCurrentNetwork"
+import {
+  useCurrentNetwork,
+  useCurrentNetworkWithStatus,
+} from "../hooks/useCurrentNetwork"
 import { useNeedsToShowNetworkStatusWarning } from "../hooks/useNeedsToShowNetworkStatusWarning"
-import { useNetworks } from "../hooks/useNetworks"
+import { useNetworksWithStatuses } from "../hooks/useNetworks"
 import { NetworkSwitcherButton } from "./NetworkSwitcherButton"
 import { NetworkSwitcherList } from "./NetworkSwitcherList"
 
 const valuesToShowNetwortWarning: Array<NetworkStatus> = ["degraded", "error"]
 
-interface NetworkSwitcherProps {
+interface NetworkSwitcherProps extends ButtonProps {
   disabled?: boolean
 }
 
 export const NetworkSwitcherContainer: FC<NetworkSwitcherProps> = ({
   disabled,
+  ...rest
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const allNetworks = useNetworks()
-  const currentNetwork = useCurrentNetwork()
+  const allNetworksWithStatuses = useNetworksWithStatuses()
+  const currentNetwork = useCurrentNetworkWithStatus()
   const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
-  const currentNetworkStatus = currentNetwork.status
+  const currentNetworkStatus = currentNetwork?.status
 
   useEffect(() => {
     if (
@@ -49,13 +53,16 @@ export const NetworkSwitcherContainer: FC<NetworkSwitcherProps> = ({
           disabled={disabled}
           currentNetwork={currentNetwork}
           currentNetworkStatus={currentNetworkStatus}
+          {...rest}
         />
       )}
-      <NetworkSwitcherList
-        currentNetwork={currentNetwork}
-        allNetworks={allNetworks}
-        onChangeNetwork={onChangeNetwork}
-      />
+      <Portal>
+        <NetworkSwitcherList
+          currentNetwork={currentNetwork}
+          allNetworks={allNetworksWithStatuses}
+          onChangeNetwork={onChangeNetwork}
+        />
+      </Portal>
     </Menu>
   )
 }

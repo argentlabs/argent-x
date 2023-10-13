@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { getPrivateKey } from "../../services/backgroundAccounts"
-import { selectedAccountView } from "../../views/account"
-import { useView } from "../../views/implementation/react"
+import { accountMessagingService } from "../../services/accountMessaging"
+import { BaseWalletAccount } from "../../../shared/wallet.model"
 
-export const usePrivateKey = (address?: string, networkId?: string) => {
+export const usePrivateKey = (
+  address: string | undefined,
+  networkId: string | undefined,
+) => {
   const [privateKey, setPrivateKey] = useState<string>()
 
-  const getPrivateKeyCallback = useCallback(getPrivateKey, [])
+  const getPrivateKeyCallback = useCallback(
+    (account: BaseWalletAccount) =>
+      accountMessagingService.getPrivateKey(account),
+    [],
+  )
 
   useEffect(() => {
     if (address && networkId) {
@@ -17,9 +23,4 @@ export const usePrivateKey = (address?: string, networkId?: string) => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return privateKey
-}
-
-export const usePrivateKeyForSelectedAccount = () => {
-  const account = useView(selectedAccountView)
-  return usePrivateKey(account?.address, account?.networkId)
 }

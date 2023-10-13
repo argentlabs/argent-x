@@ -1,11 +1,11 @@
 import { memoize } from "lodash-es"
 
-import { Network } from "./type"
+import { BaseNetwork, Network } from "./type"
 
 export const networkSelector = memoize(
-  (networkId: string) => (network: Network) => network.id === networkId,
+  (networkId: string) => (network: BaseNetwork) => network.id === networkId,
 )
 
-export const networkSelectorByChainId =
-  (chainId: string) => (network: Network) =>
-    network.chainId === chainId
+export const networkSelectorByChainId = memoize(
+  (chainId: string) => (network: Network) => network.chainId === chainId,
+)

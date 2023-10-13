@@ -14,6 +14,8 @@ const THIRD_STEP = 2
 
 export const CreateMultisigStartScreen = () => {
   const { networkId } = useParams()
+
+  // Multisig is currently available only on testnet.
   if (!networkId) {
     return <></>
   }

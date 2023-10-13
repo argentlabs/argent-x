@@ -3,15 +3,17 @@ import { Center, useDisclosure } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ApiTransactionReviewTargettedDapp } from "../../../../../../shared/transactionReview.service"
-import { VerifiedDappModal } from "./VerifiedDappModal"
+import { VerifiedDappModalArgentX } from "./VerifiedDappModalArgentX"
 
 const { VerifiedIcon } = icons
 
-export interface VerifiedDappBannerProps {
+export interface VerifiedDappBannerArgentXProps {
   dapp: ApiTransactionReviewTargettedDapp
 }
 
-export const VerifiedDappBanner: FC<VerifiedDappBannerProps> = ({ dapp }) => {
+export const VerifiedDappBannerArgentX: FC<VerifiedDappBannerArgentXProps> = ({
+  dapp,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
@@ -30,7 +32,7 @@ export const VerifiedDappBanner: FC<VerifiedDappBannerProps> = ({ dapp }) => {
           Verified
         </Button>
       </Center>
-      <VerifiedDappModal dapp={dapp} isOpen={isOpen} onClose={onClose} />
+      <VerifiedDappModalArgentX dapp={dapp} isOpen={isOpen} onClose={onClose} />
     </>
   )
 }

@@ -28,8 +28,9 @@ export const OnboardingDisclaimerScreen: FC<
       onBack={onBack}
     >
       <OnboardingCheckbox {...getCheckboxProps({ value: "lossOfFunds" })}>
-        I understand that StarkNet may introduce changes that make my existing
-        account unusable and force to create new ones.
+        I understand that StarkNet will introduce changes (e.g. Cairo 1.0) that
+        will affect my existing account(s) (e.g. rendering unusable) if I do not
+        complete account upgrades.
       </OnboardingCheckbox>
       <OnboardingCheckbox {...getCheckboxProps({ value: "alphaVersion" })}>
         I understand that StarkNet may experience performance issues and my

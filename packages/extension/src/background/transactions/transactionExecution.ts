@@ -1,42 +1,45 @@
-import { BigNumber } from "ethers"
 import {
-  Account,
   Call,
   EstimateFee,
-  TransactionBulk,
   constants,
-  number,
+  num,
   stark,
+  TransactionFinalityStatus,
+  TransactionExecutionStatus,
 } from "starknet"
-
 import {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
 import { getL1GasPrice } from "../../shared/ethersUtils"
 import { AllowArray } from "../../shared/storage/types"
-import { nameTransaction } from "../../shared/transactions"
+import {
+  ExtendedTransactionStatus,
+  TransactionRequest,
+  nameTransaction,
+} from "../../shared/transactions"
 import { WalletAccount } from "../../shared/wallet.model"
-import { accountsEqual } from "../../shared/wallet.service"
+import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { isAccountDeployed } from "../accountDeploy"
 import { analytics } from "../analytics"
-import { BackgroundService } from "../background"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
 import { argentMaxFee } from "../utils/argentMaxFee"
-import { getEstimatedFeeForMultisigTx } from "./fees/multisigFeeEstimation"
-import { getEstimatedFees } from "./fees/store"
+import { Wallet } from "../wallet"
+import { getEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import { addTransaction, transactionsStore } from "./store"
+import { isAccountV5 } from "../../shared/utils/accountv4"
+import { getMultisigAccountFromBaseWallet } from "../../shared/multisig/utils/baseMultisig"
 
 export const checkTransactionHash = (
-  transactionHash?: number.BigNumberish,
+  transactionHash?: num.BigNumberish,
   account?: WalletAccount,
 ): boolean => {
   try {
     if (!transactionHash) {
       throw Error("transactionHash not defined")
     }
-    const bn = number.toBN(transactionHash)
-    if (bn.lte(constants.ZERO) && account?.type !== "multisig") {
+    const bn = num.toBigInt(transactionHash)
+    if (bn <= constants.ZERO && account?.type !== "multisig") {
       throw Error("transactionHash needs to be >0")
     }
     return true
@@ -52,13 +55,24 @@ type TransactionAction = ExtQueueItem<{
 
 export const executeTransactionAction = async (
   action: TransactionAction,
-  { wallet }: BackgroundService,
+  wallet: Wallet,
 ) => {
   const { transactions, abis, transactionsDetail, meta = {} } = action.payload
   const allTransactions = await transactionsStore.get()
   const preComputedFees = await getEstimatedFees(transactions)
 
-  analytics.track("executeTransaction", {
+  if (!preComputedFees) {
+    throw Error("PreComputedFees not defined")
+  }
+
+  const suggestedMaxFee =
+    transactionsDetail?.maxFee ?? preComputedFees.suggestedMaxFee
+  const suggestedMaxADFee = preComputedFees.maxADFee ?? "0"
+
+  const maxFee = argentMaxFee(suggestedMaxFee)
+  const maxADFee = argentMaxFee(suggestedMaxADFee)
+
+  void analytics.track("executeTransaction", {
     usesCachedFees: Boolean(preComputedFees),
   })
 
@@ -66,68 +80,46 @@ export const executeTransactionAction = async (
     throw Error("you need an open session")
   }
   const selectedAccount = await wallet.getSelectedAccount()
+
   if (!selectedAccount) {
     throw Error("no accounts")
   }
 
+  const multisig =
+    selectedAccount.type === "multisig"
+      ? await getMultisigAccountFromBaseWallet(selectedAccount)
+      : undefined
+
   const pendingAccountTransactions = allTransactions.filter(
     (tx) =>
-      tx.status === "RECEIVED" && accountsEqual(tx.account, selectedAccount),
+      tx.finalityStatus === TransactionFinalityStatus.RECEIVED &&
+      tx.executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
+      accountsEqual(tx.account, selectedAccount),
   )
 
   const hasUpgradePending = pendingAccountTransactions.some(
     (tx) => tx.meta?.isUpgrade,
   )
 
-  const accountNeedsDeploy = selectedAccount.needsDeploy
-
   const starknetAccount = await wallet.getStarknetAccount(
     selectedAccount,
     hasUpgradePending,
   )
 
+  const accountNeedsDeploy = !(await isAccountDeployed(
+    selectedAccount,
+    starknetAccount.getClassAt.bind(starknetAccount),
+  ))
+
   // if nonce doesnt get provided by the UI, we can use the stored nonce to allow transaction queueing
   const nonceWasProvidedByUI = transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
   const nonce = accountNeedsDeploy
-    ? number.toHex(number.toBN(1))
+    ? num.toHex(1)
     : nonceWasProvidedByUI
-    ? number.toHex(number.toBN(transactionsDetail?.nonce || 0))
-    : await getNonce(selectedAccount, wallet)
+    ? num.toHex(transactionsDetail?.nonce || 0)
+    : await getNonce(selectedAccount, starknetAccount)
 
-  let maxFee = preComputedFees?.suggestedMaxFee ?? "0"
-  let maxADFee = preComputedFees?.maxADFee ?? "0"
-
-  if (
-    selectedAccount.needsDeploy &&
-    !(await isAccountDeployed(selectedAccount, starknetAccount.getClassAt))
-  ) {
-    if ("estimateFeeBulk" in starknetAccount) {
-      const deployAccountPayload =
-        selectedAccount.type === "multisig"
-          ? await wallet.getMultisigDeploymentPayload(selectedAccount)
-          : await wallet.getAccountDeploymentPayload(selectedAccount)
-
-      const bulkTransactions: TransactionBulk = [
-        {
-          type: "DEPLOY_ACCOUNT",
-          payload: deployAccountPayload,
-        },
-        {
-          type: "INVOKE_FUNCTION",
-          payload: transactions,
-        },
-      ]
-      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
-        bulkTransactions,
-      )
-
-      maxADFee =
-        preComputedFees?.maxADFee ??
-        argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-      maxFee =
-        preComputedFees?.suggestedMaxFee ??
-        argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
-    }
+  if (accountNeedsDeploy) {
     const { account, txHash } = await wallet.deployAccount(selectedAccount, {
       maxFee: maxADFee,
     })
@@ -137,7 +129,7 @@ export const executeTransactionAction = async (
       )
     }
 
-    analytics.track("deployAccount", {
+    void analytics.track("deployAccount", {
       status: "success",
       trigger: "transaction",
       networkId: account.networkId,
@@ -153,39 +145,17 @@ export const executeTransactionAction = async (
         type: "DEPLOY_ACCOUNT",
       },
     })
-  } else if (selectedAccount.type === "multisig") {
-    const { suggestedMaxFee } = await getEstimatedFeeForMultisigTx(
-      selectedAccount,
-      transactions,
-      nonce,
-    )
-
-    maxFee = argentMaxFee(suggestedMaxFee)
-  } else {
-    if (hasUpgradePending && !preComputedFees?.suggestedMaxFee) {
-      const oldStarknetAccount = await wallet.getStarknetAccount(
-        selectedAccount,
-        false,
-      )
-      // Use old starknet account to calculate the max fee if upgrade is in progress
-      const { suggestedMaxFee } = await oldStarknetAccount.estimateFee(
-        transactions,
-      )
-      maxFee = argentMaxFee(suggestedMaxFee)
-    } else if (!preComputedFees?.suggestedMaxFee) {
-      // estimate fee with onchain nonce even tho transaction nonce may be different
-      const { suggestedMaxFee } = await starknetAccount.estimateFee(
-        transactions,
-      )
-
-      maxFee = argentMaxFee(suggestedMaxFee)
-    }
   }
 
   const acc =
-    selectedAccount.type === "multisig" && starknetAccount instanceof Account // Multisig uses latest account interface
-      ? wallet.getStarknetAccountOfType(starknetAccount, "multisig")
+    selectedAccount.type !== "standard"
+      ? wallet.getStarknetAccountOfType(starknetAccount, selectedAccount.type)
       : starknetAccount
+
+  if (!isAccountV5(acc)) {
+    throw new Error("Old Accounts are not supported anymore")
+  }
+
   const transaction = await acc.execute(transactions, abis, {
     ...transactionsDetail,
     nonce,
@@ -193,28 +163,34 @@ export const executeTransactionAction = async (
   })
 
   if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
-    throw Error("Transaction could not get added to the sequencer")
+    throw new Error("Transaction could not get added to the sequencer")
   }
 
   const title = nameTransaction(transactions)
 
-  // TODO: Remove this conditional as we now fallback to computed transactionHash for multisig
-  // So we can always add the transaction to the queue. The added transaction will have
-  // status "NOT_RECEIVED" until all the owners have signed the transaction
-  if (selectedAccount.type !== "multisig") {
-    await addTransaction({
-      hash: transaction.transaction_hash,
-      account: selectedAccount,
-      meta: {
-        ...meta,
-        title,
-        transactions,
-        type: "INVOKE_FUNCTION",
-      },
-    })
+  const finalityStatus: ExtendedTransactionStatus =
+    multisig && multisig.threshold > 1
+      ? TransactionFinalityStatus.NOT_RECEIVED
+      : TransactionFinalityStatus.RECEIVED
+
+  const tx: TransactionRequest = {
+    hash: transaction.transaction_hash,
+    account: selectedAccount,
+    meta: {
+      ...meta,
+      title,
+      transactions,
+      type: meta.type ?? "INVOKE",
+    },
   }
 
-  if (!nonceWasProvidedByUI && selectedAccount.type !== "multisig") {
+  // Add transaction with finality status NOT_RECEIVED for multisig transactions with threshold > 1
+  await addTransaction(tx, finalityStatus)
+
+  if (
+    !nonceWasProvidedByUI &&
+    finalityStatus === TransactionFinalityStatus.RECEIVED
+  ) {
     await increaseStoredNonce(selectedAccount)
   }
 
@@ -229,7 +205,7 @@ export const calculateEstimateFeeFromL1Gas = async (
   account: WalletAccount,
   transactions: AllowArray<Call>,
 ): Promise<EstimateFee> => {
-  const fallbackPrice = number.toBN(10e14)
+  const fallbackPrice = num.toBigInt(10e14)
   try {
     if (account.networkId === "localhost") {
       console.log("Using fallback gas price for localhost")
@@ -242,12 +218,12 @@ export const calculateEstimateFeeFromL1Gas = async (
     const l1GasPrice = await getL1GasPrice(account.networkId)
 
     const callsLen = Array.isArray(transactions) ? transactions.length : 1
-    const multiplier = BigNumber.from(3744)
+    const multiplier = BigInt(3744)
 
     const price = l1GasPrice.mul(callsLen).mul(multiplier).toString()
 
     return {
-      overall_fee: number.toBN(price),
+      overall_fee: num.toBigInt(price),
       suggestedMaxFee: stark.estimatedFeeToMaxFee(price),
     }
   } catch {

@@ -1,5 +1,5 @@
+import { WildcardHandler, mittx } from "@argent/x-window"
 import { isFunction } from "lodash-es"
-import mitt, { WildcardHandler } from "mitt"
 
 import {
   AreaName,
@@ -10,7 +10,7 @@ import {
 } from "../types"
 
 type Events = Record<AreaName, Record<string, StorageChange>>
-const emitter = mitt<Events>()
+const emitter = mittx<Events>()
 
 function getChangeMap(oldValue?: any, newValue?: any): StorageChange {
   const changeMap: StorageChange = {

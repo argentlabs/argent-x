@@ -1,7 +1,7 @@
 import { memoize } from "lodash-es"
 import { useEffect, useRef } from "react"
-import { useLocation } from "react-router-dom"
-import { PathPattern, matchPath } from "react-router-dom"
+import { PathPattern } from "react-router"
+import { matchPath, useLocation } from "react-router-dom"
 
 import { routes } from "../../routes"
 import { useRestorationState } from "./restoration.state"
@@ -10,10 +10,10 @@ import { useRestorationState } from "./restoration.state"
  * Paths which should be captured and restored.
  */
 
-const restorationStatePathnames: Array<string | PathPattern<string>> = [
+const restorationStatePathnames: Array<string | PathPattern> = [
   /** Some users will close the extension when navigating to webmail to retreive the OTP */
   routes.shieldAccountOTP.path,
-  routes.sendToken.path,
+  routes.sendAmountAndAssetScreen.path,
 ]
 
 const isRestorationStatePathname = memoize((pathname?: string) => {

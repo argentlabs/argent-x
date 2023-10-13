@@ -3,8 +3,6 @@ import {
   CellStack,
   FlowHeader,
   FlowHeaderProps,
-  P3,
-  P4,
   icons,
 } from "@argent/ui"
 import { Center } from "@chakra-ui/react"
@@ -17,15 +15,8 @@ import {
 } from "./usePendingChangingGuardian"
 import { useShieldOnboardingTracking } from "./useShieldTracking"
 
-const SHARE_FEEDBACK_URL = "https://discord.gg/T4PDFHxm6T"
-
-const {
-  ArgentShieldIcon,
-  ArgentShieldDeactivateIcon,
-  TickIcon,
-  AnnouncementIcon,
-  AlertIcon,
-} = icons
+const { ArgentShieldIcon, ArgentShieldDeactivateIcon, TickIcon, AlertIcon } =
+  icons
 
 export interface GetFlowHeaderProps {
   accountName?: string
@@ -118,46 +109,13 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
   })
 
   const onFinish = useCallback(() => {
-    trackSuccess()
+    void trackSuccess()
     navigate(returnRoute)
   }, [navigate, returnRoute, trackSuccess])
   return (
     <CellStack flex={1}>
       <Center flex={1} flexDirection={"column"}>
         <FlowHeader size={"lg"} {...headerProps} icon={ArgentShieldIcon} />
-        <Center
-          bg={"accent.800"}
-          rounded={"xl"}
-          flexDirection={"column"}
-          px={3}
-          py={4}
-          textAlign={"center"}
-        >
-          <P3 mb={2} fontWeight={"semibold"}>
-            <AnnouncementIcon
-              display={"inline-block"}
-              fontSize={"xl"}
-              verticalAlign={"bottom"}
-              transform={"scaleX(-1)"}
-              mr={1}
-            />{" "}
-            We want to hear your feedback
-          </P3>
-          <P4 mb={4}>
-            Thanks for being an early tester of Argent Shield. Let us know your
-            thoughts on Discord
-          </P4>
-          <Button
-            as={"a"}
-            href={SHARE_FEEDBACK_URL}
-            target="_blank"
-            colorScheme={"accent"}
-            size={"xs"}
-            w={"100%"}
-          >
-            Share feedback
-          </Button>
-        </Center>
       </Center>
       <Button onClick={onFinish} colorScheme={"primary"}>
         {headerProps.isLoading ? "Dismiss" : "Done"}

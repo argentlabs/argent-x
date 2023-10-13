@@ -8,43 +8,57 @@ import { AccountListHiddenScreen } from "./AccountListHiddenScreen"
 
 describe("AccountListHiddenScreen", () => {
   it("Calls expected method when account is clicked", async () => {
-    const onUnhideAccount = vi.fn()
-    const onUnhidePendingMultisig = vi.fn()
+    const onToggleHiddenAccount = vi.fn()
+    const onToggleHiddenPendingMultisig = vi.fn()
     const onBack = vi.fn()
 
-    const hiddenAccounts = [
+    const accounts = [
       {
         name: "Account 1 Lorem Ipsum Dolor Sit Amet",
         address: "0x123",
         networkId: "goerli-alpha",
+        hidden: false,
+      },
+      {
+        name: "Account 2 Lorem Ipsum Dolor Sit Amet",
+        address: "0x124",
+        networkId: "goerli-alpha",
+        hidden: true,
       },
     ] as Account[]
 
-    const hiddenPendingMultisigAccounts = [
+    const pendingMultisigAccounts = [
       {
-        name: "Multi Sig",
+        name: "Multi Sig 1",
+        type: "multisig",
+        hidden: false,
+        publicKey: "0xabc",
+      },
+      {
+        name: "Multi Sig 2",
         type: "multisig",
         hidden: true,
-        publicKey: "0xabc",
+        publicKey: "0xabcd",
       },
     ] as PendingMultisig[]
 
     renderWithLegacyProviders(
       <AccountListHiddenScreen
         onBack={onBack}
-        hiddenAccounts={hiddenAccounts}
-        hiddenPendingMultisigAccounts={hiddenPendingMultisigAccounts}
-        onUnhideAccount={onUnhideAccount}
-        onUnhidePendingMultisig={onUnhidePendingMultisig}
+        accounts={accounts}
+        pendingMultisigAccounts={pendingMultisigAccounts}
+        onToggleHiddenAccount={onToggleHiddenAccount}
+        onToggleHiddenPendingMultisig={onToggleHiddenPendingMultisig}
       />,
     )
 
     fireEvent.click(screen.getByText(/^Account 1/))
-    expect(onUnhideAccount).toHaveBeenCalledWith(hiddenAccounts[0])
+    expect(onToggleHiddenAccount).toHaveBeenCalledWith(accounts[0], true)
 
-    fireEvent.click(screen.getByText(/^Multi Sig/))
-    expect(onUnhidePendingMultisig).toHaveBeenCalledWith(
-      hiddenPendingMultisigAccounts[0],
+    fireEvent.click(screen.getByText(/^Multi Sig 1/))
+    expect(onToggleHiddenPendingMultisig).toHaveBeenCalledWith(
+      pendingMultisigAccounts[0],
+      true,
     )
   })
 })

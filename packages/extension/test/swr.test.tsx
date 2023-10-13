@@ -4,7 +4,10 @@ import useSWR, { SWRConfig } from "swr"
 import { describe, expect, test, vi } from "vitest"
 
 import { delay } from "../src/shared/utils/delay"
-import { useConditionallyEnabledSWR, withPolling } from "../src/ui/services/swr"
+import {
+  useConditionallyEnabledSWR,
+  withPolling,
+} from "../src/ui/services/swr.service"
 
 describe("swr", () => {
   describe("useConditionallyEnabledSWR()", () => {

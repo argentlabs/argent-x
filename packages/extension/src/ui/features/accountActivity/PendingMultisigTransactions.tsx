@@ -13,6 +13,7 @@ import { useMultisig } from "../multisig/multisig.state"
 import { TransactionListItem } from "./TransactionListItem"
 import { transformTransaction } from "./transform"
 import { getTransactionFromPendingMultisigTransaction } from "./transform/transaction/transformers/pendingMultisigTransactionAdapter"
+import { num } from "starknet"
 
 const { MultisigIcon } = icons
 interface PendingTransactionsProps {
@@ -37,7 +38,9 @@ export const PendingMultisigTransactions: FC<PendingTransactionsProps> = ({
   const [selfPendingTxns, othersPendingTxns] = partition(
     pendingTransactions,
     (pendingTransaction) =>
-      pendingTransaction.nonApprovedSigners.includes(multisig.publicKey),
+      pendingTransaction.nonApprovedSigners.some(
+        (signer) => num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
+      ),
   )
 
   return (
@@ -101,7 +104,11 @@ export const PendingMultisigTransactionContainer: FC<
   const getConfirmationSubtext = memoize((approvedSigners: string[]) => {
     return `${approvedSigners.length} confirmation${
       approvedSigners.length === 1 ? "" : "s"
-    } • ${multisig.threshold - approvedSigners.length} remaining `
+    } • ${
+      multisig.threshold - approvedSigners.length > 0
+        ? multisig.threshold - approvedSigners.length
+        : 0
+    } remaining `
   })
   return (
     <>

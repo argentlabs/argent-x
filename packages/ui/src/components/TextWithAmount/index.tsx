@@ -1,5 +1,6 @@
-import { BigNumberish, formatUnits, toBigInt } from "ethers"
+import { bigDecimal } from "@argent/shared"
 import { Children, ReactElement, cloneElement } from "react"
+import { BigNumberish } from "starknet"
 
 export const TextWithAmount = ({
   amount,
@@ -14,8 +15,8 @@ export const TextWithAmount = ({
   const element = Children.only(children)
 
   try {
-    const convertedAmount = toBigInt(amount)
-    dataValue = formatUnits(convertedAmount, decimals)
+    const convertedAmount = BigInt(amount)
+    dataValue = bigDecimal.formatUnits(convertedAmount, decimals)
   } catch (e) {
     // ignore parsing error
   }

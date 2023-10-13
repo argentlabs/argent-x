@@ -10,6 +10,11 @@ global.chrome = {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     connect: noop,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    onConnect: {
+      addListener: noop,
+    },
   },
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore

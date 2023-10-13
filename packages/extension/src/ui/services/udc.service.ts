@@ -1,21 +1,12 @@
-import { ContractClass } from "starknet"
-
+import { UniversalDeployerContractPayload } from "starknet"
 import { sendMessage, waitForMessage } from "../../shared/messages"
+import { DeclareContract } from "../../shared/udc/type"
+import { UdcError } from "../../shared/errors/udc"
 
-export const declareContract = async (
-  address: string,
-  classHash: string,
-  contract: string,
-  networkId: string,
-) => {
-  sendMessage({
+export const declareContract = async (data: DeclareContract) => {
+  void sendMessage({
     type: "REQUEST_DECLARE_CONTRACT",
-    data: {
-      address,
-      classHash,
-      contract,
-      networkId,
-    },
+    data,
   })
   try {
     await Promise.race([
@@ -25,17 +16,14 @@ export const declareContract = async (
       }),
     ])
   } catch {
-    throw Error("Could not declare contract")
+    throw new UdcError({ code: "NO_DECLARE_CONTRACT" })
   }
 }
 
-interface DeployContractService {
+export interface DeployContractServicePayload
+  extends UniversalDeployerContractPayload {
   address: string
   networkId: string
-  classHash: string
-  constructorCalldata: any
-  salt: string
-  unique: boolean
 }
 
 export const deployContract = async ({
@@ -45,7 +33,7 @@ export const deployContract = async ({
   constructorCalldata,
   salt,
   unique,
-}: DeployContractService) => {
+}: DeployContractServicePayload) => {
   sendMessage({
     type: "REQUEST_DEPLOY_CONTRACT",
     data: {
@@ -65,30 +53,6 @@ export const deployContract = async ({
       }),
     ])
   } catch {
-    throw Error("Could not declare contract")
-  }
-}
-
-export const fetchConstructorParams = async (
-  classHash: string,
-  networkId: string,
-): Promise<ContractClass> => {
-  sendMessage({
-    type: "FETCH_CONSTRUCTOR_PARAMS",
-    data: {
-      classHash,
-      networkId,
-    },
-  })
-  try {
-    const result = await Promise.race([
-      waitForMessage("FETCH_CONSTRUCTOR_PARAMS_RES"),
-      waitForMessage("FETCH_CONSTRUCTOR_PARAMS_REJ").then(() => {
-        throw new Error("Rejected")
-      }),
-    ])
-    return result.contract
-  } catch {
-    throw Error("Could not fetch contract constructor params")
+    throw new UdcError({ code: "NO_DEPLOY_CONTRACT" })
   }
 }

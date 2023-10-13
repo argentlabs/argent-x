@@ -1,43 +1,23 @@
-import React, {
-  FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
+import { Address, addressSchema } from "@argent/shared"
+import { useToast } from "@argent/ui"
+import { debounce } from "lodash-es"
+import { FC, Suspense, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { number } from "starknet"
+import { addAddressPadding } from "starknet"
+import useSWR from "swr"
 import { ZodError } from "zod"
 
-import { addToken } from "../../../shared/token/storage"
-import { RequestToken, Token } from "../../../shared/token/type"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
-import { isValidAddress } from "../../services/addresses"
-import { useSelectedAccount } from "../accounts/accounts.state"
-import { fetchTokenDetails } from "../accountTokens/tokens.service"
+import { isEqualAddress } from "../../services/addresses"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
-import { AddTokenScreen } from "./AddTokenScreen"
-
-const isDataComplete = (data: Partial<Token>): data is Token => {
-  if (
-    data.address &&
-    isValidAddress(data.address) &&
-    data.decimals?.toString() &&
-    data.name &&
-    data.symbol
-  ) {
-    return true
-  }
-  return false
-}
-
-function addressFormat64Byte(address: number.BigNumberish): string {
-  return `0x${number.toBN(address).toString("hex").padStart(64, "0")}`
-}
-
-/** TODO: refactor: rework to use proper from state */
+import { AddTokenScreen, AddTokenScreenSchemaType } from "./AddTokenScreen"
+import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
+import { RequestToken } from "../../../shared/token/__new/types/token.model"
+import { tokenService } from "../../services/tokens"
 
 interface AddTokenScreenContainerProps {
   hideBackButton?: boolean
@@ -54,123 +34,95 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
 }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
-  const account = useSelectedAccount()
-  const [tokenAddress, setTokenAddress] = useState(defaultToken?.address || "")
-  const [tokenName, setTokenName] = useState(defaultToken?.name || "")
-  const [tokenSymbol, setTokenSymbol] = useState(defaultToken?.symbol || "")
-  const [tokenDecimals, setTokenDecimals] = useState(
-    defaultToken?.decimals || "0",
-  )
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [tokenDetails, setTokenDetails] = useState<Token>()
-  const prevValidAddress = useRef("")
+  const account = useView(selectedAccountView)
   const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
+  const toast = useToast()
+  const [fetchedTokenAddress, setFetchedTokenAddress] = useState(
+    defaultToken?.address,
+  )
 
-  const validAddress = useMemo(() => {
-    return isValidAddress(tokenAddress)
-  }, [tokenAddress])
-
-  const tokenExist = useMemo(
+  const onTokenAddressChange = useMemo(
     () =>
-      tokensInNetwork.some(
-        (token) => defaultToken && token.address === defaultToken.address,
-      ),
-    [defaultToken, tokensInNetwork],
+      debounce((address: Address) => {
+        setFetchedTokenAddress(address)
+      }, 500),
+    [],
   )
 
-  useEffect(() => {
-    if (
-      defaultToken &&
-      defaultToken.address === tokenAddress &&
-      !tokenDetails
-    ) {
-      setLoading(true)
-    }
-  }, [defaultToken, tokenAddress, tokenDetails])
-
-  useEffect(() => {
-    if (account) {
-      if (loading && account) {
-        fetchTokenDetails(tokenAddress, account)
-          .then((details) => {
-            setTokenDetails(details)
-            setTokenName(details.name || "")
-            setTokenSymbol(details.symbol || "")
-          })
-          .catch(() => {
-            setTokenDetails(undefined)
-          })
-          .finally(() => {
-            setLoading(false)
-          })
-      } else if (
-        isValidAddress(tokenAddress) &&
-        tokenAddress !== prevValidAddress.current
-      ) {
-        prevValidAddress.current = tokenAddress
-        setLoading(true)
-      }
-    }
-  }, [loading, tokenAddress, account])
-
-  const compiledData = useMemo(
-    () => ({
-      address: tokenAddress,
-      ...(tokenDetails ?? {}),
-      ...(tokenName && { name: tokenName }),
-      ...(tokenSymbol && { symbol: tokenSymbol }),
-      ...(!tokenDetails?.decimals && {
-        decimals: parseInt(tokenDecimals.toString(), 10) || 0,
-      }),
-      networkId: switcherNetworkId,
-    }),
-    [
-      switcherNetworkId,
-      tokenAddress,
-      tokenDecimals,
-      tokenDetails,
-      tokenName,
-      tokenSymbol,
-    ],
+  const {
+    data: fetchedTokenDetails,
+    isValidating,
+    error: fetchTokenError,
+  } = useSWR(
+    account && fetchedTokenAddress
+      ? [
+          "fetchTokenDetails",
+          fetchedTokenAddress,
+          getAccountIdentifier(account),
+        ]
+      : null,
+    () => tokenService.fetchDetails(fetchedTokenAddress, account?.networkId),
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+    },
   )
 
-  const onFormSubmit = useCallback(async () => {
-    compiledData.address = addressFormat64Byte(compiledData.address)
-    if (isDataComplete(compiledData)) {
+  const onContinue = useCallback(
+    async (token: AddTokenScreenSchemaType) => {
       try {
-        await addToken(compiledData)
+        const addTokenData = {
+          ...token,
+          address: addressSchema.parse(addAddressPadding(token.address)),
+          networkId: switcherNetworkId,
+        }
+        await tokenService.addToken(addTokenData)
         void onSubmit?.()
         navigate(routes.accountTokens())
+        toast({
+          title: "Token added",
+          status: "success",
+          duration: 1000,
+        })
       } catch (e) {
         if (e instanceof ZodError) {
-          setError(e.issues[0].message)
+          throw new Error(e.issues[0].message)
         } else {
-          setError("Token not supported")
+          throw new Error("Token not supported")
         }
       }
+    },
+    [navigate, onSubmit, switcherNetworkId, toast],
+  )
+
+  const tokenDetails = fetchedTokenDetails ?? defaultToken
+
+  const isExistingToken = useMemo(() => {
+    if (!tokenDetails) {
+      return false
     }
-  }, [compiledData, navigate, onSubmit])
+    return tokensInNetwork.some((token) =>
+      isEqualAddress(token.address, tokenDetails?.address),
+    )
+  }, [tokenDetails, tokensInNetwork])
+
+  const error = fetchTokenError
+    ? `Unable to validate token - please check that this is a valid ECR20 contract address for this network`
+    : undefined
 
   return (
-    <AddTokenScreen
-      tokenDetails={tokenDetails}
-      error={error}
-      hideBackButton={hideBackButton}
-      loading={loading}
-      onFormSubmit={onFormSubmit}
-      onReject={onReject}
-      setTokenAddress={setTokenAddress}
-      setTokenDecimals={setTokenDecimals}
-      setTokenName={setTokenName}
-      setTokenSymbol={setTokenSymbol}
-      tokenAddress={tokenAddress}
-      tokenExist={tokenExist}
-      tokenName={tokenName}
-      tokenSymbol={tokenSymbol}
-      validAddress={validAddress}
-      tokenDecimals={tokenDecimals}
-      disableSubmit={loading || !isDataComplete(compiledData)}
-    />
+    <Suspense fallback={null}>
+      <AddTokenScreen
+        tokenDetails={tokenDetails}
+        error={error}
+        hideBackButton={hideBackButton}
+        onContinue={onContinue}
+        onReject={onReject}
+        onTokenAddressChange={onTokenAddressChange}
+        isLoading={isValidating}
+        isExistingToken={isExistingToken}
+        footer={<WithActionScreenErrorFooter />}
+      />
+    </Suspense>
   )
 }

@@ -7,7 +7,7 @@ import { Transition } from "framer-motion"
  */
 
 export const animatedTransition: Transition = {
-  // duration: 3, /** uncomment to slow animations for debugging */
+  // duration: 3 /** uncomment to slow animations for debugging */,
   transition: {
     type: "spring",
     stiffness: 1000,

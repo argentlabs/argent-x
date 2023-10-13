@@ -7,7 +7,6 @@ import {
   WrappedTokenInfo,
   wrappedCurrency,
 } from "@argent/x-swap"
-import { ethers } from "ethers"
 import { FC } from "react"
 
 import { prettifyCurrencyValue } from "../../../../shared/token/price"
@@ -17,6 +16,7 @@ import {
   useTokenPriceDetails,
 } from "../../accountTokens/tokenPriceHooks"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
+import { bigDecimal } from "@argent/shared"
 
 interface TokenPriceProps {
   currency: Currency
@@ -31,7 +31,7 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
 
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
-    ethers.utils.parseUnits("1", token?.decimals ?? 18),
+    bigDecimal.parseUnits("1", token?.decimals ?? 18),
   )
 
   const priceDetails = useTokenPriceDetails(token)

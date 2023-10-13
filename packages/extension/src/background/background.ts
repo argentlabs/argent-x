@@ -1,16 +1,15 @@
 import browser from "webextension-polyfill"
 
-import { ActionItem } from "../shared/actionQueue/types"
-import { MessageType } from "../shared/messages"
-import { Queue } from "./actionQueue"
-import { MessagingKeys } from "./keys/messagingKeys"
-import { TransactionTracker } from "./transactions/tracking"
+import { IBackgroundActionService } from "./__new/services/action/interface"
+import type { MessagingKeys } from "./keys/messagingKeys"
+import type { Respond } from "./respond"
 import { Wallet } from "./wallet"
+import { TransactionTrackerWorker } from "./transactions/service/starknet.service"
 
 export interface BackgroundService {
   wallet: Wallet
-  transactionTracker: TransactionTracker
-  actionQueue: Queue<ActionItem>
+  transactionTrackerWorker: TransactionTrackerWorker
+  actionService: IBackgroundActionService
 }
 
 export class UnhandledMessage extends Error {
@@ -23,10 +22,11 @@ export class UnhandledMessage extends Error {
 interface HandlerParams<T> {
   msg: T
   sender: browser.runtime.MessageSender
+  origin: string
   port?: browser.runtime.Port
   background: BackgroundService
   messagingKeys: MessagingKeys
-  respond: (msg: MessageType) => Promise<void>
+  respond: Respond
 }
 
 export type HandleMessage<T> = (params: HandlerParams<T>) => Promise<unknown>

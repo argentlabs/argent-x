@@ -24,12 +24,12 @@ export interface GetArgentStarknetWindowObject {
   host: string
 }
 
-function updateStarknetWindowObject(
+async function updateStarknetWindowObject(
   windowObject: StarknetWindowObject,
   provider: ProviderInterface,
   remoteHandle: Sender<StarknetMethods>,
   walletAddress: string,
-): ConnectedStarknetWindowObject {
+): Promise<ConnectedStarknetWindowObject> {
   if (windowObject.isConnected) {
     return windowObject
   }
@@ -39,7 +39,7 @@ function updateStarknetWindowObject(
     "isConnected" | "chainId" | "selectedAddress" | "account" | "provider"
   > = {
     isConnected: true,
-    chainId: provider.chainId,
+    chainId: await provider.getChainId(),
     selectedAddress: walletAddress,
     account: new MessageAccount(provider, walletAddress, remoteHandle),
     provider,
@@ -94,7 +94,7 @@ export const getArgentStarknetWindowObject = (
         throw Error("not implemented")
       }
       const [selectedAddress] = await remoteHandle.call("enable")
-      updateStarknetWindowObject(
+      await updateStarknetWindowObject(
         wallet,
         provider,
         remoteHandle,

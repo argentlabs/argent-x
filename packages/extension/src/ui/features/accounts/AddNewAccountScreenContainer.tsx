@@ -3,30 +3,21 @@ import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
-import { booleanifyEnv } from "../../../shared/utils/booleanifyEnv"
 import { CreateAccountType } from "../../../shared/wallet.model"
 import { useAction } from "../../hooks/useAction"
-import { routes } from "../../routes"
+import { routes, useReturnTo } from "../../routes"
 import { assertNever } from "../../services/assertNever"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { AddNewAccountScreen } from "./AddNewAccountScreen"
+import {
+  AccountType,
+  AccountTypeId,
+  AddNewAccountScreen,
+} from "./AddNewAccountScreen"
+import { isFeatureEnabled } from "@argent/shared"
+import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { settingsStore } from "../../../shared/settings"
 
 const { WalletIcon, MultisigIcon } = icons
-
-export enum AccountTypeId {
-  STANDARD,
-  MULTISIG,
-  // LEDGER,
-}
-
-export interface AccountType {
-  id: AccountTypeId
-  type: CreateAccountType
-  title: string
-  subtitle?: string
-  icon?: React.ReactNode
-  enabled?: boolean
-}
 
 const accountTypes: AccountType[] = [
   {
@@ -43,7 +34,7 @@ const accountTypes: AccountType[] = [
     title: "Multisig Account",
     subtitle: "For multiple owners",
     icon: <MultisigIcon />,
-    enabled: booleanifyEnv(process.env.FEATURE_MULTISIG, false),
+    enabled: isFeatureEnabled(process.env.FEATURE_MULTISIG),
   },
 
   //   {
@@ -57,17 +48,25 @@ const accountTypes: AccountType[] = [
 export const AddNewAccountScreenContainer: FC = () => {
   const navigate = useNavigate()
   const { action: addAccount, loading: isAdding } = useAction(
-    accountService.create,
+    accountService.create.bind(accountService),
   )
   // TODO: should be view after networks was refactored
   const { accountClassHash, id: networkId } = useCurrentNetwork()
+  const returnTo = useReturnTo()
+
+  const betaFeatureMultisig = useKeyValueStorage(
+    settingsStore,
+    "betaFeatureMultisig",
+  )
 
   const onAccountTypeClick = useCallback(
     async (accountTypeId: AccountTypeId) => {
+      const isDevnet = networkId === "localhost"
+
       switch (accountTypeId) {
         case AccountTypeId.STANDARD:
-          await addAccount("standard", networkId) // default
-          return navigate(routes.accounts())
+          await addAccount(isDevnet ? "standardCairo0" : "standard", networkId) // default
+          return navigate(routes.accounts(returnTo))
 
         case AccountTypeId.MULTISIG:
           return navigate(routes.multisigNew())
@@ -80,7 +79,7 @@ export const AddNewAccountScreenContainer: FC = () => {
           assertNever(accountTypeId) // Should always be handled
       }
     },
-    [addAccount, navigate, networkId],
+    [addAccount, navigate, networkId, returnTo],
   )
 
   const isAccountTypeLoading = useCallback(
@@ -97,9 +96,18 @@ export const AddNewAccountScreenContainer: FC = () => {
   )
 
   const accountTypeCheck = useCallback(
-    (type: CreateAccountType) =>
-      Boolean(type === "standard" || accountClassHash?.[type]), // always enabled for standard
-    [accountClassHash],
+    (type: CreateAccountType) => {
+      if (type === "standard") {
+        return true // always enabled for standard
+      }
+
+      if (type === "multisig") {
+        return betaFeatureMultisig // Check if multisig is enabled in beta features settings
+      }
+
+      return !!accountClassHash?.[type]
+    }, // always enabled for standard
+    [accountClassHash, betaFeatureMultisig],
   )
 
   const enabledAccountTypes = useMemo(() => {

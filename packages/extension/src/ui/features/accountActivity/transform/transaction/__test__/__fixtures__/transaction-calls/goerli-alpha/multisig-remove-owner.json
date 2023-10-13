@@ -1,0 +1,9 @@
+{
+  "contractAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+  "entrypoint": "remove_signers",
+  "calldata": [
+    "1",
+    "1",
+    "2268790622135195410384859964604579147518870150183033554627249096732235776205"
+  ]
+}

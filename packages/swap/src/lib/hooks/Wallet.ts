@@ -86,21 +86,25 @@ export function useETHBalance(
   const balance = useMulticall({
     contractAddress: ethAddress,
     entrypoint: "balanceOf",
-    calldata: [address],
+    calldata: address ? [address] : [],
   })
 
-  const uint256Balance: uint256.Uint256 = useMemo(
-    () => ({ low: balance?.result?.[0], high: balance?.result?.[1] }),
-    [balance?.result],
-  )
+  const uint256Balance: uint256.Uint256 | undefined = useMemo(() => {
+    if (Array.isArray(balance?.result) && balance?.result.length > 0) {
+      return { low: balance?.result?.[0], high: balance?.result?.[1] }
+    }
+    return undefined
+  }, [balance?.result])
 
   return useMemo(() => {
-    const value = balance ? uint256.uint256ToBN(uint256Balance) : undefined
+    const value = uint256Balance
+      ? uint256.uint256ToBN(uint256Balance)
+      : undefined
     if (value && address) {
       return CurrencyAmount.ether(JSBI.BigInt(value.toString()))
     }
     return undefined
-  }, [address, balance, uint256Balance])
+  }, [address, uint256Balance])
 }
 
 /**

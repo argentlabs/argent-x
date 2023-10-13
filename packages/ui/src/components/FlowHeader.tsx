@@ -1,4 +1,10 @@
-import { Center, ChakraComponent, Circle, Spinner } from "@chakra-ui/react"
+import {
+  Center,
+  CenterProps,
+  ChakraComponent,
+  Circle,
+  Spinner,
+} from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
 import { TickIcon } from "./icons"
@@ -33,7 +39,7 @@ const variants = {
 
 export type FlowHeaderVariant = keyof typeof variants
 
-export interface FlowHeaderProps {
+export interface FlowHeaderProps extends Omit<CenterProps, "title"> {
   title: ReactNode
   subtitle?: ReactNode
   variant?: FlowHeaderVariant
@@ -49,10 +55,18 @@ const FlowHeader: FC<FlowHeaderProps> = ({
   size = "md",
   icon: Icon = TickIcon,
   isLoading,
+  ...props
 }) => {
   const variant = variants[variantKey]
   return (
-    <Center flexDirection={"column"} textAlign={"center"} pt={4} pb={8} px={4}>
+    <Center
+      flexDirection={"column"}
+      textAlign={"center"}
+      pt={4}
+      pb={8}
+      px={4}
+      {...props}
+    >
       <Circle
         size={size === "md" ? 18 : 24}
         bg={isLoading ? "black" : variant.bg}

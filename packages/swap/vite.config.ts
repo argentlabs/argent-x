@@ -1,6 +1,6 @@
 import { resolve as resolvePath } from "path"
 
-import react from "@vitejs/plugin-react"
+import react from "@vitejs/plugin-react-swc"
 import { PluginOption, defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 

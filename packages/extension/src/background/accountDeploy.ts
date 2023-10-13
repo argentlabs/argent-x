@@ -1,35 +1,28 @@
-import { ActionItem } from "../shared/actionQueue/types"
+import { BlockNumber, num } from "starknet"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
-import { Queue } from "./actionQueue"
+import { IBackgroundActionService } from "./__new/services/action/interface"
 
 export interface IDeployAccount {
   account: BaseWalletAccount
-  actionQueue: Queue<ActionItem>
+  actionService: IBackgroundActionService
 }
 
 export const deployAccountAction = async ({
-  actionQueue,
   account,
+  actionService,
 }: IDeployAccount) => {
-  await actionQueue.push({
+  await actionService.add({
     type: "DEPLOY_ACCOUNT_ACTION",
-    payload: account,
-  })
-}
-
-export const deployMultisigAction = async ({
-  actionQueue,
-  account,
-}: IDeployAccount) => {
-  await actionQueue.push({
-    type: "DEPLOY_MULTISIG_ACTION",
     payload: account,
   })
 }
 
 export const isAccountDeployed = async (
   account: WalletAccount,
-  getClassAt: (address: string, blockIdentifier?: unknown) => Promise<unknown>,
+  getClassAt: (
+    address: string,
+    blockIdentifier?: BlockNumber | num.BigNumberish, // from starknet.js due to missing export
+  ) => Promise<unknown>,
 ) => {
   if (!account.needsDeploy) {
     return true
@@ -38,6 +31,7 @@ export const isAccountDeployed = async (
     await getClassAt(account.address)
     return true
   } catch (e) {
+    console.error(e)
     return false
   }
 }

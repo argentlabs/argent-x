@@ -12,13 +12,10 @@ import { useNavigate } from "react-router-dom"
 
 import { ARGENT_SHIELD_NETWORK_ID } from "../../../shared/shield/constants"
 import { resetDevice } from "../../../shared/shield/jwt"
-import {
-  requestEmail,
-  shieldIsTokenExpired,
-} from "../../../shared/shield/register"
 import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { routes } from "../../routes"
-import { useCheckUpgradeAvailable } from "../accounts/upgrade.service"
+import { argentAccountService } from "../../services/argentAccount"
+import { useCheckUpgradeAvailable } from "../accounts/accountUpgradeCheck"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { ShieldAccountActivate } from "./ShieldAccountActivate"
 import { ShieldAccountDeactivate } from "./ShieldAccountDeactivate"
@@ -36,7 +33,7 @@ export const ShieldAccountStartScreen: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const network = useCurrentNetwork()
-  const { needsUpgrade = false } = useCheckUpgradeAvailable(account)
+  const needsUpgrade = useCheckUpgradeAvailable(account)
 
   const { trackSuccess } = useShieldOnboardingTracking({
     stepId: "welcome",
@@ -49,11 +46,19 @@ export const ShieldAccountStartScreen: FC = () => {
         setIsLoading(true)
         const isExpired = account?.guardian
           ? await getVerifiedEmailIsExpiredForRemoval()
-          : await shieldIsTokenExpired()
+          : await argentAccountService.isTokenExpired()
         if (isExpired) {
           await resetDevice()
-          await requestEmail(verifiedEmail)
-          navigate(routes.shieldAccountOTP(account?.address, verifiedEmail))
+          await argentAccountService.requestEmail(verifiedEmail)
+          if (account?.address) {
+            navigate(
+              routes.shieldAccountOTP(
+                account?.address,
+                verifiedEmail,
+                "shield",
+              ),
+            )
+          }
         } else {
           navigate(routes.shieldAccountAction(account?.address))
         }
@@ -67,7 +72,7 @@ export const ShieldAccountStartScreen: FC = () => {
         setIsLoading(false)
       }
     } else {
-      navigate(routes.shieldAccountEmail(account?.address))
+      navigate(routes.argentAccountEmail(account?.address, "shield"))
     }
   }, [
     account?.address,
@@ -96,7 +101,7 @@ export const ShieldAccountStartScreen: FC = () => {
             )}
             <Flex flex={1} />
             <Button
-              onClick={onActivate}
+              onClick={() => void onActivate()}
               colorScheme={"primary"}
               disabled={isLoading || account?.needsDeploy}
               isLoading={isLoading}

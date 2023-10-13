@@ -34,23 +34,19 @@ const stackedBorderRadius: Target = {
 }
 
 /** default display */
-const defaultActive: Target = {
+const defaultActive = {
   filter: "brightness(1)",
-  translateX: 0,
-  translateY: 0,
-  marginTop: 0,
-  scale: 1,
+  transform: "translateX(0px) translateY(0px) scale(1)",
   borderTopLeftRadius: 0,
   borderTopRightRadius: 0,
+  marginTop: 0,
 }
 
 const variants: Record<Presentation, Partial<PresentationVariant>> = {
-  /** horizontal */
   push: {
     enter: {
       filter: "brightness(1)",
-      translateX: "100%",
-      translateY: 0,
+      transform: "translateX(100%) translateY(0px)",
       boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
     },
     active: {
@@ -59,24 +55,20 @@ const variants: Record<Presentation, Partial<PresentationVariant>> = {
     },
     exit: {
       filter: "brightness(0.3)",
-      translateX: "-30%",
-      translateY: 0,
+      transform: "translateX(-30%) translateY(0px)",
     },
   },
-  /** vertical covering whole screen */
   modal: {
     get enter() {
-      return variants.modal.exit
+      return this.exit
     },
     exit: {
       ...stackedBorderRadius,
       filter: "brightness(1)",
-      translateX: 0,
-      translateY: "100%",
+      transform: "translateX(0px) translateY(100%)",
       boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
     },
   },
-  /** vertical with previous screens visibly 'stacked' */
   modalSheet: {
     get enter() {
       return variants.modal.enter
@@ -84,56 +76,49 @@ const variants: Record<Presentation, Partial<PresentationVariant>> = {
     active: {
       ...stackedBorderRadius,
       filter: "brightness(1)",
-      translateX: 0,
-      translateY: 0,
-      marginTop: "24px",
-      scale: 1,
+      transform: "translateX(0px) translateY(0px) scale(1)",
       boxShadow: "0 0 20px 5px rgba(0, 0, 0, 0.3)",
+      marginTop: "24px",
     },
     get exit() {
       return variants.modal.exit
     },
   },
-  /** horizontal within a modal sheet */
   pushModalSheet: {
     get enter() {
       return {
         ...variants.push.enter,
-        marginTop: variants.modalSheet.active?.marginTop,
+        marginTop: "24px",
       }
     },
     get active() {
       return {
         ...variants.push.active,
         ...stackedBorderRadius,
-        marginTop: variants.modalSheet.active?.marginTop,
+        marginTop: "24px",
       }
     },
     get exit() {
       return {
         ...variants.push.exit,
-        marginTop: variants.modalSheet.active?.marginTop,
+        marginTop: "24px",
       }
     },
   },
-  /** stacked behind modalSheet */
   stacked: {
     get enter() {
-      return variants.stacked.exit
+      return this.exit
     },
     exit: {
       ...stackedBorderRadius,
       filter: "brightness(0.8)",
-      translateX: 0,
-      translateY: 0,
+      transform: "translateX(0px) translateY(0px) scale(0.9)",
       marginTop: "12px",
-      scale: 0.9,
     },
   },
-  /** stacked behind stacked (visually hidden) */
   stackedStacked: {
     get enter() {
-      return variants.stackedStacked.exit
+      return this.exit
     },
     get active() {
       return variants.stacked.exit
@@ -141,13 +126,9 @@ const variants: Record<Presentation, Partial<PresentationVariant>> = {
     exit: {
       ...stackedBorderRadius,
       filter: "brightness(0)",
-      translateX: 0,
-      translateY: 0,
-      marginTop: 0,
-      scale: 0.8,
+      transform: "translateX(0px) translateY(0px) scale(0.8)",
     },
   },
-  /** beneath modal (same as animation 'stacked' but not persistent) */
   modalStacked: {
     get enter() {
       return variants.stacked.enter
@@ -159,7 +140,6 @@ const variants: Record<Presentation, Partial<PresentationVariant>> = {
       return variants.stacked.exit
     },
   },
-  /** no animation */
   replace: {
     get enter() {
       return defaultActive

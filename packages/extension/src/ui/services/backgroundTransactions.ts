@@ -9,8 +9,8 @@ export const executeTransaction = (data: ExecuteTransactionRequest) => {
   return sendMessage({ type: "EXECUTE_TRANSACTION", data })
 }
 
-export const getEstimatedFee = async (call: Call | Call[]) => {
-  sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
+export const getEstimatedFeeFromSequencer = async (call: Call | Call[]) => {
+  void sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
 
   const response = await Promise.race([
     waitForMessage("ESTIMATE_TRANSACTION_FEE_RES"),
@@ -22,6 +22,26 @@ export const getEstimatedFee = async (call: Call | Call[]) => {
   }
 
   return response
+}
+
+export const getSimulationEstimatedFee = async (call: Call | Call[]) => {
+  void sendMessage({ type: "SIMULATE_TRANSACTIONS", data: call })
+
+  const response = await Promise.race([
+    waitForMessage("SIMULATE_TRANSACTIONS_RES"),
+    waitForMessage("SIMULATE_TRANSACTIONS_REJ"),
+  ])
+
+  if (!response) {
+    console.warn("Old Account detected. Falling back to client-side simulation")
+    return
+  }
+
+  if ("error" in response) {
+    throw response.error
+  }
+
+  return response.feeEstimation
 }
 
 export const getAccountDeploymentEstimatedFee = async (

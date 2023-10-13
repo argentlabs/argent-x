@@ -1,9 +1,41 @@
 import { InvokeFunctionResponse, Signature } from "starknet"
 import { z } from "zod"
 
-const bignumberishSchema = z.union([z.string(), z.number(), z.bigint()])
+const HEX_REGEX = /^0x[0-9a-f]+$/i
+const DECIMAL_REGEX = /^\d+$/
 
-const callSchema = z.object({
+const shortStringSchema = z
+  .string()
+  .nonempty("The short string cannot be empty")
+  .max(31, "The short string cannot exceed 31 characters")
+  .refine(
+    (value) => !HEX_REGEX.test(value),
+    "The shortString should not be a hex string",
+  )
+  .refine(
+    (value) => !DECIMAL_REGEX.test(value),
+    "The shortString should not be an integer string",
+  )
+
+const bignumberishSchema = z.union([
+  z
+    .string()
+    .regex(
+      HEX_REGEX,
+      "Only hex, integers and bigint are supported in calldata",
+    ),
+  z
+    .string()
+    .regex(
+      DECIMAL_REGEX,
+      "Only hex, integers and bigint are supported in calldata",
+    ),
+  shortStringSchema,
+  z.number().int("Only hex, integers and bigint are supported in calldata"),
+  z.bigint(),
+])
+
+export const CallSchema = z.object({
   contractAddress: z.string(),
   entrypoint: z.string(),
   calldata: z.array(bignumberishSchema).optional(),
@@ -76,7 +108,7 @@ export const StarknetMethodArgumentsSchemas = {
     }),
   ]),
   execute: z.tuple([
-    z.array(callSchema).nonempty().or(callSchema),
+    z.array(CallSchema).nonempty().or(CallSchema),
     z.array(z.any()).optional(),
     z
       .object({

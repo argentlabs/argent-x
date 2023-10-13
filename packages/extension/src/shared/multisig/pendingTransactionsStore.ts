@@ -1,5 +1,5 @@
 import { memoize } from "lodash-es"
-import { AllowArray } from "starknet"
+import { AllowArray, TransactionFinalityStatus } from "starknet"
 
 import { addTransaction } from "../../background/transactions/store"
 import { ArrayStorage } from "../storage"
@@ -9,11 +9,11 @@ import { BaseWalletAccount } from "../wallet.model"
 import { getAccountIdentifier } from "../wallet.service"
 import { ApiMultisigState, ApiMultisigTransaction } from "./multisig.model"
 import { getMultisigAccountFromBaseWallet } from "./utils/baseMultisig"
+import { accountsEqual } from "../utils/accountsEqual"
 
 export type MultisigPendingTransaction = {
   requestId: string
-  address: string
-  networkId: string
+  account: BaseWalletAccount
   timestamp: number
   transaction: ApiMultisigTransaction
   type?: ExtendedTransactionType
@@ -32,8 +32,10 @@ export const multisigPendingTransactionsStore =
   })
 
 export const byAccountSelector = memoize(
-  (account?: BaseWalletAccount) => (transaction: MultisigPendingTransaction) =>
-    Boolean(account && transaction.address === account.address),
+  (account?: BaseWalletAccount) =>
+    (transaction: MultisigPendingTransaction) => {
+      return accountsEqual(transaction.account, account)
+    },
   (account) => (account ? getAccountIdentifier(account) : "unknown-account"),
 )
 
@@ -79,12 +81,9 @@ export async function multisigPendingTransactionToTransaction(
     throw new Error("Pending Multisig transaction not found")
   }
 
-  const { transaction, type, transactionHash, networkId, address } = pendingTxn
+  const { transaction, type, transactionHash, account } = pendingTxn
 
-  const multisigAccount = await getMultisigAccountFromBaseWallet({
-    address,
-    networkId,
-  })
+  const multisigAccount = await getMultisigAccountFromBaseWallet(account)
 
   if (!multisigAccount) {
     throw new Error("Multisig account not found")
@@ -103,7 +102,7 @@ export async function multisigPendingTransactionToTransaction(
         transactions: transaction.calls,
       },
     },
-    state === "CANCELLED" ? "CANCELLED" : "RECEIVED",
+    state === "CANCELLED" ? "CANCELLED" : TransactionFinalityStatus.RECEIVED,
   )
 
   await removeFromMultisigPendingTransactions(pendingTxn)

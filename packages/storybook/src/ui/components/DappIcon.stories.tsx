@@ -27,10 +27,3 @@ export const Briq = {
     host: "briq.construction",
   },
 }
-
-export const MintSquare = {
-  ...Default,
-  args: {
-    host: "mintsquare.io",
-  },
-}

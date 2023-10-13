@@ -8,8 +8,8 @@ import {
   BaseWalletAccount,
   WalletAccount,
 } from "../../../../shared/wallet.model"
-import { accountsEqual } from "../../../../shared/wallet.service"
-import { AccountListItemProps } from "../../accounts/AccountListItem"
+import { accountsEqual } from "../../../../shared/utils/accountsEqual"
+import { AccountListItemProps } from "../../accounts/accountListItem.model"
 import { AccountSelect } from "../../accounts/AccountSelect"
 
 export interface ConnectDappAccountSelectProps {

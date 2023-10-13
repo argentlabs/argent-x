@@ -9,26 +9,17 @@ import {
 } from "../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../shared/api/fetcher"
 import { IExplorerTransaction } from "../../../shared/explorer/type"
-import {
-  isPrivacySettingsEnabled,
-  settingsStore,
-} from "../../../shared/settings"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { urlWithQuery } from "../../../shared/utils/url"
 import { argentApiFetcher } from "../../services/argentApiFetcher"
-import { useConditionallyEnabledSWR, withPolling } from "../../services/swr"
+import {
+  useConditionallyEnabledSWR,
+  withPolling,
+} from "../../services/swr.service"
 import { stripAddressZeroPadding } from "../accounts/accounts.service"
+import { RefreshInterval } from "../../../shared/config"
 
 export const useArgentExplorerEnabled = () => {
-  const privacyUseArgentServices = useKeyValueStorage(
-    settingsStore,
-    "privacyUseArgentServices",
-  )
-  /** ignore `privacyUseArgentServices` entirely when the Privacy Settings UI is disabled */
-  if (!isPrivacySettingsEnabled) {
-    return ARGENT_EXPLORER_ENABLED
-  }
-  return ARGENT_EXPLORER_ENABLED && privacyUseArgentServices
+  return ARGENT_EXPLORER_ENABLED
 }
 
 export const useArgentExplorerTransaction = ({
@@ -95,7 +86,7 @@ export const useArgentExplorerAccountTransactions = ({
     Boolean(apiNetwork && argentExplorerEnabled),
     key,
     argentApiFetcher,
-    withPolling(15 * 1000) /** 15 seconds */,
+    withPolling(RefreshInterval.FAST * 1000) /** 20 seconds */,
   )
 }
 
@@ -147,7 +138,7 @@ export const useArgentExplorerAccountTransactionsInfinite = (
   return useSWRInfinite<IExplorerTransaction[]>(key, argentApiFetcher, {
     revalidateAll: true,
     shouldRetryOnError: false /** expect errors on unsupported networks */,
-    ...withPolling(15 * 1000) /** 15 seconds */,
+    ...withPolling(RefreshInterval.FAST * 1000) /** 20 seconds */,
     ...config,
   })
 }

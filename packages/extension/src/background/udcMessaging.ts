@@ -1,31 +1,36 @@
 import { UdcMessage } from "../shared/messages/UdcMessage"
-import { getNetwork } from "../shared/network"
-import { getProvider } from "../shared/network/provider"
+
 import { HandleMessage, UnhandledMessage } from "./background"
 
 export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
   msg,
-  background: { actionQueue, wallet },
+  origin,
+  background: { wallet, actionService },
   respond,
 }) => {
   switch (msg.type) {
+    // TODO: refactor after we have a plan for inpage
     case "REQUEST_DECLARE_CONTRACT": {
       const { data } = msg
-      const { classHash, contract, ...restData } = data
-      if ("address" in restData && "networkId" in restData) {
+      const { address, networkId, ...rest } = data
+      if (address && networkId) {
         await wallet.selectAccount({
-          address: restData.address,
-          networkId: restData.networkId,
+          address,
+          networkId,
         })
       }
 
-      const action = await actionQueue.push({
-        type: "DECLARE_CONTRACT_ACTION",
-        payload: {
-          classHash,
-          contract,
+      const action = await actionService.add(
+        {
+          type: "DECLARE_CONTRACT_ACTION",
+          payload: {
+            ...rest,
+          },
         },
-      })
+        {
+          origin,
+        },
+      )
 
       return respond({
         type: "REQUEST_DECLARE_CONTRACT_RES",
@@ -35,35 +40,7 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
       })
     }
 
-    case "FETCH_CONSTRUCTOR_PARAMS": {
-      const {
-        data: { networkId, classHash },
-      } = msg
-
-      const network = await getNetwork(networkId)
-      const provider = getProvider(network)
-
-      try {
-        if ("getClassByHash" in provider) {
-          const contract = await provider.getClassByHash(classHash)
-          return respond({
-            type: "FETCH_CONSTRUCTOR_PARAMS_RES",
-            data: {
-              contract,
-            },
-          })
-        }
-      } catch (error) {
-        return respond({
-          type: "FETCH_CONSTRUCTOR_PARAMS_REJ",
-          data: {
-            error: `${error}`,
-          },
-        })
-      }
-      return
-    }
-
+    // TODO: refactor after refactoring actionHandlers
     case "REQUEST_DEPLOY_CONTRACT": {
       const { data } = msg
       const {
@@ -76,15 +53,20 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
       } = data
       await wallet.selectAccount({ address, networkId })
 
-      const action = await actionQueue.push({
-        type: "DEPLOY_CONTRACT_ACTION",
-        payload: {
-          classHash: classHash.toString(),
-          constructorCalldata,
-          salt,
-          unique,
+      const action = await actionService.add(
+        {
+          type: "DEPLOY_CONTRACT_ACTION",
+          payload: {
+            classHash: classHash.toString(),
+            constructorCalldata,
+            salt,
+            unique,
+          },
         },
-      })
+        {
+          origin,
+        },
+      )
 
       return respond({
         type: "REQUEST_DEPLOY_CONTRACT_RES",

@@ -1,5 +1,5 @@
-import { Token } from "../../../../shared/token/type"
-import { parsedDefaultTokens } from "../../../../shared/token/utils"
+import { Token } from "../../../../shared/token/__new/types/token.model"
+import { parsedDefaultTokens } from "../../../../shared/token/__new/utils"
 import { isEqualAddress } from "../../../services/addresses"
 
 export const getTokenForContractAddress = (

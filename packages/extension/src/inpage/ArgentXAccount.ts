@@ -13,6 +13,7 @@ import {
 } from "starknet"
 
 import { sendMessage, waitForMessage } from "./messageActions"
+import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
 
 /**
  *  This is the latest Account Object that is imported from starknet.js.
@@ -22,18 +23,29 @@ export class ArgentXAccount extends Account {
   constructor(address: string, provider?: ProviderInterface) {
     // since account constructor is taking a KeyPair,
     // we set a dummy one (never used anyway)
-    const keyPair = ec.getKeyPair(0)
-    super(provider || defaultProvider, address, keyPair)
+    const pk = ec.starkCurve.utils.randomPrivateKey()
+    super(provider || defaultProvider, address, pk)
   }
 
-  public override async execute(
+  public async execute(
     transactions: Call | Call[],
     abis?: Abi[],
     transactionsDetail?: InvocationsDetails,
   ): ReturnType<Account["execute"]> {
+    const [parsedTransactions, parseAbis, parsedTransactionsDetail] =
+      await StarknetMethodArgumentsSchemas.execute.parseAsync([
+        transactions,
+        abis,
+        transactionsDetail,
+      ])
+
     sendMessage({
       type: "EXECUTE_TRANSACTION",
-      data: { transactions, abis, transactionsDetail },
+      data: {
+        transactions: parsedTransactions,
+        abis: parseAbis,
+        transactionsDetail: parsedTransactionsDetail,
+      },
     })
     const { actionHash } = await waitForMessage("EXECUTE_TRANSACTION_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
@@ -68,13 +80,18 @@ export class ArgentXAccount extends Account {
     }
   }
 
-  public override async declare(
-    { classHash, contract }: DeclareContractPayload,
+  public async declare(
+    { contract, classHash, casm, compiledClassHash }: DeclareContractPayload,
     _transactionsDetail?: InvocationsDetails | undefined,
   ): Promise<DeclareContractResponse> {
     sendMessage({
       type: "REQUEST_DECLARE_CONTRACT",
-      data: { classHash, contract },
+      data: {
+        contract,
+        classHash,
+        casm,
+        compiledClassHash,
+      },
     })
     const { actionHash } = await waitForMessage(
       "REQUEST_DECLARE_CONTRACT_RES",
@@ -112,9 +129,7 @@ export class ArgentXAccount extends Account {
     }
   }
 
-  public override async signMessage(
-    data: typedData.TypedData,
-  ): Promise<Signature> {
+  public async signMessage(data: typedData.TypedData): Promise<Signature> {
     sendMessage({ type: "SIGN_MESSAGE", data })
     const { actionHash } = await waitForMessage("SIGN_MESSAGE_RES", 1000)
     sendMessage({ type: "OPEN_UI" })

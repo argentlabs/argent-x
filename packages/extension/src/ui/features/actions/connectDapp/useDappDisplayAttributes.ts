@@ -1,32 +1,51 @@
-import useSWRImmutable from "swr/immutable"
-
-import { generateAvatarImage } from "../../../../shared/avatarImage"
+import { generateAvatarImage } from "@argent/shared"
 import { getKnownDappForHost } from "../../../../shared/knownDapps"
 import { getColor } from "../../accounts/accounts.service"
+import { useDappFromKnownDappsByHost } from "../../../services/knownDapps"
+import { upperFirst } from "lodash-es"
 
-interface DappDisplayAttributes {
-  title: string
+export interface DappDisplayAttributes {
+  title?: string
   iconUrl: string
+  isKnown: boolean
 }
 
-export const getDappDisplayAttributes = async (
+const getFavicon = (host: string) => {
+  return `https://www.google.com/s2/favicons?sz=64&domain=${host}`
+}
+
+export const getDappDisplayAttributes = (
   host: string,
-): Promise<DappDisplayAttributes> => {
+): DappDisplayAttributes => {
   const background = getColor(host)
   const knownDapp = getKnownDappForHost(host)
   const title = knownDapp?.title || host
-  const iconUrl = knownDapp?.icon || generateAvatarImage(title, { background })
+  const iconUrl =
+    knownDapp?.icon ||
+    getFavicon(host) ||
+    generateAvatarImage(title, { background })
+
   const result: DappDisplayAttributes = {
     title,
     iconUrl,
+    isKnown: !!knownDapp,
   }
+
   return result
 }
 
 export const useDappDisplayAttributes = (host: string) => {
-  const { data } = useSWRImmutable(
-    [host, "dappDisplayAttributes"],
-    getDappDisplayAttributes,
-  )
-  return data
+  const dapp = useDappFromKnownDappsByHost(host)
+
+  const title = dapp?.name ? upperFirst(dapp.name) : undefined
+
+  const iconUrl = dapp?.logoUrl || getFavicon(host)
+
+  const result: DappDisplayAttributes = {
+    title,
+    iconUrl,
+    isKnown: !!dapp,
+  }
+
+  return result
 }

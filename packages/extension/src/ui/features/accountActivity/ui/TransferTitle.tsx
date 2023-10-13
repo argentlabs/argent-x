@@ -1,4 +1,4 @@
-import { BigNumberish } from "ethers"
+import { BigNumberish } from "starknet"
 import { FC } from "react"
 import styled from "styled-components"
 

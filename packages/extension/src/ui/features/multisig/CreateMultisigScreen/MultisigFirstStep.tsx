@@ -27,11 +27,14 @@ export const MultisigFirstStep = ({
 
   return (
     <ScreenLayout
-      subtitle="Ask your co-owners to go to “Join existing multisig” in Argent X and send you their signer key"
+      subtitle="Ask your co-owners to go to “Join existing multisig” in Argent X and send you their signer pubkey"
       currentIndex={index}
       title="Add owners"
     >
-      <P3 color="primary.400">A signer key is NOT an account address</P3>
+      <P3 color="primary.400">
+        For security reasons each owner should have their own Argent X wallet.
+        Never add 2 signer pubkeys from the same Argent X wallet.
+      </P3>
       <Divider color="neutrals.700" my="4" />
       <Box my="2" width="100%">
         <P3 mb="1">Owner 1 (Me)</P3>

@@ -11,14 +11,12 @@ export enum ChainId { // From starknet.js
 }
 
 export type SupportedChainIds =
-  | typeof constants.StarknetChainId.MAINNET
-  | typeof constants.StarknetChainId.TESTNET
-  | typeof constants.StarknetChainId.TESTNET2
+  | typeof constants.StarknetChainId.SN_MAIN
+  | typeof constants.StarknetChainId.SN_GOERLI
 
 export enum SupportedNetworks {
   MAINNET = "mainnet-alpha",
   TESTNET = "goerli-alpha",
-  TESTNET2 = "goerli-alpha-2",
 }
 
 export const DEFAULT_NETWORK_ID = SupportedNetworks.TESTNET
@@ -39,8 +37,6 @@ export const ROUTER_ADDRESS: { [network in SupportedNetworks]: string } = {
     "0x41fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023",
   [SupportedNetworks.TESTNET]:
     "0x2bcc885342ebbcbcd170ae6cafa8a4bed22bb993479f49806e72d96af94c965",
-  [SupportedNetworks.TESTNET2]:
-    "0x0756bef7f575eafdde2af479b2413ebf94f9677e904e4bac7b84a21143d39925",
 }
 
 export const FACTORY_ADDRESS: { [networkId in SupportedNetworks]: string } = {
@@ -48,8 +44,6 @@ export const FACTORY_ADDRESS: { [networkId in SupportedNetworks]: string } = {
     "0xdad44c139a476c7a17fc8141e6db680e9abc9f56fe249a105094c44382c2fd",
   [SupportedNetworks.TESTNET]:
     "0x262744f8cea943dadc8823c318eaf24d0110dee2ee8026298f49a3bc58ed74a",
-  [SupportedNetworks.TESTNET2]:
-    "0x0329d90b8dd38a089e2c4d1e1b6f0caab166f769bda267b7d4118f06b07fed87",
 }
 
 export const PAIR_CLASS_HASH =
@@ -64,8 +58,6 @@ export const FEE_TO_SETTER_ADDRESS: {
   [SupportedNetworks.MAINNET]:
     "0x284a1ad6382cffc520d8f711cf9519ccf43b3c105b89ef081cbe1a625322410",
   [SupportedNetworks.TESTNET]:
-    "0x284a1ad6382cffc520d8f711cf9519ccf43b3c105b89ef081cbe1a625322410",
-  [SupportedNetworks.TESTNET2]:
     "0x284a1ad6382cffc520d8f711cf9519ccf43b3c105b89ef081cbe1a625322410",
 }
 

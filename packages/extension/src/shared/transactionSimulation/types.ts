@@ -1,10 +1,49 @@
-import { Call } from "starknet"
+import {
+  ArraySignatureType,
+  Calldata,
+  Sequencer,
+  TransactionType,
+  constants,
+} from "starknet"
 
 import { Fetcher } from "../api/fetcher"
-import { AllowArray } from "../storage/types"
+import { EstimatedFees } from "./fees/fees.model"
+
+export interface SimulationError extends Error {
+  name: string
+  responseJson: { status: string }
+  responseText: string
+  status: number
+  statusText: string
+  url: string
+}
+
+export interface SimulateDeployAccountRequest {
+  type: TransactionType.DEPLOY_ACCOUNT
+  classHash: string
+  calldata: Calldata
+  salt: string
+  version?: string
+  signature?: ArraySignatureType
+  nonce: string
+}
+
+export type SimulateInvokeRequest = Sequencer.InvokeEstimateFee
+
+export type SimulateTransactionsRequest = (
+  | SimulateDeployAccountRequest
+  | SimulateInvokeRequest
+)[]
 
 export interface IFetchTransactionSimulation {
-  transactions: AllowArray<Call>
+  invocation: SimulateInvokeRequest
+  chainId: constants.StarknetChainId
+  fetcher?: Fetcher
+}
+
+export interface IFetchTransactionSimulationBulk {
+  invocations: SimulateTransactionsRequest
+  chainId: constants.StarknetChainId
   fetcher?: Fetcher
 }
 
@@ -35,9 +74,29 @@ export interface TokenDetails {
   usdValue: string | null
 }
 
-export interface ApiTransactionSimulationResponse {
+export type TransactionSimulationFeesEstimation = {
+  gasPrice: number
+  gasUsage: number
+  overallFee: number
+  unit: string
+}
+
+export type ApiTransactionSimulationResponse = {
   approvals: TransactionSimulationApproval[]
   transfers: TransactionSimulationTransfer[]
+  feeEstimation: TransactionSimulationFeesEstimation
+}
+
+export type ApiTransactionBulkSimulationResponse =
+  ApiTransactionSimulationResponse[]
+
+export type ApiTransactionSimulationResponseUnparsed = {
+  simulationResults: ApiTransactionBulkSimulationResponse
+}
+
+export interface TransactionSimulationWithFees {
+  simulation: ApiTransactionBulkSimulationResponse
+  feeEstimation: EstimatedFees
 }
 
 export type EventsToTrack = "Transfer" | "Approval"

@@ -1,11 +1,23 @@
 import type { IUIService } from "../../../../shared/__new/services/ui/interface"
 import type { KeyValueStorage } from "../../../../shared/storage"
+import { DeepPick } from "../../../../shared/types/deepPick"
 import type { WalletStorageProps } from "../../../../shared/wallet/walletStore"
 import type { IOnboardingService } from "./interface"
 
+type MinimalUIService = DeepPick<
+  IUIService,
+  | "closePopup"
+  | "createTab"
+  | "focusTab"
+  | "hasPopup"
+  | "hasTab"
+  | "setDefaultPopup"
+  | "unsetDefaultPopup"
+>
+
 export default class OnboardingService implements IOnboardingService {
   constructor(
-    private uiService: IUIService,
+    private uiService: MinimalUIService,
     private walletStore: KeyValueStorage<WalletStorageProps>,
   ) {}
 

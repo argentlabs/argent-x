@@ -3,15 +3,15 @@ import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { constants } from "starknet"
 
-import { shieldAddAccount } from "../../../shared/shield/register"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { routes } from "../../routes"
-import { accountChangeGuardian } from "../../services/backgroundAccounts"
 import { ShieldBaseActionScreen } from "./ShieldBaseActionScreen"
 import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
 import { useShieldOnboardingTracking } from "./useShieldTracking"
+import { argentAccountService } from "../../services/argentAccount"
+import { accountMessagingService } from "../../services/accountMessaging"
 
 export const ShieldAccountActionScreen: FC = () => {
   const account = useRouteAccount()
@@ -42,11 +42,14 @@ export const ShieldAccountActionScreen: FC = () => {
     try {
       if (account.guardian) {
         // remove
-        await accountChangeGuardian(account, constants.ZERO.toString())
+        await accountMessagingService.changeGuardian(
+          account,
+          constants.ZERO.toString(),
+        )
       } else {
         // add
-        const { guardianAddress } = await shieldAddAccount()
-        await accountChangeGuardian(account, guardianAddress)
+        const guardianAddress = await argentAccountService.addAccount()
+        await accountMessagingService.changeGuardian(account, guardianAddress)
       }
     } catch (error) {
       IS_DEV && console.warn(coerceErrorToString(error))
@@ -63,7 +66,7 @@ export const ShieldAccountActionScreen: FC = () => {
   return (
     <ShieldBaseActionScreen
       guardian={account?.guardian}
-      onAddOrRemove={onAddOrRemove}
+      onAddOrRemove={() => void onAddOrRemove()}
       isLoading={isLoading}
     />
   )

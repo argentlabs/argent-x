@@ -19,15 +19,15 @@ export const upgradeAccountProcedure = extensionOnlyProcedure
     async ({
       input: { account, targetImplementationType },
       ctx: {
-        services: { wallet, actionQueue },
+        services: { wallet, actionService },
       },
     }) => {
       // TODO ⬇ should be a service
       await upgradeAccount({
         account,
         wallet,
+        actionService,
         targetImplementationType,
-        actionQueue,
       })
     },
   )

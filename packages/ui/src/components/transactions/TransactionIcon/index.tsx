@@ -2,8 +2,8 @@ import {
   AggregatedSimData,
   ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
+  NftItem,
   getTransactionReviewWithType,
-  useERC721Transfers,
 } from "@argent/shared"
 import { FC, useMemo } from "react"
 
@@ -17,14 +17,18 @@ import { VerifiedDappIcon } from "./VerifiedDappIcon"
 export interface TransactionIconProps {
   networkId: string
   transactionReview?: ApiTransactionReviewResponse
-  aggregatedData?: AggregatedSimData[]
+  nft?: NftItem
+  nftTransfers: AggregatedSimData[]
+  isNftLoading?: boolean
   isDeclareContract: boolean
   verifiedDapp?: ApiTransactionReviewTargettedDapp
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
   transactionReview,
-  aggregatedData,
+  nft,
+  nftTransfers,
+  isNftLoading,
   isDeclareContract,
   verifiedDapp,
   networkId,
@@ -33,7 +37,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     () => getTransactionReviewWithType(transactionReview),
     [transactionReview],
   )
-  const nftTransfers = useERC721Transfers(aggregatedData)
+
   if (isDeclareContract) {
     return <DeclareContractIcon />
   }
@@ -59,9 +63,13 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     return <VerifiedDappIcon iconUrl={verifiedDapp.iconUrl} />
   }
 
-  if (nftTransfers?.length) {
+  if (nft) {
     return (
-      <NftTransactionIcon networkId={networkId} nftTransfers={nftTransfers} />
+      <NftTransactionIcon
+        nft={nft}
+        nftTransfers={nftTransfers}
+        isNftLoading={isNftLoading}
+      />
     )
   }
 

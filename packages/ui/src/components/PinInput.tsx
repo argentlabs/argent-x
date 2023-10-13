@@ -3,7 +3,7 @@ import { defineStyle, defineStyleConfig } from "@chakra-ui/styled-system"
 
 import {
   baseStyle as inputBaseStyle,
-  sizes as inputSizes,
+  size as inputSizes,
   variantFilled,
   variantFlat,
   variantOutline,

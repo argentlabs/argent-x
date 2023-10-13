@@ -1,10 +1,10 @@
+import { FC, PropsWithChildren, useEffect } from "react"
 import { ThemeProvider, muiTheme } from "@argent-x/extension/src/ui/theme"
 import { ThemeProvider as ArgentTheme } from "@argent/ui"
 import { useColorMode } from "@chakra-ui/react"
 import { Flex } from "@chakra-ui/react"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { Preview } from "@storybook/react"
-import { FC, PropsWithChildren, useEffect } from "react"
 
 interface ColorModeProps extends PropsWithChildren {
   colorMode: "light" | "dark"
@@ -45,7 +45,7 @@ export const decorators: Preview["decorators"] = [
     return (
       <MuiThemeProvider theme={muiTheme}>
         <link
-          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;900&display=swap"
           rel="stylesheet"
         />
         <ThemeProvider>

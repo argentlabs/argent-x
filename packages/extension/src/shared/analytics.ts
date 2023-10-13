@@ -1,13 +1,11 @@
 import { base64 } from "ethers/lib/utils"
 import { encode } from "starknet"
-import browser from "webextension-polyfill"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 import { CreateAccountType } from "./wallet.model"
 
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
-const SEGMENT_PAGE_URL = "https://api.segment.io/v1/page"
 
 // dont use destructuring here
 const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY
@@ -224,10 +222,6 @@ interface Analytics {
       ? [data?: Events[T]]
       : [data: Events[T]]
   ): Promise<unknown>
-  page<T extends keyof Pages>(
-    name: T,
-    ...rest: Pages[T] extends undefined ? [data?: Pages[T]] : [data: Pages[T]]
-  ): Promise<unknown>
 }
 
 const versionRegex = /(\d+[._]\d+)([._]\d+)*/g // https://regex101.com/r/TgejzT/1
@@ -301,26 +295,6 @@ export function getAnalytics(
         // ignore
       }
     },
-    page: async (name, ...[data]) => {
-      if (!SEGMENT_WRITE_KEY) {
-        return
-      }
-      const payload = {
-        ...prebuiltPayload,
-        name,
-        properties: data,
-        timestamp: new Date().toISOString(),
-      }
-      try {
-        return await fetch(SEGMENT_PAGE_URL, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(payload),
-        })
-      } catch {
-        // ignore
-      }
-    },
   }
 }
 
@@ -334,6 +308,8 @@ interface ActiveStoreValues {
 interface ActiveStore extends ActiveStoreValues {
   update: (key: keyof ActiveStoreValues) => void
 }
+
+export type IActiveStore = typeof activeStore
 
 export const activeStore = create<ActiveStore>()(
   persist(
@@ -349,29 +325,3 @@ export const activeStore = create<ActiveStore>()(
     },
   ),
 )
-
-/*
- * There is no usable 'close' event on an extension
- *
- * instead we open a message port to the extension and simply listen for it to be disconnected
- * as a side-effect of the extension being closed
- */
-
-const EXTENSION_CONNECT_ID = "argent-x-analytics-connect"
-
-/** listen for the port connection from the UI, then detect disconnection */
-export const initBackgroundExtensionCloseListener = () => {
-  browser.runtime.onConnect.addListener((port) => {
-    if (port.name === EXTENSION_CONNECT_ID) {
-      port.onDisconnect.addListener(() => {
-        /** Extension was closed */
-        activeStore.getState().update("lastClosed")
-      })
-    }
-  })
-}
-
-/** connect to the background port from the UI */
-export const initUiExtensionCloseListener = () => {
-  browser.runtime.connect({ name: EXTENSION_CONNECT_ID })
-}

@@ -1,54 +1,62 @@
+import { isObject } from "lodash-es"
 import { useCallback, useEffect } from "react"
 
+import { uiService } from "../../../../shared/__new/services/ui"
+import { clientActionService } from "../../../services/action"
 import { analytics } from "../../../services/analytics"
-import {
-  approveAction,
-  rejectAction,
-} from "../../../services/backgroundActions"
-import { useSelectedAccount } from "../../accounts/accounts.state"
-import { EXTENSION_IS_POPUP } from "../../browser/constants"
+import { selectedAccountView } from "../../../views/account"
+import { currentActionView, isLastActionView } from "../../../views/actions"
+import { useView } from "../../../views/implementation/react"
 import { focusExtensionTab, useExtensionIsInTab } from "../../browser/tabs"
 import { getOriginatingHost } from "../../browser/useOriginatingHost"
-import { useActions } from "../actions.state"
 
 export const useActionScreen = () => {
-  const account = useSelectedAccount()
+  const selectedAccount = useView(selectedAccountView)
   const extensionIsInTab = useExtensionIsInTab()
-  const actions = useActions()
 
-  const [action] = actions
-  const isLastAction = actions.length === 1
-
-  const closePopup = useCallback(() => {
-    if (EXTENSION_IS_POPUP) {
-      window.close()
-    }
-  }, [])
+  const action = useView(currentActionView)
+  const isLastAction = useView(isLastActionView)
 
   const closePopupIfLastAction = useCallback(() => {
     if (isLastAction) {
-      closePopup()
+      void uiService.closeFloatingWindow()
     }
-  }, [closePopup, isLastAction])
+  }, [isLastAction])
 
-  const onSubmit = useCallback(async () => {
-    await approveAction(action)
-    closePopupIfLastAction()
-  }, [action, closePopupIfLastAction])
+  const approve = useCallback(async () => {
+    const result = action
+      ? await clientActionService.approveAndWait(action)
+      : undefined
+    return result
+  }, [action])
 
-  const onReject = useCallback(async () => {
+  const approveAndClose = useCallback(async () => {
+    const result = await approve()
+    if (isObject(result) && "error" in result) {
+      // stay on error screen
+    } else {
+      closePopupIfLastAction()
+    }
+  }, [closePopupIfLastAction, approve])
+
+  const reject = useCallback(async () => {
+    /** TODO: refactor: move tracking into service or action handler */
     await analytics.track("rejectedTransaction", {
-      networkId: account?.networkId || "unknown",
+      networkId: selectedAccount?.networkId || "unknown",
       host: await getOriginatingHost(),
     })
-    await rejectAction(action.meta.hash)
+    action && (await clientActionService.reject(action.meta.hash))
+  }, [action, selectedAccount?.networkId])
+
+  const rejectAndClose = useCallback(async () => {
+    await reject()
     closePopupIfLastAction()
-  }, [action, closePopupIfLastAction, account?.networkId])
+  }, [reject, closePopupIfLastAction])
 
   const rejectAllActions = useCallback(async () => {
-    await rejectAction(actions.map((act) => act.meta.hash))
-    closePopup()
-  }, [actions, closePopup])
+    await clientActionService.rejectAll()
+    void uiService.closeFloatingWindow()
+  }, [])
 
   /** Focus the extension if it is running in a tab  */
   useEffect(() => {
@@ -62,8 +70,11 @@ export const useActionScreen = () => {
 
   return {
     action,
-    onSubmit,
-    onReject,
+    selectedAccount,
+    approve,
+    approveAndClose,
+    reject: rejectAndClose,
+    rejectWithoutClose: reject,
     rejectAllActions,
     closePopupIfLastAction,
   }

@@ -27,7 +27,7 @@ import { CellStack } from "@argent/ui"
 import { ComponentProps, FC } from "react"
 
 import { decorators } from "../../decorators/routerDecorators"
-import { tokensByNetwork } from "../../tokensByNetwork"
+import { tokensByNetwork } from "../../tokens"
 
 interface ITransactionListItemWrapped
   extends Omit<TransactionListItemProps, "transactionTransformed"> {

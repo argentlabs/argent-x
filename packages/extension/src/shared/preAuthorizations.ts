@@ -6,7 +6,7 @@ import { accountService } from "./account/service"
 import { ArrayStorage } from "./storage"
 import { useArrayStorage } from "./storage/hooks"
 import { BaseWalletAccount } from "./wallet.model"
-import { accountsEqual } from "./wallet.service"
+import { accountsEqual } from "./utils/accountsEqual"
 
 interface PreAuthorization {
   account: BaseWalletAccount

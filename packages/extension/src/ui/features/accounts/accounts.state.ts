@@ -5,6 +5,43 @@ import { accountFindFamily, selectedAccountView } from "../../views/account"
 import { undefinedView } from "../../views/defaults"
 import { useView } from "../../views/implementation/react"
 import { Account } from "./Account"
+import { accountService } from "../../../shared/account/service"
+
+export const migrateAccountNetworks = async (accounts: WalletAccount[]) => {
+  const hasOldAccountNetwork = accounts.some((account) => {
+    return "baseUrl" in account.network
+  })
+
+  if (!hasOldAccountNetwork) {
+    console.log("No old account network found")
+    return accounts
+  }
+
+  const migratedAccounts = accounts.map((account) => {
+    if (
+      "baseUrl" in account.network &&
+      typeof account.network.baseUrl === "string"
+    ) {
+      const updated = {
+        ...account,
+        network: {
+          ...account.network,
+          sequencerUrl: account.network.baseUrl,
+        },
+      }
+
+      delete updated.network.baseUrl
+
+      return updated
+    }
+
+    return account
+  })
+
+  await accountService.upsert(migratedAccounts)
+
+  return migratedAccounts
+}
 
 // This file is used everywhere
 // TODO: we should get rid of this and use the WalletAccount interface only (renaming it at some point)
@@ -20,6 +57,8 @@ export const mapWalletAccountsToAccounts = (
         signer: walletAccount.signer,
         hidden: walletAccount.hidden,
         type: walletAccount.type,
+        classHash: walletAccount.classHash,
+        cairoVersion: walletAccount.cairoVersion,
         guardian: walletAccount.guardian,
         escape: walletAccount.escape,
         needsDeploy: walletAccount.needsDeploy,
@@ -27,14 +66,18 @@ export const mapWalletAccountsToAccounts = (
   )
 }
 
-export const useAccount = (
-  account?: BaseWalletAccount,
-): Account | undefined => {
+export const useWalletAccount = (account?: BaseWalletAccount) => {
   const view = useMemo(() => {
     return account ? accountFindFamily(account) : undefinedView
   }, [account])
 
-  const foundAccount = useView(view)
+  return useView(view)
+}
+
+export const useAccount = (
+  account?: BaseWalletAccount,
+): Account | undefined => {
+  const foundAccount = useWalletAccount(account)
 
   return useMemo(() => {
     return !foundAccount

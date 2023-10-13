@@ -1,4 +1,3 @@
-export const ARGENT_SHIELD_ENABLED =
-  (process.env.FEATURE_ARGENT_SHIELD || "false") === "true"
+import { defaultNetwork } from "../network"
 
-export const ARGENT_SHIELD_NETWORK_ID = process.env.ARGENT_SHIELD_NETWORK_ID
+export const ARGENT_SHIELD_NETWORK_ID = defaultNetwork.id

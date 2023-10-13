@@ -1,4 +1,24 @@
-import { WalletAccountSigner } from "../wallet.model"
+import { IRepository } from "../storage/__new/interface"
+import { BaseMultisigWalletAccount, WalletAccountSigner } from "../wallet.model"
+
+export const enum MultisigEntryPointType {
+  // read
+  GET_SIGNERS = "get_signers",
+  GET_THRESHOLD = "get_threshold",
+
+  // write
+  ADD_SIGNERS = "add_signers",
+  CHANGE_THRESHOLD = "change_threshold",
+  REMOVE_SIGNERS = "remove_signers",
+  REPLACE_SIGNER = "replace_signer",
+}
+
+export const enum MultisigTransactionType {
+  MULTISIG_ADD_SIGNERS = "MULTISIG_ADD_SIGNERS",
+  MULTISIG_CHANGE_THRESHOLD = "MULTISIG_CHANGE_THRESHOLD",
+  MULTISIG_REMOVE_SIGNERS = "MULTISIG_REMOVE_SIGNERS",
+  MULTISIG_REPLACE_SIGNER = "MULTISIG_REPLACE_SIGNER",
+}
 
 export interface BasePendingMultisig {
   networkId: string
@@ -10,3 +30,20 @@ export interface PendingMultisig extends BasePendingMultisig {
   type: "multisig"
   hidden?: boolean
 }
+
+export interface SignerMetadata {
+  key: string
+  name: string
+}
+export interface MultisigMetadata {
+  creator: string
+  signers: SignerMetadata[]
+}
+
+export type IPendingMultisigsRepositary = IRepository<PendingMultisig>
+
+export type MultisigBaseWalletRepositary =
+  IRepository<BaseMultisigWalletAccount>
+
+export type IMultisigBaseWalletRepositary =
+  IRepository<BaseMultisigWalletAccount>

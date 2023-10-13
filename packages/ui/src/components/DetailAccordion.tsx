@@ -15,7 +15,7 @@ import {
 import { FC, PropsWithChildren, ReactNode } from "react"
 
 import { CopyTooltip } from "./CopyTooltip"
-import { P4 } from "./Typography"
+import { P4, typographyStyles } from "./Typography"
 
 export const DetailAccordionHeader: FC<PropsWithChildren> = (props) => {
   return (
@@ -27,8 +27,8 @@ export const DetailAccordionHeader: FC<PropsWithChildren> = (props) => {
       mb={"1px"}
       className={"detail-accordion__header"}
     >
-      <P4
-        as={Flex}
+      <Flex
+        {...typographyStyles.P4}
         alignItems="center"
         gap="1"
         fontWeight="medium"
@@ -133,9 +133,14 @@ export const DetailAccordionButton: FC<
     >
       {label && <P4 fontWeight="medium">{label}</P4>}
       {value && (
-        <P4 color="neutrals.400" fontWeight="medium">
+        <Flex
+          {...typographyStyles.P4}
+          color="neutrals.400"
+          fontWeight="medium"
+          noOfLines={1}
+        >
           {value}
-        </P4>
+        </Flex>
       )}
       {children}
     </AccordionButton>
@@ -163,19 +168,19 @@ export const DetailAccordionRow: FC<
   return (
     <Flex justifyContent="space-between" gap="2" {...rest}>
       {header && (
-        <P4
-          as={Flex}
+        <Flex
+          {...typographyStyles.P4}
           alignItems="center"
           gap="1"
           color="neutrals.300"
           fontWeight="medium"
         >
           {header}
-        </P4>
+        </Flex>
       )}
       {label && (
-        <P4
-          as={Flex}
+        <Flex
+          {...typographyStyles.P4}
           alignItems="center"
           gap="1"
           color="neutrals.400"
@@ -197,10 +202,16 @@ export const DetailAccordionRow: FC<
           ) : (
             <>{label}</>
           )}
-        </P4>
+        </Flex>
       )}
       {value && (
-        <P4 color="neutrals.500" fontWeight="medium" maxWidth="70%">
+        <Flex
+          {...typographyStyles.P4}
+          color="neutrals.500"
+          fontWeight="medium"
+          maxWidth="70%"
+          noOfLines={1}
+        >
           {copyValue ? (
             <CopyTooltip copyValue={copyValue}>
               <Box
@@ -228,7 +239,7 @@ export const DetailAccordionRow: FC<
               {value}
             </Box>
           )}
-        </P4>
+        </Flex>
       )}
       {children}
     </Flex>

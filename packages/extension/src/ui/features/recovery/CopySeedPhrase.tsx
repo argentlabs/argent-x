@@ -22,7 +22,7 @@ export const CopySeedPhrase: FC<{ seedPhrase?: string }> = ({ seedPhrase }) => {
   }
 
   return (
-    <ColumnCenter gap="16px">
+    <ColumnCenter gap="12px">
       <WarningText>
         We do not recommend copying your recovery phrase to your clipboard. It
         can leave it susceptible to exploit!
@@ -33,8 +33,8 @@ export const CopySeedPhrase: FC<{ seedPhrase?: string }> = ({ seedPhrase }) => {
         text={seedPhrase}
       >
         <CopySeedPhraseButton active={seedPhraseCopied}>
-          {seedPhraseCopied ? "Copied" : "Copy"}
           <WarningIconRounded />
+          {seedPhraseCopied ? "Copied" : "Copy"}
         </CopySeedPhraseButton>
       </CopyToClipboard>
     </ColumnCenter>

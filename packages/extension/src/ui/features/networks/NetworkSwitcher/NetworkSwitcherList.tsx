@@ -2,7 +2,7 @@ import { B3, L2 } from "@argent/ui"
 import { Flex, MenuItem, MenuList } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { Network } from "../../../../shared/network"
+import { Network, NetworkStatus } from "../../../../shared/network"
 import {
   StatusIndicator,
   mapNetworkStatusToColor,
@@ -10,7 +10,7 @@ import {
 
 interface NetworkSwitcherListProps {
   currentNetwork: Network
-  allNetworks: Network[]
+  allNetworks: (Network & { status: NetworkStatus })[]
   onChangeNetwork: (id: string) => void
 }
 
@@ -21,8 +21,9 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
 }) => {
   return (
     <MenuList>
-      {allNetworks.map(({ id, name, baseUrl, status }) => {
+      {allNetworks.map(({ id, name, sequencerUrl, status, rpcUrl }) => {
         const isCurrent = id === currentNetwork.id
+        const url = rpcUrl || sequencerUrl
         return (
           <MenuItem
             key={id}
@@ -57,15 +58,22 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
                 >
                   {name}
                 </B3>
-                <L2
-                  sx={{
-                    color: "neutrals.400",
-                    _groupHover: { color: "neutrals.300" },
-                  }}
-                  noOfLines={1}
-                >
-                  {baseUrl}
-                </L2>
+                {url && (
+                  <L2
+                    sx={{
+                      color: "neutrals.400",
+                      _groupHover: { color: "neutrals.300" },
+                    }}
+                    noOfLines={1}
+                    display="block"
+                    overflow={"hidden"}
+                    textOverflow={"ellipsis"}
+                    maxWidth={"180px"}
+                    whiteSpace={"nowrap"}
+                  >
+                    {url}
+                  </L2>
+                )}
               </Flex>
               <StatusIndicator color={mapNetworkStatusToColor(status)} />
             </Flex>

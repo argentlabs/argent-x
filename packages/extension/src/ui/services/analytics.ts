@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef } from "react"
 import {
   AddFundsServices,
   Events,
-  Pages,
   activeStore,
   getAnalytics,
 } from "../../shared/analytics"
@@ -31,16 +30,6 @@ import {
 */
 
 export const analytics = getAnalytics(fetch)
-
-export const usePageTracking = <T extends keyof Pages>(
-  name: T,
-  ...rest: Pages[T] extends undefined ? [data?: Pages[T]] : [data: Pages[T]]
-) => {
-  useEffect(() => {
-    analytics.page(name, ...rest)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, rest[0]]) // as React in strict mode renders every component twice, this page will be tracked 2x in development. This is not the case in production.
-}
 
 export const useTimeSpentWithSuccessTracking = <T extends keyof Events>(
   event: T,

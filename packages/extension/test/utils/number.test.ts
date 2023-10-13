@@ -1,6 +1,4 @@
-import CurrencyConversionNumber from "bignumber.js"
-import { BigNumber } from "ethers"
-import { number } from "starknet"
+import { num } from "starknet"
 
 import {
   isNumeric,
@@ -9,7 +7,7 @@ import {
   prettifyTokenNumber,
 } from "../../src/shared/utils/number"
 
-const { toBN } = number
+const { toBigInt } = num
 
 describe("prettifyNumber()", () => {
   describe("when valid", () => {
@@ -75,9 +73,8 @@ describe("isNumeric()", () => {
     test("should return true", () => {
       expect(isNumeric(0)).toBeTruthy()
       expect(isNumeric("123")).toBeTruthy()
-      expect(isNumeric(BigNumber.from(123))).toBeTruthy()
-      expect(isNumeric(new CurrencyConversionNumber("1.23"))).toBeTruthy()
-      expect(isNumeric(toBN(123))).toBeTruthy()
+      expect(isNumeric(BigInt(123))).toBeTruthy()
+      expect(isNumeric(toBigInt(123))).toBeTruthy()
     })
   })
   describe("when invalid", () => {

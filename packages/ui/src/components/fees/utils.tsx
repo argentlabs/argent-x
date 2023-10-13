@@ -1,6 +1,9 @@
-import { TokenWithBalance, prettifyTokenAmount } from "@argent/shared"
+import {
+  TokenWithBalance,
+  bigDecimal,
+  prettifyTokenAmount,
+} from "@argent/shared"
 import { Flex, useColorMode } from "@chakra-ui/react"
-import { formatEther, toBigInt } from "ethers"
 import { useMemo } from "react"
 
 import { L1, P4 } from "../Typography"
@@ -42,8 +45,8 @@ export function getTooltipTextBase(maxFee?: bigint, feeTokenBalance?: bigint) {
   if (feeTokenBalance > maxFee) {
     return "Network fees are paid to the network to include transactions in blocks"
   }
-  return `Insufficient balance to pay network fees. You need at least ${formatEther(
-    toBigInt(maxFee) - feeTokenBalance,
+  return `Insufficient balance to pay network fees. You need at least ${bigDecimal.formatEther(
+    BigInt(maxFee) - feeTokenBalance,
   )} ETH more.`
 }
 
@@ -107,8 +110,10 @@ export const TooltipTextCombined = ({
   return (
     <P4 color={isDark ? "neutrals.500" : "black"}>
       Insufficient balance to pay network fees. You need at least
-      {formatEther(toBigInt(totalMaxFee) - toBigInt(feeToken.balance))} ETH
-      more.
+      {bigDecimal.formatEther(
+        BigInt(totalMaxFee) - BigInt(feeToken.balance),
+      )}{" "}
+      ETH more.
     </P4>
   )
 }

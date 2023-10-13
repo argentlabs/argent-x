@@ -1,23 +1,24 @@
 import { AllowArray } from "starknet"
 
-import { getNetwork } from "../../network"
+import { networkService } from "../../network/service"
 import { SelectorFn } from "../../storage/types"
 import {
   BaseMultisigWalletAccount,
   MultisigWalletAccount,
 } from "../../wallet.model"
-import { pendingMultisigEqual, pendingMultisigStore } from "./../store"
+import { pendingMultisigRepo } from "../repository"
 import { BasePendingMultisig, PendingMultisig } from "../types"
-import { addMultisigAccounts } from "./baseMultisig"
+import { addMultisigAccount } from "./baseMultisig"
 import {
   getPendingMultisigSelector,
+  pendingMultisigEqual,
   withoutHiddenPendingMultisig,
 } from "./selectors"
 
 export async function getAllPendingMultisigs(
   selector: SelectorFn<PendingMultisig> = withoutHiddenPendingMultisig,
 ): Promise<PendingMultisig[]> {
-  return pendingMultisigStore.get(selector)
+  return pendingMultisigRepo.get(selector)
 }
 
 export async function getPendingMultisig(
@@ -32,7 +33,7 @@ export async function getPendingMultisig(
 export async function addPendingMultisig(
   pendingMultisig: AllowArray<PendingMultisig>,
 ): Promise<void> {
-  return pendingMultisigStore.push(pendingMultisig)
+  await pendingMultisigRepo.upsert(pendingMultisig)
 }
 
 export async function removePendingMultisig(
@@ -44,14 +45,14 @@ export async function removePendingMultisig(
     throw new Error("Pending multisig to remove not found")
   }
 
-  return pendingMultisigStore.remove(pendingMultisig)
+  return pendingMultisigRepo.remove(pendingMultisig)
 }
 
 export async function pendingMultisigToMultisig(
   basePendingMultisig: BasePendingMultisig,
   multisigData: BaseMultisigWalletAccount,
 ) {
-  const network = await getNetwork(multisigData.networkId)
+  const network = await networkService.getById(multisigData.networkId)
 
   const pendingMultisig = await getPendingMultisig(basePendingMultisig)
 
@@ -69,13 +70,14 @@ export async function pendingMultisigToMultisig(
     publicKey: pendingMultisig.publicKey,
     threshold: multisigData.threshold,
     creator: multisigData.creator,
+    updatedAt: multisigData.updatedAt,
     network,
     needsDeploy: false,
     hidden: false,
   }
 
   await removePendingMultisig(pendingMultisig)
-  await addMultisigAccounts(fullMultisig)
+  await addMultisigAccount(fullMultisig)
   return fullMultisig
 }
 
@@ -87,7 +89,7 @@ export async function updatePendingMultisigName(
   if (!hit) {
     return
   }
-  await pendingMultisigStore.push({
+  await pendingMultisigRepo.upsert({
     ...hit,
     name,
   })
@@ -98,19 +100,22 @@ export async function hidePendingMultisig(base: BasePendingMultisig) {
   if (!hit) {
     return
   }
-  await pendingMultisigStore.push({
+  await pendingMultisigRepo.upsert({
     ...hit,
     hidden: true,
   })
 }
 
-export async function unhidePendingMultisig(base: BasePendingMultisig) {
+export async function unhidePendingMultisig(
+  base: BasePendingMultisig,
+  hidden: boolean,
+) {
   const [hit] = await getAllPendingMultisigs(getPendingMultisigSelector(base))
   if (!hit) {
     return
   }
-  await pendingMultisigStore.push({
+  await pendingMultisigRepo.upsert({
     ...hit,
-    hidden: false,
+    hidden,
   })
 }

@@ -1,15 +1,21 @@
 {
   "name": "@argent-x/e2e",
   "private": true,
-  "version": "6.3.0",
+  "version": "6.3.2",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.32.0",
-    "@types/node": "^18.15.11"
+    "@argent/shared": "workspace:^",
+    "@argent/x-multicall": "workspace:^",
+    "@playwright/test": "^1.37.1",
+    "@types/node": "^20.5.7",
+    "@types/uuid": "^9.0.3",
+    "dotenv": "^16.3.1",
+    "starknet": "5.18.0",
+    "uuid": "^9.0.0"
   },
   "scripts": {
-    "test:e2e:extension": "playwright test ./extension",
-    "test:e2e": "yarn run test:e2e:extension"
+    "test:extension": "pnpm playwright test --config=./extension",
+    "test:webwallet": "pnpm playwright test --config=./webwallet"
   }
 }

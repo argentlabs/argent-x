@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-swap",
-  "version": "6.3.0",
+  "version": "6.3.2",
   "license": "MIT",
   "private": true,
   "files": [
@@ -8,11 +8,11 @@
   ],
   "main": "./dist/x-swap.umd.js",
   "module": "./dist/x-swap.es.js",
-  "types": "./dist/x-swap.d.ts",
   "exports": {
     ".": {
       "import": "./dist/x-swap.es.js",
-      "require": "./dist/x-swap.umd.js"
+      "require": "./dist/x-swap.umd.js",
+      "types": "./dist/x-swap.d.ts"
     }
   },
   "scripts": {
@@ -23,12 +23,12 @@
     "lint": "eslint . --cache --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@argent/x-multicall": "^6.3.0",
     "@chakra-ui/react": "^2.6.1",
     "big.js": "^6.2.1",
     "decimal.js-light": "^2.5.1",
     "jsbi": "^4.3.0",
     "micro-starknet": "^0.2.3",
-    "starknet": "^4.21.0",
     "swr": "^1.3.0",
     "tiny-invariant": "^1.2.0",
     "tiny-warning": "^1.0.3",
@@ -41,16 +41,17 @@
     "@types/jest": "^29.2.5",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
-    "@vitejs/plugin-react": "^3.0.0",
     "babel-plugin-transform-jsbi-to-bigint": "^1.3.1",
+    "eslint": "^8.42.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "typescript": "^4.9.4",
-    "vite": "^4.0.3",
-    "vite-plugin-dts": "2.3.0"
+    "typescript": "^5.0.4",
+    "vite": "^4.3.8",
+    "vite-plugin-dts": "3.5.4"
   },
   "peerDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "starknet": "5.18.0"
   }
 }

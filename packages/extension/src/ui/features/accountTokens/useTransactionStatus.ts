@@ -11,7 +11,7 @@ import {
 function transformStatus(status: ExtendedTransactionStatus): Status {
   return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"].includes(status)
     ? "SUCCESS"
-    : status === "REJECTED"
+    : ["REJECTED", "REVERTED"].includes(status)
     ? "ERROR"
     : status === "CANCELLED"
     ? "CANCELLED"
@@ -36,9 +36,9 @@ export const useTransactionStatus = (
   )
 
   return useMemo(() => {
-    if (!transaction?.status) {
+    if (!transaction?.finalityStatus) {
       return "UNKNOWN"
     }
-    return transformStatus(transaction.status)
-  }, [transaction?.status])
+    return transformStatus(transaction.finalityStatus)
+  }, [transaction])
 }

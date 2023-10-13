@@ -6,10 +6,6 @@ import { FormProvider, useFormContext } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import {
-  addMultisigOwners,
-  updateMultisigThreshold,
-} from "../../services/backgroundMultisigs"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
 import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
@@ -20,6 +16,7 @@ import {
 import { useMultisig } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { SetConfirmationsInput } from "./SetConfirmationsInput"
+import { multisigService } from "../../services/multisig"
 
 export const MultisigConfirmationsScreen: FC = () => {
   const account = useRouteAccount()
@@ -59,9 +56,9 @@ export const MultisigConfirmationsWithOwners = ({
   } = useFormContext<FieldValuesCreateMultisigForm>()
 
   const handleNextClick = async () => {
-    trigger()
+    await trigger()
     if (isEmpty(errors)) {
-      await addMultisigOwners({
+      await multisigService.addOwner({
         address: account.address,
         newThreshold: getValues("confirmations"),
         signersToAdd: getValues("signerKeys").map((signer) => signer.key),
@@ -90,6 +87,7 @@ export const MultisigConfirmationsWithoutOwners = ({
   account: Account
 }) => {
   const multisig = useMultisig(account)
+  const navigate = useNavigate()
 
   const {
     trigger,
@@ -97,14 +95,16 @@ export const MultisigConfirmationsWithoutOwners = ({
     getValues,
   } = useFormContext<FieldValuesThresholdForm>()
 
-  const handleNextClick = () => {
-    trigger()
+  const handleNextClick = async () => {
+    await trigger()
     const newThreshold = getValues("confirmations")
     if (!Object.keys(errors).length && newThreshold !== multisig?.threshold) {
-      updateMultisigThreshold({
+      await multisigService.updateThreshold({
         address: account.address,
         newThreshold: getValues("confirmations"),
       })
+
+      navigate(routes.accountActivity())
     }
   }
 
@@ -122,11 +122,13 @@ export const BaseMultisigConfirmations = ({
   account,
   handleNextClick,
   totalSigners,
+  threshold,
   buttonTitle = "Next",
 }: {
   account: Account
   handleNextClick: () => void | Promise<void>
   totalSigners?: number
+  threshold?: number
   buttonTitle?: string
 }) => {
   const multisig = useMultisig(account)
@@ -170,7 +172,7 @@ export const BaseMultisigConfirmations = ({
           flexDirection="column"
         >
           <SetConfirmationsInput
-            existingThreshold={multisig?.threshold}
+            existingThreshold={threshold || multisig?.threshold}
             totalSigners={totalSigners}
           />
           <Button colorScheme="primary" onClick={handleNextClick}>

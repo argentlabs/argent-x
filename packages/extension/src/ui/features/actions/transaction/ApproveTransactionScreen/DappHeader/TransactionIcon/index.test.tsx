@@ -42,7 +42,7 @@ describe("TransactionIcon", () => {
     expect(queryByTestId("declare-contract-icon")).toBeInTheDocument()
   })
 
-  it("should render SendTransactionIcon if type is apiTransactionReviewActivityType.transfer", () => {
+  it("should render SendTransactionIcon if type is apiTransactionReviewActivityType.transfer", async () => {
     vi.spyOn(
       transactionReviewService,
       "getTransactionReviewWithType",
@@ -57,11 +57,11 @@ describe("TransactionIcon", () => {
       approveScreenType: ApproveScreenType.TRANSACTION,
     }
 
-    const { queryByTestId } = render(<TransactionIcon {...props} />)
-    expect(queryByTestId("send-transaction-icon")).toBeInTheDocument()
+    render(<TransactionIcon {...props} />)
+    await screen.findByTestId("send-transaction-icon")
   })
 
-  it("should render SwapTransactionIcon if type is apiTransactionReviewActivityType.swap", () => {
+  it("should render SwapTransactionIcon if type is apiTransactionReviewActivityType.swap", async () => {
     const props: TransactionIconProps = {
       approveScreenType: ApproveScreenType.TRANSACTION,
     }
@@ -75,8 +75,8 @@ describe("TransactionIcon", () => {
       })(),
     )
 
-    const { queryByTestId } = render(<TransactionIcon {...props} />)
-    expect(queryByTestId("swap-transaction-icon")).toBeInTheDocument()
+    render(<TransactionIcon {...props} />)
+    await screen.findByTestId("swap-transaction-icon")
   })
 })
 

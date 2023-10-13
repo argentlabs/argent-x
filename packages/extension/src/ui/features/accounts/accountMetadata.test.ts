@@ -70,16 +70,19 @@ describe("Test migration", () => {
   it("should update the names in the wallet accounts", async () => {
     const mockWalletAccounts = [
       getMockWalletAccount({
+        name: undefined, // undefined name should be updated with migration
         address: "0x123",
         type: "standard",
         networkId: "localhost",
       }),
       getMockWalletAccount({
+        name: undefined,
         address: "0x456",
         type: "multisig",
         networkId: "localhost",
       }),
       getMockWalletAccount({
+        name: undefined,
         address: "0x789",
         type: "standard",
         networkId: "localhost",

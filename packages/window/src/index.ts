@@ -29,8 +29,11 @@ export type {
   ResponseResultMessage,
 } from "./messages/messenger"
 
+export { MessageAccount } from "./account"
+
 export { getArgentStarknetWindowObject } from "./starknet"
 export { WindowMessenger } from "./messages/messenger/window"
 export { Sender, Receiver } from "./messages/exchange/bidirectional"
 export { Relayer } from "./messages/exchange/relayer"
-export { StarknetMethodArgumentsSchemas } from "./types"
+export { StarknetMethodArgumentsSchemas, CallSchema } from "./types"
+export * from "./utils/mittx"

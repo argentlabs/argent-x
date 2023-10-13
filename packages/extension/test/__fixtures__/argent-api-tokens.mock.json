@@ -1,74 +1,74 @@
-{
-  "tokens": [
-    {
-      "id": 1,
-      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-      "name": "Ether",
-      "tradable": false,
-      "symbol": "ETH",
-      "decimals": 18,
-      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-      "sendable": true,
-      "brandColor": "#627EEA",
-      "description": "Ethereum is a global, open-source platform for decentralized applications. In other words, the vision is to create a world computer that anyone can build applications in a decentralized manner; while all states and data are distributed and publicly accessible.",
-      "category": "currencies",
-      "marketData": {
-        "marketCap": 131697258672,
-        "marketCap24hChange": 0.46196,
-        "dailyVolume": 14225095616,
-        "rank": 2
-      },
-      "links": [
-        { "position": 1, "name": "Website", "url": "https://ethereum.org/" },
-        {
-          "position": 2,
-          "name": "Twitter",
-          "url": "https://twitter.com/ethereum"
-        },
-        {
-          "position": 3,
-          "name": "Coingecko",
-          "url": "https://www.coingecko.com/en/coins/ethereum"
-        },
-        {
-          "position": 4,
-          "name": "Reddit",
-          "url": "https://www.reddit.com/r/ethereum/"
-        }
-      ],
-      "popular": true,
-      "tags": ["web3"],
-      "pricingId": 1
+[
+  {
+    "id": 1,
+    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+    "networkId": "goerli-alpha",
+    "name": "Ether",
+    "tradable": false,
+    "symbol": "ETH",
+    "decimals": 18,
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "sendable": true,
+    "brandColor": "#627EEA",
+    "description": "Ethereum is a global, open-source platform for decentralized applications. In other words, the vision is to create a world computer that anyone can build applications in a decentralized manner; while all states and data are distributed and publicly accessible.",
+    "category": "currencies",
+    "marketData": {
+      "marketCap": 131697258672,
+      "marketCap24hChange": 0.46196,
+      "dailyVolume": 14225095616,
+      "rank": 2
     },
-    {
-      "id": 6,
-      "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
-      "name": "DAI",
-      "tradable": false,
-      "symbol": "DAI",
-      "decimals": 18,
-      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
-      "sendable": true,
-      "brandColor": "#F4B731",
-      "description": "Dai is the world’s first unbiased currency. Unlike traditional currencies, it’s resistant to geopolitical instability and manipulation. Dai is the leading decentralized, asset-backed, stablecoin — though currently on Ethereum, Dai is built to be blockchain agnostic. Dai eliminates volatility through an autonomous system of smart contracts called the Maker Protocol and decentralized community governance.",
-      "category": "currencies",
-      "marketData": {
-        "marketCap": 6463545547,
-        "marketCap24hChange": 0.50333,
-        "dailyVolume": 244897885,
-        "rank": 12
+    "links": [
+      { "position": 1, "name": "Website", "url": "https://ethereum.org/" },
+      {
+        "position": 2,
+        "name": "Twitter",
+        "url": "https://twitter.com/ethereum"
       },
-      "links": [
-        { "position": 1, "name": "Website", "url": "https://makerdao.com/" },
-        {
-          "position": 2,
-          "name": "Twitter",
-          "url": "https://twitter.com/MakerDAO"
-        }
-      ],
-      "popular": false,
-      "tags": ["stablecoin"],
-      "pricingId": 25
-    }
-  ]
-}
+      {
+        "position": 3,
+        "name": "Coingecko",
+        "url": "https://www.coingecko.com/en/coins/ethereum"
+      },
+      {
+        "position": 4,
+        "name": "Reddit",
+        "url": "https://www.reddit.com/r/ethereum/"
+      }
+    ],
+    "popular": true,
+    "tags": ["web3"],
+    "pricingId": 1
+  },
+  {
+    "id": 6,
+    "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+    "networkId": "goerli-alpha",
+    "name": "DAI",
+    "tradable": false,
+    "symbol": "DAI",
+    "decimals": 18,
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
+    "sendable": true,
+    "brandColor": "#F4B731",
+    "description": "Dai is the world’s first unbiased currency. Unlike traditional currencies, it’s resistant to geopolitical instability and manipulation. Dai is the leading decentralized, asset-backed, stablecoin — though currently on Ethereum, Dai is built to be blockchain agnostic. Dai eliminates volatility through an autonomous system of smart contracts called the Maker Protocol and decentralized community governance.",
+    "category": "currencies",
+    "marketData": {
+      "marketCap": 6463545547,
+      "marketCap24hChange": 0.50333,
+      "dailyVolume": 244897885,
+      "rank": 12
+    },
+    "links": [
+      { "position": 1, "name": "Website", "url": "https://makerdao.com/" },
+      {
+        "position": 2,
+        "name": "Twitter",
+        "url": "https://twitter.com/MakerDAO"
+      }
+    ],
+    "popular": false,
+    "tags": ["stablecoin"],
+    "pricingId": 25
+  }
+]

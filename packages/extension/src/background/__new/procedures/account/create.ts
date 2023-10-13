@@ -9,7 +9,11 @@ import { extensionOnlyProcedure } from "../permissions"
 
 const createAccountInputSchema = z.object({
   networkId: z.string(),
-  type: z.union([z.literal("standard"), z.literal("multisig")]),
+  type: z.union([
+    z.literal("standard"),
+    z.literal("multisig"),
+    z.literal("standardCairo0"),
+  ]),
 })
 
 export const createAccountProcedure = extensionOnlyProcedure

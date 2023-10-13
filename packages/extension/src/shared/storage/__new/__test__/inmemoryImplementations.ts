@@ -39,6 +39,7 @@ export class InMemoryObjectStore<T> implements IObjectStore<T> {
   }
 
   async set(value: T): Promise<void> {
+    // needs to be fixed for unit testing -- value reference between new and old is always the same
     const oldValue = this._data
     this._data = this._merge(oldValue, value)
     const change: StorageChange<T> = { oldValue, newValue: this._data }

@@ -14,10 +14,20 @@ export const useSentryInit = () => {
     "privacyAutomaticErrorReporting",
   )
 
+  const environment = process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV
+
+  let release = process.env.npm_package_version
+  const commitHash = process.env.COMMIT_HASH
+
+  if (environment === "staging" && commitHash) {
+    release = `${release}-rc__${commitHash}`
+  }
+
   useEffect(() => {
     Sentry.init({
       dsn: process.env.SENTRY_DSN,
-      environment: process.env.NODE_ENV,
+      environment,
+      release,
       autoSessionTracking: false, // don't want to track user sessions.
       enabled: enableErrorReporting,
       beforeSend(event) {
@@ -30,5 +40,5 @@ export const useSentryInit = () => {
         return null
       },
     })
-  }, [automaticErrorReporting, enableErrorReporting])
+  }, [automaticErrorReporting, enableErrorReporting, environment, release])
 }

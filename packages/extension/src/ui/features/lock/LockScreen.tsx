@@ -1,14 +1,12 @@
-import { Button, H2, P3, P4, logos } from "@argent/ui"
-import { Box, Flex, Text } from "@chakra-ui/react"
 import { FC, useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
+import { Button, H2, P3, P4, logos } from "@argent/ui"
+import { Box, Flex, Text } from "@chakra-ui/react"
 
 import { routes } from "../../routes"
 import { unlockedExtensionTracking } from "../../services/analytics"
-import { startSession } from "../../services/backgroundSessions"
-import { useActions } from "../actions/actions.state"
-import { EXTENSION_IS_POPUP } from "../browser/constants"
+import { sessionService } from "../../services/session"
 import { recover } from "../recovery/recovery.service"
 import { PasswordForm } from "./PasswordForm"
 
@@ -16,9 +14,23 @@ const { ArgentXLogo } = logos
 
 export const LockScreen: FC = () => {
   const navigate = useNavigate()
-  const actions = useActions()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>()
+  const handleVerifyPassword = async (password: string) => {
+    setIsLoading(true)
+    try {
+      await sessionService.startSession(password)
+      unlockedExtensionTracking()
+      const target = await recover()
+      navigate(target, { replace: true })
+      return true
+    } catch {
+      setError("Incorrect password")
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <Flex flex={1} flexDirection={"column"} py={6} px={5}>
       <Flex
@@ -47,30 +59,7 @@ export const LockScreen: FC = () => {
         </Box>
 
         <Box width="100%">
-          <PasswordForm
-            error={error}
-            verifyPassword={async (password) => {
-              setIsLoading(true)
-              try {
-                await startSession(password)
-                unlockedExtensionTracking()
-                const target = await recover()
-
-                // If only called by dapp (in popup) because the wallet was locked, but the dapp is already whitelisted/no transactions requested (actions=0), then close
-                if (EXTENSION_IS_POPUP && !actions.length) {
-                  window.close()
-                }
-
-                navigate(target, { replace: true })
-                return true
-              } catch {
-                setError("Incorrect password")
-                return false
-              } finally {
-                setIsLoading(false)
-              }
-            }}
-          >
+          <PasswordForm error={error} verifyPassword={handleVerifyPassword}>
             {({ isDirty, isSubmitting }) => (
               <Flex position={"absolute"} left={0} bottom={0} right={0}>
                 <Button

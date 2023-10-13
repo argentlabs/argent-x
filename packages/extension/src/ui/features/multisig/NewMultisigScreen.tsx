@@ -1,12 +1,5 @@
-import {
-  BarCloseButton,
-  H6,
-  NavigationContainer,
-  P4,
-  icons,
-  logos,
-} from "@argent/ui"
-import { Center, Flex } from "@chakra-ui/react"
+import { BarCloseButton, H6, NavigationContainer, P4, icons } from "@argent/ui"
+import { Center, Flex, Text } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -16,9 +9,10 @@ import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
 import { useCreatePendingMultisig } from "./hooks/useCreatePendingMultisig"
+import { usePendingMultisigs } from "./multisig.state"
+import { uiService } from "../../../shared/__new/services/ui"
 
-const { AddIcon, MultisigJoinIcon } = icons
-const { MultisigDiagram } = logos
+const { AddIcon, MultisigJoinIcon, MultisigImageIcon: MultisigDiagram } = icons
 
 type MultisigOptionType = "create" | "join"
 
@@ -37,7 +31,7 @@ const multisigOptions: MultisigOption[] = [
   },
   {
     title: "Join existing multisig",
-    subtitle: "Create a new signer key",
+    subtitle: "Create a new signer pubkey",
     type: "join",
     icon: <MultisigJoinIcon />,
   },
@@ -47,6 +41,9 @@ export const NewMultisigScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { createPendingMultisig } = useCreatePendingMultisig()
+
+  // HACK - this is a workaround to force the pending multisigs to be updated
+  const pendingMultisigs = usePendingMultisigs({ showHidden: true })
 
   const onClick = useCallback(
     async (type: MultisigOptionType) => {
@@ -60,6 +57,7 @@ export const NewMultisigScreen: FC = () => {
             url,
           })
           navigate(routes.accounts())
+          void uiService.closePopup()
           break
         }
 
@@ -94,7 +92,9 @@ export const NewMultisigScreen: FC = () => {
           borderColor="white30"
           mb={1}
         >
-          <MultisigDiagram />
+          <Text fontSize="58px">
+            <MultisigDiagram />
+          </Text>
           <P4 color="neutrals.100" flex={1} textAlign="left">
             A multisig allows multiple owners to manage an account by requiring
             multiple confirmations for a transaction

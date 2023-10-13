@@ -1,7 +1,6 @@
 import { Empty, EmptyButton, icons } from "@argent/ui"
 import { FC, ReactEventHandler } from "react"
 
-import { AccountNavigationBarContainer } from "./AccountNavigationBarContainer"
 import { HiddenAccountsBarContainer } from "./HiddenAccountsBar"
 
 const { WalletIcon, AddIcon } = icons
@@ -19,7 +18,6 @@ export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
 }) => {
   return (
     <>
-      <AccountNavigationBarContainer showAccountButton={false} />
       <Empty
         icon={<WalletIcon />}
         title={`You have no ${

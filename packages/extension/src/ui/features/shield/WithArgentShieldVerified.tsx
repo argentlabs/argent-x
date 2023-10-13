@@ -1,5 +1,6 @@
 import { AlertDialog } from "@argent/ui"
 import { Skeleton, VStack } from "@chakra-ui/react"
+import { useAtom } from "jotai"
 import { isArray } from "lodash-es"
 import {
   FC,
@@ -9,23 +10,19 @@ import {
   useMemo,
   useState,
 } from "react"
-import { useNavigate } from "react-router-dom"
 import { Call } from "starknet"
 
-import { ARGENT_SHIELD_ENABLED } from "../../../shared/shield/constants"
 import { guardianSignerNotRequired } from "../../../shared/shield/GuardianSignerArgentX"
 import { resetDevice } from "../../../shared/shield/jwt"
-import {
-  requestEmail,
-  shieldIsTokenExpired,
-} from "../../../shared/shield/register"
 import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/shield/verifiedEmail"
 import { coerceErrorToString } from "../../../shared/utils/error"
-import { useSelectedAccount } from "../accounts/accounts.state"
-import { WithArgentServicesEnabled } from "../settings/WithArgentServicesEnabled"
-import { useShieldState } from "./shield.state"
-import { ShieldBaseEmailScreen } from "./ShieldBaseEmailScreen"
+
+import { argentAccountService } from "../../services/argentAccount"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
+import { ArgentAccountBaseEmailScreen } from "../argentAccount/ArgentAccountBaseEmailScreen"
 import { ShieldBaseOTPScreen } from "./ShieldBaseOTPScreen"
+import { shieldStateAtom } from "./shield.state"
 import { useAccountGuardianIsSelf } from "./useAccountGuardian"
 import {
   ChangeGuardian,
@@ -58,25 +55,22 @@ export const WithArgentShieldVerified: FC<PropsWithTransactions> = ({
   children,
   transactions,
 }) => {
-  return ARGENT_SHIELD_ENABLED ? (
-    <WithArgentServicesEnabled>
-      <WithArgentShieldEnabledVerified transactions={transactions}>
-        {children}
-      </WithArgentShieldEnabledVerified>
-    </WithArgentServicesEnabled>
-  ) : (
-    <>{children}</>
+  return (
+    <WithArgentShieldVerifiedScreen transactions={transactions}>
+      {children}
+    </WithArgentShieldVerifiedScreen>
   )
 }
 
-const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
+const WithArgentShieldVerifiedScreen: FC<PropsWithTransactions> = ({
   children,
   transactions,
 }) => {
-  const unverifiedEmail = useShieldState((state) => state.unverifiedEmail)
-  const account = useSelectedAccount()
+  const [shieldState, setShieldState] = useAtom(shieldStateAtom)
+  const { unverifiedEmail } = shieldState
+  const account = useView(selectedAccountView)
+
   const verifiedEmail = useShieldVerifiedEmail()
-  const navigate = useNavigate()
   const hasGuardian = Boolean(account?.guardian)
   const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
   const [error, setError] = useState<string>()
@@ -96,7 +90,11 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
   )
 
   const isRemoveGuardian = useMemo(() => {
-    if (calls?.[0]?.entrypoint === "changeGuardian") {
+    if (
+      ["changeGuardian", "change_guardian"].includes(
+        calls?.[0]?.entrypoint || "",
+      )
+    ) {
       const type = changeGuardianCallDataToType(transactions)
       return type === ChangeGuardian.REMOVING
     }
@@ -112,8 +110,8 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
   }, [calls])
 
   const resetUnverifiedEmail = useCallback(() => {
-    useShieldState.setState({ unverifiedEmail: undefined })
-  }, [])
+    setShieldState({ unverifiedEmail: undefined })
+  }, [setShieldState])
 
   // email actions
 
@@ -131,10 +129,13 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
     setAlertDialogIsOpen(true)
   }, [])
 
-  const onEmailRequested = useCallback((email: string) => {
-    useShieldState.setState({ unverifiedEmail: email })
-    setState(ArgentShieldVerifiedState.VERIFY_OTP)
-  }, [])
+  const onEmailRequested = useCallback(
+    (email: string) => {
+      setShieldState({ unverifiedEmail: email })
+      setState(ArgentShieldVerifiedState.VERIFY_OTP)
+    },
+    [setShieldState],
+  )
 
   // otp actions
 
@@ -163,19 +164,33 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
             // restore ui state to OTP screen rather than email
             setState(ArgentShieldVerifiedState.VERIFY_OTP)
           } else {
-            // need to ask for and verify email
-            setState(ArgentShieldVerifiedState.VERIFY_EMAIL)
+            // ignore unwanted state transitions caused by unverifiedEmail/verifiedEmail not yet propagated
+            // TODO: refactor - this could potentially be improved with a combination of 'loading' states and possibly XState machine
+            if (
+              ![
+                ArgentShieldVerifiedState.VERIFY_OTP,
+                ArgentShieldVerifiedState.VERIFIED,
+                ArgentShieldVerifiedState.USER_ABORTED,
+              ].includes(state)
+            ) {
+              // need to ask for and verify email
+              setState(ArgentShieldVerifiedState.VERIFY_EMAIL)
+            }
           }
         } else {
           const isTokenExpired = isRemoveGuardian
             ? await getVerifiedEmailIsExpiredForRemoval()
-            : await shieldIsTokenExpired()
+            : await argentAccountService.isTokenExpired()
           if (isTokenExpired) {
             // need to re-verify existing email
             try {
+              // reflect unverifiedEmail in overall state
+              setShieldState({ unverifiedEmail: verifiedEmail })
+              // need to use immediate local copy too
+              const _unverifiedEmail = verifiedEmail
               await resetDevice()
-              await requestEmail(verifiedEmail)
-              setState(ArgentShieldVerifiedState.VERIFY_OTP)
+              await argentAccountService.requestEmail(_unverifiedEmail)
+              onEmailRequested(_unverifiedEmail)
             } catch (error) {
               console.error(coerceErrorToString(error))
 
@@ -193,7 +208,9 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
     cosignNotRequired,
     hasGuardian,
     isRemoveGuardian,
-    navigate,
+    onEmailRequested,
+    setShieldState,
+    state,
     unverifiedEmail,
     verifiedEmail,
   ])
@@ -221,19 +238,19 @@ const WithArgentShieldEnabledVerified: FC<PropsWithTransactions> = ({
             confirmTitle={"Continue"}
             onConfirm={onAlertDialogCancel}
           />
-          <ShieldBaseEmailScreen
+          <ArgentAccountBaseEmailScreen
             onCancel={onEmailCancel}
             onEmailRequested={onEmailRequested}
-            hasGuardian={hasGuardian}
+            flow="shield"
           />
         </>
       )
     case ArgentShieldVerifiedState.VERIFY_OTP:
       return (
         <ShieldBaseOTPScreen
-          onBack={onResetEmailRequest}
+          onBack={() => void onResetEmailRequest()}
           email={unverifiedEmail}
-          onOTPReEnterEmail={onResetEmailRequest}
+          onOTPReEnterEmail={() => void onResetEmailRequest()}
           onOTPConfirmed={onOTPConfirmed}
         />
       )

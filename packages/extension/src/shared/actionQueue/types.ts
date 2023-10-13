@@ -10,15 +10,9 @@ import type {
 import { Network } from "../network"
 import { TransactionMeta } from "../transactions"
 import { BaseWalletAccount } from "../wallet.model"
+import { ActionQueueItem } from "./schema"
 
-export interface QueueItem {
-  meta: {
-    hash: string
-    expires: number
-  }
-}
-
-export type ExtQueueItem<T> = QueueItem & T
+export type ExtQueueItem<T> = ActionQueueItem & T
 
 export interface TransactionActionPayload {
   transactions: Call | Call[]
@@ -62,6 +56,10 @@ export type ActionItem =
     }
   | {
       type: "REQUEST_SWITCH_CUSTOM_NETWORK"
+      payload: Network
+    }
+  | {
+      type: "REQUEST_ADD_CUSTOM_NETWORK"
       payload: Network
     }
   | {

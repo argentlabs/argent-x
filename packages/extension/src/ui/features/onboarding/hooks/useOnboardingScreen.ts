@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom"
 
 import { useAppState } from "../../../app.state"
 import { routes } from "../../../routes"
-import { isInitialized } from "../../../services/backgroundSessions"
 import { extensionIsInTab, openExtensionInTab } from "../../browser/tabs"
+import { isBackupStoredView } from "../../../views/session"
+import { useView } from "../../../views/implementation/react"
 
 /**
  * This hook is used to redirect to the finish screen if the wallet is already initialised
@@ -17,13 +18,14 @@ export const useOnboardingScreen = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { isFirstRender } = useAppState()
+  const isBackupStored = useView(isBackupStoredView)
+
   // TODO: this should not be nessessary, instead of pulling a value on focus, the UI should react to changes in real time by subscribing to the store
   useEffect(() => {
     /** on window focus, check if the wallet was initialised elsewhere and redirect to finish screen */
     const onFocus = async () => {
-      const { initialized } = await isInitialized()
       if (
-        initialized &&
+        isBackupStored &&
         isFirstRender &&
         location.pathname !== routes.onboardingFinish.path &&
         location.pathname !== routes.onboardingRestorePassword.path // feels very hacky this useEffect here, need to find something more sustainable
@@ -36,7 +38,7 @@ export const useOnboardingScreen = () => {
     return () => {
       window.removeEventListener("focus", onFocus)
     }
-  }, [location.pathname, navigate, isFirstRender])
+  }, [location.pathname, navigate, isFirstRender, isBackupStored])
 
   // NOTE: check if extension is in a tab, if not, open it in a tab
   const didRunInit = useRef(false)

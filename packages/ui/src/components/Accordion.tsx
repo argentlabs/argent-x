@@ -14,44 +14,70 @@ const { definePartsStyle, defineMultiStyleConfig } =
 
 const baseStyle = definePartsStyle((props) => {
   const { colorScheme: c } = props
+  if (c === "error") {
+    return {
+      container: {
+        bg: "error.900",
+        borderRadius: "lg",
+        color: "error.500",
+        border: "none",
+        overflow: "hidden",
+      },
+      panel: {
+        color: "error.300",
+      },
+      icon: {
+        color: "white",
+      },
+      button: {
+        bg: "error.500",
+        color: "white",
+        _hover: {
+          bg: "error.600",
+        },
+      },
+    }
+  }
+  if (c === "neutrals") {
+    return {
+      container: {
+        bg: "transparent",
+        borderRadius: "lg",
+        border: "none",
+        overflow: "hidden",
+      },
+      panel: {
+        color: "white",
+        bg: "neutrals.800",
+        mt: "1px",
+      },
+      icon: {
+        color: "white",
+      },
+      button: {
+        bg: "neutrals.800",
+        color: "white",
+        _hover: {
+          bg: "neutrals.700",
+        },
+      },
+    }
+  }
   return {
-    container:
-      c === "error"
-        ? {
-            bg: "error.900",
-            borderRadius: "lg",
-            color: "error.500",
-            border: "none",
-            overflow: "hidden",
-          }
-        : {
-            border: "solid 1px",
-            borderRadius: "lg",
-            color: "neutrals.700",
-          },
-    panel:
-      c === "error"
-        ? {
-            color: "error.300",
-          }
-        : {
-            color: "white",
-          },
+    container: {
+      border: "solid 1px",
+      borderRadius: "lg",
+      color: "neutrals.700",
+    },
+    panel: {
+      color: "white",
+    },
     icon: {
       color: "white",
     },
-    button:
-      c === "error"
-        ? {
-            bg: "error.500",
-            color: "white",
-            _hover: {
-              bg: "error.600",
-            },
-          }
-        : {
-            color: "white",
-          },
+    button: {
+      color: "white",
+    },
   }
 })
 

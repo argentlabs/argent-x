@@ -1,5 +1,4 @@
-import { BigNumberish } from "ethers"
-
+import { BigNumberish } from "starknet"
 import {
   PRETTY_UNLIMITED,
   isUnlimitedAmount,

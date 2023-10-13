@@ -1,25 +1,48 @@
-import { number, shortString } from "starknet"
+import { num, shortString } from "starknet"
 
 import { NetworkMessage } from "../shared/messages/NetworkMessage"
-import { getNetworkByChainId } from "../shared/network"
+import { networkService } from "../shared/network/service"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 
 export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
   msg,
-  background: { actionQueue },
+  origin,
+  background: { actionService },
   respond,
 }) => {
   switch (msg.type) {
+    case "REQUEST_ADD_CUSTOM_NETWORK": {
+      const exists = await networkService.getByChainId(msg.data.chainId)
+
+      if (exists) {
+        return respond({
+          type: "REQUEST_ADD_CUSTOM_NETWORK_REJ",
+          data: {
+            error: `Network with chainId ${msg.data.chainId} already exists`,
+          },
+        })
+      }
+
+      const { meta } = await actionService.add({
+        type: "REQUEST_ADD_CUSTOM_NETWORK",
+        payload: msg.data,
+      })
+
+      return respond({
+        type: "REQUEST_ADD_CUSTOM_NETWORK_RES",
+        data: {
+          actionHash: meta.hash,
+        },
+      })
+    }
+
     case "REQUEST_SWITCH_CUSTOM_NETWORK": {
       const { chainId } = msg.data
+      const isHexChainId = num.isHex(chainId)
 
-      const isHexChainId = number.isHex(chainId)
-
-      const decodedChainId = shortString.decodeShortString(chainId)
-
-      const network = await getNetworkByChainId(
-        isHexChainId ? decodedChainId : chainId,
+      const network = await networkService.getByChainId(
+        isHexChainId ? shortString.decodeShortString(chainId) : chainId,
       )
 
       if (!network) {
@@ -31,10 +54,15 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
         })
       }
 
-      const { meta } = await actionQueue.push({
-        type: "REQUEST_SWITCH_CUSTOM_NETWORK",
-        payload: network,
-      })
+      const { meta } = await actionService.add(
+        {
+          type: "REQUEST_SWITCH_CUSTOM_NETWORK",
+          payload: network,
+        },
+        {
+          origin,
+        },
+      )
 
       return respond({
         type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
@@ -46,7 +74,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
 
     case "REJECT_REQUEST_ADD_CUSTOM_NETWORK":
     case "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK": {
-      return await actionQueue.remove(msg.data.actionHash)
+      return await actionService.remove(msg.data.actionHash)
     }
   }
 

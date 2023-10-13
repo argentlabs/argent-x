@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
 import { ArgentAccountType } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/wallet.service"
+import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { AutoColumn } from "../../components/Column"
 import { routes } from "../../routes"
 import { selectedAccountView } from "../../views/account"
@@ -60,20 +60,17 @@ const ImplementationItem: FC<ImplementationItemProps> = ({
   description,
   icon,
   active,
-  onClick,
 }) => {
   return (
     <ButtonCell
       leftIcon={icon}
-      rightIcon={
-        active ? (
-          <TickIcon color="primary.500" />
-        ) : (
-          <P4 color="primary.500">Enable</P4>
-        )
-      }
+      rightIcon={active && <TickIcon color="primary.500" />}
       extendedDescription={description}
-      onClick={onClick}
+      _hover={{
+        cursor: "default",
+      }}
+      _active={{}}
+      disabled={!active}
     >
       {title}
     </ButtonCell>
@@ -83,20 +80,9 @@ const ImplementationItem: FC<ImplementationItemProps> = ({
 export const AccountImplementationScreen: FC = () => {
   const selectedAccount = useView(selectedAccountView)
   const account = useRouteAccount()
-  const navigate = useNavigate()
 
   if (!account || !selectedAccount) {
     return <></>
-  }
-
-  const isSelectedAccount = accountsEqual(selectedAccount, account)
-
-  const handleImplementationClick = (i: Implementation) => async () => {
-    if (!isSelectedAccount) {
-      await accountService.select(account)
-    }
-    await accountService.upgrade(account, i.id)
-    navigate(routes.accountTokens(), { replace: true })
   }
 
   const [[activeImplementation], otherImplementations] = partition(
@@ -108,7 +94,7 @@ export const AccountImplementationScreen: FC = () => {
 
   return (
     <NavigationContainer
-      title="Change account implementation"
+      title="Account implementation"
       leftButton={<BarBackButton />}
     >
       <Box p="5" display={"flex"} flexDirection="column" gap="4">
@@ -129,12 +115,7 @@ export const AccountImplementationScreen: FC = () => {
             </H6>
             <AutoColumn gap="md">
               {otherImplementations.map((i) => (
-                <ImplementationItem
-                  {...i}
-                  key={i.id}
-                  active={false}
-                  onClick={handleImplementationClick(i)}
-                />
+                <ImplementationItem {...i} key={i.id} active={false} />
               ))}
             </AutoColumn>
           </>

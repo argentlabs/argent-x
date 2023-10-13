@@ -1,4 +1,4 @@
-import { AggregatedSimData, useAspectNft } from "@argent/shared"
+import { AggregatedSimData, NftItem } from "@argent/shared"
 import { Box, Image, ImageProps, Skeleton } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -7,20 +7,16 @@ import { UnknownDappIcon } from "./UnknownDappIcon"
 
 interface NFTPictureProps extends ImageProps {
   nftTransfers: AggregatedSimData[]
-  networkId: string
+  nft?: NftItem
+  isNftLoading?: boolean
 }
 
 export const NftTransactionIcon: FC<NFTPictureProps> = ({
+  isNftLoading,
+  nft,
   nftTransfers,
-  networkId,
 }) => {
-  const { data: nft, isValidating } = useAspectNft(
-    nftTransfers[0].token.address,
-    nftTransfers[0].token.tokenId,
-    networkId,
-  )
-
-  if (isValidating) {
+  if (isNftLoading) {
     return (
       <IconWrapper>
         <Skeleton

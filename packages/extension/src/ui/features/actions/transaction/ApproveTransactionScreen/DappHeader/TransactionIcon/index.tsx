@@ -1,3 +1,4 @@
+import { useERC721Transactions } from "@argent/shared"
 import { FC } from "react"
 
 import {
@@ -8,8 +9,7 @@ import {
 } from "../../../../../../../shared/transactionReview.service"
 import { useCurrentNetwork } from "../../../../../networks/hooks/useCurrentNetwork"
 import { ApproveScreenType } from "../../../types"
-import { useERC721Transfers } from "../../../useErc721Transfers"
-import { AggregatedSimData } from "../../../useTransactionSimulatedData"
+import { AggregatedSimData } from "@argent/shared"
 import { ActivateAccountIcon } from "./ActivateAccountIcon"
 import { ActivateMultisigIcon } from "./ActivateMultisigIcon"
 import { AddArgentShieldIcon } from "./AddArgentShieldIcon"
@@ -23,6 +23,7 @@ import { SwapTransactionIcon } from "./SwapTransactionIcon"
 import { UnknownDappIcon } from "./UnknownDappIcon"
 import { UpdateThresholdIcon } from "./UpdateThresholdIcon"
 import { VerifiedDappIcon } from "./VerifiedDappIcon"
+import { ReplaceOwnerIcon } from "./ReplaceOwnerIcon"
 
 export interface TransactionIconProps {
   transactionReview?: ApiTransactionReviewResponse
@@ -39,7 +40,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
 }) => {
   const network = useCurrentNetwork()
 
-  const nftTransfers = useERC721Transfers(aggregatedData)
+  const nftTransfers = useERC721Transactions(aggregatedData)
   const swapTxnReview = getTransactionReviewSwap(transactionReview)
   const transactionReviewWithType =
     getTransactionReviewWithType(transactionReview)
@@ -56,8 +57,10 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       return <ActivateMultisigIcon />
     case ApproveScreenType.MULTISIG_ADD_SIGNERS:
       return <AddOwnerIcon />
-    case ApproveScreenType.MULTISIG_REMOVE_SIGNER:
+    case ApproveScreenType.MULTISIG_REMOVE_SIGNERS:
       return <RemoveOwnerIcon />
+    case ApproveScreenType.MULTISIG_REPLACE_SIGNER:
+      return <ReplaceOwnerIcon />
     case ApproveScreenType.MULTISIG_UPDATE_THRESHOLD:
       return <UpdateThresholdIcon />
     case ApproveScreenType.ADD_ARGENT_SHIELD:

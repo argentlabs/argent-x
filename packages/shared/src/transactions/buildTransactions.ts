@@ -1,7 +1,9 @@
-import { BigNumber } from "ethers"
-import { stark } from "starknet"
+import { CallData } from "starknet"
 
-import { getUint256CalldataFromBN, parseAmount } from "../utils/parseAmount"
+import {
+  getUint256CalldataFromBN,
+  parseAmountValue,
+} from "../utils/parseAmount"
 
 const erc20TransferTransaction = (
   contractAddress: string,
@@ -11,9 +13,9 @@ const erc20TransferTransaction = (
 ) => ({
   contractAddress,
   entrypoint: "transfer",
-  calldata: stark.compileCalldata({
+  calldata: CallData.compile({
     recipient,
-    amount: getUint256CalldataFromBN(parseAmount(amount, decimals)),
+    amount: getUint256CalldataFromBN(parseAmountValue(amount, decimals)),
   }),
 })
 
@@ -25,10 +27,10 @@ const erc721TransferFromTransaction = (
 ) => ({
   contractAddress,
   entrypoint: "transferFrom",
-  calldata: stark.compileCalldata({
+  calldata: CallData.compile({
     from_: from,
     to: recipient,
-    tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)), // OZ specs need a uint256 as tokenId
+    tokenId: getUint256CalldataFromBN(tokenId), // OZ specs need a uint256 as tokenId
   }),
 })
 
@@ -40,11 +42,11 @@ const erc721SafeTransferFromTransaction = (
 ) => ({
   contractAddress,
   entrypoint: "safeTransferFrom",
-  calldata: stark.compileCalldata({
+  calldata: CallData.compile({
     from_: from,
     to: recipient,
-    tokenId: getUint256CalldataFromBN(BigNumber.from(tokenId)),
-    amount: getUint256CalldataFromBN(BigNumber.from(1)),
+    tokenId: getUint256CalldataFromBN(tokenId),
+    amount: getUint256CalldataFromBN(1),
     data_len: "0",
   }),
 })

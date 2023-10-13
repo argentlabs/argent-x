@@ -2,14 +2,17 @@ import { Multicall } from "@argent/x-multicall"
 import { number, uint256 } from "starknet"
 
 import tokens from "../assets/tokens.json"
+import { Address } from "../chains"
 import { Token, TokenWithBalance } from "./token"
 
 export const getTokensBalances = async (
   networkId: string,
   multicallProvider: Multicall,
-  address: string,
+  address: Address,
 ): Promise<TokenWithBalance[]> => {
-  const filtered = tokens.filter((token) => token.networkId === networkId)
+  const filtered = tokens.filter(
+    (token) => token.networkId === networkId,
+  ) as Token[]
 
   const res = await Promise.allSettled(
     filtered.map((token) =>
@@ -50,21 +53,23 @@ export const getTokensBalances = async (
 }
 
 export const getTokens = async (): Promise<Token[]> => {
-  return tokens
+  return tokens as Token[]
 }
 
 export const getFeeToken = async (): Promise<Token | null> => {
-  return tokens.find((t) => t.symbol === "ETH") || null
+  return (tokens.find((t) => t.symbol === "ETH") as Token) || null
 }
 
 export const useToken = ({
   address,
   networkId,
 }: {
-  address: string
+  address: Address
   networkId: string
-}) => {
-  return tokens.find(
+}): Token | undefined => {
+  // TODO replace this with actual token schema
+  const parsedTokens = tokens as Token[]
+  return parsedTokens.find(
     (token) => token.address === address && token.networkId === networkId,
   )
 }

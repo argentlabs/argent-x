@@ -2,17 +2,20 @@ import { some } from "lodash-es"
 
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { accountService } from "../../../shared/account/service"
-import { defaultNetwork, getNetwork } from "../../../shared/network"
-import { accountsEqual, isDeprecated } from "../../../shared/wallet.service"
+import { defaultNetwork } from "../../../shared/network"
+import { networkService } from "../../../shared/network/service"
+import { accountsEqual } from "../../../shared/utils/accountsEqual"
+import { walletStore } from "../../../shared/wallet/walletStore"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
-import {
-  accountsOnNetwork,
-  getLastSelectedAccount,
-} from "../../services/backgroundAccounts"
+import { accountsOnNetwork } from "../../services/backgroundAccounts"
 import { setDefaultAccountNames } from "../accounts/accountMetadata.state"
-import { mapWalletAccountsToAccounts } from "../accounts/accounts.state"
+import {
+  mapWalletAccountsToAccounts,
+  migrateAccountNetworks,
+} from "../accounts/accounts.state"
 import { useRestorationState } from "../stateRestoration/restoration.state"
+import { isDeprecated } from "../../../shared/wallet.service"
 
 interface RecoveryOptions {
   networkId?: string
@@ -26,15 +29,17 @@ export const recover = async ({
   showHiddenAccountList,
 }: RecoveryOptions = {}) => {
   try {
-    const lastSelectedAccount = await getLastSelectedAccount()
+    const { selected: lastSelectedAccount } = await walletStore.get()
 
     /** validate that network exists (may have been a custom that was deleted), or use default */
-    const network = await getNetwork(
+    const network = await networkService.getById(
       lastSelectedAccount?.networkId || networkId || defaultNetwork.id,
     )
     networkId = network.id
 
-    const allWalletAccounts = await accountService.get(withHiddenSelector)
+    let allWalletAccounts = await accountService.get(withHiddenSelector)
+    allWalletAccounts = await migrateAccountNetworks(allWalletAccounts)
+
     const walletAccounts = accountsOnNetwork(allWalletAccounts, networkId)
 
     const selectedWalletAccount = walletAccounts.find(
@@ -44,9 +49,11 @@ export const recover = async ({
 
     const firstUnhiddenAccount = walletAccounts.find((wa) => !wa.hidden)
 
-    const selectedAccount = !selectedWalletAccount?.hidden
-      ? selectedWalletAccount
-      : firstUnhiddenAccount
+    // If no selected account or the selected account is hidden, select the first unhidden account
+    const selectedAccount =
+      !selectedWalletAccount || selectedWalletAccount.hidden
+        ? firstUnhiddenAccount
+        : selectedWalletAccount
 
     const allAccounts = mapWalletAccountsToAccounts(allWalletAccounts)
     const allAccountsHasNames = allAccounts.every((account) => account.name)
@@ -59,12 +66,6 @@ export const recover = async ({
       await accountService.select(selectedAccount)
     }
     useAppState.setState({ switcherNetworkId: networkId })
-
-    // this needs to be after changing the state, otherwise the migration screen would deploy on the network that was selected before the switch
-    // shows deprecation screen depending on selected network
-    if (some(walletAccounts) && walletAccounts.every(isDeprecated)) {
-      return routes.migrationDisclaimer()
-    }
 
     if (showAccountList || !selectedAccount) {
       return routes.accounts()

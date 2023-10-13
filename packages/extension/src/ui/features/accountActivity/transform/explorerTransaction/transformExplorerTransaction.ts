@@ -1,5 +1,5 @@
 import { IExplorerTransaction } from "../../../../../shared/explorer/type"
-import { Token } from "../../../../../shared/token/type"
+import { Token } from "../../../../../shared/token/__new/types/token.model"
 import { TransformedTransaction } from "../type"
 import { fingerprintExplorerTransaction } from "./fingerprintExplorerTransaction"
 import accountCreateTransformer from "./transformers/accountCreateTransformer"

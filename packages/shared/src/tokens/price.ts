@@ -1,6 +1,4 @@
-import CurrencyConversionNumber from "bignumber.js"
-import { BigNumber, BigNumberish, utils } from "ethers"
-import { uint256 } from "starknet"
+import { BigNumberish, uint256 } from "starknet"
 import useSWR from "swr"
 import urlJoin from "url-join"
 
@@ -12,6 +10,7 @@ import {
   prettifyTokenNumber,
 } from "../utils/number"
 import { Token, TokenWithBalance } from "./token"
+import { formatUnits, parseUnits } from "../bigdecimal"
 
 const { UINT_256_MAX } = uint256
 
@@ -146,19 +145,15 @@ export const convertTokenAmountToCurrencyValue = ({
   ) {
     return
   }
+
+  /** decimal is numeric, hence can be converted to Number */
   const decimalsNumber = Number(decimals)
-  /** amount to divide by to take amount to unit value */
-  const unitDivideBy = Math.pow(10, decimalsNumber)
-  /** take amount to unit value */
-  const amountDecimal = new CurrencyConversionNumber(
-    amount.toString(),
-  ).dividedBy(unitDivideBy)
+
   /** multiply to convert to currency */
-  const currencyValue = amountDecimal.multipliedBy(
-    new CurrencyConversionNumber(unitCurrencyValue),
-  )
+  const currencyValue =
+    BigInt(amount) * parseUnits(unitCurrencyValue.toString(), 6)
   /** keep as string to avoid loss of precision elsewhere */
-  return currencyValue.toString()
+  return formatUnits(currencyValue, decimalsNumber + 6)
 }
 
 /**
@@ -226,9 +221,9 @@ export const prettifyTokenAmount = ({
   amount,
   decimals,
   symbol,
-  showPlusSign,
-  withSymbol,
-  unlimitedText,
+  showPlusSign = false,
+  withSymbol = true,
+  unlimitedText = PRETTY_UNLIMITED,
 }: IPrettifyTokenAmount) => {
   if (!isNumeric(amount)) {
     return null
@@ -239,20 +234,25 @@ export const prettifyTokenAmount = ({
     prettyValue = unlimitedText
   } else {
     const decimalsNumber = Number(decimals)
-    const balanceBn = BigNumber.from(amount)
-    const balanceFullString = utils.formatUnits(balanceBn, decimalsNumber)
-    prettyValue = prettifyTokenNumber(balanceFullString)
-    isPositiveValue = balanceBn.gt(0)
+    const balance = BigInt(amount)
+    isPositiveValue = balance > 0n
+    const balanceFullString =
+      decimalsNumber > 0
+        ? formatUnits(balance, decimalsNumber)
+        : balance.toString()
+    prettyValue =
+      decimalsNumber > 0
+        ? prettifyTokenNumber(balanceFullString)
+        : balanceFullString
   }
-  const prettyValueWithSymbol = [
-    showPlusSign && isPositiveValue && "+",
-    prettyValue,
-    withSymbol && symbol,
-  ]
+
+  const prettyValueWithSymbol = [prettyValue, withSymbol && symbol]
     .filter(Boolean)
     .join(" ")
 
-  return prettyValueWithSymbol
+  return showPlusSign && isPositiveValue
+    ? `+${prettyValueWithSymbol}`
+    : prettyValueWithSymbol
 }
 
 export interface IConvertTokenAmount {
@@ -288,13 +288,10 @@ export const convertTokenUnitAmountWithDecimals = ({
   ) {
     return
   }
+
+  /** decimal is numeric, hence can be converted to Number */
   const decimalsNumber = Number(decimals)
-  /** amount to multipy by to take unit amount to token value */
-  const unitMultiplyBy = Math.pow(10, decimalsNumber)
-  /** take unit amount to token amount, enforcing integer */
-  const amount = new CurrencyConversionNumber(unitAmount.toString())
-    .multipliedBy(unitMultiplyBy)
-    .integerValue()
-  /** keep as string to avoid loss of precision elsewhere */
-  return amount.toString()
+
+  // keep as string to avoid loss of precision elsewhere
+  return parseUnits(unitAmount.toString(), decimalsNumber).toString()
 }

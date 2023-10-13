@@ -1,3 +1,4 @@
+import { Address } from "@argent/shared"
 import { isArray, lowerCase } from "lodash-es"
 import { Call } from "starknet"
 
@@ -25,6 +26,7 @@ export type ApiTransactionReviewAssessmentReason =
   | "operator_is_black_listed"
   | "src_token_black_listed"
   | "unknown_token"
+  | "contract_is_not_verified"
 
 export type ApiTransactionReviewTargettedDapp = {
   name: string
@@ -62,7 +64,7 @@ export type TransactionReviewWithType = ApiTransactionReview & {
 export type ApiTransactionReviewSlippageType = "equal" | "at_least" | "at_most"
 
 export interface ApiTransactionReviewToken {
-  address: string
+  address: Address
   name?: string
   symbol?: string
   decimals: number
@@ -80,7 +82,7 @@ export interface ApiTransactionReviewActivity {
     slippage: ApiTransactionReviewSlippageType
   }
   dapp?: {
-    address: string
+    address: Address
     name: string
   }
   src?: {
@@ -104,7 +106,7 @@ export interface ApiTransactionReview {
   assessment: ApiTransactionReviewAssessment
   assessmentReason?: ApiTransactionReviewAssessmentReason
   assessmentDetails: {
-    contract_address: string
+    contract_address: Address
   }
   activity?: ApiTransactionReviewActivity
 }

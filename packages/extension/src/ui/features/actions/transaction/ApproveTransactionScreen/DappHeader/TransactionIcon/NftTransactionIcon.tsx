@@ -2,7 +2,7 @@ import { Box, Image, ImageProps, Skeleton } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network } from "../../../../../../../shared/network"
-import { useAspectNft } from "../../../../../accountNfts/aspect.service"
+import { useRemoteNft } from "../../../../../accountNfts/useRemoteNft"
 import { AggregatedSimData } from "../../../useTransactionSimulatedData"
 import { IconWrapper } from "./IconWrapper"
 import { UnknownDappIcon } from "./UnknownDappIcon"
@@ -20,14 +20,10 @@ export const NftTransactionIcon: FC<NFTPictureProps> = ({
     data: nft,
     isValidating,
     error,
-  } = useAspectNft(
+  } = useRemoteNft(
     nftTransfers[0].token.address,
     nftTransfers[0].token.tokenId,
     network.id,
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-    },
   )
 
   if (!nft) {

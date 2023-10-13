@@ -13,7 +13,7 @@ To help test contract upgrades there is a simple script which will declare an up
   nvm use 18
 
   # start the tool
-  yarn devnet:upgrade-helper
+  pnpm devnet:upgrade-helper
   ```
 
 - Set the contract class hash in Settings → Manage Networks → Localhost → Advanced
