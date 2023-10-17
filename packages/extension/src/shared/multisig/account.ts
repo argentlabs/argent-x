@@ -16,7 +16,7 @@ import {
 import { Account as AccountV4__deprecated } from "starknet4-deprecated"
 import { MultisigPendingTransaction } from "./pendingTransactionsStore"
 import { MultisigSigner } from "./signer"
-import { isAccountV4 } from "../utils/accountv4"
+import { isAccountV4__deprecated } from "../utils/accountv4"
 import { IMultisigBackendService } from "./service/backend/interface"
 
 export class MultisigAccount extends Account {
@@ -42,7 +42,7 @@ export class MultisigAccount extends Account {
     account: Account | AccountV4__deprecated,
     multisigBackendService: IMultisigBackendService,
   ): MultisigAccount {
-    if (isAccountV4(account)) {
+    if (isAccountV4__deprecated(account)) {
       throw Error("Multisig is not supported for old accounts")
     }
 

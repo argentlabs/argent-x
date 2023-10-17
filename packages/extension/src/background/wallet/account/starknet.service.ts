@@ -102,11 +102,7 @@ export class WalletAccountStarknetService {
       return this.getStarknetAccountOfType(starknetAccount, account.type)
     }
 
-    const providerV4 = getProviderv4__deprecated(
-      account.network && account.network.sequencerUrl
-        ? account.network
-        : await this.networkService.getById(selector.networkId),
-    )
+    const providerV4 = getProviderv4__deprecated(account.network)
 
     const oldAccount = new AccountV4__deprecated(
       providerV4,

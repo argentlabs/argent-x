@@ -16,7 +16,10 @@ import {
 import { getErrorObject } from "../../shared/utils/error"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
-import { isAccountV5 } from "../../shared/utils/accountv4"
+import {
+  isAccountV4__deprecated,
+  isAccountV5,
+} from "../../shared/utils/accountv4"
 import { argentMaxFee } from "../utils/argentMaxFee"
 import { addEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import { transactionCallsAdapter } from "./transactionAdapter"
@@ -472,12 +475,16 @@ export const handleTransactionMessage: HandleMessage<
           throw new AccountError({ code: "NOT_FOUND" })
         }
         const starknetAccount = await wallet.getSelectedStarknetAccount()
-
-        if (!isAccountV5(starknetAccount)) {
+        if (isAccountV4__deprecated(starknetAccount)) {
           // Old accounts are not supported
+          // This should no longer happen as we prevent deprecated accounts from being used
           return respond({
-            type: "SIMULATE_TRANSACTION_INVOCATION_RES",
-            data: null,
+            type: "SIMULATE_TRANSACTIONS_REJ",
+            data: {
+              error: new TransactionError({
+                code: "DEPRECATED_ACCOUNT",
+              }),
+            },
           })
         }
 

@@ -4,10 +4,7 @@ import {
   SequencerProvider as SequencerProviderV4,
   RpcProvider as RpcProviderV4,
 } from "starknet4"
-import {
-  SequencerProvider as SequencerProviderv4__deprecated,
-  RpcProvider as RpcProviderV4__deprecated,
-} from "starknet4-deprecated"
+import { SequencerProvider as SequencerProviderv4__deprecated } from "starknet4-deprecated"
 
 import { Network } from "./type"
 
@@ -74,19 +71,12 @@ export function getProviderV4ForBaseUrl__deprecated(baseUrl: string) {
   return new SequencerProviderv4__deprecated({ baseUrl })
 }
 
-export function getProviderV4ForRpcUrl__deprecated(
-  rpcUrl: string,
-): RpcProviderV4__deprecated {
-  return new RpcProviderV4__deprecated({ nodeUrl: rpcUrl })
-}
-
 export function getProviderv4__deprecated(network: Network) {
-  if (network.rpcUrl) {
-    return getProviderV4ForRpcUrl__deprecated(network.rpcUrl)
-  } else if (network.sequencerUrl) {
+  // Don't use RPC provider here as it's broken for v4
+  if (network.sequencerUrl) {
     return getProviderV4ForBaseUrl__deprecated(network.sequencerUrl)
   } else {
-    throw new Error("No v4 (deprecated) provider available")
+    throw new Error("RPC is not supported for v4 deprecated provider")
   }
 }
 

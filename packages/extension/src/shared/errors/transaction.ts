@@ -5,6 +5,7 @@ export enum TRANSACTION_ERROR_MESSAGE {
   INVALID_TRANSACTION_HASH_RANGE = "Transaction Hash needs to be > 0",
   SIMULATION_DISABLED = "Transaction simulation is disabled",
   SIMULATION_ERROR = "Transaction simulation failed",
+  DEPRECATED_ACCOUNT = "Deprecated account",
 }
 
 export type TransactionErrorMessage = keyof typeof TRANSACTION_ERROR_MESSAGE

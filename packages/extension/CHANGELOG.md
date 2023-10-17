@@ -1,5 +1,11 @@
 # @argent-x/extension
 
+## 6.9.1
+
+### Patch Changes
+
+- 4f1b2ac88: Release
+
 ## 6.9.0
 
 ### Minor Changes
