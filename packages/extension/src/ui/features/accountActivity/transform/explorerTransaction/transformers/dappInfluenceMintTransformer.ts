@@ -3,7 +3,7 @@ import { getEntityWithName } from "../getEntityWithName"
 import { getParameter } from "../getParameter"
 import { IExplorerTransactionTransformer } from "./type"
 
-/** adds Influence NFT purcahse */
+/** adds Influence NFT purchase */
 
 export default function ({
   explorerTransaction,

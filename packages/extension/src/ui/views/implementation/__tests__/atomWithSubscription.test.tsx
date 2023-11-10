@@ -40,7 +40,7 @@ describe("atomWithSubscription", () => {
     testStore = createStore("test")
   })
 
-  it("should show inital value", async () => {
+  it("should show initial value", async () => {
     const atom = atomWithSubscription(
       () => testStore.get(),
       (next) => testStore.subscribe(next),

@@ -43,7 +43,7 @@ export const AddressBookAddOrEditScreenContainer: FC<
   const currentNetwork = useCurrentNetwork()
   const currentNetworkId = currentNetwork?.id
 
-  /** retreive an existing contact from id provided in contact prop or via url */
+  /** retrieve an existing contact from id provided in contact prop or via url */
   const existingContact = useView(
     addressBookContactIdView(id || contactProp?.id),
   )

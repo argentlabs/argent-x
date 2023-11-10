@@ -19,7 +19,7 @@ export const NFTImage: FC<NFTImageProps> = ({
 }) => {
   const nft = useNft(addressSchema.parse(contractAddress ?? ""), tokenId)
 
-  // if nft is not in the storage anymore, need to fetch it because it was transfered
+  // if nft is not in the storage anymore, need to fetch it because it was transferred
   const { data } = useRemoteNft(contractAddress, tokenId, networkId)
   const displayNft = nft ?? data
 

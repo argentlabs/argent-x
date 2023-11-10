@@ -26,7 +26,7 @@ import {
 import { usePartitionDeprecatedAccounts } from "./accountUpgradeCheck"
 import { tokenBalancesView } from "../../views/tokenBalances"
 
-/** TODO: we should be able to retreive all these account collections using queries from storage */
+/** TODO: we should be able to retrieve all these account collections using queries from storage */
 export const AccountListScreenContainer: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()

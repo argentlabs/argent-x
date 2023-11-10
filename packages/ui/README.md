@@ -23,7 +23,7 @@ export const App: FC = () => {
 
 ### Theme and utilities
 
-The theme contains standard set of attributes which are accessed using a name or key as decribed by chakra-ui. This allows the system to change the underlying values and units without changing the component markup.
+The theme contains standard set of attributes which are accessed using a name or key as described by chakra-ui. This allows the system to change the underlying values and units without changing the component markup.
 
 See [chakra style props](https://chakra-ui.com/docs/styled-system/style-props) for examples
 

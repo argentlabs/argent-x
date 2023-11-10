@@ -5,7 +5,7 @@ import { NftFallback } from "./NftFallback"
 
 type NftThumbnailImage = ImgHTMLAttributes<HTMLImageElement>
 
-/** Transparently displays an image or palceholder fallback set to square aspect ratio */
+/** Transparently displays an image or placeholder fallback set to square aspect ratio */
 
 export const NftThumbnailImage: FC<NftThumbnailImage> = ({ src, ...rest }) => {
   if (!src) {
