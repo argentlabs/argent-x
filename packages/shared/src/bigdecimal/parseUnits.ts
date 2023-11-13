@@ -1,3 +1,5 @@
+import { BigDecimal } from "./types"
+
 /**
  * Parses a string value representing a number to a BigInt, with a specified number of decimals.
  * If the fraction part of the string value is longer than the allowed decimal places, it rounds the value.
@@ -6,7 +8,7 @@
  * @param {number} decimals - The number of decimals to consider during parsing.
  * @returns {bigint} The parsed BigInt value.
  */
-export function parseUnits(value: string, decimals: number): bigint {
+export function parseUnits(value: string, decimals: number): BigDecimal {
   let [integer, fraction = ""] = value.split(".")
 
   const negative = integer.startsWith("-")
@@ -29,5 +31,10 @@ export function parseUnits(value: string, decimals: number): bigint {
     fraction = fraction.padEnd(decimals, "0")
   }
 
-  return BigInt(`${negative ? "-" : ""}${integer}${fraction}`)
+  const parsedValue = BigInt(`${negative ? "-" : ""}${integer}${fraction}`)
+
+  return {
+    value: parsedValue,
+    decimals,
+  }
 }

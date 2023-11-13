@@ -1,10 +1,10 @@
-import { utils } from "ethers"
+import { base58, hex } from "@scure/base"
 import { BigNumberish, encode, num } from "starknet"
 
 export const encodeBase58 = (val: BigNumberish) => {
-  const bytes = encode.sanitizeHex(num.toHex(val))
-  const base58 = utils.base58.encode(bytes)
-  return base58
+  const hexValue = encode.removeHexPrefix(encode.sanitizeHex(num.toHex(val)))
+  const bytesValue = hex.decode(hexValue)
+  return base58.encode(bytesValue)
 }
 
 export const encodeBase58Array = (arr: BigNumberish[]) => {
@@ -12,9 +12,9 @@ export const encodeBase58Array = (arr: BigNumberish[]) => {
 }
 
 export const decodeBase58 = (val: string) => {
-  const bytes = utils.base58.decode(val)
-  const hex = encode.sanitizeHex(utils.hexlify(bytes))
-  return hex
+  const bytesValue = base58.decode(val)
+  const hexValue = encode.sanitizeHex(hex.encode(bytesValue))
+  return hexValue
 }
 
 export const decodeBase58Array = (arr: string[]) => {

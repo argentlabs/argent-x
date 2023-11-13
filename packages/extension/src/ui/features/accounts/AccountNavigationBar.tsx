@@ -37,7 +37,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
               <MultisigIcon />
             </Text>
           )}
-          <Text noOfLines={1} maxW={"180px"}>
+          <Text lineHeight="5" noOfLines={1} maxW={"180px"}>
             {accountName}
           </Text>
           <Text fontSize={"2xs"} ml={1}>

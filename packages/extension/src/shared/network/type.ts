@@ -20,3 +20,8 @@ export type DefaultNetworkId =
   | "goerli-alpha"
   | "localhost"
   | "integration"
+
+export type PublicRpcNode = {
+  mainnet: string
+  testnet: string
+}

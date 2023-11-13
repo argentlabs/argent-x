@@ -15,13 +15,20 @@ const getProviderForBaseUrl = memoize((baseUrl: string): SequencerProvider => {
   return new SequencerProvider({ baseUrl })
 })
 
+export const shouldUseRpcProvider = (network: Network) => {
+  const hasRpcUrl = !!network.rpcUrl?.length
+  const hasSequencerUrl = !!network.sequencerUrl?.length
+  const preferRpc = network.prefer === "rpc"
+  return hasRpcUrl && (!hasSequencerUrl || preferRpc)
+}
+
 /**
  * Returns a RPC provider for the given RPC URL.
  *
  */
-export function getProviderForRpcUrl(rpcUrl: string): RpcProvider {
+export const getProviderForRpcUrl = memoize((rpcUrl: string): RpcProvider => {
   return new RpcProvider({ nodeUrl: rpcUrl })
-}
+})
 
 /**
  * Returns a provider for the given network
@@ -29,7 +36,7 @@ export function getProviderForRpcUrl(rpcUrl: string): RpcProvider {
  * @returns
  */
 export function getProvider(network: Network): ProviderInterface {
-  if (network.rpcUrl && allowRpcProvider(network)) {
+  if (network.rpcUrl && shouldUseRpcProvider(network)) {
     return getProviderForRpcUrl(network.rpcUrl)
   } else if (network.sequencerUrl) {
     return getProviderForBaseUrl(network.sequencerUrl)
@@ -43,9 +50,6 @@ export function getProvider(network: Network): ProviderInterface {
     throw new Error("No v5 provider available")
   }
 }
-
-const allowRpcProvider = (network: Network) =>
-  localStorage.getItem("betaFeatureRpcProvider") === "true" || !network.readonly
 
 /** ======================================================================== */
 
@@ -76,7 +80,8 @@ export function getProviderv4__deprecated(network: Network) {
   if (network.sequencerUrl) {
     return getProviderV4ForBaseUrl__deprecated(network.sequencerUrl)
   } else {
-    throw new Error("RPC is not supported for v4 deprecated provider")
+    console.error("RPC is not supported for v4 deprecated provider")
+    return undefined
   }
 }
 

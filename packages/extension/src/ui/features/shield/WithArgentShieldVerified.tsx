@@ -1,4 +1,4 @@
-import { AlertDialog } from "@argent/ui"
+import { AlertDialog, useToast } from "@argent/ui"
 import { Skeleton, VStack } from "@chakra-ui/react"
 import { useAtom } from "jotai"
 import { isArray } from "lodash-es"
@@ -8,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
 import { Call } from "starknet"
@@ -29,6 +30,7 @@ import {
   changeGuardianCallDataToType,
 } from "./usePendingChangingGuardian"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
+import { IS_DEV } from "../../../shared/utils/dev"
 
 enum ArgentShieldVerifiedState {
   INITIALISING = "INITIALISING",
@@ -37,7 +39,6 @@ enum ArgentShieldVerifiedState {
   VERIFY_OTP = "VERIFY_OTP",
   VERIFIED = "VERIFIED",
   USER_ABORTED = "USER_ABORTED",
-  ERROR = "ERROR",
 }
 
 /**
@@ -66,6 +67,10 @@ const WithArgentShieldVerifiedScreen: FC<PropsWithTransactions> = ({
   children,
   transactions,
 }) => {
+  // TODO: refactor all this logic into service and pass only clean state into React
+  // this flag prevents the expiry flow re-triggering on internal state change
+  const isTokenExpiryFlow = useRef(false)
+
   const [shieldState, setShieldState] = useAtom(shieldStateAtom)
   const { unverifiedEmail } = shieldState
   const account = useView(selectedAccountView)
@@ -73,7 +78,7 @@ const WithArgentShieldVerifiedScreen: FC<PropsWithTransactions> = ({
   const verifiedEmail = useShieldVerifiedEmail()
   const hasGuardian = Boolean(account?.guardian)
   const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
-  const [error, setError] = useState<string>()
+  const toast = useToast()
 
   const [alertDialogIsOpen, setAlertDialogIsOpen] = useState(false)
   const [state, setState] = useState(
@@ -182,9 +187,16 @@ const WithArgentShieldVerifiedScreen: FC<PropsWithTransactions> = ({
             ? await getVerifiedEmailIsExpiredForRemoval()
             : await argentAccountService.isTokenExpired()
           if (isTokenExpired) {
+            // this ref guards against this flow re-running and sending > 1 emails
+            if (isTokenExpiryFlow.current) {
+              return
+            }
+            isTokenExpiryFlow.current = true
             // need to re-verify existing email
             try {
               // reflect unverifiedEmail in overall state
+              // the isTokenExpiryFlow ref guards against this state change
+              // triggering this flow again before completion
               setShieldState({ unverifiedEmail: verifiedEmail })
               // need to use immediate local copy too
               const _unverifiedEmail = verifiedEmail
@@ -192,10 +204,15 @@ const WithArgentShieldVerifiedScreen: FC<PropsWithTransactions> = ({
               await argentAccountService.requestEmail(_unverifiedEmail)
               onEmailRequested(_unverifiedEmail)
             } catch (error) {
-              console.error(coerceErrorToString(error))
-
-              setError(coerceErrorToString(error))
-              setState(ArgentShieldVerifiedState.ERROR)
+              // user can navigate back to re-enter their email
+              IS_DEV && console.warn(coerceErrorToString(error))
+              toast({
+                title: "Unable to verify email",
+                status: "error",
+                duration: 3000,
+              })
+            } finally {
+              isTokenExpiryFlow.current = false
             }
           } else {
             setState(ArgentShieldVerifiedState.VERIFIED)
@@ -211,6 +228,7 @@ const WithArgentShieldVerifiedScreen: FC<PropsWithTransactions> = ({
     onEmailRequested,
     setShieldState,
     state,
+    toast,
     unverifiedEmail,
     verifiedEmail,
   ])
@@ -258,8 +276,7 @@ const WithArgentShieldVerifiedScreen: FC<PropsWithTransactions> = ({
     case ArgentShieldVerifiedState.VERIFIED:
     case ArgentShieldVerifiedState.USER_ABORTED:
       return <>{children}</>
-
-    case ArgentShieldVerifiedState.ERROR:
-      throw new Error(error) // should be caught by error boundary
+    default:
+      state satisfies never
   }
 }

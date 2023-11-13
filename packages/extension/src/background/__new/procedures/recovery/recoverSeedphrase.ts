@@ -15,7 +15,7 @@ export const recoverSeedphraseProcedure = extensionOnlyProcedure
     async ({
       input: { jwe },
       ctx: {
-        services: { wallet, transactionTracker },
+        services: { recoveryService },
       },
     }) => {
       const messagingKeys = await getMessagingKeys()
@@ -29,8 +29,6 @@ export const recoverSeedphraseProcedure = extensionOnlyProcedure
         newPassword: string
       } = JSON.parse(bytesToUft8(plaintext))
 
-      await wallet.restoreSeedPhrase(seedPhrase, newPassword)
-      void transactionTracker.loadHistory()
-      return { isSuccess: true }
+      return recoveryService.bySeedPhrase(seedPhrase, newPassword)
     },
   )

@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { Address, addressSchema, normalizeAddress } from "./address"
+import { Address, normalizeAddress } from "./address"
 
 /**
  * https://docs.starknet.id/for-devs/encoding-algorithm#the-basic-alphabet
@@ -42,10 +42,3 @@ export const normalizeAddressOrStarknetId = (
   }
   return normalizeAddress(addressOrStarknetId)
 }
-
-export const addressOrStarknetIdSchema = z.union([
-  addressSchema,
-  starknetIdSchema,
-])
-
-export type AddressOrStarknetId = z.infer<typeof addressOrStarknetIdSchema>

@@ -16,7 +16,6 @@ import {
   AccordionItem,
   AccordionPanel,
   Box,
-  Flex,
   SimpleGrid,
 } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
@@ -83,7 +82,7 @@ export const NftScreen: FC<NftScreenProps> = ({
             />
             <NftImage nft={nft} />
           </Box>
-          <H5 py="6" textAlign="center">
+          <H5 py="6" textAlign="center" mx={4}>
             {nft.name}
           </H5>
         </>
@@ -94,29 +93,13 @@ export const NftScreen: FC<NftScreenProps> = ({
               <AccordionButton justifyContent="space-between">
                 <P4 color="neutrals.300">Description</P4> <AccordionIcon />
               </AccordionButton>
-              <AccordionPanel>{nft.description}</AccordionPanel>
+              <AccordionPanel>
+                {nft.description.length > 0
+                  ? nft.description
+                  : nft.collection?.description}
+              </AccordionPanel>
             </AccordionItem>
           </Accordion>
-
-          <Flex
-            justifyContent="space-between"
-            alignItems="center"
-            px="4"
-            py="2"
-            border="solid 1px"
-            borderColor="neutrals.700"
-            borderRadius="lg"
-          >
-            <P4 color="neutrals.300">Best Offer</P4>
-            <P4>
-              {nft.best_bid_order?.payment_amount
-                ? bigDecimal.formatEther(
-                    BigInt(nft.best_bid_order?.payment_amount),
-                  )
-                : "0"}{" "}
-              ETH
-            </P4>
-          </Flex>
         </CellStack>
         <SimpleGrid
           bg="neutrals.900"

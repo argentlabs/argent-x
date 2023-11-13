@@ -28,6 +28,7 @@ type MinimalIWalletSessionService = Pick<
 
 export default class BackgroundUIService implements IBackgroundUIService {
   private _opened = false
+  private isInitialising = true
 
   constructor(
     readonly emitter: Emittery<Events>,
@@ -36,6 +37,11 @@ export default class BackgroundUIService implements IBackgroundUIService {
     private sessionService: MinimalIWalletSessionService,
   ) {
     this.initListeners()
+    void (async () => {
+      /** initialise opened state */
+      const hasTab = await this.uiService.hasTab()
+      this.opened = hasTab
+    })()
   }
 
   /*
@@ -73,6 +79,12 @@ export default class BackgroundUIService implements IBackgroundUIService {
   }
 
   private set opened(opened: boolean) {
+    if (this.isInitialising) {
+      /** don't emit on initial value change */
+      this.isInitialising = false
+      this._opened = opened
+      return
+    }
     if (this._opened === opened) {
       return
     }

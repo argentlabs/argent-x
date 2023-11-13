@@ -17,6 +17,7 @@ import {
   invalidJson,
   validJson,
 } from "./nft.mock"
+import { constants } from "starknet"
 
 const messageClientMock = {
   transfer: {
@@ -173,13 +174,112 @@ describe("NFTService", () => {
 
       const txHash = await testClass.transferNft(
         "0x0798e884450c19e072d6620fefdbeb7387d0453d3fd51d95f5ace1f17633d88b",
-        "0x123",
-        "0x456",
+        "0x070C58360B2493D3Ab8C42f8f66Df15fcFc3B77E76bAc1C690E68819B5511911",
+        "0x070C58360B2493D3Ab8C42f8f66Df15fcFc3B77E76bAc1C690E68819B5511911",
         "854406733492",
         "ERC721",
+        {
+          name: "testnet",
+          id: "goerli-alpha",
+          chainId: constants.StarknetChainId.SN_GOERLI,
+          sequencerUrl: "https://alpha4.starknet.io",
+        },
       )
 
       expect(txHash).toEqual("0x999")
+    })
+
+    it("should throw error for contract address", async () => {
+      const result = await testClass.getAssets(
+        "starknet",
+        "goerli-alpha",
+        "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      )
+
+      expect(result).toEqual(expectedValidRes)
+      await testClass.upsert(result, "0x123", "goerli-alpha")
+
+      messageClientMock.transfer.send.mutate = vi
+        .fn()
+        .mockResolvedValue("0x999")
+
+      await expect(
+        testClass.transferNft(
+          "0x0798e884450c19e072d6620fefdbeb738",
+          "0x070C58360B2493D3Ab8C42f8f66Df15fcFc3B77E76bAc1C690E68819B5511911",
+          "0x070C58360B2493D3Ab8C42f8f66Df15fcFc3B77E76bAc1C690E68819B5511911",
+          "854406733492",
+          "ERC721",
+          {
+            name: "testnet",
+            id: "goerli-alpha",
+            chainId: constants.StarknetChainId.SN_GOERLI,
+            sequencerUrl: "https://alpha4.starknet.io",
+          },
+        ),
+      ).rejects.toThrow(`Invalid address`)
+    })
+
+    it("should throw error for account address", async () => {
+      const result = await testClass.getAssets(
+        "starknet",
+        "goerli-alpha",
+        "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      )
+
+      expect(result).toEqual(expectedValidRes)
+      await testClass.upsert(result, "0x123", "goerli-alpha")
+
+      messageClientMock.transfer.send.mutate = vi
+        .fn()
+        .mockResolvedValue("0x999")
+
+      await expect(
+        testClass.transferNft(
+          "0x0798e884450c19e072d6620fefdbeb7387d0453d3fd51d95f5ace1f17633d88b",
+          "0x070C58360B2493D3Ab8C42f8f66Df",
+          "0x070C58360B2493D3Ab8C42f8f66Df15fcFc3B77E76bAc1C690E68819B5511911",
+          "854406733492",
+          "ERC721",
+          {
+            name: "testnet",
+            id: "goerli-alpha",
+            chainId: constants.StarknetChainId.SN_GOERLI,
+            sequencerUrl: "https://alpha4.starknet.io",
+          },
+        ),
+      ).rejects.toThrow(`Invalid address`)
+    })
+
+    it("should throw error for invalid recipient", async () => {
+      const result = await testClass.getAssets(
+        "starknet",
+        "goerli-alpha",
+        "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      )
+
+      expect(result).toEqual(expectedValidRes)
+      await testClass.upsert(result, "0x123", "goerli-alpha")
+
+      messageClientMock.transfer.send.mutate = vi
+        .fn()
+        .mockResolvedValue("0x999")
+
+      await expect(
+        testClass.transferNft(
+          "0x0798e884450c19e072d6620fefdbeb7387d0453d3fd51d95f5ace1f17633d88b",
+          "0x070C58360B2493D3Ab8C42f8f66Df15fcFc3B77E76bAc1C690E68819B5511911",
+          "0x070C58360B2493D3Ab8",
+          "854406733492",
+          "ERC721",
+          {
+            name: "testnet",
+            id: "goerli-alpha",
+            chainId: constants.StarknetChainId.SN_GOERLI,
+            sequencerUrl: "https://alpha4.starknet.io",
+          },
+        ),
+      ).rejects.toThrow("Invalid address")
     })
   })
 })

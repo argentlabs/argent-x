@@ -11,7 +11,7 @@ import Network from "./Network"
 import Settings from "./Settings"
 import Wallet from "./Wallet"
 import config from "../config"
-import { balanceEther, transferEth, AccountsToSetup } from "../utils/account"
+import { transferEth, AccountsToSetup, validateTx } from "../utils/account"
 
 export default class ExtensionPage {
   page: Page
@@ -140,14 +140,11 @@ export default class ExtensionPage {
     return { accountAddresses, seed }
   }
 
-  async validateTx(address: string) {
-    const initialBalance = await balanceEther(address)
-    await this.navigation.approve.click()
-    await this.activity.checkActivity(1)
-    await expect(
-      this.navigation.menuPendingTransactionsIndicator,
-    ).not.toBeVisible({ timeout: 60000 })
-    const finalBalance = await balanceEther(address)
-    expect(parseFloat(finalBalance)).toBeGreaterThan(parseFloat(initialBalance))
+  async validateTx(reciever: string, amount?: number) {
+    console.log(reciever, amount)
+    await this.navigation.menuActivity.click()
+    await this.activity.ensureNoPendingTransactions()
+    const txs = await this.activity.activityTxHashs()
+    await validateTx(txs[0]!, reciever, amount)
   }
 }

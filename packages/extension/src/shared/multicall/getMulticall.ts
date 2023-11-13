@@ -1,7 +1,7 @@
-import { Multicall } from "@argent/x-multicall"
 import { memoize } from "lodash-es"
 
 import { Network, getProvider } from "../network"
+import { getBatchProvider } from "@argent/x-multicall"
 
 const MAX_BATCH_SIZE = process.env.MULTICALL_MAX_BATCH_SIZE
 
@@ -22,12 +22,12 @@ const getMulticallAddress = (network: Network) => {
 const maxBatchSize = MAX_BATCH_SIZE ? parseInt(MAX_BATCH_SIZE) : 10
 
 const getMemoizeKey = (network: Network) => {
-  // using chainId here because we want to memoize based on the network. RPC network can have same chainId as sequencer network
+  // using chainId here because we want to memoize based on the network. RPC network can have same chainId as sequencer network, so also change the key if the prefered method changes
   const elements = [
     network.chainId,
     getMulticallAddress(network),
     maxBatchSize,
-    localStorage.getItem("betaFeatureRpcProvider") === "true",
+    network.prefer,
   ]
   const key = elements.filter(Boolean).join("-")
   return key
@@ -35,13 +35,13 @@ const getMemoizeKey = (network: Network) => {
 
 export const getMulticallForNetwork = memoize(
   (network: Network) => {
-    const multicall = new Multicall(
+    const multicall = getBatchProvider(
       getProvider(network),
-      getMulticallAddress(network),
       {
         batchInterval: 500,
         maxBatchSize,
       },
+      getMulticallAddress(network),
     )
     return multicall
   },

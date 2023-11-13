@@ -17,7 +17,7 @@ export default {
 }
 
 const account = {
-  accountName: "Account 1 Lorem Ipsum Dolor Sit Amet",
+  accountName: "Account Lorem Ipsum Dolor Sit Amet 10",
   accountAddress:
     "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
   networkId: "goerli-alpha",

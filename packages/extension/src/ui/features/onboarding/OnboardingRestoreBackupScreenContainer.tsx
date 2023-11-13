@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { fileToString } from "../../services/files"
-import { recoveryService } from "../../services/recovery"
+import { clientRecoveryService } from "../../services/recovery"
 import { useOnboardingScreen } from "./hooks/useOnboardingScreen"
 import { OnboardingRestoreBackupScreen } from "./OnboardingRestoreBackupScreen"
 
@@ -18,7 +18,7 @@ export const OnboardingRestoreBackupScreenContainer: FC = () => {
     async (acceptedFile: File) => {
       try {
         const data = await fileToString(acceptedFile)
-        await recoveryService.byBackup(data)
+        await clientRecoveryService.byBackup(data)
         navigate(routes.onboardingFinish.path, { replace: true })
       } catch (err: any) {
         const error = `${err}`

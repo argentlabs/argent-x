@@ -1,6 +1,8 @@
-import { ethers, wordlists } from "ethers"
 import { z } from "zod"
 import { create } from "zustand"
+import { splitPhrase } from "./phraseUtils"
+import { validateMnemonic } from "@scure/bip39"
+import { wordlist } from "@scure/bip39/wordlists/english"
 
 interface State {
   seedPhrase?: string
@@ -10,24 +12,15 @@ interface State {
 export const useSeedRecovery = create<State>()(() => ({}))
 
 export const validateSeedPhrase = (seedPhrase: string): boolean => {
-  const words = wordlists.en.split(seedPhrase.trim())
+  const words = splitPhrase(seedPhrase.trim())
   // check seed phrase has correct number of words
   if (words.length !== 12) {
     return false
   }
-  // check every word is in the wordlist
-  if (!words.every((word) => wordlists.en.getWordIndex(word) >= 0)) {
-    return false
-  }
 
-  // check if seedphrase is valid with HDNode
-  try {
-    ethers.utils.HDNode.fromMnemonic(seedPhrase)
-  } catch {
-    return false
-  }
+  const isValid = validateMnemonic(seedPhrase.trim(), wordlist)
 
-  return true
+  return isValid
 }
 
 export const passwordSchema = z

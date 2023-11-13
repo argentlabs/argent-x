@@ -1,5 +1,4 @@
-import { Multicall } from "@argent/x-multicall"
-import { number, uint256 } from "starknet"
+import { number, uint256, ProviderInterface } from "starknet"
 
 import tokens from "../assets/tokens.json"
 import { Address } from "../chains"
@@ -7,7 +6,7 @@ import { Token, TokenWithBalance } from "./token"
 
 export const getTokensBalances = async (
   networkId: string,
-  multicallProvider: Multicall,
+  provider: Pick<ProviderInterface, "callContract">,
   address: Address,
 ): Promise<TokenWithBalance[]> => {
   const filtered = tokens.filter(
@@ -16,7 +15,7 @@ export const getTokensBalances = async (
 
   const res = await Promise.allSettled(
     filtered.map((token) =>
-      multicallProvider.call({
+      provider.callContract({
         contractAddress: token.address,
         entrypoint: "balanceOf",
         calldata: [address],
@@ -27,7 +26,7 @@ export const getTokensBalances = async (
   return res.reduce((accumulator, r, i) => {
     if (
       r.status === "rejected" ||
-      (r.value[0] === "0x0" && r.value[1] === "0x0")
+      (r.value.result[0] === "0x0" && r.value.result[1] === "0x0")
     ) {
       return accumulator
     }
@@ -35,8 +34,8 @@ export const getTokensBalances = async (
     const balance = BigInt(
       number.toHex(
         uint256.uint256ToBN({
-          low: r.value[0],
-          high: r.value[1],
+          low: r.value.result[0],
+          high: r.value.result[1],
         }),
       ),
     )

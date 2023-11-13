@@ -24,8 +24,8 @@ export const getImplementationForAccount = async (
       entrypoint: "get_implementation",
     }
     const multicall = getMulticallForNetwork(network)
-    const response = await multicall.call(call)
-    return response[0]
+    const response = await multicall.callContract(call)
+    return response.result[0]
   } catch {
     try {
       // If it fails, get implementation Class Hash for Cairo 1 accounts

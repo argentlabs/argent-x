@@ -5,7 +5,7 @@ import { uiService } from "../shared/__new/services/ui"
 import { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
 import { isPreAuthorized, preAuthorizeStore } from "../shared/preAuthorizations"
 import { Opened, backgroundUIService } from "./__new/services/ui"
-import { addTab, sendMessageToHost } from "./activeTabs"
+import { sendMessageToHost } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
 
@@ -32,24 +32,7 @@ preAuthorizeStore.subscribe(async (_, changeSet) => {
 
 export const handlePreAuthorizationMessage: HandleMessage<
   PreAuthorisationMessage
-> = async ({
-  msg,
-  sender,
-  origin,
-  port,
-  background: { wallet, actionService },
-  respond,
-}) => {
-  async function addSenderTab() {
-    if (sender.tab?.id && port) {
-      await addTab({
-        id: sender.tab?.id,
-        host: origin,
-        port,
-      })
-    }
-  }
-
+> = async ({ msg, origin, background: { wallet, actionService }, respond }) => {
   switch (msg.type) {
     case "CONNECT_DAPP": {
       let selectedAccount = await wallet.getSelectedAccount()
@@ -67,7 +50,6 @@ export const handlePreAuthorizationMessage: HandleMessage<
       }
 
       const isAuthorized = await isPreAuthorized(selectedAccount, origin)
-      await addSenderTab()
 
       if (!isAuthorized) {
         /** Prompt user to connect to dapp */
@@ -116,7 +98,6 @@ export const handlePreAuthorizationMessage: HandleMessage<
 
     case "IS_PREAUTHORIZED": {
       const selectedAccount = await wallet.getSelectedAccount()
-      await addSenderTab()
 
       if (!selectedAccount) {
         return respond({ type: "IS_PREAUTHORIZED_RES", data: false })

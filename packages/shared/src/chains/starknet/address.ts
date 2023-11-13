@@ -58,6 +58,11 @@ export const addressSchema = addressSchemaLooseLength
     return `0x${padded}`
   })
 
+export const addressOrEmptyUndefinedSchema = addressSchema
+  .or(z.literal(""))
+  .transform((v) => (v === "" ? undefined : v))
+  .optional()
+
 export const addressSchemaArgentBackend = addressSchemaBase.transform(
   (value) => {
     // 0 padded, 0x prefixed, lowercase hex with a length of 66

@@ -10,3 +10,5 @@ export * from "./chains"
 export * as bigDecimal from "./bigdecimal"
 export * from "./hooks"
 export * from "./knownDapps"
+
+export type { BigDecimal } from "./bigdecimal/types"

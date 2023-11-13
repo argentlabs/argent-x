@@ -1,5 +1,7 @@
 import { parseUnits } from "./parseUnits"
 import { formatUnits } from "./formatUnits"
+import { BigDecimal } from "./types"
+import { abs } from "."
 
 /**
  * Formats a BigInt representing wei into a string representing ether,
@@ -14,7 +16,7 @@ import { formatUnits } from "./formatUnits"
  * @returns {string} The amount in ether.
  */
 export function formatEther(wei: bigint): string {
-  return formatUnits(wei, 18)
+  return formatUnits({ value: wei, decimals: 18 })
 }
 
 /**
@@ -23,7 +25,7 @@ export function formatEther(wei: bigint): string {
  * @param {string} ether - The amount in ether to be parsed to wei.
  * @returns {bigint} The amount in wei.
  */
-export function parseEther(ether: string): bigint {
+export function parseEther(ether: string): BigDecimal {
   return parseUnits(ether, 18)
 }
 
@@ -36,11 +38,11 @@ export function parseEther(ether: string): bigint {
  *    decimals: 6
  * }
  *
- * @param {bigint} amount - The amount to be formatted.
+ * @param {bigint} value - The amount to be formatted.
  * @returns {string} The formatted amount.
  */
-export function formatCurrency(amount: bigint): string {
-  return formatUnits(amount, 6)
+export function formatCurrency(value: bigint): string {
+  return formatUnits({ value, decimals: 6 })
 }
 
 /**
@@ -49,7 +51,7 @@ export function formatCurrency(amount: bigint): string {
  * @param {string} amount - The amount to be parsed.
  * @returns {bigint} The parsed amount.
  */
-export function parseCurrency(amount: string): bigint {
+export function parseCurrency(amount: string): BigDecimal {
   return parseUnits(amount, 6)
 }
 
@@ -60,7 +62,7 @@ export function parseCurrency(amount: string): bigint {
  * @returns {bigint} The absolute value of the number.
  */
 export function absBigInt(num: bigint): bigint {
-  return num < 0n ? -num : num
+  return abs({ value: num, decimals: 0 }).value
 }
 
 /**
@@ -70,6 +72,6 @@ export function absBigInt(num: bigint): bigint {
  * @param {string} amount - The amount to be parsed and then converted to absolute value.
  * @returns {bigint} The absolute value of the parsed amount.
  */
-export function parseCurrencyAbs(amount: string): bigint {
-  return absBigInt(parseCurrency(amount))
+export function parseCurrencyAbs(amount: string): BigDecimal {
+  return abs(parseCurrency(amount))
 }

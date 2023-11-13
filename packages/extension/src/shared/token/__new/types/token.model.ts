@@ -22,6 +22,7 @@ export const RequestTokenSchema = z.object({
 export type RequestToken = z.infer<typeof RequestTokenSchema>
 
 export const TokenSchema = RequestTokenSchema.required().extend({
+  id: z.number().optional(),
   iconUrl: z.string().optional(),
   showAlways: z.boolean().optional(),
   popular: z.boolean().optional(),

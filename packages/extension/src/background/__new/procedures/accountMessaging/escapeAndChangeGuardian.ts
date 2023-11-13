@@ -77,14 +77,24 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
           /**
            * Call `escapeGuardian` to change guardian to this account publicKey
            */
+
+          /** Cairo 0 takes public key as argument, Cairo 1 does not */
+          let calldata: string[] = []
+          if (starknetAccount.cairoVersion === "0") {
+            calldata = [num.hexToDecimalString(publicKey)]
+          }
+
           await actionService.add(
             {
               type: "TRANSACTION",
               payload: {
                 transactions: {
                   contractAddress: account.address,
-                  entrypoint: "escapeGuardian",
-                  calldata: [num.hexToDecimalString(publicKey)],
+                  entrypoint: getEntryPointSafe(
+                    "escapeGuardian",
+                    starknetAccount.cairoVersion,
+                  ),
+                  calldata,
                 },
                 meta: {
                   isChangeGuardian: true,

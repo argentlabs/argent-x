@@ -11,11 +11,11 @@ import {
 } from "./details/getAndMergeAccountDetails"
 import { accountService } from "./service"
 import { multisigBaseWalletRepo } from "../multisig/repository"
-import { Multicall } from "@argent/x-multicall"
 import { getProvider } from "../network"
 import { networkService } from "../network/service"
 import { MultisigEntryPointType } from "../multisig/types"
 import { getAccountCairoVersionFromChain } from "./details/getAccountCairoVersionFromChain"
+import { getBatchProvider } from "@argent/x-multicall"
 
 type UpdateScope = "all" | "implementation" | "deploy" | "guardian"
 
@@ -87,11 +87,16 @@ export async function updateMultisigAccountDetails(
           const { address, networkId } = multisigAccount
           const network = await networkService.getById(networkId)
           const provider = getProvider(network)
-          const multicall = new Multicall(provider, network.multicallAddress)
-          return multicall.call({
+          const multicall = getBatchProvider(
+            provider,
+            undefined, // batch options
+            network.multicallAddress,
+          )
+          const { result } = await multicall.callContract({
             contractAddress: address,
             entrypoint,
           })
+          return result
         }),
       )
       return {

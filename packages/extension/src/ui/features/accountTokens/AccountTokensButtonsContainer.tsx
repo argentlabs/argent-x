@@ -18,11 +18,12 @@ import { useAddFundsDialogSend } from "./useAddFundsDialog"
 
 interface AccountTokensButtonsContainerProps {
   account: Account
+  hideSend?: boolean
 }
 
 export const AccountTokensButtonsContainer: FC<
   AccountTokensButtonsContainerProps
-> = ({ account }) => {
+> = ({ account, hideSend = false }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const multisig = useMultisig(account)
@@ -49,13 +50,20 @@ export const AccountTokensButtonsContainer: FC<
   const showSendButton = useMemo(() => {
     if (
       showSaveRecoveryPhraseModal ||
-      (multisig && (multisig.needsDeploy || !signerIsInMultisig))
+      (multisig && (multisig.needsDeploy || !signerIsInMultisig)) ||
+      hideSend
     ) {
       return false
     }
 
     return Boolean(sendToken)
-  }, [multisig, sendToken, signerIsInMultisig, showSaveRecoveryPhraseModal])
+  }, [
+    multisig,
+    sendToken,
+    signerIsInMultisig,
+    showSaveRecoveryPhraseModal,
+    hideSend,
+  ])
 
   const showAddFundsButton = useMemo(() => {
     if (showSaveRecoveryPhraseModal || (multisig && !signerIsInMultisig)) {

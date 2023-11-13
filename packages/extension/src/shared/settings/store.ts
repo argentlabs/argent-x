@@ -10,8 +10,6 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
     privacyAutomaticErrorReporting: false,
     experimentalAllowChooseAccount: false,
     blockExplorerKey: defaultBlockExplorerKey,
-    betaFeatureMultisig: false,
-    betaFeatureRpcProvider: false,
   },
   "core:settings",
 )

@@ -42,6 +42,8 @@ export interface IRepositoryOptions<T> {
   deserialize?: (value: any) => AllowPromise<T[]>
   /** Optional. A function that compares two values of type T and returns a boolean. */
   compare?: (a: T, b: T) => boolean
+  /** Optional. A function that merges two values of type T. */
+  merge?: (oldValue: T, newValue: T) => T
 }
 
 export type UpsertResult = { created: number; updated: number }

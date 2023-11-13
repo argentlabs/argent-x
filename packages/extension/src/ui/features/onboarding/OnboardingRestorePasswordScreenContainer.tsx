@@ -3,7 +3,7 @@ import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { recoveryService } from "../../services/recovery"
+import { clientRecoveryService } from "../../services/recovery"
 import {
   useSeedRecovery,
   validateAndSetPassword,
@@ -40,8 +40,8 @@ export const OnboardingRestorePasswordScreenContainer: FC = () => {
         throw new RecoveryError({ code: "SEED_RECOVERY_INCOMPLETE" })
       }
 
-      // should throw right away, no return value needed; to be replaced with a service which uses the new transport
-      await recoveryService.bySeedPhrase(state.seedPhrase, state.password)
+      // should throw right away, no return value needed;
+      await clientRecoveryService.bySeedPhrase(state.seedPhrase, state.password)
       setHasSavedRecoverySeedphrase(true) // as the user recovered their seed, we can assume they have a backup
 
       navigate(routes.onboardingFinish.path, { replace: true })
@@ -65,7 +65,6 @@ export const OnboardingRestorePasswordScreenContainer: FC = () => {
         status: "error",
         duration: 3000,
       })
-
       throw err
     }
   }

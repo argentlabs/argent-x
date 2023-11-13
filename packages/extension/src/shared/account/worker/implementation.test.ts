@@ -1,4 +1,4 @@
-import { AccountWorker } from "./implementation"
+import { AccountUpdaterTaskId, AccountWorker } from "./implementation"
 import { IAccountService } from "../../account/service/interface"
 import { IScheduleService } from "../../schedule/interface"
 import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
@@ -10,7 +10,7 @@ vi.mock("../details/getAccountCairoVersionFromChain")
 
 describe("AccountWorker", () => {
   let accountServiceMock: IAccountService
-  let scheduleService: IScheduleService<"accountUpdate">
+  let scheduleService: IScheduleService<AccountUpdaterTaskId.UPDATE_DEPLOYED>
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -32,6 +32,8 @@ describe("AccountWorker", () => {
       in: vi.fn(),
       every: vi.fn(),
       delete: vi.fn(),
+      onInstallAndUpgrade: vi.fn(),
+      onStartup: vi.fn(),
     }
   })
 
@@ -45,7 +47,7 @@ describe("AccountWorker", () => {
       "updateAccountCairoVersion",
     )
 
-    await worker.updateAll()
+    await worker.runUpdaterForAllTasks()
 
     expect(spyUpdateDeployed).toHaveBeenCalled()
     expect(spyUpdateAccountClassHash).toHaveBeenCalled()

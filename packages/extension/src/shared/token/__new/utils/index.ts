@@ -4,10 +4,9 @@ import {
   isEqualAddress,
   isNumeric,
 } from "@argent/shared"
-import { BaseToken, BaseTokenSchema, Token } from "../types/token.model"
+import { BaseToken, Token } from "../types/token.model"
 import { BigNumberish } from "starknet"
 import defaultTokens from "../../../../assets/default-tokens.json"
-import { tokenRepo } from "../repository/token"
 
 export const equalToken = (a: BaseToken, b: BaseToken) =>
   a.networkId === b.networkId && isEqualAddress(a.address, b.address)
@@ -43,9 +42,14 @@ export const convertTokenAmountToCurrencyValue = ({
 
   /** multiply to convert to currency */
   const currencyValue =
-    BigInt(amount) * bigDecimal.parseUnits(unitCurrencyValue.toString(), 6)
+    BigInt(amount) *
+    bigDecimal.parseUnits(unitCurrencyValue.toString(), 6).value
+
   /** keep as string to avoid loss of precision elsewhere */
-  return bigDecimal.formatUnits(currencyValue, decimalsNumber + 6)
+  return bigDecimal.formatUnits({
+    value: currencyValue,
+    decimals: decimalsNumber + 6,
+  })
 }
 
 export const parsedDefaultTokens: Token[] = defaultTokens.map((token) => ({

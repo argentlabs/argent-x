@@ -82,6 +82,7 @@ describe("transformTransaction", () => {
             "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+            "id": 1,
             "name": "Ether",
             "network": "goerli-alpha",
             "networkId": "goerli-alpha",

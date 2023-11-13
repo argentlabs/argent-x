@@ -1,6 +1,5 @@
 import { z } from "zod"
 import { BaseTokenSchema, TokenSchema } from "./token.model"
-import { addressSchema } from "@argent/shared"
 import { BaseTokenWithBalanceSchema } from "./tokenBalance.model"
 
 export const ApiPriceDetailsSchema = z.object({

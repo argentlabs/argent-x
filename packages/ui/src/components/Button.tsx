@@ -116,6 +116,19 @@ export const buttonTheme = defineStyleConfig({
             bg: mode(`gray.100`, `neutrals.800`)(props),
           },
         }
+      } else if (c === "inverted-primary") {
+        return {
+          bg: "transparent",
+          border: "solid",
+          borderColor: `primary.500`,
+          color: `primary.500`,
+          _hover: {
+            bg: `gray.50`,
+          },
+          _active: {
+            bg: `primary.600`,
+          },
+        }
       }
 
       /** same for dark or light mode */

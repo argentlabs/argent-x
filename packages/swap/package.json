@@ -23,8 +23,9 @@
     "lint": "eslint . --cache --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "@argent/x-multicall": "^6.3.0",
+    "@argent/x-multicall": "^7.0.8",
     "@chakra-ui/react": "^2.6.1",
+    "@ethersproject/units": "^5.7.0",
     "big.js": "^6.2.1",
     "decimal.js-light": "^2.5.1",
     "jsbi": "^4.3.0",
@@ -47,11 +48,11 @@
     "react-dom": "^18.2.0",
     "typescript": "^5.0.4",
     "vite": "^4.3.8",
-    "vite-plugin-dts": "3.5.4"
+    "vite-plugin-dts": "3.6.0"
   },
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "starknet": "5.18.0"
+    "starknet": "5.19.5"
   }
 }

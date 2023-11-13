@@ -40,13 +40,14 @@ export const ArgentAccountLoggedInScreen: FC<
             value={verifiedEmail}
             bgColor="neutrals.800"
             color="white"
+            fontWeight={600}
           />
-          <Divider color="neutrals.700" my={3} />
+          <Divider color="neutrals.700" mt={4} mb={5} />
           <H6 color="neutrals.300" mx={2}>
             Your email will be used for the following features if you choose to
             enable them:
           </H6>
-          <Box my={4}>
+          <Box my={5}>
             <ArgentAccountFeaturesList
               isEmailNotificationsEnabled={isEmailNotificationsEnabled}
               accountsWithShieldEnabled={accountsWithShieldEnabled}

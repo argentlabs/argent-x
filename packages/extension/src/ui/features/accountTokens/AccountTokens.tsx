@@ -1,6 +1,6 @@
 import { CellStack, DapplandBanner, Empty, icons } from "@argent/ui"
 import dapplandBanner from "@argent/ui/assets/dapplandBannerBackground.png"
-import { Flex, VStack } from "@chakra-ui/react"
+import { Center, Flex, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { routes } from "../../routes"
@@ -17,7 +17,7 @@ import { TokenListItemVariant } from "./TokenListItem"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { AccountDeprecatedBanner } from "./AccountDeprecatedBanner"
 
-const { MultisigIcon } = icons
+const { MultisigIcon, WalletIcon } = icons
 
 export interface AccountTokensProps {
   account: Account
@@ -60,7 +60,10 @@ export const AccountTokens: FC<AccountTokensProps> = ({
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mt={4} mb={6}>
         <AccountTokensHeader account={account} accountName={account.name} />
-        <AccountTokensButtonsContainer account={account} />
+        <AccountTokensButtonsContainer
+          account={account}
+          hideSend={showAddFundsBackdrop}
+        />
       </VStack>
       {showTokensAndBanners ? (
         <CellStack pt={0}>
@@ -103,9 +106,15 @@ export const AccountTokens: FC<AccountTokensProps> = ({
           )}
           {showAddFundsBackdrop && (
             <Empty
-              icon={<MultisigIcon color="neutrals.500" />}
-              title="Add funds to activate multisig"
-            />
+              icon={<WalletIcon color="neutrals.500" />}
+              title={"Add funds"}
+            >
+              <Center textAlign={"center"}>
+                {multisig
+                  ? "You will need some ETH to activate the multisig account"
+                  : "You will need some ETH to use the account"}
+              </Center>
+            </Empty>
           )}
           {!showAddFundsBackdrop && (
             <TokenList

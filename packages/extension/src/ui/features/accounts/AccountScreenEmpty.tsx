@@ -24,7 +24,7 @@ export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
           hasHiddenAccounts ? "visible " : ""
         }accounts on ${currentNetworkName}`}
       >
-        <EmptyButton leftIcon={<AddIcon />} onClick={onCreate}>
+        <EmptyButton mt={8} leftIcon={<AddIcon />} onClick={onCreate}>
           Create account
         </EmptyButton>
       </Empty>

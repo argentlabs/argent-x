@@ -1,3 +1,7 @@
+import {
+  ARGENT_API_TOKENS_INFO_URL,
+  ARGENT_API_TOKENS_PRICES_URL,
+} from "../../../api/constants"
 import { networkService } from "../../../network/service"
 import { tokenRepo } from "../repository/token"
 import { tokenBalanceRepo } from "../repository/tokenBalance"
@@ -9,4 +13,6 @@ export const tokenService = new TokenService(
   tokenRepo,
   tokenBalanceRepo,
   tokenPriceRepo,
+  ARGENT_API_TOKENS_INFO_URL,
+  ARGENT_API_TOKENS_PRICES_URL,
 )

@@ -158,7 +158,8 @@ export const BalanceChangeOverviewArgentX: FC<
                                 <L2 color="neutrals.300">
                                   {prettifyCurrencyValue(
                                     bigDecimal.formatCurrency(
-                                      bigDecimal.parseCurrencyAbs(usdValue),
+                                      bigDecimal.parseCurrencyAbs(usdValue)
+                                        .value,
                                     ),
                                   )}
                                 </L2>

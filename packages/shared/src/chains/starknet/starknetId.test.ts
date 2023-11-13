@@ -1,11 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import {
-  addressOrStarknetIdSchema,
-  isEqualStarknetId,
-  isStarknetId,
-  starknetIdSchema,
-} from "./starknetId"
+import { isEqualStarknetId, isStarknetId, starknetIdSchema } from "./starknetId"
 
 describe("chains/starknet/address", () => {
   describe("starknetIdSchema", () => {
@@ -35,33 +30,6 @@ describe("chains/starknet/address", () => {
         expect(starknetIdSchema.safeParse("..stark").success).toBeFalsy()
         expect(starknetIdSchema.safeParse(".stark").success).toBeFalsy()
         expect(starknetIdSchema.safeParse("!??.stark").success).toBeFalsy()
-      })
-    })
-  })
-  describe("addressOrStarknetIdSchema", () => {
-    describe("when valid", () => {
-      test("success should be true", () => {
-        expect(
-          addressOrStarknetIdSchema.safeParse("foo.stark").success,
-        ).toBeTruthy()
-        expect(
-          addressOrStarknetIdSchema.safeParse(
-            "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-          ).success,
-        ).toBeTruthy()
-      })
-    })
-    describe("when invalid", () => {
-      test("success should be false", () => {
-        expect(addressOrStarknetIdSchema.safeParse("").success).toBeFalsy()
-        expect(
-          addressOrStarknetIdSchema.safeParse(".stark").success,
-        ).toBeFalsy()
-        expect(
-          addressOrStarknetIdSchema.safeParse(
-            "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a00",
-          ).success,
-        ).toBeFalsy()
       })
     })
   })

@@ -12,6 +12,10 @@ export const tokenRepo: ITokenRepository = new ChromeRepository<Token>(
     areaName: "local",
     namespace: "core:tokens",
     compare: (a: BaseToken, b: BaseToken) => equalToken(a, b),
+    merge: (oldValue: Token, newValue: Token) => ({
+      ...oldValue,
+      ...newValue,
+    }),
     defaults: parsedDefaultTokens,
   },
 )

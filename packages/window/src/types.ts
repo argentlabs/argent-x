@@ -38,7 +38,9 @@ const bignumberishSchema = z.union([
 export const CallSchema = z.object({
   contractAddress: z.string(),
   entrypoint: z.string(),
-  calldata: z.array(bignumberishSchema).optional(),
+  calldata: z
+    .array(bignumberishSchema.or(z.array(bignumberishSchema)))
+    .optional(),
 })
 
 export const typedDataSchema = z.object({

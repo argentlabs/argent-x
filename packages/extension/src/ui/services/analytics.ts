@@ -51,7 +51,7 @@ export const useTimeSpentWithSuccessTracking = <T extends keyof Events>(
       }
       didTrack.current = true
       const resolvedArgs = isFunction(args) ? await args() : args
-      analytics.track(event, {
+      void analytics.track(event, {
         ...resolvedArgs,
         success,
         timeSpent,
@@ -76,7 +76,7 @@ export const useTimeSpentWithSuccessTracking = <T extends keyof Events>(
         const timeSpent = new Date().getTime() - startedAt.current
         /** don't track failure unless window was open > 500ms */
         if (timeSpent > 500) {
-          trackFailure()
+          void trackFailure()
         }
       }
     }
@@ -96,30 +96,31 @@ const N_24_HOURS = 24 * 60 * 60 * 1000
 const N_1_WEEK = 7 * N_24_HOURS
 const N_1_MONTH = 4 * N_1_WEEK
 
-function openedExtensionTodayTracking() {
+async function openedExtensionTodayTracking() {
   try {
-    if (Date.now() - activeStore.getState().lastOpened > N_24_HOURS) {
-      activeStore.getState().update("lastOpened")
-      analytics.track("openedExtensionToday")
+    const lastOpened = await activeStore.get("lastOpened")
+    if (Date.now() - lastOpened > N_24_HOURS) {
+      await activeStore.update("lastOpened")
+      void analytics.track("openedExtensionToday")
     }
   } catch (e) {
     // nothing of this should be blocking
   }
 }
 
-export function unlockedExtensionTracking() {
+export async function unlockedExtensionTracking() {
   try {
-    const { lastUnlocked } = activeStore.getState()
+    const lastUnlocked = await activeStore.get("lastUnlocked")
     // track once every 24h
     if (Date.now() - lastUnlocked > N_24_HOURS) {
-      activeStore.getState().update("lastUnlocked")
-      analytics.track("unlockedExtensionToday")
+      await activeStore.update("lastUnlocked")
+      void analytics.track("unlockedExtensionToday")
 
       if (Date.now() - lastUnlocked > N_1_WEEK) {
-        analytics.track("unlockedExtensionWeekly")
+        void analytics.track("unlockedExtensionWeekly")
       }
       if (Date.now() - lastUnlocked > N_1_MONTH) {
-        analytics.track("unlockedExtensionMonthly")
+        void analytics.track("unlockedExtensionMonthly")
       }
     }
   } catch (e) {
@@ -127,19 +128,22 @@ export function unlockedExtensionTracking() {
   }
 }
 
-export function sessionStartTracking() {
+async function sessionStartTracking() {
   try {
+    const [lastSession, lastClosed] = await Promise.all([
+      activeStore.get("lastSession"),
+      activeStore.get("lastClosed"),
+    ])
     // track once every 5 minutes
-    if (Date.now() - activeStore.getState().lastSession > N_5_MINUTES) {
-      analytics.track("sessionStart")
+    if (Date.now() - lastSession > N_5_MINUTES) {
+      await analytics.track("sessionStart")
       // ...and also if extension was closed for 5 minutes
-      if (Date.now() - activeStore.getState().lastClosed > N_5_MINUTES) {
-        const length =
-          activeStore.getState().lastClosed - activeStore.getState().lastSession
-        analytics.track("sessionEnded", { length })
+      if (Date.now() - lastClosed > N_5_MINUTES) {
+        const length = lastClosed - lastSession
+        await analytics.track("sessionEnded", { length })
       }
     }
-    activeStore.getState().update("lastSession")
+    await activeStore.update("lastSession")
   } catch (e) {
     // nothing of this should be blocking
   }
@@ -155,8 +159,8 @@ export function trackAddFundsService(
 export const useTracking = () => {
   useEffect(() => {
     // as React in strict mode renders every component twice, this will be called 2x in development. This is not the case in production.
-    sessionStartTracking()
-    openedExtensionTodayTracking()
+    void sessionStartTracking()
+    void openedExtensionTodayTracking()
     return () => {
       /**
        * NOTE: any code here may run in dev but will not be triggered in a production build

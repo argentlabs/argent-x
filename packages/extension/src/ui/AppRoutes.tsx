@@ -8,7 +8,6 @@ import { useAppState, useMessageStreamHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
 import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
-import { AccountImplementationScreen } from "./features/accountEdit/AccountImplementationScreen"
 import { CollectionNftsContainer } from "./features/accountNfts/CollectionNftsContainer"
 import { NftScreenContainer } from "./features/accountNfts/NftScreenContainer"
 import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
@@ -27,7 +26,6 @@ import { LoadingScreenContainer } from "./features/actions/LoadingScreenContaine
 import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingFaucetFallbackScreen } from "./features/funding/FundingFaucetFallbackScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
-import { FundingQrCodeScreen } from "./features/funding/FundingQrCodeScreen"
 import { FundingScreen } from "./features/funding/FundingScreen"
 import { LockScreen } from "./features/lock/LockScreen"
 import { ResetScreen } from "./features/lock/ResetScreen"
@@ -95,6 +93,9 @@ import { SuspenseScreen } from "./components/SuspenseScreen"
 import { BetaFeaturesSettings } from "./features/settings/BetaFeatureSettings"
 import { ChangeAccountImplementationScreen } from "./features/accountEdit/ChangeAccountImplementationScreen"
 import { MultisigReplaceOwnerScreen } from "./features/multisig/MultisigReplaceOwnerScreen"
+import { FundingQrCodeScreenContainer } from "./features/funding/FundingQrCodeScreenContainer"
+import { AppBackgroundError } from "./AppBackgroundError"
+import { isRecoveringView } from "./views/recovery"
 
 interface LocationWithState extends Location {
   state: {
@@ -129,6 +130,10 @@ const ResponsiveRoutes: FC = () => (
 const nonWalletRoutes = (
   <>
     <Route path={"/index.html"} element={null} />
+    <Route
+      path={routes.backgroundError.path}
+      element={<AppBackgroundError />}
+    />
     <Route path={routes.error.path} element={<ErrorScreenContainer />} />
     <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
@@ -205,11 +210,6 @@ const walletRoutes = (
       presentation="push"
       path={routes.changeAccountImplementations.path}
       element={<ChangeAccountImplementationScreen />}
-    />
-    <Route
-      presentation="push"
-      path={routes.accountImplementation.path}
-      element={<AccountImplementationScreen />}
     />
     <Route
       presentation="push"
@@ -444,7 +444,7 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.fundingQrCode.path}
-      element={<FundingQrCodeScreen />}
+      element={<FundingQrCodeScreenContainer />}
     />
     <Route
       presentation="push"
@@ -597,6 +597,7 @@ export const AppRoutes: FC = () => {
 
   const { isLoading } = useAppState()
   const hasActions = useView(hasActionsView)
+  const isRecovering = useView(isRecoveringView)
 
   /** TODO: refactor: this should maybe be invoked by service + worker pattern */
   const showActions = useMemo(() => {
@@ -605,6 +606,9 @@ export const AppRoutes: FC = () => {
     return hasActions && !isNonWalletRoute
   }, [hasActions, pathname, state])
 
+  if (isRecovering) {
+    return <LoadingScreenContainer loadingTexts={["Recovering accounts..."]} />
+  }
   if (isLoading) {
     return <LoadingScreenContainer />
   }

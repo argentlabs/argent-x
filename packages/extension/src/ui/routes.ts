@@ -259,6 +259,7 @@ export const routes = {
   ),
   userReview: route("/user-review"),
   userReviewFeedback: route("/user-review/feedback"),
+  backgroundError: route("/background-error"),
   error: route("/error"),
   ledgerEntry: route("/ledger/start"),
   ledgerSelect: route("/ledger/select"),

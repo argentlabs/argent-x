@@ -14,6 +14,7 @@ import {
 
 import { sendMessage, waitForMessage } from "./messageActions"
 import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import { SignMessageOptions } from "../shared/messages/ActionMessage"
 
 /**
  *  This is the latest Account Object that is imported from starknet.js.
@@ -129,8 +130,11 @@ export class ArgentXAccount extends Account {
     }
   }
 
-  public async signMessage(data: typedData.TypedData): Promise<Signature> {
-    sendMessage({ type: "SIGN_MESSAGE", data })
+  public async signMessage(
+    typedData: typedData.TypedData,
+    options: SignMessageOptions = { skipDeploy: false },
+  ): Promise<Signature> {
+    sendMessage({ type: "SIGN_MESSAGE", data: { typedData, options } })
     const { actionHash } = await waitForMessage("SIGN_MESSAGE_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 

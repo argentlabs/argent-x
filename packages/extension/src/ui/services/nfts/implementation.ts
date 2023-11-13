@@ -5,6 +5,7 @@ import {
   NftItem,
   PaginatedItems,
   getUint256CalldataFromBN,
+  parseAddress,
 } from "@argent/shared"
 import { differenceWith, groupBy, isEqual } from "lodash-es"
 import { CallData, constants, num, shortString } from "starknet"
@@ -18,8 +19,10 @@ import {
 import { AllowArray } from "../../../shared/storage/types"
 import { isEqualAddress } from "../addresses"
 import { messageClient } from "../messaging/trpc"
-import { INFTService } from "./interface"
+import { INFTService } from "../../../shared/nft/interface"
 import { networkService } from "../../../shared/network/service"
+import { Network } from "../../../shared/network"
+import { getMulticallForNetwork } from "../../../shared/multicall"
 
 const chainIdToPandoraNetwork = (chainId: string): "mainnet" | "goerli" => {
   const encodedChainId = num.isHex(chainId)
@@ -31,9 +34,8 @@ const chainIdToPandoraNetwork = (chainId: string): "mainnet" | "goerli" => {
       return "mainnet"
     case constants.StarknetChainId.SN_GOERLI:
       return "goerli"
-    default:
-      throw new Error(`Unsupported network ${chainId}`)
   }
+  throw new Error(`Unsupported network ${chainId}`)
 }
 
 export class NFTService implements INFTService {
@@ -44,6 +46,15 @@ export class NFTService implements INFTService {
     private readonly nftsContractsRepository: INftsContractsRepository,
     private readonly argentNftService: ArgentBackendNftService,
   ) {}
+
+  isSupported(network: Network) {
+    try {
+      chainIdToPandoraNetwork(network.chainId) // throws if not supported
+      return true
+    } catch {
+      return false
+    }
+  }
 
   async getAsset(
     chain: string,
@@ -82,7 +93,7 @@ export class NFTService implements INFTService {
         networkId,
       }))
     } catch (e) {
-      throw new Error((e as Error).message)
+      throw new Error(`An error occured ${e}`)
     }
   }
 
@@ -200,15 +211,42 @@ export class NFTService implements INFTService {
     recipient: string,
     tokenId: string,
     schema: string,
+    network: Network,
   ) {
+    let parsedRecipient = null
+    let parsedContractAddress = null
+    let parsedAccountAddress = null
+
+    try {
+      parsedContractAddress = await parseAddress({
+        address: contractAddress,
+        networkId: network.id,
+        multicallProvider: getMulticallForNetwork(network),
+      })
+
+      parsedAccountAddress = await parseAddress({
+        address: accountAddress,
+        networkId: network.id,
+        multicallProvider: getMulticallForNetwork(network),
+      })
+
+      parsedRecipient = await parseAddress({
+        address: recipient,
+        networkId: network.id,
+        multicallProvider: getMulticallForNetwork(network),
+      })
+    } catch (e) {
+      throw new Error(`An error occured ${e}`)
+    }
+
     let compiledCalldata = CallData.toCalldata({
-      from_: accountAddress,
-      to: recipient,
+      from_: parsedAccountAddress,
+      to: parsedRecipient,
       tokenId: getUint256CalldataFromBN(tokenId), // OZ specs need a uint256 as tokenId
     })
 
     const transactions = {
-      contractAddress,
+      contractAddress: parsedContractAddress,
       entrypoint: "transferFrom",
       calldata: compiledCalldata,
     }
@@ -217,8 +255,8 @@ export class NFTService implements INFTService {
       transactions.entrypoint = "safeTransferFrom"
 
       compiledCalldata = CallData.toCalldata({
-        from_: accountAddress,
-        to: recipient,
+        from_: parsedAccountAddress,
+        to: parsedRecipient,
         tokenId: getUint256CalldataFromBN(tokenId),
         amount: getUint256CalldataFromBN(1),
         data_len: "0",

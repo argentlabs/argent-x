@@ -102,20 +102,22 @@ export class WalletAccountStarknetService {
       return this.getStarknetAccountOfType(starknetAccount, account.type)
     }
 
+    /// TODO: Get rid of this deprecated code
     const providerV4 = getProviderv4__deprecated(account.network)
 
-    const oldAccount = new AccountV4__deprecated(
-      providerV4,
-      account.address,
-      isKeyPair(signer)
-        ? ec__deprecated.getKeyPair(signer.getPrivate())
-        : signer,
-    )
+    const oldAccount = providerV4
+      ? new AccountV4__deprecated(
+          providerV4,
+          account.address,
+          isKeyPair(signer)
+            ? ec__deprecated.getKeyPair(signer.getPrivate())
+            : signer,
+        )
+      : null
 
-    const isOldAccount = await isNonceManagedOnAccountContract(
-      oldAccount,
-      account,
-    )
+    const isOldAccount = oldAccount
+      ? await isNonceManagedOnAccountContract(oldAccount, account)
+      : false
 
     // Keep the fallback here as we don't want to block the users
     // if the worker has not updated the account yet
@@ -140,7 +142,7 @@ export class WalletAccountStarknetService {
       accountCairoVersion,
     )
 
-    return isOldAccount
+    return isOldAccount && oldAccount
       ? oldAccount
       : this.getStarknetAccountOfType(starknetAccount, account.type)
   }

@@ -4,6 +4,7 @@ import { runRemoveTestnet2Migration } from "./network/removeTestnet2"
 import { KeyValueStorage } from "../../shared/storage"
 import { runRemoveTestnet2Accounts, runV581Migration } from "./wallet"
 import { runV59TokenMigration } from "./token/v5.9"
+import { runV510TokenMigration } from "./token/v5.10"
 
 enum WalletMigrations {
   v581 = "wallet:v581",
@@ -16,6 +17,7 @@ enum NetworkMigrations {
 
 enum TokenMigrations {
   v59 = "token:v59",
+  v510 = "token:v510",
 }
 
 const migrationsStore = new KeyValueStorage(
@@ -24,6 +26,7 @@ const migrationsStore = new KeyValueStorage(
     [WalletMigrations.removeTestnet2Accounts]: false,
     [NetworkMigrations.removeTestnet2]: false,
     [TokenMigrations.v59]: false,
+    [TokenMigrations.v510]: false,
   },
   "core:migrations",
 )
@@ -41,6 +44,7 @@ export const migrationListener = walletSessionServiceEmitter.on(
         WalletMigrations.removeTestnet2Accounts,
       )
       const v59Migration = await migrationsStore.get(TokenMigrations.v59)
+      const v510Migration = await migrationsStore.get(TokenMigrations.v510)
       if (!v581Migration) {
         await runV581Migration()
         await migrationsStore.set(WalletMigrations.v581, true)
@@ -57,6 +61,11 @@ export const migrationListener = walletSessionServiceEmitter.on(
       if (!v59Migration) {
         await runV59TokenMigration()
         await migrationsStore.set(TokenMigrations.v59, true)
+      }
+
+      if (!v510Migration) {
+        await runV510TokenMigration()
+        await migrationsStore.set(TokenMigrations.v510, true)
       }
     }
   },

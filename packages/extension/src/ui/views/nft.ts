@@ -8,7 +8,13 @@ import {
 } from "../../shared/storage/__new/repositories/nft"
 
 import { atomFromRepo } from "./implementation/atomFromRepo"
-import { Address, Collection, NftItem, isEqualAddress } from "@argent/shared"
+import {
+  Address,
+  Collection,
+  NftItem,
+  isEqualAddress,
+  ensureArray,
+} from "@argent/shared"
 
 const allNftsAtom = atomFromRepo(nftsRepository)
 
@@ -65,11 +71,11 @@ export const accountNftsView = accountNftsAtomFamily(allNftsView)
 export const nftAssetView = nftAssetAtomFamily(allNftsView)
 
 /* Collections */
-const allNftsColletionsAtom = atomFromRepo(nftsCollectionsRepository)
+const allNftsCollectionsAtom = atomFromRepo(nftsCollectionsRepository)
 
 export const allCollectionsView = atom(async (get) => {
-  const nfts = await get(allNftsColletionsAtom)
-  return nfts
+  const nfts = await get(allNftsCollectionsAtom)
+  return ensureArray(nfts)
 })
 
 export const collectionAtomFamily = (view: Atom<Promise<Collection[]>>) =>
@@ -92,7 +98,6 @@ export const collectionsByNetworkAtomFamily = (
       atom(async (get) => {
         const collections = await get(view)
         return collections.filter((collection) => {
-          console.log(collection.networkId, networkId)
           return collection.networkId === networkId
         })
       }),
@@ -166,7 +171,7 @@ const allNftsContractsAtom = atomFromRepo(nftsContractsRepository)
 
 export const allNftsContractsView = atom(async (get) => {
   const nfts = await get(allNftsContractsAtom)
-  return nfts
+  return ensureArray(nfts)
 })
 
 export const contractAddressesAtomFamily = (

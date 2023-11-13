@@ -1,10 +1,4 @@
-import {
-  differenceWith,
-  isEqual,
-  isFunction,
-  reverse,
-  uniqWith,
-} from "lodash-es"
+import { differenceWith, isEqual, isFunction } from "lodash-es"
 
 import { ObjectStorage, ObjectStorageOptions } from "./object"
 import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
@@ -17,24 +11,7 @@ import {
   SetterFn,
   StorageChange,
 } from "./types"
-
-export function mergeArrayStableWith<T>(
-  source: T[],
-  other: T[],
-  compareFn: (a: T, b: T) => boolean = isEqual,
-  insertMode: "unshift" | "push" = "push",
-): T[] {
-  const result = reverse(uniqWith(reverse(source), compareFn)) // 2x reverse to keep the order while keeping the last occurence of duplicates
-  for (const element of other) {
-    const index = result.findIndex((e) => compareFn(e, element))
-    if (index === -1) {
-      result[insertMode](element)
-    } else {
-      result[index] = element
-    }
-  }
-  return result
-}
+import { mergeArrayStableWith } from "./__new/base"
 
 interface ArrayStorageOptions<T> extends ObjectStorageOptions<T[]> {
   compare?: (a: T, b: T) => boolean
@@ -95,14 +72,20 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
   public async push(value: AllowArray<T> | SetterFn<T>): Promise<void> {
     const all = await this.get()
     const newValue = this.setterOrArrayToValue(value, all)
-    const newAll = mergeArrayStableWith(all, newValue, this.compare)
+    const newAll = mergeArrayStableWith(all, newValue, {
+      compareFn: this.compare.bind(this),
+      insertMode: "push",
+    })
     await this.storageImplementation.set(newAll)
   }
 
   public async unshift(value: AllowArray<T> | SetterFn<T>): Promise<void> {
     const all = await this.get()
     const newValue = this.setterOrArrayToValue(value, all)
-    const newAll = mergeArrayStableWith(all, newValue, this.compare, "unshift")
+    const newAll = mergeArrayStableWith(all, newValue, {
+      compareFn: this.compare.bind(this),
+      insertMode: "unshift",
+    })
     await this.storageImplementation.set(newAll)
   }
 

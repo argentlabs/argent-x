@@ -21,7 +21,8 @@ export const SignActionScreenContainer: FC = () => {
   return (
     <WithArgentShieldVerified>
       <ApproveSignatureScreenContainer
-        dataToSign={action.payload}
+        dataToSign={action.payload.typedData}
+        skipDeployWarning={action.payload.options?.skipDeploy}
         onSubmit={() => void approveAndClose()}
         onReject={() => void reject()}
         onRejectWithoutClose={() => void rejectWithoutClose()}

@@ -19,7 +19,6 @@ const TextareaAutosize = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <Textarea
         ref={refs}
-        lineHeight={1.15}
         overflow={"hidden"}
         resize={"none"}
         rows={1}

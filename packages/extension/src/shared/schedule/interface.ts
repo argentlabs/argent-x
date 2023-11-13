@@ -16,4 +16,7 @@ export interface IScheduleService<T extends string = string> {
   delete(task: BaseScheduledTask<T>): Promise<void>
 
   registerImplementation(task: ImplementedScheduledTask<T>): Promise<void>
+
+  onStartup(task: ImplementedScheduledTask): Promise<void>
+  onInstallAndUpgrade(task: ImplementedScheduledTask): Promise<void>
 }

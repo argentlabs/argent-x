@@ -6,15 +6,16 @@ import { Navigate, useNavigate, useParams } from "react-router-dom"
 import { routes } from "../../routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { useNft } from "./nfts.state"
 import { NftScreen } from "./NftScreen"
+import { useRemoteNft } from "./useRemoteNft"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
 export const NftScreenContainer: FC = () => {
   const navigate = useNavigate()
   const { contractAddress, tokenId } = useParams()
   const account = useView(selectedAccountView)
-
-  const nft = useNft(addressSchema.parse(contractAddress), tokenId)
+  const network = useCurrentNetwork()
+  const { data: nft } = useRemoteNft(contractAddress, tokenId, network.id)
 
   if (!account || !contractAddress || !tokenId) {
     return <Navigate to={routes.accounts()} />

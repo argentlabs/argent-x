@@ -130,15 +130,7 @@ export const AccountEditButtons = () => {
           Change account implementation
         </ButtonCell>
       )} */}
-      {account && (
-        <ButtonCell
-          onClick={() => {
-            navigate(routes.accountImplementation(account.address))
-          }}
-        >
-          Account implementation
-        </ButtonCell>
-      )}
+
       {canDeployAccount && (
         <ButtonCell onClick={handleDeploy}>Deploy account</ButtonCell>
       )}

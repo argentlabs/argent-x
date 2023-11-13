@@ -7,7 +7,7 @@ import {
   starknetNetworkToNetworkId,
 } from "../../../utils/starknetNetwork"
 import { urlWithQuery } from "../../../utils/url"
-import { BaseWalletAccount } from "../../../wallet.model"
+import { BaseWalletAccount, MultisigWalletAccount } from "../../../wallet.model"
 import {
   ApiMultisigAccountData,
   ApiMultisigAccountDataSchema,
@@ -16,7 +16,9 @@ import {
   ApiMultisigDataForSignerSchema,
   ApiMultisigGetRequests,
   ApiMultisigGetRequestsSchema,
+  ApiMultisigPostRequestTxn,
   ApiMultisigPostRequestTxnSchema,
+  ApiMultisigState,
   ApiMultisigTxnResponseSchema,
 } from "../../multisig.model"
 import { IMultisigBackendService } from "./interface"
@@ -24,10 +26,24 @@ import {
   IAddNewTransaction,
   IAddRequestSignature,
   IFetchMultisigDataForSigner,
+  IMapTransactionDetails,
+  IPrepareTransaction,
+  IProcessNewTransactionResponse,
+  IProcessRequestSignatureResponse,
+  MappedTransactionDetails,
 } from "./types"
 import { getMultisigAccountFromBaseWallet } from "../../utils/baseMultisig"
-import { InvokeFunctionResponse, hash, num, stark, transaction } from "starknet"
 import {
+  AllowArray,
+  InvokeFunctionResponse,
+  Signature,
+  hash,
+  num,
+  stark,
+  transaction,
+} from "starknet"
+import {
+  MultisigPendingTransaction,
   addToMultisigPendingTransactions,
   cancelPendingMultisigTransactions,
   multisigPendingTransactionToTransaction,
@@ -36,16 +52,63 @@ import { MultisigError } from "../../../errors/multisig"
 
 export class MultisigBackendService implements IMultisigBackendService {
   public readonly baseUrl: string
+  public addToTransactionsStore: (
+    payload: AllowArray<MultisigPendingTransaction>,
+  ) => Promise<void>
+  public cancelPendingTransactions: (
+    account: BaseWalletAccount,
+  ) => Promise<void>
+  public convertToTransaction: (
+    requestId: string,
+    state: ApiMultisigState,
+  ) => Promise<void>
 
-  constructor(baseUrl?: string, private readonly fetcherImpl = fetcher) {
+  constructor(
+    baseUrl?: string,
+    private readonly fetcherImpl = fetcher,
+    addToTransactionsStore: (
+      payload: AllowArray<MultisigPendingTransaction>,
+    ) => Promise<void> = addToMultisigPendingTransactions,
+    cancelPendingTransactions: (
+      account: BaseWalletAccount,
+    ) => Promise<void> = cancelPendingMultisigTransactions,
+    convertToTransaction: (
+      requestId: string,
+      state: ApiMultisigState,
+    ) => Promise<void> = multisigPendingTransactionToTransaction,
+  ) {
     if (!baseUrl) {
       throw new MultisigError({
         code: "NO_MULTISIG_BASE_URL",
         message: "No multisig base url provided",
       })
     }
-
+    this.addToTransactionsStore = addToTransactionsStore
+    this.cancelPendingTransactions = cancelPendingTransactions
+    this.convertToTransaction = convertToTransaction
     this.baseUrl = baseUrl
+  }
+
+  private constructUrlForSigner(
+    starknetNetwork: string,
+    signer: string,
+  ): string {
+    return urlWithQuery([this.baseUrl, starknetNetwork], { signer })
+  }
+
+  private async makeApiCall<T>(
+    url: string,
+    method: "GET" | "POST" = "GET",
+    body?: BodyInit | null | undefined,
+  ): Promise<T> {
+    return await this.fetcherImpl<T>(url, {
+      method,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body,
+    })
   }
 
   async fetchMultisigDataForSigner({
@@ -54,18 +117,8 @@ export class MultisigBackendService implements IMultisigBackendService {
   }: IFetchMultisigDataForSigner): Promise<ApiMultisigDataForSigner> {
     try {
       const starknetNetwork = networkToStarknetNetwork(network)
-
-      const url = urlWithQuery([this.baseUrl, starknetNetwork], {
-        signer,
-      })
-
-      const data = await this.fetcherImpl<ApiMultisigDataForSigner>(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
+      const url = this.constructUrlForSigner(starknetNetwork, signer)
+      const data = await this.makeApiCall<ApiMultisigDataForSigner>(url)
 
       return ApiMultisigDataForSignerSchema.parse(data)
     } catch (e) {
@@ -79,16 +132,8 @@ export class MultisigBackendService implements IMultisigBackendService {
   }: BaseWalletAccount): Promise<ApiMultisigAccountData> {
     try {
       const starknetNetwork = networkIdToStarknetNetwork(networkId)
-
       const url = urlJoin(this.baseUrl, starknetNetwork, address)
-
-      const data = await this.fetcherImpl(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
+      const data = await this.makeApiCall(url)
 
       return ApiMultisigAccountDataSchema.parse(data)
     } catch (e) {
@@ -102,16 +147,8 @@ export class MultisigBackendService implements IMultisigBackendService {
   }: BaseWalletAccount): Promise<ApiMultisigGetRequests> {
     try {
       const starknetNetwork = networkIdToStarknetNetwork(networkId)
-
       const url = urlJoin(this.baseUrl, starknetNetwork, address, "request")
-
-      const data = await fetcher<unknown>(url, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
+      const data = await this.makeApiCall(url)
 
       return ApiMultisigGetRequestsSchema.parse(data)
     } catch (e) {
@@ -119,47 +156,64 @@ export class MultisigBackendService implements IMultisigBackendService {
     }
   }
 
-  async addNewTransaction({
-    address,
-    signature,
-    calls,
+  private mapTransactionDetails({
     transactionDetails,
-  }: IAddNewTransaction): Promise<InvokeFunctionResponse> {
-    const { nonce, version, maxFee, cairoVersion, chainId } = transactionDetails
+    address,
+  }: IMapTransactionDetails): MappedTransactionDetails {
+    const { nonce, version, maxFee, chainId, cairoVersion } = transactionDetails
     const starknetNetwork = chainIdToStarknetNetwork(chainId)
     const networkId = starknetNetworkToNetworkId(starknetNetwork)
     const account: BaseWalletAccount = { address, networkId }
 
-    const multisig = await getMultisigAccountFromBaseWallet(account)
-
-    if (!multisig) {
-      throw Error(`Multisig wallet with address ${address} not found`)
+    return {
+      nonce,
+      version,
+      maxFee,
+      starknetNetwork,
+      account,
+      chainId,
+      cairoVersion,
     }
+  }
 
+  private async fetchMultisigAccount(
+    account: BaseWalletAccount,
+  ): Promise<MultisigWalletAccount> {
+    const multisig = await getMultisigAccountFromBaseWallet(account)
+    if (!multisig) {
+      throw Error(`Multisig wallet with address ${account.address} not found`)
+    }
+    return multisig
+  }
+
+  private async prepareTransaction({
+    signature,
+    mappedDetails,
+    calls,
+  }: IPrepareTransaction): Promise<ApiMultisigPostRequestTxn> {
     const [creator, r, s] = stark.signatureToHexArray(signature)
-
-    const request = ApiMultisigPostRequestTxnSchema.parse({
+    return ApiMultisigPostRequestTxnSchema.parse({
       creator,
       transaction: {
-        nonce: num.toHex(nonce),
-        version: num.toHex(version),
-        maxFee: num.toHex(maxFee),
+        nonce: num.toHex(mappedDetails.nonce),
+        version: num.toHex(mappedDetails.version),
+        maxFee: num.toHex(mappedDetails.maxFee),
         calls,
       },
       starknetSignature: { r, s },
     })
+  }
 
-    const url = urlJoin(this.baseUrl, starknetNetwork, address, "request")
-
-    const response = await fetcher(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    })
-
+  private async processNewTransactionApiResponse({
+    response,
+    calls,
+    cairoVersion,
+    chainId,
+    nonce,
+    maxFee,
+    address,
+    version,
+  }: IProcessNewTransactionResponse) {
     const data = ApiMultisigTxnResponseSchema.parse(response)
 
     const calldata = transaction.getExecuteCalldata(
@@ -178,12 +232,60 @@ export class MultisigBackendService implements IMultisigBackendService {
 
     const transactionHash =
       data.content.transactionHash ?? computedTransactionHash
+    return { transactionHash, content: data.content }
+  }
 
+  async addNewTransaction({
+    address,
+    signature,
+    calls,
+    transactionDetails,
+  }: IAddNewTransaction): Promise<InvokeFunctionResponse> {
+    const {
+      nonce,
+      version,
+      maxFee,
+      cairoVersion,
+      chainId,
+      account,
+      starknetNetwork,
+    } = this.mapTransactionDetails({ transactionDetails, address })
+
+    const multisig = await this.fetchMultisigAccount(account)
+    const request = await this.prepareTransaction({
+      signature,
+      mappedDetails: {
+        nonce,
+        version,
+        maxFee,
+      },
+      calls,
+    })
+
+    const url = urlJoin(this.baseUrl, starknetNetwork, address, "request")
+
+    const response = await this.makeApiCall(
+      url,
+      "POST",
+      JSON.stringify(request),
+    )
+
+    const { transactionHash, content } =
+      await this.processNewTransactionApiResponse({
+        response,
+        calls,
+        cairoVersion,
+        chainId,
+        nonce,
+        maxFee,
+        address,
+        version,
+      })
     // If the multisig threshold is 1, we can execute the transaction directly
     if (multisig.threshold !== 1) {
-      await addToMultisigPendingTransactions({
-        ...data.content,
-        requestId: data.content.id,
+      await this.addToTransactionsStore({
+        ...content,
+        requestId: content.id,
         timestamp: Date.now(),
         type: "INVOKE",
         account,
@@ -197,6 +299,42 @@ export class MultisigBackendService implements IMultisigBackendService {
     }
   }
 
+  private async prepareRequestSignature(signature: Signature) {
+    const [signer, r, s] = stark.signatureToHexArray(signature)
+    const request = ApiMultisigAddRequestSignatureSchema.parse({
+      signer,
+      starknetSignature: { r, s },
+    })
+    return request
+  }
+
+  private async processRequestSignatureApiResponse({
+    response,
+    multisig,
+    address,
+    networkId,
+    transactionToSign,
+  }: IProcessRequestSignatureResponse) {
+    const data = ApiMultisigTxnResponseSchema.parse(response)
+
+    if (data.content.approvedSigners.length === multisig.threshold) {
+      await this.convertToTransaction(data.content.id, data.content.state)
+
+      await this.cancelPendingTransactions({
+        address,
+        networkId,
+      })
+    } else {
+      await this.addToTransactionsStore({
+        ...transactionToSign,
+        approvedSigners: data.content.approvedSigners,
+        nonApprovedSigners: data.content.nonApprovedSigners,
+        state: data.content.state,
+        notify: false,
+      })
+    }
+  }
+
   async addRequestSignature({
     address,
     transactionToSign,
@@ -205,16 +343,10 @@ export class MultisigBackendService implements IMultisigBackendService {
   }: IAddRequestSignature): Promise<InvokeFunctionResponse> {
     const starknetNetwork = chainIdToStarknetNetwork(chainId)
     const networkId = starknetNetworkToNetworkId(starknetNetwork)
-    const multisig = await getMultisigAccountFromBaseWallet({
+    const multisig = await this.fetchMultisigAccount({
       address,
       networkId,
     })
-
-    if (!multisig) {
-      throw Error(`Multisig wallet with address ${address} not found`)
-    }
-
-    const [signer, r, s] = stark.signatureToHexArray(signature)
 
     const url = urlJoin(
       this.baseUrl,
@@ -224,42 +356,21 @@ export class MultisigBackendService implements IMultisigBackendService {
       transactionToSign.requestId,
       "signature",
     )
+    const request = await this.prepareRequestSignature(signature)
 
-    const request = ApiMultisigAddRequestSignatureSchema.parse({
-      signer,
-      starknetSignature: { r, s },
+    const response = await this.makeApiCall(
+      url,
+      "POST",
+      JSON.stringify(request),
+    )
+
+    void this.processRequestSignatureApiResponse({
+      response,
+      multisig,
+      address,
+      networkId,
+      transactionToSign,
     })
-
-    const response = await fetcher(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    })
-
-    const data = ApiMultisigTxnResponseSchema.parse(response)
-
-    if (data.content.approvedSigners.length === multisig.threshold) {
-      await multisigPendingTransactionToTransaction(
-        data.content.id,
-        data.content.state,
-      )
-
-      await cancelPendingMultisigTransactions({
-        address,
-        networkId,
-      })
-    } else {
-      await addToMultisigPendingTransactions({
-        ...transactionToSign,
-        approvedSigners: data.content.approvedSigners,
-        nonApprovedSigners: data.content.nonApprovedSigners,
-        state: data.content.state,
-        notify: false,
-      })
-    }
 
     return {
       transaction_hash: transactionToSign.transactionHash,

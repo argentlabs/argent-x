@@ -1,12 +1,11 @@
 /**
  * All of this file should probably go into the data model for accounts, either as a field which gets updated from a worker, or as a computed field, if we have such a concept.
  */
-import { ethers } from "ethers"
 import { num } from "starknet"
 import useSWR from "swr"
 
 import { updateAccountDetails } from "../../../shared/account/update"
-import { generateAvatarImage } from "@argent/shared"
+import { generateAvatarImage, id } from "@argent/shared"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { withPolling } from "../../services/swr.service"
@@ -29,7 +28,7 @@ const argentColorsArray = [
 ]
 
 export const getColor = (name: string) => {
-  const hash = ethers.utils.id(name).slice(-2)
+  const hash = id(name).slice(-2)
   const index = parseInt(hash, 16) % argentColorsArray.length
   return argentColorsArray[index]
 }

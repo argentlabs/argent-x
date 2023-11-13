@@ -12,7 +12,7 @@ export const parseAmountValue = (
     return 0n
   }
 
-  return parseUnits(amountNoComma, Number(decimals))
+  return parseUnits(amountNoComma, Number(decimals)).value
 }
 export function getUint256CalldataFromBN(bn: BigNumberish) {
   return uint256.bnToUint256(bn)

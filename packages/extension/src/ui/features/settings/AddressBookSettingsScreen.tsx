@@ -73,7 +73,7 @@ export const AddressBookSettingsScreen: FC<AddressBookSettingsScreenProps> = ({
     if (!hasContacts) {
       return (
         <Empty icon={<AddressBookIcon />} title={`No saved contacts`}>
-          <EmptyButton leftIcon={<AddIcon />} onClick={onAddContact}>
+          <EmptyButton mt={8} leftIcon={<AddIcon />} onClick={onAddContact}>
             New contact
           </EmptyButton>
         </Empty>

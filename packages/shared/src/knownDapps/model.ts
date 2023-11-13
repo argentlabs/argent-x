@@ -8,12 +8,14 @@ export const dappLinksSchema = z.array(
   }),
 )
 
-export const dappContractsSchema = z.array(
-  z.object({
-    address: z.string(),
-    chain: z.string(),
-  }),
-)
+export const dappContractsSchema = z
+  .array(
+    z.object({
+      address: z.string(),
+      chain: z.string(),
+    }),
+  )
+  .optional()
 
 export const knownDappSchema = z.object({
   dappId: z.string(),

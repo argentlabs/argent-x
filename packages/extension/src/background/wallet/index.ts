@@ -19,7 +19,7 @@ import { WalletDeploymentStarknetService } from "./deployment/starknet.service"
 import { WalletRecoverySharedService } from "./recovery/shared.service"
 import { WalletSessionService } from "./session/session.service"
 import { WalletRecoveryStarknetService } from "./recovery/starknet.service"
-import { ProgressCallback } from "ethers/lib/utils"
+import { ProgressCallback } from "ethers"
 
 export class Wallet {
   constructor(

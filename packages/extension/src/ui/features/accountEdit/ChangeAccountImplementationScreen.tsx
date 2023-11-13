@@ -8,52 +8,24 @@ import {
 } from "@argent/ui"
 import { Box } from "@chakra-ui/react"
 import { filter, partition } from "lodash-es"
-import { FC, ReactNode } from "react"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
-import { ArgentAccountType } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { AutoColumn } from "../../components/Column"
 import { routes } from "../../routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useRouteAccount } from "../shield/useRouteAccount"
+import {
+  CurrentImplementation,
+  Implementation,
+  ImplementationItemProps,
+  implementations,
+} from "./Implementation"
 
-const { WalletIcon, PluginIcon, MulticallIcon, TickIcon } = icons
-
-interface Implementation {
-  id: ArgentAccountType
-  title: string
-  description: string
-  icon: ReactNode
-}
-const implementations: Implementation[] = [
-  {
-    id: "standard",
-    title: "Default",
-    description: "The default Argent account implementation",
-    icon: <WalletIcon />,
-  },
-  {
-    id: "plugin",
-    title: "Plugin",
-    description: "The Argent account implementation with plugin support",
-    icon: <PluginIcon />,
-  },
-  {
-    id: "betterMulticall",
-    title: "Better multicall",
-    description:
-      "The Argent account implementation with better multicall support",
-    icon: <MulticallIcon />,
-  },
-]
-
-interface ImplementationItemProps extends Implementation {
-  active: boolean
-  onClick?: () => void
-}
+const { TickIcon } = icons
 
 const ImplementationItem: FC<ImplementationItemProps> = ({
   title,
@@ -113,14 +85,11 @@ export const ChangeAccountImplementationScreen: FC = () => {
     >
       <Box p="5" display={"flex"} flexDirection="column" gap="4">
         {activeImplementation && (
-          <>
-            <H6 color="neutrals.300" pl="2">
-              Current implementation
-            </H6>
-            <AutoColumn>
+          <CurrentImplementation
+            implementationItem={
               <ImplementationItem {...activeImplementation} active={true} />
-            </AutoColumn>
-          </>
+            }
+          />
         )}
         {otherImplementations && (
           <>

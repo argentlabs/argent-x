@@ -41,6 +41,7 @@ export const SaveRecoverySeedphraseBanner: FC = () => {
       <Button
         onClick={navigateToRecoveryPhrase}
         backgroundColor="accent.500"
+        _hover={{ bg: "accent.600" }}
         px={2}
       >
         Show recovery phrase

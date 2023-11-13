@@ -95,26 +95,3 @@ export function useArrayStorage<T>(
 
   return filteredValue
 }
-
-export function useLocalStorageState<T>(
-  key: string,
-  initialValue: T,
-): [T, (value: T) => void] {
-  const [state, setState] = useState<T>(() => {
-    try {
-      const item = localStorage.getItem(key)
-      if (!item) {
-        return initialValue
-      }
-      return JSON.parse(item)
-    } catch {
-      return initialValue
-    }
-  })
-
-  const setValue = (value: T) => {
-    setState(value)
-    localStorage.setItem(key, JSON.stringify(value))
-  }
-  return [state, setValue]
-}

@@ -114,7 +114,7 @@ export const sumTokenBalancesToCurrencyValue = ({
       if (currencyValue !== undefined) {
         didGetValidConversion = true
         sumTokenBalance =
-          sumTokenBalance + bigDecimal.parseUnits(currencyValue, 6)
+          sumTokenBalance + bigDecimal.parseCurrency(currencyValue).value
       }
     }
   })
@@ -123,7 +123,7 @@ export const sumTokenBalancesToCurrencyValue = ({
     return
   }
   /** keep as string to avoid loss of precision elsewhere */
-  return bigDecimal.formatUnits(sumTokenBalance, 6)
+  return bigDecimal.formatCurrency(sumTokenBalance)
 }
 
 export interface IConvertTokenAmountToCurrencyValue {
@@ -157,9 +157,13 @@ export const convertTokenAmountToCurrencyValue = ({
 
   /** multiply to convert to currency */
   const currencyValue =
-    BigInt(amount) * bigDecimal.parseUnits(unitCurrencyValue.toString(), 6)
+    BigInt(amount) *
+    bigDecimal.parseCurrency(unitCurrencyValue.toString()).value
   /** keep as string to avoid loss of precision elsewhere */
-  return bigDecimal.formatUnits(currencyValue, decimalsNumber + 6)
+  return bigDecimal.formatUnits({
+    value: currencyValue,
+    decimals: decimalsNumber + 6,
+  })
 }
 
 /**
@@ -235,7 +239,7 @@ export const prettifyTokenAmount = ({
     isPositiveValue = balance > 0n
     const balanceFullString =
       decimalsNumber > 0
-        ? bigDecimal.formatUnits(balance, decimalsNumber)
+        ? bigDecimal.formatUnits({ value: balance, decimals: decimalsNumber })
         : balance.toString()
     prettyValue =
       decimalsNumber > 0
@@ -290,5 +294,7 @@ export const convertTokenUnitAmountWithDecimals = ({
   const decimalsNumber = Number(decimals)
 
   // keep as string to avoid loss of precision elsewhere
-  return bigDecimal.parseUnits(unitAmount.toString(), decimalsNumber).toString()
+  return bigDecimal
+    .parseUnits(unitAmount.toString(), decimalsNumber)
+    .value.toString()
 }

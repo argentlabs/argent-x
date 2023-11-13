@@ -18,7 +18,7 @@ export default class Account extends Navigation {
   accountName2 = "Account 2"
 
   get noAccountBanner() {
-    return this.page.locator(`div h5:text-is("${lang.account.noAccounts}")`)
+    return this.page.locator(`div h5:has-text("${lang.account.noAccounts}")`)
   }
 
   get createAccount() {
@@ -107,6 +107,30 @@ export default class Account extends Navigation {
     return this.page.locator('[data-testid="account-tokens"] h2')
   }
 
+  invalidStarkIdError(id: string) {
+    return this.page.locator(
+      `form label:has-text('${id}${lang.account.invalidStarkIdError}')`,
+    )
+  }
+
+  get shortAddressError() {
+    return this.page.locator(
+      `form label:has-text('${lang.account.shortAddressError}')`,
+    )
+  }
+
+  get invalidCheckSumError() {
+    return this.page.locator(
+      `form label:has-text('${lang.account.invalidCheckSumError}')`,
+    )
+  }
+
+  get invalidAddress() {
+    return this.page.locator(
+      `form label:has-text('${lang.account.invalidAddress}')`,
+    )
+  }
+
   async addAccountMainnet({ firstAccount = true }: { firstAccount?: boolean }) {
     if (firstAccount) {
       await this.createAccount.click()
@@ -168,14 +192,14 @@ export default class Account extends Navigation {
     }
     return assetsList
   }
-  ////*[text() = 'Ethereum']/following-sibling::div
+
   async ensureAsset(accountName: string, name: "Ethereum", value: string) {
     await this.ensureSelectedAccount(accountName)
     await expect(
       this.page.locator(
         `//*[text() = '${name}']/following-sibling::div/p[text() = '${value}']`,
       ),
-    ).toBeVisible({ timeout: 90000 })
+    ).toBeVisible({ timeout: 1000 * 60 * 4 })
   }
 
   async getTotalFeeValue() {
@@ -188,6 +212,46 @@ export default class Account extends Navigation {
     }
 
     return parseFloat(fee.split(" ")[0])
+  }
+  async transferAmount() {
+    /*
+      https://argent.atlassian.net/browse/BLO-1713
+      const sendTitleText = await this.page
+        .locator('[data-testid="send-title"]')
+        .innerText()
+      const sendTitleAmount = sendTitleText.split(" ")[1]
+      const balanceChange = await this.page
+      .locator("[data-value]")
+      .first()
+      .getAttribute("data-value")
+      expect(balanceChange).toBe(sendTitleAmount)
+  */
+    const amount = await this.page
+      .locator('[data-testid="send-title"]')
+      .getAttribute("data-value")
+    return amount
+  }
+
+  async fillRecipientAddress({
+    recipientAddress,
+    fillRecipientAddress = "paste",
+    validAddress = true,
+  }: {
+    recipientAddress: string
+    fillRecipientAddress?: "typing" | "paste"
+    validAddress?: boolean
+  }) {
+    fillRecipientAddress === "paste"
+      ? await this.recipientAddressQuery.fill(recipientAddress)
+      : await this.recipientAddressQuery.type(recipientAddress)
+    if (validAddress) {
+      if (recipientAddress.endsWith("stark")) {
+        await this.page.click(`button:has-text("${recipientAddress}")`)
+      } else {
+        await this.recipientAddressQuery.focus()
+        await this.page.keyboard.press("Enter")
+      }
+    }
   }
   async transfer({
     originAccountName,
@@ -206,15 +270,7 @@ export default class Account extends Navigation {
   }) {
     await this.ensureSelectedAccount(originAccountName)
     await this.token(tokenName).click()
-    fillRecipientAddress === "paste"
-      ? await this.recipientAddressQuery.fill(recipientAddress)
-      : await this.recipientAddressQuery.type(recipientAddress)
-    if (recipientAddress.endsWith("stark")) {
-      await this.page.click(`button:has-text("${recipientAddress}")`)
-    } else {
-      await this.recipientAddressQuery.focus()
-      await this.page.keyboard.press("Enter")
-    }
+    await this.fillRecipientAddress({ recipientAddress, fillRecipientAddress })
     if (amount === "MAX") {
       await expect(this.balance).toBeVisible()
       await expect(this.sendMax).toBeVisible()
@@ -224,7 +280,11 @@ export default class Account extends Navigation {
     }
 
     await this.reviewSend.click()
-    submit ?? (await this.approve.click())
+    const trxAmount = await this.transferAmount()
+    if (submit) {
+      await this.approve.click()
+    }
+    return Math.abs(parseFloat(trxAmount!))
   }
 
   async ensureTokenBalance({

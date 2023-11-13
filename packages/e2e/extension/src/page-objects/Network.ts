@@ -58,4 +58,8 @@ export default class Network {
         throw new Error(`Unknown ARGENTX_Network: ${defaultNetworkId}`)
     }
   }
+
+  ensureSelectedNetwork(networkName: NetworkName) {
+    return expect(this.networkSelector).toHaveText(networkName)
+  }
 }

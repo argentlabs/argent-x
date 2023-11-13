@@ -1,3 +1,4 @@
+import { debounceService } from "../../../../shared/debounce"
 import { defaultNetworks } from "../../../../shared/network"
 import { networkStatusRepo } from "../../../../shared/network/statusStore"
 import { networkRepo } from "../../../../shared/network/store"
@@ -18,4 +19,5 @@ export const networkWorker = new NetworkWorker(
   backgroundNetworkService,
   backgroundUIService,
   chromeScheduleService,
+  debounceService,
 )

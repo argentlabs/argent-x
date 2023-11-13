@@ -1,26 +1,18 @@
-import "./__new/router"
-import "./transactions/service/worker"
-import "./migrations"
+import browser from "webextension-polyfill"
+import * as Sentry from "@sentry/browser"
+import { getBrowserAction } from "../shared/browser"
 
-import { messageStream } from "../shared/messages"
-import { initWorkers } from "./workers"
-import { initBadgeText } from "./transactions/badgeText"
-import { transactionTrackerWorker } from "./transactions/service/worker"
-import { handleMessage } from "./messageHandling/handle"
-import { addMessageListeners } from "./messageHandling/addMessageListeners"
-
-// badge shown on extension icon
-initBadgeText()
-
-// load transaction history
-transactionTrackerWorker
-  .loadHistory()
-  .catch(() => console.warn("failed to load transaction history"))
-
-addMessageListeners()
-
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-messageStream.subscribe(handleMessage)
-
-// start workers
-initWorkers()
+try {
+  // catch any errors from init.ts
+  require("./init")
+} catch (error) {
+  console.error("Fatal exception in background/init.ts", error)
+  Sentry.captureException(error)
+  // run on next event loop to override changes by any successful services
+  setTimeout(() => {
+    // clicking icon will start on the error screen
+    void getBrowserAction(browser).setPopup({
+      popup: "index.html?goto=background-error",
+    })
+  }, 0)
+}

@@ -10,7 +10,7 @@ export class AnalyticsWorker {
     this.backgroundUIService.emitter.on(Opened, (opened) => {
       if (!opened) {
         /** Extension was closed */
-        this.activeStore.getState().update("lastClosed")
+        void this.activeStore.update("lastClosed")
       }
     })
   }

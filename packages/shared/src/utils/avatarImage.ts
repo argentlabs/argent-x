@@ -1,23 +1,8 @@
-import { ethers } from "ethers"
-import { isString, upperCase } from "lodash-es"
 import { num } from "starknet"
+import { getInitials } from "./initials"
+import { id } from "./id"
 
 const { toBigInt } = num
-
-export const getInitials = (name: string, alphanumeric = false) => {
-  if (!isString(name)) {
-    return ""
-  }
-  const filtered = alphanumeric ? name.replace(/[^0-9a-z ]/gi, "") : name
-  const uppercase = upperCase(filtered)
-  const uppercaseElements = uppercase.split(" ")
-
-  if (uppercaseElements.length === 1) {
-    return uppercaseElements[0].substring(0, 2)
-  }
-  const initials = uppercaseElements.map((n) => n[0])
-  return [initials[0], initials[initials.length - 1]].join("")
-}
 
 const parseColor = (color: string) => {
   const hex = color.replace("#", "")
@@ -38,11 +23,13 @@ export const generateAvatarImage = (
   // get alphanumeric initials (to avoid issues with being outside range of btoa)
   const initials = getInitials(name, true)
 
+  // note it's not possible to use Barlow here without embedding the file directly into the svg @see https://css-tricks.com/using-custom-fonts-with-svg-in-an-image-tag/
+
   // generate 64x64 svg with initials in the center (horizontal and vertical) with font color and background color and font family Helvetica (plus fallbacks)
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-    <rect width="64" height="64" fill="${background}" />
-    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="28" font-family="Helvetica, Arial, sans-serif" fill="${color}">${initials}</text>
-    </svg>`
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+    <rect width="48" height="48" fill="${background}" />
+    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-size="16" font-family="Barlow, Helvetica, Arial, sans-serif" fill="${color}">${initials}</text>
+  </svg>`
   return `data:image/svg+xml;base64,${btoa(svg)}`
 }
 
@@ -58,7 +45,7 @@ const argentColorsArray = [
 ]
 
 export const getColor = (name: string) => {
-  const hash = ethers.utils.id(name).slice(-2)
+  const hash = id(name).slice(-2)
   const index = parseInt(hash, 16) % argentColorsArray.length
   return argentColorsArray[index]
 }

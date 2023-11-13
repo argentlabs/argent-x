@@ -1,7 +1,6 @@
 import { createChromeHandler } from "trpc-browser/adapter"
 
 import { getMessagingKeys } from "../keys/messagingKeys"
-import { transactionTrackerWorker } from "../transactions/service/worker"
 import { walletSingleton } from "../walletSingleton"
 import { accountRouter } from "./procedures/account"
 import { accountMessagingRouter } from "./procedures/accountMessaging"
@@ -18,6 +17,7 @@ import { backgroundActionService } from "./services/action"
 import { backgroundArgentAccountService } from "./services/argentAccount"
 import { backgroundMultisigService } from "./services/multisig"
 import { router } from "./trpc"
+import { backgroundRecoveryService } from "./services/recovery"
 
 const appRouter = router({
   account: accountRouter,
@@ -42,11 +42,11 @@ createChromeHandler({
     services: {
       // services can be shared accross requests, as we usually only handle one user at a time
       wallet: walletSingleton, // wallet "service" is obviously way too big and should be split up
-      transactionTracker: transactionTrackerWorker,
       actionService: backgroundActionService,
       messagingKeys: await getMessagingKeys(),
       argentAccountService: backgroundArgentAccountService,
       multisigService: backgroundMultisigService,
+      recoveryService: backgroundRecoveryService,
     },
   }),
 })

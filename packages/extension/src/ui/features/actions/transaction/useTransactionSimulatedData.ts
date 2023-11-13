@@ -83,6 +83,11 @@ function partitionIncomingOutgoingTransfers(transfers: AggregatedSimData[]) {
   return partition(transfers, (t) => t.amount > 0n)
 }
 
+const FEE_MULTIPLIER = 1.5
+const scale = 10
+const scaledMultiplier = Math.round(FEE_MULTIPLIER * scale)
+const FEE_MULTIPLIER_BIGINT = BigInt(scaledMultiplier)
+
 function orderAggregatedSimData(
   simData: AggregatedSimData[],
 ): AggregatedSimData[] {
@@ -184,7 +189,8 @@ export const useAggregatedTxFeesData = (
 
   const { amount } = feeSimulation
 
-  const suggestedMaxFee = BigInt(amount) * BigInt(3) //.toString() // add 3x overhead
+  const suggestedMaxFee =
+    (BigInt(amount) * BigInt(FEE_MULTIPLIER_BIGINT)) / BigInt(scale) // add 1.5x overhead
   let maxADFee = num.toBigInt(0)
   let accountDeploymentFee = num.toBigInt(0)
 
@@ -192,7 +198,8 @@ export const useAggregatedTxFeesData = (
     accountDeploymentFee = num.toBigInt(
       transactionSimulation[0].feeEstimation.overallFee,
     )
-    maxADFee = BigInt(accountDeploymentFee.valueOf()) * BigInt(3) // add 3x overhead
+    maxADFee =
+      (accountDeploymentFee.valueOf() * FEE_MULTIPLIER_BIGINT) / BigInt(scale) // add 1.5x overhead
   }
 
   return {
@@ -350,7 +357,7 @@ export const useAggregatedSimData = (
 
         const amount = transfers.reduce<bigint>((acc, t) => {
           const isTokenTranfer = checkIsTokenTransfer(t)
-          if (isTokenTranfer && t.from === account?.address) {
+          if (isTokenTranfer && isEqualAddress(t.from, account?.address)) {
             return acc - BigInt(t.value ?? ONE) // This works because ERC721 tokens have value undefined and the amount is always 1
           }
 
@@ -364,10 +371,10 @@ export const useAggregatedSimData = (
           const isTokenTranfer = checkIsTokenTransfer(t)
 
           if (isTokenTranfer && t.from === account?.address) {
-            return acc - bigDecimal.parseCurrency(t.usdValue)
+            return acc - bigDecimal.parseCurrency(t.usdValue).value
           }
 
-          return acc + bigDecimal.parseCurrency(t.usdValue)
+          return acc + bigDecimal.parseCurrency(t.usdValue).value
         }, ZERO)
 
         const usdValue = bigDecimal.formatCurrency(usdValueBigInt)
@@ -380,11 +387,12 @@ export const useAggregatedSimData = (
           if (!isTokenTranfer) {
             return []
           }
+
           return [
             ...acc,
             {
               address: t.to,
-              amount: t.to === account?.address ? amount : negated,
+              amount: isEqualAddress(t.to, account?.address) ? amount : negated,
               usdValue: t.usdValue ?? undefined,
             },
           ]

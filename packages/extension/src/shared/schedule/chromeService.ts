@@ -11,6 +11,8 @@ export type MinimalBrowser = DeepPick<
   | "alarms.getAll"
   | "alarms.clear"
   | "alarms.onAlarm.addListener"
+  | "runtime.onStartup.addListener"
+  | "runtime.onInstalled.addListener"
 >
 
 type WaitFn = (ms: number) => Promise<void>
@@ -57,14 +59,14 @@ export class ChromeScheduleService implements IScheduleService {
       ? Math.max(Math.floor(60 / seconds - 1), 1)
       : 1
     const periodInMinutes = Math.max(Math.round(seconds / 60), 1)
-    this.browser.alarms.create(`${task.id}::run${runXTimesPerMinute}`, {
+    await this.browser.alarms.create(`${task.id}::run${runXTimesPerMinute}`, {
       periodInMinutes,
     })
   }
 
   async in(seconds: number, task: BaseScheduledTask): Promise<void> {
     const delayInMinutes = Math.max(Math.round(seconds / 60), 1)
-    this.browser.alarms.create(`${task.id}::run1`, {
+    await this.browser.alarms.create(`${task.id}::run1`, {
       delayInMinutes,
     })
   }
@@ -86,6 +88,18 @@ export class ChromeScheduleService implements IScheduleService {
         const frequency = getFrequency(alarm.name)
         void runXTimesPerMinute(frequency, task.callback, this.waitFn)
       }
+    })
+  }
+
+  async onStartup(task: ImplementedScheduledTask): Promise<void> {
+    this.browser.runtime.onStartup.addListener(() => {
+      void task.callback()
+    })
+  }
+
+  async onInstallAndUpgrade(task: ImplementedScheduledTask): Promise<void> {
+    this.browser.runtime.onInstalled.addListener(() => {
+      void task.callback()
     })
   }
 }

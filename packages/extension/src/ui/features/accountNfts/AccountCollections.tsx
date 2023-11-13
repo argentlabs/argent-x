@@ -31,7 +31,7 @@ export const AccountCollections: FC<AccountCollectionsProps> = ({
       p="4"
       {...rest}
     >
-      {collections.map((collection: Collection) => (
+      {collections.map((collection) => (
         <AccountCollection
           key={collection.contractAddress}
           collection={collection}

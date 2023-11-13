@@ -20,7 +20,7 @@ export const LockScreen: FC = () => {
     setIsLoading(true)
     try {
       await sessionService.startSession(password)
-      unlockedExtensionTracking()
+      await unlockedExtensionTracking()
       const target = await recover()
       navigate(target, { replace: true })
       return true

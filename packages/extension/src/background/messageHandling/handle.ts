@@ -7,7 +7,7 @@ import { migrateWallet } from "../../shared/wallet/storeMigration"
 import { backgroundActionService } from "../__new/services/action"
 import { handleAccountMessage } from "../accountMessaging"
 import { handleActionMessage } from "../actionMessaging"
-import { hasTab, sendMessageToActiveTabs } from "../activeTabs"
+import { addTab, hasTab, sendMessageToActiveTabs } from "../activeTabs"
 import {
   BackgroundService,
   HandleMessage,
@@ -55,7 +55,7 @@ export const handleMessage = async (
     actionService: backgroundActionService,
   }
 
-  const extensionUrl = browser.extension.getURL("")
+  const extensionUrl = browser.runtime.getURL("")
   const safeOrigin = extensionUrl.replace(/\/$/, "")
   const origin = getOriginFromSender(sender)
   const isSafeOrigin = Boolean(origin === safeOrigin)
@@ -80,6 +80,14 @@ export const handleMessage = async (
     if (await hasTab(sender.tab?.id)) {
       await sendMessageToActiveTabs(msg)
     }
+  }
+
+  if (sender.tab?.id && port) {
+    await addTab({
+      id: sender.tab?.id,
+      host: origin,
+      port,
+    })
   }
 
   for (const handleMessage of handlers) {

@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers"
+import { BigNumber } from "@ethersproject/bignumber"
 
 export const reviveJsonBigNumber = (_: string, value: any) => {
   if (value?.type === "BigNumber" && "hex" in value) {

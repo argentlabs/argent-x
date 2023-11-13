@@ -79,10 +79,6 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   const hasEscape = accountHasEscape(account)
   const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
 
-  const showAddFundsBackdrop = useMemo(() => {
-    return multisig?.needsDeploy && !!feeTokenBalance && feeTokenBalance <= 0n
-  }, [feeTokenBalance, multisig?.needsDeploy])
-
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
 
   const isDeprecated = useIsDeprecatedTxV0(account)
@@ -99,8 +95,17 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
     return !hasSavedRecoverySeedPhrase && isMainnet
   }, [hasSavedRecoverySeedPhrase, isMainnet])
 
+  const showAddFundsBackdrop = useMemo(() => {
+    return (
+      !showSaveRecoverySeedphraseBanner &&
+      feeTokenBalance !== undefined &&
+      feeTokenBalance <= 0n
+    )
+  }, [feeTokenBalance, showSaveRecoverySeedphraseBanner])
+
   const showDapplandBanner =
     !hasSeenBanner &&
+    !showAddFundsBackdrop &&
     !showSaveRecoverySeedphraseBanner &&
     !needsUpgrade &&
     !hasPendingTransactions &&

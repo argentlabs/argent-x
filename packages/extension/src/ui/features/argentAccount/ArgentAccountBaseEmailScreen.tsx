@@ -102,6 +102,7 @@ export const ArgentAccountBaseEmailScreen: FC<
             variant="primary"
             size="md"
             pb={1}
+            pt={0}
           />
           <Input
             {...rest}
@@ -122,7 +123,7 @@ export const ArgentAccountBaseEmailScreen: FC<
         <Button
           colorScheme={"primary"}
           type="submit"
-          disabled={!formState.isDirty}
+          isDisabled={!formState.isDirty || Boolean(formState.errors.email)}
           isLoading={formState.isSubmitting}
           loadingText={"Verifying email"}
         >

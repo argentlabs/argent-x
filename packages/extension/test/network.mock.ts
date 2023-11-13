@@ -5,7 +5,7 @@ const defaultNetwork: Network = {
   name: "mockNetwork",
   chainId: "1",
   rpcUrl: "rpcUrl",
-  multicallAddress: "multicallAddress",
+  multicallAddress: "0xmulticallAddress",
   accountClassHash: {
     standard: "standard",
   },

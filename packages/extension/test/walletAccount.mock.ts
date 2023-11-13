@@ -32,7 +32,7 @@ const defaultWalletAccount: WalletAccount = {
   hidden: false,
 }
 
-export const getMockWalletAccount = (overrides: Partial<WalletAccount>) => ({
+export const getMockWalletAccount = (overrides?: Partial<WalletAccount>) => ({
   ...defaultWalletAccount,
-  ...overrides,
+  ...(overrides ?? {}),
 })

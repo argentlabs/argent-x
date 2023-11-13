@@ -94,11 +94,10 @@ export class ChromeRepository<T> implements IRepository<T> {
       newValues = [value]
     }
 
-    const mergedValues = mergeArrayStableWith(
-      items,
-      newValues,
-      this.options.compare,
-    )
+    const mergedValues = mergeArrayStableWith(items, newValues, {
+      compareFn: this.options.compare.bind(this),
+      mergeFn: this.options.merge.bind(this),
+    })
 
     await this.set(mergedValues)
 

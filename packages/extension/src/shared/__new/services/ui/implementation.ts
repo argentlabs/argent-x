@@ -1,10 +1,10 @@
+import { MinimalActionBrowser, getBrowserAction } from "../../../browser"
 import { DeepPick } from "../../../types/deepPick"
 import { UI_SERVICE_CONNECT_ID } from "./constants"
 import { IUIService } from "./interface"
 
 type MinimalBrowser = DeepPick<
   typeof chrome,
-  | "browserAction.setPopup"
   | "extension.getViews"
   | "runtime.getURL"
   | "tabs.create"
@@ -13,7 +13,8 @@ type MinimalBrowser = DeepPick<
   | "windows.update"
   | "windows.remove"
   | "windows.getAll"
->
+> &
+  MinimalActionBrowser
 
 export default class UIService implements IUIService {
   constructor(
@@ -22,7 +23,7 @@ export default class UIService implements IUIService {
   ) {}
 
   setDefaultPopup(popup = "index.html") {
-    return this.browser.browserAction.setPopup({ popup })
+    return getBrowserAction(this.browser).setPopup({ popup })
   }
 
   unsetDefaultPopup() {
@@ -35,6 +36,9 @@ export default class UIService implements IUIService {
   }
 
   hasPopup() {
+    if (typeof window === "undefined") {
+      return false
+    }
     const popup = this.getPopup()
     return Boolean(popup)
   }

@@ -56,6 +56,7 @@ export const defaultNetworks: Network[] = [
     multicallAddress: MULTICALL_CONTRACT_ADDRESS,
     feeTokenAddress: FEE_TOKEN_ADDRESS_ETH,
     readonly: true,
+    prefer: "sequencer",
   },
   {
     id: "goerli-alpha",
@@ -77,6 +78,7 @@ export const defaultNetworks: Network[] = [
     multicallAddress: MULTICALL_CONTRACT_ADDRESS,
     feeTokenAddress: FEE_TOKEN_ADDRESS_ETH,
     readonly: true,
+    prefer: "rpc",
   },
   ...(process.env.NODE_ENV === "development" ? DEV_ONLY_NETWORKS : []),
   {

@@ -7,8 +7,6 @@ export interface ISettingsStorage {
   privacyAutomaticErrorReporting: boolean
   experimentalAllowChooseAccount: boolean
   blockExplorerKey: BlockExplorerKey
-  betaFeatureMultisig: boolean
-  betaFeatureRpcProvider: boolean
 }
 
 export type SettingsStorageKey = keyof ISettingsStorage

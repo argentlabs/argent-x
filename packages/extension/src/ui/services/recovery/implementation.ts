@@ -1,8 +1,8 @@
 import { encryptForBackground } from "../crypto"
 import { messageClient } from "../messaging/trpc"
-import { IRecoveryService } from "./interface"
+import { IRecoveryService } from "../../../shared/recovery/service/interface"
 
-export class RecoveryService implements IRecoveryService {
+export class ClientRecoveryService implements IRecoveryService {
   async byBackup(backup: string) {
     await messageClient.recovery.recoverBackup.mutate({ backup })
   }

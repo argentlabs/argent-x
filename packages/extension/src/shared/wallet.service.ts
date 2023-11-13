@@ -1,5 +1,3 @@
-import { isFeatureEnabled } from "@argent/shared"
-
 import { isEqualAddress } from "../ui/services/addresses"
 import { BaseWalletAccount, WalletAccount } from "./wallet.model"
 
@@ -29,18 +27,11 @@ export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
 }
 
 export const isDeprecatedTxV0 = (account: WalletAccount): boolean => {
-  const hideDeprecatedAccounts = isFeatureEnabled(
-    process.env.FEATURE_HIDE_DEPRECATED_ACCOUNTS,
-  )
-
-  if (!hideDeprecatedAccounts) {
-    return false
-  }
-
   return (
     !!account.classHash &&
-    DEPRECATED_TX_V0_ACCOUNT_IMPLEMENTATION_CLASS_HASH.includes(
-      account.classHash.toLowerCase(),
+    DEPRECATED_TX_V0_ACCOUNT_IMPLEMENTATION_CLASS_HASH.some(
+      (deprecatedClassHash) =>
+        isEqualAddress(deprecatedClassHash, account.classHash),
     )
   )
 }

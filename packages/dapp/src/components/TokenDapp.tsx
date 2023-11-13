@@ -130,13 +130,12 @@ export const TokenDapp: FC<{
     }
   }
 
-  const handleSignSubmit = async (e: React.FormEvent) => {
+  const handleSignSubmit = async (skipDeploy: boolean) => {
     try {
-      e.preventDefault()
       setTransactionStatus("approve")
 
       console.log("sign", shortText)
-      const result = await signMessage(shortText)
+      const result = await signMessage(shortText, skipDeploy)
       console.log(result)
 
       setLastSig(stark.formatSignature(result))
@@ -334,7 +333,12 @@ export const TokenDapp: FC<{
         </form>
       </div>
       <div className="columns">
-        <form onSubmit={handleSignSubmit}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSignSubmit(false)
+          }}
+        >
           <h2 className={styles.title}>Sign Message</h2>
 
           <label htmlFor="mint-amount">Short Text</label>
@@ -346,7 +350,16 @@ export const TokenDapp: FC<{
             onChange={(e) => setShortText(e.target.value)}
           />
 
-          <input type="submit" value="Sign" />
+          <div style={{ display: "flex", alignItems: "center", gap: "1em" }}>
+            <input type="submit" value="Sign" />
+            <input
+              type="button"
+              value="Sign without deploy"
+              onClick={async () => {
+                handleSignSubmit(true)
+              }}
+            />
+          </div>
         </form>
         <form>
           <h2 className={styles.title}>Sign results</h2>

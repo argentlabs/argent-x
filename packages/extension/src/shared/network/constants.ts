@@ -1,3 +1,5 @@
+import { PublicRpcNode } from "./type"
+
 export const FEE_TOKEN_ADDRESS_ETH =
   "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
 
@@ -18,7 +20,21 @@ export const BETTER_MULTICAL_ACCOUNT_CLASS_HASH =
   "0x057c2f22f0209a819e6c60f78ad7d3690f82ade9c0c68caea492151698934ede"
 
 export const ARGENT_5_MINUTE_ESCAPE_TESTING_ACCOUNT_CLASS_HASH =
-  "0x058a42e2553e65e301b7f22fb89e4a2576e9867c1e20bb1d32746c74ff823639"
+  "0x0545d680a2b4909f886371b2ac820745491f55ac7f0e81b3c4668a81e2a656f0" /** Cairo 1 */
+// "0x058a42e2553e65e301b7f22fb89e4a2576e9867c1e20bb1d32746c74ff823639" /** Cairo 0 - please keep for testing */
 
 export const MULTICALL_CONTRACT_ADDRESS =
   "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4"
+
+// Public RPC nodes
+export const BLAST_RPC_NODE: PublicRpcNode = {
+  mainnet: "https://starknet-mainnet.public.blastapi.io",
+  testnet: "https://starknet-testnet.public.blastapi.io",
+}
+
+export const LAVA_RPC_NODE: PublicRpcNode = {
+  mainnet: "https://rpc.starknet.lava.build",
+  testnet: "https://rpc.starknet-testnet.lava.build",
+}
+
+export const PUBLIC_RPC_NODES = [BLAST_RPC_NODE, LAVA_RPC_NODE]

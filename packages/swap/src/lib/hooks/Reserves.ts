@@ -46,7 +46,7 @@ export function useReserves(pairAddresses: (string | undefined)[]) {
 
     const promises = pairAddresses.map((pairAddress) =>
       pairAddress
-        ? multicall.call({
+        ? multicall.callContract({
             contractAddress: pairAddress,
             entrypoint: "get_reserves",
           })
@@ -61,8 +61,8 @@ export function useReserves(pairAddresses: (string | undefined)[]) {
       }
 
       return {
-        reserve0: uint256ToHex({ low: res[0], high: res[1] }),
-        reserve1: uint256ToHex({ low: res[2], high: res[3] }),
+        reserve0: uint256ToHex({ low: res.result[0], high: res.result[1] }),
+        reserve1: uint256ToHex({ low: res.result[2], high: res.result[3] }),
       } as Reserves
     })
   })

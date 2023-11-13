@@ -3,7 +3,6 @@ import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
-import { CreateAccountType } from "../../../shared/wallet.model"
 import { useAction } from "../../hooks/useAction"
 import { routes, useReturnTo } from "../../routes"
 import { assertNever } from "../../services/assertNever"
@@ -13,9 +12,6 @@ import {
   AccountTypeId,
   AddNewAccountScreen,
 } from "./AddNewAccountScreen"
-import { isFeatureEnabled } from "@argent/shared"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import { settingsStore } from "../../../shared/settings"
 
 const { WalletIcon, MultisigIcon } = icons
 
@@ -34,7 +30,7 @@ const accountTypes: AccountType[] = [
     title: "Multisig Account",
     subtitle: "For multiple owners",
     icon: <MultisigIcon />,
-    enabled: isFeatureEnabled(process.env.FEATURE_MULTISIG),
+    enabled: true,
   },
 
   //   {
@@ -51,13 +47,8 @@ export const AddNewAccountScreenContainer: FC = () => {
     accountService.create.bind(accountService),
   )
   // TODO: should be view after networks was refactored
-  const { accountClassHash, id: networkId } = useCurrentNetwork()
+  const { id: networkId } = useCurrentNetwork()
   const returnTo = useReturnTo()
-
-  const betaFeatureMultisig = useKeyValueStorage(
-    settingsStore,
-    "betaFeatureMultisig",
-  )
 
   const onAccountTypeClick = useCallback(
     async (accountTypeId: AccountTypeId) => {
@@ -95,26 +86,9 @@ export const AddNewAccountScreenContainer: FC = () => {
     [isAdding],
   )
 
-  const accountTypeCheck = useCallback(
-    (type: CreateAccountType) => {
-      if (type === "standard") {
-        return true // always enabled for standard
-      }
-
-      if (type === "multisig") {
-        return betaFeatureMultisig // Check if multisig is enabled in beta features settings
-      }
-
-      return !!accountClassHash?.[type]
-    }, // always enabled for standard
-    [accountClassHash, betaFeatureMultisig],
-  )
-
   const enabledAccountTypes = useMemo(() => {
-    return accountTypes.filter(
-      ({ type, enabled }) => enabled && accountTypeCheck(type),
-    )
-  }, [accountTypeCheck])
+    return accountTypes.filter(({ enabled }) => enabled)
+  }, [])
 
   const onClose = useNavigateBack()
 

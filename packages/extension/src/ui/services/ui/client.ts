@@ -1,3 +1,4 @@
+import { autoConnect } from "trpc-browser/shared/chrome"
 import { IUIService } from "../../../shared/__new/services/ui/interface"
 import { DeepPick } from "../../../shared/types/deepPick"
 import { IClientUIService } from "./interface"
@@ -9,6 +10,9 @@ export default class ClientUIService implements IClientUIService {
 
   registerUIProcess() {
     /** connect to the background port from the UI */
-    this.browser.runtime.connect({ name: this.uiService.connectId })
+    void autoConnect(
+      () => this.browser.runtime.connect({ name: this.uiService.connectId }),
+      () => {}, // just ignore the new port, the important part is that the connection got established
+    )
   }
 }

@@ -30,6 +30,13 @@ export default defineConfig({
     }),
   ],
   test: {
+    deps: {
+      optimizer: {
+        web: {
+          enabled: false,
+        },
+      },
+    },
     environment: "happy-dom",
     exclude: ["**/node_modules/**", "**/*.mock.ts"],
     coverage: {

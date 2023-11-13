@@ -11,6 +11,7 @@ import { Network } from "../network"
 import { TransactionMeta } from "../transactions"
 import { BaseWalletAccount } from "../wallet.model"
 import { ActionQueueItem } from "./schema"
+import { SignMessageOptions } from "../messages/ActionMessage"
 
 export type ExtQueueItem<T> = ActionQueueItem & T
 
@@ -42,7 +43,7 @@ export type ActionItem =
     }
   | {
       type: "SIGN"
-      payload: typedData.TypedData
+      payload: { typedData: typedData.TypedData; options: SignMessageOptions }
     }
   | {
       type: "REQUEST_TOKEN"

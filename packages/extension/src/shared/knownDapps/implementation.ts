@@ -30,7 +30,7 @@ export class KnownDappService implements IKnownDappService {
     const knownDapps = await this.knownDappsRepository.get()
 
     const dapp = knownDapps?.find((knownDapp) =>
-      knownDapp.contracts.some(
+      knownDapp.contracts?.some(
         (contract) =>
           contract.address === contractAddress && contract.chain === "starknet",
       ),

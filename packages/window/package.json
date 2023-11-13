@@ -20,7 +20,7 @@
     "dev": "vite build --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "setup": "pnpm run build"
   },
   "devDependencies": {
@@ -28,11 +28,11 @@
     "@argent/eslint-plugin-local": "^6.3.1",
     "typescript": "^5.0.4",
     "vite": "^4.3.8",
-    "vitest": "^0.33.0",
+    "vitest": "^0.34.0",
     "zod": "^3.20.6"
   },
   "peerDependencies": {
-    "starknet": "5.18.0",
+    "starknet": "5.19.5",
     "zod": "^3.20.6"
   },
   "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"

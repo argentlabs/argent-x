@@ -42,7 +42,7 @@ export function useMultipleTokenBalances(
 
     const promises = tokenAddresses.map((pairAddress) =>
       pairAddress
-        ? multicall.call({
+        ? multicall.callContract({
             contractAddress: pairAddress,
             entrypoint: "balanceOf",
             calldata: [accountAddress],
@@ -57,7 +57,7 @@ export function useMultipleTokenBalances(
         return undefined
       }
 
-      return uint256ToHex({ low: res[0], high: res[1] })
+      return uint256ToHex({ low: res.result[0], high: res.result[1] })
     })
   })
 

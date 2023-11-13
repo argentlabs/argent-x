@@ -1,25 +1,8 @@
-import { FC, useEffect, useState } from "react"
-import styled, { keyframes } from "styled-components"
+import { FC, useEffect, useState, PropsWithChildren } from "react"
+import { Box, keyframes } from "@chakra-ui/react"
+import { P3 } from "@argent/ui"
 
-import { H2 } from "../../theme/Typography"
-
-export const GreetingsWrapper = styled.div`
-  position: relative;
-
-  margin: 16px 0px;
-  height: 41px;
-  width: 100%;
-`
-
-const Text = styled(H2)`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-`
-
-const FadeInAndOut = keyframes`
+const fadeInAndOut = keyframes`
   0% {
     opacity: 0;
   }
@@ -33,9 +16,20 @@ const FadeInAndOut = keyframes`
     opacity: 0;
   }
 `
-const FadeInAndOutText = styled(Text)`
-  animation: ${FadeInAndOut} 3s ease-in-out forwards;
-`
+
+const FadeInAndOutText: FC<{ duration?: string } & PropsWithChildren> = ({
+  duration = "3s",
+  ...props
+}) => {
+  return (
+    <P3
+      animation={`${fadeInAndOut} ${duration} ease-in-out forwards`}
+      color="neutrals.300"
+      mt={6}
+      {...props}
+    />
+  )
+}
 
 const useCarousel = (greetings: string[], delay = 3000): number => {
   const [index, setState] = useState(0)
@@ -61,8 +55,8 @@ interface GreetingsProps {
 export const Greetings: FC<GreetingsProps> = ({ greetings, ...props }) => {
   const index = useCarousel(greetings)
   return (
-    <GreetingsWrapper {...props}>
+    <Box position="relative" mx="4" my="0" h={10} w="100%" {...props}>
       <FadeInAndOutText key={index}>{greetings[index]}</FadeInAndOutText>
-    </GreetingsWrapper>
+    </Box>
   )
 }

@@ -1,11 +1,9 @@
-// import { parseBytes32String } from "@ethersproject/strings"
 import { useMemo } from "react"
 
 import { Currency, ETHER, Token } from "../../sdk"
 import { validateAndParseAddress } from "../../sdk/utils"
 import { useArgentTokenList } from "../../tokenlist"
 import { useSwapProvider } from "../providers"
-import { useNetworkIdFromChainId } from "../services/network"
 
 export function useAllTokens(): { [address: string]: Token } {
   const { selectedAccount, networkId } = useSwapProvider()

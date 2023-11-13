@@ -1,5 +1,5 @@
 import { Button, L2, P3, icons, logos } from "@argent/ui"
-import { SimpleGrid, VStack } from "@chakra-ui/react"
+import { SimpleGrid, VStack, StackProps } from "@chakra-ui/react"
 import { FC } from "react"
 import { Link } from "react-router-dom"
 
@@ -8,8 +8,21 @@ import { routes } from "../../routes"
 const { SupportIcon } = icons
 const { Discord, Github, Twitter } = logos
 
-const SupportFooter: FC = () => (
-  <VStack mt={4} borderTop="solid 1px" borderTopColor="border">
+interface SupportFooterProps extends StackProps {
+  privacyStatement?: boolean
+}
+
+const SupportFooter: FC<SupportFooterProps> = ({
+  privacyStatement = true,
+  ...rest
+}) => (
+  <VStack
+    mt={4}
+    gap={2}
+    borderTop="solid 1px"
+    borderTopColor="border"
+    {...rest}
+  >
     <P3 color="neutrals.400" pt="6">
       Help, support &amp; suggestions:
     </P3>
@@ -59,14 +72,14 @@ const SupportFooter: FC = () => (
         Twitter
       </Button>
     </SimpleGrid>
-    <Link to={routes.settingsPrivacyStatement()}>
-      <L2 color="neutrals.400" cursor="inherit" textDecoration="underline">
-        Privacy statement
-      </L2>
-    </Link>
-    <L2 color="neutrals.500" py="2">
-      Version: v{process.env.VERSION}
-    </L2>
+    {privacyStatement && (
+      <Link to={routes.settingsPrivacyStatement()}>
+        <L2 color="neutrals.400" cursor="inherit" textDecoration="underline">
+          Privacy statement
+        </L2>
+      </Link>
+    )}
+    <L2 color="neutrals.500">Version: v{process.env.VERSION}</L2>
   </VStack>
 )
 

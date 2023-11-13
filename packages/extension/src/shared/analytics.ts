@@ -1,9 +1,8 @@
-import { base64 } from "ethers/lib/utils"
+import { base64 } from "@scure/base"
 import { encode } from "starknet"
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
 
 import { CreateAccountType } from "./wallet.model"
+import { KeyValueStorage } from "./storage"
 
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 
@@ -305,23 +304,32 @@ interface ActiveStoreValues {
   lastClosed: number
 }
 
-interface ActiveStore extends ActiveStoreValues {
-  update: (key: keyof ActiveStoreValues) => void
+interface ActiveStoreMethods {
+  update: (key: keyof ActiveStoreValues) => Promise<void>
 }
 
-export type IActiveStore = typeof activeStore
+class ActiveStore
+  extends KeyValueStorage<ActiveStoreValues>
+  implements ActiveStoreMethods
+{
+  constructor() {
+    super(
+      {
+        lastOpened: 0, // defaults to tracking once when no value set yet
+        lastUnlocked: 0, // defaults to tracking once when no value set yet
+        lastSession: 0, // defaults to tracking once when no value set yet
+        lastClosed: 0, // defaults to tracking once when no value set yet
+      },
+      {
+        namespace: "analytics:active",
+      },
+    )
+  }
 
-export const activeStore = create<ActiveStore>()(
-  persist(
-    (set) => ({
-      lastOpened: 0, // defaults to tracking once when no value set yet
-      lastUnlocked: 0, // defaults to tracking once when no value set yet
-      lastSession: 0, // defaults to tracking once when no value set yet
-      lastClosed: 0, // defaults to tracking once when no value set yet
-      update: (key) => set((state) => ({ ...state, [key]: Date.now() })),
-    }),
-    {
-      name: "lastSeen",
-    },
-  ),
-)
+  update(key: keyof ActiveStoreValues) {
+    return this.set(key, Date.now())
+  }
+}
+
+export const activeStore = new ActiveStore()
+export type IActiveStore = typeof activeStore

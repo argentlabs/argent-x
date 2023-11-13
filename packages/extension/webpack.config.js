@@ -21,7 +21,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
 })
 
 const isProd = process.env.NODE_ENV === "production"
-const useManifestV3 = process.env.MANIFEST_VERSION === "v3"
+const useManifestV2 = process.env.MANIFEST_VERSION === "v2"
 const safeEnvVars = process.env.SAFE_ENV_VARS === "true"
 function safeGetCommitHash() {
   const dotenvPath = path.resolve(__dirname, ".env")
@@ -97,7 +97,7 @@ module.exports = {
       patterns: [
         { from: "./src/ui/favicon.ico", to: "favicon.ico" },
         {
-          from: `./manifest/${useManifestV3 ? "v3" : "v2"}.json`,
+          from: `./manifest/${!useManifestV2 ? "v3" : "v2"}.json`,
           to: "manifest.json",
         },
         { from: "./src/assets", to: "assets" },
@@ -105,12 +105,11 @@ module.exports = {
     }),
     new DefinePlugin({
       "process.env.VERSION": JSON.stringify(
-        useManifestV3 ? manifestV3.version : manifestV2.version, // doesn't matter much, but why not
+        !useManifestV2 ? manifestV3.version : manifestV2.version, // doesn't matter much, but why not
       ),
       "process.env.COMMIT_HASH": JSON.stringify(commitHash),
     }),
     new ProvidePlugin({
-      Buffer: ["buffer", "Buffer"],
       React: "react",
     }),
 

@@ -19,12 +19,12 @@ export async function getAccountCairoVersion(
     if (network.multicallAddress) {
       const multicall = getMulticallForNetwork(network)
 
-      const response = await multicall.call({
+      const response = await multicall.callContract({
         contractAddress: accountAddress,
         entrypoint: "getVersion",
       })
 
-      encodedString = response[0]
+      encodedString = response.result[0]
     } else {
       const provider = getProvider(network)
       const response = await provider.callContract({

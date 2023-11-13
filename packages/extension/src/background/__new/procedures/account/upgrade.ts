@@ -2,19 +2,24 @@ import { z } from "zod"
 
 import {
   argentAccountTypeSchema,
-  baseWalletAccountSchema,
+  walletAccountSchema,
 } from "../../../../shared/wallet.model"
 import { upgradeAccount } from "../../../accountUpgrade"
 import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
+import { getAccountClassHashFromChain } from "../../../../shared/account/details"
+import { networkService } from "../../../../shared/network/service"
+import { isEqualAddress } from "@argent/shared"
 
 const upgradeAccountSchema = z.object({
-  account: baseWalletAccountSchema,
+  account: walletAccountSchema,
   targetImplementationType: argentAccountTypeSchema.optional(),
 })
+
 export const upgradeAccountProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
   .input(upgradeAccountSchema)
+  .output(z.tuple([z.boolean(), walletAccountSchema]))
   .mutation(
     async ({
       input: { account, targetImplementationType },
@@ -22,6 +27,32 @@ export const upgradeAccountProcedure = extensionOnlyProcedure
         services: { wallet, actionService },
       },
     }) => {
+      const [onchainAccount] = await getAccountClassHashFromChain([account])
+
+      const { accountClassHash } = await networkService.getById(
+        account.network.id,
+      )
+
+      if (!accountClassHash) {
+        throw new Error("Account class hash not found")
+      }
+
+      const targetClassHash =
+        accountClassHash[targetImplementationType ?? account.type]
+
+      if (
+        onchainAccount.classHash &&
+        isEqualAddress(onchainAccount.classHash, targetClassHash)
+      ) {
+        const updatedAccount = {
+          ...account,
+          classHash: onchainAccount.classHash,
+          type: onchainAccount.type,
+        }
+
+        return [false, updatedAccount] // Upgrade not needed
+      }
+
       // TODO ⬇ should be a service
       await upgradeAccount({
         account,
@@ -29,5 +60,7 @@ export const upgradeAccountProcedure = extensionOnlyProcedure
         actionService,
         targetImplementationType,
       })
+
+      return [true, account] // Upgrade needed, return the account as is
     },
   )

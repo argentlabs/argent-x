@@ -23,32 +23,35 @@ export const ArgentAccountFeaturesList: FC<ArgentAccountFeaturesListProps> = ({
       borderRadius="lg"
       mb={1}
     >
-      <Flex alignItems="start" mb={3}>
+      <Flex alignItems="start" mb={5}>
         <ArgentShieldIcon fontSize={20} mr={2} />
         <Flex direction="column">
           <H6 lineHeight={4}>Argent Shield</H6>
           <Text mt={1} fontSize={13} color="neutrals.300" lineHeight={4}>
             Protect your account with two-factor authentication (2FA)
           </Text>
-          {accountsWithShieldEnabled && (
-            <Text
-              color="primary.500"
-              fontSize={13}
-              _hover={{ cursor: "pointer" }}
-            >
-              Enabled on{" "}
-              <Tooltip
-                label={accountsWithShieldEnabled.map((acc) => (
-                  <Text key={acc.accountName}>{acc.accountName}</Text>
-                ))}
+          {accountsWithShieldEnabled &&
+            accountsWithShieldEnabled.length > 0 && (
+              <Text
+                color="primary.500"
+                fontSize={13}
+                _hover={{ cursor: "pointer" }}
               >
-                <Text as="u">{accountsWithShieldEnabled.length} accounts</Text>
-              </Tooltip>
-            </Text>
-          )}
+                Enabled on{" "}
+                <Tooltip
+                  label={accountsWithShieldEnabled.map((acc) => (
+                    <Text key={acc.accountName}>{acc.accountName}</Text>
+                  ))}
+                >
+                  <Text as="u">
+                    {accountsWithShieldEnabled.length} accounts
+                  </Text>
+                </Tooltip>
+              </Text>
+            )}
         </Flex>
       </Flex>
-      <Flex alignItems="start" mb={3}>
+      <Flex alignItems="start" mb={5}>
         <EmailIcon fontSize={20} mr={2} />
         <Flex direction="column">
           <H6 lineHeight={4}>Email notifications</H6>

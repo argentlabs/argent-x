@@ -1,4 +1,11 @@
 import path from "path"
+import dotenv from "dotenv"
+import fs from "fs"
+
+const envPath = path.resolve(__dirname, "../../.env")
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath })
+}
 
 export default {
   password: "MyP@ss3!",

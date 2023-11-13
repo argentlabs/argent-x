@@ -1,8 +1,8 @@
 import { CosignerOffchainMessage, GuardianSigner } from "@argent/guardian"
 import type { CosignerMessage } from "@argent/guardian"
 import { Signature, hash, num } from "starknet"
+import { isEqualAddress } from "@argent/shared"
 
-import { isEqualAddress } from "../../ui/services/addresses"
 import { isTokenExpired } from "./backend/account"
 
 /**
@@ -11,6 +11,8 @@ import { isTokenExpired } from "./backend/account"
 export const guardianSignerNotRequired = [
   "escapeGuardian",
   "triggerEscapeGuardian",
+  "escape_guardian",
+  "trigger_escape_guardian",
 ]
 
 export const guardianSignerNotRequiredSelectors = guardianSignerNotRequired.map(

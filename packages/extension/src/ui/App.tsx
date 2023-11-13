@@ -18,14 +18,20 @@ import { useCaptureEntryRouteRestorationState } from "./features/stateRestoratio
 import { useTracking } from "./services/analytics"
 import SoftReloadProvider from "./services/resetAndReload"
 import { useSentryInit } from "./services/sentry"
-import { swrCacheProvider } from "./services/swr.service"
+import { onErrorRetry, swrCacheProvider } from "./services/swr.service"
 import { ThemeProvider, muiTheme } from "./theme"
 import { allAccountsView } from "./views/account"
 import { useView } from "./views/implementation/react"
+import { allNftsView } from "./views/nft"
 
 /** TODO: refactor: remove when test `User should be able to restore default networks if network is not selected` passes without this workaround */
 const useAccountsListFix = () => {
   useView(allAccountsView)
+}
+
+/** TODO: this is a workaround for background storage updates to `nftsRepository` not propagating into ui `allNftsView` unless the hook is mounted */
+const useNftsFix = () => {
+  useView(allNftsView)
 }
 
 export const App: FC = () => {
@@ -34,9 +40,15 @@ export const App: FC = () => {
   useSentryInit()
   useCaptureEntryRouteRestorationState()
   useAccountsListFix()
+  useNftsFix()
   return (
     <SoftReloadProvider>
-      <SWRConfig value={{ provider: () => swrCacheProvider }}>
+      <SWRConfig
+        value={{
+          provider: () => swrCacheProvider,
+          onErrorRetry: onErrorRetry,
+        }}
+      >
         <MuiThemeProvider theme={muiTheme}>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" />

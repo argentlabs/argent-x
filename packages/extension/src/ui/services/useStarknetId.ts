@@ -34,9 +34,11 @@ export async function getStarknetId(account: BaseWalletAccount) {
     calldata: [account.address],
   }
 
-  const response = await multicall.call(call)
+  const response = await multicall.callContract(call)
 
-  const decimalDomain = response.map((element) => BigInt(element)).slice(1)
+  const decimalDomain = response.result
+    .map((element) => BigInt(element))
+    .slice(1)
 
   const stringDomain = starknetId.useDecoded(decimalDomain)
 
@@ -72,8 +74,8 @@ export async function getAddressFromStarkName(
 
   let response, starkNameAddress
   try {
-    response = await multicall.call(call)
-    starkNameAddress = response[0]
+    response = await multicall.callContract(call)
+    starkNameAddress = response.result[0]
   } catch (error) {
     throw Error("Could not get address from stark name")
   }

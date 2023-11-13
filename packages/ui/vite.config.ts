@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     dts({
       insertTypesEntry: true,
-      tsConfigFilePath: resolvePath(__dirname, "tsconfig.json"),
+      tsconfigPath: resolvePath(__dirname, "tsconfig.json"),
     }),
     react(),
   ],
@@ -36,7 +36,7 @@ export default defineConfig({
         "@chakra-ui/styled-system",
         "framer-motion",
         "popmotion",
-        "@ethersproject/wordlists",
+        "@scure/bip39",
       ],
       output: {
         globals: {
@@ -52,12 +52,21 @@ export default defineConfig({
           "@chakra-ui/styled-system": "ChakraUIStyledSystem",
           "framer-motion": "FramerMotion",
           popmotion: "PopMotion",
-          "@ethersproject/wordlists": "EthersProjectWordLists",
+          "@scure/bip39": "ScureBip39",
         },
       },
     },
   },
   esbuild: {
     pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
+  },
+  test: {
+    deps: {
+      optimizer: {
+        web: {
+          enabled: false,
+        },
+      },
+    },
   },
 })

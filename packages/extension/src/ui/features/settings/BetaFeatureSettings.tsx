@@ -7,43 +7,29 @@ import {
 } from "@argent/ui"
 import { FC } from "react"
 
-import { settingsStore } from "../../../shared/settings"
-import {
-  useKeyValueStorage,
-  useLocalStorageState,
-} from "../../../shared/storage/hooks"
 import { SettingsScreenWrapper } from "./SettingsScreen"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { networkRepo } from "../../../shared/network/store"
 
 export const BetaFeaturesSettings: FC = () => {
-  const betaFeatureMultisig = useKeyValueStorage(
-    settingsStore,
-    "betaFeatureMultisig",
-  )
-  const [betaFeatureRpcProvider, setBetaFeatureRpcProvider] =
-    useLocalStorageState("betaFeatureRpcProvider", false)
+  const network = useCurrentNetwork()
+  const isUsingRpcProvider = network.prefer === "rpc"
+
+  const toggleNetworkProvider = async () => {
+    await networkRepo.upsert({
+      ...network,
+      prefer: isUsingRpcProvider ? "sequencer" : "rpc",
+    })
+  }
 
   return (
-    <NavigationContainer leftButton={<BarBackButton />} title={"Experimental"}>
+    <NavigationContainer leftButton={<BarBackButton />} title={"Beta Features"}>
       <SettingsScreenWrapper>
         <CellStack>
           <ButtonCell
-            onClick={() =>
-              void settingsStore.set(
-                "betaFeatureMultisig",
-                !betaFeatureMultisig,
-              )
-            }
+            onClick={toggleNetworkProvider}
             rightIcon={
-              <Switch isChecked={betaFeatureMultisig} pointerEvents="none" />
-            }
-            extendedDescription="Shows a multisig option on the add account menu, which allows a user to set up a multisig account with others"
-          >
-            Enable multisig account
-          </ButtonCell>
-          <ButtonCell
-            onClick={() => setBetaFeatureRpcProvider(!betaFeatureRpcProvider)}
-            rightIcon={
-              <Switch isChecked={betaFeatureRpcProvider} pointerEvents="none" />
+              <Switch isChecked={isUsingRpcProvider} pointerEvents="none" />
             }
             extendedDescription=" ArgentX will use an RPC Provider (instead of the feeder gateway) to
             interact with Starknet."

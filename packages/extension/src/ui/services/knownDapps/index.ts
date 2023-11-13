@@ -29,7 +29,7 @@ export function useDappFromKnownDappsByContractAddress(
   return useMemo(
     () =>
       knownDapps?.find((knownDapp) =>
-        knownDapp.contracts.some(
+        knownDapp.contracts?.some(
           (contract) =>
             contract.address === contractAddress &&
             contract.chain === "starknet",

@@ -248,10 +248,10 @@ export const useAggregatedSimData = ({
           const isTokenTranfer = checkIsTokenTransfer(t)
 
           if (isTokenTranfer && t.from === account?.address) {
-            return acc - parseCurrency(t.usdValue)
+            return acc - parseCurrency(t.usdValue).value
           }
 
-          return acc + parseCurrency(t.usdValue)
+          return acc + parseCurrency(t.usdValue).value
         }, ZERO)
 
         const usdValue = formatCurrency(usdValueBigInt)

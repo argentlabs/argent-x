@@ -6,7 +6,7 @@ import {
   SimpleGrid,
   SimpleGridProps,
 } from "@chakra-ui/react"
-import { wordlists } from "@ethersproject/wordlists"
+import { wordlist } from "@scure/bip39/wordlists/english"
 import {
   FC,
   SetStateAction,
@@ -15,14 +15,12 @@ import {
   useRef,
   useState,
 } from "react"
+import { generateFakeWords } from "./generateFakeWords"
 
 interface SeedInputProps extends Omit<SimpleGridProps, "onChange"> {
   length?: 12
   onChange?: (seed: string) => void
 }
-
-const WORDLIST_LENGTH = 2048
-const JUNK_MULTIPLIER = 12
 
 export const SeedInput: FC<SeedInputProps> = ({
   length = 12,
@@ -41,16 +39,9 @@ export const SeedInput: FC<SeedInputProps> = ({
     [onChange, seedInput],
   )
 
-  const fakeWords = useMemo(
-    () =>
-      [...Array(length * JUNK_MULTIPLIER)].map((_, index) =>
-        wordlists.en.getWord(
-          (Math.floor(Math.random() * WORDLIST_LENGTH) * (index + 1)) %
-            WORDLIST_LENGTH,
-        ),
-      ),
-    [length],
-  )
+  const fakeWords = useMemo(() => {
+    return generateFakeWords(wordlist, length)
+  }, [length])
 
   return (
     <SimpleGrid columns={4} spacing={2} spacingY={3} {...rest}>

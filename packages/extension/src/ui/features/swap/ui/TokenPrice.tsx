@@ -31,7 +31,7 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
 
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
-    bigDecimal.parseUnits("1", token?.decimals ?? 18),
+    bigDecimal.parseUnits("1", token?.decimals ?? 18).value,
   )
 
   const priceDetails = useTokenPriceDetails(token)

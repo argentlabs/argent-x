@@ -5,44 +5,59 @@ import { getAccountClassHashFromChain } from "../details/getAccountClassHashFrom
 import { getAccountCairoVersionFromChain } from "../details/getAccountCairoVersionFromChain"
 import { IAccountService } from "../service/interface"
 import { isUndefined, keyBy } from "lodash-es"
-import { RefreshInterval } from "../../config"
+import {
+  onInstallAndUpgrade,
+  onStartup,
+} from "../../../background/__new/services/worker/schedule/decorators"
+// This is a worker, and workers should be in the background, not shared
+// TODO: move this file
+import { AllowArray } from "../../storage/__new/interface"
+import { pipe } from "../../../background/__new/services/worker/schedule/pipe"
 
-type TaskId = "accountUpdate"
+export enum AccountUpdaterTaskId {
+  UPDATE_DEPLOYED = "accountUpdateDeployed",
+  ACCOUNT_UPDATE_ON_STARTUP = "accountUpdateOnStartup",
+  ACCOUNT_UPDATE_ON_INSTALL_AND_UPGRADE = "accountUpdateOnInstallAndUpgrade",
+}
+
+enum AccountUpdaterTask {
+  UPDATE_DEPLOYED,
+  UPDATE_ACCOUNT_CLASS_HASH,
+  UPDATE_ACCOUNT_CAIRO_VERSION,
+}
 
 export class AccountWorker {
   constructor(
     private readonly accountService: IAccountService,
-    private readonly scheduleService: IScheduleService<TaskId>,
-  ) {
-    void this.scheduleService.registerImplementation({
-      id: "accountUpdate",
-      callback: this.updateAll.bind(this),
-    })
+    private readonly scheduleService: IScheduleService<AccountUpdaterTaskId>,
+  ) {}
 
-    void this.scheduleService.every(
-      RefreshInterval.SLOW, // 5 minutes
-      {
-        id: "accountUpdate",
-      },
-    )
+  runUpdaterForAllTasks = pipe(
+    onStartup(this.scheduleService), // This will run the function on startup
+    onInstallAndUpgrade(this.scheduleService), // This will run the function on install and upgrade
+  )(async (): Promise<void> => {
+    await this.runUpdaterTask([
+      AccountUpdaterTask.UPDATE_DEPLOYED,
+      AccountUpdaterTask.UPDATE_ACCOUNT_CLASS_HASH,
+      AccountUpdaterTask.UPDATE_ACCOUNT_CAIRO_VERSION,
+    ])
+  })
 
-    // required for the initial update and to prevent tests from failing
-    setTimeout(() => {
-      void this.updateImmediately()
-    }, 100)
-  }
-
-  async updateAll(): Promise<void> {
-    // Keeping the promises sequential here as both the functions use upsert
-    // Using upsert in parallel can cause unexpected results
-    await this.updateDeployed()
-    await this.updateAccountClassHash()
-    await this.updateAccountCairoVersion()
-  }
-
-  async updateImmediately(): Promise<void> {
-    await this.updateAccountClassHashImmediately()
-    await this.updateAccountCairoVersionImmediately()
+  async runUpdaterTask(tasks: AllowArray<AccountUpdaterTask>): Promise<void> {
+    const updaterTasks = Array.isArray(tasks) ? tasks : [tasks]
+    for (const task of updaterTasks) {
+      switch (task) {
+        case AccountUpdaterTask.UPDATE_DEPLOYED:
+          await this.updateDeployed()
+          break
+        case AccountUpdaterTask.UPDATE_ACCOUNT_CLASS_HASH:
+          await this.updateAccountClassHash()
+          break
+        case AccountUpdaterTask.UPDATE_ACCOUNT_CAIRO_VERSION:
+          await this.updateAccountCairoVersion()
+          break
+      }
+    }
   }
 
   async updateDeployed(): Promise<void> {

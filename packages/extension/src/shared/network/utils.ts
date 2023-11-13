@@ -3,6 +3,7 @@ import { constants } from "starknet"
 import { isEqualAddress } from "../../ui/services/addresses"
 import { ArgentAccountType } from "../wallet.model"
 import { DefaultNetworkId, Network } from "./type"
+import { PUBLIC_RPC_NODES } from "./constants"
 
 // LEGACY ⬇️
 export function mapImplementationToArgentAccountType(
@@ -108,4 +109,16 @@ export const getNetworkUrl = (network: Network) => {
 
 export function isArgentNetwork(network: Network) {
   return network.id === "mainnet-alpha" || network.id === "goerli-alpha"
+}
+
+export function getRandomPublicRPCNode(network: Network) {
+  const randomIndex = Math.floor(Math.random() * PUBLIC_RPC_NODES.length)
+
+  const randomNode = PUBLIC_RPC_NODES[randomIndex]
+
+  if (!randomNode) {
+    throw new Error(`No random node found for network: ${network.id}`)
+  }
+
+  return randomNode
 }

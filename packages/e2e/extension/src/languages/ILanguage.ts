@@ -35,6 +35,10 @@ export interface ILanguage {
     confirmTheSeedPhrase: string
     showAccountRecovery: string
     wrongPassword: string
+    invalidStarkIdError: string
+    shortAddressError: string
+    invalidCheckSumError: string
+    invalidAddress: string
   }
   wallet: {
     //first screen

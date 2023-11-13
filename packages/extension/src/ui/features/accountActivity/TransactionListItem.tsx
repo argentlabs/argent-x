@@ -159,6 +159,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
 
   return (
     <CustomButtonCell
+      data-tx-hash={txHash}
       highlighted={highlighted}
       onClick={(e) => !isCancelled && onClick?.(e)}
       _hover={{ cursor: isCancelled ? "default" : "pointer" }}

@@ -1,3 +1,3 @@
-import { RecoveryService } from "./implementation"
+import { ClientRecoveryService } from "./implementation"
 
-export const recoveryService = new RecoveryService()
+export const clientRecoveryService = new ClientRecoveryService()

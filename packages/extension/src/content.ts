@@ -1,5 +1,6 @@
 import { Relayer, WindowMessenger } from "@argent/x-window"
 import { relay } from "trpc-browser/relay"
+import { autoConnect } from "trpc-browser/shared/chrome"
 import browser from "webextension-polyfill"
 
 import { ExtensionMessenger } from "./shared/extensionMessenger"
@@ -17,15 +18,26 @@ container.insertBefore(script, container.children[0])
 const windowMessenger = new WindowMessenger(window, {
   post: window.location.origin,
 })
-const port = browser.runtime.connect()
-const portMessenger = new ExtensionMessenger(port)
 
-const bridge = new Relayer(windowMessenger, portMessenger)
+void autoConnect(
+  () => browser.runtime.connect(),
+  (port) => {
+    const portMessenger = new ExtensionMessenger(port)
 
-// Please keep this log statement, it is used to detect if the bridge is loaded
-console.log("Legacy Bridge ID:", bridge.id)
+    const bridge = new Relayer(windowMessenger, portMessenger)
 
-// NOTE: not used yet, as trpc is only used for UI <-> Background comms atm
-const unsub = relay(window, port)
-// unsub on content script unload
-window.addEventListener("unload", unsub)
+    // Please keep this log statement, it is used to detect if the bridge is loaded
+    console.log("Legacy Bridge ID:", bridge.id)
+
+    // NOTE: not used yet, as trpc is only used for UI <-> Background comms atm
+    const unsub = relay(window, port)
+    // unsub on content script unload
+    window.addEventListener("unload", unsub)
+
+    return () => {
+      unsub()
+      bridge.destroy()
+      window.removeEventListener("unload", unsub)
+    }
+  },
+)

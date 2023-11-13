@@ -1,8 +1,10 @@
 import { z } from "zod"
+import { Account } from "starknet"
 
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
+import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 
 const triggerEscapeGuardianSchema = z.object({
   account: baseWalletAccountSchema,
@@ -14,17 +16,22 @@ export const triggerEscapeGuardianProcedure = extensionOnlyProcedure
     async ({
       input: { account },
       ctx: {
-        services: { actionService },
+        services: { actionService, wallet },
       },
     }) => {
       try {
+        const starknetAccount =
+          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
         await actionService.add(
           {
             type: "TRANSACTION",
             payload: {
               transactions: {
                 contractAddress: account.address,
-                entrypoint: "triggerEscapeGuardian",
+                entrypoint: getEntryPointSafe(
+                  "triggerEscapeGuardian",
+                  starknetAccount.cairoVersion,
+                ),
                 calldata: [],
               },
               meta: {

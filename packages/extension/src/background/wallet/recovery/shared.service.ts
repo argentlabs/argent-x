@@ -1,5 +1,3 @@
-import { ethers } from "ethers"
-
 import { defaultNetworks } from "../../../shared/network"
 import { INetworkService } from "../../../shared/network/service/interface"
 import {
@@ -28,7 +26,6 @@ export class WalletRecoverySharedService {
     if (!session?.secret) {
       throw new WalletError({ code: "NOT_INITIALIZED" })
     }
-    const wallet = new ethers.Wallet(session?.secret)
 
     const networks = defaultNetworks.map((network) => network.id)
 
@@ -38,7 +35,7 @@ export class WalletRecoverySharedService {
       const network = await this.networkService.getById(networkId)
       const accountResults =
         await this.chainRecoveryService.restoreAccountsFromWallet(
-          wallet.privateKey,
+          session.secret,
           network,
         )
       accounts.push(...accountResults)

@@ -62,10 +62,23 @@ describe("BackgroundUIService", () => {
       },
     }
 
-    /** open */
+    /** simulate initially open - e.g. happens when service worker restarts */
     backgroundUIService.onConnectPort(port)
     expect(backgroundUIService.opened).toBeTruthy()
     expect(port.onDisconnect.addListener).toHaveBeenCalled()
+
+    /** no emit on initial value change */
+    expect(emitter.emit).not.toHaveBeenCalled()
+
+    /** close */
+    await backgroundUIService.onDisconnectPort()
+    expect(backgroundUIService.opened).toBeFalsy()
+    expect(emitter.emit).toHaveBeenCalledWith(Opened, false)
+
+    /** re-open */
+    emitter.emit.mockReset()
+    backgroundUIService.onConnectPort(port)
+    expect(backgroundUIService.opened).toBeTruthy()
     expect(emitter.emit).toHaveBeenCalledWith(Opened, true)
 
     /** should not fire again */

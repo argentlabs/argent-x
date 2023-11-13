@@ -20,7 +20,11 @@ vi.stubGlobal("Response", Response)
 vi.stubGlobal("chrome", {
   runtime: {
     id: "test",
-    connect: noop,
+    connect: () => ({
+      onDisconnect: {
+        addListener: noop,
+      },
+    }),
     onConnect: {
       addListener: noop,
     },

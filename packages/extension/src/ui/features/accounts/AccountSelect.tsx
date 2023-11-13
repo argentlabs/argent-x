@@ -111,6 +111,7 @@ const Option = ({
     <Box {...innerProps}>
       <AccountListItem
         {...data}
+        avatarSize={9}
         width={"full"}
         rounded={"none"}
         _active={{

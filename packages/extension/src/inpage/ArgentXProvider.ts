@@ -1,17 +1,23 @@
-import { BlockIdentifier, Call, Provider } from "starknet"
+import { BlockIdentifier, Call, Provider, ProviderInterface } from "starknet"
 import { Network, getProvider } from "../shared/network"
-import { isArgentNetwork } from "../shared/network/utils"
+import {
+  getRandomPublicRPCNode,
+  isArgentNetwork,
+} from "../shared/network/utils"
 
-export class ArgentXProvider extends Provider {
+export class ArgentXProvider extends Provider implements ProviderInterface {
   constructor(network: Network) {
     // Only expose sequencer provider for argent networks
     if (isArgentNetwork(network)) {
-      if (!network.sequencerUrl) {
-        throw new Error(
-          `No Sequencer URL found for argent network: ${network.id}`,
-        )
+      const publicRpcNode = getRandomPublicRPCNode(network)
+      if (network.id === "mainnet-alpha") {
+        if (!network.sequencerUrl) {
+          throw new Error("Missing sequencer url for mainnet")
+        }
+        super({ sequencer: { baseUrl: network.sequencerUrl } })
+      } else {
+        super({ rpc: { nodeUrl: publicRpcNode.testnet } })
       }
-      super({ sequencer: { baseUrl: network.sequencerUrl } })
     } else {
       // Otherwise, it's a custom network, so we expose the custom provider
       super(getProvider(network))

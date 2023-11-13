@@ -7,9 +7,10 @@ export enum TOKEN_ERROR_MESSAGES {
   TOKEN_PRICE_PARSING_ERROR = "Unable to parse token price response",
   TOKEN_PRICE_NOT_FOUND = "Token price not found",
   TOKEN_NOT_FOUND = "Token not found",
+  TOKEN_DETAILS_NOT_FOUND = "Token details not found",
   FEE_TOKEN_NOT_FOUND = "Fee token not found",
   UNABLE_TO_CALCULATE_CURRENCY_VALUE = "Unable to calculate currency value",
-  NOT_SAFE = "Not a safe integer",
+  UNSAFE_DECIMALS = "Unsafe decimals in token",
 }
 
 export type TokenValidationErrorMessage = keyof typeof TOKEN_ERROR_MESSAGES

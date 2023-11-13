@@ -15,9 +15,9 @@ describe("Utility functions", () => {
   })
 
   test("parseEther function should correctly parse ether string to BigInt", () => {
-    expect(parseEther("1")).toBe(1000000000000000000n)
-    expect(parseEther("1.23456789")).toBe(1234567890000000000n)
-    expect(parseEther("-1")).toBe(-1000000000000000000n)
+    expect(parseEther("1").value).toBe(1000000000000000000n)
+    expect(parseEther("1.23456789").value).toBe(1234567890000000000n)
+    expect(parseEther("-1").value).toBe(-1000000000000000000n)
   })
 
   test("formatCurrency function should correctly format BigInt to currency string", () => {
@@ -27,9 +27,9 @@ describe("Utility functions", () => {
   })
 
   test("parseCurrency function should correctly parse currency string to BigInt", () => {
-    expect(parseCurrency("1")).toBe(1000000n)
-    expect(parseCurrency("1.234567")).toBe(1234567n)
-    expect(parseCurrency("-1")).toBe(-1000000n)
+    expect(parseCurrency("1").value).toBe(1000000n)
+    expect(parseCurrency("1.234567").value).toBe(1234567n)
+    expect(parseCurrency("-1").value).toBe(-1000000n)
   })
 
   test("absBigInt function should return absolute value of BigInt", () => {
@@ -39,8 +39,8 @@ describe("Utility functions", () => {
   })
 
   test("parseCurrencyAbs function should return absolute value of parsed currency string", () => {
-    expect(parseCurrencyAbs("1")).toBe(1000000n)
-    expect(parseCurrencyAbs("1.234567")).toBe(1234567n)
-    expect(parseCurrencyAbs("-1")).toBe(1000000n)
+    expect(parseCurrencyAbs("1").value).toBe(1000000n)
+    expect(parseCurrencyAbs("1.234567").value).toBe(1234567n)
+    expect(parseCurrencyAbs("-1").value).toBe(1000000n)
   })
 })

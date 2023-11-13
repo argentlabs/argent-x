@@ -21,7 +21,7 @@ export const cancelEscapeProcedure = extensionOnlyProcedure
     }) => {
       try {
         const starknetAccount =
-          (await wallet.getSelectedStarknetAccount()) as Account
+          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
         await actionService.add(
           {
             type: "TRANSACTION",

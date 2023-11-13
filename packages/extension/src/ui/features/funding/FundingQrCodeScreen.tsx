@@ -1,42 +1,45 @@
-import { BarBackButton, BarCloseButton, NavigationContainer } from "@argent/ui"
+import {
+  BarBackButton,
+  BarCloseButton,
+  H4,
+  NavigationContainer,
+  P2,
+  icons,
+} from "@argent/ui"
+import { Button, Flex } from "@chakra-ui/react"
+import copy from "copy-to-clipboard"
 import { FC, useCallback, useRef } from "react"
-import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
-import { AccountAddress, AccountName } from "../../components/Address"
-import { CopyIconButton } from "../../components/CopyIconButton"
-import { PageWrapper } from "../../components/Page"
-import { routes } from "../../routes"
 import { formatFullAddress, normalizeAddress } from "../../services/addresses"
-import { selectedAccountView } from "../../views/account"
-import { useView } from "../../views/implementation/react"
 import { QrCode } from "./QrCode"
 
-const Container = styled.div`
-  padding: 0 20px;
-  text-align: center;
-`
+const { CopyIcon } = icons
 
-const StyledCopyIconButton = styled(CopyIconButton)`
-  margin-top: 16px;
-  width: auto;
-`
+interface FundingQrCodeScreenProps {
+  onClose?: () => void
+  accountName: string
+  accountAddress: string
+}
 
-export const FundingQrCodeScreen: FC = () => {
-  const navigate = useNavigate()
+export const FundingQrCodeScreen: FC<FundingQrCodeScreenProps> = ({
+  onClose,
+  accountName,
+  accountAddress,
+}) => {
+  const normalizedAddress = normalizeAddress(accountAddress)
+  const formattedAddress = formatFullAddress(accountAddress)
+
   const addressRef = useRef<HTMLParagraphElement | null>(null)
-  const account = useView(selectedAccountView)
-  const copyAccountAddress = account ? normalizeAddress(account.address) : ""
 
   /** Intercept 'copy' event and replace fragmented address with plain text address */
   const onCopyAddress = useCallback(
     (e: ClipboardEvent) => {
       if (e.clipboardData) {
-        e.clipboardData.setData("text/plain", copyAccountAddress)
+        e.clipboardData.setData("text/plain", normalizedAddress)
         e.preventDefault()
       }
     },
-    [copyAccountAddress],
+    [normalizedAddress],
   )
 
   /** Intercept 'mouseup' and automatically select the entire address */
@@ -63,30 +66,38 @@ export const FundingQrCodeScreen: FC = () => {
     [onCopyAddress, onSelectAddress],
   )
 
+  const onClickCopy = () => copy(normalizedAddress)
+
   return (
     <NavigationContainer
       leftButton={<BarBackButton />}
-      rightButton={
-        <BarCloseButton onClick={() => navigate(routes.accountTokens())} />
-      }
+      rightButton={<BarCloseButton onClick={onClose} />}
     >
-      <PageWrapper>
-        {account && (
-          <Container>
-            <QrCode size={220} data={account?.address} />
-            <AccountName>{account.name}</AccountName>
-            <AccountAddress
-              ref={setAddressRef}
-              aria-label="Full account address"
-            >
-              {formatFullAddress(account.address)}
-            </AccountAddress>
-            <StyledCopyIconButton size="s" copyValue={copyAccountAddress}>
-              Copy address
-            </StyledCopyIconButton>
-          </Container>
-        )}
-      </PageWrapper>
+      <Flex
+        p={4}
+        direction={"column"}
+        gap={6}
+        flex={1}
+        alignItems={"center"}
+        textAlign={"center"}
+      >
+        <QrCode
+          size={220}
+          data={normalizedAddress}
+          data-address={normalizedAddress}
+        />
+        <H4>{accountName}</H4>
+        <P2
+          color={"neutrals.300"}
+          ref={setAddressRef}
+          aria-label="Full account address"
+        >
+          {formattedAddress}
+        </P2>
+        <Button size={"sm"} leftIcon={<CopyIcon />} onClick={onClickCopy}>
+          Copy address
+        </Button>
+      </Flex>
     </NavigationContainer>
   )
 }

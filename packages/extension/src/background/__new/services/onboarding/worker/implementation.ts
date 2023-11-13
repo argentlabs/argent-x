@@ -1,3 +1,7 @@
+import {
+  MinimalActionBrowser,
+  getBrowserAction,
+} from "../../../../../shared/browser"
 import type { KeyValueStorage } from "../../../../../shared/storage"
 import type { StorageChange } from "../../../../../shared/storage/types"
 import type { DeepPick } from "../../../../../shared/types/deepPick"
@@ -6,8 +10,9 @@ import type { IOnboardingService } from "../interface"
 
 type MinimalBrowser = DeepPick<
   typeof chrome,
-  "runtime.onInstalled.addListener" | "browserAction.onClicked.addListener"
->
+  "runtime.onInstalled.addListener"
+> &
+  MinimalActionBrowser
 
 export default class OnboardingWorker {
   constructor(
@@ -16,7 +21,7 @@ export default class OnboardingWorker {
     private browser: MinimalBrowser,
   ) {
     this.browser.runtime.onInstalled.addListener(this.onInstalled.bind(this))
-    this.browser.browserAction.onClicked.addListener(
+    getBrowserAction(this.browser).onClicked.addListener(
       this.onExtensionIconClick.bind(this),
     )
     this.walletStore.subscribe(

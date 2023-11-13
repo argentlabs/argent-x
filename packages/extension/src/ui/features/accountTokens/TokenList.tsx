@@ -1,4 +1,4 @@
-import { FC, Suspense } from "react"
+import { FC, Suspense, useMemo } from "react"
 
 import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
@@ -12,6 +12,8 @@ import { TokenListItemContainer } from "./TokenListItemContainer"
 import { useTokensInNetwork } from "./tokens.state"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
 import { Token } from "../../../shared/token/__new/types/token.model"
+import { sortBy } from "lodash-es"
+import { num } from "starknet"
 
 interface TokenListProps {
   tokenList?: Token[]
@@ -45,10 +47,18 @@ export const TokenList: FC<TokenListProps> = ({
     })
   }
 
+  const tokens = useMemo(
+    () =>
+      sortBy(tokenList ?? tokensInNetwork, (token) =>
+        token.id ? BigInt(token.id) : num.toBigInt(token.address),
+      ),
+    [tokenList, tokensInNetwork],
+  )
+
   if (!account) {
     return null
   }
-  const tokens = tokenList || tokensInNetwork
+
   return (
     <ErrorBoundary
       fallback={

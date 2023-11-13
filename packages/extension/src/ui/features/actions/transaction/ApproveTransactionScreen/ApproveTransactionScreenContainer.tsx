@@ -24,6 +24,7 @@ import { MultisigBannerProps } from "./MultisigBanner"
 import { useEstimatedFees } from "../../feeEstimation/useEstimatedFees"
 import { WithActionScreenErrorFooter } from "./WithActionScreenErrorFooter"
 import { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
+import { ensureArray } from "@argent/shared"
 
 const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
 
@@ -134,12 +135,14 @@ export const ApproveTransactionScreenContainer: FC<
   )
 
   const txnHasTransfers = useMemo(
-    () => transactionSimulation?.some((txn) => !isEmpty(txn.transfers)),
+    () =>
+      ensureArray(transactionSimulation).some((txn) => !isEmpty(txn.transfers)),
     [transactionSimulation],
   )
 
   const txnHasApprovals = useMemo(
-    () => transactionSimulation?.some((txn) => !isEmpty(txn.approvals)),
+    () =>
+      ensureArray(transactionSimulation).some((txn) => !isEmpty(txn.approvals)),
     [transactionSimulation],
   )
 

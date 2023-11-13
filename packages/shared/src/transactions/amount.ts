@@ -18,7 +18,7 @@ export const inputAmountSchema = z
   .refine(
     (amount) => {
       try {
-        const bn = parseAmount(amount)
+        const bn = parseAmount(amount).value
         if (bn < 0n) {
           throw new Error("Amount must be positive")
         }

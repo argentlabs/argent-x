@@ -6,10 +6,13 @@ import useSWR, {
   SWRConfiguration,
   unstable_serialize,
   useSWRConfig,
+  Revalidator,
+  RevalidatorOptions,
 } from "swr"
 
 import { reviveJsonBigNumber } from "../../shared/json"
 import { checkStorageAndPrune } from "../../shared/storage/__new/prune"
+import { isFunction, isUndefined } from "lodash-es"
 
 export interface SWRConfigCommon {
   suspense?: boolean
@@ -114,4 +117,39 @@ export const swrCacheProvider: Cache = {
       return swrPersistedCache.delete(key)
     }
   },
+}
+
+const exponentialBackoff = (retryCount: number) =>
+  (Math.pow(2, retryCount) - 1) * 1000
+
+export function onErrorRetry<Data = any, Error = any>(
+  error: any,
+  key: string,
+  config: SWRConfiguration<Data, Error>,
+  revalidate: Revalidator,
+  opts: RevalidatorOptions,
+  getTimeout?: (retryCount: number) => number,
+) {
+  // We only want to retry on 429 and 5xx http errors
+  if (error?.status < 500 && error?.status !== 429) {
+    return
+  }
+
+  const maxRetryCount = config.errorRetryCount || 5 // A maximum of 5 retries
+  const currentRetryCount = opts.retryCount
+
+  if (isUndefined(maxRetryCount) || isUndefined(currentRetryCount)) {
+    return
+  }
+
+  // 1s, 3s, 7s, 15s, 31s
+  const timeout = isFunction(getTimeout)
+    ? getTimeout(currentRetryCount)
+    : exponentialBackoff(currentRetryCount)
+
+  if (currentRetryCount >= maxRetryCount) {
+    return
+  }
+
+  setTimeout(revalidate, timeout, opts)
 }

@@ -44,23 +44,18 @@ The example dapp is also contained in this repository.
 
 ## 🌐 Usage with your dapp
 
-If you want to use this StarkNet Wallet extension with your dapp, the easiest way is to checkout the `@argent/get-starknet` package developed in this repo by running:
+If you want to use this StarkNet Wallet extension with your dapp, the easiest way is to checkout the [starknetkit](https://github.com/argentlabs/starknetkit) package
 
 ```bash
 # starknet.js is a peer dependency
-pnpm add @argent/get-starknet starknet
+pnpm add starknetkit starknet
 ```
 
-The package is a light wrapper around [starknet.js](https://github.com/0xs34n/starknet.js) to interact with the wallet extension. You can then use it like the following:
-
 ```javascript
-import { connect } from "@argent/get-starknet"
+import { connect } from "starknetkit"
 
 // Let the user pick a wallet (on button click)
 const starknet = connect()
-
-// or try to connect to an approved wallet silently (on mount probably)
-const starknet = connect({ showList: false })
 
 if (!starknet) {
   throw Error("User rejected wallet selection or silent connect found nothing")

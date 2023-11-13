@@ -1,12 +1,12 @@
-import { num, stark } from "starknet"
+import { num } from "starknet"
 
 /**
  *
- * This method calculate the max fee for argent. Argent adds a 3x overhead to the fee.
+ * This method calculate the max fee for argent. Argent keeps the 1.5x overhead to the fee.
  *
  * @param suggestedMaxFee: fee calculated in starknetjs with the formula: overall_fee * 1.5
- * @returns argentMaxFee: fee calculated by argent x overhead. argentMaxFee = suggestedMaxFee * 2 = overall_fee * 3
+ * @returns argentMaxFee: currently equal to suggestedMaxFee
  *
  *  */
 export const argentMaxFee = (suggestedMaxFee: num.BigNumberish) =>
-  num.toHex(stark.estimatedFeeToMaxFee(suggestedMaxFee, 1))
+  num.toHex(suggestedMaxFee)

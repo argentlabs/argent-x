@@ -16,7 +16,7 @@ interface CurrencyValueProps {
 const CurrencyValue: FC<CurrencyValueProps> = ({ amount, approx, token }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token as Token,
-    amount ? bigDecimal.parseUnits(amount, token.decimals) : 0,
+    amount ? bigDecimal.parseUnits(amount, token.decimals).value : 0,
   )
 
   return (

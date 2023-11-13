@@ -1,12 +1,13 @@
-import { isStarknetId, parseAmount } from "@argent/shared"
+import { parseAddress, parseAmount } from "@argent/shared"
 import { FieldError } from "@argent/ui"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { formatUnits } from "ethers/lib/utils"
+import { formatUnits } from "ethers"
 import { FC, useCallback, useMemo } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { z } from "zod"
 
+import { getMulticallForNetwork } from "../../../shared/multicall"
 import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
@@ -33,7 +34,6 @@ import {
 } from "./SendAmountAndAssetScreen"
 import { TokenAmountInput } from "./TokenAmountInput"
 import { genericErrorSchema } from "../actions/feeEstimation/feeError"
-import { getAddressFromStarkName } from "../../services/useStarknetId"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { useLiveTokenBalanceForAccount } from "../accountTokens/useLiveTokenBalanceForAccount"
 import { Spinner } from "@chakra-ui/react"
@@ -85,7 +85,7 @@ interface GuardedSendAmountAndAssetTokenScreenContainerProps
   extends SendAmountAndAssetScreenProps {
   token: Token
   balance?: bigint
-  tokenBalanceLoading?: boolean
+  tokenBalanceLoading: boolean
   account: WalletAccount
 }
 
@@ -117,7 +117,8 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
   const inputAmount = watch().amount
   const { ref, onChange, ...amountInputRest } = register("amount")
   const inputRef = useAutoFocusInputRef<HTMLInputElement>()
-  const { id: currentNetworkId } = useCurrentNetwork()
+
+  const network = useCurrentNetwork()
 
   const feeToken = useNetworkFeeToken(account?.networkId)
 
@@ -131,25 +132,27 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
 
   const onSubmit = useCallback(async () => {
     if (token && recipientAddress && inputAmount) {
-      let recipient = recipientAddress
+      const to = await parseAddress({ address: token.address })
 
-      if (isStarknetId(recipient)) {
-        recipient = await getAddressFromStarkName(recipient, currentNetworkId)
-      }
+      const recipient = await parseAddress({
+        address: recipientAddress,
+        networkId: network.id,
+        multicallProvider: getMulticallForNetwork(network),
+      })
 
       await sendTransaction({
-        to: token.address,
+        to,
         method: "transfer",
         calldata: {
           recipient,
           amount: getUint256CalldataFromBN(
-            parseAmount(inputAmount, token.decimals).toString(),
+            parseAmount(inputAmount, token.decimals).value,
           ),
         },
       })
     }
     onCancel()
-  }, [currentNetworkId, inputAmount, onCancel, recipientAddress, token])
+  }, [network, inputAmount, onCancel, recipientAddress, token])
 
   const onMaxClick = useCallback(() => {
     if (balance && maxFee) {
@@ -173,11 +176,12 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     }
   }, [balance, maxFee, token.decimals, account?.networkId, setValue])
 
-  const parsedInputAmount = inputAmount
-    ? parseAmount(inputAmount, token.decimals)
-    : parseAmount("0", token.decimals)
+  const parsedInputAmount = parseAmount(
+    inputAmount || "0",
+    token.decimals,
+  ).value
 
-  const parsedTokenBalance = balance || parseAmount("0", token.decimals)
+  const parsedTokenBalance = balance || 0n
 
   const isInputAmountGtBalance = useMemo(() => {
     return (
@@ -233,6 +237,7 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     if (!maxFeeError) {
       return prettifyCurrencyValue(currencyValue)
     }
+
     const genericError = genericErrorSchema.safeParse(maxFeeError)
     if (genericError.success) {
       return <FieldError>{genericError.data.message}</FieldError>

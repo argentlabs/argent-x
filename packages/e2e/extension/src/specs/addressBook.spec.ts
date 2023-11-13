@@ -41,6 +41,7 @@ test.describe("Address Book", () => {
     await extension.addressBook.addressByName("New name").click()
     await extension.account.sendMax.click()
     await extension.navigation.reviewSend.click()
+    await extension.navigation.confirm.click()
 
     await extension.validateTx(config.account1Seed2!)
 
@@ -76,6 +77,7 @@ test.describe("Address Book", () => {
 
     await extension.account.sendMax.click()
     await extension.navigation.reviewSend.click()
+    await extension.navigation.confirm.click()
 
     await extension.validateTx(config.account1Seed2!)
   })
@@ -102,6 +104,7 @@ test.describe("Address Book", () => {
 
     await extension.account.sendMax.click()
     await extension.navigation.reviewSend.click()
+    await extension.navigation.confirm.click()
 
     await extension.validateTx(config.account1Seed2!)
   })

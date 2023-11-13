@@ -11,12 +11,12 @@ import { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/Confi
 import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { MultisigSignatureScreenWarning } from "../multisig/MultisigSignatureScreenWarning"
 import { ExecuteFromOutsideScreen } from "./ExecuteFromOutsideScreen"
-import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 
 interface ApproveSignatureScreenContainerProps
   extends Omit<ConfirmScreenProps, "onSubmit"> {
   dataToSign: typedData.TypedData
+  skipDeployWarning?: boolean
   onSubmit: (data: typedData.TypedData) => void
   onReject: () => void
   onRejectWithoutClose?: () => void
@@ -27,6 +27,7 @@ export const ApproveSignatureScreenContainer: FC<
   ApproveSignatureScreenContainerProps
 > = ({
   dataToSign,
+  skipDeployWarning = false,
   onSubmit,
   selectedAccount,
   onRejectWithoutClose,
@@ -37,6 +38,7 @@ export const ApproveSignatureScreenContainer: FC<
   const accountWithDeployState = useAccount(selectedAccount)
   const isMainnet = useIsMainnet()
   if (
+    !skipDeployWarning &&
     selectedAccount?.needsDeploy &&
     !accountWithDeployState?.deployTransaction
   ) {

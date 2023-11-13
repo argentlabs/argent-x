@@ -18,16 +18,16 @@ export const getGuardianForAccount = async (
     entrypoint: "get_guardian",
   }
   const multicall = getMulticallForNetwork(network)
-  let response: string[] = []
+  let response: { result: string[] } = { result: [] }
 
   try {
-    response = await multicall.call(call)
+    response = await multicall.callContract(call)
   } catch {
     call.entrypoint = "getGuardian"
-    response = await multicall.call(call)
+    response = await multicall.callContract(call)
   }
   // if guardian is 0, return undefined
-  return num.toHex(response[0]) === num.toHex(constants.ZERO)
+  return num.toHex(response.result[0]) === num.toHex(constants.ZERO)
     ? undefined
-    : response[0]
+    : response.result[0]
 }

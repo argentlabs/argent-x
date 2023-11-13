@@ -1,4 +1,4 @@
-import { P4, icons, Button, NavigationContainer, H3 } from "@argent/ui"
+import { P3, icons, Button, NavigationContainer, H3 } from "@argent/ui"
 import { Box, Circle, Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../routes"
@@ -37,10 +37,10 @@ export const BeforeYouContinueScreen = () => {
               Before you continue...
             </H3>
 
-            <P4 fontSize={16} color={"neutrals.100"} textAlign="center">
+            <P3 color={"neutrals.100"} textAlign="center">
               Please save your recovery phrase. This is the only way you will be
               able to recover your Argent X accounts
-            </P4>
+            </P3>
           </Flex>
         </Box>
         <Button onClick={navigateToRecoveryPhrase} colorScheme="primary" px={2}>

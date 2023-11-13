@@ -76,31 +76,35 @@ export const getChainId = async (
   } catch {}
 }
 
-export const signMessage = async (message: string) => {
+export const signMessage = async (message: string, skipDeploy = false) => {
   if (!windowStarknet?.isConnected) throw Error("starknet wallet not connected")
   if (!shortString.isShortString(message)) {
     throw Error("message must be a short string")
   }
 
-  return windowStarknet.account.signMessage({
-    domain: {
-      name: "Example DApp",
-      chainId: windowStarknet.chainId,
-      version: "0.0.1",
+  return windowStarknet.account.signMessage(
+    {
+      domain: {
+        name: "Example DApp",
+        chainId: windowStarknet.chainId,
+        version: "0.0.1",
+      },
+      types: {
+        StarkNetDomain: [
+          { name: "name", type: "felt" },
+          { name: "chainId", type: "felt" },
+          { name: "version", type: "felt" },
+        ],
+        Message: [{ name: "message", type: "felt" }],
+      },
+      primaryType: "Message",
+      message: {
+        message,
+      },
     },
-    types: {
-      StarkNetDomain: [
-        { name: "name", type: "felt" },
-        { name: "chainId", type: "felt" },
-        { name: "version", type: "felt" },
-      ],
-      Message: [{ name: "message", type: "felt" }],
-    },
-    primaryType: "Message",
-    message: {
-      message,
-    },
-  })
+    // @ts-ignore
+    { skipDeploy },
+  )
 }
 
 export const waitForTransaction = async (hash: string) => {

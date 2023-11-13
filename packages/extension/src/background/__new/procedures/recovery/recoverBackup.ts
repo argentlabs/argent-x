@@ -12,9 +12,9 @@ export const recoverBackupProcedure = extensionOnlyProcedure
     async ({
       input: { backup },
       ctx: {
-        services: { wallet },
+        services: { recoveryService },
       },
     }) => {
-      await wallet.importBackup(backup)
+      return recoveryService.byBackup(backup)
     },
   )

@@ -27,11 +27,17 @@ export const addMessageListeners = () => {
           }
 
           case "SIGN_MESSAGE": {
-            const [message] =
+            const [typedData] =
               await StarknetMethodArgumentsSchemas.signMessage.parseAsync([
-                msg.data,
+                msg.data.typedData,
               ])
-            return handleMessage([{ ...msg, data: message }, sender], port)
+            return handleMessage(
+              [
+                { ...msg, data: { typedData, options: msg.data.options } },
+                sender,
+              ],
+              port,
+            )
           }
 
           default:

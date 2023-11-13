@@ -62,8 +62,9 @@ export async function waitForMessage<
 
 export type WaitForMessage = typeof waitForMessage
 
-if ((<any>window).PLAYWRIGHT || IS_DEV) {
-  ;(<any>window).messageStream = messageStream
-  ;(<any>window).sendMessage = sendMessage
-  ;(<any>window).waitForMessage = waitForMessage
-}
+// // window is not accessible in MV3
+// if ((<any>window).PLAYWRIGHT || IS_DEV) {
+//   ;(<any>window).messageStream = messageStream
+//   ;(<any>window).sendMessage = sendMessage
+//   ;(<any>window).waitForMessage = waitForMessage
+// }

@@ -18,7 +18,7 @@ export function parseInputAmountToUint256(
   input: string,
   decimals: number = 18,
 ) {
-  return getUint256CalldataFromBN(bigDecimal.parseUnits(input, decimals))
+  return getUint256CalldataFromBN(bigDecimal.parseUnits(input, decimals).value)
 }
 
 export const mintToken = async (mintAmount: string): Promise<any> => {

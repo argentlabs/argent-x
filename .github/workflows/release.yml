@@ -5,7 +5,6 @@ on:
     branches:
       - release/*
     tags:
-      # - "@argent-x/extension@*"
       - "**"
 
 env:
@@ -56,12 +55,14 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           cache: "pnpm"
       - run: pnpm run setup
-      - run: pnpm --filter=\!@argent/web build
+
+      - name: Build Chrome version
+        run: pnpm --filter=\!@argent/web build
 
       - run: pnpm --filter @argent-x/dapp export
 

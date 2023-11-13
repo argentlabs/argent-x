@@ -21,3 +21,5 @@ license-report.md
 **/.parcel-cache
 
 vite.config.ts.timestamp-*
+
+report

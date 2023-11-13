@@ -23,6 +23,7 @@ import { WalletRecoveryStarknetService } from "./recovery/starknet.service"
 import { WalletSessionService } from "./session/session.service"
 import { Wallet } from "."
 import { MultisigBackendService } from "../../shared/multisig/service/backend/implementation"
+import { IScheduleService } from "../../shared/schedule/interface"
 
 const isDev = true
 const isTest = true
@@ -101,11 +102,13 @@ export const backupServiceMock = new WalletBackupService(
   networkServiceMock,
 )
 
-const schedulingServiceMock = {
+const schedulingServiceMock: IScheduleService = {
   in: vi.fn(),
   every: vi.fn(),
   delete: vi.fn(),
   registerImplementation: vi.fn(),
+  onInstallAndUpgrade: vi.fn(),
+  onStartup: vi.fn(),
 }
 
 export const emitterMock = {

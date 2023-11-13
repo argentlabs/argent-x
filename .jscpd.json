@@ -1,0 +1,13 @@
+{
+  "reporters": ["html", "console"],
+  "ignore": [
+    "**/__snapshots__/**",
+    "**/__fixtures__/**",
+    "**/__tests__/**",
+    "**/*.test.*",
+    "*.json",
+    "*.svg"
+  ],
+  "minTokens": 75,
+  "absolute": true
+}

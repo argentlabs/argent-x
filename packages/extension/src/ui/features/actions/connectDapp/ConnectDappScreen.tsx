@@ -18,7 +18,6 @@ import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmSc
 import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
 import { DappIcon } from "./DappIcon"
 import { DappDisplayAttributes } from "./useDappDisplayAttributes"
-import { upperFirst } from "lodash-es"
 import { KnownDappModal } from "./KnownDappModal"
 
 const { LinkIcon, TickIcon, VerifiedIcon } = icons
@@ -78,7 +77,7 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
         <Center flexDirection={"column"} textAlign={"center"} gap={1}>
           <DappIcon dappDisplayAttributes={dappDisplayAttributes} />
           <H5 mt={4}>Connect to {dappDisplayAttributes?.title ?? "dapp"}</H5>
-          <Flex gap="2" align="flex-end">
+          <Flex gap="1" align="flex-end">
             <P4 fontWeight="bold" color={"neutrals.300"}>
               {hostName}
             </P4>

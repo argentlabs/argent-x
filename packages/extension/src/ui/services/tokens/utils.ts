@@ -13,7 +13,7 @@ export function formatTokenBalance(
   if (balanceBn === 0n) {
     balanceFullString = `0.${"0".repeat(length)}`
   } else {
-    balanceFullString = bigDecimal.formatUnits(balanceBn, decimals)
+    balanceFullString = bigDecimal.formatUnits({ value: balanceBn, decimals })
   }
 
   // show max ${length} characters or what's needed to show everything before the decimal point

@@ -4,19 +4,19 @@ import type { IArgentAccountServiceBackground } from "../../shared/argentAccount
 import { BaseError } from "../../shared/errors/baseError"
 import type { IMultisigService } from "../../shared/multisig/service/messaging/interface"
 import { MessagingKeys } from "../keys/messagingKeys"
-import { TransactionTrackerWorker } from "../transactions/service/starknet.service"
 import { Wallet } from "../wallet"
 import type { IBackgroundActionService } from "./services/action/interface"
+import { IRecoveryService } from "../../shared/recovery/service/interface"
 
 interface Context {
   sender?: chrome.runtime.MessageSender
   services: {
     wallet: Wallet
-    transactionTracker: TransactionTrackerWorker
     actionService: IBackgroundActionService
     messagingKeys: MessagingKeys
     argentAccountService: IArgentAccountServiceBackground
     multisigService: IMultisigService
+    recoveryService: IRecoveryService
   }
 }
 

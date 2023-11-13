@@ -1,5 +1,5 @@
 import { getAccountClassHashFromChain } from "./getAccountClassHashFromChain"
-import { tryGetClassHashFromMulticall } from "./tryGetClassHashFromMulticall"
+import { tryGetClassHash } from "./tryGetClassHashFromMulticall"
 import { tryGetClassHashFromProvider } from "./tryGetClassHashFromProvider"
 import { networkService } from "../../network/service"
 import { getProvider } from "../../network"
@@ -25,10 +25,9 @@ const mockNetworkService = networkService as jest.Mocked<typeof networkService>
 const mockGetMulticallForNetwork =
   getMulticallForNetwork as jest.MockedFunction<typeof getMulticallForNetwork>
 const mockGetProvider = getProvider as jest.MockedFunction<typeof getProvider>
-const mockTryGetClassHashFromMulticall =
-  tryGetClassHashFromMulticall as jest.MockedFunction<
-    typeof tryGetClassHashFromMulticall
-  >
+const mockTryGetClassHashFromMulticall = tryGetClassHash as jest.MockedFunction<
+  typeof tryGetClassHash
+>
 const mockTryGetClassHashFromProvider =
   tryGetClassHashFromProvider as jest.MockedFunction<
     typeof tryGetClassHashFromProvider
@@ -67,7 +66,9 @@ describe("getAccountClassHashFromChain", () => {
     }
 
     mockGetMulticallForNetwork.mockReturnValueOnce({
-      call: vi.fn().mockResolvedValueOnce([STANDARD_ACCOUNT_CLASS_HASH]),
+      callContract: vi
+        .fn()
+        .mockResolvedValueOnce([STANDARD_ACCOUNT_CLASS_HASH]),
     } as any)
 
     mockGetProvider.mockReturnValueOnce({
@@ -85,8 +86,10 @@ describe("getAccountClassHashFromChain", () => {
 
     expect(mockTryGetClassHashFromMulticall).toHaveBeenCalledWith(
       call,
-      mockGetMulticallForNetwork.mock.results[0].value,
-      mockGetProvider.mock.results[0].value,
+      expect.objectContaining({
+        callContract: expect.any(Function),
+        getClassHashAt: expect.any(Function),
+      }),
       STANDARD_ACCOUNT_CLASS_HASH,
     )
 
@@ -140,7 +143,9 @@ describe("getAccountClassHashFromChain", () => {
     }
 
     mockGetMulticallForNetwork.mockReturnValueOnce({
-      call: vi.fn().mockResolvedValueOnce([STANDARD_ACCOUNT_CLASS_HASH]),
+      callContract: vi
+        .fn()
+        .mockResolvedValueOnce([STANDARD_ACCOUNT_CLASS_HASH]),
     } as any)
 
     mockGetProvider.mockReturnValueOnce({
@@ -164,16 +169,20 @@ describe("getAccountClassHashFromChain", () => {
     expect(mockTryGetClassHashFromMulticall).toHaveBeenNthCalledWith(
       1,
       first_call,
-      mockGetMulticallForNetwork.mock.results[0].value,
-      mockGetProvider.mock.results[0].value,
+      expect.objectContaining({
+        callContract: expect.any(Function),
+        getClassHashAt: expect.any(Function),
+      }),
       STANDARD_ACCOUNT_CLASS_HASH,
     )
 
     expect(mockTryGetClassHashFromMulticall).toHaveBeenNthCalledWith(
       2,
       second_call,
-      mockGetMulticallForNetwork.mock.results[0].value,
-      mockGetProvider.mock.results[0].value,
+      expect.objectContaining({
+        callContract: expect.any(Function),
+        getClassHashAt: expect.any(Function),
+      }),
       MULTISIG_ACCOUNT_CLASS_HASH,
     )
 

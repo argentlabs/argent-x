@@ -1,5 +1,5 @@
 import { useERC20Transactions, useERC721Transactions } from "@argent/shared"
-import { icons } from "@argent/ui"
+import { TextWithAmount, icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, PropsWithChildren, useMemo } from "react"
 
@@ -20,10 +20,8 @@ export interface TransactionTitleArgentXProps {
   approveScreenType: ApproveScreenType
 }
 
-const Title: FC<PropsWithChildren> = ({ children }) => (
-  <Flex alignItems="center" gap="1">
-    {children}
-  </Flex>
+const Title: FC<PropsWithChildren> = (props) => (
+  <Flex alignItems="center" gap="1" {...props} />
 )
 
 export const TransactionTitleArgentX: FC<TransactionTitleArgentXProps> = ({
@@ -91,14 +89,16 @@ export const TransactionTitleArgentX: FC<TransactionTitleArgentXProps> = ({
     const symbol = transactionReviewWithType.activity.value.token.symbol
 
     return (
-      <Title>
-        Send{" "}
-        {prettifyTokenAmount({
-          amount,
-          decimals,
-        })}{" "}
-        {symbol}
-      </Title>
+      <TextWithAmount amount={amount} decimals={decimals}>
+        <Title data-testid="send-title">
+          Send{" "}
+          {prettifyTokenAmount({
+            amount,
+            decimals,
+          })}{" "}
+          {symbol}
+        </Title>
+      </TextWithAmount>
     )
   }
 

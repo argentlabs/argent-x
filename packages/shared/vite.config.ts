@@ -34,4 +34,13 @@ export default defineConfig({
       insertTypesEntry: true,
     }),
   ],
+  test: {
+    deps: {
+      optimizer: {
+        web: {
+          enabled: false,
+        },
+      },
+    },
+  },
 })

@@ -19,6 +19,15 @@ import ExtensionPage from "./page-objects/ExtensionPage"
 const isCI = Boolean(process.env.CI)
 const isExtensionURL = (url: string) => url.startsWith("chrome-extension://")
 let browserCtx: ChromiumBrowserContext
+const outputFolder = (testInfo: TestInfo) =>
+  testInfo.title.replace(/\s+/g, "_").replace(/\W/g, "")
+const artifactFilename = (testInfo: TestInfo) =>
+  `${testInfo.retry}-${testInfo.status}-${pageId++}-${testInfo.workerIndex}`
+const keepArtifacts = (testInfo: TestInfo) =>
+  testInfo.config.preserveOutput === "always" ||
+  (testInfo.config.preserveOutput === "failures-only" &&
+    testInfo.status === "failed") ||
+  testInfo.status === "timedOut"
 const closePages = async (browserContext: ChromiumBrowserContext) => {
   const pages = browserContext?.pages() || []
   for (const page of pages) {
@@ -29,33 +38,28 @@ const closePages = async (browserContext: ChromiumBrowserContext) => {
   }
 }
 
-const keepArtifacts = async (testInfo: TestInfo, page: Page) => {
-  if (
-    testInfo.config.preserveOutput === "always" ||
-    (testInfo.config.preserveOutput === "failures-only" &&
-      testInfo.status !== "passed")
-  ) {
-    //save HTML
-    const folder = testInfo.title.replace(/\s+/g, "_").replace(/\W/g, "")
-    const filename = `${testInfo.retry}-${testInfo.status}-${pageId}-${testInfo.workerIndex}.html`
-    try {
-      const htmlContent = await page.content()
-      await fs.promises
-        .mkdir(path.resolve(config.artifactsDir, folder), { recursive: true })
-        .catch((error) => {
-          console.error(error)
-        })
-      await fs.promises
-        .writeFile(
-          path.resolve(config.artifactsDir, folder, filename),
-          htmlContent,
-        )
-        .catch((error) => {
-          console.error(error)
-        })
-    } catch (error) {
-      console.error("Error while saving HTML content", error)
-    }
+const keepHtml = async (testInfo: TestInfo, page: Page) => {
+  if (keepArtifacts(testInfo)) {
+    const htmlContent = await page.content()
+    await fs.promises
+      .mkdir(path.resolve(config.artifactsDir, outputFolder(testInfo)), {
+        recursive: true,
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+    await fs.promises
+      .writeFile(
+        path.resolve(
+          config.artifactsDir,
+          outputFolder(testInfo),
+          `${artifactFilename(testInfo)}.html`,
+        ),
+        htmlContent,
+      )
+      .catch((error) => {
+        console.error(error)
+      })
   }
 }
 
@@ -69,8 +73,9 @@ const createBrowserContext = () => {
       "--ipc=host",
       `--disable-extensions-except=${config.distDir}`,
       `--load-extension=${config.distDir}`,
-      "--disable-gp",
+      "--disable-gpu",
     ],
+    ignoreDefaultArgs: ["--disable-component-extensions-with-background-pages"],
     recordVideo: {
       dir: config.artifactsDir,
       size: {
@@ -94,25 +99,21 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
     })
 
     page.on("close", async (page) => {
-      if (
-        testInfo.config.preserveOutput === "always" ||
-        (testInfo.config.preserveOutput === "failures-only" &&
-          testInfo.status === "failed") ||
-        testInfo.status === "timedOut"
-      ) {
-        const folder = testInfo.title.replace(/\s+/g, "_").replace(/\W/g, "")
-        const filename = `${testInfo.retry}-${testInfo.status}-${pageId++}-${
-          testInfo.workerIndex
-        }.webm`
-
+      if (keepArtifacts(testInfo)) {
         await page
           .video()
-          ?.saveAs(path.resolve(config.artifactsDir, folder, filename))
+          ?.saveAs(
+            path.resolve(
+              config.artifactsDir,
+              outputFolder(testInfo),
+              `${artifactFilename(testInfo)}.webm`,
+            ),
+          )
           .catch((error) => {
             console.error(error)
           })
       }
-      page
+      await page
         .video()
         ?.delete()
         .catch((error) => {
@@ -157,16 +158,30 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
   return { browserContext, extensionURL, page }
 }
 
+//delete videos related with chrome://extensions/ page
+function cleanArtifactDir() {
+  try {
+    fs.readdirSync(config.artifactsDir)
+      .filter((f) => f.endsWith("webm"))
+      .forEach((fileToDelete) =>
+        fs.rmSync(`${config.artifactsDir}/${fileToDelete}`),
+      )
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 function createExtension() {
   return async ({}, use: any, testInfo: TestInfo) => {
     const { browserContext, page, extensionURL } =
       await initBrowserWithExtension(testInfo)
     const extension = new ExtensionPage(page, extensionURL)
-    await keepArtifacts(testInfo, page)
     await closePages(browserContext)
     browserCtx = browserContext
     await use(extension)
+    await keepHtml(testInfo, page)
     await browserContext.close()
+    cleanArtifactDir()
   }
 }
 

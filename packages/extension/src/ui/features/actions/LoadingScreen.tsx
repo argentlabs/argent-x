@@ -3,7 +3,7 @@ import { FC } from "react"
 
 import { Greetings } from "../lock/Greetings"
 
-const loadingTexts = [
+const defaultLoadingTexts = [
   "Loading…",
   "Please wait…",
   "Patience is a virtue…",
@@ -12,9 +12,13 @@ const loadingTexts = [
 
 interface LoadingScreenProps {
   progress?: number
+  loadingTexts?: string[]
 }
 
-export const LoadingScreen: FC<LoadingScreenProps> = ({ progress }) => {
+export const LoadingScreen: FC<LoadingScreenProps> = ({
+  progress,
+  loadingTexts = defaultLoadingTexts,
+}) => {
   return (
     <Center
       textAlign={"center"}
@@ -25,8 +29,8 @@ export const LoadingScreen: FC<LoadingScreenProps> = ({ progress }) => {
       height={"100vh"}
     >
       <CircularProgress
-        size={"100px"}
-        thickness={"8px"}
+        size={"60px"}
+        thickness={"2px"}
         isIndeterminate={progress === undefined}
         max={1}
         value={progress}

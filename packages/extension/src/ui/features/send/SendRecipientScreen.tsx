@@ -113,6 +113,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                   inputRef.current = e
                 }}
                 px={10}
+                pt={3}
                 autoComplete="off"
                 placeholder="Address (0x) or Starknet ID"
                 isInvalid={hasQueryError}
@@ -184,7 +185,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
               <TabPanels flex={1} display={"flex"} flexDirection={"column"}>
                 <TabPanel flex={1} display={"flex"} flexDirection={"column"}>
                   {hasFilteredAccounts ? (
-                    <CellStack px={0} pt={2}>
+                    <CellStack px={0} pt={4}>
                       {filteredAccounts.map((account) => (
                         <AccountListItemWithBalance
                           key={getAccountIdentifier(account)}

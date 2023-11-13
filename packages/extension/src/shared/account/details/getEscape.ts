@@ -23,20 +23,22 @@ export const getEscapeForAccount = async (account: BaseWalletAccount) => {
     entrypoint: "get_escape",
   }
   const multicall = getMulticallForNetwork(network)
-  let response: string[] = []
+  let response: { result: string[] } = { result: [] }
 
   try {
-    response = await multicall.call(call)
+    response = await multicall.callContract(call)
   } catch {
     call.entrypoint = "getEscape"
-    response = await multicall.call(call)
+    response = await multicall.callContract(call)
   }
 
-  return shapeResponse(response)
+  return shapeResponse(response.result)
 }
 
 /*
 Example responses:
+
+Cairo 0
 
 inactive
 [
@@ -49,13 +51,30 @@ active
   "0x63e3bb79", <- activeAt
   "0x1" <- type
 ]
+
+Cairo 1
+
+inactive
+[
+  "0x0", <- ready_at
+  "0x0" <- escape_type
+  "0x0" <- new_signer
+]
+
+active
+[
+  "0x653a33a3", <- ready_at
+  "0x1", <- escape_type
+  "0x0" <- new_signer
+]
+
 */
 
 const shapeResponse = (response: string[]) => {
-  if (response.length !== 2) {
+  if (response.length !== 2 && response.length !== 3) {
     return
   }
-  const [activeAtHex, typeHex] = response
+  const [activeAtHex, typeHex] = response /** ignore Cairo 1 new_signer */
   const activeAt = Number(num.hexToDecimalString(activeAtHex))
   const type = Number(num.hexToDecimalString(typeHex))
   if (

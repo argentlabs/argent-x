@@ -16,7 +16,7 @@ export const TextWithAmount = ({
 
   try {
     const convertedAmount = BigInt(amount)
-    dataValue = bigDecimal.formatUnits(convertedAmount, decimals)
+    dataValue = bigDecimal.formatUnits({ value: convertedAmount, decimals })
   } catch (e) {
     // ignore parsing error
   }

@@ -72,8 +72,8 @@ export const prettifyNumber = (
 
   // If number is greater than or equal to 1, we format with minimum decimal places
   if (parseFloat(numberString) >= 1) {
-    const numberBN = parseUnits(numberString, minDecimalPlaces)
-    untrimmed = formatUnits(numberBN, minDecimalPlaces)
+    const numberBN = parseUnits(numberString, minDecimalPlaces).value
+    untrimmed = formatUnits({ value: numberBN, decimals: minDecimalPlaces })
   } else {
     // For numbers less than 1, determine the number of leading zeros after the decimal point
     const leadingZerosInDecimalPart =
@@ -86,8 +86,8 @@ export const prettifyNumber = (
     )
 
     // Format the number with the required decimal places
-    const numberBN = parseUnits(numberString, prettyDecimalPlaces)
-    untrimmed = formatUnits(numberBN, prettyDecimalPlaces)
+    const numberBN = parseUnits(numberString, prettyDecimalPlaces).value
+    untrimmed = formatUnits({ value: numberBN, decimals: prettyDecimalPlaces })
   }
 
   // Split the number into integer and fraction parts

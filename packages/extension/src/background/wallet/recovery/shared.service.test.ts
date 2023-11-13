@@ -23,15 +23,6 @@ import { WalletRecoverySharedService } from "./shared.service"
 import { WalletRecoveryStarknetService } from "./starknet.service"
 import { WalletError } from "../../../shared/errors/wallet"
 
-vi.mock("ethers", async () => {
-  const actual = await vi.importActual("ethers")
-
-  return {
-    ...(actual as object),
-    Wallet: vi.fn().mockReturnValue({ privateKey: "abc" }),
-  }
-})
-
 describe("WalletRecoverySharedService", () => {
   let service: WalletRecoverySharedService
   let storeMock: IObjectStore<WalletStorageProps>

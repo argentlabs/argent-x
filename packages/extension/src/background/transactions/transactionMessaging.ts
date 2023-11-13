@@ -154,7 +154,7 @@ export const handleTransactionMessage: HandleMessage<
           await wallet.getAccountDeploymentFee(account)
 
         const maxADFee = num.toHex(
-          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
         )
 
         return respond({
@@ -257,7 +257,7 @@ export const handleTransactionMessage: HandleMessage<
           }
         }
 
-        const suggestedMaxFee = argentMaxFee(maxTxFee) // This add the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        const suggestedMaxFee = argentMaxFee(maxTxFee) // This add the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
 
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
@@ -349,7 +349,7 @@ export const handleTransactionMessage: HandleMessage<
           }
         }
 
-        const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 3x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 3x
+        const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
 
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",

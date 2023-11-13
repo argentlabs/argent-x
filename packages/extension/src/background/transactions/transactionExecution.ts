@@ -1,9 +1,6 @@
 import {
-  Call,
-  EstimateFee,
   constants,
   num,
-  stark,
   TransactionFinalityStatus,
   TransactionExecutionStatus,
 } from "starknet"
@@ -11,8 +8,6 @@ import {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
-import { getL1GasPrice } from "../../shared/ethersUtils"
-import { AllowArray } from "../../shared/storage/types"
 import {
   ExtendedTransactionStatus,
   TransactionRequest,
@@ -199,38 +194,4 @@ export const executeTransactionAction = async (
   }
 
   return transaction
-}
-
-export const calculateEstimateFeeFromL1Gas = async (
-  account: WalletAccount,
-  transactions: AllowArray<Call>,
-): Promise<EstimateFee> => {
-  const fallbackPrice = num.toBigInt(10e14)
-  try {
-    if (account.networkId === "localhost") {
-      console.log("Using fallback gas price for localhost")
-      return {
-        overall_fee: fallbackPrice,
-        suggestedMaxFee: stark.estimatedFeeToMaxFee(fallbackPrice),
-      }
-    }
-
-    const l1GasPrice = await getL1GasPrice(account.networkId)
-
-    const callsLen = Array.isArray(transactions) ? transactions.length : 1
-    const multiplier = BigInt(3744)
-
-    const price = l1GasPrice.mul(callsLen).mul(multiplier).toString()
-
-    return {
-      overall_fee: num.toBigInt(price),
-      suggestedMaxFee: stark.estimatedFeeToMaxFee(price),
-    }
-  } catch {
-    console.warn("Could not get L1 gas price")
-    return {
-      overall_fee: fallbackPrice,
-      suggestedMaxFee: stark.estimatedFeeToMaxFee(fallbackPrice),
-    }
-  }
 }

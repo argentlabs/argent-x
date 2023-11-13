@@ -21,7 +21,7 @@ export const Empty: FC<EmptyProps> = ({
       <Circle backgroundColor={"panel"} size={20}>
         <Text fontSize={"5xl"}>{icon}</Text>
       </Circle>
-      <H5 textAlign={"center"} pt={4} pb={12}>
+      <H5 textAlign={"center"} pt={4} pb={4}>
         {title}
       </H5>
       {children}

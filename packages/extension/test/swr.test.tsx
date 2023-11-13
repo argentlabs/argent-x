@@ -5,9 +5,12 @@ import { describe, expect, test, vi } from "vitest"
 
 import { delay } from "../src/shared/utils/delay"
 import {
+  onErrorRetry,
   useConditionallyEnabledSWR,
   withPolling,
 } from "../src/ui/services/swr.service"
+
+const getTimeout = (retryCount: number) => 100 // no need for backoff in testing
 
 describe("swr", () => {
   describe("useConditionallyEnabledSWR()", () => {
@@ -154,6 +157,183 @@ describe("swr", () => {
       expect(fetcher).toHaveBeenCalledTimes(4)
 
       await delay(POLL_INTERVAL)
+      expect(fetcher).toHaveBeenCalledTimes(5)
+    })
+  })
+
+  describe("onErrorRetry", () => {
+    test.each([200, 404, 401])(
+      "should not retry, given %i error code",
+      async (errorCode) => {
+        const fetcher = vi.fn().mockRejectedValue({ status: errorCode })
+
+        function Component() {
+          const { data, error } = useSWR<string>(
+            `test-key-${errorCode}`,
+            fetcher,
+          )
+          return (
+            <div>{(data || error) && <span>Initial rendering done</span>}</div>
+          )
+        }
+
+        render(
+          <SWRConfig
+            value={{
+              onErrorRetry: (err, key, config, revalidate, revalidateOpts) =>
+                onErrorRetry(
+                  err,
+                  key,
+                  config,
+                  revalidate,
+                  revalidateOpts,
+                  getTimeout,
+                ),
+            }}
+          >
+            <Component />
+          </SWRConfig>,
+        )
+
+        await screen.findAllByText("Initial rendering done")
+
+        // Initial fetch
+        expect(fetcher).toHaveBeenCalledTimes(1)
+
+        await delay(500)
+
+        // offset to check for retries
+        expect(fetcher).toHaveBeenCalledTimes(1)
+      },
+    )
+
+    test.each([429, 500, 503])(
+      "should stop retrying after success, given %i error code",
+      async (errorCode) => {
+        const fetcher = vi
+          .fn()
+          .mockRejectedValueOnce({ status: errorCode })
+          .mockRejectedValueOnce({ status: errorCode })
+          .mockResolvedValue("foo")
+
+        function Component() {
+          const { data, error } = useSWR<string>(
+            `test-key-${errorCode}`,
+            fetcher,
+          )
+          return (
+            <div>{(data || error) && <span>Initial rendering done</span>}</div>
+          )
+        }
+
+        render(
+          <SWRConfig
+            value={{
+              onErrorRetry: (err, key, config, revalidate, revalidateOpts) =>
+                onErrorRetry(
+                  err,
+                  key,
+                  config,
+                  revalidate,
+                  revalidateOpts,
+                  getTimeout,
+                ),
+            }}
+          >
+            <Component />
+          </SWRConfig>,
+        )
+
+        await screen.findAllByText("Initial rendering done")
+
+        // initial rendering
+        expect(fetcher).toHaveBeenCalledTimes(1)
+
+        await delay(1000)
+
+        expect(fetcher).toHaveBeenCalledTimes(3)
+      },
+    )
+
+    test.each([429, 500, 503])(
+      "should stop retrying after hitting the max retry count",
+      async (errorCode) => {
+        const fetcher = vi.fn().mockRejectedValue({ status: errorCode })
+
+        function Component() {
+          const { data, error } = useSWR<string>(
+            `test-key-${errorCode}`,
+            fetcher,
+          )
+          return (
+            <div>{(data || error) && <span>Initial rendering done</span>}</div>
+          )
+        }
+
+        render(
+          <SWRConfig
+            value={{
+              onErrorRetry: (err, key, config, revalidate, revalidateOpts) =>
+                onErrorRetry(
+                  err,
+                  key,
+                  config,
+                  revalidate,
+                  revalidateOpts,
+                  getTimeout,
+                ),
+            }}
+          >
+            <Component />
+          </SWRConfig>,
+        )
+
+        await screen.findAllByText("Initial rendering done")
+
+        // initial rendering
+        expect(fetcher).toHaveBeenCalledTimes(1)
+
+        await delay(1000)
+
+        expect(fetcher).toHaveBeenCalledTimes(5)
+      },
+    )
+
+    test("should retry an unknown error maximum 5 times", async () => {
+      const fetcher = vi.fn().mockRejectedValue({})
+
+      function Component() {
+        const { data, error } = useSWR<string>(`test-key`, fetcher)
+        return (
+          <div>{(data || error) && <span>Initial rendering done</span>}</div>
+        )
+      }
+
+      render(
+        <SWRConfig
+          value={{
+            onErrorRetry: (err, key, config, revalidate, revalidateOpts) =>
+              onErrorRetry(
+                err,
+                key,
+                config,
+                revalidate,
+                revalidateOpts,
+                getTimeout,
+              ),
+          }}
+        >
+          <Component />
+        </SWRConfig>,
+      )
+
+      await screen.findAllByText("Initial rendering done")
+
+      // initial rendering
+      expect(fetcher).toHaveBeenCalledTimes(1)
+
+      await delay(1000)
+
       expect(fetcher).toHaveBeenCalledTimes(5)
     })
   })

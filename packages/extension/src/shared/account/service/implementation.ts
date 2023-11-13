@@ -97,12 +97,18 @@ export class AccountService implements IAccountService {
     baseWalletAccount: BaseWalletAccount,
     targetImplementationType?: ArgentAccountType | undefined,
   ): Promise<void> {
-    const account = baseWalletAccountSchema.parse(baseWalletAccount)
+    const baseAccount = baseWalletAccountSchema.parse(baseWalletAccount)
+    const [account] = await this.get((a) => accountsEqual(a, baseAccount))
+    const [upgradeNeeded, correctAcc] =
+      await this.trpcClient.account.upgrade.mutate({
+        account,
+        targetImplementationType,
+      })
 
-    return this.trpcClient.account.upgrade.mutate({
-      account,
-      targetImplementationType,
-    })
+    if (!upgradeNeeded) {
+      // This means we have incorrect state locally, and we should update it with onchain state
+      await this.upsert(correctAcc)
+    }
   }
 
   async get(

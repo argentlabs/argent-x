@@ -22,6 +22,7 @@ import { PendingTransactions } from "./PendingTransactions"
 import { isVoyagerTransaction } from "./transform/is"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
+import { isEqualAddress } from "@argent/shared"
 
 const { ActivityIcon } = icons
 
@@ -108,7 +109,10 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     const mergedTransactions = voyagerTransactions.map((voyagerTransaction) => {
       const explorerTransaction = explorerTransactions.find(
         (explorerTransaction) =>
-          explorerTransaction.transactionHash === voyagerTransaction.hash,
+          isEqualAddress(
+            explorerTransaction.transactionHash,
+            voyagerTransaction.hash,
+          ),
       )
 
       // TODO: remove this when after backend update
@@ -133,7 +137,9 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
 
     const unmatchedExplorerTransactions = explorerTransactions.filter(
       (explorerTransaction) =>
-        !matchedHashes.includes(explorerTransaction.transactionHash),
+        !matchedHashes.some((matchedHash) =>
+          isEqualAddress(matchedHash, explorerTransaction.transactionHash),
+        ),
     )
 
     const transactionsWithoutTimestamp = []
@@ -162,7 +168,11 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     > = {}
     const { transactions, transactionsWithoutTimestamp } = mergedTransactions
     let lastExplorerTransactionHash
-    for (const transaction of transactions) {
+    const submittedTransactions = transactions.filter(
+      (transaction) => transaction.finalityStatus !== "NOT_RECEIVED",
+    )
+
+    for (const transaction of submittedTransactions) {
       const date = new Date(transaction.timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
       if (!mergedActivity[dateLabel]) {

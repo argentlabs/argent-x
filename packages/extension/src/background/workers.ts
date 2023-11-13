@@ -1,5 +1,5 @@
-import { multisigWorker } from "../shared/multisig/worker"
-import { nftsWorker } from "../shared/nft/worker"
+import { multisigWorker } from "./multisig/worker"
+import { nftsWorker } from "./__new/services/nft/worker"
 import { analyticsWorker } from "./__new/services/analytics"
 import { networkWorker } from "./__new/services/network"
 import { onboardingWorker } from "./__new/services/onboarding"

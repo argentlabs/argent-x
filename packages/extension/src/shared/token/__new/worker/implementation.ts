@@ -1,4 +1,7 @@
-import { IScheduleService } from "../../../schedule/interface"
+import {
+  IScheduleService,
+  ImplementedScheduledTask,
+} from "../../../schedule/interface"
 import { ITokenService } from "../service/interface"
 import { ITokenWorker } from "./interface"
 import { INetworkService } from "../../../network/service/interface"
@@ -20,11 +23,16 @@ import { WalletRecoverySharedService } from "../../../../background/wallet/recov
 import { Recovered } from "../../../../background/wallet/recovery/interface"
 import { KeyValueStorage } from "../../../storage"
 import { RefreshInterval } from "../../../config"
+import {
+  onInstallAndUpgrade,
+  onStartup,
+} from "../../../../background/__new/services/worker/schedule/decorators"
+import { pipe } from "../../../../background/__new/services/worker/schedule/pipe"
 
 /**
  * Enum for scheduling token updates
  */
-const enum TokenWorkerSchedule {
+export const enum TokenWorkerSchedule {
   updateTokens = "updateTokens", // Schedule for updating tokens
   updateTokenBalances = "updateTokenBalances", // Schedule for updating token balances
   updateTokenPrices = "updateTokenPrices", // Schedule for updating token prices
@@ -78,10 +86,11 @@ export class TokenWorker implements ITokenWorker {
    */
   initialize(): void {
     // Register schedules
-    void this.scheduleService.registerImplementation({
+    const updateTokensTask: ImplementedScheduledTask<TokenWorkerSchedule> = {
       id: TokenWorkerSchedule.updateTokens,
       callback: this.updateTokens.bind(this),
-    })
+    }
+    void this.scheduleService.registerImplementation(updateTokensTask)
     void this.scheduleService.registerImplementation({
       id: TokenWorkerSchedule.updateTokenBalances,
       callback: this.updateTokenBalances.bind(this),
@@ -130,17 +139,16 @@ export class TokenWorker implements ITokenWorker {
       void this.updateTokenBalances() // Update token balances on token change
       void this.updateTokenPrices() // Update token prices on token change
     })
-
-    setTimeout(() => {
-      void this.updateTokens() // Update tokens on startup
-    }, 100)
   }
 
   /**
    * Update tokens
    * Fetches tokens for all networks and updates the token service
    */
-  async updateTokens(): Promise<void> {
+  updateTokens = pipe(
+    onStartup(this.scheduleService), // This will run the function on startup
+    onInstallAndUpgrade(this.scheduleService), // This will run the function on update
+  )(async (): Promise<void> => {
     const networks = await this.networkService.get() // Get all networks
 
     // // Fetch tokens for all networks in parallel
@@ -155,7 +163,7 @@ export class TokenWorker implements ITokenWorker {
       .flat()
 
     await this.tokenService.updateTokens(tokens) // Update tokens in the token service
-  }
+  })
 
   /**
    * Update token balances

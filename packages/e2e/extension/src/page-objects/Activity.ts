@@ -16,6 +16,14 @@ export default class Activity extends Navigation {
     ).toBeVisible()
   }
 
+  ensureNoPendingTransactions() {
+    return expect(
+      this.page.locator(
+        `h6 div:text-is("${lang.account.pendingTransactions}") >> div`,
+      ),
+    ).not.toBeVisible({ timeout: 60000 })
+  }
+
   activityByDestination(destination: string) {
     return this.page.locator(
       `//button//p[contains(text()[1], 'To: ') and contains(text()[2], '${destination}')]`,
@@ -27,5 +35,13 @@ export default class Activity extends Navigation {
       this.menuPendingTransactionsIndicator.click(),
       this.ensurePendingTransactions(nbr),
     ])
+  }
+
+  async activityTxHashs() {
+    await expect(
+      this.page.locator("button[data-tx-hash]").first(),
+    ).toBeVisible()
+    const loc = await this.page.locator("button[data-tx-hash]").all()
+    return Promise.all(loc.map((el) => el.getAttribute("data-tx-hash")))
   }
 }

@@ -61,7 +61,7 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           cache: "pnpm"
@@ -84,7 +84,12 @@ jobs:
         run: pnpm run setup
 
       - name: Build extension for ${{ matrix.extension_type }}
-        run: pnpm run build:extension
+        run: |
+          if [[ "${{ matrix.extension_type }}" == "firefox" ]]; then
+            MANIFEST_VERSION=v2 pnpm run build:extension
+          else
+            MANIFEST_VERSION=v3 pnpm run build:extension
+          fi
 
       - name: Check bundlesize for ${{ matrix.extension_type }}
         run: pnpm bundlewatch
@@ -136,7 +141,7 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           cache: "pnpm"
@@ -201,7 +206,7 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           cache: "pnpm"
@@ -258,7 +263,7 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "16"
           cache: "pnpm"
@@ -302,7 +307,7 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           cache: "pnpm"
@@ -342,7 +347,7 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           cache: "pnpm"
@@ -403,7 +408,7 @@ jobs:
           version: 8
           run_install: false
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
           cache: "pnpm"
@@ -423,6 +428,8 @@ jobs:
       - name: Run tests
         run: |
           pnpm run --filter @argent/web start:ci &
+          sleep 10 &&
+          curl http://localhost:3005 &&
           pnpm run test:e2e:webwallet
 
       - name: Upload artifacts

@@ -37,6 +37,10 @@ const texts = {
     recipientAddress: "Recipient's address",
     saveAddress: "Save address",
     wrongPassword: "Incorrect password",
+    invalidStarkIdError: " not found",
+    shortAddressError: "Address must be 66 characters long",
+    invalidCheckSumError: "Invalid address (checksum error)",
+    invalidAddress: "Invalid address",
   },
   wallet: {
     //first screen

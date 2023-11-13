@@ -1,5 +1,4 @@
-import { Multicall } from "@argent/x-multicall"
-
+import { ProviderInterface } from "starknet"
 import { SupportedNetworks } from "../../sdk"
 
 interface BaseWalletAccount {
@@ -7,14 +6,16 @@ interface BaseWalletAccount {
   networkId: string
 }
 
+type MinimalProvider = Pick<ProviderInterface, "callContract">
+
 export interface SwapContextInterface {
   selectedAccount?: BaseWalletAccount
-  multicall?: Multicall
+  multicall?: MinimalProvider
   networkId?: SupportedNetworks
 }
 
 export interface SwapProviderArgs {
   selectedAccount?: BaseWalletAccount
-  multicall?: Multicall
+  multicall?: MinimalProvider
   children: React.ReactNode
 }

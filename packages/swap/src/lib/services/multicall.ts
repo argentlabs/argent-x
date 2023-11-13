@@ -1,8 +1,9 @@
-import { Multicall } from "@argent/x-multicall"
+import { getBatchProvider } from "@argent/x-multicall"
 import { memoize } from "lodash-es"
 
 import { SupportedNetworks } from "../../sdk"
 import { getProviderForNetworkId } from "./provider"
+import type { ProviderInterface } from "starknet"
 
 export class NoMulticallError extends Error {
   constructor(message?: string) {
@@ -12,9 +13,8 @@ export class NoMulticallError extends Error {
 }
 
 export const getMulticallForNetwork = memoize(
-  (networkId: SupportedNetworks) => {
-    const multicall = new Multicall(getProviderForNetworkId(networkId))
-    return multicall
+  (networkId: SupportedNetworks): Pick<ProviderInterface, "callContract"> => {
+    return getBatchProvider(getProviderForNetworkId(networkId))
   },
   (networkId) => networkId,
 )

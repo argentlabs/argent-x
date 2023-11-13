@@ -164,7 +164,10 @@ export const handleActionApproval = async (
     }
 
     case "SIGN": {
-      const typedData = action.payload
+      const {
+        typedData,
+        options: { skipDeploy = false },
+      } = action.payload
       if (!(await wallet.isSessionOpen())) {
         throw Error("you need an open session")
       }

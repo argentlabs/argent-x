@@ -64,7 +64,7 @@
     "ws": "^8.8.1"
   },
   "peerDependencies": {
-    "starknet": "5.18.0"
+    "starknet": "5.19.5"
   },
   "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"
 }

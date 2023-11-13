@@ -1,4 +1,4 @@
-import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/utils"
+import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/__new/utils"
 import { AddTokenScreen } from "@argent-x/extension/src/ui/features/actions/AddTokenScreen"
 
 import { decorators } from "../../decorators/routerDecorators"

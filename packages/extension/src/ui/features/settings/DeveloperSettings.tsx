@@ -8,9 +8,12 @@ import {
 } from "../../../shared/settings"
 import { routes } from "../../routes"
 import { SettingsMenuItem } from "./SettingsMenuItem"
+import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 
 const DeveloperSettings: FC = () => {
   const navigate = useNavigate()
+  const isMainnet = useIsMainnet()
+
   return (
     <>
       <NavigationBar
@@ -29,7 +32,7 @@ const DeveloperSettings: FC = () => {
           title="Block explorer"
         />
 
-        {isBetaFeaturesEnabled && (
+        {isBetaFeaturesEnabled && isMainnet && (
           <SettingsMenuItem
             to={routes.settingsBetaFeatures()}
             title="Beta features"

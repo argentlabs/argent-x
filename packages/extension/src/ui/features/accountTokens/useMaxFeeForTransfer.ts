@@ -52,12 +52,12 @@ export const useMaxFeeEstimateForTransfer = (
         calldata: CallData.compile({
           // We are using a dummy address (ETH here) as recipient to estimate the fee given we don't have a receipient yet
           recipient: feeToken.address,
-          amount: uint256.bnToUint256(balance),
+          // We are using the smallest possible amount to make sure this doesn't throw an error
+          amount: uint256.bnToUint256(BigInt(1)),
         }),
       }
 
       const estimatedFeeFromSimulation = await getSimulationEstimatedFee(call)
-
       if (!estimatedFeeFromSimulation) {
         const estimatedFeeFromSequencer = await getEstimatedFeeFromSequencer(
           call,

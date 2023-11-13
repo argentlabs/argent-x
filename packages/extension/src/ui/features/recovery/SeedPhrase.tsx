@@ -1,10 +1,10 @@
-import { wordlists } from "ethers"
 import { FC } from "react"
 
 import { LoadingSeedWordBadge } from "./ui/LoadingSeedWordBadge"
 import { SeedPhraseGrid } from "./ui/SeedPhraseGrid"
 import { SeedWordBadge } from "./ui/SeedWordBadge"
 import { SeedWordBadgeNumber } from "./ui/SeedWordBadgeNumber"
+import { splitPhrase } from "./phraseUtils"
 
 interface SeedPhraseProps {
   seedPhrase?: string
@@ -13,7 +13,7 @@ interface SeedPhraseProps {
 export const SeedPhrase: FC<SeedPhraseProps> = ({ seedPhrase }) =>
   seedPhrase ? (
     <SeedPhraseGrid>
-      {wordlists.en.split(seedPhrase).map((word, index) => (
+      {splitPhrase(seedPhrase).map((word, index) => (
         <SeedWordBadge key={word + index}>
           <SeedWordBadgeNumber>{index + 1}</SeedWordBadgeNumber>
           {word}

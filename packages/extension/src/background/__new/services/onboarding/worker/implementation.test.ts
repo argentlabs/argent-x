@@ -17,15 +17,17 @@ describe("OnboardingWorker", () => {
     } as unknown as KeyValueStorage<WalletStorageProps>
     const browser = {
       runtime: {
+        getManifest: vi.fn(() => ({ manifest_version: 3 } as any)),
         onInstalled: {
           addListener: vi.fn(),
         },
       },
-      browserAction: {
+      action: {
         onClicked: {
           addListener: vi.fn(),
         },
-      },
+      } as any,
+      browserAction: {} as any,
     }
     const onboardingWorker = new OnboardingWorker(
       onboardingService,
@@ -45,7 +47,7 @@ describe("OnboardingWorker", () => {
       async () => false,
     )
     expect(browser.runtime.onInstalled.addListener).toHaveBeenCalled()
-    expect(browser.browserAction.onClicked.addListener).toHaveBeenCalled()
+    expect(browser.action.onClicked.addListener).toHaveBeenCalled()
     expect(walletStore.subscribe).toHaveBeenCalled()
     expect(onboardingService.getOnboardingComplete).toHaveBeenCalled()
     await Promise.resolve()

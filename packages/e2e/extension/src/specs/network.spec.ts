@@ -38,7 +38,7 @@ test.describe("Network", () => {
     await extension.navigation.back.click()
     await extension.navigation.back.click()
     await extension.navigation.close.click()
-
+    await extension.network.ensureSelectedNetwork("Testnet")
     // select network
     await extension.network.selectNetwork("My Network")
 
@@ -55,7 +55,9 @@ test.describe("Network", () => {
     await extension.navigation.back.click()
     await extension.navigation.back.click()
     await extension.navigation.close.click()
-
+    await extension.network.ensureSelectedNetwork("My Network")
+    await expect(extension.account.createAccount).toBeVisible()
+    await expect(extension.account.noAccountBanner).toBeVisible()
     // select other network
     await extension.network.selectNetwork("Testnet")
     // delete network

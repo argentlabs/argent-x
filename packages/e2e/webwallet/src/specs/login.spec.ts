@@ -4,11 +4,11 @@ import config from "../config"
 import test from "../test"
 
 test.describe(`Login page`, () => {
-  test.skip("can log in", async ({ webWallet }) => {
+  test("can log in", async ({ webWallet }) => {
     await webWallet.login.success()
   })
 
-  test.skip("wrong password", async ({ webWallet }) => {
+  test("wrong password", async ({ webWallet }) => {
     await webWallet.login.email.fill(config.validLogin.email)
     await webWallet.login.fillPin(config.validLogin.pin)
     await webWallet.login.password.fill("VeryFake123!")

@@ -6,7 +6,7 @@ import { NetworkStatus } from "../../shared/network"
 import { assertNever } from "../services/assertNever"
 import { NetworkWarningIcon } from "./Icons/NetworkWarningIcon"
 
-export type StatusIndicatorColor = "green" | "orange" | "red" | "transparent"
+export type StatusIndicatorColor = "green" | "orange" | "red" | "neutral"
 
 interface StatusIndicatorProps {
   color?: StatusIndicatorColor
@@ -23,17 +23,17 @@ export function mapNetworkStatusToColor(
     case "ok":
       return "green"
     case "unknown":
-      return "transparent"
+      return "neutral"
     case undefined:
-      return "transparent"
+      return "neutral"
     default:
       assertNever(status)
-      return "transparent"
+      return "neutral"
   }
 }
 
 export const StatusIndicator = ({
-  color = "transparent",
+  color = "neutral",
 }: {
   color: StatusIndicatorColor
 }) => (
@@ -49,13 +49,13 @@ export const StatusIndicator = ({
         ? "#ffa85c"
         : color === "red"
         ? "#C12026"
-        : "transparent"
+        : "#808080"
     }
   />
 )
 
 export const NetworkStatusIndicator: FC<StatusIndicatorProps> = ({
-  color = "transparent",
+  color = "neutral",
 }) => {
   if (color === "orange") {
     return <NetworkWarningIcon />

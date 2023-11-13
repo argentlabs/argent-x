@@ -5,14 +5,16 @@ import UIService from "./implementation"
 describe("UIService", () => {
   const makeService = () => {
     const browser = {
-      browserAction: {
+      action: {
         setPopup: vi.fn(),
-      },
+      } as any,
+      browserAction: {} as any,
       extension: {
         getViews: vi.fn(),
       },
       runtime: {
         getURL: vi.fn(),
+        getManifest: vi.fn(() => ({ manifest_version: 3 } as any)),
       },
       tabs: {
         create: vi.fn(),
@@ -34,14 +36,14 @@ describe("UIService", () => {
   test("setDefaultPopup", async () => {
     const { uiService, browser } = makeService()
     await uiService.setDefaultPopup()
-    expect(browser.browserAction.setPopup).toHaveBeenCalledWith({
+    expect(browser.action.setPopup).toHaveBeenCalledWith({
       popup: "index.html",
     })
   })
   test("unsetDefaultPopup", async () => {
     const { uiService, browser } = makeService()
     await uiService.unsetDefaultPopup()
-    expect(browser.browserAction.setPopup).toHaveBeenCalledWith({
+    expect(browser.action.setPopup).toHaveBeenCalledWith({
       popup: "",
     })
   })

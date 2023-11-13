@@ -1,11 +1,12 @@
+import { BigDecimal } from "./types"
+
 /**
  * Formats a BigInt value to a string with a given number of decimal places.
  *
- * @param {bigint} value - The BigInt value to be formatted.
- * @param {number} decimals - The number of decimal places to format the value to.
+ * @param {BigDecimal} The amount to format
  * @returns {string} The formatted string.
  */
-export function formatUnits(value: bigint, decimals: number): string {
+export function formatUnits({ value, decimals }: BigDecimal): string {
   if (decimals === 0) {
     return value.toString()
   }

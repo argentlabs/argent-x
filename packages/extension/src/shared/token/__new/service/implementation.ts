@@ -26,10 +26,6 @@ import { getMulticallForNetwork } from "../../../multicall"
 import { getProvider } from "../../../network/provider"
 import { Network, defaultNetwork } from "../../../network"
 import { fetcherWithArgentApiHeadersForNetwork } from "../../../api/fetcher"
-import {
-  ARGENT_API_TOKENS_INFO_URL,
-  ARGENT_API_TOKENS_PRICES_URL,
-} from "../../../api/constants"
 import { getAccountIdentifier } from "../../../wallet.service"
 import { TokenError } from "../../../errors/token"
 
@@ -38,18 +34,33 @@ import { TokenError } from "../../../errors/token"
  * It provides methods to interact with the token repository, token balance repository and token price repository.
  */
 export class TokenService implements ITokenService {
+  private readonly TOKENS_INFO_URL: string
+  private readonly TOKENS_PRICES_URL: string
   /**
    * @param {INetworkService} networkService - The network service.
    * @param {ITokenRepository} tokenRepo - The token repository.
    * @param {ITokenBalanceRepository} tokenBalanceRepo - The token balance repository.
    * @param {ITokenPriceRepository} tokenPriceRepo - The token price repository.
+   * @param {string} TOKENS_INFO_URL - The tokens info url.
+   * @param {string} TOKENS_PRICES_URL - The tokens prices url.
    */
   constructor(
     private readonly networkService: INetworkService,
     private readonly tokenRepo: ITokenRepository,
     private readonly tokenBalanceRepo: ITokenBalanceRepository,
     private readonly tokenPriceRepo: ITokenPriceRepository,
-  ) {}
+    TOKENS_INFO_URL: string | undefined,
+    TOKENS_PRICES_URL: string | undefined,
+  ) {
+    if (!TOKENS_INFO_URL) {
+      throw new TokenError({ code: "NO_TOKEN_API_URL" })
+    }
+    if (!TOKENS_PRICES_URL) {
+      throw new TokenError({ code: "NO_TOKEN_PRICE_API_URL" })
+    }
+    this.TOKENS_INFO_URL = TOKENS_INFO_URL
+    this.TOKENS_PRICES_URL = TOKENS_PRICES_URL
+  }
 
   /**
    * Add a token to the token repository.
@@ -106,10 +117,10 @@ export class TokenService implements ITokenService {
    */
   async fetchTokensFromBackend(networkId: string): Promise<Token[]> {
     const isDefaultNetwork = defaultNetwork.id === networkId
+
     const tokensOnNetwork = await this.tokenRepo.get(
       (t) => t.networkId === networkId,
     )
-
     if (!isDefaultNetwork) {
       return tokensOnNetwork
     }
@@ -119,11 +130,8 @@ export class TokenService implements ITokenService {
       tokensOnNetwork.map((t) => [getAccountIdentifier(t), t]),
     )
 
-    if (!ARGENT_API_TOKENS_INFO_URL) {
-      throw new TokenError({ code: "NO_TOKEN_API_URL" })
-    }
     const fetcher = fetcherWithArgentApiHeadersForNetwork(networkId)
-    const response = await fetcher(ARGENT_API_TOKENS_INFO_URL)
+    const response = await fetcher(this.TOKENS_INFO_URL)
     const parsedResponse = ApiTokenDataResponseSchema.safeParse(response)
 
     if (!parsedResponse.success) {
@@ -141,6 +149,7 @@ export class TokenService implements ITokenService {
           getAccountIdentifier({ address: token.address, networkId }),
         )
         return {
+          id: token.id,
           address: token.address,
           decimals: token.decimals || cached?.decimals || 18,
           name: token.name,
@@ -186,7 +195,7 @@ export class TokenService implements ITokenService {
         )
         tokenBalances.push(...balances)
       } else {
-        const balances = await this.fetchTokenBalancesWithSingleCall(
+        const balances = await this.fetchTokenBalancesWithoutMulticall(
           network,
           accountsArray,
           tokensOnCurrentNetwork,
@@ -197,7 +206,7 @@ export class TokenService implements ITokenService {
     return tokenBalances
   }
 
-  private async fetchTokenBalancesWithMulticall(
+  public async fetchTokenBalancesWithMulticall(
     network: Network,
     accountsGroupedByNetwork: Record<string, BaseWalletAccount[]>,
     tokensOnCurrentNetwork: Token[],
@@ -207,7 +216,7 @@ export class TokenService implements ITokenService {
     const calls = tokensOnCurrentNetwork
       .map((token) =>
         accounts.map((account) =>
-          multicall.call({
+          multicall.callContract({
             contractAddress: token.address,
             entrypoint: "balanceOf",
             calldata: [account.address],
@@ -223,7 +232,7 @@ export class TokenService implements ITokenService {
       const token = tokensOnCurrentNetwork[Math.floor(i / accounts.length)]
       const account = accounts[i % accounts.length]
       if (result.status === "fulfilled") {
-        const [low, high] = result.value
+        const [low, high] = result.value.result
         const balance = uint256.uint256ToBN({ low, high }).toString()
         tokenBalances.push({
           account,
@@ -237,7 +246,7 @@ export class TokenService implements ITokenService {
     return tokenBalances
   }
 
-  private async fetchTokenBalancesWithSingleCall(
+  async fetchTokenBalancesWithoutMulticall(
     network: Network,
     accountsArray: BaseWalletAccount[],
     tokensOnCurrentNetwork: Token[],
@@ -284,11 +293,8 @@ export class TokenService implements ITokenService {
       return tokenPrices
     }
 
-    if (!ARGENT_API_TOKENS_PRICES_URL) {
-      throw new TokenError({ code: "NO_TOKEN_PRICE_API_URL" })
-    }
     const fetcher = fetcherWithArgentApiHeadersForNetwork(defaultNetwork.id)
-    const response = await fetcher(ARGENT_API_TOKENS_PRICES_URL)
+    const response = await fetcher(this.TOKENS_PRICES_URL)
     const parsedResponse = ApiPriceDataResponseSchema.safeParse(response)
 
     if (!parsedResponse.success) {
@@ -322,41 +328,37 @@ export class TokenService implements ITokenService {
 
   async fetchTokenDetails(baseToken: BaseToken): Promise<Token> {
     const [token] = await this.tokenRepo.get((t) => equalToken(t, baseToken))
-    if (token) {
+
+    // Only return cached token if it's not a custom token
+    // Otherwise fetch token details from blockchain
+    if (token && !token.custom) {
       return token
     }
+
     const network = await this.networkService.getById(baseToken.networkId)
-    const tokenEntryPoints = ["name", "symbol", "decimals"]
     let name: string, symbol: string, decimals: string
-    if (network.multicallAddress) {
-      const multicall = getMulticallForNetwork(network)
-      const responses = await Promise.all(
-        tokenEntryPoints.map((entrypoint) =>
-          multicall.call({
-            contractAddress: baseToken.address,
-            entrypoint,
-          }),
-        ),
-      )
-      ;[name, symbol, decimals] = responses.map((response) => response[0])
-    } else {
-      const provider = getProvider(network)
-      const responses = await Promise.all(
-        tokenEntryPoints.map((entrypoint) =>
-          provider.callContract({
-            contractAddress: baseToken.address,
-            entrypoint,
-          }),
-        ),
-      )
-      ;[name, symbol, decimals] = responses.map(
-        (response) => response.result[0],
-      )
+
+    try {
+      if (network.multicallAddress) {
+        ;[name, symbol, decimals] = await this.fetchTokenDetailsWithMulticall(
+          baseToken,
+          network,
+        )
+      } else {
+        ;[name, symbol, decimals] =
+          await this.fetchTokenDetailsWithoutMulticall(baseToken, network)
+      }
+    } catch (error) {
+      console.error(error)
+      throw new TokenError({
+        code: "TOKEN_DETAILS_NOT_FOUND",
+        message: `Token details not found for token ${baseToken.address}`,
+      })
     }
 
     if (Number.parseInt(decimals) > Number.MAX_SAFE_INTEGER) {
       throw new TokenError({
-        code: "NOT_SAFE",
+        code: "UNSAFE_DECIMALS",
         options: { context: { decimals } },
       })
     }
@@ -369,6 +371,40 @@ export class TokenService implements ITokenService {
       decimals: Number.parseInt(decimals),
       custom: true,
     }
+  }
+
+  async fetchTokenDetailsWithMulticall(
+    baseToken: BaseToken,
+    network: Network,
+    tokenEntryPoints = ["name", "symbol", "decimals"],
+  ): Promise<string[]> {
+    const multicall = getMulticallForNetwork(network)
+    const responses = await Promise.all(
+      tokenEntryPoints.map((entrypoint) =>
+        multicall.callContract({
+          contractAddress: baseToken.address,
+          entrypoint,
+        }),
+      ),
+    )
+    return responses.map((response) => response.result[0])
+  }
+
+  async fetchTokenDetailsWithoutMulticall(
+    baseToken: BaseToken,
+    network: Network,
+    tokenEntryPoints = ["name", "symbol", "decimals"],
+  ): Promise<string[]> {
+    const provider = getProvider(network)
+    const responses = await Promise.all(
+      tokenEntryPoints.map((entrypoint) =>
+        provider.callContract({
+          contractAddress: baseToken.address,
+          entrypoint,
+        }),
+      ),
+    )
+    return responses.map((response) => response.result[0])
   }
 
   async getToken(baseToken: BaseToken): Promise<Token | undefined> {
@@ -479,13 +515,12 @@ export class TokenService implements ITokenService {
       tokensWithBalanceAndPrice,
       ({ account }) => `${account.address}:${account.networkId}`,
     )
-
     const totalCurrencyBalanceForAccounts: { [key: string]: string } = {}
 
     for (const account in groupedBalances) {
       const totalBalance = groupedBalances[account].reduce(
         (total, token) =>
-          total + bigDecimal.parseCurrency(token.usdValue || "0"),
+          total + bigDecimal.parseCurrency(token.usdValue || "0").value,
         0n,
       )
       totalCurrencyBalanceForAccounts[account] =

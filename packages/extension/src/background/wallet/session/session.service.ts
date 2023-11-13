@@ -1,6 +1,10 @@
 import Emittery from "emittery"
-import { ethers } from "ethers"
-import { ProgressCallback } from "ethers/lib/utils"
+import {
+  ProgressCallback,
+  Wallet,
+  decryptKeystoreJson,
+  encryptKeystoreJson,
+} from "ethers"
 import { noop, throttle } from "lodash-es"
 
 import { SessionError } from "../../../shared/errors/session"
@@ -14,6 +18,7 @@ import {
 } from "../backup/backup.service"
 import { WalletRecoverySharedService } from "../recovery/shared.service"
 import { Events, Locked } from "./interface"
+import { walletToKeystore } from "../utils"
 
 type TaskId = "sessionTimeout"
 
@@ -34,6 +39,7 @@ export interface WalletSession {
 
 export class WalletSessionService {
   private _locked = true
+  private isInitialising = true
 
   constructor(
     readonly emitter: Emittery<Events>,
@@ -84,7 +90,7 @@ export class WalletSessionService {
     }
 
     try {
-      const wallet = await ethers.Wallet.fromEncryptedJson(
+      const wallet = await decryptKeystoreJson(
         backup,
         password,
         throttledProgressCallback,
@@ -113,12 +119,12 @@ export class WalletSessionService {
       return
     }
 
-    const ethersWallet = ethers.Wallet.createRandom()
-    const encryptedBackup = await ethersWallet.encrypt(
-      password,
-      { scrypt: { N: this.SCRYPT_N } },
+    const ethersWallet = Wallet.createRandom()
+    const keystore = walletToKeystore(ethersWallet)
+    const encryptedBackup = await encryptKeystoreJson(keystore, password, {
+      scrypt: { N: this.SCRYPT_N },
       progressCallback,
-    )
+    })
 
     await this.store.set({ discoveredOnce: true })
     await this.store.set({ backup: encryptedBackup })
@@ -155,6 +161,12 @@ export class WalletSessionService {
   }
 
   private set locked(locked: boolean) {
+    if (this.isInitialising) {
+      /** don't emit on initial value change */
+      this.isInitialising = false
+      this._locked = locked
+      return
+    }
     if (this._locked === locked) {
       return
     }

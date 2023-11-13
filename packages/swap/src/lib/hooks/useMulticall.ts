@@ -24,12 +24,13 @@ export const useMulticall = (call: Call, unique = false) => {
     ...rest
   } = useSWR(
     key,
-    () => {
+    async () => {
       if (!multicall) {
         throw new NoMulticallError("Multicall not available")
       }
 
-      return multicall.call(call)
+      const { result } = await multicall.callContract(call)
+      return result
     },
     {
       shouldRetryOnError: (err) => {

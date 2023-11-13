@@ -14,6 +14,7 @@ import {
 import { sendMessage, waitForMessage } from "./messageActions"
 import { stark } from "starknet"
 import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import { SignMessageOptions } from "../shared/messages/ActionMessage"
 
 /**
  *  This is Account Object is imported from starknet v4.
@@ -82,8 +83,11 @@ export class ArgentXAccount4 extends Account implements AccountInterface {
     }
   }
 
-  public async signMessage(data: typedData.TypedData): Promise<Signature> {
-    sendMessage({ type: "SIGN_MESSAGE", data })
+  public async signMessage(
+    typedData: typedData.TypedData,
+    options: SignMessageOptions = { skipDeploy: false },
+  ): Promise<Signature> {
+    sendMessage({ type: "SIGN_MESSAGE", data: { typedData, options } })
     const { actionHash } = await waitForMessage("SIGN_MESSAGE_RES", 1000)
     sendMessage({ type: "OPEN_UI" })
 

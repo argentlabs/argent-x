@@ -1,6 +1,11 @@
 import { WalletBackupService } from "../backup/backup.service"
 
-import { ethers } from "ethers"
+import {
+  decryptKeystoreJson,
+  encryptKeystoreJson,
+  HDNodeWallet,
+  Mnemonic,
+} from "ethers"
 import { defaultNetwork } from "../../../shared/network"
 import { WalletRecoverySharedService } from "../recovery/shared.service"
 import { WalletSessionService } from "../session/session.service"
@@ -8,6 +13,7 @@ import type { WalletSession } from "../session/walletSession.model"
 import { IWalletDeploymentService } from "../deployment/interface"
 import { IObjectStore } from "../../../shared/storage/__new/interface"
 import { WalletError } from "../../../shared/errors/wallet"
+import { walletToKeystore } from "../utils"
 
 export class WalletCryptoSharedService {
   constructor(
@@ -24,10 +30,14 @@ export class WalletCryptoSharedService {
     if ((await this.backupService.isInitialized()) || session) {
       throw new WalletError({ code: "ALREADY_INITIALIZED" })
     }
-    const ethersWallet = ethers.Wallet.fromMnemonic(seedPhrase)
-    const encryptedBackup = await ethersWallet.encrypt(newPassword, {
-      scrypt: { N: this.SCRYPT_N },
-    })
+    const ethersWallet = HDNodeWallet.fromPhrase(seedPhrase)
+    const encryptedBackup = await encryptKeystoreJson(
+      walletToKeystore(ethersWallet),
+      newPassword,
+      {
+        scrypt: { N: this.SCRYPT_N },
+      },
+    )
 
     await this.backupService.importBackup(encryptedBackup)
     await this.sessionService.setSession(ethersWallet.privateKey, newPassword)
@@ -50,11 +60,14 @@ export class WalletCryptoSharedService {
       throw new Error("Session is not open")
     }
 
-    const wallet = await ethers.Wallet.fromEncryptedJson(
-      backup,
-      session.password,
-    )
+    const keystore = await decryptKeystoreJson(backup, session.password)
 
-    return wallet.mnemonic.phrase
+    if (!keystore.mnemonic?.entropy) {
+      throw new Error("No entropy found in keystore")
+    }
+
+    const mnemonic = Mnemonic.fromEntropy(keystore.mnemonic.entropy)
+
+    return mnemonic.phrase
   }
 }

@@ -17,7 +17,7 @@ export const useEntryRoute = () => {
   const isPasswordSet = useView(isPasswordSetView)
 
   useEffect(() => {
-    ;(async () => {
+    void (async () => {
       if (isFirstRender) {
         const query = new URLSearchParams(window.location.search)
         const entry = await determineEntry(query, isBackupStored, isPasswordSet)
@@ -40,6 +40,10 @@ const determineEntry = async (
   isBackupStored: boolean,
   isPasswordSet: boolean,
 ) => {
+  if (query.get("goto") === "background-error") {
+    return routes.backgroundError()
+  }
+
   if (query.get("goto") === "ledger") {
     return routes.ledgerEntry()
   }
