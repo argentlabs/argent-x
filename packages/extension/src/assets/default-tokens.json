@@ -135,5 +135,13 @@
     "decimals": "18",
     "network": "mainnet-alpha",
     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/reth.png"
+  },
+  {
+    "name": "Stark Inu",
+    "address": "0x022b13d47cd79711adbedbf3c8e56567c18e9adc884bba3f7f1615cb587b484d",
+    "symbol": "STARKINU",
+    "decimals": 18,
+    "chainId": "0x534e5f4d41494e",
+    "logoURI": "https://raw.githubusercontent.com/starkinu/public-assets/main/img/StarkInu_small.png"
   }
 ]
