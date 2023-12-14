@@ -1,5 +1,5 @@
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
-import { deployAccountAction } from "../../../accountDeploy"
+import { addDeployAccountAction } from "../../../accountDeploy"
 import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
 
@@ -10,12 +10,13 @@ export const deployAccountProcedure = extensionOnlyProcedure
     async ({
       input,
       ctx: {
-        services: { actionService },
+        services: { actionService, wallet },
       },
     }) => {
-      await deployAccountAction({
+      await addDeployAccountAction({
         account: input,
         actionService,
+        wallet,
       })
     },
   )

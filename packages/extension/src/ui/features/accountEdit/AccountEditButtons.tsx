@@ -3,7 +3,6 @@ import { Spinner } from "@chakra-ui/react"
 import { useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
-import { accountService } from "../../../shared/account/service"
 import { settingsStore } from "../../../shared/settings"
 import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
@@ -20,6 +19,7 @@ import {
   useLiveAccountGuardianState,
 } from "../shield/usePendingChangingGuardian"
 import { useRouteAccount } from "../shield/useRouteAccount"
+import { clientAccountService } from "../../services/account"
 
 const { ExpandIcon, ArgentShieldIcon } = icons
 
@@ -73,7 +73,7 @@ export const AccountEditButtons = () => {
 
   const handleDeploy = async () => {
     if (account) {
-      await accountService.deploy(account)
+      await clientAccountService.deploy(account)
     }
   }
   return (
@@ -92,6 +92,7 @@ export const AccountEditButtons = () => {
             <Spinner size={"sm"} />
           ) : (
             <Switch
+              data-testid="shield-switch"
               size={"lg"}
               isChecked={Boolean(shieldIsLoading ? isAdding : hasGuardian)}
               onChange={() =>

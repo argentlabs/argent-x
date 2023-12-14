@@ -18,11 +18,7 @@ describe("AccountWorker", () => {
       get: () => Promise.resolve([getMockWalletAccount({})]),
       getDeployed: () => Promise.resolve(true),
       upsert: vi.fn(),
-      select: vi.fn(),
       remove: vi.fn(),
-      create: vi.fn(),
-      deploy: vi.fn(),
-      upgrade: vi.fn(),
       setHide: vi.fn(),
       setName: vi.fn(),
     })

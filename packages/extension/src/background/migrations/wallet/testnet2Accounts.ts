@@ -1,9 +1,9 @@
-import {
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { WalletStorageProps } from "../../wallet/account/shared.service"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 export async function getTestnet2Accounts(
   walletStore: IRepository<WalletAccount>,

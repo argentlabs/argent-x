@@ -16,7 +16,7 @@ export default class Navigation {
     return this.page.locator(`[aria-label="${lang.common.close}"]`)
   }
 
-  get approve() {
+  get confirm() {
     return this.page.locator(`button:text-is("${lang.common.confirm}")`)
   }
 
@@ -100,5 +100,17 @@ export default class Navigation {
 
   get cancel() {
     return this.page.locator(`button:text-is("${lang.common.cancel}")`)
+  }
+
+  get approve() {
+    return this.page.locator(`button:text-is("${lang.common.approve}")`)
+  }
+
+  get addArgentShield() {
+    return this.page.locator(`button:text-is("${lang.common.addArgentShield}")`)
+  }
+
+  get dismiss() {
+    return this.page.locator(`button:text-is("${lang.common.dismiss}")`)
   }
 }

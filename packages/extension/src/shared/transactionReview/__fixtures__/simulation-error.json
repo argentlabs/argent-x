@@ -1,0 +1,147 @@
+{
+  "transactions": [
+    {
+      "reviewOfTransaction": {
+        "assessment": "neutral",
+        "warnings": [],
+        "reviews": [
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "ERC20_approve",
+              "properties": [
+                {
+                  "type": "amount",
+                  "label": "ERC20_approve_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  },
+                  "amount": "2020005050000000",
+                  "usd": "4.75",
+                  "editable": true
+                },
+                {
+                  "type": "address",
+                  "label": "ERC20_approve_to",
+                  "address": "0x03374d4a1b4f8dc87bd680ddbd4f1181b3ec3cf5a8ef803bc4351603b063314f",
+                  "verified": false
+                }
+              ],
+              "defaultProperties": [
+                {
+                  "type": "token_address",
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  }
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "approve",
+                  "calldata": [
+                    "1454648566693524972585253146654712267053014576236258096888965210222799040847",
+                    "2020005050000000",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "buy",
+              "properties": [],
+              "defaultProperties": [
+                {
+                  "type": "address",
+                  "label": "default_contract",
+                  "address": "0x03374d4a1b4f8dc87bd680ddbd4f1181b3ec3cf5a8ef803bc4351603b063314f",
+                  "verified": false
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "buy",
+                  "calldata": ["1", "10"]
+                }
+              ]
+            }
+          },
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "ERC20_approve",
+              "properties": [
+                {
+                  "type": "amount",
+                  "label": "ERC20_approve_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  },
+                  "amount": "0",
+                  "usd": "0.00",
+                  "editable": true
+                },
+                {
+                  "type": "address",
+                  "label": "ERC20_approve_to",
+                  "address": "0x03374d4a1b4f8dc87bd680ddbd4f1181b3ec3cf5a8ef803bc4351603b063314f",
+                  "verified": false
+                }
+              ],
+              "defaultProperties": [
+                {
+                  "type": "token_address",
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  }
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "approve",
+                  "calldata": [
+                    "1454648566693524972585253146654712267053014576236258096888965210222799040847",
+                    "0",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "simulationError": { "label": "transaction_unknown_error", "code": -1 }
+    }
+  ]
+}

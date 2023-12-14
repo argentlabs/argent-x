@@ -13,7 +13,7 @@ import {
   UpdateMultisigThresholdPayload,
 } from "../../../../shared/multisig/multisig.model"
 import { Wallet } from "../../../wallet"
-import { CallData } from "starknet"
+import { CallData, DeployAccountContractPayload } from "starknet"
 import { IBackgroundActionService } from "../action/interface"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import {
@@ -22,7 +22,14 @@ import {
   PendingMultisig,
 } from "../../../../shared/multisig/types"
 import { MultisigAccount } from "../../../../shared/multisig/account"
-import { decodeBase58, decodeBase58Array } from "@argent/shared"
+import {
+  addOwnersCalldataSchema,
+  changeThresholdCalldataSchema,
+  decodeBase58,
+  decodeBase58Array,
+  removeOwnersCalldataSchema,
+  replaceSignerCalldataSchema,
+} from "@argent/shared"
 import { AccountError } from "../../../../shared/errors/account"
 import { getMultisigPendingTransaction } from "../../../../shared/multisig/pendingTransactionsStore"
 import { MultisigError } from "../../../../shared/errors/multisig"
@@ -74,23 +81,33 @@ export default class BackgroundMultisigService implements IMultisigService {
 
     const signersPayload = {
       entrypoint: MultisigEntryPointType.ADD_SIGNERS,
-      calldata: CallData.compile({
-        new_threshold: newThreshold.toString(),
-        signers_to_add: decodeBase58Array(signersToAdd),
-      }),
+      calldata: CallData.compile(
+        addOwnersCalldataSchema.parse({
+          new_threshold: newThreshold.toString(),
+          signers_to_add: decodeBase58Array(signersToAdd),
+        }),
+      ),
       contractAddress: address,
     }
-
-    await this.actionService.add({
-      type: "TRANSACTION",
-      payload: {
-        transactions: signersPayload,
-        meta: {
-          title: "Add signers",
-          type: MultisigTransactionType.MULTISIG_ADD_SIGNERS,
+    const title = `Add owner${
+      signersToAdd.length > 1 ? "s" : ""
+    } and set confirmations to ${newThreshold}`
+    await this.actionService.add(
+      {
+        type: "TRANSACTION",
+        payload: {
+          transactions: signersPayload,
+          meta: {
+            title: "Add signers",
+            type: MultisigTransactionType.MULTISIG_ADD_SIGNERS,
+          },
         },
       },
-    })
+      {
+        title,
+        icon: "MultisigJoinIcon",
+      },
+    )
   }
 
   async removeOwner(payload: RemoveOwnerMultisigPayload): Promise<void> {
@@ -100,23 +117,33 @@ export default class BackgroundMultisigService implements IMultisigService {
 
     const signersPayload = {
       entrypoint: MultisigEntryPointType.REMOVE_SIGNERS,
-      calldata: CallData.compile({
-        new_threshold: newThreshold.toString(),
-        signers_to_remove: signersToRemove,
-      }),
+      calldata: CallData.compile(
+        removeOwnersCalldataSchema.parse({
+          new_threshold: newThreshold.toString(),
+          signers_to_remove: signersToRemove,
+        }),
+      ),
+
       contractAddress: address,
     }
-
-    await this.actionService.add({
-      type: "TRANSACTION",
-      payload: {
-        transactions: signersPayload,
-        meta: {
-          title: "Remove signers",
-          type: MultisigTransactionType.MULTISIG_REMOVE_SIGNERS,
+    const title = `Remove owner${
+      signersToRemove.length > 1 ? "s" : ""
+    } and set confirmations to ${newThreshold}}`
+    await this.actionService.add(
+      {
+        type: "TRANSACTION",
+        payload: {
+          transactions: signersPayload,
+          meta: {
+            type: MultisigTransactionType.MULTISIG_REMOVE_SIGNERS,
+          },
         },
       },
-    })
+      {
+        title,
+        icon: "MultisigRemoveIcon",
+      },
+    )
   }
 
   async replaceOwner(payload: ReplaceOwnerMultisigPayload): Promise<void> {
@@ -127,23 +154,30 @@ export default class BackgroundMultisigService implements IMultisigService {
 
     const signersPayload = {
       entrypoint: MultisigEntryPointType.REPLACE_SIGNER,
-      calldata: CallData.compile({
-        signer_to_remove: decodedSignerToRemove,
-        signer_to_add: decodedSignerToAdd,
-      }),
+      calldata: CallData.compile(
+        replaceSignerCalldataSchema.parse({
+          signer_to_remove: decodedSignerToRemove,
+          signer_to_add: decodedSignerToAdd,
+        }),
+      ),
       contractAddress: address,
     }
 
-    await this.actionService.add({
-      type: "TRANSACTION",
-      payload: {
-        transactions: signersPayload,
-        meta: {
-          title: "Replace signer",
-          type: MultisigTransactionType.MULTISIG_REPLACE_SIGNER,
+    await this.actionService.add(
+      {
+        type: "TRANSACTION",
+        payload: {
+          transactions: signersPayload,
+          meta: {
+            type: MultisigTransactionType.MULTISIG_REPLACE_SIGNER,
+          },
         },
       },
-    })
+      {
+        title: "Replace owner",
+        icon: "MultisigReplaceIcon",
+      },
+    )
   }
 
   async addPendingAccount(networkId: string): Promise<PendingMultisig> {
@@ -181,10 +215,34 @@ export default class BackgroundMultisigService implements IMultisigService {
   }
 
   async deploy(account: BaseWalletAccount): Promise<void> {
-    await this.actionService.add({
-      type: "DEPLOY_MULTISIG_ACTION",
-      payload: account,
-    })
+    let displayCalldata: string[] = []
+    const walletAccount = await this.wallet.getAccount(account)
+    if (!walletAccount) {
+      throw new AccountError({ code: "MULTISIG_NOT_FOUND" })
+    }
+    try {
+      /** determine the calldata to display to the end user */
+      const deployAccountPayload =
+        await this.wallet.getMultisigDeploymentPayload(walletAccount)
+      const { constructorCalldata } = deployAccountPayload
+      displayCalldata = CallData.toCalldata(constructorCalldata)
+    } catch {
+      /** ignore non-critical error */
+    }
+
+    await this.actionService.add(
+      {
+        type: "DEPLOY_MULTISIG",
+        payload: {
+          account,
+          displayCalldata,
+        },
+      },
+      {
+        title: "Activate multisig",
+        icon: "MultisigIcon",
+      },
+    )
   }
 
   async updateThreshold(
@@ -194,19 +252,24 @@ export default class BackgroundMultisigService implements IMultisigService {
 
     const thresholdPayload = {
       entrypoint: MultisigEntryPointType.CHANGE_THRESHOLD,
-      calldata: [newThreshold.toString()],
+      calldata: changeThresholdCalldataSchema.parse([newThreshold.toString()]),
       contractAddress: address,
     }
 
-    await this.actionService.add({
-      type: "TRANSACTION",
-      payload: {
-        transactions: thresholdPayload,
-        meta: {
-          title: "Change threshold",
-          type: MultisigTransactionType.MULTISIG_CHANGE_THRESHOLD,
+    await this.actionService.add(
+      {
+        type: "TRANSACTION",
+        payload: {
+          transactions: thresholdPayload,
+          meta: {
+            type: MultisigTransactionType.MULTISIG_CHANGE_THRESHOLD,
+          },
         },
       },
-    })
+      {
+        title: `Set confirmations to ${newThreshold}`,
+        icon: "ApproveIcon",
+      },
+    )
   }
 }

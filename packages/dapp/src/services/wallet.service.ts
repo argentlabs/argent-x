@@ -1,17 +1,28 @@
-import { StarknetWindowObject, connect } from "@argent/get-starknet"
-import type { AddStarknetChainParameters } from "get-starknet-core"
+import { createOffchainSession } from "@argent/x-sessions"
+import type {
+  AddStarknetChainParameters,
+  StarknetWindowObject,
+} from "get-starknet-core"
 import {
   AccountInterface,
   DeclareContractPayload,
   InvocationsDetails,
   ProviderInterface,
   UniversalDeployerContractPayload,
+  num,
   shortString,
 } from "starknet"
+import { connect, disconnect } from "starknetkit"
+import { ETHTokenAddress } from "./token.service"
+import getConfig from "next/config"
+import { Hex, bigDecimal } from "@argent/shared"
 
 export type StarknetWindowObjectV5 = StarknetWindowObject & {
   account: AccountInterface
 }
+
+const { publicRuntimeConfig } = getConfig()
+const { webWalletUrl, argentMobileChainId } = publicRuntimeConfig
 
 export let windowStarknet: StarknetWindowObjectV5 | null = null
 
@@ -20,6 +31,11 @@ export const starknetVersion = "v5"
 export const silentConnectWallet = async () => {
   const _windowStarknet = await connect({
     modalMode: "neverAsk",
+    webWalletUrl,
+    argentMobileOptions: {
+      dappName: "Example dapp",
+      chainId: argentMobileChainId,
+    },
   })
   // comment this when using webwallet -- enable is already done by @argent/get-starknet and webwallet is currently using only v4
   // to remove when @argent/get-starknet will support both v4 and v5
@@ -28,11 +44,13 @@ export const silentConnectWallet = async () => {
   return windowStarknet ?? undefined
 }
 
-export const connectWallet = async (enableWebWallet: boolean) => {
+export const connectWallet = async () => {
   const _windowStarknet = await connect({
-    exclude: enableWebWallet ? [] : ["argentWebWallet"],
-    modalWalletAppearance: "all",
-    enableArgentMobile: true,
+    webWalletUrl, // TODO: remove hardcoding
+    argentMobileOptions: {
+      dappName: "Example dapp",
+      chainId: argentMobileChainId,
+    },
   })
 
   // comment this when using webwallet -- enable is already done by @argent/get-starknet and webwallet is currently using only v4
@@ -40,6 +58,13 @@ export const connectWallet = async (enableWebWallet: boolean) => {
   //await _windowStarknet?.enable({ starknetVersion })
   windowStarknet = _windowStarknet as StarknetWindowObjectV5 | null
   return windowStarknet ?? undefined
+}
+
+export const disconnectWallet = async () => {
+  if (!windowStarknet?.isConnected) {
+    return
+  }
+  await disconnect()
 }
 
 export const walletAddress = async (): Promise<string | undefined> => {
@@ -104,6 +129,35 @@ export const signMessage = async (message: string, skipDeploy = false) => {
     },
     // @ts-ignore
     { skipDeploy },
+  )
+}
+
+export const createSessionKeys = async (
+  sessionKey: string,
+  approvedFees: string,
+  account: AccountInterface,
+) => {
+  if (!account) throw Error("starknet wallet not connected")
+
+  return await createOffchainSession(
+    {
+      sessionKey,
+      expirationTime: Math.floor((Date.now() + 1000 * 60 * 60 * 24) / 1000), // 1 day in seconds
+      allowedMethods: [
+        {
+          contractAddress: ETHTokenAddress,
+          method: "transfer",
+        },
+      ],
+    },
+    account,
+    {
+      tokenAddress: ETHTokenAddress, // Only used for test purposes in this dapp
+      maximumAmount: {
+        low: num.toHex(bigDecimal.parseUnits(approvedFees, 18).value) as Hex,
+        high: "0x0",
+      },
+    },
   )
 }
 

@@ -1,3 +1,5 @@
+import { CairoVersion } from "starknet"
+
 export type ParameterField =
   | {
       name: string
@@ -17,4 +19,5 @@ export interface FieldValues {
   parameters: ParameterField[]
   salt: string
   unique: boolean
+  cairoVersion: CairoVersion
 }

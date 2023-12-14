@@ -224,16 +224,20 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
       const { fromAddress, toAddress } = transactionTransformed
       return (
         <>
-          <AccountAddressField
-            title="From"
-            accountAddress={fromAddress}
-            networkId={network.id}
-          />
-          <AccountAddressField
-            title="To"
-            accountAddress={toAddress}
-            networkId={network.id}
-          />
+          {fromAddress && (
+            <AccountAddressField
+              title="From"
+              accountAddress={fromAddress}
+              networkId={network.id}
+            />
+          )}
+          {toAddress && (
+            <AccountAddressField
+              title="To"
+              accountAddress={toAddress}
+              networkId={network.id}
+            />
+          )}
         </>
       )
     }

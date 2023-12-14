@@ -1,18 +1,23 @@
-import { ButtonProps, Menu, Portal } from "@chakra-ui/react"
-import { FC, useCallback, useEffect } from "react"
+import {
+  ButtonProps,
+  Menu,
+  Portal,
+  usePrefersReducedMotion,
+} from "@chakra-ui/react"
+import { FC, Fragment, useCallback, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { NetworkStatus } from "../../../../shared/network"
 import { routes } from "../../../routes"
 import { autoSelectAccountOnNetwork } from "../../accounts/switchAccount"
-import {
-  useCurrentNetwork,
-  useCurrentNetworkWithStatus,
-} from "../hooks/useCurrentNetwork"
+import { useCurrentNetworkWithStatus } from "../hooks/useCurrentNetwork"
 import { useNeedsToShowNetworkStatusWarning } from "../hooks/useNeedsToShowNetworkStatusWarning"
 import { useNetworksWithStatuses } from "../hooks/useNetworks"
 import { NetworkSwitcherButton } from "./NetworkSwitcherButton"
-import { NetworkSwitcherList } from "./NetworkSwitcherList"
+import {
+  NetworkSwitcherList,
+  NetworkSwitcherListProps,
+} from "./NetworkSwitcherList"
 
 const valuesToShowNetwortWarning: Array<NetworkStatus> = ["degraded", "error"]
 
@@ -46,6 +51,19 @@ export const NetworkSwitcherContainer: FC<NetworkSwitcherProps> = ({
     await autoSelectAccountOnNetwork(networkId)
   }, [])
 
+  /** In testing or if user has reduced motion, explicity disable menu animation */
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const networkSwitcherListProps: Partial<NetworkSwitcherListProps> =
+    prefersReducedMotion
+      ? {
+          motionProps: {
+            variants: {},
+          },
+        }
+      : {}
+  /** Portal is flaky in e2e tests but required when animating in production. Only wrap in Portal if motion is enabled */
+  const Container = prefersReducedMotion ? Fragment : Portal
+
   return (
     <Menu>
       {currentNetworkStatus && (
@@ -56,13 +74,14 @@ export const NetworkSwitcherContainer: FC<NetworkSwitcherProps> = ({
           {...rest}
         />
       )}
-      <Portal>
+      <Container>
         <NetworkSwitcherList
           currentNetwork={currentNetwork}
           allNetworks={allNetworksWithStatuses}
           onChangeNetwork={onChangeNetwork}
+          {...networkSwitcherListProps}
         />
-      </Portal>
+      </Container>
     </Menu>
   )
 }

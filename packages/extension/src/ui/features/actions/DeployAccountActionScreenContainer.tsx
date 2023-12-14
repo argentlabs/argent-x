@@ -14,7 +14,7 @@ export const DeployAccountActionScreenContainer: FC = () => {
     selectedAccount,
     rejectAllActions,
   } = useActionScreen()
-  if (action?.type !== "DEPLOY_ACCOUNT_ACTION") {
+  if (action?.type !== "DEPLOY_ACCOUNT") {
     throw new Error(
       "DeployAccountActionScreenContainer used with incompatible action.type",
     )
@@ -36,6 +36,9 @@ export const DeployAccountActionScreenContainer: FC = () => {
     <WithArgentShieldVerified>
       <ApproveDeployAccountScreen
         actionHash={action.meta.hash}
+        title={action.meta?.title}
+        iconKey={action.meta?.icon}
+        displayCalldata={action.payload.displayCalldata}
         onSubmit={() => void onSubmit()}
         onReject={() => void rejectAllActions()}
         selectedAccount={selectedAccount}

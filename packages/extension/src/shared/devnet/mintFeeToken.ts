@@ -1,7 +1,7 @@
 import urlJoin from "url-join"
 
 import { networkService as argentNetworkService } from "../network/service"
-import { getNetworkUrl } from "../network/utils"
+
 import { BaseWalletAccount } from "../wallet.model"
 import { INetworkService } from "../network/service/interface"
 
@@ -13,7 +13,7 @@ export const tryToMintFeeToken = async (
     const network = await (networkService || argentNetworkService).getById(
       account.networkId,
     )
-    const networkUrl = getNetworkUrl(network)
+    const networkUrl = network.rpcUrl
     await fetch(urlJoin(networkUrl, "mint"), {
       method: "POST",
       headers: {

@@ -72,7 +72,7 @@ export const DeclareOrDeployContractSuccessScreen: FC<
                 size="3xs"
                 color={"white50"}
                 bg={"transparent"}
-                _hover={{ bg: "neutrals.700", color: "text" }}
+                _hover={{ bg: "neutrals.700", color: "text.primary" }}
               >
                 <CopyIcon /> Copy
               </Button>

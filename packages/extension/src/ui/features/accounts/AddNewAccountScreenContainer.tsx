@@ -2,7 +2,6 @@ import { icons, useNavigateBack } from "@argent/ui"
 import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { accountService } from "../../../shared/account/service"
 import { useAction } from "../../hooks/useAction"
 import { routes, useReturnTo } from "../../routes"
 import { assertNever } from "../../services/assertNever"
@@ -12,6 +11,7 @@ import {
   AccountTypeId,
   AddNewAccountScreen,
 } from "./AddNewAccountScreen"
+import { clientAccountService } from "../../services/account"
 
 const { WalletIcon, MultisigIcon } = icons
 
@@ -44,7 +44,7 @@ const accountTypes: AccountType[] = [
 export const AddNewAccountScreenContainer: FC = () => {
   const navigate = useNavigate()
   const { action: addAccount, loading: isAdding } = useAction(
-    accountService.create.bind(accountService),
+    clientAccountService.create.bind(clientAccountService),
   )
   // TODO: should be view after networks was refactored
   const { id: networkId } = useCurrentNetwork()

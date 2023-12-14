@@ -107,6 +107,7 @@ describe("atomWithSubscription", () => {
 
     screen.unmount()
   })
+
   it("can keep value on remount", async () => {
     const atom = atomWithSubscription(
       () => testStore.get(),
@@ -140,6 +141,55 @@ describe("atomWithSubscription", () => {
     )
 
     await waitFor(() => expect(screen.getAllByText("updated")).toHaveLength(2))
+
+    act(() => {
+      testStore.set("updated2")
+    })
+
+    await waitFor(() => expect(screen.getAllByText("updated2")).toHaveLength(2))
+
+    screen.unmount()
+  })
+
+  it("can render update value when unmounted on remount", async () => {
+    const atom = atomWithSubscription(
+      () => testStore.get(),
+      (next) => testStore.subscribe(next),
+    )
+
+    let screen = render(
+      <>
+        <RenderAtom atom={atom} />
+        <RenderAtom atom={atom} />
+      </>,
+    )
+    await waitFor(() => expect(screen.getAllByText("test")).toHaveLength(2))
+
+    act(() => {
+      testStore.set("updated")
+    })
+    await waitFor(() => expect(screen.getAllByText("updated")).toHaveLength(2))
+
+    screen.unmount()
+
+    await waitFor(() =>
+      expect(screen.container).toMatchInlineSnapshot("<div />"),
+    )
+
+    act(() => {
+      testStore.set("updated-unmounted")
+    })
+
+    screen = render(
+      <>
+        <RenderAtom atom={atom} />
+        <RenderAtom atom={atom} />
+      </>,
+    )
+
+    await waitFor(() =>
+      expect(screen.getAllByText("updated-unmounted")).toHaveLength(2),
+    )
 
     act(() => {
       testStore.set("updated2")

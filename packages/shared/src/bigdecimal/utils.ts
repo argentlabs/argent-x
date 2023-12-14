@@ -1,7 +1,7 @@
 import { parseUnits } from "./parseUnits"
 import { formatUnits } from "./formatUnits"
 import { BigDecimal } from "./types"
-import { abs } from "."
+import { abs } from "./lib"
 
 /**
  * Formats a BigInt representing wei into a string representing ether,

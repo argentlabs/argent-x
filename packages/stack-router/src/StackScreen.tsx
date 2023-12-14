@@ -37,8 +37,8 @@ export const StackScreen: FC<StackScreenProps> = ({
    *
    * Note that framer `<MotionConfig reducedMotion="..."` does not affect the `useReducedMotion` hook
    */
-  // const prefersReducedMotion = useReducedMotion()
-  const prefersReducedMotion = true
+  // const prefersReducedMotion = true
+  const prefersReducedMotion = useReducedMotion()
 
   const { variant, presentation, zIndex } = presentationByPath[path] || {}
   const { enter, active, exit } = variant || {}

@@ -107,9 +107,16 @@ export default class Account extends Navigation {
     return this.page.locator('[data-testid="account-tokens"] h2')
   }
 
-  invalidStarkIdError(id: string) {
+  /** FIME: revert to this function once testnet starknet id is returing a 'not found' state */
+  _invalidStarkIdError(id: string) {
     return this.page.locator(
       `form label:has-text('${id}${lang.account.invalidStarkIdError}')`,
+    )
+  }
+
+  invalidStarkIdError(_id: string) {
+    return this.page.locator(
+      `form label:has-text('Could not get address from stark name')`,
     )
   }
 
@@ -213,22 +220,26 @@ export default class Account extends Navigation {
 
     return parseFloat(fee.split(" ")[0])
   }
-  async transferAmount() {
-    /*
-      https://argent.atlassian.net/browse/BLO-1713
-      const sendTitleText = await this.page
-        .locator('[data-testid="send-title"]')
-        .innerText()
-      const sendTitleAmount = sendTitleText.split(" ")[1]
-      const balanceChange = await this.page
-      .locator("[data-value]")
-      .first()
-      .getAttribute("data-value")
-      expect(balanceChange).toBe(sendTitleAmount)
-  */
-    const amount = await this.page
-      .locator('[data-testid="send-title"]')
-      .getAttribute("data-value")
+  async txValidations(txAmount: string) {
+    const trxAmountHeader = await this.page
+      .locator(`//*[starts-with(text(),'Send ')]`)
+      .textContent()
+      .then((v) => v?.split(" ")[1])
+
+    const amountLocator = this.page.locator(
+      `//div//label[text()='Send']/following-sibling::div[1]//*[@data-testid]`,
+    )
+    const sendAmount = await amountLocator
+      .textContent()
+      .then((v) => v?.split(" ")[0])
+
+    expect(sendAmount!.substring(1)).toBe(`${trxAmountHeader}`)
+    if (txAmount != "MAX") {
+      expect(txAmount.toString()).toBe(trxAmountHeader)
+    }
+    const amount = await amountLocator
+      .getAttribute("data-testid")
+      .then((value) => parseInt(value!) / Math.pow(10, 18))
     return amount
   }
 
@@ -280,11 +291,11 @@ export default class Account extends Navigation {
     }
 
     await this.reviewSend.click()
-    const trxAmount = await this.transferAmount()
+    const trxAmount = await this.txValidations(amount.toString())
     if (submit) {
-      await this.approve.click()
+      await this.confirm.click()
     }
-    return Math.abs(parseFloat(trxAmount!))
+    return trxAmount
   }
 
   async ensureTokenBalance({
@@ -405,6 +416,24 @@ export default class Account extends Navigation {
       `navigator.clipboard.readText();`,
     )
     expect(seed).toBe(seedPhraseCopied)
-    return seedPhraseCopied
+    return String(seedPhraseCopied)
+  }
+
+  // 2FA
+  get email() {
+    return this.page.locator('input[name="email"]')
+  }
+
+  get pinInput() {
+    return this.page.locator('[aria-label="Please enter your pin code"]')
+  }
+
+  async fillPin(pin: string) {
+    await this.pinInput.first().click()
+    await this.pinInput.first().fill(pin)
+  }
+
+  get deployNeededWarning() {
+    return this.page.locator(`p:has-text("${lang.account.deployFirst}")`)
   }
 }

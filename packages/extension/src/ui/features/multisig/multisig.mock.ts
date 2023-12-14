@@ -13,7 +13,7 @@ const defaultNetwork: Network = {
   id: "localhost",
   name: "localhostNetwork",
   chainId: "1",
-  sequencerUrl: "sequencerUrl",
+  rpcUrl: "rpcUrl",
 }
 const defaultSigner: WalletAccountSigner = {
   type: "local_secret",

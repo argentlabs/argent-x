@@ -1,8 +1,8 @@
 import { constants } from "starknet"
+import { isEqualAddress } from "@argent/shared"
 
-import { isEqualAddress } from "../../ui/services/addresses"
-import { ArgentAccountType } from "../wallet.model"
-import { DefaultNetworkId, Network } from "./type"
+import type { ArgentAccountType } from "../wallet.model"
+import type { DefaultNetworkId, Network, PublicRpcNode } from "./type"
 import { PUBLIC_RPC_NODES } from "./constants"
 
 // LEGACY ⬇️
@@ -27,21 +27,6 @@ export function mapImplementationToArgentAccountType(
   return "standard"
 }
 
-export function getChainIdFromNetworkId(
-  networkId: string,
-): constants.StarknetChainId {
-  switch (networkId) {
-    case "mainnet-alpha":
-      return constants.StarknetChainId.SN_MAIN
-
-    case "goerli-alpha":
-      return constants.StarknetChainId.SN_GOERLI
-
-    default:
-      throw new Error(`Unknown networkId: ${networkId}`)
-  }
-}
-
 export function getNetworkIdFromChainId(
   encodedChainId: string,
 ): "mainnet-alpha" | "goerli-alpha" {
@@ -57,7 +42,7 @@ export function getNetworkIdFromChainId(
   }
 }
 
-export function getDefaultNetwork(defaultNetworks: Network[]): Network {
+export function getDefaultNetworkId() {
   const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
   let defaultNetworkId: DefaultNetworkId
 
@@ -80,6 +65,12 @@ export function getDefaultNetwork(defaultNetworks: Network[]): Network {
       throw new Error(`Unknown ARGENTX_ENVIRONMENT: ${argentXEnv}`)
   }
 
+  return defaultNetworkId
+}
+
+export function getDefaultNetwork(defaultNetworks: Network[]): Network {
+  const defaultNetworkId = getDefaultNetworkId()
+
   const defaultNetwork = defaultNetworks.find(
     (dn) => dn.id === defaultNetworkId,
   )
@@ -89,22 +80,6 @@ export function getDefaultNetwork(defaultNetworks: Network[]): Network {
   }
 
   return defaultNetwork
-}
-
-export const getNetworkUrl = (network: Network) => {
-  if (network.rpcUrl) {
-    return network.rpcUrl
-  } else if (network.sequencerUrl) {
-    return network.sequencerUrl
-  } else if (
-    "baseUrl" in network &&
-    network.baseUrl &&
-    typeof network.baseUrl === "string"
-  ) {
-    return network.baseUrl
-  } else {
-    throw new Error("No network URL found")
-  }
 }
 
 export function isArgentNetwork(network: Network) {
@@ -121,4 +96,19 @@ export function getRandomPublicRPCNode(network: Network) {
   }
 
   return randomNode
+}
+
+export function getPublicRPCNodeUrls(network: Network) {
+  if (!isArgentNetwork) {
+    throw new Error(`Not an Argent network: ${network.id}`)
+  }
+  const key: keyof PublicRpcNode =
+    network.id === "mainnet-alpha" ? "mainnet" : "testnet"
+  const nodeUrls = PUBLIC_RPC_NODES.map((node) => node[key])
+
+  if (!nodeUrls) {
+    throw new Error(`No nodes found for network: ${network.id}`)
+  }
+
+  return nodeUrls
 }

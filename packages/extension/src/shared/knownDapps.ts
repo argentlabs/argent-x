@@ -14,6 +14,8 @@ export interface KnownDapp {
   contracts: {
     [network: string]: string[]
   }
+  /** dapp url on dappland */
+  dappland?: string
 }
 
 const knownDapps: KnownDapp[] = untypedKnownDapps

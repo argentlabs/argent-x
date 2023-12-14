@@ -6,6 +6,7 @@ import {
 } from "../../../shared/wallet.model"
 import { multisigService } from "../../services/multisig"
 import { Account, AccountConstructorProps } from "../accounts/Account"
+import { ZERO_MULTISIG } from "./constants"
 
 export interface MultisigConstructorProps extends AccountConstructorProps {
   signers: string[]
@@ -13,14 +14,6 @@ export interface MultisigConstructorProps extends AccountConstructorProps {
   creator?: string // Creator is the public key of the account that created the multisig account
   publicKey: string
   updatedAt?: number
-}
-
-export const ZERO_MULTISIG: MultisigData = {
-  signers: [],
-  threshold: 0,
-  creator: undefined,
-  publicKey: "0x0",
-  updatedAt: Date.now(),
 }
 
 export class Multisig extends Account {

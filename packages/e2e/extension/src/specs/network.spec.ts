@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 
 import test from "../test"
+import config from "../config"
 
 test.describe("Network", () => {
   test("Available networks", async ({ extension }) => {
@@ -8,9 +9,9 @@ test.describe("Network", () => {
     await extension.open()
     await expect(extension.network.networkSelector).toBeVisible()
     await extension.network.ensureAvailableNetworks([
-      "Mainnet\nhttps://cloud.argent-api.com/v1/starknet/mainnet/rpc/v0.4",
-      "Testnet\nhttps://cloud.argent-api.com/v1/starknet/goerli/rpc/v0.4",
-      "Localhost 5050\nhttp://localhost:5050",
+      "Mainnet",
+      `Testnet`,
+      "Localhost 5050\nhttp://localhost:5050/rpc",
     ])
   })
 
@@ -27,10 +28,7 @@ test.describe("Network", () => {
     await extension.developerSettings.addNetwork.click()
     await extension.developerSettings.networkName.fill("My Network")
     await extension.developerSettings.chainId.fill("SN_GOERLI")
-    await extension.developerSettings.sequencerUrl.fill(
-      "https://alpha4.starknet.io",
-    )
-
+    await extension.developerSettings.rpcUrl.fill(config.testnetRpcUrl!)
     await extension.navigation.create.click()
     await expect(
       extension.developerSettings.networkByName("My Network"),
@@ -83,9 +81,7 @@ test.describe("Network", () => {
     await extension.developerSettings.addNetwork.click()
     await extension.developerSettings.networkName.fill("My Network")
     await extension.developerSettings.chainId.fill("SN_GOERLI")
-    await extension.developerSettings.sequencerUrl.fill(
-      "https://alpha4.starknet.io",
-    )
+    await extension.developerSettings.rpcUrl.fill(config.testnetRpcUrl!)
 
     await extension.navigation.create.click()
     await expect(

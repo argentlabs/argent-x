@@ -1,4 +1,4 @@
-import { debounce, noop, union } from "lodash-es"
+import { debounce } from "lodash-es"
 
 import { KeyValueStorage } from "../keyvalue"
 import { IObjectStore, StorageChange } from "./interface"
@@ -41,23 +41,13 @@ export function adaptKeyValue<T extends Record<string, any>>(
     subscribe(
       callback: (value: StorageChange<Partial<T>>) => void,
     ): () => void {
+      /** coalesce changes in same event loop */
       const debounceTickCallback = debounce(
         () => this.get().then(callback),
         0,
         { leading: false },
       )
-      let unsub: () => void = noop
-      void storage.getStoredKeys().then((keys) => {
-        const defaultsKeys = Object.keys(storage.defaults)
-        const allKeys = union(keys, defaultsKeys)
-        const unsubs = allKeys.map((key) =>
-          storage.subscribe(key, debounceTickCallback),
-        )
-        unsub = () => {
-          unsubs.forEach((unsub) => unsub())
-        }
-      })
-
+      const unsub = storage.subscribe(debounceTickCallback)
       return unsub
     },
   }

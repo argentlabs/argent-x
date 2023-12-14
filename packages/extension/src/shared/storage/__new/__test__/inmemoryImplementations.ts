@@ -1,4 +1,4 @@
-import { isArray, isEqual, isFunction } from "lodash-es"
+import { isArray, isEqual, isFunction, isString } from "lodash-es"
 
 import {
   AllowArray,
@@ -12,6 +12,7 @@ import {
   StorageChange,
   UpsertResult,
 } from "../interface"
+import { IKeyValueStorage } from "../.."
 
 export class InMemoryObjectStore<T> implements IObjectStore<T> {
   public namespace: string
@@ -143,6 +144,119 @@ export class InMemoryRepository<T> implements IRepository<T> {
     this._subscribers.add(callback)
     return () => {
       this._subscribers.delete(callback)
+    }
+  }
+}
+
+export class InMemoryKeyValueStore<T extends Record<string, any>>
+  implements IKeyValueStorage<T>
+{
+  private _data: T
+  private _subscribers: Map<
+    keyof T,
+    Set<(value: any, changeSet: StorageChange) => AllowPromise<void>>
+  > = new Map()
+  private _subscribersAll: Set<
+    (changeSet: StorageChange) => AllowPromise<void>
+  > = new Set()
+  public namespace: string
+  public areaName: "local" | "sync"
+  public defaults: T
+
+  constructor(options: IObjectStoreOptions<T>) {
+    this.namespace = options.namespace
+    this.areaName = "local"
+    this._data = options.defaults ? { ...options.defaults } : ({} as T)
+    this.defaults = options.defaults ?? ({} as T)
+
+    if (options.deserialize || options.serialize) {
+      throw new Error("Serialization is not supported in InMemoryObjectStore")
+    }
+  }
+
+  async get<K extends keyof T>(key: K): Promise<T[K]> {
+    return this._data[key]
+  }
+
+  async set<K extends keyof T>(key: K, value: T[K]): Promise<void> {
+    const oldValue = this._data[key]
+    this._data[key] = value
+
+    const subscribers = this._subscribers.get(key)
+    if (subscribers) {
+      const change: StorageChange = { oldValue, newValue: value }
+      subscribers.forEach((subscriber) => {
+        void subscriber(value, change)
+      })
+    }
+    this._subscribersAll.forEach((subscriberAll) => {
+      const change: StorageChange = {
+        oldValue: this._data,
+        newValue: { ...this._data, [key]: value },
+      }
+      void subscriberAll(change)
+    })
+  }
+
+  async delete<K extends keyof T>(key: K): Promise<void> {
+    const oldValue = this._data[key]
+    delete this._data[key]
+
+    const subscribers = this._subscribers.get(key)
+    if (subscribers) {
+      const change: StorageChange = { oldValue, newValue: undefined }
+      subscribers.forEach((subscriber) => {
+        void subscriber(oldValue, change)
+      })
+    }
+  }
+
+  public subscribe<K extends keyof T>(
+    ...args:
+      | [
+          key: K,
+          callback: (
+            value: T[K],
+            changeSet: StorageChange,
+          ) => AllowPromise<void>,
+        ]
+      | [callback: (changeSet: StorageChange<T>) => AllowPromise<void>]
+  ) {
+    if (args.length === 2 && isString(args[0]) && isFunction(args[1])) {
+      return this.subscribeKey(args[0], args[1])
+    }
+    if (args.length === 1 && isFunction(args[0])) {
+      return this.subscribeAll(args[0])
+    }
+    throw new Error("Invalid subscribe arguments")
+  }
+
+  private subscribeKey<K extends keyof T>(
+    key: K,
+    callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
+  ): () => void {
+    let subscribers = this._subscribers.get(key as any)
+    if (!subscribers) {
+      subscribers = new Set()
+      this._subscribers.set(key as any, subscribers)
+    }
+
+    subscribers.add(callback)
+
+    return () => {
+      subscribers?.delete(callback)
+      if (subscribers && subscribers.size === 0) {
+        this._subscribers.delete(key)
+      }
+    }
+  }
+
+  private subscribeAll(
+    callback: (changeSet: StorageChange<any>) => AllowPromise<void>,
+  ) {
+    this._subscribersAll.add(callback)
+    return () => {
+      this._subscribersAll.delete(callback)
     }
   }
 }

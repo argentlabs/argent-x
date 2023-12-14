@@ -90,12 +90,13 @@ import { ArgentAccountLoggedInScreenContainer } from "./features/argentAccount/A
 import { ArgentAccountEmailNotificationsScreenContainer } from "./features/argentAccount/ArgentAccountEmailNotificationsScreenContainer"
 import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
 import { SuspenseScreen } from "./components/SuspenseScreen"
-import { BetaFeaturesSettings } from "./features/settings/BetaFeatureSettings"
+// import { BetaFeaturesSettings } from "./features/settings/BetaFeatureSettings"
 import { ChangeAccountImplementationScreen } from "./features/accountEdit/ChangeAccountImplementationScreen"
 import { MultisigReplaceOwnerScreen } from "./features/multisig/MultisigReplaceOwnerScreen"
 import { FundingQrCodeScreenContainer } from "./features/funding/FundingQrCodeScreenContainer"
 import { AppBackgroundError } from "./AppBackgroundError"
 import { isRecoveringView } from "./views/recovery"
+import { BetaFeaturesSettings } from "./features/settings/BetaFeatureSettings"
 
 interface LocationWithState extends Location {
   state: {

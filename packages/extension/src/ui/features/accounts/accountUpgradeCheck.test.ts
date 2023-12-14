@@ -7,6 +7,7 @@ import { WalletAccount } from "../../../shared/wallet.model"
 import { Network } from "../../../shared/network"
 import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
+import { getMockNetwork } from "../../../../test/network.mock"
 
 describe("accountUpgradeCheck", () => {
   let account: WalletAccount
@@ -21,7 +22,7 @@ describe("accountUpgradeCheck", () => {
       // ...other properties if needed
     })
 
-    network = {
+    network = getMockNetwork({
       id: "localhost",
       name: "localhostNetwork",
       chainId: "SN_GOERLI",
@@ -31,7 +32,7 @@ describe("accountUpgradeCheck", () => {
         standardCairo0: STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
         // ... other properties if needed
       },
-    }
+    })
   })
 
   describe("checkIfUpgradeAvailable", () => {

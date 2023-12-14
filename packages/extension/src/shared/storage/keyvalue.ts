@@ -9,6 +9,7 @@ import {
   StorageArea,
   StorageChange,
 } from "./types"
+import { isFunction, isString } from "lodash-es"
 
 export interface IKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
@@ -16,9 +17,14 @@ export interface IKeyValueStorage<
   get<K extends keyof T>(key: K): Promise<T[K]>
   set<K extends keyof T>(key: K, value: T[K]): Promise<void>
   delete<K extends keyof T>(key: K): Promise<void>
+  /** subscribe to changes for a single key */
   subscribe<K extends keyof T>(
     key: K,
     callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
+  ): () => void
+  /** subscribe to all changes */
+  subscribe(
+    callback: (changeSet: StorageChange) => AllowPromise<void>,
   ): () => void
 }
 
@@ -37,10 +43,15 @@ export class KeyValueStorage<
   constructor(
     public readonly defaults: T,
     optionsOrNamespace: StorageOptionsOrNameSpace,
+    storageImplementation?: StorageArea | browser.storage.StorageArea,
   ) {
     const options = getOptionsWithDefaults(optionsOrNamespace)
     this.namespace = options.namespace
     this.areaName = options.areaName
+    if (storageImplementation) {
+      this.storageImplementation = storageImplementation
+      return
+    }
     try {
       this.storageImplementation = browser.storage[options.areaName]
       if (!this.storageImplementation) {
@@ -59,8 +70,12 @@ export class KeyValueStorage<
     }
   }
 
+  private getStorageKeyPrefix(): string {
+    return this.namespace + ":"
+  }
+
   private getStorageKey<K extends keyof T>(key: K): string {
-    return this.namespace + ":" + key.toString()
+    return this.getStorageKeyPrefix() + key.toString()
   }
 
   public async get<K extends keyof T>(key: K): Promise<T[K]> {
@@ -88,7 +103,34 @@ export class KeyValueStorage<
   public subscribe<K extends keyof T>(
     key: K,
     callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
+  ): () => void
+  public subscribe(
+    callback: (changeSet: StorageChange) => AllowPromise<void>,
+  ): () => void
+  public subscribe<K extends keyof T>(
+    ...args:
+      | [
+          key: K,
+          callback: (
+            value: T[K],
+            changeSet: StorageChange,
+          ) => AllowPromise<void>,
+        ]
+      | [callback: (changeSet: StorageChange) => AllowPromise<void>]
   ): () => void {
+    if (args.length === 2 && isString(args[0]) && isFunction(args[1])) {
+      return this.subscribeKey(args[0], args[1])
+    }
+    if (args.length === 1 && isFunction(args[0])) {
+      return this.subscribeAll(args[0])
+    }
+    throw new Error("Invalid subscribe arguments")
+  }
+
+  private subscribeKey<K extends keyof T>(
+    key: K,
+    callback: (value: T[K], changeSet: StorageChange) => AllowPromise<void>,
+  ) {
     const storageKey = this.getStorageKey(key)
 
     /** storage for manifest v2 */
@@ -120,6 +162,70 @@ export class KeyValueStorage<
           changes[storageKey].newValue ?? this.defaults[key], // if newValue is undefined, it means the value was deleted from storage, so we use the default value
           changes[storageKey],
         )
+      }
+    }
+
+    browser.storage.onChanged.addListener(handler)
+
+    return () => browser.storage.onChanged.removeListener(handler)
+  }
+
+  /** convert all changes into one payload for the single storage key */
+  private deriveChanges(
+    changes: Record<string, StorageChange>,
+    storageKeyPrefix = this.getStorageKeyPrefix(),
+  ) {
+    let hasChanges = false
+    const derivedChanges: StorageChange = {
+      newValue: {},
+      oldValue: {},
+    }
+    for (const [key, value] of Object.entries(changes)) {
+      if (!key.startsWith(storageKeyPrefix)) {
+        continue
+      }
+      const storageKey = key.substring(storageKeyPrefix.length)
+      derivedChanges.newValue[storageKey] = value.newValue ?? this.defaults[key] // if newValue is undefined, it means the value was deleted from storage, so we use the default value
+      if (value.oldValue !== undefined) {
+        derivedChanges.oldValue[storageKey] = value.oldValue
+      }
+      hasChanges = true
+    }
+    if (hasChanges) {
+      return derivedChanges
+    }
+  }
+
+  private subscribeAll(
+    callback: (changeSet: StorageChange) => AllowPromise<void>,
+  ) {
+    /** storage for manifest v2 */
+    if (isMockStorage(this.storageImplementation)) {
+      const handler = (changes: Record<string, StorageChange>) => {
+        const derivedChanges = this.deriveChanges(changes)
+        if (derivedChanges) {
+          void callback(derivedChanges)
+        }
+      }
+
+      this.storageImplementation.onChanged.addListener(handler)
+
+      return () => {
+        if (isMockStorage(this.storageImplementation)) {
+          this.storageImplementation.onChanged.removeListener(handler)
+        }
+      }
+    }
+
+    const handler = (
+      changes: Record<string, StorageChange>,
+      areaName: browser.storage.AreaName,
+    ) => {
+      if (this.areaName === areaName) {
+        const derivedChanges = this.deriveChanges(changes)
+        if (derivedChanges) {
+          void callback(derivedChanges)
+        }
       }
     }
 

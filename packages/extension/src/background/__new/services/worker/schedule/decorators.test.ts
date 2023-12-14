@@ -15,7 +15,7 @@ import { getMockDebounceService } from "../../../../../shared/debounce/mock"
 describe("decorators", () => {
   describe("onStartup", () => {
     it("should call scheduleService.onStartup with the correct arguments", () => {
-      const scheduleService = createScheduleServiceMock()
+      const [, scheduleService] = createScheduleServiceMock()
       const fn = async () => {}
       onStartup(scheduleService)(fn)
       expect(scheduleService.onStartup).toHaveBeenCalledWith({
@@ -27,7 +27,7 @@ describe("decorators", () => {
 
   describe("onInstallAndUpgrade", () => {
     it("should call scheduleService.onInstallAndUpgrade with the correct arguments", () => {
-      const scheduleService = createScheduleServiceMock()
+      const [, scheduleService] = createScheduleServiceMock()
       const fn = async () => {}
       onInstallAndUpgrade(scheduleService)(fn)
       expect(scheduleService.onInstallAndUpgrade).toHaveBeenCalledWith({
@@ -39,9 +39,9 @@ describe("decorators", () => {
 
   describe("every", () => {
     it("should call scheduleService.registerImplementation and scheduleService.every with the correct arguments", async () => {
-      const scheduleService = createScheduleServiceMock()
+      const [, scheduleService] = createScheduleServiceMock()
       const fn = async () => {}
-      every(scheduleService, 1)(fn)
+      every(scheduleService, 1, "test")(fn)
       expect(scheduleService.registerImplementation).toHaveBeenCalledWith({
         id: expect.stringContaining("every@1s:"),
         callback: fn,
@@ -70,7 +70,7 @@ describe("decorators", () => {
     })
   })
 
-  describe("onOpen", async () => {
+  describe("onlyIfOpen", async () => {
     test("should call the function when the background ui service is opened", async () => {
       const [mockBackgroundUIServiceManager, mockBackgroundUIService] =
         getMockBackgroundUIService()
@@ -94,13 +94,13 @@ describe("decorators", () => {
     test("should call the function when not in debounce interval", async () => {
       const debounceService = getMockDebounceService()
       const fn = vi.fn()
-      const debouncedFn = debounce(debounceService, 1)(fn)
+      const debouncedFn = debounce(debounceService, 1, "test")(fn)
       expect(fn).toHaveBeenCalledTimes(0)
       expect(debounceService.debounce).toHaveBeenCalledTimes(0)
       await debouncedFn()
       expect(debounceService.debounce).toHaveBeenCalledWith({
         id: expect.stringContaining("debounce@1s:"),
-        debounce: 1,
+        debounce: 1, // usually seconds, but mock implementation makes this ms
         callback: fn,
       })
     })
@@ -110,15 +110,29 @@ describe("decorators", () => {
     test("should call the function when the background ui service is opened", async () => {
       const [mockBackgroundUIServiceManager, mockBackgroundUIService] =
         getMockBackgroundUIService()
-      const scheduleService = createScheduleServiceMock()
+      const [scheduleServiceManager, scheduleService] =
+        createScheduleServiceMock()
       const debounceService = getMockDebounceService()
       const fn = vi.fn()
-      everyWhenOpen(
+      const fnExec = everyWhenOpen(
         mockBackgroundUIService,
         scheduleService,
         debounceService,
         1,
+        "test",
       )(fn)
+
+      // wait 1 loop
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      // test scheduleService
+      expect(scheduleService.registerImplementation).toHaveBeenCalledWith({
+        id: expect.stringContaining("every@1s:"),
+        callback: expect.any(Function),
+      })
+      expect(scheduleService.every).toBeCalledTimes(1)
+
+      // test onOpen
       expect(fn).toHaveBeenCalledTimes(0)
       await mockBackgroundUIServiceManager.setOpened(true)
       expect(fn).toHaveBeenCalledTimes(1)
@@ -126,6 +140,27 @@ describe("decorators", () => {
       expect(fn).toHaveBeenCalledTimes(1)
       await mockBackgroundUIServiceManager.setOpened(true)
       expect(fn).toHaveBeenCalledTimes(2)
+
+      // test scheduleService
+      await scheduleServiceManager.fireAll("every")
+      expect(fn).toHaveBeenCalledTimes(3)
+
+      // test debounce
+      expect(debounceService.debounce).toHaveBeenCalledTimes(3)
+      await fnExec()
+      expect(debounceService.debounce).toHaveBeenCalledTimes(4)
+      expect(debounceService.debounce).toHaveBeenCalledWith({
+        id: expect.stringContaining("debounce@1s:"),
+        debounce: 1,
+        callback: expect.any(Function),
+      })
+      expect(fn).toHaveBeenCalledTimes(4)
+
+      // does not call debounce when not open
+      await mockBackgroundUIServiceManager.setOpened(false)
+      await fnExec()
+      expect(debounceService.debounce).toHaveBeenCalledTimes(4)
+      expect(fn).toHaveBeenCalledTimes(4)
     })
   })
 })

@@ -36,5 +36,4 @@ export const safeIfPreauthorizedMessages: MessageType["type"][] = [
   "REQUEST_TOKEN",
   "REQUEST_ADD_CUSTOM_NETWORK",
   "REQUEST_SWITCH_CUSTOM_NETWORK",
-  "REQUEST_DECLARE_CONTRACT",
 ]

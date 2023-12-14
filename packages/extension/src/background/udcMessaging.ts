@@ -22,54 +22,19 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
 
       const action = await actionService.add(
         {
-          type: "DECLARE_CONTRACT_ACTION",
+          type: "DECLARE_CONTRACT",
           payload: {
             ...rest,
           },
         },
         {
           origin,
+          icon: "DocumentIcon",
         },
       )
 
       return respond({
         type: "REQUEST_DECLARE_CONTRACT_RES",
-        data: {
-          actionHash: action.meta.hash,
-        },
-      })
-    }
-
-    // TODO: refactor after refactoring actionHandlers
-    case "REQUEST_DEPLOY_CONTRACT": {
-      const { data } = msg
-      const {
-        address,
-        networkId,
-        classHash,
-        constructorCalldata,
-        salt,
-        unique,
-      } = data
-      await wallet.selectAccount({ address, networkId })
-
-      const action = await actionService.add(
-        {
-          type: "DEPLOY_CONTRACT_ACTION",
-          payload: {
-            classHash: classHash.toString(),
-            constructorCalldata,
-            salt,
-            unique,
-          },
-        },
-        {
-          origin,
-        },
-      )
-
-      return respond({
-        type: "REQUEST_DEPLOY_CONTRACT_RES",
         data: {
           actionHash: action.meta.hash,
         },

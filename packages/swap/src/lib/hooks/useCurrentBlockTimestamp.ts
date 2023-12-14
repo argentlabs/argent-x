@@ -1,22 +1,23 @@
 import useSWR from "swr"
 
 import { useSwapProvider } from "../providers"
-import { getProviderForNetworkId } from "../services/provider"
+import { getRpcProvider } from "../services/provider"
 
 // gets the current timestamp from the blockchain
 export default function useCurrentBlockTimestamp(): number | undefined {
-  const { networkId } = useSwapProvider()
+  const { rpcUrl, chainId } = useSwapProvider()
 
   const { data } = useSWR("block-timestamp", async () => {
-    if (!networkId) {
+    if (!rpcUrl) {
       return undefined
     }
 
-    const provider = getProviderForNetworkId(networkId)
+    const { timestamp } = await getRpcProvider(
+      rpcUrl,
+      chainId,
+    ).getBlockWithTxHashes("latest")
 
-    const blockResponse = await provider.getBlock("latest")
-
-    return blockResponse.timestamp
+    return timestamp
   })
 
   return data

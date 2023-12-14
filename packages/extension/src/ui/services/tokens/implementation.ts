@@ -6,6 +6,7 @@ import { getNetworkFeeToken } from "../../features/accountTokens/tokens.state"
 import { messageClient } from "../messaging/trpc"
 import { ITokensService } from "./interface"
 import { formatTokenBalance } from "./utils"
+import { Call, CallData, RawArgs } from "starknet"
 import { BalancesMap, PricesMap } from "./types"
 import {
   BaseTokenWithBalance,
@@ -166,5 +167,36 @@ export class TokenService implements ITokensService {
         [addr]: balances[i],
       }
     }, {})
+  }
+
+  async send({
+    to,
+    method,
+    calldata,
+    title,
+    subtitle,
+  }: {
+    to: Address
+    method: string
+    calldata: RawArgs
+    title: string
+    subtitle: string
+  }) {
+    await this.trpcMessageClient.transfer.send.mutate({
+      transactions: {
+        contractAddress: to,
+        entrypoint: method,
+        calldata: CallData.toCalldata(calldata),
+      },
+      title,
+      subtitle,
+    })
+  }
+
+  async swap(transactions: Call[], title: string) {
+    await this.trpcMessageClient.tokens.swap.mutate({
+      transactions,
+      title,
+    })
   }
 }

@@ -24,7 +24,7 @@ import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import { isFeatureEnabled } from "@argent/shared"
 import { Grid } from "@chakra-ui/react"
 
-const { Ramp, Banxa } = logos
+const { RampLogo, BanxaLogo } = logos
 
 // Can be used to highlight a specific option with a recommended badge
 const RecommendedText = styled.span`
@@ -100,7 +100,7 @@ export const FundingProviderScreen: FC = () => {
                   </>
                 }
                 description="Card or bank transfer"
-                icon={<Ramp width={6} height={6} />}
+                icon={<RampLogo width={6} height={6} />}
               />
             </A>
           )}
@@ -113,7 +113,7 @@ export const FundingProviderScreen: FC = () => {
               <Option
                 title="Banxa"
                 description="Card or bank transfer"
-                icon={<Banxa width={6} height={6} />}
+                icon={<BanxaLogo width={6} height={6} />}
               />
             </A>
           )}

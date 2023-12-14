@@ -1,8 +1,8 @@
 import { Collection, NftItem, addressSchema } from "@argent/shared"
 import useSWR, { SWRConfiguration } from "swr"
 
-import { nftService } from "../../services/nfts"
 import { useCollection, useNft } from "./nfts.state"
+import { nftService } from "../../../shared/nft"
 
 export const useRemoteNft = (
   contractAddress: string | undefined,

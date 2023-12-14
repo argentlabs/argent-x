@@ -5,7 +5,7 @@ import {
 
 export interface DebouncedImplementedScheduledTask<T extends string = string>
   extends ImplementedScheduledTask<T> {
-  debounce: number
+  debounce: number // in seconds
 }
 
 export interface IDebounceService<T extends string = string> {

@@ -8,14 +8,13 @@ import { DeployAccountActionScreenContainer } from "./DeployAccountActionScreenC
 import { DeployContractActionScreenContainer } from "./DeployContractActionScreenContainer"
 import { DeployMultisigActionScreenContainer } from "./DeployMultisigActionScreenContainer"
 import { useActionScreen } from "./hooks/useActionScreen"
-import { SignActionScreenContainer } from "./SignActionScreenContainer"
-import { TransactionActionScreenContainer } from "./TransactionActionScreenContainer"
+import { TransactionActionScreenContainerV2 } from "./transactionV2/TransactionActionScreenContainerV2"
+import { SignActionScreenContainerV2 } from "./transactionV2/SignActionScreenContainerV2"
 
 /** TODO: refactor: actual file should be renamed `ActionScreenContainer.tsx` */
 
 export const ActionScreenContainer: FC = () => {
   const { action } = useActionScreen()
-
   switch (action?.type) {
     case "CONNECT_DAPP":
       return <ConnectDappScreenContainer />
@@ -30,21 +29,21 @@ export const ActionScreenContainer: FC = () => {
       return <AddNetworkScreenContainer mode="switch" />
 
     case "TRANSACTION":
-      return <TransactionActionScreenContainer />
+      return <TransactionActionScreenContainerV2 />
 
-    case "DEPLOY_ACCOUNT_ACTION":
+    case "DEPLOY_ACCOUNT":
       return <DeployAccountActionScreenContainer />
 
-    case "DEPLOY_MULTISIG_ACTION":
+    case "DEPLOY_MULTISIG":
       return <DeployMultisigActionScreenContainer />
 
     case "SIGN":
-      return <SignActionScreenContainer />
+      return <SignActionScreenContainerV2 />
 
-    case "DECLARE_CONTRACT_ACTION":
+    case "DECLARE_CONTRACT":
       return <DeclareContractActionScreenContainer />
 
-    case "DEPLOY_CONTRACT_ACTION":
+    case "DEPLOY_CONTRACT":
       return <DeployContractActionScreenContainer />
 
     default:

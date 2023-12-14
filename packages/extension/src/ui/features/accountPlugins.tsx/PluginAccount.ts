@@ -3,6 +3,11 @@ import { Abi, Call, CallData, Contract, hash, num } from "starknet"
 import ArgentPluginCompiledContractAbi from "../../../abis/ArgentPluginAccount.json"
 import { executeTransaction } from "../../services/backgroundTransactions"
 import { Account as ArgentXAccount } from "../accounts/Account"
+import {
+  addPluginCalldataSchema,
+  executeOnPluginCalldataSchema,
+  removePluginCalldataSchema,
+} from "@argent/shared"
 
 export class PluginAccount extends ArgentXAccount {
   constructor(account: ArgentXAccount) {
@@ -38,7 +43,9 @@ export class PluginAccount extends ArgentXAccount {
       transactions: {
         contractAddress: this.address,
         entrypoint: "addPlugin",
-        calldata: [num.hexToDecimalString(pluginClassHash)],
+        calldata: addPluginCalldataSchema.parse([
+          num.hexToDecimalString(pluginClassHash),
+        ]),
       },
     })
   }
@@ -48,7 +55,9 @@ export class PluginAccount extends ArgentXAccount {
       transactions: {
         contractAddress: this.address,
         entrypoint: "removePlugin",
-        calldata: [num.hexToDecimalString(pluginClassHash)],
+        calldata: removePluginCalldataSchema.parse([
+          num.hexToDecimalString(pluginClassHash),
+        ]),
       },
     })
   }
@@ -61,14 +70,14 @@ export class PluginAccount extends ArgentXAccount {
       transactions: {
         contractAddress: this.address,
         entrypoint: "executeOnPlugin",
-        calldata: [
+        calldata: executeOnPluginCalldataSchema.parse([
           pluginClassHash,
           hash.getSelectorFromName(call.entrypoint),
           call.calldata?.length ?? 0,
           ...num.bigNumberishArrayToDecimalStringArray(
             CallData.toCalldata(call.calldata),
           ),
-        ],
+        ]),
       },
     })
   }

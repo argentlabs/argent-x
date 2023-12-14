@@ -1,3 +1,4 @@
+export * from "./argent"
 export * from "./account"
 export * from "./nfts"
 export * from "./http"
@@ -10,5 +11,6 @@ export * from "./chains"
 export * as bigDecimal from "./bigdecimal"
 export * from "./hooks"
 export * from "./knownDapps"
+export { BaseError } from "./errors/baseErrors"
 
 export type { BigDecimal } from "./bigdecimal/types"

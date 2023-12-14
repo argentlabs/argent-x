@@ -7,6 +7,10 @@ import { constants, num, Account } from "starknet"
 import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 import { AccountError } from "../../../../shared/errors/account"
+import {
+  changeGuardianCalldataSchema,
+  escapeGuardianCalldataSchema,
+} from "@argent/shared"
 
 const escapeAndChangeGuardianSchema = z.object({
   account: baseWalletAccountSchema,
@@ -60,7 +64,9 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
                     "changeGuardian",
                     starknetAccount.cairoVersion,
                   ),
-                  calldata: [num.hexToDecimalString(constants.ZERO.toString())],
+                  calldata: changeGuardianCalldataSchema.parse([
+                    num.hexToDecimalString(constants.ZERO.toString()),
+                  ]),
                 },
                 meta: {
                   isChangeGuardian: true,
@@ -77,11 +83,14 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
           /**
            * Call `escapeGuardian` to change guardian to this account publicKey
            */
+          // TODO figure out what should be the title here
 
           /** Cairo 0 takes public key as argument, Cairo 1 does not */
           let calldata: string[] = []
           if (starknetAccount.cairoVersion === "0") {
-            calldata = [num.hexToDecimalString(publicKey)]
+            calldata = escapeGuardianCalldataSchema.parse([
+              num.hexToDecimalString(publicKey),
+            ])
           }
 
           await actionService.add(

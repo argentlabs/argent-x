@@ -7,6 +7,5 @@ export type TransactionActionFixture = Pick<
   | "transactionReview"
   | "transactions"
   | "transactionSimulation"
-  | "verifiedDapp"
   | "transactionActionsType"
 >

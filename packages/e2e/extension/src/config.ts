@@ -7,7 +7,7 @@ if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath })
 }
 
-export default {
+const config = {
   password: "MyP@ss3!",
   artifactsDir: path.resolve(__dirname, "../../artifacts/playwright"),
   reportsDir: path.resolve(__dirname, "../../artifacts/reports"),
@@ -23,4 +23,14 @@ export default {
   account1Seed3: process.env.E2E_ACCOUNT_1_SEED3,
   starknetTestNetUrl: process.env.STARKNET_TESTNET_URL,
   starkscanTestNetUrl: process.env.STARKSCAN_TESTNET_URL,
+  testnetRpcUrl: process.env.ARGENT_TESTNET_RPC_URL,
 }
+
+// check that no value of config is undefined, otherwise throw error
+Object.entries(config).forEach(([key, value]) => {
+  if (value === undefined) {
+    throw new Error(`Missing ${key} config variable; check .env file`)
+  }
+})
+
+export default config

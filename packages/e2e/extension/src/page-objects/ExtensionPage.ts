@@ -83,15 +83,71 @@ export default class ExtensionPage {
     await expect(this.network.networkSelector).toBeVisible()
   }
 
-  getClipboard() {
-    return this.page.evaluate(`navigator.clipboard.readText()`)
+  async getClipboard() {
+    return String(await this.page.evaluate(`navigator.clipboard.readText()`))
   }
 
-  async deployAccountByName(accountName: string) {
+  async addAccount() {
+    await this.account.addAccount({ firstAccount: false })
+    await this.account.copyAddress.click()
+    const accountAddress = await this.getClipboard()
+    expect(accountAddress).toMatch(/^0x0/)
+    return accountAddress
+  }
+
+  async deployAccount(accountName: string) {
+    if (accountName) {
+      await this.account.ensureSelectedAccount(accountName)
+    }
     await this.navigation.showSettings.click()
     await this.page.locator(`text=${accountName}`).click()
-    await this.account.deployAccount.click()
+    await this.settings.deployAccount.click()
     await this.navigation.confirm.click()
+    await this.navigation.back.click()
+    await this.navigation.close.click()
+    await this.navigation.menuActivity.click()
+    await expect(
+      this.page.getByText(
+        /(Account created and transfer|Contract interaction)/,
+      ),
+    ).toBeVisible({ timeout: 120000 })
+    await this.navigation.showSettings.click()
+    await expect(this.page.getByText("Deploying")).toBeHidden({
+      timeout: 90000,
+    })
+    await this.navigation.close.click()
+    await this.navigation.menuTokens.click()
+  }
+
+  async activate2fa(accountName: string, email: string, pin = "111111") {
+    //await this.page.pause()
+    await this.account.ensureSelectedAccount(accountName)
+    await this.navigation.showSettings.click()
+    await this.settings.account(accountName).click()
+    await this.settings.argentShield().click()
+    await this.navigation.next.click()
+    await this.account.email.fill(email)
+    await this.navigation.next.first().click()
+    await this.account.fillPin(pin)
+    await this.navigation.addArgentShield.click()
+    await this.navigation.confirm.click()
+    await this.navigation.dismiss.click()
+    await this.navigation.back.click()
+    await this.navigation.close.click()
+    await Promise.all([
+      expect(this.activity.menuPendingTransactionsIndicator).toBeHidden(),
+      expect(
+        this.page.locator('[data-testid="shield-on-account-view"]'),
+      ).toBeVisible(),
+    ])
+    await this.navigation.showSettings.click()
+    await expect(
+      this.page.locator('[data-testid="shield-on-settings"]'),
+    ).toBeVisible()
+    await this.settings.account(accountName).click()
+    await expect(
+      this.page.locator('[data-testid="shield-switch"]'),
+    ).toBeEnabled()
     await this.navigation.back.click()
     await this.navigation.close.click()
   }
@@ -132,7 +188,7 @@ export default class ExtensionPage {
           `${acc.initialBalance} ETH`,
         )
         if (acc.deploy) {
-          await this.deployAccountByName(`Account ${accIndex + 1}`)
+          await this.deployAccount(`Account ${accIndex + 1}`)
         }
       }
     }
@@ -141,8 +197,25 @@ export default class ExtensionPage {
   }
 
   async validateTx(reciever: string, amount?: number) {
-    console.log(reciever, amount)
     await this.navigation.menuActivity.click()
+    if (amount) {
+      const activityAmount = await this.page
+        .locator("button[ data-tx-hash] [data-value]")
+        .first()
+        .textContent()
+        .then((text) => text?.replace(/[^0-9.]+/, ""))
+
+      if (amount.toString().length > 6) {
+        expect(activityAmount).toBe(
+          parseFloat(amount.toString())
+            .toFixed(4)
+            .toString()
+            .match(/[\d\\.]+[^0]+/)?.[0],
+        )
+      } else {
+        expect(activityAmount).toBe(parseFloat(amount.toString()).toString())
+      }
+    }
     await this.activity.ensureNoPendingTransactions()
     const txs = await this.activity.activityTxHashs()
     await validateTx(txs[0]!, reciever, amount)

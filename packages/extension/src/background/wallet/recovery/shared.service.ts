@@ -5,11 +5,11 @@ import {
   IRepository,
 } from "../../../shared/storage/__new/interface"
 import { WalletAccount } from "../../../shared/wallet.model"
-import { WalletStorageProps } from "../account/shared.service"
 import { WalletSession } from "../session/walletSession.model"
 import { Events, IWalletRecoveryService, Recovered } from "./interface"
 import { WalletError } from "../../../shared/errors/wallet"
 import Emittery from "emittery"
+import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 export class WalletRecoverySharedService {
   constructor(

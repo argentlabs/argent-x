@@ -117,7 +117,7 @@ export const NftDetails: FC<NftDetailsProps> = ({
           h="5"
           borderRadius="base"
         />
-        <P4 fontWeight="bold" color="text">
+        <P4 fontWeight="bold" color="text.primary">
           {nftToDisplay.name}
         </P4>
         {!safe && (

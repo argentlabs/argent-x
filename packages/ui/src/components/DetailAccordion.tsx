@@ -190,7 +190,7 @@ export const DetailAccordionRow: FC<
             <CopyTooltip copyValue={copyLabel}>
               <Box
                 _hover={{
-                  color: "text",
+                  color: "text.primary",
                 }}
                 cursor="pointer"
                 transitionProperty="color"
@@ -216,7 +216,7 @@ export const DetailAccordionRow: FC<
             <CopyTooltip copyValue={copyValue}>
               <Box
                 _hover={{
-                  color: "text",
+                  color: "text.primary",
                 }}
                 cursor="pointer"
                 transitionProperty="color"

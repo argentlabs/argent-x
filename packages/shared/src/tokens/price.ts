@@ -10,7 +10,8 @@ import {
   prettifyTokenNumber,
 } from "../utils/number"
 import { Token, TokenWithBalance } from "./token"
-import { formatUnits, parseUnits } from "../bigdecimal"
+import { formatUnits, parseCurrency, parseUnits } from "../bigdecimal"
+import { bigDecimal } from ".."
 
 const { UINT_256_MAX } = uint256
 
@@ -151,9 +152,12 @@ export const convertTokenAmountToCurrencyValue = ({
 
   /** multiply to convert to currency */
   const currencyValue =
-    BigInt(amount) * parseUnits(unitCurrencyValue.toString(), 6)
+    BigInt(amount) * parseCurrency(unitCurrencyValue.toString()).value
   /** keep as string to avoid loss of precision elsewhere */
-  return formatUnits(currencyValue, decimalsNumber + 6)
+  return bigDecimal.formatUnits({
+    value: currencyValue,
+    decimals: decimalsNumber + 6,
+  })
 }
 
 /**
@@ -238,7 +242,7 @@ export const prettifyTokenAmount = ({
     isPositiveValue = balance > 0n
     const balanceFullString =
       decimalsNumber > 0
-        ? formatUnits(balance, decimalsNumber)
+        ? formatUnits({ value: balance, decimals: decimalsNumber })
         : balance.toString()
     prettyValue =
       decimalsNumber > 0

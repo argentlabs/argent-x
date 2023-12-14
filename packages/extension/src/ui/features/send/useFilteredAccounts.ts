@@ -1,4 +1,4 @@
-import { isEqualAddress, normalizeAddressOrStarknetId } from "@argent/shared"
+import { isEqualAddress, normalizeAddressOrDomain } from "@argent/shared"
 import { useMemo } from "react"
 
 import { useAppState } from "../../app.state"
@@ -19,7 +19,7 @@ export const useFilteredAccounts = (query?: string) => {
       (account) =>
         account.name.toLowerCase().includes(queryLowercase) ||
         account.address.toLowerCase().includes(queryLowercase) ||
-        normalizeAddressOrStarknetId(account.address)
+        normalizeAddressOrDomain(account.address)
           .toLowerCase()
           .includes(queryLowercase) ||
         isEqualAddress(account.address, query),

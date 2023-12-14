@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { pubkeySchema } from "./useCreateMultisigForm"
+import { pubkeySchema } from "../../../../shared/multisig/multisig.model"
 
 const FormSchema = z.object({
   signerKey: pubkeySchema,

@@ -1,21 +1,16 @@
-import { ExtQueueItem } from "../shared/actionQueue/types"
-import { BaseWalletAccount } from "../shared/wallet.model"
+import { ExtensionActionItemOfType } from "../shared/actionQueue/types"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
 import { Wallet } from "./wallet"
 
-type DeployAccountAction = ExtQueueItem<{
-  type: "DEPLOY_ACCOUNT_ACTION"
-  payload: BaseWalletAccount
-}>
-
 export const accountDeployAction = async (
-  { payload: baseAccount }: DeployAccountAction,
+  action: ExtensionActionItemOfType<"DEPLOY_ACCOUNT">,
   wallet: Wallet,
 ) => {
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
+  const { account: baseAccount } = action.payload
   const selectedAccount = await wallet.getAccount(baseAccount)
 
   const accountNeedsDeploy = selectedAccount?.needsDeploy

@@ -4,9 +4,8 @@ import { networkService } from "../shared/network/service"
 import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
 import { IBackgroundActionService } from "./__new/services/action/interface"
 import { Wallet } from "./wallet"
-import { isAccountV5 } from "../shared/utils/accountv4"
 import { AccountError } from "../shared/errors/account"
-
+import { isAccountV5 } from "@argent/shared"
 export interface IUpgradeAccount {
   account: BaseWalletAccount
   wallet: Wallet
@@ -52,15 +51,21 @@ export const upgradeAccount = async ({
   }
 
   const calldata = CallData.compile(upgradeCalldata)
-  await actionService.add({
-    type: "TRANSACTION",
-    payload: {
-      transactions: {
-        contractAddress: fullAccount.address,
-        entrypoint: "upgrade",
-        calldata,
+  await actionService.add(
+    {
+      type: "TRANSACTION",
+      payload: {
+        transactions: {
+          contractAddress: fullAccount.address,
+          entrypoint: "upgrade",
+          calldata,
+        },
+        meta: { isUpgrade: true, title: "Switch account type" },
       },
-      meta: { isUpgrade: true, title: "Switch account type" },
     },
-  })
+    {
+      title: "Upgrade account",
+      icon: "UpgradeIcon",
+    },
+  )
 }

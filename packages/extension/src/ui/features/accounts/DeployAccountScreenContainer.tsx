@@ -1,21 +1,24 @@
 import { FC, useCallback } from "react"
 
-import { accountService } from "../../../shared/account/service"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { DeployAccountScreen } from "./DeployAccountScreen"
 import { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
+import { clientAccountService } from "../../services/account"
+import { useActionScreen } from "../actions/hooks/useActionScreen"
 
 export const DeployAccountScreenContainer: FC<
   DeployAccountScreenContainerProps
 > = (props) => {
   const selectedAccount = useView(selectedAccountView)
 
-  const onActivate = useCallback(() => {
+  const { approve } = useActionScreen()
+  const onActivate = useCallback(async () => {
     if (selectedAccount) {
-      void accountService.deploy(selectedAccount)
+      void clientAccountService.deploy(selectedAccount)
+      await approve()
     }
-  }, [selectedAccount])
+  }, [selectedAccount, approve])
 
   if (!selectedAccount) {
     return null

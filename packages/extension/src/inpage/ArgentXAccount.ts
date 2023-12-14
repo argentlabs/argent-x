@@ -149,18 +149,22 @@ export class ArgentXAccount extends Account {
         10 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       )
-        .then(() => "error" as const)
-        .catch(() => {
-          sendMessage({ type: "SIGNATURE_FAILURE", data: { actionHash } })
+        .then((x) => x)
+        .catch((e) => {
+          sendMessage({
+            type: "SIGNATURE_FAILURE",
+            data: { actionHash, error: e.message }, // this error will be thrown by waitForMessage after the timeout
+          })
           return "timeout" as const
         }),
     ])
 
-    if (result === "error") {
-      throw Error("User abort")
-    }
     if (result === "timeout") {
       throw Error("User action timed out")
+    }
+
+    if ("error" in result) {
+      throw Error(result.error)
     }
 
     return result.signature

@@ -14,8 +14,6 @@ import { useAccount } from "./accounts.state"
 import { AccountScreenEmptyContainer } from "./AccountScreenEmptyContainer"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { usePendingMultisigs } from "../multisig/multisig.state"
-import { tokenBalancesView } from "../../views/tokenBalances"
 
 interface AccountScreenProps {
   tab: "tokens" | "collections" | "activity" | "swap"
@@ -32,11 +30,6 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const hasAccount = account !== undefined
 
   const multicall = account && getMulticallForNetwork(account?.network)
-
-  // HACK - this is a workaround to force the pending multisigs to be updated
-  usePendingMultisigs({ showHidden: true })
-  // HACK: force refresh of token balances
-  useView(tokenBalancesView)
 
   const noSwap = useMemo(
     () =>
@@ -63,7 +56,12 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
     body = noSwap ? (
       <NoSwap />
     ) : (
-      <SwapProvider selectedAccount={account} multicall={multicall}>
+      <SwapProvider
+        selectedAccount={account}
+        multicall={multicall}
+        rpcUrl={account.network.rpcUrl}
+        chainId={account.network.chainId}
+      >
         <Swap />
       </SwapProvider>
     )

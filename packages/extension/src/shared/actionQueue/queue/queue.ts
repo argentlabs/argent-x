@@ -3,7 +3,7 @@ import oHash from "object-hash"
 
 import type { IRepository } from "../../storage/__new/interface"
 import type { ActionQueueItemMeta } from "../schema"
-import type { ExtQueueItem } from "../types"
+import { isTransactionActionItem, type ExtQueueItem } from "../types"
 import type { IActionQueue } from "./interface"
 
 function objectHash(obj: object | null) {
@@ -64,6 +64,13 @@ export function getActionQueue<T extends AllObjects>(
     item: U,
     meta?: Partial<ActionQueueItemMeta>,
   ): Promise<ExtQueueItem<U>> {
+    if (isTransactionActionItem(item) && !item.payload.createdAt) {
+      /**
+       * ensure same transaction shapes have a unique hash based on time,
+       * e.g. swap tx may expire
+       */
+      item.payload.createdAt = Date.now()
+    }
     const expires = meta?.expires || DEFAULT_EXPIRY_TIME_MS
     const hash = objectHash(item)
     const newItem = {

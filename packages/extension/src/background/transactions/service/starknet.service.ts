@@ -146,6 +146,7 @@ export class TransactionTrackerWorker
   }
   async syncTransactionRepo() {
     const allTransactions = await this.transactionsRepo.get()
+
     const updatedTransactions = await getTransactionsUpdate(
       // is smart enough to filter for just the pending transactions, as the rest needs no update
       allTransactions,

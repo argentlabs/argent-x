@@ -4,7 +4,6 @@ import {
   validChecksumAddressSchema,
   validateAddressRangeSchema,
 } from "./address"
-import { starknetIdSchema } from "./starknetId"
 
 export const addressInputCharactersAndLengthSchema = z
   .string()
@@ -14,12 +13,3 @@ export const addressInputCharactersAndLengthSchema = z
 export const addressInputSchema = addressSchemaStrictLength
   .pipe(validChecksumAddressSchema)
   .pipe(validateAddressRangeSchema)
-
-export const addressOrStarknetIdInputSchema = z.union([
-  addressInputSchema,
-  starknetIdSchema,
-])
-
-export type AddressOrStarknetIdInput = z.infer<
-  typeof addressOrStarknetIdInputSchema
->

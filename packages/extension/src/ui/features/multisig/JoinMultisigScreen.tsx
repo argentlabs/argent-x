@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useEncodedPublicKey } from "../accounts/usePublicKey"
 import { IconWrapper } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
 import { recover } from "../recovery/recovery.service"
-import { usePendingMultisigs } from "./multisig.state"
 import { useAppState } from "../../app.state"
 
 const { CopyIcon, ShareIcon } = icons
@@ -18,9 +17,6 @@ export const JoinMultisigScreen: FC = () => {
   const { publicKey } = useParams()
 
   const signerKey = useEncodedPublicKey(publicKey)
-
-  // HACK - this is a workaround to force the pending multisigs to be updated
-  const pendingMultisigs = usePendingMultisigs({ showHidden: true })
 
   const { onCopy, hasCopied, setValue } = useClipboard("", 2000)
 

@@ -11,7 +11,6 @@ import {
 import {
   WalletAccountSharedService,
   WalletSession,
-  WalletStorageProps,
 } from "./account/shared.service"
 import { WalletAccountStarknetService } from "./account/starknet.service"
 import { WalletBackupService } from "./backup/backup.service"
@@ -24,6 +23,7 @@ import { WalletSessionService } from "./session/session.service"
 import { Wallet } from "."
 import { MultisigBackendService } from "../../shared/multisig/service/backend/implementation"
 import { IScheduleService } from "../../shared/schedule/interface"
+import { WalletStorageProps } from "../../shared/wallet/walletStore"
 
 const isDev = true
 const isTest = true

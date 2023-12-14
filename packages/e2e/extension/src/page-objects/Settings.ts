@@ -40,6 +40,12 @@ export default class Settings {
     )
   }
 
+  get deployAccount() {
+    return this.page.locator(
+      `//button//*[text()="${lang.settings.deployAccount}"]`,
+    )
+  }
+
   get hideAccount() {
     return this.page.locator(
       `//button//*[text()="${lang.settings.hideAccount}"]`,
@@ -69,14 +75,8 @@ export default class Settings {
     return this.page.locator(`button :text-is("${accountName}")`)
   }
 
-  get deleteAccount() {
-    return this.page.locator(
-      `button :text-is("${lang.settings.deleteAccount}")`,
-    )
-  }
-
-  get confirmDelete() {
-    return this.page.locator(`button:text-is("${lang.settings.delete}")`)
+  argentShield() {
+    return this.page.locator('[data-testid="shield-switch"]')
   }
 
   get privateKey() {

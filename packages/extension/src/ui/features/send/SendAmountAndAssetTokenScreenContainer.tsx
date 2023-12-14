@@ -1,4 +1,10 @@
-import { parseAddress, parseAmount } from "@argent/shared"
+import {
+  formatAddress,
+  isAddress,
+  parseAmount,
+  prettifyTokenNumber,
+  transferCalldataSchema,
+} from "@argent/shared"
 import { FieldError } from "@argent/ui"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { formatUnits } from "ethers"
@@ -7,7 +13,6 @@ import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { z } from "zod"
 
-import { getMulticallForNetwork } from "../../../shared/multicall"
 import {
   prettifyCurrencyValue,
   prettifyTokenBalance,
@@ -18,10 +23,7 @@ import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 import { routes } from "../../routes"
 import { DEFAULT_TOKEN_LENGTH } from "../../services/tokens/implementation"
 import { formatTokenBalance } from "../../services/tokens/utils"
-import {
-  getUint256CalldataFromBN,
-  sendTransaction,
-} from "../../services/transactions"
+import { getUint256CalldataFromBN } from "../../services/transactions"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useTokenUnitAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
@@ -35,8 +37,10 @@ import {
 import { TokenAmountInput } from "./TokenAmountInput"
 import { genericErrorSchema } from "../actions/feeEstimation/feeError"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { tokenService } from "../../services/tokens"
 import { useLiveTokenBalanceForAccount } from "../accountTokens/useLiveTokenBalanceForAccount"
 import { Spinner } from "@chakra-ui/react"
+import { clientStarknetAddressService } from "../../services/address"
 
 const formSchema = z.object({
   amount: amountInputSchema,
@@ -132,23 +136,28 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
 
   const onSubmit = useCallback(async () => {
     if (token && recipientAddress && inputAmount) {
-      const to = await parseAddress({ address: token.address })
-
-      const recipient = await parseAddress({
-        address: recipientAddress,
-        networkId: network.id,
-        multicallProvider: getMulticallForNetwork(network),
-      })
-
-      await sendTransaction({
-        to,
+      if (!isAddress(token.address)) {
+        console.warn("Invalid address", token.address)
+        return
+      }
+      const recipient = await clientStarknetAddressService.parseAddressOrDomain(
+        recipientAddress,
+        network.id,
+      )
+      const formattedRecipient = isAddress(recipient)
+        ? formatAddress(recipient)
+        : recipient
+      await tokenService.send({
+        to: token.address,
         method: "transfer",
-        calldata: {
+        calldata: transferCalldataSchema.parse({
           recipient,
           amount: getUint256CalldataFromBN(
             parseAmount(inputAmount, token.decimals).value,
           ),
-        },
+        }),
+        title: `Send ${prettifyTokenNumber(inputAmount)} ${token.symbol}`,
+        subtitle: `to ${formattedRecipient}`,
       })
     }
     onCancel()

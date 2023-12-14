@@ -1,14 +1,6 @@
-import { FC, ReactNode, useCallback, useEffect, useState } from "react"
+import { FC, ReactNode } from "react"
 
-import {
-  Alert,
-  CellStack,
-  ErrorMessage,
-  Input,
-  Select,
-  SpacerCell,
-  icons,
-} from "@argent/ui"
+import { CellStack, ErrorMessage, Input, Select, SpacerCell } from "@argent/ui"
 import { Box, chakra } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import {
@@ -17,25 +9,19 @@ import {
   SubmitHandler,
   useForm,
 } from "react-hook-form"
-import { AbiEntry, num, uint256 } from "starknet"
 
-import { accountService } from "../../../../shared/account/service"
 import { Transaction } from "../../../../shared/transactions"
 import { useAppState } from "../../../app.state"
-import { udcService } from "../../../services/udc"
-import {
-  DeployContractServicePayload,
-  deployContract,
-} from "../../../services/udc.service"
 
 import { ClassHashInputActions } from "./ClassHashInputActions"
-import { DeploySmartContractParameters } from "./DeploySmartContractParameters"
 import { useLastDeclaredContracts } from "./udc.state"
 import { useFormSelects } from "./useFormSelects"
 import { useAutoFocusInputRef } from "../../../hooks/useAutoFocusInputRef"
-import { FieldValues, ParameterField } from "./deploySmartContractForm.model"
-
-const { AlertIcon } = icons
+import { DeploySmartContractParametersContainer } from "./DeploySmartContractParametersContainer"
+import { udcService } from "../../../services/udc"
+import { DeployContractPayload } from "../../../../shared/udc/service/interface"
+import { FieldValues } from "./deploySmartContractForm.model"
+import { clientAccountService } from "../../../services/account"
 
 interface DeploySmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
@@ -43,12 +29,8 @@ interface DeploySmartContractFormProps {
   setIsLoading: (isLoading: boolean) => void
 }
 
-const supportedConstructorTypes = ["felt", "Uint256", "felt*"]
-
 const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
   children,
-  isLoading,
-  setIsLoading,
 }) => {
   const methods = useForm<FieldValues>({
     mode: "onSubmit",
@@ -61,16 +43,11 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     formState,
     handleSubmit,
     clearErrors,
-    setError,
     watch,
     setValue,
+    setError,
   } = methods
   const { errors, isDirty, isSubmitting } = formState
-
-  const [fetchError, setFetchError] = useState("")
-  const [parameterFields, setParameterFields] = useState<
-    ParameterField[] | null
-  >(null)
 
   const currentNetwork = watch("network")
   const currentClassHash = watch("classHash")
@@ -86,122 +63,33 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     salt,
     unique,
   }: FieldValues) => {
-    useAppState.setState({ switcherNetworkId: network })
-
-    await accountService.select({
-      address: account,
-      networkId: network,
-    })
-
-    const constructorCalldata = parameters.flatMap<string>((param, i) => {
-      try {
-        if (param.type === "felt") {
-          return [num.toHex(param.value)]
-        }
-        if (param.type === "felt*") {
-          return param.value.map((value) => num.toHex(value))
-        }
-        if (param.type === "Uint256") {
-          const { low, high } = uint256.bnToUint256(num.toBigInt(param.value))
-          return [low, high].map(num.toHex)
-        }
-        setError(`parameters.${i}`, {
-          type: "manual",
-          message: `Unsupported type ${param.type}`,
-        })
-        throw new Error(`Unsupported type ${param.type}`)
-      } catch (e) {
-        setError(`parameters.${i}`, {
-          type: "manual",
-          message:
-            "Invalid parameter. Only hex and decimal numbers are supported",
-        })
-        throw new Error("Invalid parameter")
-      }
-    })
-
-    clearErrors()
-
-    const payload: DeployContractServicePayload = {
-      address: account,
-      networkId: network,
-      classHash,
-      constructorCalldata,
-      unique,
-    }
-    if (salt !== "") {
-      payload.salt = salt
-    }
-    await deployContract(payload)
-  }
-
-  const resetAbiFields = useCallback(() => {
-    resetField("parameters")
-    resetField("salt")
-    resetField("unique")
-    setParameterFields(null)
-  }, [resetField])
-
-  const getConstructorParams = async (
-    currentClassHash: string,
-    currentNetwork: string,
-  ) => {
-    setIsLoading(true)
     try {
-      const { abi } = await udcService.getConstructorParams(
-        currentNetwork,
-        currentClassHash,
-      )
-      const constructorAbi = abi?.find((item) => item.type === "constructor")
-      setParameterFields(
-        constructorAbi?.inputs.map((input: AbiEntry) => {
-          if (!supportedConstructorTypes.includes(input.type)) {
-            throw Error(
-              `Unsupported constructor type "${input.type}" for ${
-                input.name
-              }. Only ${supportedConstructorTypes.join(", ")} are supported.`,
-            )
-          }
+      useAppState.setState({ switcherNetworkId: network })
 
-          if (input.type.endsWith("*")) {
-            return {
-              name: input.name,
-              type: input.type,
-              value: [],
-            }
-          }
-          return {
-            name: input.name,
-            type: input.type,
-            value: "",
-          }
-        }) || [],
-      )
+      await clientAccountService.select({
+        address: account,
+        networkId: network,
+      })
+
+      const payload: DeployContractPayload = {
+        address: account,
+        networkId: network,
+        classHash,
+        constructorCalldata: parameters,
+        unique,
+        salt: salt ?? "",
+      }
+
+      await udcService.deployContract(payload)
     } catch (e) {
-      resetAbiFields()
-      if (
-        e instanceof Error &&
-        e.message.startsWith("Unsupported constructor type")
-      ) {
-        setError("classHash", {
-          type: "manual",
+      console.error(e)
+      if (e instanceof Error) {
+        setError("root", {
           message: e.message,
         })
-      } else {
-        setFetchError("Contract classhash not found in this network")
       }
-    } finally {
-      setIsLoading(false)
     }
   }
-
-  useEffect(() => {
-    if (currentNetwork && currentClassHash) {
-      setFetchError("")
-      getConstructorParams(currentClassHash, currentNetwork)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentClassHash, currentNetwork])
 
   const inputRef = useAutoFocusInputRef<HTMLInputElement>()
   const { ref, ...classHashInputRest } = register("classHash", {
@@ -291,23 +179,12 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
           {!isEmpty(errors.account) && (
             <ErrorMessage message="Account is required" />
           )}
-
-          {fetchError && (
-            <>
-              <SpacerCell />
-              <Alert
-                icon={<AlertIcon />}
-                colorScheme={"error"}
-                description={fetchError}
-              />
-            </>
+          {Boolean(currentClassHash) && Boolean(currentNetwork) && (
+            <DeploySmartContractParametersContainer
+              currentClassHash={currentClassHash}
+              currentNetwork={currentNetwork}
+            />
           )}
-          <SpacerCell />
-
-          <DeploySmartContractParameters
-            isLoading={isLoading}
-            constructorParameters={parameterFields}
-          />
           {children?.({ isDirty, isSubmitting })}
         </CellStack>
       </chakra.form>

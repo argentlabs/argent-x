@@ -14,7 +14,7 @@ import { analytics } from "./analytics"
 import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "./transactions/store"
 import { checkTransactionHash } from "./transactions/transactionExecution"
-import { argentMaxFee } from "./utils/argentMaxFee"
+import { argentMaxFee } from "../shared/utils/argentMaxFee"
 import { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
 import { WalletError } from "../shared/errors/wallet"
@@ -23,12 +23,12 @@ import { UdcError } from "../shared/errors/udc"
 const { UDC } = constants
 
 type DeclareContractAction = ExtQueueItem<{
-  type: "DECLARE_CONTRACT_ACTION"
+  type: "DECLARE_CONTRACT"
   payload: DeclareContractPayload
 }>
 
 type DeployContractAction = ExtQueueItem<{
-  type: "DEPLOY_CONTRACT_ACTION"
+  type: "DEPLOY_CONTRACT"
   payload: UniversalDeployerContractPayload
 }>
 
@@ -84,8 +84,12 @@ export const udcDeclareContract = async (
         { skipValidate: true },
       )
 
-      maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-      maxDeclareFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
+      maxADFee = argentMaxFee({
+        suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
+      })
+      maxDeclareFee = argentMaxFee({
+        suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
+      })
     }
     const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
       selectedAccount,
@@ -124,7 +128,7 @@ export const udcDeclareContract = async (
           nonce: declareNonce,
         },
       )
-      maxDeclareFee = argentMaxFee(suggestedMaxFee)
+      maxDeclareFee = argentMaxFee({ suggestedMaxFee })
     } else {
       throw new UdcError({ code: "NO_STARKNET_DECLARE_FEE" })
     }
@@ -215,8 +219,12 @@ export const udcDeployContract = async (
         { skipValidate: true },
       )
 
-      maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-      maxDeployFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
+      maxADFee = argentMaxFee({
+        suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
+      })
+      maxDeployFee = argentMaxFee({
+        suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
+      })
     }
     const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
       selectedAccount,
@@ -260,7 +268,7 @@ export const udcDeployContract = async (
           nonce: deployNonce,
         },
       )
-      maxDeployFee = argentMaxFee(suggestedMaxFee)
+      maxDeployFee = argentMaxFee({ suggestedMaxFee })
     } else {
       throw new UdcError({ code: "NO_STARKNET_DECLARE_FEE" })
     }

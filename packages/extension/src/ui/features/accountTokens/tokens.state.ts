@@ -1,4 +1,3 @@
-import { keyBy } from "lodash-es"
 import { useMemo } from "react"
 import { num } from "starknet"
 
@@ -15,6 +14,8 @@ import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
 import { tokenBalanceForAccountView } from "../../views/tokenBalances"
 import { tokenRepo } from "../../../shared/token/__new/repository/token"
 import { networkRepo } from "../../../shared/network/store"
+import { isEqualAddress } from "@argent/shared"
+import { accountsEqual } from "../../../shared/utils/accountsEqual"
 
 export async function getNetworkFeeToken(networkId?: string) {
   if (!networkId) {
@@ -73,19 +74,25 @@ export const useTokensWithBalance = (account?: BaseWalletAccount) => {
   const tokensInNetwork = useTokensInNetwork(networkId)
   const balances = useView(tokenBalanceForAccountView(account))
 
-  const balancesMap = useMemo(
-    () => (balances ? keyBy(balances, "address") : {}),
-    [balances],
+  const accountBalances = useMemo(
+    () =>
+      balances?.filter((balance) => accountsEqual(balance.account, account)),
+    [account, balances],
   )
 
   return useMemo(() => {
     return tokensInNetwork
-      .map((token) => ({
-        ...token,
-        balance: BigInt(balancesMap[token.address]?.balance ?? 0n),
-      }))
+      .map((token) => {
+        const balance = accountBalances?.find((balance) =>
+          isEqualAddress(balance.address, token.address),
+        )?.balance
+        return {
+          ...token,
+          balance: BigInt(balance ?? 0n),
+        }
+      })
       .filter(
         (token) => token.showAlways || (token.balance && token.balance > 0n),
       )
-  }, [tokensInNetwork, balancesMap])
+  }, [tokensInNetwork, accountBalances])
 }

@@ -1,4 +1,4 @@
-import { addressOrStarknetIdInputSchema } from "@argent/shared"
+import { addressOrDomainInputSchema } from "@argent/shared"
 import { z } from "zod"
 
 export const addressBookContactSchema = z.object({
@@ -12,7 +12,7 @@ export const addressBookContactSchema = z.object({
     .string()
     .trim()
     .min(1, { message: "Address is required" })
-    .pipe(addressOrStarknetIdInputSchema),
+    .pipe(addressOrDomainInputSchema),
 })
 
 export const addressBookContactNoIdSchema = addressBookContactSchema.omit({

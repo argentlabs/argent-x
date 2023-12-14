@@ -6,6 +6,7 @@ import { onboardingWorker } from "./__new/services/onboarding"
 import { tokenWorker } from "../shared/token/__new/worker"
 import { accountWorker } from "../shared/account/worker"
 import { knownDappsWorker } from "./../shared/knownDapps/worker"
+import { transactionReviewWorker } from "./__new/services/transactionReview/worker"
 
 /** TODO: refactor: remove this facade */
 export function initWorkers() {
@@ -18,5 +19,6 @@ export function initWorkers() {
     networkWorker,
     knownDappsWorker,
     analyticsWorker,
+    transactionReviewWorker,
   }
 }

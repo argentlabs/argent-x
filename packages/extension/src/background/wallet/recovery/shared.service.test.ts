@@ -12,7 +12,7 @@ import {
   IRepository,
 } from "../../../shared/storage/__new/interface"
 import { WalletAccount } from "../../../shared/wallet.model"
-import { WalletSession, WalletStorageProps } from "../account/shared.service"
+import { WalletSession } from "../account/shared.service"
 import {
   emitterMock,
   getSessionStoreMock,
@@ -22,6 +22,7 @@ import {
 import { WalletRecoverySharedService } from "./shared.service"
 import { WalletRecoveryStarknetService } from "./starknet.service"
 import { WalletError } from "../../../shared/errors/wallet"
+import { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 describe("WalletRecoverySharedService", () => {
   let service: WalletRecoverySharedService

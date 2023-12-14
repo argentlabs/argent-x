@@ -37,7 +37,7 @@
   "dependencies": {
     "@argent/web-sdk": "^6.4.1",
     "@argent/x-window": "^6.4.0",
-    "@starknet-react/core": "2.0.0-next.0"
+    "@starknet-react/core": "2.0.0-next.5"
   },
   "devDependencies": {
     "@tsconfig/svelte": "^5.0.0",
@@ -47,7 +47,7 @@
     "vite-plugin-dts": "^3.0.0"
   },
   "peerDependencies": {
-    "starknet": "5.19.5"
+    "starknet": "5.24.3"
   },
   "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"
 }

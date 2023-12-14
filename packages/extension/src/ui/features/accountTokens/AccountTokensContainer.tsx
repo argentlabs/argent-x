@@ -23,7 +23,7 @@ import { useDapplandBanner } from "./dappland/banner.state"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { AddFundsDialogProvider } from "./useAddFundsDialog"
 import { useFeeTokenBalance } from "./useFeeTokenBalance"
-import { accountService } from "../../../shared/account/service"
+import { clientAccountService } from "../../services/account"
 
 interface AccountTokensContainerProps {
   account: Account
@@ -137,7 +137,7 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
       return navigate(routes.funding())
     }
     setUpgradeLoading(true)
-    await accountService.upgrade(account)
+    await clientAccountService.upgrade(account)
     setUpgradeLoading(false)
   }, [account, navigate, showNoBalanceForUpgrade])
 

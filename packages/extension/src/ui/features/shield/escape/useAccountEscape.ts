@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
 import { Escape } from "../../../../shared/account/details/escape.model"
-import { accountService } from "../../../../shared/account/service"
 import { useArrayStorage } from "../../../../shared/storage/hooks"
 import { isNumeric } from "../../../../shared/utils/number"
 import {
@@ -20,6 +19,7 @@ import {
   escapeWarningStore,
   getEscapeWarningStoreKey,
 } from "./escapeWarningStore"
+import { clientAccountService } from "../../../services/account"
 
 const pluralise = (value: number, unit: string) => {
   return `${value} ${unit}${value === 1 ? "" : "s"}`
@@ -99,7 +99,7 @@ export const useAccountEscapeWarning = () => {
   useEffect(() => {
     const maybeShowWarning = async () => {
       if (accountWithNewEscape) {
-        await accountService.select(accountWithNewEscape)
+        await clientAccountService.select(accountWithNewEscape)
         navigate(routes.shieldEscapeWarning(accountWithNewEscape.address))
       }
     }

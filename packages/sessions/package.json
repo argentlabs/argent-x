@@ -1,6 +1,6 @@
 {
   "name": "@argent/x-sessions",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "private": false,
   "description": "Manage sessions for Argent X wallets",
   "keywords": [
@@ -48,6 +48,7 @@
     "url": "https://github.com/argentlabs/argent-x/issues"
   },
   "devDependencies": {
+    "@argent/shared": "^6.3.3",
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@types/minimalistic-assert": "^1.0.1",
     "@vitest/coverage-c8": "^0.33.0",
@@ -58,7 +59,7 @@
   },
   "dependencies": {
     "minimalistic-assert": "^1.0.1",
-    "starknet": "5.19.5",
+    "starknet": "5.24.3",
     "starknet4": "npm:starknet@4.22.0"
   },
   "gitHead": "b16688a8638cc138938e74e1a39d004760165d75"

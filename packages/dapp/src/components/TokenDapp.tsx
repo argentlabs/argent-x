@@ -1,61 +1,39 @@
+import { H2, H4, Input, Textarea } from "@argent/ui"
 import { SessionAccount, createSession } from "@argent/x-sessions"
-import { FC, useEffect, useMemo, useState } from "react"
-import {
-  Abi,
-  AccountInterface,
-  Contract,
-  stark,
-  hash,
-  GatewayError,
-  isSierra,
-  CompiledSierraCasm,
-  DeclareContractPayload,
-  UniversalDeployerContractPayload,
-} from "starknet"
+import { FC, useEffect, useState } from "react"
+import { Abi, AccountInterface, Contract, GatewayError } from "starknet"
 
-import Erc20Abi from "../../abi/ERC20.json"
-import { truncateAddress, truncateHex } from "../services/address.service"
-import {
-  DAITokenAddress,
-  ETHTokenAddress,
-  mintToken,
-  parseInputAmountToUint256,
-  transfer,
-} from "../services/token.service"
-import {
-  addNetwork,
-  addToken,
-  declare,
-  deploy,
-  signMessage,
-  waitForTransaction,
-  declareAndDeploy,
-} from "../services/wallet.service"
-import styles from "../styles/Home.module.css"
+import { Flex } from "@chakra-ui/react"
 import { getStarkKey, utils } from "micro-starknet"
-import { readFileAsString } from "@argent/shared"
-
-type Status = "idle" | "approve" | "pending" | "success" | "failure"
+import Erc20Abi from "../../abi/ERC20.json"
+import { truncateHex } from "../services/address.service"
+import {
+  ETHTokenAddress,
+  parseInputAmountToUint256,
+} from "../services/token.service"
+import { waitForTransaction } from "../services/wallet.service"
+import { AddNetwork } from "./AddNetwork"
+import { AddToken } from "./AddToken"
+import { Declare } from "./Declare"
+import { Deploy } from "./Deploy"
+import { InfoRow } from "./InfoRow"
+import { Mint } from "./Mint"
+import { MintWithStarknetReact } from "./MintWithStarknetReact"
+import { OffchainSessionKeys } from "./OffchainSessionKeys"
+import { SignMessage } from "./SignMessage"
+import { Transfer } from "./Transfer"
+import { TransferWithStarknetReact } from "./TransferWithStarknetReact"
+import { SignMessageWithStarknetReact } from "./SignMessageWithStarknetReact"
+import { Status } from "../types/Status"
 
 export const TokenDapp: FC<{
   showSession: null | boolean
   account: AccountInterface
-}> = ({ showSession, account }) => {
-  const [mintAmount, setMintAmount] = useState("10")
-  const [transferTo, setTransferTo] = useState("")
-  const [transferAmount, setTransferAmount] = useState("1")
-  const [shortText, setShortText] = useState("")
-  const [lastSig, setLastSig] = useState<string[]>([])
+  starknetReact?: boolean
+}> = ({ account, showSession, starknetReact }) => {
   const [lastTransactionHash, setLastTransactionHash] = useState("")
   const [transactionStatus, setTransactionStatus] = useState<Status>("idle")
   const [transactionError, setTransactionError] = useState("")
-  const [addTokenError, setAddTokenError] = useState("")
-  const [classHash, setClassHash] = useState("")
-  const [contract, setContract] = useState<string | null>(null)
-  const [casm, setCasm] = useState<CompiledSierraCasm | null>(null)
-  const [shouldDeploy, setShouldDeploy] = useState(false)
-  const [deployClassHash, setDeployClassHash] = useState("")
-  const [addNetworkError, setAddNetworkError] = useState("")
 
   const [sessionSigner] = useState(utils.randomPrivateKey())
   const [sessionAccount, setSessionAccount] = useState<
@@ -65,7 +43,7 @@ export const TokenDapp: FC<{
   const buttonsDisabled = ["approve", "pending"].includes(transactionStatus)
 
   useEffect(() => {
-    ;(async () => {
+    const waitTx = async () => {
       if (lastTransactionHash && transactionStatus === "pending") {
         setTransactionError("")
         try {
@@ -80,71 +58,9 @@ export const TokenDapp: FC<{
           setTransactionError(message)
         }
       }
-    })()
+    }
+    waitTx()
   }, [transactionStatus, lastTransactionHash])
-
-  // if (network !== "goerli-alpha" && network !== "mainnet-alpha") {
-  //   return (
-  //     <>
-  //       <p>
-  //         There is no demo token for this network, but you can deploy one and
-  //         add its address to this file:
-  //       </p>
-  //       <div>
-  //         <pre>packages/dapp/src/token.service.ts</pre>
-  //       </div>
-  //     </>
-  //   )
-  // }
-
-  const handleMintSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setTransactionStatus("approve")
-
-      console.log("mint", mintAmount)
-      const result = await mintToken(mintAmount)
-      console.log(result)
-
-      setLastTransactionHash(result.transaction_hash)
-      setTransactionStatus("pending")
-    } catch (e) {
-      console.error(e)
-      setTransactionStatus("idle")
-    }
-  }
-
-  const handleTransferSubmit = async (e: React.FormEvent) => {
-    try {
-      e.preventDefault()
-      setTransactionStatus("approve")
-
-      const result = await transfer(transferTo, transferAmount)
-      console.log(result)
-
-      setLastTransactionHash(result.transaction_hash)
-      setTransactionStatus("pending")
-    } catch (e) {
-      console.error(e)
-      setTransactionStatus("idle")
-    }
-  }
-
-  const handleSignSubmit = async (skipDeploy: boolean) => {
-    try {
-      setTransactionStatus("approve")
-
-      console.log("sign", shortText)
-      const result = await signMessage(shortText, skipDeploy)
-      console.log(result)
-
-      setLastSig(stark.formatSignature(result))
-      setTransactionStatus("success")
-    } catch (e) {
-      console.error(e)
-      setTransactionStatus("idle")
-    }
-  }
 
   const handleOpenSessionSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -188,7 +104,6 @@ export const TokenDapp: FC<{
         account.address,
         parseInputAmountToUint256("0.000000001"),
       )
-      console.log(result)
 
       setLastTransactionHash(result.transaction_hash)
       setTransactionStatus("pending")
@@ -196,378 +111,126 @@ export const TokenDapp: FC<{
       console.error(e)
       setTransactionStatus("idle")
     }
-  }
-
-  const handleDeclare = async (e: React.FormEvent) => {
-    try {
-      e.preventDefault()
-      if (!contract) {
-        throw new Error("No contract")
-      }
-      if (!classHash) {
-        throw new Error("No class hash")
-      }
-      const payload: DeclareContractPayload = {
-        contract,
-        classHash,
-      }
-      if (casm) {
-        payload.casm = casm
-        delete payload.classHash
-      }
-      if (shouldDeploy) {
-        const result = await declareAndDeploy(payload)
-        console.log(result)
-        setLastTransactionHash(result.deploy.transaction_hash)
-      } else {
-        const result = await declare(payload)
-        console.log(result)
-        setLastTransactionHash(result.transaction_hash)
-      }
-      setTransactionStatus("pending")
-    } catch (e) {
-      console.error(e)
-      setTransactionStatus("idle")
-    }
-  }
-
-  const contractIsSierra = useMemo(() => {
-    return contract && isSierra(contract)
-  }, [contract])
-
-  const handleDeploy = async (e: React.FormEvent) => {
-    try {
-      e.preventDefault()
-      if (!deployClassHash) {
-        throw new Error("No class hash")
-      }
-      const payload: UniversalDeployerContractPayload = {
-        classHash: deployClassHash,
-      }
-      const result = await deploy(payload)
-      console.log(result)
-      setLastTransactionHash(result.transaction_hash)
-      setTransactionStatus("pending")
-    } catch (e) {
-      console.error(e)
-      setTransactionStatus("idle")
-    }
-  }
-
-  const handleAddNetwork = async () => {
-    await addNetwork({
-      id: "dapp-test",
-      chainId: "SN_DAPP_TEST",
-      chainName: "Test chain name",
-      baseUrl: "http://localhost:5050",
-    })
   }
 
   return (
     <>
-      <h3 style={{ margin: 0 }}>
-        Transaction status: <code>{transactionStatus}</code>
-      </h3>
+      <InfoRow title="Transaction status" content={transactionStatus} />
       {lastTransactionHash && (
-        <h3 style={{ margin: 0 }}>
-          Transaction hash:{" "}
-          <a
-            // href={`${getExplorerBaseUrl()}/tx/${lastTransactionHash}`}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "blue", margin: "0 0 1em" }}
-          >
-            <code>{truncateHex(lastTransactionHash)}</code>
-          </a>
-        </h3>
+        <>
+          <Flex mt="1">
+            <InfoRow
+              title="Transaction hash"
+              content={truncateHex(lastTransactionHash)}
+              copyContent={lastTransactionHash}
+            />
+          </Flex>
+        </>
       )}
       {transactionError && (
-        <h3 style={{ margin: 0 }}>
-          Transaction error:{" "}
-          <textarea
-            style={{ width: "100%", height: 100, background: "white" }}
-            value={transactionError}
-            readOnly
-          />
-        </h3>
+        <Flex direction="column" gap="1" mt="1" mb="6">
+          <H4 whiteSpace="nowrap">Transaction error:</H4>
+          <Textarea value={"transactionError"} readOnly w="full" />
+        </Flex>
       )}
-      <div className="columns">
-        <form onSubmit={handleMintSubmit}>
-          <h2 className={styles.title}>Mint token</h2>
-
-          <label htmlFor="mint-amount">Amount</label>
-          <input
-            disabled
-            type="text"
-            id="mint-amount"
-            name="fname"
-            value={mintAmount}
-            onChange={(e) => setMintAmount(e.target.value)}
-          />
-
-          <input type="submit" disabled={true} value="Not possible with ETH!" />
-        </form>
-
-        <form onSubmit={handleTransferSubmit}>
-          <h2 className={styles.title}>Transfer token</h2>
-
-          <label htmlFor="transfer-to">To</label>
-          <input
-            type="text"
-            id="transfer-to"
-            name="fname"
-            value={transferTo}
-            onChange={(e) => setTransferTo(e.target.value)}
-          />
-
-          <label htmlFor="transfer-amount">Amount</label>
-          <input
-            type="text"
-            id="transfer-amount"
-            name="fname"
-            value={transferAmount}
-            onChange={(e) => setTransferAmount(e.target.value)}
-          />
-          <br />
-          <input type="submit" disabled={buttonsDisabled} value="Transfer" />
-        </form>
-      </div>
-      <div className="columns">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleSignSubmit(false)
-          }}
-        >
-          <h2 className={styles.title}>Sign Message</h2>
-
-          <label htmlFor="mint-amount">Short Text</label>
-          <input
-            type="text"
-            id="short-text"
-            name="short-text"
-            value={shortText}
-            onChange={(e) => setShortText(e.target.value)}
-          />
-
-          <div style={{ display: "flex", alignItems: "center", gap: "1em" }}>
-            <input type="submit" value="Sign" />
-            <input
-              type="button"
-              value="Sign without deploy"
-              onClick={async () => {
-                handleSignSubmit(true)
-              }}
+      {!transactionError && <Flex mb="6" />}
+      <Flex direction="column" gap="10">
+        <Flex flex={1} width="full" gap={10}>
+          {starknetReact ? (
+            <MintWithStarknetReact
+              account={account}
+              setLastTransactionHash={setLastTransactionHash}
+              setTransactionStatus={setTransactionStatus}
+              transactionStatus={transactionStatus}
             />
-          </div>
-        </form>
-        <form>
-          <h2 className={styles.title}>Sign results</h2>
-
-          {/* Label and textarea for value r */}
-          <label htmlFor="r">r</label>
-          <textarea
-            className={styles.textarea}
-            id="r"
-            name="r"
-            value={lastSig[0]}
-            readOnly
-          />
-          {/* Label and textarea for value s */}
-          <label htmlFor="s">s</label>
-          <textarea
-            className={styles.textarea}
-            id="s"
-            name="s"
-            value={lastSig[1]}
-            readOnly
-          />
-        </form>
-      </div>
-      {showSession && (
-        <div className="columns">
-          <form onSubmit={handleOpenSessionSubmit}>
-            <h2 className={styles.title}>Sessions</h2>
-
-            <p>
-              Random session signer:{" "}
-              <code>{truncateHex(getStarkKey(sessionSigner))}</code>
-            </p>
-
-            <input
-              type="submit"
-              value="Open session"
-              disabled={Boolean(sessionAccount)}
+          ) : (
+            <Mint
+              account={account}
+              setLastTransactionHash={setLastTransactionHash}
+              setTransactionStatus={setTransactionStatus}
+              transactionStatus={transactionStatus}
             />
-          </form>
-          <form onSubmit={handleSessionTransactionSubmit}>
-            <h2 className={styles.title}>Open session</h2>
-
-            <p>Send some ETH to yourself using the session!</p>
-
-            <input
-              type="submit"
-              value="Use session"
-              disabled={Boolean(!sessionAccount) || buttonsDisabled}
-            />
-          </form>
-        </div>
-      )}
-
-      <div className="columns">
-        <form onSubmit={handleDeclare}>
-          <h2 className={styles.title}>Declare (and deploy)</h2>
-
-          <label htmlFor="contract">Compiled Cairo contract to declare:</label>
-          <input
-            id="contract"
-            name="contract"
-            type="file"
-            onChange={async (e) => {
-              if (!e.target.files) {
-                return
-              }
-              setCasm(null)
-
-              const file = e.target.files[0]
-              const fileAsString = await readFileAsString(file)
-              setContract(fileAsString)
-
-              const classHash = hash.computeContractClassHash(fileAsString)
-              setClassHash(classHash)
-            }}
-          />
-
-          <label htmlFor="classHash">
-            ClassHash (calculated automatically):
-          </label>
-          <input
-            style={{ width: "100%" }}
-            id="classHash"
-            name="classHash"
-            type="text"
-            value={classHash}
-            readOnly
-          />
-
-          {contractIsSierra && (
-            <>
-              <label htmlFor="contract">Compiled CASM to declare:</label>
-              <input
-                id="casm"
-                name="casm"
-                type="file"
-                onChange={async (e) => {
-                  if (!e.target.files) {
-                    return
-                  }
-                  const file = e.target.files[0]
-                  const fileAsString = await readFileAsString(file)
-                  const fileAsJson = JSON.parse(fileAsString)
-                  setCasm(fileAsJson)
-                }}
-              />
-            </>
           )}
 
-          <input
-            type="checkbox"
-            id="shouldDeploy"
-            name="shouldDeploy"
-            checked={shouldDeploy}
-            onChange={() => setShouldDeploy(!shouldDeploy)}
+          {starknetReact ? (
+            <TransferWithStarknetReact
+              account={account}
+              setLastTransactionHash={setLastTransactionHash}
+              setTransactionStatus={setTransactionStatus}
+              transactionStatus={transactionStatus}
+            />
+          ) : (
+            <Transfer
+              setLastTransactionHash={setLastTransactionHash}
+              setTransactionStatus={setTransactionStatus}
+              transactionStatus={transactionStatus}
+            />
+          )}
+        </Flex>
+        {starknetReact ? (
+          <SignMessageWithStarknetReact
+            account={account}
+            setTransactionStatus={setTransactionStatus}
           />
-          <label htmlFor="shouldDeploy">Also deploy</label>
+        ) : (
+          <SignMessage setTransactionStatus={setTransactionStatus} />
+        )}
+        <OffchainSessionKeys
+          account={account}
+          setLastTransactionHash={setLastTransactionHash}
+          setTransactionStatus={setTransactionStatus}
+          transactionStatus={transactionStatus}
+        />
+        {showSession && (
+          <>
+            <div className="columns">
+              <form onSubmit={handleOpenSessionSubmit}>
+                <H2>Sessions</H2>
 
-          <input
-            type="submit"
-            value={shouldDeploy ? "Declare and Deploy" : "Declare"}
-            disabled={!contract}
-          />
-        </form>
-        <form onSubmit={handleDeploy}>
-          <h2 className={styles.title}>Deploy</h2>
+                <p>
+                  Random session signer:{" "}
+                  <code>{truncateHex(getStarkKey(sessionSigner))}</code>
+                </p>
 
-          <label htmlFor="deployClassHash">Class Hash to deploy:</label>
-          <input
-            style={{ width: "100%" }}
-            id="deployClassHash"
-            name="deployClassHash"
-            type="text"
-            onChange={(e) => {
-              setDeployClassHash(e.target.value)
-            }}
-            value={deployClassHash}
-          />
+                <Input
+                  type="submit"
+                  value="Open session"
+                  disabled={Boolean(sessionAccount)}
+                />
+              </form>
+              <form onSubmit={handleSessionTransactionSubmit}>
+                <H2>Open session</H2>
 
-          <input type="submit" value="Deploy" />
-        </form>
-      </div>
-      <div className="columns">
-        <div>
-          <h2 className={styles.title}>ERC20</h2>
-          ETH token address
-          <br />
-          <code>
-            <a
-              target="_blank"
-              // href={`${getExplorerBaseUrl()}/contract/${tokenAddress}`}
-              rel="noreferrer"
-            >
-              {truncateAddress(ETHTokenAddress)}
-            </a>
-          </code>
-          <br />
-          <button
-            className="flat"
-            style={{ marginLeft: ".6em" }}
-            onClick={async () => {
-              try {
-                await addToken(ETHTokenAddress)
-                setAddTokenError("")
-              } catch (error) {
-                setAddTokenError((error as any).message)
-              }
-            }}
-          >
-            Add ETH token to wallet
-          </button>
-          <br />
-          <button
-            className="flat"
-            style={{ marginLeft: ".6em" }}
-            onClick={async () => {
-              try {
-                await addToken(DAITokenAddress)
-                setAddTokenError("")
-              } catch (error) {
-                setAddTokenError((error as any).message)
-              }
-            }}
-          >
-            Add DAI token to wallet
-          </button>
-          <span className="error-message">{addTokenError}</span>
-        </div>
-        <div>
-          <h2 className={styles.title}>Network</h2>
-          <button
-            className="flat"
-            onClick={async () => {
-              try {
-                await handleAddNetwork()
-                setAddNetworkError("")
-              } catch (error) {
-                setAddNetworkError((error as any).message)
-              }
-            }}
-          >
-            Add network to wallet
-          </button>
-          <br />
-          <span className="error-message">{addNetworkError}</span>
-        </div>
-      </div>
+                <p>Send some ETH to yourself using the session!</p>
+
+                <Input
+                  type="submit"
+                  value="Use session"
+                  disabled={Boolean(!sessionAccount) || buttonsDisabled}
+                />
+              </form>
+            </div>
+          </>
+        )}
+        {!starknetReact && (
+          <Flex>
+            <Declare
+              setLastTransactionHash={setLastTransactionHash}
+              setTransactionStatus={setTransactionStatus}
+            />
+            <Deploy
+              setLastTransactionHash={setLastTransactionHash}
+              setTransactionStatus={setTransactionStatus}
+            />
+          </Flex>
+        )}
+        {!starknetReact && (
+          <Flex flex={1} width="full" gap={10}>
+            <AddToken />
+            <AddNetwork />
+          </Flex>
+        )}
+      </Flex>
     </>
   )
 }

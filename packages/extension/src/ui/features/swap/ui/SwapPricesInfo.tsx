@@ -1,4 +1,4 @@
-import { L1, P4, icons } from "@argent/ui"
+import { FloatingForm, L1, P4, icons } from "@argent/ui"
 import {
   Currency,
   ONE_BIPS,
@@ -11,9 +11,9 @@ import {
 import { Box, Flex, Text, Tooltip } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
 
-import { SlippageForm } from "./SlippageForm"
-
 const { InfoIcon, SettingsIcon } = icons
+
+const MAX_SLIPPAGE = 1_000
 
 interface SwapPricesInfoProps {
   currencyIn?: Currency
@@ -31,7 +31,7 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
 }) => {
   const [inverted, setInverted] = useState(false)
   const [showSlippageForm, setShowSlippageForm] = useState(false)
-  const { userSlippageTolerance } = useUserState()
+  const { userSlippageTolerance, updateUserSlippageTolerance } = useUserState()
   const switchRate = useCallback(() => {
     setInverted(!inverted)
   }, [inverted])
@@ -39,7 +39,20 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
   const showSlippage = useCallback(() => {
     setShowSlippageForm(!showSlippageForm)
   }, [showSlippageForm])
-
+  const reduceSlippage = () => {
+    const updatedValue = userSlippageTolerance - 20
+    updateUserSlippageTolerance(updatedValue < 0 ? 0 : updatedValue)
+  }
+  const changeSlippage = (newSlippage: number) => {
+    const value = +newSlippage > 10 ? MAX_SLIPPAGE : +newSlippage * 100
+    updateUserSlippageTolerance(value)
+  }
+  const increaseSlippage = () => {
+    const updatedValue = userSlippageTolerance + 20
+    updateUserSlippageTolerance(
+      updatedValue > MAX_SLIPPAGE ? MAX_SLIPPAGE : updatedValue,
+    )
+  }
   return (
     <>
       <Flex
@@ -94,7 +107,17 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
                   Slippage {userSlippageTolerance / 100}%
                 </P4>
               </Flex>
-              {showSlippageForm && <SlippageForm closeHandler={showSlippage} />}
+              {showSlippageForm && (
+                <FloatingForm
+                  onClose={() => setShowSlippageForm(false)}
+                  onChange={changeSlippage}
+                  onIncrease={increaseSlippage}
+                  onReduce={reduceSlippage}
+                  value={userSlippageTolerance / 100}
+                  min={0}
+                  max={MAX_SLIPPAGE}
+                />
+              )}
             </Box>
             <P4 fontWeight="bold">
               {trade

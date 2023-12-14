@@ -1,49 +1,56 @@
-import { StarknetWindowObject } from "@argent/get-starknet"
 import { supportsSessions } from "@argent/x-sessions"
-import type { NextPage } from "next"
-import Head from "next/head"
+import type { StarknetWindowObject } from "get-starknet-core"
 import { useCallback, useEffect, useState } from "react"
 import { AccountInterface } from "starknet"
+import { Header } from "../components/Header"
 
-import { TokenDapp } from "../components/TokenDapp"
+import { Button } from "@argent/ui"
+import { InfoRow } from "../components/InfoRow"
 import { truncateAddress } from "../services/address.service"
 import {
   addWalletChangeListener,
-  getChainId,
   connectWallet,
+  disconnectWallet,
+  getChainId,
   removeWalletChangeListener,
   silentConnectWallet,
 } from "../services/wallet.service"
-import styles from "../styles/Home.module.css"
+import { TokenDapp } from "../components/TokenDapp"
+import { Flex } from "@chakra-ui/react"
 
-const Home: NextPage = () => {
-  const [address, setAddress] = useState<string>()
+const StarknetKitDapp = () => {
   const [supportSessions, setSupportsSessions] = useState<boolean | null>(null)
   const [chain, setChain] = useState<string | undefined>(undefined)
   const [isConnected, setConnected] = useState(false)
   const [account, setAccount] = useState<AccountInterface | null>(null)
+  const [isSilentConnect, setIsSilentConnect] = useState(true)
 
   useEffect(() => {
     const handler = async () => {
-      const wallet = await silentConnectWallet()
-      setAddress(wallet?.selectedAddress)
-      const chainId = await getChainId(wallet?.provider as any)
-      setChain(chainId)
-      setConnected(!!wallet?.isConnected)
-      if (wallet?.account) {
-        setAccount(wallet.account as any)
-      }
-      setSupportsSessions(null)
-      if (wallet?.selectedAddress && wallet.provider) {
-        try {
-          const sessionSupport = await supportsSessions(
-            wallet.selectedAddress,
-            wallet.provider,
-          )
-          setSupportsSessions(sessionSupport)
-        } catch {
-          setSupportsSessions(false)
+      try {
+        const wallet = await silentConnectWallet()
+        const chainId = await getChainId(wallet?.provider as any)
+        setChain(chainId)
+        setConnected(!!wallet?.isConnected)
+        if (wallet?.account) {
+          setAccount(wallet.account as any)
         }
+        setSupportsSessions(null)
+        if (wallet?.selectedAddress && wallet.provider) {
+          try {
+            const sessionSupport = await supportsSessions(
+              wallet.selectedAddress,
+              wallet.provider,
+            )
+            setSupportsSessions(sessionSupport)
+          } catch {
+            setSupportsSessions(false)
+          }
+        }
+      } catch (e) {
+        console.log(e)
+      } finally {
+        setIsSilentConnect(false)
       }
     }
 
@@ -66,7 +73,6 @@ const Home: NextPage = () => {
       ) =>
       async () => {
         const wallet = await connectWallet(enableWebWallet)
-        setAddress(wallet?.selectedAddress)
         const chainId = await getChainId(wallet?.provider as any)
         setChain(chainId)
         setConnected(!!wallet?.isConnected)
@@ -89,49 +95,79 @@ const Home: NextPage = () => {
     [],
   )
 
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Test dapp</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+  const handleDisconnect = useCallback(
+    () => async () => {
+      try {
+        await disconnectWallet()
+        setChain(undefined)
+        setConnected(false)
+        setAccount(null)
+        setSupportsSessions(null)
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    [],
+  )
 
-      <main className={styles.main}>
+  if (isSilentConnect) {
+    return (
+      <Flex py="0" px="2rem">
+        <Flex
+          as="main"
+          minHeight="100vh"
+          py="4rem"
+          px="0"
+          flex="1"
+          flexDirection="column"
+        >
+          <p>Connecting wallet...</p>
+        </Flex>
+      </Flex>
+    )
+  }
+
+  return (
+    <Flex py="0" px="2rem">
+      <Flex
+        as="main"
+        minHeight="100vh"
+        py="4rem"
+        px="0"
+        flex="1"
+        flexDirection="column"
+      >
         {isConnected ? (
           <>
-            <h3 style={{ margin: 0 }}>
-              Wallet address: <code>{address && truncateAddress(address)}</code>
-            </h3>
-            <h3 style={{ margin: 0 }}>
-              supports sessions: <code>{`${supportSessions}`}</code>
-            </h3>
-            <h3 style={{ margin: 0 }}>
-              Url: <code>{chain}</code>
-            </h3>
+            <Header isConnected disconnectFn={handleDisconnect()} />
+            <InfoRow
+              title="Wallet address:"
+              content={account?.address && truncateAddress(account?.address)}
+            />
+            <InfoRow
+              title="Supports sessions:"
+              content={`${supportSessions}`}
+            />
+            <InfoRow title="Url:" content={chain} />
             {account && (
-              <TokenDapp showSession={supportSessions} account={account} />
+              <TokenDapp account={account} showSession={supportSessions} />
             )}
           </>
         ) : (
           <>
-            <button
-              className={styles.connect}
+            <Header />
+            <Button
+              colorScheme="primary"
               onClick={handleConnectClick(connectWallet)}
+              maxW={350}
             >
-              Connect Wallet
-            </button>
-            <button
-              className={styles.connect}
-              onClick={handleConnectClick(connectWallet, false)}
-            >
-              Connect Wallet (without WebWallet)
-            </button>
-            <p>First connect wallet to use dapp.</p>
+              Connect wallet with Starknetkit
+            </Button>
           </>
         )}
-      </main>
-    </div>
+      </Flex>
+    </Flex>
   )
 }
 
-export default Home
+export default StarknetKitDapp

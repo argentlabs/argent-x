@@ -9,12 +9,60 @@ import { isEqualWalletAddress } from "../shared/wallet.service"
 import { assertNever } from "../ui/services/assertNever"
 import { accountDeployAction } from "./accountDeployAction"
 import { analytics } from "./analytics"
-import { multisigDeployAction } from "./multisig/multisigDeployAction"
+import { addMultisigDeployAction } from "./multisig/multisigDeployAction"
 import { openUi } from "./openUi"
-import { executeTransactionAction } from "./transactions/transactionExecution"
+import {
+  TransactionAction,
+  executeTransactionAction,
+} from "./transactions/transactionExecution"
 import { udcDeclareContract, udcDeployContract } from "./udcAction"
 import { Wallet } from "./wallet"
+import { networkSchema } from "../shared/network"
+import { encodeChainId } from "../shared/utils/encodeChainId"
 
+const handleTransactionAction = async ({
+  action,
+  networkId,
+  wallet,
+}: {
+  action: TransactionAction
+  networkId: string
+  wallet: Wallet
+}): Promise<MessageType> => {
+  const host = action.meta.origin
+  const actionHash = action.meta.hash
+
+  try {
+    void analytics.track("signedTransaction", {
+      networkId,
+      host,
+    })
+
+    const response = await executeTransactionAction(action, wallet)
+
+    void analytics.track("sentTransaction", {
+      success: true,
+      networkId,
+      host,
+    })
+
+    return {
+      type: "TRANSACTION_SUBMITTED",
+      data: { txHash: response.transaction_hash, actionHash },
+    }
+  } catch (error) {
+    void analytics.track("sentTransaction", {
+      success: false,
+      networkId,
+      host,
+    })
+
+    return {
+      type: "TRANSACTION_FAILED",
+      data: { actionHash, error: `${error}` },
+    }
+  }
+}
 export const handleActionApproval = async (
   action: ExtensionActionItem,
   wallet: Wallet,
@@ -43,40 +91,10 @@ export const handleActionApproval = async (
     }
 
     case "TRANSACTION": {
-      const host = action.meta.origin
-      try {
-        void analytics.track("signedTransaction", {
-          networkId,
-          host,
-        })
-
-        const response = await executeTransactionAction(action, wallet)
-
-        void analytics.track("sentTransaction", {
-          success: true,
-          networkId,
-          host,
-        })
-
-        return {
-          type: "TRANSACTION_SUBMITTED",
-          data: { txHash: response.transaction_hash, actionHash },
-        }
-      } catch (error) {
-        void analytics.track("sentTransaction", {
-          success: false,
-          networkId,
-          host,
-        })
-
-        return {
-          type: "TRANSACTION_FAILED",
-          data: { actionHash, error: `${error}` },
-        }
-      }
+      return handleTransactionAction({ action, networkId, wallet })
     }
 
-    case "DEPLOY_ACCOUNT_ACTION": {
+    case "DEPLOY_ACCOUNT": {
       try {
         void analytics.track("signedTransaction", {
           networkId,
@@ -87,7 +105,7 @@ export const handleActionApproval = async (
         void analytics.track("deployAccount", {
           status: "success",
           trigger: "sign",
-          networkId: action.payload.networkId,
+          networkId: action.payload.account.networkId,
         })
 
         void analytics.track("sentTransaction", {
@@ -112,7 +130,7 @@ export const handleActionApproval = async (
 
         void analytics.track("deployAccount", {
           status: "failure",
-          networkId: action.payload.networkId,
+          networkId: action.payload.account.networkId,
           errorMessage: `${error}`,
         })
 
@@ -123,18 +141,18 @@ export const handleActionApproval = async (
       }
     }
 
-    case "DEPLOY_MULTISIG_ACTION": {
+    case "DEPLOY_MULTISIG": {
       try {
         void analytics.track("signedTransaction", {
           networkId,
         })
 
-        const txHash = await multisigDeployAction(action, wallet)
+        const txHash = await addMultisigDeployAction(action, wallet)
 
         void analytics.track("deployMultisig", {
           status: "success",
           trigger: "transaction",
-          networkId: action.payload.networkId,
+          networkId: action.payload.account.networkId,
         })
 
         void analytics.track("sentTransaction", {
@@ -156,7 +174,7 @@ export const handleActionApproval = async (
 
         void analytics.track("deployMultisig", {
           status: "failure",
-          networkId: action.payload.networkId,
+          networkId: action.payload.account.networkId,
           errorMessage: `${error}`,
         })
         break
@@ -169,10 +187,39 @@ export const handleActionApproval = async (
         options: { skipDeploy = false },
       } = action.payload
       if (!(await wallet.isSessionOpen())) {
-        throw Error("you need an open session")
+        throw new Error("you need an open session")
       }
       const starknetAccount = await wallet.getSelectedStarknetAccount()
       const selectedAccount = await wallet.getSelectedAccount()
+
+      if (!selectedAccount) {
+        return {
+          type: "SIGNATURE_FAILURE",
+          data: {
+            error: "No selected account",
+            actionHash,
+          },
+        }
+      }
+
+      // let's compare encoded formats of both chainIds
+      const encodedDomainChainId = encodeChainId(typedData.domain.chainId)
+      const encodedSelectedChainId = encodeChainId(
+        selectedAccount.network.chainId,
+      )
+      // typedData.domain.chainId is optional, so we need to check if it exists
+      if (
+        encodedDomainChainId &&
+        encodedSelectedChainId !== encodedDomainChainId
+      ) {
+        return {
+          type: "SIGNATURE_FAILURE",
+          data: {
+            error: `Cannot sign the message from a different chainId. Expected ${encodedSelectedChainId}, got ${encodedDomainChainId}`,
+            actionHash,
+          },
+        }
+      }
 
       const signature = await starknetAccount.signMessage(typedData)
       const formattedSignature = stark.signatureToDecimalArray(signature)
@@ -199,7 +246,8 @@ export const handleActionApproval = async (
 
     case "REQUEST_ADD_CUSTOM_NETWORK": {
       try {
-        await networkService.add(action.payload)
+        const parsedNetwork = networkSchema.parse(action.payload)
+        await networkService.add(parsedNetwork)
         return {
           type: "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
           data: { actionHash },
@@ -258,7 +306,7 @@ export const handleActionApproval = async (
       }
     }
 
-    case "DECLARE_CONTRACT_ACTION": {
+    case "DECLARE_CONTRACT": {
       try {
         void analytics.track("signedDeclareTransaction", {
           networkId,
@@ -293,7 +341,7 @@ export const handleActionApproval = async (
       }
     }
 
-    case "DEPLOY_CONTRACT_ACTION": {
+    case "DEPLOY_CONTRACT": {
       try {
         void analytics.track("signedDeployTransaction", {
           networkId,
@@ -363,21 +411,21 @@ export const handleActionRejection = async (
       }
     }
 
-    case "DEPLOY_ACCOUNT_ACTION": {
+    case "DEPLOY_ACCOUNT": {
       return {
         type: "DEPLOY_ACCOUNT_ACTION_FAILED",
         data: { actionHash },
       }
     }
 
-    case "DEPLOY_MULTISIG_ACTION": {
+    case "DEPLOY_MULTISIG": {
       break
     }
 
     case "SIGN": {
       return {
         type: "SIGNATURE_FAILURE",
-        data: { actionHash },
+        data: { actionHash, error: "User rejected" },
       }
     }
 
@@ -402,13 +450,13 @@ export const handleActionRejection = async (
       }
     }
 
-    case "DECLARE_CONTRACT_ACTION": {
+    case "DECLARE_CONTRACT": {
       return {
         type: "REQUEST_DECLARE_CONTRACT_REJ",
         data: { actionHash },
       }
     }
-    case "DEPLOY_CONTRACT_ACTION": {
+    case "DEPLOY_CONTRACT": {
       return {
         type: "REQUEST_DEPLOY_CONTRACT_REJ",
         data: { actionHash },

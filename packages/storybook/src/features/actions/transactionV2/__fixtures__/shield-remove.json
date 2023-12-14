@@ -1,0 +1,52 @@
+{
+  "transactions": [
+    {
+      "reviewOfTransaction": {
+        "assessment": "neutral",
+        "warnings": [],
+        "reviews": [
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "account_change_guardian_remove",
+              "properties": [
+                {
+                  "type": "text",
+                  "label": "account_change_guardian_address",
+                  "text": "0"
+                }
+              ],
+              "defaultProperties": [
+                {
+                  "type": "address",
+                  "label": "default_contract",
+                  "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+                  "verified": false
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "change_guardian",
+                  "calldata": ["0"]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "simulation": {
+        "approvals": [],
+        "transfers": [],
+        "summary": [],
+        "calculatedNonce": "0x11",
+        "feeEstimation": {
+          "overallFee": "2510000030120",
+          "gasPrice": "1000000012",
+          "gasUsage": "2510",
+          "unit": "wei"
+        }
+      }
+    }
+  ]
+}

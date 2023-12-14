@@ -29,6 +29,7 @@ export const knownDappSchema = z.object({
   contracts: dappContractsSchema,
   categories: z.optional(z.array(z.string())),
   supportedApps: z.optional(z.array(z.string())),
+  dappland: z.optional(z.string()),
 })
 
 export const knownDappsSchema = z.array(knownDappSchema)

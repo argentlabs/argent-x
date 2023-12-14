@@ -4,7 +4,6 @@ import {
   TransactionType,
   hash,
   num,
-  stark,
   transaction,
 } from "starknet"
 
@@ -16,17 +15,14 @@ import {
 import { getErrorObject } from "../../shared/utils/error"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
-import {
-  isAccountV4__deprecated,
-  isAccountV5,
-} from "../../shared/utils/accountv4"
-import { argentMaxFee } from "../utils/argentMaxFee"
+import { argentMaxFee } from "../../shared/utils/argentMaxFee"
 import { addEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import { transactionCallsAdapter } from "./transactionAdapter"
 import { AccountError } from "../../shared/errors/account"
 import { fetchTransactionBulkSimulation } from "../../shared/transactionSimulation/transactionSimulation.service"
 import { TransactionError } from "../../shared/errors/transaction"
 import { getEstimatedFeeFromSimulation } from "../../shared/transactionSimulation/utils"
+import { isAccountV4, isAccountV5 } from "@argent/shared"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
@@ -40,6 +36,8 @@ export const handleTransactionMessage: HandleMessage<
         },
         {
           origin,
+          title: "Review transaction",
+          icon: "NetworkIcon",
         },
       )
       return respond({
@@ -51,7 +49,6 @@ export const handleTransactionMessage: HandleMessage<
     case "ESTIMATE_TRANSACTION_FEE": {
       const selectedAccount = await wallet.getSelectedAccount()
       const transactions = msg.data
-      const oldAccountTransactions = transactionCallsAdapter(transactions)
 
       if (!selectedAccount) {
         throw new AccountError({ code: "NOT_FOUND" })
@@ -93,21 +90,24 @@ export const handleTransactionMessage: HandleMessage<
             accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
             txFee = num.toHex(estimateFeeBulk[1].overall_fee)
 
-            maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
-            maxTxFee = argentMaxFee(estimateFeeBulk[1].suggestedMaxFee)
+            maxADFee = argentMaxFee({
+              suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
+            })
+            maxTxFee = argentMaxFee({
+              suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
+            })
           }
         } else {
-          const { overall_fee, suggestedMaxFee } = isAccountV5(starknetAccount)
-            ? await starknetAccount.estimateFee(transactions, {
-                skipValidate: true,
-              })
-            : await starknetAccount.estimateFee(oldAccountTransactions)
+          const { overall_fee, suggestedMaxFee } =
+            await starknetAccount.estimateFee(transactions, {
+              skipValidate: true,
+            })
 
           txFee = num.toHex(overall_fee)
           maxTxFee = num.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
         }
 
-        const suggestedMaxFee = argentMaxFee(maxTxFee)
+        const suggestedMaxFee = argentMaxFee({ suggestedMaxFee: maxTxFee })
 
         await addEstimatedFees(
           {
@@ -153,10 +153,7 @@ export const handleTransactionMessage: HandleMessage<
         const { overall_fee, suggestedMaxFee } =
           await wallet.getAccountDeploymentFee(account)
 
-        const maxADFee = num.toHex(
-          stark.estimatedFeeToMaxFee(suggestedMaxFee, 1), // This adds the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
-        )
-
+        const maxADFee = argentMaxFee({ suggestedMaxFee })
         return respond({
           type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
           data: {
@@ -173,7 +170,7 @@ export const handleTransactionMessage: HandleMessage<
             type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
             data: {
               amount: num.toHex(fallbackPrice),
-              maxADFee: argentMaxFee(fallbackPrice),
+              maxADFee: argentMaxFee({ suggestedMaxFee: fallbackPrice }),
             },
           })
         }
@@ -241,7 +238,9 @@ export const handleTransactionMessage: HandleMessage<
             accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
             txFee = num.toHex(estimateFeeBulk[1].overall_fee)
 
-            maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+            maxADFee = argentMaxFee({
+              suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
+            })
             maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
           }
         } else {
@@ -257,7 +256,7 @@ export const handleTransactionMessage: HandleMessage<
           }
         }
 
-        const suggestedMaxFee = argentMaxFee(maxTxFee) // This add the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
+        const suggestedMaxFee = argentMaxFee({ suggestedMaxFee: maxTxFee }) // This add the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
 
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
@@ -330,7 +329,9 @@ export const handleTransactionMessage: HandleMessage<
             accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
             txFee = num.toHex(estimateFeeBulk[1].overall_fee)
 
-            maxADFee = argentMaxFee(estimateFeeBulk[0].suggestedMaxFee)
+            maxADFee = argentMaxFee({
+              suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
+            })
             maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
           }
         } else {
@@ -349,7 +350,7 @@ export const handleTransactionMessage: HandleMessage<
           }
         }
 
-        const suggestedMaxFee = argentMaxFee(maxTxFee) // This adds the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
+        const suggestedMaxFee = argentMaxFee({ suggestedMaxFee: maxTxFee }) // This adds the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
 
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
@@ -475,7 +476,7 @@ export const handleTransactionMessage: HandleMessage<
           throw new AccountError({ code: "NOT_FOUND" })
         }
         const starknetAccount = await wallet.getSelectedStarknetAccount()
-        if (isAccountV4__deprecated(starknetAccount)) {
+        if (isAccountV4(starknetAccount)) {
           // Old accounts are not supported
           // This should no longer happen as we prevent deprecated accounts from being used
           return respond({
@@ -565,7 +566,7 @@ export const handleTransactionMessage: HandleMessage<
           data: simulationWithFees,
         })
       } catch (error) {
-        console.error("SIMULATE_TRANSACTIONS_REJ", error)
+        console.error("SIMULATE_TRANSACTIONS_REJ", error, "kek")
         return respond({
           type: "SIMULATE_TRANSACTIONS_REJ",
           data: {

@@ -10,7 +10,7 @@ on:
 env:
   FEATURE_PRIVACY_SETTINGS: "true"
   FEATURE_EXPERIMENTAL_SETTINGS: "false"
-  FEATURE_BETA_FEATURES: "true"
+  FEATURE_BETA_FEATURES: "false"
   FEATURE_BANXA: "true"
   FEATURE_LAYERSWAP: "true"
   FEATURE_ORBITER: "true"
@@ -26,9 +26,8 @@ env:
   FILENAME: argent-extension
   SAFE_ENV_VARS: true
   ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
-  ARGENT_TRANSACTION_REVIEW_API_BASE_URL: ${{ vars.ARGENT_TRANSACTION_REVIEW_API_BASE_URL }}
+  ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
   ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
-  ARGENT_EXPLORER_BASE_URL: ${{ vars.ARGENT_EXPLORER_BASE_URL }}
   ARGENT_X_ENVIRONMENT: "prod"
   MULTICALL_MAX_BATCH_SIZE: 20
   FAST: 20 # 20s
@@ -136,7 +135,7 @@ jobs:
           pnpm --filter @argent/get-starknet publish --no-git-checks --access public || exit 0
           pnpm --filter @argent/web-sdk publish --no-git-checks --access public || exit 0
           pnpm --filter @argent/starknet-react-webwallet-connector publish --no-git-checks --access public || exit 0
-          pnpm --filter @argent-x/sessions publish --no-git-checks --access public || exit 0
+          pnpm --filter @argent/x-sessions publish --no-git-checks --access public || exit 0
 
       - name: Get product version
         id: product-version
@@ -149,7 +148,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
-          title: extension@${{ steps.product-version.outputs.current-version }}
+          name: extension@${{ steps.product-version.outputs.current-version }}
           files: |
             ${{ env.FILENAME }}-chrome.zip
             ${{ env.FILENAME }}-firefox.zip

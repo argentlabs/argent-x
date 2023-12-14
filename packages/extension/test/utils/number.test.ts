@@ -32,6 +32,7 @@ describe("prettifyNumber()", () => {
         expect(prettifyCurrencyNumber("1199.05823328686698812")).toEqual(
           "1,199.06",
         )
+        expect(prettifyCurrencyNumber(1234n)).toEqual("1,234.00")
       })
     })
     describe("when using default token config", () => {
@@ -54,6 +55,7 @@ describe("prettifyNumber()", () => {
         expect(prettifyTokenNumber("1.50004")).toEqual("1.5")
         expect(prettifyTokenNumber("1.50005")).toEqual("1.5001")
         expect(prettifyTokenNumber("123456789")).toEqual("123,456,789.0")
+        expect(prettifyTokenNumber(123456789n)).toEqual("123,456,789.0")
       })
     })
   })
@@ -75,6 +77,7 @@ describe("isNumeric()", () => {
       expect(isNumeric("123")).toBeTruthy()
       expect(isNumeric(BigInt(123))).toBeTruthy()
       expect(isNumeric(toBigInt(123))).toBeTruthy()
+      expect(isNumeric(123n)).toBeTruthy()
     })
   })
   describe("when invalid", () => {

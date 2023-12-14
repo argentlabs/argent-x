@@ -17,6 +17,9 @@ export interface ILanguage {
     create: string
     cancel: string
     privacyStatement: string
+    approve: string
+    addArgentShield: string
+    dismiss: string
     reviewSend: string
   }
   account: {
@@ -34,6 +37,7 @@ export interface ILanguage {
     saveAddress: string
     confirmTheSeedPhrase: string
     showAccountRecovery: string
+    deployFirst: string
     wrongPassword: string
     invalidStarkIdError: string
     shortAddressError: string

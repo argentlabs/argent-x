@@ -21,14 +21,14 @@ export const MultisigBanner = ({
 
   return (
     <Box
-      backgroundColor="neutrals.700"
+      backgroundColor="surface.elevated"
       p={3}
       borderRadius="lg"
       _hover={
         onClick
           ? {
               cursor: "pointer",
-              backgroundColor: "neutrals.600",
+              backgroundColor: "surface.elevated.hover",
             }
           : {}
       }

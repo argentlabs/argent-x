@@ -8,7 +8,10 @@ import {
 } from "../../services/backgroundTransactions"
 import { Account } from "../accounts/Account"
 import { useNetworkFeeToken } from "./tokens.state"
-import { swrRefetchDisabledConfig } from "@argent/shared"
+import {
+  swrRefetchDisabledConfig,
+  transferCalldataSchema,
+} from "@argent/shared"
 
 const { estimatedFeeToMaxFee: addOverheadToFee } = stark
 
@@ -49,12 +52,14 @@ export const useMaxFeeEstimateForTransfer = (
       const call: Call = {
         contractAddress: tokenAddress,
         entrypoint: "transfer",
-        calldata: CallData.compile({
-          // We are using a dummy address (ETH here) as recipient to estimate the fee given we don't have a receipient yet
-          recipient: feeToken.address,
-          // We are using the smallest possible amount to make sure this doesn't throw an error
-          amount: uint256.bnToUint256(BigInt(1)),
-        }),
+        calldata: CallData.compile(
+          transferCalldataSchema.parse({
+            // We are using a dummy address (ETH here) as recipient to estimate the fee given we don't have a receipient yet
+            recipient: feeToken.address,
+            // We are using the smallest possible amount to make sure this doesn't throw an error
+            amount: uint256.bnToUint256(BigInt(1)),
+          }),
+        ),
       }
 
       const estimatedFeeFromSimulation = await getSimulationEstimatedFee(call)

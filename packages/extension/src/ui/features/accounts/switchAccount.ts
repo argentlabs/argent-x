@@ -3,6 +3,7 @@ import { accountService } from "../../../shared/account/service"
 import { isEqualWalletAddress } from "../../../shared/wallet.service"
 import { old_walletStore } from "../../../shared/wallet/walletStore"
 import { useAppState } from "../../app.state"
+import { clientAccountService } from "../../services/account"
 import { setDefaultAccountNames } from "./accountMetadata.state"
 import { mapWalletAccountsToAccounts } from "./accounts.state"
 
@@ -37,10 +38,10 @@ export const autoSelectAccountOnNetwork = async (networkId: string) => {
 
     // if the selected account is not on the network, switch to the first visible account
     const account = existingAccountOnNetwork || visibleAccountsOnNetwork[0]
-    await accountService.select(account)
+    await clientAccountService.select(account)
     return account
   } else {
-    await accountService.select(null)
+    await clientAccountService.select(null)
     return null
   }
 }

@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo, useState } from "react"
 
-import { accountService } from "../../../../shared/account/service"
 import {
   removePreAuthorization,
   useIsPreauthorized,
@@ -17,6 +16,7 @@ import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 import { useDisclosure } from "@chakra-ui/react"
 import { NavigationBar } from "@argent/ui"
 import { NetworkSwitcherContainer } from "../../networks/NetworkSwitcher/NetworkSwitcherContainer"
+import { clientAccountService } from "../../../services/account"
 
 export const ConnectDappScreenContainer: FC = () => {
   const {
@@ -42,11 +42,6 @@ export const ConnectDappScreenContainer: FC = () => {
   const isConnected = useIsPreauthorized(host, initiallySelectedAccount)
 
   const dappDisplayAttributes = useDappDisplayAttributes(host)
-  const {
-    isOpen: isKnownDappModalOpen,
-    onOpen: onKnownDappModalOpen,
-    onClose: onKnownDappModalClose,
-  } = useDisclosure()
 
   const selectedAccount = useMemo(() => {
     if (connectedAccount) {
@@ -64,7 +59,7 @@ export const ConnectDappScreenContainer: FC = () => {
   const onConnect = useCallback(async () => {
     if (selectedAccount) {
       // continue with approval with selected account
-      await accountService.select(selectedAccount)
+      await clientAccountService.select(selectedAccount)
     }
     await approveAndClose()
   }, [approveAndClose, selectedAccount])
@@ -98,9 +93,6 @@ export const ConnectDappScreenContainer: FC = () => {
       onConnect={() => void onConnect()}
       onDisconnect={() => void onDisconnect()}
       onReject={() => void reject()}
-      onKnownDappModalClose={onKnownDappModalClose}
-      onKnownDappModalOpen={onKnownDappModalOpen}
-      isKnownDappModalOpen={isKnownDappModalOpen}
       host={host}
       accounts={visibleAccounts}
       dappDisplayAttributes={dappDisplayAttributes}

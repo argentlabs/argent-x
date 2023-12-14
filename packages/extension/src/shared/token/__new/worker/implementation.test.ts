@@ -2,7 +2,7 @@ import { IRepository } from "./../../../storage/__new/interface"
 import { Mocked } from "vitest"
 import { INetworkService } from "../../../network/service/interface"
 import { ITokenService } from "../service/interface"
-import { TokenWorker, TokenWorkerSchedule } from "./implementation"
+import { TokenWorker } from "./implementation"
 import { MockFnRepository } from "../../../storage/__new/__test__/mockFunctionImplementation"
 import { WalletStorageProps } from "../../../wallet/walletStore"
 import { KeyValueStorage } from "../../../storage"
@@ -13,7 +13,6 @@ import { IScheduleService } from "../../../schedule/interface"
 import {
   emitterMock,
   recoverySharedServiceMock,
-  sessionServiceMock,
 } from "../../../../background/wallet/test.utils"
 import { IBackgroundUIService } from "../../../../background/__new/services/ui/interface"
 import { getMockNetwork } from "../../../../../test/network.mock"
@@ -28,9 +27,13 @@ import { BaseWalletAccount } from "../../../wallet.model"
 import { BaseTokenWithBalance } from "../types/tokenBalance.model"
 import { TokenPriceDetails } from "../types/tokenPrice.model"
 import { defaultNetwork } from "../../../network"
+import { IDebounceService } from "../../../debounce"
+import { getMockDebounceService } from "../../../debounce/mock"
+import { createScheduleServiceMock } from "../../../schedule/mock"
+import { IActivityService } from "../../../../background/__new/services/activity/interface"
+import { IActivityStorage } from "../../../activity/types"
 
 const accountAddress1 = addressSchema.parse(stark.randomAddress())
-const accountAddress2 = addressSchema.parse(stark.randomAddress())
 const tokenAddress1 = addressSchema.parse(stark.randomAddress())
 const tokenAddress2 = addressSchema.parse(stark.randomAddress())
 
@@ -42,9 +45,10 @@ describe("TokenWorker", () => {
   let mockTransactionsRepo: IRepository<Transaction>
   let mockTokenRepo: IRepository<Token>
   let mockAccountService: IAccountService
-  let mockScheduleService: IScheduleService<TokenWorkerSchedule>
+  let mockScheduleService: IScheduleService
   let mockBackgroundUIService: IBackgroundUIService
-
+  let mockDebounceService: IDebounceService
+  let mockActivityService: IActivityService
   beforeEach(() => {
     // Initialize mocks
     mockTokenService = {
@@ -79,22 +83,28 @@ describe("TokenWorker", () => {
       get: vi.fn(),
     } as unknown as IAccountService
 
+    mockActivityService = {
+      shouldUpdateBalance: vi.fn().mockResolvedValue({
+        shouldUpdate: true,
+        lastModified: 1234,
+        id: "1234",
+      }),
+      addActivityToStore: vi.fn(),
+    } as unknown as IActivityService
+
     mockTransactionsRepo = new MockFnRepository()
     mockTokenRepo = new MockFnRepository()
 
     mockBackgroundUIService = {
+      opened: true,
       emitter: emitterMock,
       openUiAndUnlock: vi.fn(),
-    } as unknown as IBackgroundUIService
-
-    mockScheduleService = {
-      registerImplementation: vi.fn(),
-      in: vi.fn(),
-      every: vi.fn(),
-      delete: vi.fn(),
-      onInstallAndUpgrade: vi.fn(),
-      onStartup: vi.fn(),
     }
+
+    const [, _mockScheduleService] = createScheduleServiceMock()
+    mockScheduleService = _mockScheduleService
+
+    mockDebounceService = getMockDebounceService()
 
     tokenWorker = new TokenWorker(
       mockWalletStore,
@@ -103,10 +113,11 @@ describe("TokenWorker", () => {
       mockTokenService,
       mockAccountService,
       mockNetworkService,
-      sessionServiceMock,
       recoverySharedServiceMock,
       mockBackgroundUIService,
       mockScheduleService,
+      mockDebounceService,
+      mockActivityService,
     )
   })
 
@@ -166,7 +177,7 @@ describe("TokenWorker", () => {
       )
 
       // Act
-      await tokenWorker.updateTokenBalances(mockAccount)
+      await tokenWorker.updateTokenBalancesForAccount(mockAccount)
 
       // Assert
       expect(mockTokenService.getTokens).toHaveBeenCalledWith(
@@ -183,11 +194,11 @@ describe("TokenWorker", () => {
     it("should fetch token balances for all accounts on the current network and update the token service when no account is provided", async () => {
       const mockSelectedAccount: BaseWalletAccount = {
         address: accountAddress1,
-        networkId: "1",
+        networkId: "goerli-alpha",
       }
       const mockAccounts: BaseWalletAccount[] = [mockSelectedAccount]
-      const mockBaseToken = getMockBaseToken({ networkId: "1" })
-      const mockTokens: Token[] = [getMockToken({ networkId: "1" })]
+      const mockBaseToken = getMockBaseToken({ networkId: "goerli-alpha" })
+      const mockTokens: Token[] = [getMockToken({ networkId: "goerli-alpha" })]
       const mockTokensWithBalances: BaseTokenWithBalance[] = [
         {
           ...mockBaseToken,
@@ -203,6 +214,7 @@ describe("TokenWorker", () => {
         .mockResolvedValue(mockTokensWithBalances)
 
       await tokenWorker.updateTokenBalances()
+
       expect(mockWalletStore.get).toHaveBeenCalledWith("selected")
       expect(mockAccountService.get).toHaveBeenCalledWith(expect.any(Function))
       expect(mockTokenService.getTokens).toHaveBeenCalledWith(
@@ -214,7 +226,83 @@ describe("TokenWorker", () => {
       expect(mockTokenService.updateTokenBalances).toHaveBeenCalledWith(
         mockTokensWithBalances,
       )
+      expect(mockActivityService.addActivityToStore).toHaveBeenCalledWith({
+        address: mockSelectedAccount.address,
+        lastModified: 1234,
+        id: "1234",
+      })
     })
+  })
+
+  it("should not fetch token balances for all accounts on the current network and not update the token service if activity service returns false", async () => {
+    const mockSelectedAccount: BaseWalletAccount = {
+      address: accountAddress1,
+      networkId: "goerli-alpha",
+    }
+    const mockAccounts: BaseWalletAccount[] = [mockSelectedAccount]
+    const mockBaseToken = getMockBaseToken({ networkId: "1" })
+    const mockTokens: Token[] = [getMockToken({ networkId: "1" })]
+    const mockTokensWithBalances: BaseTokenWithBalance[] = [
+      {
+        ...mockBaseToken,
+        account: mockSelectedAccount,
+        balance: "100",
+      },
+    ]
+    mockActivityService.shouldUpdateBalance = vi
+      .fn()
+      .mockResolvedValue({ shouldUpdate: false })
+    mockWalletStore.get = vi.fn().mockReturnValue(mockSelectedAccount)
+    mockAccountService.get = vi.fn().mockResolvedValue(mockAccounts)
+    mockTokenService.getTokens = vi.fn().mockResolvedValue(mockTokens)
+    mockTokenService.fetchTokenBalancesFromOnChain = vi
+      .fn()
+      .mockResolvedValue(mockTokensWithBalances)
+
+    await tokenWorker.updateTokenBalances()
+
+    expect(mockWalletStore.get).toHaveBeenCalledWith("selected")
+    expect(mockAccountService.get).toHaveBeenCalledWith(expect.any(Function))
+    expect(mockTokenService.getTokens).toHaveBeenCalledWith(
+      expect.any(Function),
+    )
+    expect(
+      mockTokenService.fetchTokenBalancesFromOnChain,
+    ).not.toHaveBeenCalled()
+    expect(mockTokenService.updateTokenBalances).not.toHaveBeenCalledWith(
+      mockTokensWithBalances,
+    )
+  })
+
+  it("should not fetch token balances from the backend if the selected network isnt support by backend", async () => {
+    const mockSelectedAccount: BaseWalletAccount = {
+      address: accountAddress1,
+      networkId: "insupportable",
+    }
+    const mockAccounts: BaseWalletAccount[] = [mockSelectedAccount]
+    const mockBaseToken = getMockBaseToken({ networkId: "1" })
+    const mockTokens: Token[] = [getMockToken({ networkId: "1" })]
+    const mockTokensWithBalances: BaseTokenWithBalance[] = [
+      {
+        ...mockBaseToken,
+        account: mockSelectedAccount,
+        balance: "100",
+      },
+    ]
+    mockActivityService.shouldUpdateBalance = vi.fn().mockResolvedValue(false)
+    mockWalletStore.get = vi.fn().mockReturnValue(mockSelectedAccount)
+    mockAccountService.get = vi.fn().mockResolvedValue(mockAccounts)
+    mockTokenService.getTokens = vi.fn().mockResolvedValue(mockTokens)
+    mockTokenService.fetchTokenBalancesFromOnChain = vi
+      .fn()
+      .mockResolvedValue(mockTokensWithBalances)
+
+    await tokenWorker.updateTokenBalances()
+
+    expect(mockWalletStore.get).toHaveBeenCalledWith("selected")
+    expect(mockAccountService.get).not.toHaveBeenCalledWith(
+      expect.any(Function),
+    )
   })
 
   describe("updateTokenPrices", () => {
@@ -242,39 +330,6 @@ describe("TokenWorker", () => {
       expect(mockTokenService.updateTokenPrices).toHaveBeenCalledWith(
         mockTokenPrices,
       )
-    })
-  })
-
-  describe("onOpened ", () => {
-    it("should start the token worker schedule when opened", async () => {
-      // Act
-      tokenWorker.onOpened(true)
-
-      // Assert
-      expect(mockScheduleService.every).toHaveBeenCalledTimes(3)
-      expect(mockScheduleService.every).toHaveBeenNthCalledWith(1, 86400, {
-        id: TokenWorkerSchedule.updateTokens,
-      })
-      expect(mockScheduleService.every).toHaveBeenNthCalledWith(2, 20, {
-        id: TokenWorkerSchedule.updateTokenBalances,
-      })
-      expect(mockScheduleService.every).toHaveBeenNthCalledWith(3, 60, {
-        id: TokenWorkerSchedule.updateTokenPrices,
-      })
-    })
-
-    it("should delete the token worker schedule when closed", async () => {
-      // Act
-      tokenWorker.onOpened(false)
-
-      // Assert
-      expect(mockScheduleService.delete).toHaveBeenCalledTimes(2)
-      expect(mockScheduleService.delete).toHaveBeenNthCalledWith(1, {
-        id: TokenWorkerSchedule.updateTokenBalances,
-      })
-      expect(mockScheduleService.delete).toHaveBeenNthCalledWith(2, {
-        id: TokenWorkerSchedule.updateTokenPrices,
-      })
     })
   })
 })

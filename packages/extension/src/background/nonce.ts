@@ -4,8 +4,6 @@ import { KeyValueStorage } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { getAccountIdentifier } from "../shared/wallet.service"
 
-import { Account as AccountV4__deprecated } from "starknet4-deprecated"
-
 const nonceStore = new KeyValueStorage<Record<string, string>>(
   {},
   {
@@ -16,7 +14,7 @@ const nonceStore = new KeyValueStorage<Record<string, string>>(
 
 export async function getNonce(
   account: WalletAccount,
-  starknetAccount: Account | AccountV4__deprecated,
+  starknetAccount: Account,
 ): Promise<string> {
   const storageAddress = getAccountIdentifier(account)
   const result = await starknetAccount.getNonce()

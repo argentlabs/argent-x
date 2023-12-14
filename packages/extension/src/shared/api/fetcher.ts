@@ -1,6 +1,7 @@
 /** generic json fetcher */
 
-import { useAppState } from "../../ui/app.state"
+import { defaultNetwork } from "../network"
+import { walletStore } from "../wallet/walletStore"
 
 export type Fetcher = <T>(
   input: RequestInfo | URL,
@@ -85,12 +86,12 @@ export const fetcherWithArgentApiHeadersForNetwork = (
   return fetcherWithArgentApiHeaders
 }
 
-export const fetcherWithArgentApiHeaders = (fetcherImpl: Fetcher = fetcher) => {
-  const { switcherNetworkId } = useAppState.getState()
-  const fetcher = fetcherWithArgentApiHeadersForNetwork(
-    switcherNetworkId,
-    fetcherImpl,
-  )
+export const fetcherWithArgentApiHeaders = async (
+  fetcherImpl: Fetcher = fetcher,
+) => {
+  const { selected } = await walletStore.get()
+  const networkId = selected?.networkId ?? defaultNetwork.id
+  const fetcher = fetcherWithArgentApiHeadersForNetwork(networkId, fetcherImpl)
   return fetcher
 }
 

@@ -11,7 +11,7 @@ interface GetTimeResponse {
 
 export const getBackendTimeSeconds = async () => {
   try {
-    const fetcher = fetcherWithArgentApiHeaders()
+    const fetcher = await fetcherWithArgentApiHeaders()
     const { time } = await fetcher<GetTimeResponse>(
       urlJoin(ARGENT_API_BASE_URL, `time`),
     )

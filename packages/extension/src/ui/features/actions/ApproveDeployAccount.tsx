@@ -3,21 +3,27 @@ import { Navigate } from "react-router-dom"
 
 import { routes } from "../../routes"
 import { DeployAccountFeeEstimation } from "./feeEstimation/DeployAccountFeeEstimation"
-import { AccountNetworkInfoArgentX } from "./transaction/ApproveTransactionScreen/AccountNetworkInfoArgentX"
 import {
   ConfirmPageProps,
   ConfirmScreen,
 } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
-import { DappHeaderArgentX } from "./transaction/ApproveTransactionScreen/DappHeader/DappHeaderArgentX"
-import { TransactionActions } from "./transaction/ApproveTransactionScreen/TransactionActions"
 import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
-import { ApproveScreenType } from "./transaction/types"
+import { AccountDetails } from "./transactionV2/TransactionHeader/AccountDetails"
+import { Divider } from "@chakra-ui/react"
+import {
+  TransactionHeader,
+  TransactionHeaderProps,
+} from "./transactionV2/TransactionHeader"
+import { TransactionReviewActions } from "./transactionV2/action/TransactionReviewActions"
+import { ReviewOfTransaction } from "../../../shared/transactionReview/schema"
 
 export interface ApproveDeployAccountScreenProps
-  extends Omit<ConfirmPageProps, "onSubmit"> {
+  extends Omit<ConfirmPageProps, "onSubmit">,
+    Pick<TransactionHeaderProps, "title" | "iconKey"> {
   actionHash: string
   onSubmit: () => void
   actionIsApproving?: boolean
+  displayCalldata?: string[]
 }
 
 export const ApproveDeployAccountScreen: FC<
@@ -25,25 +31,64 @@ export const ApproveDeployAccountScreen: FC<
 > = ({
   selectedAccount,
   actionHash,
-  onSubmit,
   actionIsApproving,
-  ...props
+  displayCalldata = [],
+  title = "Deploy",
+  iconKey,
+  ...rest
 }) => {
   const [disableConfirm, setDisableConfirm] = useState(false)
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
+  const navigationBar = (
+    <>
+      <AccountDetails />
+      <Divider color="neutrals.700" />
+    </>
+  )
+
+  /** Show mock tx review to the end user */
+
+  const reviewOfTransaction: ReviewOfTransaction = {
+    assessment: "verified",
+    reviews: [
+      {
+        assessment: "verified",
+        action: {
+          name: title,
+          properties: [],
+          defaultProperties: [
+            {
+              type: "address",
+              label: "default_contract",
+              address: selectedAccount.address,
+              verified: false,
+            },
+            {
+              type: "calldata",
+              label: "default_call",
+              entrypoint: "constructor",
+              calldata: displayCalldata,
+            },
+          ],
+        },
+      },
+    ],
+  }
+
+  const transactionReviewActions = (
+    <TransactionReviewActions
+      reviewOfTransaction={reviewOfTransaction}
+      initiallyExpanded
+    />
+  )
 
   return (
     <ConfirmScreen
-      title="Review activation"
-      rejectButtonText="Cancel"
       confirmButtonIsLoading={actionIsApproving}
       confirmButtonDisabled={disableConfirm || actionIsApproving}
-      selectedAccount={selectedAccount}
-      onSubmit={onSubmit}
-      showHeader={true}
       footer={
         <WithActionScreenErrorFooter isTransaction>
           <DeployAccountFeeEstimation
@@ -55,24 +100,11 @@ export const ApproveDeployAccountScreen: FC<
           />
         </WithActionScreenErrorFooter>
       }
-      {...props}
+      navigationBar={navigationBar}
+      {...rest}
     >
-      {/** Use Transaction Review to get DappHeader */}
-      <DappHeaderArgentX approveScreenType={ApproveScreenType.ACCOUNT_DEPLOY} />
-
-      <TransactionActions
-        action={{
-          type: "DEPLOY_ACCOUNT",
-          payload: {
-            accountAddress: selectedAccount.address,
-            classHash:
-              selectedAccount.network.accountClassHash?.[selectedAccount.type],
-            type: selectedAccount.type,
-          },
-        }}
-      />
-
-      <AccountNetworkInfoArgentX account={selectedAccount} />
+      <TransactionHeader px={0} title={title} iconKey={iconKey} />
+      {transactionReviewActions}
     </ConfirmScreen>
   )
 }

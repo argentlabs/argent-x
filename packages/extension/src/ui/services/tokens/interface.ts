@@ -2,7 +2,7 @@ import { Address } from "@argent/shared"
 
 import { Network } from "../../../shared/network"
 import { TokenView } from "../../features/accountTokens/tokens.service"
-import { BigNumberish } from "starknet"
+import { BigNumberish, Call, RawArgs } from "starknet"
 import { BalancesMap } from "./types"
 import {
   BaseTokenWithBalance,
@@ -47,4 +47,18 @@ export interface ITokensService {
     accountAddresses: Address[],
     network: Network,
   ): Promise<Record<string, string>>
+  send({
+    to,
+    method,
+    calldata,
+    title,
+    subtitle,
+  }: {
+    to: Address
+    method: string
+    calldata: RawArgs
+    title: string
+    subtitle: string
+  }): Promise<void>
+  swap(transaction: Call[], title: string): Promise<void>
 }

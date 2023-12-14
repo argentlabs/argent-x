@@ -42,7 +42,10 @@ export default class Dapps extends Navigation {
     await dapp.goto("chrome://inspect/#extensions")
     await dapp.waitForTimeout(5000)
     await dapp.goto(url)
-
+    const warningLoc = dapp.locator("text=enter anyway")
+    if (await warningLoc.isVisible()) {
+      await warningLoc.click()
+    }
     await dapp
       .locator('div :text-matches("Connect Wallet", "i")')
       .first()

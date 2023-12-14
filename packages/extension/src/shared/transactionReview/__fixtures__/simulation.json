@@ -1,0 +1,139 @@
+{
+  "transactions": [
+    {
+      "reviewOfTransaction": {
+        "assessment": "warn",
+        "warnings": [
+          { "reason": "undeployed_account", "details": {}, "severity": "info" }
+        ],
+        "reviews": [
+          {
+            "assessment": "warn",
+            "warnings": [
+              {
+                "reason": "undeployed_account",
+                "details": {},
+                "severity": "info"
+              }
+            ],
+            "action": {
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "type": "amount",
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  },
+                  "amount": "10177678004054592",
+                  "usd": "23.96",
+                  "editable": false
+                },
+                {
+                  "type": "address",
+                  "label": "ERC20_transfer_recipient",
+                  "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+                  "verified": false
+                }
+              ],
+              "defaultProperties": [
+                {
+                  "type": "token_address",
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  }
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "transfer",
+                  "calldata": [
+                    "2689035213040902571798644155430358178496847363710771602620498934381075712549",
+                    "10177678004054592",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "simulation": {
+        "approvals": [],
+        "transfers": [
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "from": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "to": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "value": "10177678004054592",
+            "usdValue": "23.96",
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          }
+        ],
+        "summary": [
+          {
+            "type": "transfer",
+            "label": "simulation_summary_send",
+            "value": "10177678004054592",
+            "usdValue": "23.96",
+            "token": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            },
+            "sent": true
+          },
+          {
+            "type": "transfer",
+            "label": "simulation_summary_receive",
+            "value": "10177678004054592",
+            "usdValue": "23.96",
+            "token": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            },
+            "sent": false
+          }
+        ],
+        "calculatedNonce": "0x22",
+        "feeEstimation": {
+          "overallFee": "2520000100800",
+          "gasPrice": "1000000040",
+          "gasUsage": "2520",
+          "unit": "wei",
+          "maxFee": "5040003826577"
+        }
+      }
+    }
+  ]
+}

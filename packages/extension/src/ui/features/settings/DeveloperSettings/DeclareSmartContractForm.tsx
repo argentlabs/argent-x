@@ -6,13 +6,13 @@ import { CompiledSierraCasm, hash, isSierra } from "starknet"
 import { chakra } from "@chakra-ui/react"
 
 import { readFileAsString } from "@argent/shared"
-import { accountService } from "../../../../shared/account/service"
-import { DeclareContract } from "../../../../shared/udc/type"
 import { useAppState } from "../../../app.state"
-import { declareContract } from "../../../services/udc.service"
 import { FileNameWithClassHash } from "./ui/ContractWithClassHash"
 import { FileInputButton } from "./ui/FileInputButton"
 import { useFormSelects } from "./useFormSelects"
+import { udcService } from "../../../services/udc"
+import { DeclareContractBackgroundPayload } from "../../../../shared/udc/type"
+import { clientAccountService } from "../../../services/account"
 
 interface FieldValues {
   contractJson: string
@@ -153,11 +153,11 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
       return
     }
     useAppState.setState({ switcherNetworkId: network })
-    await accountService.select({
+    await clientAccountService.select({
       address: account,
       networkId: network,
     })
-    const payload: DeclareContract = {
+    const payload: DeclareContractBackgroundPayload = {
       address: account,
       contract: contractJsonRef.current,
       networkId: network,
@@ -171,8 +171,7 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
       // payload.casm = contractCasmRef.current
       payload.compiledClassHash = contractCasmClassHash
     }
-
-    await declareContract(payload)
+    await udcService.declareContract(payload)
     clearErrors()
   }
 

@@ -1,4 +1,4 @@
-import { isEqualAddress, normalizeAddressOrStarknetId } from "@argent/shared"
+import { isEqualAddress, normalizeAddressOrDomain } from "@argent/shared"
 import { useMemo } from "react"
 
 import { useAppState } from "../../app.state"
@@ -17,9 +17,9 @@ export const useFilteredContacts = (query?: string) => {
 
     return contacts.filter(
       (contact) =>
-        contact.name.toLowerCase().includes(queryLowercase) ||
+        contact.name?.toLowerCase().includes(queryLowercase) ||
         contact.address.toLowerCase().includes(queryLowercase) ||
-        normalizeAddressOrStarknetId(contact.address)
+        normalizeAddressOrDomain(contact.address)
           .toLowerCase()
           .includes(queryLowercase) ||
         isEqualAddress(contact.address, query),

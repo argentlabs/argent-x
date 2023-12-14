@@ -1,10 +1,10 @@
-import { Box, Tooltip } from "@chakra-ui/react"
+import { Box, Tooltip, TooltipProps } from "@chakra-ui/react"
 import { FC, PropsWithChildren, useEffect, useRef, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
 import { useOnClickOutside } from "../hooks"
 
-interface CopyTooltipProps extends PropsWithChildren {
+interface CopyTooltipProps extends Omit<TooltipProps, "label" | "isOpen"> {
   copyValue: string
   prompt?: string
   message?: string
@@ -19,6 +19,7 @@ export const CopyTooltip: FC<CopyTooltipProps> = ({
   autoDismiss = true,
   children,
   onClick,
+  ...rest
 }) => {
   const [visible, setVisible] = useState(false)
   const timeoutIdRef = useRef<ReturnType<typeof setTimeout>>()
@@ -35,7 +36,11 @@ export const CopyTooltip: FC<CopyTooltipProps> = ({
   }, [autoDismiss, visible])
 
   return (
-    <Tooltip label={visible ? message : prompt} isOpen={visible || undefined}>
+    <Tooltip
+      label={visible ? message : prompt}
+      isOpen={visible || undefined}
+      {...rest}
+    >
       <Box ref={clickOutsideRef}>
         {!onClick && (
           <CopyToClipboard text={copyValue} onCopy={() => setVisible(true)}>

@@ -11,7 +11,6 @@ import { filter, partition } from "lodash-es"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { accountService } from "../../../shared/account/service"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { AutoColumn } from "../../components/Column"
 import { routes } from "../../routes"
@@ -24,6 +23,7 @@ import {
   ImplementationItemProps,
   implementations,
 } from "./Implementation"
+import { clientAccountService } from "../../services/account"
 
 const { TickIcon } = icons
 
@@ -65,9 +65,9 @@ export const ChangeAccountImplementationScreen: FC = () => {
 
   const handleImplementationClick = (i: Implementation) => async () => {
     if (!isSelectedAccount) {
-      await accountService.select(account)
+      await clientAccountService.select(account)
     }
-    await accountService.upgrade(account, i.id)
+    await clientAccountService.upgrade(account, i.id)
     navigate(routes.accountTokens(), { replace: true })
   }
 

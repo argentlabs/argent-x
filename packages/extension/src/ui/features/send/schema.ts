@@ -1,10 +1,10 @@
-import { addressOrStarknetIdSchema, addressSchema } from "@argent/shared"
+import { addressOrDomainSchema, addressSchema } from "@argent/shared"
 import { z } from "zod"
 
 import { useQuery } from "../../hooks/useQuery"
 
 export const sendQuerySchema = z.object({
-  recipientAddress: addressOrStarknetIdSchema.optional(),
+  recipientAddress: addressOrDomainSchema.optional(),
   tokenAddress: addressSchema.optional(),
   tokenId: z.string().optional(),
   amount: z.string().optional(),

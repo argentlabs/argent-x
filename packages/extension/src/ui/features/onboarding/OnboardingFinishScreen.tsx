@@ -8,7 +8,7 @@ import { OnboardingRectButton } from "./ui/OnboardingRectButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
 const { TickCircleIcon } = icons
-const { Twitter, Discord } = logos
+const { TwitterLogo, DiscordLogo } = logos
 
 export interface OnboardingFinishScreenProps {
   onFinish: ReactEventHandler
@@ -34,7 +34,7 @@ export const OnboardingFinishScreen: FC<OnboardingFinishScreenProps> = ({
           target="_blank"
         >
           <Circle size={16} bg={"#1DA1F2"}>
-            <Twitter fontSize={"2xl"} />
+            <TwitterLogo fontSize={"2xl"} />
           </Circle>
           Follow Argent X on Twitter
         </OnboardingRectButton>
@@ -45,7 +45,7 @@ export const OnboardingFinishScreen: FC<OnboardingFinishScreenProps> = ({
           target="_blank"
         >
           <Circle size={16} bg={"#5865F2"}>
-            <Discord fontSize={"2xl"} />
+            <DiscordLogo fontSize={"2xl"} />
           </Circle>
           Join the Argent X Discord
         </OnboardingRectButton>

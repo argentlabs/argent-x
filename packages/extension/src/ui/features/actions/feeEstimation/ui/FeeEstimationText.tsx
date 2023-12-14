@@ -23,7 +23,7 @@ export interface FeeEstimationTextProps extends ThemingProps<"Flex"> {
 export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
   colorScheme = "neutrals",
   tooltipText,
-  title = "Network fee",
+  title = "Estimated fee",
   subtitle,
   isLoading = false,
   primaryText,

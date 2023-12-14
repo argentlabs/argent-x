@@ -15,12 +15,14 @@ export class NetworkWorker {
     private readonly debounceService: IDebounceService<typeof TASK_ID>,
   ) {}
 
-  updateNetworkStatuses = everyWhenOpen(
-    this.backgroundUIService,
-    this.scheduleService,
-    this.debounceService,
-    RefreshInterval.MEDIUM,
-  )(async (): Promise<void> => {
-    await this.backgroundNetworkService.updateStatuses()
-  })
+  // Temp: This is commented out until we have a final decision on RPC provider
+  //updateNetworkStatuses = everyWhenOpen(
+  //  this.backgroundUIService,
+  //  this.scheduleService,
+  //  this.debounceService,
+  //  RefreshInterval.MEDIUM,
+  //  "NetworkWorker.updateNetworkStatuses",
+  //)(async (): Promise<void> => {
+  //  await this.backgroundNetworkService.updateStatuses()
+  //})
 }

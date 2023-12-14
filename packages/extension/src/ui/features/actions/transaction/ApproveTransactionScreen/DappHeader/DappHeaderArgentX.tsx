@@ -3,21 +3,17 @@ import { Box, Flex } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 import { Call } from "starknet"
 
-import {
-  ApiTransactionReviewResponse,
-  ApiTransactionReviewTargettedDapp,
-} from "../../../../../../shared/transactionReview.service"
+import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
 import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
-import { VerifiedDappBannerArgentX } from "../VerifiedDappBanner"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitleArgentX } from "./TransactionTitleArgentX"
+import { KnownDappButtonWrapper } from "../../../connectDapp/KnownDappButtonWrapper"
 
 export interface DappHeaderArgentXProps {
   transactions?: Call[]
   transactionReview?: ApiTransactionReviewResponse
   aggregatedData?: AggregatedSimData[]
-  verifiedDapp?: ApiTransactionReviewTargettedDapp
   approveScreenType: ApproveScreenType
 }
 
@@ -26,7 +22,6 @@ export const DappHeaderArgentX: FC<DappHeaderArgentXProps> = ({
   transactionReview,
   aggregatedData,
   approveScreenType,
-  verifiedDapp,
 }) => {
   const targetedDappWebsite = useMemo(
     () =>
@@ -47,7 +42,7 @@ export const DappHeaderArgentX: FC<DappHeaderArgentXProps> = ({
           verifiedDapp={transactionReview?.targetedDapp}
           approveScreenType={approveScreenType}
         />
-        {verifiedDapp && <VerifiedDappBannerArgentX dapp={verifiedDapp} />}
+
         <Flex
           direction="column"
           justifyContent="center"
@@ -67,9 +62,12 @@ export const DappHeaderArgentX: FC<DappHeaderArgentXProps> = ({
             />
           </H5>
           {targetedDappWebsite && (
-            <P4 color="neutrals.300" sx={{ marginTop: 0 }}>
-              {targetedDappWebsite.url}
-            </P4>
+            <Flex alignItems="center">
+              <P4 color="neutrals.300" sx={{ marginTop: 0 }} pr={1}>
+                {targetedDappWebsite.url}
+              </P4>
+              <KnownDappButtonWrapper dappHost={targetedDappWebsite.url} />
+            </Flex>
           )}
         </Flex>
       </Flex>

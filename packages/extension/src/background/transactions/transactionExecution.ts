@@ -18,12 +18,11 @@ import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { isAccountDeployed } from "../accountDeploy"
 import { analytics } from "../analytics"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
-import { argentMaxFee } from "../utils/argentMaxFee"
 import { Wallet } from "../wallet"
 import { getEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import { addTransaction, transactionsStore } from "./store"
-import { isAccountV5 } from "../../shared/utils/accountv4"
 import { getMultisigAccountFromBaseWallet } from "../../shared/multisig/utils/baseMultisig"
+import { isAccountV5 } from "@argent/shared"
 
 export const checkTransactionHash = (
   transactionHash?: num.BigNumberish,
@@ -43,7 +42,7 @@ export const checkTransactionHash = (
   }
 }
 
-type TransactionAction = ExtQueueItem<{
+export type TransactionAction = ExtQueueItem<{
   type: "TRANSACTION"
   payload: TransactionActionPayload
 }>
@@ -64,8 +63,8 @@ export const executeTransactionAction = async (
     transactionsDetail?.maxFee ?? preComputedFees.suggestedMaxFee
   const suggestedMaxADFee = preComputedFees.maxADFee ?? "0"
 
-  const maxFee = argentMaxFee(suggestedMaxFee)
-  const maxADFee = argentMaxFee(suggestedMaxADFee)
+  const maxFee = suggestedMaxFee
+  const maxADFee = suggestedMaxADFee
 
   void analytics.track("executeTransaction", {
     usesCachedFees: Boolean(preComputedFees),

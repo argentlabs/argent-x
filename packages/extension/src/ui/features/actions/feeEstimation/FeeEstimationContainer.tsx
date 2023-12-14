@@ -23,6 +23,7 @@ export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
   transactionSimulationFee,
   transactionSimulationFeeError,
   transactionSimulationLoading,
+  needsDeploy = false,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
@@ -105,6 +106,7 @@ export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
           showFeeError={showFeeError}
           suggestedMaxFeeCurrencyValue={suggestedMaxFeeCurrencyValue}
           userClickedAddFunds={userClickedAddFunds}
+          needsDeploy={needsDeploy}
         />
       )}
     </>

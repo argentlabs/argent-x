@@ -1,10 +1,8 @@
 import { flatMap, isEmpty, partition } from "lodash-es"
 import { hash, transaction } from "starknet"
+import { getChainIdFromNetworkId } from "@argent/shared"
 
-import {
-  IBackgroundUIService,
-  Opened,
-} from "../../../background/__new/services/ui/interface"
+import { IBackgroundUIService } from "../../../background/__new/services/ui/interface"
 import { IScheduleService } from "../../../shared/schedule/interface"
 import { IMultisigBackendService } from "../../../shared/multisig/service/backend/interface"
 import { INetworkService } from "../../../shared/network/service/interface"
@@ -33,7 +31,6 @@ import {
   multisigPendingTransactionToTransaction,
 } from "../../../shared/multisig/pendingTransactionsStore"
 import { getMultisigTransactionType } from "../../../shared/multisig/utils/getMultisigTransactionType"
-import { getChainIdFromNetworkId } from "../../../shared/network/utils"
 import { everyWhenOpen } from "../../__new/services/worker/schedule/decorators"
 import { IDebounceService } from "../../../shared/debounce"
 import { pipe } from "../../__new/services/worker/schedule/pipe"
@@ -57,6 +54,7 @@ export class MultisigWorker {
       this.scheduleService,
       this.debounceService,
       RefreshInterval.FAST,
+      "MultisigWorker.updateAll",
     ),
   )(async (): Promise<void> => {
     console.log("Updating multisig data")

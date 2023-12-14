@@ -19,7 +19,7 @@ jobs:
       # FEATURE flags
       FEATURE_PRIVACY_SETTINGS: "true"
       FEATURE_EXPERIMENTAL_SETTINGS: "false"
-      FEATURE_BETA_FEATURES: "true"
+      FEATURE_BETA_FEATURES: "false"
       FEATURE_BANXA: "true"
       FEATURE_LAYERSWAP: "true"
       FEATURE_ORBITER: "true"
@@ -29,6 +29,7 @@ jobs:
       # API URLs
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
 
       # API ENVIRONMENT
       ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
@@ -49,6 +50,9 @@ jobs:
       MEDIUM: 60 # 60s
       SLOW: 60 * 5 # 5m
       VERY_SLOW: 24 * 60 * 60 # 1d
+
+      #For testing only
+      FEE_OVERHEAD: 2
 
     steps:
       # Setup Project
@@ -120,12 +124,13 @@ jobs:
 
     env:
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+      ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
       ARGENT_X_ENVIRONMENT: "hydrogen"
 
     services:
       devnet:
-        image: shardlabs/starknet-devnet:latest-seed0
+        image: shardlabs/starknet-devnet-rs:latest-seed0
         ports:
           - 5050:5050
 
@@ -184,6 +189,7 @@ jobs:
         shardTotal: [8]
     env:
       ARGENT_X_ENVIRONMENT: "hydrogen"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
       E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
       E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
       E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
@@ -195,6 +201,7 @@ jobs:
       E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
       STARKNET_TESTNET_URL: ${{ secrets.STARKNET_TESTNET_URL }}
       STARKSCAN_TESTNET_URL: ${{ secrets.STARKSCAN_TESTNET_URL }}
+      ARGENT_TESTNET_RPC_URL: ${{ secrets.ARGENT_TESTNET_RPC_URL }}
 
     steps:
       - uses: actions/checkout@v4
@@ -397,6 +404,7 @@ jobs:
       NEXT_PUBLIC_RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
       NEXT_PUBLIC_FEATURE_COSIGNER: "true"
       NEXT_PUBLIC_ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+      NEXT_PUBLIC_ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
 
     steps:
       - uses: actions/checkout@v4
@@ -445,7 +453,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: all-blob-reports
+          name: all-blob-reports-webwallet
           path: packages/e2e/blob-report/
           retention-days: 5
 

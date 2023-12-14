@@ -44,6 +44,7 @@ export const AccountListItemShieldBadge: FC<
         bg={"neutrals.800"}
         color={"white"}
         fontSize={"2xs"}
+        data-testid="shield-on-settings"
       >
         <ArgentShieldIcon />
       </Circle>

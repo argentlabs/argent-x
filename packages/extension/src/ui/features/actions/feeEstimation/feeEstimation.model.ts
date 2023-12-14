@@ -13,4 +13,5 @@ export interface FeeEstimationProps {
   showFeeError: boolean
   suggestedMaxFeeCurrencyValue?: string
   userClickedAddFunds?: boolean
+  needsDeploy?: boolean
 }

@@ -28,7 +28,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
           onClick={onAccountList}
         >
           {isShield && (
-            <Text fontSize={"2xs"} mr={1}>
+            <Text fontSize={"2xs"} mr={1} data-testid="shield-on-account-view">
               <ArgentShieldIcon />
             </Text>
           )}

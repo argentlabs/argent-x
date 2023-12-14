@@ -3,9 +3,9 @@ import { icons } from "@argent/ui"
 import { Spinner } from "@chakra-ui/react"
 import { FC, useCallback, useMemo } from "react"
 
-import { accountService } from "../../../shared/account/service"
 import { useIsMultisigDeploying } from "./hooks/useIsMultisigDeploying"
 import { Multisig } from "./Multisig"
+import { clientAccountService } from "../../services/account"
 
 const { MultisigIcon } = icons
 
@@ -26,7 +26,7 @@ export const MultisigBanner: FC<{
 
   const onActivateMultisig = useCallback(async () => {
     if (multisig) {
-      await accountService.deploy(multisig)
+      await clientAccountService.deploy(multisig)
     }
   }, [multisig])
 

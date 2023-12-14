@@ -1,70 +1,136 @@
-import urlJoin from "url-join"
-import { ARGENT_API_BASE_URL } from "../../api/constants"
+import { isArray } from "lodash-es"
+import {
+  ARGENT_API_BASE_URL,
+  ARGENT_EXPLORER_BASE_URL,
+} from "../../api/constants"
+import { Transaction, getInFlightTransactions } from "../../transactions"
 
-const DEFAULT_THRESHOLD = 0.9 // 90%
+export interface IMinimalStorage
+  extends Pick<Storage, "setItem" | "getItem" | "removeItem"> {}
 
-const pruneThreshold = DEFAULT_THRESHOLD
+export type PruneFn = (value: string) => string
 
-const keysToRemoveFirst = [
-  // Might be an old key as it does not seem to exist in newer wallets, so we want to remove it first.
-  urlJoin(ARGENT_API_BASE_URL, "tokens/info?chain="),
-  urlJoin(ARGENT_API_BASE_URL, "tokens/info?chain=starknet"),
-] // Add keys you want to prioritize for removal here.
+export type Pattern = RegExp | [RegExp, PruneFn]
 
-export function pruneData() {
-  // Fetch all keys from the local storage.
-  const keys = Object.keys(localStorage)
+/** prune anything which can be retrieved again on-demand */
 
-  // Sort keys based on their priority in keysToRemoveFirst.
-  keys.sort((a, b) => {
-    const indexA = keysToRemoveFirst.indexOf(a)
-    const indexB = keysToRemoveFirst.indexOf(b)
+const localStoragePatterns: Pattern[] = [
+  new RegExp(`${ARGENT_API_BASE_URL}`, "i"),
+  new RegExp(`${ARGENT_EXPLORER_BASE_URL}`, "i"),
+  /"useTransactionReviewV2"/,
+  /"simulateAndReview"/,
+  /"maxEthTransferEstimate"/,
+  /"accountDeploymentFeeEstimation"/,
+  /"nonce"/,
+  /"fee"/,
+  /"balanceOf"/,
+  /"accountTokenBalances"/,
+  /"feeTokenBalance"/,
+  [/^core:transactions$/, pruneTransactions],
+  /^dev:storage/,
+]
 
-    if (indexA !== -1 && indexB === -1) {
-      return -1 // a comes before b
+/** keep in-flight transactions as they can't be retreived from backend or on-chain */
+
+export function pruneTransactions(value: string) {
+  try {
+    const transactions: Transaction[] = JSON.parse(value)
+    const prunedTransactions = getInFlightTransactions(transactions)
+    return JSON.stringify(prunedTransactions)
+  } catch (e) {
+    // ignore parsing error
+  }
+  return value
+}
+
+export function copyStorageToObject(storage: IMinimalStorage = localStorage) {
+  const object: Record<string, string> = {}
+  for (const key of Object.keys(storage)) {
+    const value = storage.getItem(key)
+    if (value !== null) {
+      object[key] = value
     }
-    if (indexA === -1 && indexB !== -1) {
-      return 1 // b comes before a
-    }
-    if (indexA !== -1 && indexB !== -1) {
-      return indexA - indexB // sort by their position in keysToRemoveFirst
-    }
+  }
+  return object
+}
 
-    // If neither key is in keysToRemoveFirst, keep the original order
-    return 0
-  })
+export function copyObjectToStorage(
+  object: Record<string, string>,
+  storage: IMinimalStorage = localStorage,
+) {
+  for (const key of Object.keys(storage)) {
+    storage.removeItem(key)
+  }
+  for (const key in object) {
+    const value = object[key]
+    storage.setItem(key, value)
+  }
+}
 
-  // Remove items based on sorted order till storage is below threshold or all items are removed.
-  for (const key of keys) {
-    localStorage.removeItem(key)
-    if (checkIfBelowThreshold()) {
-      break
+export function pruneStorageData(
+  storage: IMinimalStorage = localStorage,
+  patterns: Pattern[] = localStoragePatterns,
+) {
+  for (const key of Object.keys(storage)) {
+    const matches = patterns.some((pattern) => {
+      if (isArray(pattern)) {
+        const [regexp, pruneFn] = pattern
+        if (regexp.test(key)) {
+          const value = storage.getItem(key)
+          if (value !== null) {
+            storage.setItem(key, pruneFn(value))
+            return false
+          }
+        }
+        return false
+      }
+      return pattern.test(key)
+    })
+    if (matches) {
+      storage.removeItem(key)
     }
   }
 }
 
-const MAX_STORAGE_BYTES = 5 * 1024 * 1024 // 5MB in bytes (what is usually allowed by browsers)
+export function isQuotaExceededError(e: unknown) {
+  return e instanceof DOMException && e.name === "QuotaExceededError"
+}
 
-export function checkStorageAndPrune() {
-  const isBelowThreshold = checkIfBelowThreshold()
+/** strategy - tries to store value, on quota error prunes storage and then tries again - avoids expensive storage size checks */
 
-  if (!isBelowThreshold) {
-    pruneData()
+export function setItemWithStorageQuotaExceededStrategy(
+  key: string,
+  value: string,
+  storage: IMinimalStorage = localStorage,
+  patterns: Pattern[] = localStoragePatterns,
+) {
+  /** quota sizes vary - try to set the item and catch quota error */
+  try {
+    return storage.setItem(key, value)
+  } catch (e) {
+    /** only continue if quota was exceeded */
+    if (!isQuotaExceededError(e)) {
+      throw e
+    }
+  }
+  /** if there is a further error pruning or storing, revert to snapshot */
+  const snapshot = copyStorageToObject(storage)
+  try {
+    /** prune data and try again */
+    pruneStorageData(storage, patterns)
+    return storage.setItem(key, value)
+  } catch (e) {
+    /** TODO: could potentially further check for quota error here and try pruning matching key and value, then setting pruned value */
+    /** revert storage to original snapshot */
+    copyObjectToStorage(snapshot, storage)
+    throw e
   }
 }
 
-function getTotalUsedBytes() {
+export function getStorageUsedBytes(storage: Storage = localStorage) {
   let usedBytes = 0
-
-  for (const key in localStorage) {
-    usedBytes += new Blob([localStorage[key]]).size
+  for (const key of Object.keys(storage)) {
+    usedBytes += new Blob([storage[key]]).size
   }
-
   return usedBytes
-}
-
-function checkIfBelowThreshold() {
-  const usedBytes = getTotalUsedBytes()
-
-  return usedBytes / MAX_STORAGE_BYTES <= pruneThreshold
 }

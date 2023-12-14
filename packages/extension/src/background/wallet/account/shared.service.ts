@@ -21,16 +21,11 @@ import { accountsEqual } from "./../../../shared/utils/accountsEqual"
 import { getPathForIndex } from "../../keys/keyDerivation"
 import { AccountError } from "../../../shared/errors/account"
 import { MULTISIG_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
+import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 export interface WalletSession {
   secret: string
   password: string
-}
-
-export interface WalletStorageProps {
-  backup?: string
-  selected?: BaseWalletAccount | null
-  discoveredOnce?: boolean
 }
 
 export class WalletAccountSharedService {

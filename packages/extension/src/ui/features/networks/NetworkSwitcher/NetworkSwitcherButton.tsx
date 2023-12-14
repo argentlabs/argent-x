@@ -27,11 +27,12 @@ export const NetworkSwitcherButton: FC<NetworkSwitcherButtonProps> = ({
       colorScheme={"neutrals"}
       size={"2xs"}
       as={Button}
-      rightIcon={
-        <StatusIndicator
-          color={mapNetworkStatusToColor(currentNetworkStatus)}
-        />
-      }
+      // Temp: This is commented out until we have a final decision on RPC provider
+      // rightIcon={
+      //   <StatusIndicator
+      //     color={mapNetworkStatusToColor(currentNetworkStatus)}
+      //   />
+      // }
       {...rest}
     >
       {currentNetwork.name}

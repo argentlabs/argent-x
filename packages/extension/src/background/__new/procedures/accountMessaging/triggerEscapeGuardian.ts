@@ -42,6 +42,7 @@ export const triggerEscapeGuardianProcedure = extensionOnlyProcedure
             },
           },
           {
+            title: "Trigger escape guardian",
             origin,
           },
         )

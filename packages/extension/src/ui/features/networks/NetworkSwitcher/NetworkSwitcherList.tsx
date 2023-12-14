@@ -1,5 +1,5 @@
 import { B3, L2 } from "@argent/ui"
-import { Flex, MenuItem, MenuList } from "@chakra-ui/react"
+import { Flex, MenuItem, MenuList, MenuListProps } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network, NetworkStatus } from "../../../../shared/network"
@@ -8,7 +8,7 @@ import {
   mapNetworkStatusToColor,
 } from "../../../components/StatusIndicator"
 
-interface NetworkSwitcherListProps {
+export interface NetworkSwitcherListProps extends MenuListProps {
   currentNetwork: Network
   allNetworks: (Network & { status: NetworkStatus })[]
   onChangeNetwork: (id: string) => void
@@ -18,12 +18,12 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
   currentNetwork,
   allNetworks,
   onChangeNetwork,
+  ...rest
 }) => {
   return (
-    <MenuList>
-      {allNetworks.map(({ id, name, sequencerUrl, status, rpcUrl }) => {
+    <MenuList {...rest}>
+      {allNetworks.map(({ id, name, status, rpcUrl, readonly }) => {
         const isCurrent = id === currentNetwork.id
-        const url = rpcUrl || sequencerUrl
         return (
           <MenuItem
             key={id}
@@ -58,7 +58,7 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
                 >
                   {name}
                 </B3>
-                {url && (
+                {rpcUrl && !readonly && (
                   <L2
                     sx={{
                       color: "neutrals.400",
@@ -71,11 +71,12 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
                     maxWidth={"180px"}
                     whiteSpace={"nowrap"}
                   >
-                    {url}
+                    {rpcUrl}
                   </L2>
                 )}
               </Flex>
-              <StatusIndicator color={mapNetworkStatusToColor(status)} />
+              {/* Temp: This is commented out until we have a final decision on RPC provider */}
+              {/*<StatusIndicator color={mapNetworkStatusToColor(status)} />*/}
             </Flex>
           </MenuItem>
         )

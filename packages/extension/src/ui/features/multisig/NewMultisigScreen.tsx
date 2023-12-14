@@ -9,7 +9,6 @@ import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { routes } from "../../routes"
 import { assertNever } from "../../services/assertNever"
 import { useCreatePendingMultisig } from "./hooks/useCreatePendingMultisig"
-import { usePendingMultisigs } from "./multisig.state"
 import { uiService } from "../../../shared/__new/services/ui"
 
 const { AddIcon, MultisigJoinIcon, MultisigImageIcon: MultisigDiagram } = icons
@@ -41,9 +40,6 @@ export const NewMultisigScreen: FC = () => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const { createPendingMultisig } = useCreatePendingMultisig()
-
-  // HACK - this is a workaround to force the pending multisigs to be updated
-  const pendingMultisigs = usePendingMultisigs({ showHidden: true })
 
   const onClick = useCallback(
     async (type: MultisigOptionType) => {

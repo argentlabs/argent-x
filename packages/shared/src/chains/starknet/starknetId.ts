@@ -1,7 +1,5 @@
 import { z } from "zod"
 
-import { Address, normalizeAddress } from "./address"
-
 /**
  * https://docs.starknet.id/for-devs/encoding-algorithm#the-basic-alphabet
  *
@@ -32,13 +30,4 @@ export const isEqualStarknetId = (a: string, b?: string) => {
 
 export const normalizeStarknetId = (starknetId: StarknetID) => {
   return starknetIdSchema.parse(starknetId).toLowerCase()
-}
-
-export const normalizeAddressOrStarknetId = (
-  addressOrStarknetId: Address | StarknetID,
-) => {
-  if (isStarknetId(addressOrStarknetId)) {
-    return normalizeStarknetId(addressOrStarknetId)
-  }
-  return normalizeAddress(addressOrStarknetId)
 }

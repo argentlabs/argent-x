@@ -43,8 +43,8 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
           <Input isReadOnly value={requestedNetwork.name} />
           <HeaderCell>Chain ID</HeaderCell>
           <Input isReadOnly value={requestedNetwork.chainId} />
-          <HeaderCell>Base URL</HeaderCell>
-          <Input isReadOnly value={requestedNetwork.sequencerUrl} />
+          <HeaderCell>RPC URL</HeaderCell>
+          <Input isReadOnly value={requestedNetwork.rpcUrl} />
           {/*** Show Optional Fields only if the value is provided */}
           {requestedNetwork.explorerUrl && (
             <>
@@ -56,12 +56,6 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
             <>
               <HeaderCell>Explorer redirect URL</HeaderCell>
               <Input isReadOnly value={requestedNetwork.blockExplorerUrl} />
-            </>
-          )}
-          {requestedNetwork.rpcUrl && (
-            <>
-              <HeaderCell>RPC URL</HeaderCell>
-              <Input isReadOnly value={requestedNetwork.rpcUrl} />
             </>
           )}
           {error && <FieldError>{error}</FieldError>}

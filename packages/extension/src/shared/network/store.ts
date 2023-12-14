@@ -17,16 +17,10 @@ export const allNetworksStore = new ArrayStorage<Network>(defaultNetworks, {
   compare: networksEqual,
   deserialize(value: Network[]): Network[] {
     // overwrite the stored values for the default networks with the default values
-    const mergedArray = mergeArrayStableWith(value, defaultReadonlyNetworks, {
+    return mergeArrayStableWith(value, defaultReadonlyNetworks, {
       compareFn: networksEqual,
       insertMode: "unshift",
     })
-
-    // except for the prefer property, which should be kept
-    return mergedArray.map((n) => ({
-      ...n,
-      prefer: value.find((v) => v.id === n.id)?.prefer ?? n.prefer,
-    }))
   },
 })
 

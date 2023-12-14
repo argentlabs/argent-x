@@ -5,6 +5,12 @@ import { knownDappsRepository } from "../storage/__new/repositories/knownDapp"
 
 export const argentKnownDappsService = new ArgentKnownDappsBackendService(
   ARGENT_API_BASE_URL,
+  {
+    headers: {
+      "argent-version": process.env.VERSION ?? "Unknown version",
+      "argent-client": "argent-x",
+    },
+  },
 )
 
 export const knownDappsService = new KnownDappService(

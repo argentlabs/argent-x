@@ -29,7 +29,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   transactionReview,
   transactions,
   transactionSimulation,
-  verifiedDapp,
   approveScreenType,
   hasPendingMultisigTransactions,
   onReject,
@@ -73,7 +72,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           transactions={transactions}
           transactionReview={transactionReview}
           aggregatedData={aggregatedData}
-          verifiedDapp={verifiedDapp || undefined}
           approveScreenType={approveScreenType}
         />
         {showFraudMonitorBanner && (

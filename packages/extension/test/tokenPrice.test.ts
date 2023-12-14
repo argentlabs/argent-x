@@ -185,6 +185,13 @@ describe("prettifyCurrencyValue()", () => {
       expect(prettifyCurrencyValue("0.0000001")).toEqual("$0.0000001")
       expect(prettifyCurrencyValue("1.504")).toEqual("$1.50")
       expect(prettifyCurrencyValue("1.505")).toEqual("$1.51")
+      expect(prettifyCurrencyValue("3.99")).toEqual("$3.99")
+      expect(prettifyCurrencyValue("3.994")).toEqual("$3.99")
+      expect(prettifyCurrencyValue("3.995")).toEqual("$4.00")
+      expect(prettifyCurrencyValue("3.9999")).toEqual("$4.00")
+      expect(
+        prettifyCurrencyValue("3999999999999.9999999999999999999999999999"),
+      ).toEqual("$4,000,000,000,000.00")
     })
   })
   describe("when invalid", () => {

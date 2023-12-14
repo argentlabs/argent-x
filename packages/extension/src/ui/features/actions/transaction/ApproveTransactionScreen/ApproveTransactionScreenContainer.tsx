@@ -26,8 +26,6 @@ import { WithActionScreenErrorFooter } from "./WithActionScreenErrorFooter"
 import { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
 import { ensureArray } from "@argent/shared"
 
-const VERIFIED_DAPP_ENABLED = process.env.FEATURE_VERIFIED_DAPPS === "true"
-
 export const ApproveTransactionScreenContainer: FC<
   ApproveTransactionScreenContainerProps
 > = ({
@@ -68,7 +66,6 @@ export const ApproveTransactionScreenContainer: FC<
     isValidating: isSimulationValidating,
     error: transactionSimulationError,
   } = useTransactionSimulation({
-    account: selectedAccount,
     transactions,
     actionHash,
   })
@@ -93,10 +90,6 @@ export const ApproveTransactionScreenContainer: FC<
     transactionContext === "STANDARD_EXECUTE"
       ? pendingMultisigTransactions.length > 0
       : pendingMultisigTransactions.length > 1
-
-  const verifiedDapp =
-    (VERIFIED_DAPP_ENABLED && isMainnet && transactionReview?.targetedDapp) ||
-    undefined
 
   const onShowAddFunds = useCallback(
     (hasInsufficientFunds: boolean) => {
@@ -233,7 +226,6 @@ export const ApproveTransactionScreenContainer: FC<
       transactionReview={transactionReview}
       transactions={transactionsArray}
       transactionSimulation={transactionSimulation}
-      verifiedDapp={verifiedDapp}
       hasPendingMultisigTransactions={hasPendingMultisigTransactions}
       multisig={multisig}
       multisigModalDisclosure={

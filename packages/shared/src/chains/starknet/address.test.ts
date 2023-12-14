@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { addressSchema } from "./address"
+import { addressSchema, isZeroAddress } from "./address"
 
 describe("chains/starknet/address", () => {
   describe("addressSchema", () => {
@@ -51,6 +51,31 @@ describe("chains/starknet/address", () => {
             "0x02b4ceFEABc0a31e7F457dDaD679b637Ff567bAeb43aF8Ccc4bA11d47590D1d6",
           ).success,
         ).toBeFalsy()
+      })
+    })
+  })
+  describe("isZeroAddress", () => {
+    describe("when valid", () => {
+      test("should return true", () => {
+        expect(isZeroAddress("0x0")).toBeTruthy()
+        expect(
+          isZeroAddress(
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+          ),
+        ).toBeTruthy()
+      })
+    })
+    describe("when invalid", () => {
+      test("should return false", () => {
+        expect(isZeroAddress("")).toBeFalsy()
+        expect(isZeroAddress("0x")).toBeFalsy()
+        expect(isZeroAddress("0x1")).toBeFalsy()
+        expect(
+          isZeroAddress(
+            "0x02b4cEFEABc0a31e7F457dDaD679b637Ff567bAeb43aF8Ccc4bA11d47590D1d6",
+          ),
+        ).toBeFalsy()
+        expect(isZeroAddress("0")).toBeFalsy()
       })
     })
   })

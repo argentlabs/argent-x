@@ -6,7 +6,7 @@ import { Link } from "react-router-dom"
 import { routes } from "../../routes"
 
 const { SupportIcon } = icons
-const { Discord, Github, Twitter } = logos
+const { DiscordLogo, GithubLogo, TwitterLogo } = logos
 
 interface SupportFooterProps extends StackProps {
   privacyStatement?: boolean
@@ -42,7 +42,7 @@ const SupportFooter: FC<SupportFooterProps> = ({
         as={"a"}
         size="sm"
         rounded={"lg"}
-        leftIcon={<Discord />}
+        leftIcon={<DiscordLogo />}
         href="https://discord.gg/T4PDFHxm6T"
         title="Ask a question on the argent-x-support channel on Discord"
         target="_blank"
@@ -53,7 +53,7 @@ const SupportFooter: FC<SupportFooterProps> = ({
         as="a"
         size="sm"
         rounded={"lg"}
-        leftIcon={<Github />}
+        leftIcon={<GithubLogo />}
         href="https://github.com/argentlabs/argent-x/issues"
         title="Post an issue on Argent X GitHub"
         target="_blank"
@@ -64,7 +64,7 @@ const SupportFooter: FC<SupportFooterProps> = ({
         as="a"
         size="sm"
         rounded={"lg"}
-        leftIcon={<Twitter />}
+        leftIcon={<TwitterLogo />}
         href="https://twitter.com/argenthq"
         title="Follow Argent X on Twitter"
         target="_blank"

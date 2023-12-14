@@ -16,7 +16,7 @@ export const DeployContractActionScreenContainer: FC = () => {
     closePopupIfLastAction,
     rejectAllActions,
   } = useActionScreen()
-  if (action?.type !== "DEPLOY_CONTRACT_ACTION") {
+  if (action?.type !== "DEPLOY_CONTRACT") {
     throw new Error(
       "DeployContractActionScreenContainer used with incompatible action.type",
     )

@@ -1,24 +1,19 @@
 import { num } from "starknet"
 
-import { ExtQueueItem } from "../../shared/actionQueue/types"
-import { BaseWalletAccount } from "../../shared/wallet.model"
+import { ExtensionActionItemOfType } from "../../shared/actionQueue/types"
 import { addTransaction } from "../transactions/store"
 import { checkTransactionHash } from "../transactions/transactionExecution"
-import { argentMaxFee } from "../utils/argentMaxFee"
+import { argentMaxFee } from "../../shared/utils/argentMaxFee"
 import { Wallet } from "../wallet"
 
-type DeployMultisigAction = ExtQueueItem<{
-  type: "DEPLOY_MULTISIG_ACTION"
-  payload: BaseWalletAccount
-}>
-
-export const multisigDeployAction = async (
-  { payload: baseAccount }: DeployMultisigAction,
+export const addMultisigDeployAction = async (
+  action: ExtensionActionItemOfType<"DEPLOY_MULTISIG">,
   wallet: Wallet,
 ) => {
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
+  const { account: baseAccount } = action.payload
   const selectedMultisig = await wallet.getMultisigAccount(baseAccount)
 
   const multisigNeedsDeploy = selectedMultisig.needsDeploy
@@ -34,10 +29,10 @@ export const multisigDeployAction = async (
       selectedMultisig,
     )
 
-    maxFee = argentMaxFee(suggestedMaxFee)
+    maxFee = argentMaxFee({ suggestedMaxFee: suggestedMaxFee })
   } catch (error) {
     const fallbackPrice = num.toBigInt(10e14)
-    maxFee = argentMaxFee(fallbackPrice)
+    maxFee = argentMaxFee({ suggestedMaxFee: fallbackPrice })
   }
 
   const { account, txHash } = await wallet.deployAccount(selectedMultisig, {

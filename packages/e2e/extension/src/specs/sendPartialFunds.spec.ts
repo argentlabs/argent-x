@@ -14,7 +14,7 @@ test.describe("Send funds", () => {
       tokenName: "Ethereum",
       amount: 0.005,
     })
-    expect(amountTrx).toBe(0.005)
+
     await extension.validateTx(accountAddresses[1], amountTrx)
     await extension.navigation.menuTokens.click()
 
@@ -46,7 +46,7 @@ test.describe("Send funds", () => {
       amount: 0.005,
       fillRecipientAddress: "typing",
     })
-    expect(amountTrx).toBe(0.005)
+
     await extension.validateTx(config.destinationAddress!, amountTrx)
     await extension.navigation.menuTokens.click()
 

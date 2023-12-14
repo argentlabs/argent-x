@@ -10,15 +10,12 @@ import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { slugify } from "./slugify"
 import { addressSchema } from "@argent/shared"
 import { addAddressPadding } from "starknet"
-import { useNetworks } from "../networks/hooks/useNetworks"
 import { NetworkSettingsFormScreen } from "./NetworkSettingsFormScreen"
 import {
   FEE_TOKEN_ADDRESS_ETH,
   MULTICALL_CONTRACT_ADDRESS,
   STANDARD_ACCOUNT_CLASS_HASH,
 } from "../../../shared/network/constants"
-import { useView } from "../../views/implementation/react"
-import { allTokensView } from "../../views/token"
 import { networkService } from "../../../shared/network/service"
 import { Token } from "../../../shared/token/__new/types/token.model"
 import { TokenSchema } from "../../../shared/token/__new/types/token.model"
@@ -36,8 +33,6 @@ type NetworkSettingsFormScreenContainerProps =
 export const NetworkSettingsFormScreenContainer: FC<
   NetworkSettingsFormScreenContainerProps
 > = (props) => {
-  useNetworks() // FIXME: Do not remove this line. Removing it will cause the networks to not be updated.
-  useView(allTokensView) // FIXME: Do not remove this line. Removing it will cause the tokens to not be updated.
   const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
@@ -49,12 +44,11 @@ export const NetworkSettingsFormScreenContainer: FC<
         id: "",
         name: "",
         chainId: "",
+        rpcUrl: "",
         status: "unknown",
         accountClassHash: {
           standard: STANDARD_ACCOUNT_CLASS_HASH,
         },
-        rpcUrl: undefined,
-        sequencerUrl: undefined,
         feeTokenAddress: FEE_TOKEN_ADDRESS_ETH,
 
         // should we add a default for this or use undefined? For better UX, its a good idea to have a default imo - Dhruv

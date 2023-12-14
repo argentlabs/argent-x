@@ -1,12 +1,12 @@
 import { BaseScheduledTask } from "../schedule/interface"
-import { KeyValueStorage } from "../storage"
+import { IKeyValueStorage } from "../storage"
 import {
   DebouncedImplementedScheduledTask,
   IDebounceService,
 } from "./interface"
 
-function shouldRun(lastRun: number, debounce: number): boolean {
-  return Date.now() - lastRun > debounce
+export function shouldRun(lastRun: number, debounce: number): boolean {
+  return Date.now() - lastRun > debounce * 1000
 }
 
 export class DebounceService<T extends string = string>
@@ -16,13 +16,14 @@ export class DebounceService<T extends string = string>
   private readonly taskIsRunning = new Map<string, boolean>()
 
   constructor(
-    private readonly kv: KeyValueStorage<{
+    private readonly kv: IKeyValueStorage<{
       [key: string]: number
     }>,
   ) {}
 
   async debounce(task: DebouncedImplementedScheduledTask<T>): Promise<void> {
     const lastRun = await this.lastRun(task)
+
     if (this.isRunning(task) || !shouldRun(lastRun ?? 0, task.debounce)) {
       // if task is running or last run is within debounce,
       return
@@ -30,6 +31,7 @@ export class DebounceService<T extends string = string>
 
     this.taskIsRunning.set(task.id, true)
     await this.kv.set(task.id, Date.now())
+    await task.callback()
     this.taskIsRunning.set(task.id, false)
   }
 

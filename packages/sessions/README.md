@@ -14,6 +14,132 @@ pnpm add @argent/x-sessions
 pnpm add @argent/x-sessions
 ```
 
+# Offchain session keys
+
+## Creating an offchain session as a dapp
+
+First you need to have a deployed account.
+
+This is the account that will authorise the session and interact with the contracts of your dapp.
+
+A session looks like this:
+
+```typescript
+export interface OffchainSessionAllowedMethods {
+  contractAddress: Hex
+  method: string
+}
+
+export interface OffchainRequestSession {
+  sessionKey: string
+  expirationTime: number
+  allowedMethods: OffchainSessionAllowedMethods[]
+}
+
+// part of the message to sign, see below
+export interface GasFees {
+  tokenAddress: Hex
+  maximumAmount: {
+    low: Hex
+    high: Hex
+  }
+}
+```
+
+You can get that by using an injected instance of a wallet **(only webwallet for now)**
+
+```typescript
+const account = windowStarknet.account
+```
+
+Next you need to come up with the permissions you would like for your session.
+
+You also need to generate the session keypair you want to grant these rights to.
+
+This example session will allow the dapp to execute an example endpoint on an example contract without asking the user to approve the transaction again. After signing the session the dapp can execute all transactions listed in `allowedMethods` whenever it wants and as many times as it wants.
+
+**The list of allowedMethods needs to be communicated with Argent, in order to be whitelisted.**
+
+The `method` property needs to be with the following format `method: 0x...` instead of the selector.
+
+The selector name is used only on client side (will be hashed before sending the message)
+
+```typescript
+import {
+  OffchainSessionAccount,
+  createOffchainSession
+} from "@argent/x-sessions"
+import { getStarkKey, utils } from "micro-starknet"
+
+// random key for this example
+const sessionSigner = utils.randomPrivateKey()
+const requestSession: RequestSession = {
+  sessionKey: getStarkKey(sessionSigner),
+  expirationTime: Math.floor(
+    (Date.now() + 1000 * 60 * 60 * 24) / 1000
+  ), // set your time
+  // set your list of contract addresses and methods
+  allowedMethods: [
+    {
+      contractAddress: "0x...",
+      method: "transfer"
+    }
+  ]
+}
+
+const gasFees: GasFees = {
+  tokenAddress: "0x...",
+  maximumAmount: {
+    low: "0x...",
+    high: "0x..."
+  }
+}
+```
+
+Now you can sign the session with the account you have. The user will be asked to sign a message
+
+```typescript
+import { createOffchainSession } from "@argent/x-sessions"
+
+// calls account.signMessage internally
+const signedSession = createOffchainSession(
+  requestSession,
+  window.starknet.account,
+  gasFees
+)
+```
+
+### Using established sessions
+
+With your signed session you can now use it with your dapp to do transactions without the user having to approve again.
+
+```typescript
+import { OffchainSessionAccount } from "@argent/x-sessions"
+
+const offchainSessionAccount = new OffchainSessionAccount(
+  new RpcProvider({ nodeUrl: "url" }), // provider, in this example RpcProvider
+  account.address, // current account address
+  sessionSigner, // in this example has value utils.randomPrivateKey() -- utils from micro-starknet
+  signedSession, // created session
+  account // the actual account
+)
+
+// this transaction should get executed without the user having to approve again
+const tx = sessionAccount.execute({
+  // lets assume this is a erc20 contract
+  contractAddress: "0x...",
+  selector: "transfer",
+  calldata: [
+    "0x..."
+    // ...
+  ]
+})
+```
+
+Congratulations, you can now use your dapp to execute transactions without the user having to approve!
+
+# Argent-x Sessions
+
 ## Creating a session as a dapp
 
 First you need to have a deployed account with a valid Signer. This is the account that will authorise the session and interact with the contracts of your dapp.

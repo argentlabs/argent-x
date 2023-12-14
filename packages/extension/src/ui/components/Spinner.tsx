@@ -17,6 +17,7 @@ export const Spinner: FC<CircularProgressProps> = (props) => {
 
   return (
     <CircularProgress
+      data-testid="spinner"
       {...props}
       style={{ ...defaultStyle, color: theme.text1, ...props.style }}
     />

@@ -16,7 +16,7 @@ export const DeclareContractActionScreenContainer: FC = () => {
     selectedAccount,
     rejectAllActions,
   } = useActionScreen()
-  if (action?.type !== "DECLARE_CONTRACT_ACTION") {
+  if (action?.type !== "DECLARE_CONTRACT") {
     throw new Error(
       "DeclareContractActionScreenContainer used with incompatible action.type",
     )

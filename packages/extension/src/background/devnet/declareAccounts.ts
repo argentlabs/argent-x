@@ -8,7 +8,6 @@ import {
   ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
   PROXY_CONTRACT_CLASS_HASHES,
 } from "../wallet/starknet.constants"
-import { getNetworkUrl } from "../../shared/network/utils"
 
 interface PreDeployedAccount {
   address: string
@@ -20,7 +19,7 @@ export const getPreDeployedAccount = async (
   index = 0,
 ): Promise<AccountInterface | null> => {
   try {
-    const networkUrl = getNetworkUrl(network)
+    const networkUrl = network.rpcUrl
 
     const preDeployedAccounts = await fetch(
       urlJoin(networkUrl, "predeployed_accounts"),
@@ -101,7 +100,7 @@ export const declareContracts = memoize(
       accountClassHash: accountClassHash ?? computedAccountClassHash,
     }
   },
-  (network) => `${network.sequencerUrl}`,
+  (network) => `${network.rpcUrl}`,
 )
 
 export const checkIfClassIsDeclared = async (

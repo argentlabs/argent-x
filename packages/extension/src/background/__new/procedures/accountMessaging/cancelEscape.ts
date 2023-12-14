@@ -43,6 +43,7 @@ export const cancelEscapeProcedure = extensionOnlyProcedure
           },
           {
             origin,
+            title: "Keep Argent Shield",
           },
         )
       } catch (error) {

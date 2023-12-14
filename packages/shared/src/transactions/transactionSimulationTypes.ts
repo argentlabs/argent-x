@@ -5,7 +5,7 @@ import {
   Calldata,
   DeployAccountContractPayload,
   Sequencer,
-  SequencerProvider,
+  ProviderInterface,
   TransactionType,
 } from "starknet"
 
@@ -43,7 +43,7 @@ export interface IUseTransactionSimulation {
   account?: Account
   accountDeployPayload?: DeployAccountContractPayload
   transactions: Call | Call[]
-  provider: SequencerProvider
+  provider: ProviderInterface
   transactionSimulationEnabled?: boolean
 }
 

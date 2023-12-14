@@ -1,4 +1,4 @@
-import { Collection, addressSchema, getAccountIdentifier } from "@argent/shared"
+import { Collection, addressSchema } from "@argent/shared"
 import { Empty, H4, icons } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
@@ -8,9 +8,7 @@ import { Spinner } from "../../components/Spinner"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { AccountCollections } from "./AccountCollections"
 import { useCollectionsByAccountAndNetwork } from "./nfts.state"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
-import { nftWorkerStore } from "../../../shared/nft/worker/store"
-import { nftService } from "../../services/nfts"
+import { nftService } from "../../../shared/nft"
 
 const { NftIcon } = icons
 
@@ -26,11 +24,6 @@ export const AccountCollectionsContainer: FC<
 > = ({ account, withHeader = true, customList, navigateToSend, ...rest }) => {
   const network = useCurrentNetwork()
   const isSupported = nftService.isSupported(network)
-  const accountIdentifier = getAccountIdentifier(account)
-  const loadingState = useKeyValueStorage(nftWorkerStore, accountIdentifier)
-
-  const lastUpdatedTimestamp = loadingState?.lastUpdatedTimestamp || 0
-  const isInitialised = lastUpdatedTimestamp !== 0
 
   const ownedCollections = useCollectionsByAccountAndNetwork(
     addressSchema.parse(account.address),
@@ -44,20 +37,6 @@ export const AccountCollectionsContainer: FC<
         icon={<NftIcon />}
         title={`NFTs are not supported on ${displayName} right now`}
       />
-    )
-  }
-
-  if (!isInitialised) {
-    return (
-      <Flex
-        direction="column"
-        alignItems={"center"}
-        justifyContent={"center"}
-        flex={1}
-        {...rest}
-      >
-        <Spinner size={64} />
-      </Flex>
     )
   }
 

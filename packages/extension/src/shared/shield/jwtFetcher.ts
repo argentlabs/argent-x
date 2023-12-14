@@ -18,7 +18,7 @@ export const jwtFetcher = async <T>(
       "Content-Type": "application/json",
     },
   }
-  const fetcher = fetcherWithArgentApiHeaders()
+  const fetcher = await fetcherWithArgentApiHeaders()
   try {
     return await fetcher<T>(input, initWithArgentJwtHeaders)
   } catch (error) {

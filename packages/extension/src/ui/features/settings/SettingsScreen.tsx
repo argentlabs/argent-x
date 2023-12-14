@@ -8,12 +8,12 @@ import {
   icons,
 } from "@argent/ui"
 import { Box, Center } from "@chakra-ui/react"
-import { FC, useEffect } from "react"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { routes, useCurrentPathnameWithQuery, useReturnTo } from "../../routes"
+import { routes, useCurrentPathnameWithQuery } from "../../routes"
 import { useStopSession } from "../../services/useStopSession"
 import { H2 } from "../../theme/Typography"
 import { selectedAccountView } from "../../views/account"

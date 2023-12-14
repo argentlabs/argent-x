@@ -6,7 +6,10 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "../../../../shared/token/price"
-import { FeeEstimationBox } from "./ui/FeeEstimationBox"
+import {
+  FeeEstimationBox,
+  FeeEstimationBoxWithDeploy,
+} from "./ui/FeeEstimationBox"
 import { FeeEstimationText } from "./ui/FeeEstimationText"
 import { InsufficientFundsAccordion } from "./ui/InsufficientFundsAccordion"
 import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
@@ -24,6 +27,7 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   showFeeError,
   suggestedMaxFeeCurrencyValue,
   userClickedAddFunds,
+  needsDeploy,
 }) => {
   const tooltipText = useMemo(() => {
     if (fee) {
@@ -33,12 +37,9 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   }, [fee, feeTokenBalance])
   const primaryText = useMemo(() => {
     if (fee) {
-      return amountCurrencyValue !== undefined ? (
-        `≈ ${prettifyCurrencyValue(amountCurrencyValue)}`
-      ) : (
+      return (
         <TextWithAmount amount={fee.amount} decimals={feeToken.decimals}>
           <>
-            ≈{" "}
             {feeToken ? (
               prettifyTokenAmount({
                 amount: fee.amount,
@@ -48,6 +49,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             ) : (
               <>{fee.amount} Unknown</>
             )}
+            {amountCurrencyValue !== undefined &&
+              ` (${prettifyCurrencyValue(amountCurrencyValue)})`}
           </>
         </TextWithAmount>
       )
@@ -55,16 +58,13 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   }, [amountCurrencyValue, fee, feeToken])
   const secondaryText = useMemo(() => {
     if (fee) {
-      if (suggestedMaxFeeCurrencyValue !== undefined) {
-        return `(Max ${prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})`
-      }
       return (
         <TextWithAmount
           amount={fee.suggestedMaxFee}
           decimals={feeToken.decimals}
         >
           <>
-            (Max&nbsp;
+            Max&nbsp;
             {feeToken ? (
               prettifyTokenAmount({
                 amount: fee.suggestedMaxFee,
@@ -74,15 +74,26 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
             ) : (
               <>{fee.suggestedMaxFee} Unknown</>
             )}
-            )
+            {suggestedMaxFeeCurrencyValue !== undefined &&
+              ` (Max ${prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})`}
           </>
         </TextWithAmount>
       )
     }
   }, [fee, feeToken, suggestedMaxFeeCurrencyValue])
   const isLoading = !fee || isUndefined(feeTokenBalance) // because 0n is a valid balance but falsy
+
   if (!showError) {
-    return (
+    return needsDeploy ? (
+      <FeeEstimationBoxWithDeploy>
+        <FeeEstimationText
+          tooltipText={tooltipText}
+          primaryText={primaryText}
+          secondaryText={secondaryText}
+          isLoading={isLoading}
+        />
+      </FeeEstimationBoxWithDeploy>
+    ) : (
       <FeeEstimationBox>
         <FeeEstimationText
           tooltipText={tooltipText}

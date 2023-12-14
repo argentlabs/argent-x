@@ -2,7 +2,6 @@ import { FieldError } from "@argent/ui"
 import { Box, Button } from "@chakra-ui/react"
 import { useFormContext } from "react-hook-form"
 
-import { accountService } from "../../../../shared/account/service"
 import { isEmptyValue } from "../../../../shared/utils/object"
 import { useAction } from "../../../hooks/useAction"
 import { useNextPublicKey, useNextSignerKey } from "../../accounts/usePublicKey"
@@ -10,6 +9,7 @@ import { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { SetConfirmationsInput } from "../SetConfirmationsInput"
 import { ScreenLayout } from "./ScreenLayout"
 import { getErrorData } from "../../../../shared/errors/errorData"
+import { clientAccountService } from "../../../services/account"
 
 export const MultisigSecondStep = ({
   index,
@@ -25,7 +25,7 @@ export const MultisigSecondStep = ({
   const creatorPubKey = useNextPublicKey(networkId)
   const creatorSignerKey = useNextSignerKey(networkId)
   const { action: createAccount, error } = useAction(
-    accountService.create.bind(accountService),
+    clientAccountService.create.bind(clientAccountService),
   )
   const {
     formState: { errors },

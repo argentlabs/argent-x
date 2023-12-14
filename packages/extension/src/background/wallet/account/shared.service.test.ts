@@ -1,8 +1,5 @@
-import {
-  WalletAccountSharedService,
-  WalletSession,
-  WalletStorageProps,
-} from "./shared.service"
+import { WalletAccountSharedService, WalletSession } from "./shared.service"
+import { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 import { BaseMultisigWalletAccount } from "../../../shared/wallet.model"
 import { PendingMultisig } from "../../../shared/multisig/types"

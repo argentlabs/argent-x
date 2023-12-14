@@ -2,7 +2,6 @@ import { IDebounceService } from "../../../../../shared/debounce"
 import { IScheduleService } from "../../../../../shared/schedule/interface"
 import { IBackgroundUIService, Opened } from "../../ui/interface"
 import { pipe } from "./pipe"
-import { nanoid } from "nanoid"
 
 type Fn = (...args: unknown[]) => Promise<void>
 
@@ -47,9 +46,13 @@ export const onInstallAndUpgrade =
  * @returns {Function} The scheduled function.
  */
 export const every =
-  <T extends Fn>(scheduleService: IScheduleService, seconds: number) =>
+  <T extends Fn>(
+    scheduleService: IScheduleService,
+    seconds: number,
+    name: string,
+  ) =>
   (fn: T): T => {
-    const id = `every@${seconds}s:${nanoid()}`
+    const id = `every@${seconds}s:${name}`
     void scheduleService
       .registerImplementation({
         id,
@@ -75,6 +78,18 @@ export const onOpen =
   (fn: T): T => {
     backgroundUIService.emitter.on(Opened, async (open) => {
       if (open) {
+        await fn()
+      }
+    })
+
+    return fn
+  }
+
+export const onClose =
+  <T extends Fn>(backgroundUIService: MinimalIBackgroundUIService) =>
+  (fn: T): T => {
+    backgroundUIService.emitter.on(Opened, async (open) => {
+      if (!open) {
         await fn()
       }
     })
@@ -108,9 +123,13 @@ export const onlyIfOpen =
  * @returns {Promise<void>} The debounced function.
  */
 export const debounce =
-  <T extends Fn>(debounceService: IDebounceService, seconds: number) =>
+  <T extends Fn>(
+    debounceService: IDebounceService,
+    seconds: number,
+    name: string,
+  ) =>
   (fn: T): (() => Promise<void>) => {
-    const id = `debounce@${seconds}s:${nanoid()}`
+    const id = `debounce@${seconds}s:${name}`
     const task = { id, callback: fn, debounce: seconds }
 
     return () => {
@@ -131,11 +150,13 @@ export const everyWhenOpen = (
   scheduleService: IScheduleService,
   debounceService: IDebounceService,
   seconds: number,
+  name: string,
 ) => {
   return pipe(
-    onOpen(backgroundUIService),
-    every(scheduleService, seconds),
+    debounce(debounceService, seconds, name),
     onlyIfOpen(backgroundUIService),
-    debounce(debounceService, seconds),
+    onOpen(backgroundUIService),
+    onInstallAndUpgrade(scheduleService),
+    every(scheduleService, seconds, name),
   )
 }

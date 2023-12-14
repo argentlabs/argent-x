@@ -20,9 +20,12 @@ export const ModalCloseButton: FC = () => {
       ml="auto"
       colorScheme="transparent"
       size="auto"
-      color="white50"
+      color="black50"
       fontSize="xl"
       onClick={onClose}
+      _dark={{
+        color: "white50",
+      }}
     >
       <CloseIcon />
     </Button>
@@ -49,7 +52,7 @@ export const ModalDialog: FC<ModalDialogProps> = ({
         <ModalContent
           p={4}
           gap={4}
-          bg="neutrals.700"
+          bg="surface.default"
           rounded="2xl"
           maxWidth={[pxToRem(320), pxToRem(480)]}
           alignItems={"center"}

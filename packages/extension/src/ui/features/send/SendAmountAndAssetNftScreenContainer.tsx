@@ -3,7 +3,6 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
-import { nftService } from "../../services/nfts"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useNft } from "../accountNfts/nfts.state"
@@ -13,6 +12,7 @@ import {
   SendAmountAndAssetScreen,
   SendAmountAndAssetScreenProps,
 } from "./SendAmountAndAssetScreen"
+import { clientNftService } from "../../services/nfts"
 
 export const SendAmountAndAssetNftScreenContainer: FC<
   SendAmountAndAssetScreenProps
@@ -24,13 +24,11 @@ export const SendAmountAndAssetNftScreenContainer: FC<
   const nft = useNft(addressSchema.parse(tokenAddress), tokenId)
   const onSubmit = useCallback(async () => {
     if (account && nft && recipientAddress && tokenAddress && tokenId) {
-      await nftService.transferNft(
-        tokenAddress,
+      await clientNftService.transferNft(
+        network,
+        nft,
         account.address,
         recipientAddress,
-        tokenId,
-        nft.spec ?? "",
-        network,
       )
     }
     onCancel()

@@ -1,4 +1,3 @@
-import { LegacyContractClass } from "starknet"
 import { z } from "zod"
 
 import { getProvider } from "../../../../shared/network"
@@ -13,12 +12,17 @@ const getConstructorParamsSchema = z.object({
 
 const basicContractClassSchema = z.object({
   abi: z.array(z.any()),
+  contract_class_version: z.string(),
+  entry_points_by_type: z.any().optional(),
+  sierra_program: z.array(z.string()).optional(),
 })
+
+export type BasicContractClass = z.infer<typeof basicContractClassSchema>
 
 export const getConstructorParamsProcedure = extensionOnlyProcedure
   .input(getConstructorParamsSchema)
   .output(
-    z.custom<LegacyContractClass>((item) => {
+    z.custom((item) => {
       return basicContractClassSchema.parse(item)
     }),
   )
@@ -35,13 +39,17 @@ export const getConstructorParamsProcedure = extensionOnlyProcedure
 
       const contract = await provider.getClassByHash(classHash)
 
-      if ("sierra_program" in contract) {
-        throw new UdcError({
-          code: "CAIRO_1_NOT_SUPPORTED",
-        })
+      const extendedContract: BasicContractClass = {
+        ...contract,
+        sierra_program:
+          "sierra_program" in contract ? contract.sierra_program : [],
+        contract_class_version:
+          "contract_class_version" in contract
+            ? contract.contract_class_version
+            : "0",
       }
 
-      return contract
+      return extendedContract
     } catch (error) {
       throw new UdcError({
         options: { error },

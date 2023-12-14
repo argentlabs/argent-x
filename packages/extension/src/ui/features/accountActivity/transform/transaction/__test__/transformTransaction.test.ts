@@ -34,7 +34,7 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
           standard:
             "0x389a968f62e344b2e08a50e091987797a74b34840840022fd797769230a9d3f",
         },
-        sequencerUrl: "https://alpha4.starknet.io",
+        rpcUrl: "https://starknet-testnet.public.blastapi.io",
         chainId: "SN_GOERLI",
         explorerUrl: "https://goerli.voyager.online",
         id: "goerli-alpha",

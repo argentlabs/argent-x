@@ -253,29 +253,6 @@ export const jediswap: TransactionActionFixture = {
       },
     },
   ],
-  verifiedDapp: {
-    name: "JediSwap",
-    description:
-      "A community-led fully permissionless and composable AMM on Starknet.",
-    logoUrl: "https://www.dappland.com/dapps/jediswap/dapp-icon-jediswap.png",
-    links: [
-      {
-        name: "website",
-        url: "https://jediswap.xyz",
-        position: 1,
-      },
-      {
-        name: "twitter",
-        url: "https://twitter.com/jediswap",
-        position: 2,
-      },
-      {
-        name: "discord",
-        url: "https://discord.gg/jediswap",
-        position: 3,
-      },
-    ],
-  },
 }
 
 export const jediswapUnsafe: TransactionActionFixture = {

@@ -1,4 +1,4 @@
-import { TransactionStatus as StarknetTxStatus } from "starknet"
+import { RpcProvider, TransactionStatus as StarknetTxStatus } from "starknet"
 
 import { getProvider } from "../../network"
 import { INetworkService } from "../../network/service/interface"
@@ -43,25 +43,38 @@ export class StarknetChainService implements IChainService {
   ): Promise<TransactionWithStatus> {
     const network = await this.networkService.getById(transaction.networkId)
     const provider = getProvider(network)
-    const receipt = await provider.getTransactionReceipt(transaction.hash)
     let error_reason: string | undefined
+    const { finality_status, execution_status } =
+      await provider.getTransactionStatus(transaction.hash)
 
-    if (!receipt.status) {
-      throw new Error("Invalid response from Starknet node")
+    // TODO: Use constants
+    const isFailed =
+      execution_status === "REVERTED" || finality_status === "REJECTED"
+    const isSuccessful =
+      finality_status === "ACCEPTED_ON_L2" ||
+      finality_status === "ACCEPTED_ON_L1"
+
+    if (isFailed) {
+      // Only get the receipt if the transaction failed
+      const receipt = await provider.getTransactionReceipt(transaction.hash)
+      error_reason =
+        receipt.revert_reason ||
+        ("transaction_failure_reason" in receipt &&
+          (receipt.transaction_failure_reason as any)?.error_message)
     }
 
-    if ("revert_reason" in receipt) {
-      error_reason = receipt.revert_reason
-    }
+    error_reason =
+      error_reason ?? "Unknown Error while fetching transaction status"
 
-    if ("transaction_failure_reason" in receipt) {
-      error_reason = receipt.transaction_failure_reason.error_message
-    }
+    const status: TransactionStatus = isFailed
+      ? {
+          status: "failed",
+          reason: new Error(error_reason),
+        }
+      : isSuccessful
+      ? { status: "confirmed" }
+      : { status: "pending" }
 
-    const status = starknetStatusToTransactionStatus(
-      receipt.status as StarknetTxStatus,
-      () => new Error(error_reason),
-    )
     return {
       ...transaction,
       status,

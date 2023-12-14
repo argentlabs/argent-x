@@ -13,7 +13,7 @@ import {
 } from "@argent/ui"
 import {
   addressInputCharactersAndLengthSchema,
-  isStarknetId,
+  isStarknetDomainName,
 } from "@argent/shared"
 import {
   Button,
@@ -39,7 +39,7 @@ import {
 } from "../../../shared/addressBook/type"
 import { ControlledInput } from "../../components/ControlledInput"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import { useGetAddressFromStarknetId } from "../send/useGetAddressFromStarknetId"
+import { useGetAddressFromDomainNameInput } from "../send/useGetAddressFromDomainName"
 
 const { ProfileIcon, BinIcon } = icons
 
@@ -98,7 +98,7 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
     error: starknetIdError,
     result: starknetAddress,
     isValid: starknetAddressIsValid,
-  } = useGetAddressFromStarknetId(contactAddress, contactNetwork)
+  } = useGetAddressFromDomainNameInput(contactAddress, contactNetwork)
 
   const contactAvatar = useMemo(() => {
     if (!contactName) {
@@ -142,10 +142,10 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
     )
   }, [isEditingExistingContact])
 
-  const isStarknetIdAddress = isStarknetId(contactAddress)
+  const isStarknetDomainNameAddress = isStarknetDomainName(contactAddress)
 
   useEffect(() => {
-    if (isStarknetIdAddress) {
+    if (isStarknetDomainNameAddress) {
       if (starknetIdError) {
         setError("address", {
           type: "custom",
@@ -157,11 +157,11 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
     } else {
       clearErrors("address")
     }
-  }, [clearErrors, isStarknetIdAddress, setError, starknetIdError])
+  }, [clearErrors, isStarknetDomainNameAddress, setError, starknetIdError])
 
   const hasAddressError = "address" in errors
   const disableSubmit =
-    isStarknetIdAddress && (isLoading || !starknetAddressIsValid)
+    isStarknetDomainNameAddress && (isLoading || !starknetAddressIsValid)
 
   const { onChange, ...addressRest } = register("address")
 

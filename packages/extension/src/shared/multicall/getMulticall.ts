@@ -27,7 +27,7 @@ const getMemoizeKey = (network: Network) => {
     network.chainId,
     getMulticallAddress(network),
     maxBatchSize,
-    network.prefer,
+    network.rpcUrl,
   ]
   const key = elements.filter(Boolean).join("-")
   return key

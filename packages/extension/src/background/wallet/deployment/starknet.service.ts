@@ -1,5 +1,6 @@
 import {
   addressSchema,
+  isAccountV5,
   isContractDeployed,
   isEqualAddress,
 } from "@argent/shared"
@@ -41,7 +42,6 @@ import {
   getStarkPair,
 } from "../../keys/keyDerivation"
 import { getNonce, increaseStoredNonce } from "../../nonce"
-import { isAccountV5 } from "../../../shared/utils/accountv4"
 import { WalletAccountStarknetService } from "../account/starknet.service"
 import { WalletBackupService } from "../backup/backup.service"
 import { WalletCryptoStarknetService } from "../crypto/starknet.service"
@@ -53,6 +53,7 @@ import { SessionError } from "../../../shared/errors/session"
 import { WalletError } from "../../../shared/errors/wallet"
 import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
 import { AccountError } from "../../../shared/errors/account"
+import { argentMaxFee } from "../../../shared/utils/argentMaxFee"
 
 const { getSelectorFromName, calculateContractAddressFromHash } = hash
 
@@ -83,30 +84,38 @@ export class WalletDeploymentStarknetService
       throw new AccountError({ code: "CANNOT_DEPLOY_OLD_ACCOUNTS" })
     }
 
-    let deployAccountPayload: DeployAccountContractPayload
-
-    if (walletAccount.type === "multisig") {
-      deployAccountPayload = await this.getMultisigDeploymentPayload(
-        walletAccount,
-      )
-    } else {
-      deployAccountPayload = await this.getAccountDeploymentPayload(
-        walletAccount,
-      )
-    }
+    const deployAccountPayload =
+      await this.getAccountOrMultisigDeploymentPayload(walletAccount)
 
     if (!isAccountV5(starknetAccount)) {
       throw new AccountError({ code: "CANNOT_DEPLOY_OLD_ACCOUNTS" })
     }
-
+    const maxFee = transactionDetails?.maxFee
+      ? argentMaxFee({ suggestedMaxFee: transactionDetails?.maxFee })
+      : argentMaxFee({
+          suggestedMaxFee: (await this.getAccountDeploymentFee(walletAccount))
+            .suggestedMaxFee,
+        })
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
-      transactionDetails,
+      {
+        ...transactionDetails,
+        maxFee,
+      },
     )
 
     await this.accountSharedService.selectAccount(walletAccount)
 
     return { account: walletAccount, txHash: transaction_hash }
+  }
+
+  public async getAccountOrMultisigDeploymentPayload(
+    walletAccount: WalletAccount,
+  ) {
+    if (walletAccount.type === "multisig") {
+      return this.getMultisigDeploymentPayload(walletAccount)
+    }
+    return this.getAccountDeploymentPayload(walletAccount)
   }
 
   public async getAccountDeploymentFee(
@@ -120,9 +129,8 @@ export class WalletDeploymentStarknetService
     }
 
     const deployAccountPayload =
-      walletAccount.type === "multisig"
-        ? await this.getMultisigDeploymentPayload(walletAccount)
-        : await this.getAccountDeploymentPayload(walletAccount)
+      await this.getAccountOrMultisigDeploymentPayload(walletAccount)
+
     if (!isAccountV5(starknetAccount)) {
       throw new AccountError({
         code: "CANNOT_ESTIMATE_FEE_OLD_ACCOUNTS_DEPLOYMENT",

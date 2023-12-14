@@ -9,6 +9,8 @@ const sendSchema = z.object({
     entrypoint: z.string(),
     calldata: z.string().array(),
   }),
+  title: z.string(),
+  subtitle: z.string().optional(),
 })
 
 export const sendProcedure = extensionOnlyProcedure
@@ -16,17 +18,24 @@ export const sendProcedure = extensionOnlyProcedure
   .output(z.string())
   .mutation(
     async ({
-      input: { transactions },
+      input: { transactions, title, subtitle },
       ctx: {
         services: { actionService },
       },
     }) => {
-      const { meta } = await actionService.add({
-        type: "TRANSACTION",
-        payload: {
-          transactions,
+      const { meta } = await actionService.add(
+        {
+          type: "TRANSACTION",
+          payload: {
+            transactions,
+          },
         },
-      })
+        {
+          title,
+          subtitle,
+          icon: "SendIcon",
+        },
+      )
 
       return meta.hash
     },

@@ -80,7 +80,6 @@ describe("ApproveTransactionScreen", () => {
       onSubmit,
     })
 
-    expect(screen.getByText(/Verified/)).toBeInTheDocument()
     expect(screen.getByText(/Confirm transactions/)).toBeInTheDocument()
     expect(screen.getByText(/https:\/\/jediswap.xyz/)).toBeInTheDocument()
 

@@ -6,7 +6,7 @@ import { routes } from "../../routes"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
 const { CardIcon } = icons
-const { Starknet } = logos
+const { StarknetLogo } = logos
 
 interface FundingOnRampOptionProps {
   allowFiatPurchase: boolean
@@ -46,7 +46,7 @@ export const FundingOnRampOption: FC<FundingOnRampOptionProps> = ({
       >
         <Option
           title="Get test ETH"
-          icon={<Starknet width={6} height={6} />}
+          icon={<StarknetLogo width={6} height={6} />}
           description="From StarkNet token faucet"
         />
       </Link>

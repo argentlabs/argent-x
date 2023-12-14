@@ -3,7 +3,7 @@ import { FC, useCallback } from "react"
 
 import { useMultisig } from "../multisig/multisig.state"
 import { useActionScreen } from "./hooks/useActionScreen"
-import { ApproveDeployMultisig } from "./transaction/ApproveDeployMultisig"
+import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
 
 export const DeployMultisigActionScreenContainer: FC = () => {
   const {
@@ -13,7 +13,7 @@ export const DeployMultisigActionScreenContainer: FC = () => {
     closePopupIfLastAction,
     rejectAllActions,
   } = useActionScreen()
-  if (action?.type !== "DEPLOY_MULTISIG_ACTION") {
+  if (action?.type !== "DEPLOY_MULTISIG") {
     throw new Error(
       "DeployMultisigActionScreenContainer used with incompatible action.type",
     )
@@ -32,11 +32,14 @@ export const DeployMultisigActionScreenContainer: FC = () => {
   }, [approve, closePopupIfLastAction, multisig])
 
   return (
-    <ApproveDeployMultisig
+    <ApproveDeployAccountScreen
       actionHash={action.meta.hash}
+      title={action.meta?.title}
+      iconKey={action.meta?.icon}
+      displayCalldata={action.payload.displayCalldata}
       onSubmit={() => void onSubmit()}
       onReject={() => void rejectAllActions()}
-      selectedAccount={multisig}
+      selectedAccount={selectedAccount}
       actionIsApproving={Boolean(action.meta.startedApproving)}
     />
   )

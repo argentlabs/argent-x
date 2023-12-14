@@ -1,6 +1,6 @@
 import { walletSessionServiceEmitter } from "../walletSingleton"
 import { Locked } from "../wallet/session/interface"
-import { runRemoveTestnet2Migration } from "./network/removeTestnet2"
+import { restoreDefaultNetworks } from "./network/restoreDefaultNetworksMigration"
 import { KeyValueStorage } from "../../shared/storage"
 import { runRemoveTestnet2Accounts, runV581Migration } from "./wallet"
 import { runV59TokenMigration } from "./token/v5.9"
@@ -12,7 +12,7 @@ enum WalletMigrations {
 }
 
 enum NetworkMigrations {
-  removeTestnet2 = "network:removeTestnet2",
+  rpcEverywhere = "network:rpcEverywhere",
 }
 
 enum TokenMigrations {
@@ -24,7 +24,7 @@ const migrationsStore = new KeyValueStorage(
   {
     [WalletMigrations.v581]: false,
     [WalletMigrations.removeTestnet2Accounts]: false,
-    [NetworkMigrations.removeTestnet2]: false,
+    [NetworkMigrations.rpcEverywhere]: false,
     [TokenMigrations.v59]: false,
     [TokenMigrations.v510]: false,
   },
@@ -37,8 +37,8 @@ export const migrationListener = walletSessionServiceEmitter.on(
     if (!locked) {
       // TODO: come up with a better, generic mechanism for this
       const v581Migration = await migrationsStore.get(WalletMigrations.v581)
-      const networkMigration = await migrationsStore.get(
-        NetworkMigrations.removeTestnet2,
+      const rpcEverywhereMigration = await migrationsStore.get(
+        NetworkMigrations.rpcEverywhere,
       )
       const removeTestnet2Accounts = await migrationsStore.get(
         WalletMigrations.removeTestnet2Accounts,
@@ -53,9 +53,9 @@ export const migrationListener = walletSessionServiceEmitter.on(
         await runRemoveTestnet2Accounts()
         await migrationsStore.set(WalletMigrations.removeTestnet2Accounts, true)
       }
-      if (!networkMigration) {
-        await runRemoveTestnet2Migration()
-        await migrationsStore.set(NetworkMigrations.removeTestnet2, true)
+      if (!rpcEverywhereMigration) {
+        await restoreDefaultNetworks()
+        await migrationsStore.set(NetworkMigrations.rpcEverywhere, true)
       }
 
       if (!v59Migration) {

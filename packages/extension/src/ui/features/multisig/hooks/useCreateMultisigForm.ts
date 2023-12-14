@@ -4,16 +4,13 @@ import { z } from "zod"
 import { accountMessagingService } from "../../../services/accountMessaging"
 import { getBaseMultisigAccounts } from "../../../../shared/multisig/utils/baseMultisig"
 import { encodeBase58Array } from "@argent/shared"
+import { pubkeySchema } from "../../../../shared/multisig/multisig.model"
 
 export const confirmationsSchema = z
   .number()
   .positive()
   .min(1, "You need at least one confirmation")
   .default(1)
-
-export const pubkeySchema = z
-  .string()
-  .regex(/^[a-zA-Z0-9]{41,43}$/, "Incorrect signer pubkey")
 
 const getFormSchema = (accountSignerKey?: string, isNewMultisig = true) =>
   z

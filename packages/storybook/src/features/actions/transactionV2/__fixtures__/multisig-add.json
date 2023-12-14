@@ -1,0 +1,55 @@
+{
+  "transactions": [
+    {
+      "reviewOfTransaction": {
+        "assessment": "neutral",
+        "warnings": [],
+        "reviews": [
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "account_multisig_add_signers",
+              "properties": [
+                {
+                  "type": "text",
+                  "label": "account_multisig_set_threshold",
+                  "text": "1"
+                },
+                {
+                  "type": "address",
+                  "label": "account_multisig_signer",
+                  "address": "0x04aaa0b704c86cdf386aa9da915bcb551987e689b3655ec567b44e860cf3c747",
+                  "verified": false
+                },
+                {
+                  "type": "text",
+                  "label": "account_multisig_number_of_signers",
+                  "text": "1"
+                }
+              ],
+              "defaultProperties": [
+                {
+                  "type": "address",
+                  "label": "default_contract",
+                  "address": "0x01cf2a3112c54821398a8544736108b8491a72dfd9d0687759037bc0792097ec",
+                  "verified": false
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "add_signers",
+                  "calldata": [
+                    "1",
+                    "1",
+                    "2110724608934816813321617549385877489143281708467346823067930903549958145863"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

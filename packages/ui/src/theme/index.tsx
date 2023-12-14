@@ -43,7 +43,7 @@ const extendedTheme = extendTheme({
   styles: {
     global: {
       "html, body": {
-        color: "text",
+        color: "text.primary",
         bg: "bg",
       },
     },

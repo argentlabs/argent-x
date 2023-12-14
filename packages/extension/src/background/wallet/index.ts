@@ -1,5 +1,4 @@
 import { Account, InvocationsDetails } from "starknet"
-import { Account as Account4__deprecated } from "starknet4-deprecated"
 
 import {
   ArgentAccountType,
@@ -75,10 +74,7 @@ export class Wallet {
   public async newPendingMultisig(networkId: string): Promise<PendingMultisig> {
     return this.walletAccountStarknetService.newPendingMultisig(networkId)
   }
-  public getStarknetAccountOfType(
-    account: Account | Account4__deprecated,
-    type: ArgentAccountType,
-  ) {
+  public getStarknetAccountOfType(account: Account, type: ArgentAccountType) {
     return this.walletAccountStarknetService.getStarknetAccountOfType(
       account,
       type,
@@ -185,6 +181,13 @@ export class Wallet {
   }
   public async getMultisigDeploymentPayload(walletAccount: WalletAccount) {
     return this.walletDeploymentStarknetService.getMultisigDeploymentPayload(
+      walletAccount,
+    )
+  }
+  public async getAccountOrMultisigDeploymentPayload(
+    walletAccount: WalletAccount,
+  ) {
+    return this.walletDeploymentStarknetService.getAccountOrMultisigDeploymentPayload(
       walletAccount,
     )
   }

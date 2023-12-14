@@ -14,7 +14,7 @@ import { openNftOnFlex, openNftOnUnframed } from "@argent/shared"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 
 const { ViewIcon } = icons
-const { Unframed, Flex: FlexLogo } = logos
+const { UnframedLogo, FlexLogo } = logos
 
 export interface TokenMenuProps {
   contractAddress: string
@@ -70,7 +70,7 @@ const ViewOnMenu: FC<TokenMenuProps> = ({
             bg="neutrals.700"
             _hover={{ bg: "neutrals.600" }}
           >
-            <Unframed />
+            <UnframedLogo />
             <B3>Unframed</B3>
           </Button>
           <Button

@@ -15,6 +15,7 @@ const txFixture: ActionItem = {
       entrypoint: "fooBar",
       calldata: [],
     },
+    createdAt: 123,
   },
 }
 

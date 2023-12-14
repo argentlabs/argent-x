@@ -67,6 +67,46 @@ export class GuardianSigner extends Signer {
     )
   }
 
+  public async ownerSignTransaction(
+    transactions: Call[],
+    transactionsDetail: InvocationsSignerDetails,
+    abis?: Abi[],
+  ): Promise<Signature> {
+    const signatures = await super.signTransaction(
+      transactions,
+      transactionsDetail,
+      abis,
+    )
+
+    return [signatures].flatMap(stark.signatureToDecimalArray)
+  }
+
+  public async cosignTransaction(
+    transactions: Call[],
+    transactionsDetail: InvocationsSignerDetails,
+    _?: Abi[],
+  ): Promise<Signature> {
+    const calldata = transaction.getExecuteCalldata(
+      transactions,
+      this.cairoVersion,
+    )
+    const cosignerMessage = {
+      contractAddress: addAddressPadding(transactionsDetail.walletAddress),
+      version: num.toBigInt(transactionsDetail.version).toString(10),
+      calldata: calldata.map((data) => num.toHex(num.toBigInt(data))),
+      maxFee: num.toBigInt(transactionsDetail.maxFee).toString(10),
+      chainId: num.toBigInt(transactionsDetail.chainId).toString(10),
+      nonce: num.toBigInt(transactionsDetail.nonce).toString(10),
+    }
+
+    const cosignerSignature = await this.cosignMessage({
+      message: cosignerMessage,
+      type: "starknet",
+    })
+
+    return [cosignerSignature].flatMap(stark.signatureToDecimalArray)
+  }
+
   public async signTransaction(
     transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,

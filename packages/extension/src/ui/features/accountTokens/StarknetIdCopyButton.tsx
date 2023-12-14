@@ -25,7 +25,7 @@ export const StarknetIdCopyButton: FC<StarknetIdCopyButtonProps> = ({
       <Button
         size="3xs"
         bg="neutrals.700"
-        _hover={{ bg: "neutrals.700", color: "text" }}
+        _hover={{ bg: "neutrals.700", color: "text.primary" }}
         borderRadius="100px"
         color="white50"
         textAlign="center"

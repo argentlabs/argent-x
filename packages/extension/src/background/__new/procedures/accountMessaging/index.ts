@@ -8,6 +8,7 @@ import { escapeAndChangeGuardianProcedure } from "./escapeAndChangeGuardian"
 import { getPublicKeyProcedure } from "./getPublicKey"
 import { getNextPublicKeyForMultisigProcedure } from "./getNextPublicKeyForMultisig"
 import { getPublicKeysBufferForMultisigProcedure } from "./getPublicKeysBufferForMultisig"
+import { getAccountDeploymentPayloadProcedure } from "./getAccountDeploymentPayload"
 
 export const accountMessagingRouter = router({
   getEncryptedPrivateKey: getEncryptedPrivateKeyProcedure,
@@ -19,4 +20,5 @@ export const accountMessagingRouter = router({
   getPublicKey: getPublicKeyProcedure,
   getNextPublicKeyForMultisig: getNextPublicKeyForMultisigProcedure,
   getPublicKeysBufferForMultisig: getPublicKeysBufferForMultisigProcedure,
+  getAccountDeploymentPayload: getAccountDeploymentPayloadProcedure,
 })

@@ -1,7 +1,7 @@
 import { isFunction } from "lodash-es"
 import { ZodType } from "zod"
 
-import { HttpError, IHttpService } from "./IHttpService"
+import { HTTP_ERROR_MESSAGE, HttpError, IHttpService } from "./IHttpService"
 
 type ResponseType = "response" | "json"
 
@@ -37,7 +37,7 @@ export class HTTPService implements IHttpService {
     }
 
     const response = await fetch(url, mergedRequestInit).catch(() => {
-      throw new HttpError("Failed to fetch url", 0)
+      throw new HttpError(HTTP_ERROR_MESSAGE.FAILED_TO_FETCH_URL, 0)
     })
 
     if (this.responseType === "json") {
@@ -71,11 +71,15 @@ export class HTTPService implements IHttpService {
     }
 
     const response = await fetch(url, mergedRequestInit).catch(() => {
-      throw new HttpError("Failed to post url", 0)
+      throw new HttpError(HTTP_ERROR_MESSAGE.FAILED_TO_POST_URL, 0)
     })
 
     if (!response.ok) {
-      throw new HttpError(response.statusText, response.status)
+      throw new HttpError(
+        response.statusText,
+        response.status,
+        await response.json(),
+      )
     }
 
     const json = await response.json()
@@ -88,5 +92,30 @@ export class HTTPService implements IHttpService {
       }
     }
     return json as T
+  }
+
+  async delete(url: string, requestInit?: RequestInit): Promise<void> {
+    const globalRequestInit = isFunction(this.requestInit)
+      ? await this.requestInit()
+      : this.requestInit
+
+    const mergedRequestInit = {
+      ...globalRequestInit,
+      ...requestInit,
+      method: "DELETE",
+      // merge headers
+      headers: {
+        ...globalRequestInit?.headers,
+        ...requestInit?.headers,
+      },
+    }
+
+    const response = await fetch(url, mergedRequestInit).catch(() => {
+      throw new HttpError("Failed to delete url", 0)
+    })
+
+    if (!response.ok) {
+      throw new HttpError(response.statusText, response.status)
+    }
   }
 }

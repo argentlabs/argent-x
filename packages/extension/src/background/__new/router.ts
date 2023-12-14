@@ -11,25 +11,32 @@ import { multisigRouter } from "./procedures/multisig"
 import { recoveryRouter } from "./procedures/recovery"
 import { sessionRouter } from "./procedures/session"
 import { tokensRouter } from "./procedures/tokens"
+import { transactionReviewRouter } from "./procedures/transactionReview"
 import { transferRouter } from "./procedures/transfer"
 import { udcRouter } from "./procedures/udc"
 import { backgroundActionService } from "./services/action"
 import { backgroundArgentAccountService } from "./services/argentAccount"
 import { backgroundMultisigService } from "./services/multisig"
+import { backgroundTransactionReviewService } from "./services/transactionReview"
 import { router } from "./trpc"
 import { backgroundRecoveryService } from "./services/recovery"
+import { addressRouter } from "./procedures/address"
+import { backgroundStarknetAddressService } from "./services/address"
+import { networkService } from "../../shared/network/service"
 
 const appRouter = router({
   account: accountRouter,
   accountMessaging: accountMessagingRouter,
   action: actionRouter,
+  address: addressRouter,
   addressBook: addressBookRouter,
-  recovery: recoveryRouter,
-  tokens: tokensRouter,
-  transfer: transferRouter,
   argentAccount: argentAccountRouter,
   multisig: multisigRouter,
+  recovery: recoveryRouter,
   session: sessionRouter,
+  tokens: tokensRouter,
+  transactionReview: transactionReviewRouter,
+  transfer: transferRouter,
   udc: udcRouter,
 })
 
@@ -47,6 +54,9 @@ createChromeHandler({
       argentAccountService: backgroundArgentAccountService,
       multisigService: backgroundMultisigService,
       recoveryService: backgroundRecoveryService,
+      transactionReviewService: backgroundTransactionReviewService,
+      starknetAddressService: backgroundStarknetAddressService,
+      networkService,
     },
   }),
 })

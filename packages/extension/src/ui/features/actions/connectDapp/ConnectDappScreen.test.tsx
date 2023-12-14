@@ -13,9 +13,6 @@ describe("ConnectDappScreen", () => {
   const onConnect = vi.fn()
   const onDisconnect = vi.fn()
   const onSelectedAccountChange = vi.fn()
-  const onKnownDappModalOpen = vi.fn()
-  const onKnownDappModalClose = vi.fn()
-  const isKnownDappModalOpen = false
 
   const props: ConnectDappScreenProps = {
     isConnected: true,
@@ -25,9 +22,6 @@ describe("ConnectDappScreen", () => {
     selectedAccount: accounts[0],
     host: "http://localhost:3000",
     onSelectedAccountChange,
-    onKnownDappModalOpen,
-    onKnownDappModalClose,
-    isKnownDappModalOpen,
   }
 
   beforeEach(() => {

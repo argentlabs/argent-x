@@ -14,6 +14,7 @@ export enum ACCOUNT_ERROR_MESSAGES {
   UPGRADE_NOT_SUPPORTED = "Old Account upgrades are no longer supporte",
   DEPLOYED_ACCOUNT_CAIRO_VERSION_NOT_FOUND = "Unable to determine cairo version of DEPLOYED account",
   UNDEPLOYED_ACCOUNT_CAIRO_VERSION_NOT_FOUND = "Unable to determine cairo version of UNDEPLOYED account",
+  MISSING_METHOD = "Missing method",
 }
 
 export type AccountValidationErrorMessage = keyof typeof ACCOUNT_ERROR_MESSAGES

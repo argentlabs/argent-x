@@ -1,53 +1,15 @@
-import { messageClient } from "../../../ui/services/messaging/trpc"
 import { mockChainService } from "../../chain/service/__test__/mock"
-import {
-  MockFnObjectStore,
-  MockFnRepository,
-} from "../../storage/__new/__test__/mockFunctionImplementation"
+import { MockFnRepository } from "../../storage/__new/__test__/mockFunctionImplementation"
 import type { BaseWalletAccount, WalletAccount } from "../../wallet.model"
-import type { IWalletStore } from "../../wallet/walletStore"
 import { AccountService } from "./implementation"
-import { IMultisigService } from "../../multisig/service/messaging/interface"
 
 describe("AccountService", () => {
   let accountRepo: MockFnRepository<WalletAccount>
-  let walletStore: IWalletStore
   let accountService: AccountService
-  let multisigService: IMultisigService
-  const mutateMock = vi.fn()
-  const messageClientMock = {
-    account: {
-      select: {
-        mutate: mutateMock,
-      },
-    },
-  } as unknown as jest.Mocked<typeof messageClient>
 
   beforeEach(() => {
     accountRepo = new MockFnRepository()
-    walletStore = new MockFnObjectStore()
-    accountService = new AccountService(
-      mockChainService,
-      accountRepo,
-      walletStore,
-      messageClientMock,
-      multisigService,
-    )
-  })
-
-  describe("select", () => {
-    it("should update wallet store with selected account", async () => {
-      const baseAccount: BaseWalletAccount = {
-        address: "0x123",
-        networkId: "0x1",
-      }
-      await accountService.select(baseAccount)
-
-      expect(mutateMock).toHaveBeenCalledWith({
-        address: baseAccount.address,
-        networkId: baseAccount.networkId,
-      })
-    })
+    accountService = new AccountService(mockChainService, accountRepo)
   })
 
   describe("get", () => {

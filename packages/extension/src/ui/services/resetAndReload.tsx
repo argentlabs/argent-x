@@ -57,6 +57,9 @@ export const useSoftReload = () => {
  */
 
 export const hardReload = (resetRoute = true) => {
+  if (typeof window === "undefined") {
+    return
+  }
   const url = browser.runtime.getURL("index.html")
   const shouldResetRoute = !IS_DEV || resetRoute
   window.location.href = shouldResetRoute

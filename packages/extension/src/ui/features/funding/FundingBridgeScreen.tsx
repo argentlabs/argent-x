@@ -19,7 +19,7 @@ import { isFeatureEnabled } from "@argent/shared"
 import { getLayerSwapUrl } from "./utils"
 import { Grid } from "@chakra-ui/react"
 
-const { Ethereum, Orbiter, Layerswap } = logos
+const { EthereumLogo, OrbiterLogo, LayerswapLogo } = logos
 
 export const FundingBridgeScreen: FC = () => {
   const account = useView(selectedAccountView)
@@ -62,14 +62,14 @@ export const FundingBridgeScreen: FC = () => {
               <Option
                 title="StarkGate"
                 description="Bridge trustlessly from Ethereum"
-                icon={<Ethereum width={6} height={6} />}
+                icon={<EthereumLogo width={6} height={6} />}
               />
             </A>
           ) : (
             <Option
               title="Bridge from Ethereum"
               description="Not available for this network"
-              icon={<Ethereum width={6} height={6} />}
+              icon={<EthereumLogo width={6} height={6} />}
               disabled
             />
           )}
@@ -82,7 +82,7 @@ export const FundingBridgeScreen: FC = () => {
               <Option
                 title="Layerswap"
                 description="Bridge from other chains"
-                icon={<Layerswap width={6} height={6} />}
+                icon={<LayerswapLogo width={6} height={6} />}
               />
             </A>
           )}
@@ -95,7 +95,7 @@ export const FundingBridgeScreen: FC = () => {
               <Option
                 title="Orbiter.finance"
                 description="Bridge from other chains"
-                icon={<Orbiter width={6} height={6} />}
+                icon={<OrbiterLogo width={6} height={6} />}
               />
             </A>
           )}

@@ -1,4 +1,4 @@
-import { H5, H6, L2, P4, icons } from "@argent/ui"
+import { H5, H6, KnownDappButton, L2, P4, icons } from "@argent/ui"
 import {
   Box,
   Center,
@@ -18,18 +18,15 @@ import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmSc
 import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
 import { DappIcon } from "./DappIcon"
 import { DappDisplayAttributes } from "./useDappDisplayAttributes"
-import { KnownDappModal } from "./KnownDappModal"
 
-const { LinkIcon, TickIcon, VerifiedIcon } = icons
+const { LinkIcon, TickIcon } = icons
 
 export interface ConnectDappScreenProps {
   isConnected: boolean
   onConnect: () => void
   onDisconnect: () => void
   onReject?: () => void
-  onKnownDappModalOpen: () => void
-  onKnownDappModalClose: () => void
-  isKnownDappModalOpen: boolean
+
   host: string
   accounts: WalletAccount[]
   selectedAccount?: BaseWalletAccount
@@ -45,9 +42,6 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
   onConnect,
   onDisconnect,
   onReject,
-  isKnownDappModalOpen = false,
-  onKnownDappModalOpen,
-  onKnownDappModalClose,
   host,
   accounts,
   dappDisplayAttributes,
@@ -82,15 +76,9 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
               {hostName}
             </P4>
             {dappDisplayAttributes?.isKnown && (
-              <Box
-                p="1px"
-                color="success.500"
-                fontSize="sm"
-                cursor="pointer"
-                onClick={onKnownDappModalOpen}
-              >
-                <VerifiedIcon />
-              </Box>
+              <KnownDappButton
+                dapplandUrl={dappDisplayAttributes.dapplandUrl}
+              />
             )}
           </Flex>
         </Center>
@@ -150,10 +138,6 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
           </Text>
         </Box>
       </ConfirmScreen>
-      <KnownDappModal
-        isOpen={isKnownDappModalOpen}
-        onClose={onKnownDappModalClose}
-      />
     </>
   )
 }

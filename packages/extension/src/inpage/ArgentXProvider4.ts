@@ -11,14 +11,13 @@ export class ArgentXProviderV4 extends Provider implements ProviderInterface {
     // Only expose sequencer provider for argent networks
     if (isArgentNetwork(network)) {
       const publicRpcNode = getRandomPublicRPCNode(network)
-      if (network.id === "mainnet-alpha") {
-        if (!network.sequencerUrl) {
-          throw new Error("Missing sequencer url for mainnet")
-        }
-        super({ sequencer: { baseUrl: network.sequencerUrl } })
-      } else {
-        super({ rpc: { nodeUrl: publicRpcNode.testnet } })
-      }
+
+      const nodeUrl =
+        network.id === "mainnet-alpha"
+          ? publicRpcNode.mainnet
+          : publicRpcNode.testnet
+
+      super({ rpc: { nodeUrl } })
     } else {
       // Otherwise, it's a custom network, so we expose the custom provider
       super(getProviderv4(network))

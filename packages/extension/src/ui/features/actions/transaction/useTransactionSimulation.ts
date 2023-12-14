@@ -4,12 +4,10 @@ import { Call } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../../../shared/messages"
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
-import { WalletAccount } from "../../../../shared/wallet.model"
 import { useConditionallyEnabledSWR } from "../../../services/swr.service"
 import { ARGENT_TRANSACTION_SIMULATION_API_ENABLED } from "./../../../../shared/api/constants"
 
 export interface IUseTransactionSimulation {
-  account?: WalletAccount
   transactions: Call | Call[]
   actionHash?: string
 }
@@ -19,16 +17,11 @@ export const useTransactionSimulationEnabled = () => {
 }
 
 export const useTransactionSimulation = ({
-  account,
   transactions,
   actionHash = "",
 }: IUseTransactionSimulation) => {
   const transactionSimulationEnabled = useTransactionSimulationEnabled()
   const transactionSimulationFetcher = useCallback(async () => {
-    if (!account) {
-      return
-    }
-
     void sendMessage({ type: "SIMULATE_TRANSACTIONS", data: transactions })
 
     const result = await Promise.race([
@@ -48,7 +41,7 @@ export const useTransactionSimulation = ({
     }
 
     return result.simulation
-  }, [account, transactions]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [transactions]) // eslint-disable-line react-hooks/exhaustive-deps
   return useConditionallyEnabledSWR<
     ApiTransactionBulkSimulationResponse | undefined
   >(

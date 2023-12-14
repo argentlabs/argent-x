@@ -10,20 +10,21 @@ let _messageClient = createTRPCProxyClient<AppRouter>({
   links: [chromeLink({ port: initalPort })],
 })
 
-// only if in UI
-if (typeof window !== "undefined") {
-  // setup auto-reconnect
-  void autoReconnect(
-    initalPort,
-    () => browser.runtime.connect(),
-    (newPort) => {
-      console.log("Reconnecting to new port", newPort.name)
-      _messageClient = createTRPCProxyClient<AppRouter>({
-        links: [chromeLink({ port: newPort })],
-      })
-    },
-  )
+if (typeof window === "undefined") {
+  throw new Error("This file should only be imported in the UI")
 }
+
+// setup auto-reconnect
+void autoReconnect(
+  initalPort,
+  () => browser.runtime.connect(),
+  (newPort) => {
+    console.log("Reconnecting to new port", newPort.name)
+    _messageClient = createTRPCProxyClient<AppRouter>({
+      links: [chromeLink({ port: newPort })],
+    })
+  },
+)
 
 const getProxyHandler = (path: string[] = []): ProxyHandler<any> => ({
   get: function (target: any, prop: string) {

@@ -46,6 +46,10 @@ export default class DeveloperSettings {
     return this.page.locator('[name="sequencerUrl"]')
   }
 
+  get rpcUrl() {
+    return this.page.locator('[name="rpcUrl"]')
+  }
+
   get create() {
     return this.page.locator('button[type="submit"]')
   }

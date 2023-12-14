@@ -11,7 +11,7 @@ import { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/Confi
 import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { MultisigSignatureScreenWarning } from "../multisig/MultisigSignatureScreenWarning"
 import { ExecuteFromOutsideScreen } from "./ExecuteFromOutsideScreen"
-import { useIsMainnet } from "../networks/hooks/useIsMainnet"
+import { validateOutsideExecution } from "./transaction/executeFromOutside/utils"
 
 interface ApproveSignatureScreenContainerProps
   extends Omit<ConfirmScreenProps, "onSubmit"> {
@@ -36,7 +36,6 @@ export const ApproveSignatureScreenContainer: FC<
   const multisig = useMultisig(selectedAccount)
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
   const accountWithDeployState = useAccount(selectedAccount)
-  const isMainnet = useIsMainnet()
   if (
     !skipDeployWarning &&
     selectedAccount?.needsDeploy &&
@@ -58,10 +57,14 @@ export const ApproveSignatureScreenContainer: FC<
     )
   }
 
+  const isValidOutsideExecution = validateOutsideExecution(
+    dataToSign,
+    selectedAccount?.network,
+  )
+
   if (
-    // For now we don't support off-chain signatures for meta transactions
     dataToSign.domain.name === "Account.execute_from_outside" &&
-    isMainnet
+    !isValidOutsideExecution
   ) {
     return (
       <ExecuteFromOutsideScreen selectedAccount={selectedAccount} {...props} />

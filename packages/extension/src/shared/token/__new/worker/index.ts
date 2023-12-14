@@ -1,13 +1,12 @@
+import { activityService } from "../../../../background/__new/services/activity"
 import { backgroundUIService } from "../../../../background/__new/services/ui"
 import { transactionsRepo } from "../../../../background/transactions/store"
-import {
-  recoverySharedService,
-  sessionService,
-} from "../../../../background/walletSingleton"
+import { recoverySharedService } from "../../../../background/walletSingleton"
 import { accountService } from "../../../account/service"
+import { debounceService } from "../../../debounce"
 import { networkService } from "../../../network/service"
 import { chromeScheduleService } from "../../../schedule"
-import { old_walletStore, walletStore } from "../../../wallet/walletStore"
+import { old_walletStore } from "../../../wallet/walletStore"
 import { tokenRepo } from "../repository/token"
 
 import { tokenService } from "../service"
@@ -20,8 +19,9 @@ export const tokenWorker = new TokenWorker(
   tokenService,
   accountService,
   networkService,
-  sessionService,
   recoverySharedService,
   backgroundUIService,
   chromeScheduleService,
+  debounceService,
+  activityService,
 )

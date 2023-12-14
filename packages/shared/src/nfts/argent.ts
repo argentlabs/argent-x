@@ -79,18 +79,12 @@ interface NftResponse {
 
 const PAGE_SIZE = 32
 
-interface Headers extends RequestInit {
-  "argent-version": string
-  "argent-client": string
-  "argent-network"?: string | undefined
-}
-
 export class ArgentBackendNftService implements NFTService {
   private readonly httpService: IHttpService
 
   constructor(
     protected readonly apiBase: string,
-    private readonly headers: Headers | undefined,
+    private readonly headers: RequestInit | undefined,
   ) {
     this.httpService = new HTTPService(this.headers, "json")
   }

@@ -1,25 +1,24 @@
 import {
-  AddressOrStarknetId,
+  AddressOrDomain,
   normalizeAddress,
   formatTruncatedAddress,
-  isStarknetId,
   isValidAddress,
   getAccountIdentifier,
+  isStarknetDomainName,
 } from "@argent/shared"
 import { icons } from "@argent/ui"
 import { FC, ReactNode, useEffect, useMemo, useState } from "react"
 
 import { useAppState } from "../../app.state"
-import { getAddressFromStarkName } from "../../services/useStarknetId"
 import { AccountListItem } from "../accounts/AccountListItem"
 import { AccountListItemWithBalance } from "../accounts/AccountListItemWithBalance"
 import { useAccountOrContact } from "./useAccountOrContact"
-import { genericErrorSchema } from "../actions/feeEstimation/feeError"
+import { useGetAddressFromDomainName } from "../send/useGetAddressFromDomainName"
 
 const { WalletIcon } = icons
 
 interface AccountAddressListItemProps {
-  accountAddress: AddressOrStarknetId
+  accountAddress: AddressOrDomain
   onClick?: () => void
   fallbackAccessory?: ReactNode
   truncated?: boolean
@@ -31,38 +30,39 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
   fallbackAccessory,
   truncated = false,
 }) => {
-  const [starknetAddress, setStarknetAddress] = useState("")
+  const [addressFromDomain, setAddressFromDomain] = useState("")
   const { switcherNetworkId } = useAppState()
 
-  const isStarknetIdQuery = isStarknetId(accountAddress)
+  const isStarknetDomainNameAddress = isStarknetDomainName(accountAddress)
+
+  const { result, error } = useGetAddressFromDomainName(
+    accountAddress,
+    switcherNetworkId,
+  )
 
   const { contact, account } = useAccountOrContact(accountAddress)
 
   useEffect(() => {
-    const init = async () => {
-      if (!isStarknetIdQuery) {
-        return
-      }
-      try {
-        const starknetAddress = await getAddressFromStarkName(
-          accountAddress,
-          switcherNetworkId,
-        )
-        setStarknetAddress(starknetAddress)
-      } catch (e) {
-        const genericError = genericErrorSchema.safeParse(e)
-        if (genericError.success) {
-          setStarknetAddress(genericError.data.message)
-        } else {
-          setStarknetAddress(`${e}`)
-        }
-      }
+    if (!isStarknetDomainNameAddress) {
+      return
     }
-    void init()
-  }, [accountAddress, isStarknetIdQuery, switcherNetworkId])
+    if (result) {
+      setAddressFromDomain(result)
+    } else if (error) {
+      setAddressFromDomain(error)
+    }
+  }, [
+    accountAddress,
+    error,
+    isStarknetDomainNameAddress,
+    result,
+    switcherNetworkId,
+  ])
 
   const accountDescription = useMemo(() => {
-    const address = isStarknetIdQuery ? starknetAddress : accountAddress
+    const address = isStarknetDomainNameAddress
+      ? addressFromDomain
+      : accountAddress
     if (!address) {
       return ""
     }
@@ -72,7 +72,12 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
         : normalizeAddress(address)
     }
     return address
-  }, [accountAddress, isStarknetIdQuery, starknetAddress, truncated])
+  }, [
+    accountAddress,
+    isStarknetDomainNameAddress,
+    addressFromDomain,
+    truncated,
+  ])
 
   if (account) {
     const key = getAccountIdentifier(account)
@@ -105,7 +110,7 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
 
   return (
     <AccountListItem
-      accountName={isStarknetIdQuery ? accountAddress : ""}
+      accountName={isStarknetDomainNameAddress ? accountAddress : ""}
       accountAddress=""
       accountDescription={accountDescription}
       networkId={switcherNetworkId}

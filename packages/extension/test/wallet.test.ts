@@ -75,7 +75,7 @@ const networkService: Pick<INetworkService, "getById"> = {
     return (networkId === NETWORK && {
       id: NETWORK,
       chainId: "SN_GOERLI",
-      sequencerUrl: "http://127.0.0.1:5050/",
+      rpcUrl: "http://127.0.0.1:5050/",
       name: "Test Network",
     }) as Network
   },

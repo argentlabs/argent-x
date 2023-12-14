@@ -5,6 +5,7 @@ import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
 import { constants, num, Account } from "starknet"
 import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
+import { changeGuardianCalldataSchema } from "@argent/shared"
 
 const changeGuardianSchema = z.object({
   guardian: z.string(),
@@ -24,7 +25,7 @@ export const changeGuardianProcedure = extensionOnlyProcedure
         const newGuardian = num.hexToDecimalString(guardian)
         const starknetAccount =
           (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
-
+        const isRemoveGuardian = num.toBigInt(newGuardian) === constants.ZERO
         await actionService.add(
           {
             type: "TRANSACTION",
@@ -35,20 +36,26 @@ export const changeGuardianProcedure = extensionOnlyProcedure
                   "changeGuardian",
                   starknetAccount.cairoVersion,
                 ),
-                calldata: [newGuardian],
+                calldata: changeGuardianCalldataSchema.parse([newGuardian]),
               },
               meta: {
                 isChangeGuardian: true,
                 title: "Change account guardian",
-                type:
-                  num.toBigInt(newGuardian) === constants.ZERO // if guardian is 0, it's a remove guardian action
-                    ? "REMOVE_ARGENT_SHIELD"
-                    : "ADD_ARGENT_SHIELD",
+                type: isRemoveGuardian // if guardian is 0, it's a remove guardian action
+                  ? "REMOVE_ARGENT_SHIELD"
+                  : "ADD_ARGENT_SHIELD",
               },
             },
           },
           {
             origin,
+            title: isRemoveGuardian
+              ? "Remove Argent Shield"
+              : "Add Argent Shield",
+            icon: isRemoveGuardian
+              ? "ArgentShieldDeactivateIcon"
+              : "ArgentShieldIcon",
+            subtitle: "",
           },
         )
       } catch (error) {

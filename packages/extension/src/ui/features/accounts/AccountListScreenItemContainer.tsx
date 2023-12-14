@@ -1,7 +1,6 @@
 import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { accountService } from "../../../shared/account/service"
 import { useIsPreauthorized } from "../../../shared/preAuthorizations"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { routes } from "../../routes"
@@ -14,6 +13,7 @@ import { Account } from "./Account"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import { BoxProps } from "@chakra-ui/react"
 import { useIsDeprecatedTxV0 } from "./accountUpgradeCheck"
+import { clientAccountService } from "../../services/account"
 
 interface AccountListScreenItemContainerProps
   extends Pick<BoxProps, "borderBottomRadius"> {
@@ -64,7 +64,7 @@ export const AccountListScreenItemContainer: FC<
 
       navigate(routeTo)
     } else {
-      await accountService.select(account)
+      await clientAccountService.select(account)
 
       // For multisig accounts, navigate to the multisig screen if the account is not yet deployed
       // Otherwise, it blocks users as there is no navigation to go back to the tokens screen

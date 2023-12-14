@@ -1,4 +1,4 @@
-import { addressSchema, isStarknetId } from "@argent/shared"
+import { addressSchema, isStarknetDomainName } from "@argent/shared"
 import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
 import { Box, Circle, Flex, Switch, Tooltip, chakra } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
@@ -125,7 +125,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
     const descriptionElements = []
     if (accountDescription) {
       descriptionElements.push(accountDescription)
-    } else if (isStarknetId(accountAddress)) {
+    } else if (isStarknetDomainName(accountAddress)) {
       descriptionElements.push(accountAddress)
     } else {
       if (addressSchema.safeParse(accountAddress).success) {

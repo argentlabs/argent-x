@@ -6,7 +6,7 @@ import {
 import { useReducedMotion } from "framer-motion"
 import { ComponentProps, FC } from "react"
 
-import { ChevronDownIcon } from "./icons"
+import { ChevronDownIcon, DropdownDownIcon } from "./icons"
 import { typographyStyles } from "./Typography"
 
 const { definePartsStyle, defineMultiStyleConfig } =
@@ -47,18 +47,18 @@ const baseStyle = definePartsStyle((props) => {
         overflow: "hidden",
       },
       panel: {
-        color: "white",
-        bg: "neutrals.800",
+        color: "text.primary",
         mt: "1px",
+        bg: "surface.elevated",
       },
       icon: {
-        color: "white",
+        color: "text.primary",
       },
       button: {
-        bg: "neutrals.800",
-        color: "white",
+        bg: "surface.elevated",
+        color: "text.primary",
         _hover: {
-          bg: "neutrals.700",
+          bg: "surface.elevated.hover",
         },
       },
     }
@@ -70,15 +70,45 @@ const baseStyle = definePartsStyle((props) => {
       color: "neutrals.700",
     },
     panel: {
-      color: "white",
+      color: "text.primary",
     },
     icon: {
-      color: "white",
+      color: "text.primary",
     },
     button: {
-      color: "white",
+      color: "text.primary",
     },
   }
+})
+
+const nested = definePartsStyle({
+  root: {
+    _notFirst: {
+      mt: 2,
+    },
+  },
+  container: {
+    bg: "transparent",
+    border: "none",
+    overflow: "hidden",
+    borderRadius: 0,
+  },
+  button: {
+    ...typographyStyles.P4,
+    fontWeight: "normal",
+    color: "text.secondary",
+    padding: 0,
+  },
+  panel: {
+    padding: 0,
+    borderLeft: "2px solid",
+    borderLeftColor: "neutrals.100",
+    pl: 2.5,
+    mt: 2,
+    _dark: {
+      borderLeftColor: "neutrals.500",
+    },
+  },
 })
 
 const sizes = {
@@ -98,6 +128,9 @@ const sizes = {
 export const accordionTheme = defineMultiStyleConfig({
   baseStyle,
   sizes,
+  variants: {
+    nested,
+  },
   defaultProps: {
     size: "base",
   },
@@ -114,6 +147,23 @@ export const AccordionIcon: FC<ComponentProps<typeof ChevronDownIcon>> = (
       transition={prefersReducedMotion ? undefined : "transform 0.2s"}
       transformOrigin={"center"}
       opacity={isDisabled ? 0.4 : 1}
+      {...props}
+    />
+  )
+}
+
+export const AccordionIconDropdown: FC<
+  ComponentProps<typeof DropdownDownIcon>
+> = (props) => {
+  const { isOpen, isDisabled } = useAccordionItemState()
+  const prefersReducedMotion = useReducedMotion()
+  return (
+    <DropdownDownIcon
+      transform={isOpen ? undefined : "rotate(-90deg)"}
+      transition={prefersReducedMotion ? undefined : "transform 0.2s"}
+      transformOrigin={"center"}
+      opacity={isDisabled ? 0.4 : 1}
+      color="text.secondary"
       {...props}
     />
   )

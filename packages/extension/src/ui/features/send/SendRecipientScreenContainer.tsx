@@ -1,8 +1,8 @@
 import {
   addressInputSchema,
-  addressOrStarknetIdInputSchema,
-  isStarknetId,
-  normalizeAddressOrStarknetId,
+  addressOrDomainInputSchema,
+  isStarknetDomainName,
+  normalizeAddressOrDomain,
 } from "@argent/shared"
 import { useDisclosure } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -23,7 +23,7 @@ import { SendRecipientScreen } from "./SendRecipientScreen"
 import { useSendQuery } from "./schema"
 import { useFilteredAccounts } from "./useFilteredAccounts"
 import { useFilteredContacts } from "./useFilteredContacts"
-import { useGetAddressFromStarknetId } from "./useGetAddressFromStarknetId"
+import { useGetAddressFromDomainNameInput } from "./useGetAddressFromDomainName"
 import { IS_DEV } from "../../../shared/utils/dev"
 import { FormType, formSchema } from "./sendRecipientScreen.model"
 
@@ -56,15 +56,15 @@ export const SendRecipientScreenContainer: FC = () => {
 
   const {
     isLoading,
-    error: starknetIdError,
+    error: starknetDomainError,
     result: starknetAddress,
     isValid: starknetAddressIsValid,
-  } = useGetAddressFromStarknetId(query, switcherNetworkId)
+  } = useGetAddressFromDomainNameInput(query, switcherNetworkId)
 
   const selectAddress = useCallback(
     (address: string) => {
-      const isStarknetIdQuery = isStarknetId(query)
-      if (isStarknetIdQuery && (isLoading || !starknetAddressIsValid)) {
+      const isStarknetDomainNameQuery = isStarknetDomainName(query)
+      if (isStarknetDomainNameQuery && (isLoading || !starknetAddressIsValid)) {
         return
       }
       navigate(
@@ -121,13 +121,13 @@ export const SendRecipientScreenContainer: FC = () => {
     : accounts.length > 1
 
   useEffect(() => {
-    if (starknetIdError) {
+    if (starknetDomainError) {
       setError("query", {
         type: "custom",
-        message: starknetIdError,
+        message: starknetDomainError,
       })
     }
-  }, [setError, starknetIdError])
+  }, [setError, starknetDomainError])
 
   useEffect(() => {
     if (starknetAddressIsValid) {
@@ -137,11 +137,11 @@ export const SendRecipientScreenContainer: FC = () => {
   }, [query, reset, starknetAddress, starknetAddressIsValid])
 
   const placeholderValidAddress = useMemo(() => {
-    const isStarknetIdQuery = isStarknetId(query)
+    const isStarknetDomainNameQuery = isStarknetDomainName(query)
     if (
-      !addressOrStarknetIdInputSchema.safeParse(query).success ||
-      (isStarknetIdQuery && isLoading) ||
-      (isStarknetIdQuery && !starknetAddressIsValid)
+      !addressOrDomainInputSchema.safeParse(query).success ||
+      (isStarknetDomainNameQuery && isLoading) ||
+      (isStarknetDomainNameQuery && !starknetAddressIsValid)
     ) {
       return null
     }
@@ -156,7 +156,7 @@ export const SendRecipientScreenContainer: FC = () => {
   }, [handleSubmit, isLoading, onSubmit, query, starknetAddressIsValid])
 
   const onSaveContact = ({ address }: AddressBookContact) => {
-    setValue("query", normalizeAddressOrStarknetId(address), {
+    setValue("query", normalizeAddressOrDomain(address), {
       shouldDirty: true,
       shouldValidate: true,
     })

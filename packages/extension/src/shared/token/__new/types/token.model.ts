@@ -44,7 +44,11 @@ export const ApiTokenDetailsSchema = z.object({
   refundable: z.boolean(),
   listed: z.boolean(),
   tradable: z.boolean(),
-  category: z.union([z.literal("tokens"), z.literal("currencies")]),
+  category: z.union([
+    z.literal("tokens"),
+    z.literal("currencies"),
+    z.literal("savings"),
+  ]),
   pricingId: z.number().optional(),
 })
 

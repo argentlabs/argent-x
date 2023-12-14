@@ -20,12 +20,12 @@ import { keyframes } from "@chakra-ui/react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { analytics } from "../../../background/analytics"
-import { executeTransaction } from "../../services/backgroundTransactions"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { HighPriceImpactModal } from "./ui/HighPriceImpactModal"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 import { SwapWarning } from "./ui/SwapWarning"
+import { tokenService } from "../../services/tokens"
 
 const { SwitchDirectionIcon } = icons
 
@@ -165,7 +165,7 @@ const Swap = () => {
     userSlippageTolerance,
   )
 
-  const handleSwap = useCallback(() => {
+  const handleSwap = useCallback(async () => {
     if (swapCallbackError) {
       console.error(swapCallbackError)
       return
@@ -173,18 +173,19 @@ const Swap = () => {
 
     if (swapCallback) {
       const swapCalls = swapCallback()
-
-      analytics.track("swapInitiated", {
+      void analytics.track("swapInitiated", {
         networkId,
         pair:
           trade?.inputAmount.currency.symbol +
           "-" +
           trade?.outputAmount.currency.symbol,
       })
+      await tokenService.swap(
+        swapCalls,
+        `Swap ${trade?.inputAmount.currency.symbol} to ${trade?.outputAmount.currency.symbol}`,
+      )
 
-      return executeTransaction({ transactions: swapCalls }).then(() => {
-        onUserInput(Field.INPUT, "")
-      })
+      onUserInput(Field.INPUT, "")
     }
   }, [
     networkId,

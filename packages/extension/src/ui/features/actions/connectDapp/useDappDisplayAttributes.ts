@@ -6,8 +6,10 @@ import { upperFirst } from "lodash-es"
 
 export interface DappDisplayAttributes {
   title?: string
-  iconUrl: string
+  iconUrl?: string
   isKnown: boolean
+  dapplandUrl?: string
+  verified?: boolean
 }
 
 const getFavicon = (host: string) => {
@@ -39,12 +41,14 @@ export const useDappDisplayAttributes = (host: string) => {
 
   const title = dapp?.name ? upperFirst(dapp.name) : undefined
 
-  const iconUrl = dapp?.logoUrl || getFavicon(host)
+  const iconUrl = dapp?.logoUrl
 
   const result: DappDisplayAttributes = {
     title,
     iconUrl,
     isKnown: !!dapp,
+    dapplandUrl: dapp?.dappland,
+    verified: dapp?.argentVerified,
   }
 
   return result

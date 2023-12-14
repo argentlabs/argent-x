@@ -1,4 +1,5 @@
 import {
+  constants,
   getChecksumAddress,
   num,
   validateAndParseAddress,
@@ -77,7 +78,8 @@ export const isAddress = (string: string): string is Address =>
 
 export const isValidAddress = isAddress
 
-export const normalizeAddress = (address: string) => getChecksumAddress(address)
+export const normalizeAddress = (address: string) =>
+  getChecksumAddress(address) as Address
 
 export const formatTruncatedAddress = (address: string) => {
   const normalized = normalizeAddress(address)
@@ -108,6 +110,17 @@ export const isEqualAddress = (a: string, b?: string) => {
       return false
     }
     return num.hexToDecimalString(a) === num.hexToDecimalString(b)
+  } catch {
+    // ignore parsing error
+  }
+  return false
+}
+
+export const isZeroAddress = (address: string) => {
+  try {
+    const isZero =
+      num.toBigInt(addressSchemaBase.parse(address)) === constants.ZERO
+    return isZero
   } catch {
     // ignore parsing error
   }

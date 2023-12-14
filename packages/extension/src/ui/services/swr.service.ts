@@ -11,8 +11,12 @@ import useSWR, {
 } from "swr"
 
 import { reviveJsonBigNumber } from "../../shared/json"
-import { checkStorageAndPrune } from "../../shared/storage/__new/prune"
+import {
+  isQuotaExceededError,
+  setItemWithStorageQuotaExceededStrategy,
+} from "../../shared/storage/__new/prune"
 import { isFunction, isUndefined } from "lodash-es"
+import { exponentialBackoff } from "../../shared/network/exponentialBackoff"
 
 export interface SWRConfigCommon {
   suspense?: boolean
@@ -24,13 +28,20 @@ const swrStateCache: Cache = new Map()
 
 const swrPersistedCache: Cache = {
   set: (key, value) => {
-    checkStorageAndPrune()
-    return localStorage.setItem(
-      unstable_serialize(key),
-      JSON.stringify(value, (_key, value) =>
-        typeof value === "bigint" ? value.toString() : value,
-      ),
-    )
+    try {
+      setItemWithStorageQuotaExceededStrategy(
+        unstable_serialize(key),
+        JSON.stringify(value, (_key, value) =>
+          typeof value === "bigint" ? value.toString() : value,
+        ),
+      )
+    } catch (e) {
+      if (isQuotaExceededError(e)) {
+        console.warn("Storage quota exceeded -", e)
+      } else {
+        console.error("Error", e)
+      }
+    }
   },
   get: (key) => {
     try {
@@ -118,9 +129,6 @@ export const swrCacheProvider: Cache = {
     }
   },
 }
-
-const exponentialBackoff = (retryCount: number) =>
-  (Math.pow(2, retryCount) - 1) * 1000
 
 export function onErrorRetry<Data = any, Error = any>(
   error: any,

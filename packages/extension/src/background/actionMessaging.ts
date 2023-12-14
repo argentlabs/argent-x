@@ -17,6 +17,7 @@ export const handleActionMessage: HandleMessage<ActionMessage> = async ({
         },
         {
           origin,
+          title: "Review signature request",
         },
       )
 

@@ -1,11 +1,10 @@
 import {
   Account,
-  SequencerProvider,
-  constants,
   uint256,
   num,
-  GetTransactionReceiptResponse,
   TransactionExecutionStatus,
+  RpcProvider,
+  constants,
 } from "starknet"
 import { bigDecimal } from "@argent/shared"
 import { getBatchProvider } from "@argent/x-multicall"
@@ -17,12 +16,20 @@ export interface AccountsToSetup {
   deploy?: boolean
 }
 
-const provider = new SequencerProvider({
-  network: constants.NetworkName.SN_GOERLI,
+console.log(
+  "Creating RPC provider with url",
+  process.env.ARGENT_TESTNET_RPC_URL,
+)
+if (!process.env.ARGENT_TESTNET_RPC_URL) {
+  throw new Error("Missing ARGENT_TESTNET_RPC_URL env variable")
+}
+
+const provider = new RpcProvider({
+  nodeUrl: process.env.ARGENT_TESTNET_RPC_URL,
+  chainId: constants.StarknetChainId.SN_GOERLI,
 })
 const tnkETH =
   "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7" // address of ETH
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 const maxRetries = 4
 
@@ -40,13 +47,6 @@ const isEqualAddress = (a: string, b: string) => {
 
 const formatAmount = (amount: string) => {
   return parseInt(amount, 16) / Math.pow(10, 18)
-}
-
-const getTransaction = async (tx: string) => {
-  return fetch(
-    `${config.starknetTestNetUrl}/feeder_gateway/get_transaction?transactionHash=${tx}`,
-    { method: "GET" },
-  )
 }
 
 export async function transferEth(amount: string, to: string) {
@@ -81,23 +81,9 @@ export async function transferEth(amount: string, to: string) {
         calldata: [to, low, high],
       })
       txHash = tx.transaction_hash
-      let txStatusResponse
-      let hasExecutionStatus = false
-      while (!hasExecutionStatus) {
-        const txStatus = await getTransaction(tx.transaction_hash)
-        txStatusResponse =
-          (await txStatus.json()) as GetTransactionReceiptResponse
-        hasExecutionStatus =
-          "execution_status" in txStatusResponse
-            ? Boolean(txStatusResponse.execution_status)
-            : false
-        if (!hasExecutionStatus) {
-          console.log(
-            `[TX awating execution_status] hash: ${tx.transaction_hash}, status: ${txStatusResponse.status}`,
-          )
-          await sleep(5000)
-        }
-      }
+      const txStatusResponse = await provider.waitForTransaction(
+        tx.transaction_hash,
+      )
       if (
         txStatusResponse &&
         "execution_status" in txStatusResponse &&
@@ -121,12 +107,7 @@ export async function transferEth(amount: string, to: string) {
         if ("revert_reason" in txStatusResponse) {
           elements.push(`revert_reason: ${txStatusResponse.revert_reason}`)
         }
-        if ("transaction_failure_reason" in txStatusResponse) {
-          elements.push(
-            `transaction_failure_reason.error_message: ${txStatusResponse.transaction_failure_reason.error_message}`,
-          )
-        }
-        elements.push(`status: ${txStatusResponse.status}`)
+        elements.push(`status: ${txStatusResponse.execution_status}`)
       } else {
         elements.push("unable to get tx status response")
       }

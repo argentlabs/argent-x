@@ -13,17 +13,19 @@ import {
   useColorMode,
 } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
-import { Call, num, CallData } from "starknet"
+import { Call, num, CallData, TransactionType } from "starknet"
 
 import { CopyTooltip } from "../CopyTooltip"
 import { P4 } from "../Typography"
 
 export interface TransactionActionsProps {
   transactions: Call[]
+  type?: TransactionType
 }
 
 export const TransactionActions: FC<TransactionActionsProps> = ({
   transactions,
+  type = "INVOKE_FUNCTION",
 }) => {
   const { colorMode } = useColorMode()
   const isDark = useMemo(() => colorMode === "dark", [colorMode])
@@ -57,7 +59,7 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                 <h2>
                   <AccordionButton
                     display="flex"
-                    color="text" // this is for whatever reason needed to support light and dark mode
+                    color="text.primary" // @see semanticTokens.ts
                     width="100%"
                     justifyContent="space-between"
                     outline="none"
@@ -88,7 +90,9 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                     }}
                   >
                     <P4 fontWeight="bold">
-                      {entryPointToHumanReadable(transaction.entrypoint)}
+                      {type === "DEPLOY_ACCOUNT" && transactions.length === 1
+                        ? "Activate account"
+                        : entryPointToHumanReadable(transaction.entrypoint)}
                     </P4>
                     <P4 fontWeight="bold">
                       {formatTruncatedAddress(transaction.contractAddress)}
@@ -112,7 +116,7 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                           justifyContent="space-between"
                           gap="2"
                         >
-                          <P4 fontWeight="bold" color="text">
+                          <P4 fontWeight="bold" color="text.primary">
                             Calldata {cdIndex + 1}
                           </P4>
 
@@ -122,10 +126,10 @@ export const TransactionActions: FC<TransactionActionsProps> = ({
                                 backgroundColor: isDark
                                   ? "neutrals.700"
                                   : "gray.50",
-                                color: "text",
+                                color: "text.primary",
                                 cursor: "pointer",
                               }}
-                              color="text"
+                              color="text.primary"
                               whiteSpace="nowrap"
                               textOverflow="ellipsis"
                               overflow="hidden"

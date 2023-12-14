@@ -29,6 +29,7 @@ import { bigDecimal } from "@argent/shared"
 import { num } from "starknet"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { Token } from "../../../../shared/token/__new/types/token.model"
+import { FEE_OVERHEAD } from "../../../../shared/utils/argentMaxFee"
 
 interface CommonSimulationData {
   token: Token
@@ -83,7 +84,7 @@ function partitionIncomingOutgoingTransfers(transfers: AggregatedSimData[]) {
   return partition(transfers, (t) => t.amount > 0n)
 }
 
-const FEE_MULTIPLIER = 1.5
+const FEE_MULTIPLIER = FEE_OVERHEAD
 const scale = 10
 const scaledMultiplier = Math.round(FEE_MULTIPLIER * scale)
 const FEE_MULTIPLIER_BIGINT = BigInt(scaledMultiplier)

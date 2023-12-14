@@ -31,12 +31,4 @@ export interface INFTService {
     owner: Address,
     networkId: string,
   ) => Promise<void>
-  transferNft: (
-    accountAddress: string,
-    contractAddress: string,
-    tokenId: string,
-    recipient: string,
-    schema: string,
-    network: Network,
-  ) => Promise<string>
 }

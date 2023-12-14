@@ -7,7 +7,7 @@ import {
 import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { WalletCryptoStarknetService } from "../../wallet/crypto/starknet.service"
-import { WalletStorageProps } from "../../wallet/account/shared.service"
+import { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 export async function determineMigrationNeededV581(
   cryptoStarknetService: WalletCryptoStarknetService,

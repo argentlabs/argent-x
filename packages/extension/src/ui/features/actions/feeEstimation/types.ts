@@ -15,4 +15,5 @@ export interface TransactionsFeeEstimationProps {
   transactionSimulationFee?: EstimatedFees
   transactionSimulationLoading: boolean
   transactionSimulationFeeError?: Error
+  needsDeploy?: boolean
 }

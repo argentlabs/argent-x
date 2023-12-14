@@ -44,8 +44,6 @@ export const chainIdToStarknetNetwork = (
       return "mainnet"
     case constants.StarknetChainId.SN_GOERLI:
       return "testnet"
-    case constants.StarknetChainId.SN_GOERLI2:
-      return "testnet2"
     default:
       return "testnet"
   }

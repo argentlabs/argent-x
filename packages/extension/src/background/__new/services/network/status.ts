@@ -1,23 +1,13 @@
 import { Network, NetworkStatus } from "../../../../shared/network"
 import { GetNetworkStatusesFn } from "./interface"
-import {
-  getProvider,
-  getProviderForRpcUrl,
-  shouldUseRpcProvider,
-} from "../../../../shared/network/provider"
+import { getProvider } from "../../../../shared/network/provider"
 
 async function getNetworkStatus(network: Network): Promise<NetworkStatus> {
   const provider = getProvider(network)
-  if (!shouldUseRpcProvider(network) || !network.rpcUrl) {
-    // chainId can not be used, as snjs is shallowing the network error
-    await provider.getBlock("latest") // throws if not connected
-    return "ok"
-  }
+  const sync = await provider.getSyncingStats() // throws if not connected
 
-  const rpcProvider = getProviderForRpcUrl(network.rpcUrl)
-  const sync = await rpcProvider.getSyncingStats() // throws if not connected
-
-  if (sync === false) {
+  // Can only be false but inproperly typed in the current version of snjs
+  if (typeof sync === "boolean") {
     // not syncing
     return "ok"
   }

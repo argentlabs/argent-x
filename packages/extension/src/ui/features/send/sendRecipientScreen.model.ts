@@ -1,8 +1,8 @@
 import { z } from "zod"
-import { addressOrStarknetIdInputSchema } from "@argent/shared"
+import { addressOrDomainInputSchema } from "@argent/shared"
 
 export const formSchema = z.object({
-  query: addressOrStarknetIdInputSchema,
+  query: addressOrDomainInputSchema,
 })
 
 export type FormType = z.infer<typeof formSchema>

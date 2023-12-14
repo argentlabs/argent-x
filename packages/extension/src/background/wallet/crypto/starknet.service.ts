@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { calldataSchema, isEqualAddress } from "@argent/shared"
 import { CairoVersion, CallData, hash } from "starknet"
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { MultisigSigner } from "../../../shared/multisig/signer"

@@ -2,7 +2,6 @@ import { useNavigateBack } from "@argent/ui"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { accountService } from "../../../shared/account/service"
 import { defaultNetwork } from "../../../shared/network"
 import { routes } from "../../routes"
 import { clientAccountService } from "../../services/account"
@@ -32,12 +31,12 @@ export const OnboardingPasswordScreenContainer: FC = () => {
       try {
         await sessionService.startSession(password)
 
-        const newAccount = await clientAccountService.createAccount(
-          networkId,
+        const newAccount = await clientAccountService.create(
           "standard",
+          networkId,
         )
 
-        await accountService.select(newAccount)
+        await clientAccountService.select(newAccount)
 
         // TBD: duplication of "createAccount" which comes from BG?
         void analytics.track("createWallet", {

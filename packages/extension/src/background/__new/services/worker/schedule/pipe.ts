@@ -11,7 +11,7 @@ type PipeReturn<T extends Func<any, any>[]> = ReturnType<
 >
 
 /**
- * Function to pipe a series of functions together.
+ * Function to pipe a series of functions together. Calls the functions in order, passing the result of the previous function to the next function.
  * @param {Function[]} fns - The functions to pipe.
  * @returns {Function} The piped function.
  */

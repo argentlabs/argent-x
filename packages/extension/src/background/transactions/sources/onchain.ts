@@ -14,39 +14,46 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
   const fetchedTransactions = await Promise.allSettled(
     transactionsToCheck.map(async (transaction) => {
       const provider = getProvider(transaction.account.network)
-      const tx = await provider.getTransactionReceipt(transaction.hash)
+      const { finality_status, execution_status } =
+        await provider.getTransactionStatus(transaction.hash)
 
-      let updatedTransaction: Transaction
+      const isFailed =
+        execution_status === "REVERTED" || finality_status === "REJECTED"
+      if (!isFailed) {
+        return {
+          ...transaction,
+          finalityStatus: finality_status as TransactionFinalityStatus,
+          executionStatus: execution_status as TransactionExecutionStatus,
+        }
+      }
+
+      const tx = await provider.getTransactionReceipt(transaction.hash)
 
       // Handle Reverted transaction
       if ("revert_reason" in tx) {
-        updatedTransaction = {
+        const finalityStatus =
+          (tx.finality_status as TransactionFinalityStatus) ||
+          "status" in tx ||
+          TransactionFinalityStatus.NOT_RECEIVED // For backward compatibility on mainnet
+
+        return {
           ...transaction,
-          finalityStatus:
-            tx.finality_status ||
-            tx.status ||
-            TransactionFinalityStatus.NOT_RECEIVED, // For backward compatibility on mainnet
+          finalityStatus,
           revertReason: tx.revert_reason,
         }
 
         // Handle Rejected transaction
       } else if ("transaction_failure_reason" in tx) {
-        updatedTransaction = {
+        const anyTx = tx as any
+        return {
           ...transaction,
-          finalityStatus: tx.status ?? TransactionFinalityStatus.RECEIVED,
+          finalityStatus: anyTx.status ?? TransactionFinalityStatus.RECEIVED,
           executionStatus: TransactionExecutionStatus.REJECTED,
-          failureReason: tx.transaction_failure_reason,
-        }
-      } else {
-        // Handle successful transaction
-        updatedTransaction = {
-          ...transaction,
-          finalityStatus: tx.finality_status || tx.status, // For backward compatibility on mainnet
-          executionStatus: tx.execution_status,
+          failureReason: anyTx.transaction_failure_reason,
         }
       }
 
-      return updatedTransaction
+      return transaction
     }),
   )
 

@@ -8,7 +8,6 @@ const network: Network = {
   id: "networkId",
   name: "Ethereum",
   chainId: "chainId",
-  sequencerUrl: "https://mainnet.infura.io/v3/123456",
   explorerUrl: "https://etherscan.io",
   blockExplorerUrl: "https://blockchair.com/ethereum",
   rpcUrl: "https://mainnet.infura.io/v3/123456-RPC",
@@ -34,10 +33,6 @@ describe("AddNetworkScreen", () => {
     expect(screen.getByDisplayValue(network.name)).toBeInTheDocument()
     expect(screen.getByText("Chain ID")).toBeInTheDocument()
     expect(screen.getByDisplayValue(network.chainId)).toBeInTheDocument()
-    expect(screen.getByText("Base URL")).toBeInTheDocument()
-    expect(
-      screen.getByDisplayValue(network.sequencerUrl ?? ""),
-    ).toBeInTheDocument()
     expect(screen.getByText("Explorer URL")).toBeInTheDocument()
     expect(screen.getByDisplayValue(network.explorerUrl!)).toBeInTheDocument()
     expect(screen.getByText("Explorer redirect URL")).toBeInTheDocument()

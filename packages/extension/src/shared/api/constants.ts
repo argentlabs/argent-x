@@ -30,7 +30,7 @@ export const ARGENT_TRANSACTION_REVIEW_STARKNET_URL =
     ? urlJoin(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         ARGENT_TRANSACTION_REVIEW_API_BASE_URL!,
-        "transactions/review/starknet",
+        "transactions/v2/review/starknet",
       )
     : undefined
 

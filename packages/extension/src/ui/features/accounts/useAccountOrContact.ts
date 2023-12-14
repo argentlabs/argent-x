@@ -1,8 +1,8 @@
 import {
-  AddressOrStarknetId,
+  AddressOrDomain,
   isEqualAddress,
-  isEqualStarknetId,
-  isStarknetId,
+  isEqualStarknetDomainName,
+  isStarknetDomainName,
 } from "@argent/shared"
 import { useMemo } from "react"
 import { useAppState } from "../../app.state"
@@ -14,20 +14,20 @@ import { useView } from "../../views/implementation/react"
  * return account and contact matching the provided accountAddress or starknet id
  */
 
-export const useAccountOrContact = (accountAddress?: AddressOrStarknetId) => {
+export const useAccountOrContact = (accountAddress?: AddressOrDomain) => {
   const { switcherNetworkId } = useAppState()
 
-  const isStarknetIdQuery = isStarknetId(accountAddress)
+  const isStarknetDomainNameAddress = isStarknetDomainName(accountAddress)
 
   const contacts = useView(addressBookContactsOnNetworkView(switcherNetworkId))
   const contact = useMemo(() => {
     return contacts.find((contact) => {
-      if (isStarknetIdQuery) {
-        return isEqualStarknetId(accountAddress, contact.address)
+      if (isStarknetDomainNameAddress) {
+        return isEqualStarknetDomainName(accountAddress, contact.address)
       }
       return isEqualAddress(contact.address, accountAddress)
     })
-  }, [accountAddress, contacts, isStarknetIdQuery])
+  }, [accountAddress, contacts, isStarknetDomainNameAddress])
 
   const accounts = useView(visibleAccountsOnNetworkFamily(switcherNetworkId))
   const account = useMemo(() => {

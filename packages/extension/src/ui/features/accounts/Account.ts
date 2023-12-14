@@ -124,9 +124,9 @@ export class Account {
 
   public static async create(
     networkId: string,
-    type?: CreateAccountType,
+    type: CreateAccountType = "standard",
   ): Promise<Account> {
-    const account = await clientAccountService.createAccount(networkId, type)
+    const account = await clientAccountService.create(type, networkId)
     const network = await networkService.getById(networkId)
 
     if (!network) {

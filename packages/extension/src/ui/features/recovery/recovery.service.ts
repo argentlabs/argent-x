@@ -1,5 +1,3 @@
-import { some } from "lodash-es"
-
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { accountService } from "../../../shared/account/service"
 import { defaultNetwork } from "../../../shared/network"
@@ -15,7 +13,7 @@ import {
   migrateAccountNetworks,
 } from "../accounts/accounts.state"
 import { useRestorationState } from "../stateRestoration/restoration.state"
-import { isDeprecated } from "../../../shared/wallet.service"
+import { clientAccountService } from "../../services/account"
 
 interface RecoveryOptions {
   networkId?: string
@@ -63,7 +61,7 @@ export const recover = async ({
       setDefaultAccountNames(allAccounts)
     }
     if (selectedAccount) {
-      await accountService.select(selectedAccount)
+      await clientAccountService.select(selectedAccount)
     }
     useAppState.setState({ switcherNetworkId: networkId })
 

@@ -3,7 +3,7 @@ import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
 const { NftIcon } = icons
-const { Briq, Unframed, Flex: FlexLogo } = logos
+const { BriqLogo, UnframedLogo, FlexLogo } = logos
 
 const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
   icon,
@@ -63,7 +63,7 @@ const EmptyCollections: FC<{ networkId: string }> = ({ networkId }) => (
       <SimpleGrid columns={3} gap="2" mx="8">
         <ButtonLink
           title="Unframed"
-          icon={<Unframed />}
+          icon={<UnframedLogo />}
           href="https://unframed.co/"
         />
         <ButtonLink
@@ -73,7 +73,7 @@ const EmptyCollections: FC<{ networkId: string }> = ({ networkId }) => (
         />
         <ButtonLink
           title="Briq"
-          icon={<Briq />}
+          icon={<BriqLogo />}
           href="https://briq.construction/"
         />
       </SimpleGrid>

@@ -32,4 +32,10 @@ export interface IWalletDeploymentService {
     type?: CreateAccountType, // Should not be able to create plugin accounts. Default to argent account
     multisigPayload?: MultisigData,
   ): Promise<CreateWalletAccount>
+  getMultisigDeploymentPayload(
+    walletAccount: WalletAccount,
+  ): Promise<Required<DeployAccountContractPayload>>
+  getAccountOrMultisigDeploymentPayload(
+    walletAccount: WalletAccount,
+  ): Promise<Required<DeployAccountContractPayload>>
 }

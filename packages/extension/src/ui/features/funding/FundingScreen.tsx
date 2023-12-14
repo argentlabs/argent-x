@@ -21,7 +21,7 @@ import { getLayerSwapUrl } from "./utils"
 import { FundingOnRampOption } from "./FundingOnRampOption"
 import { Grid } from "@chakra-ui/react"
 
-const { Ethereum, Coinbase } = logos
+const { EthereumLogo, CoinbaseLogo } = logos
 const { QrIcon } = icons
 
 export const FundingScreen: FC = () => {
@@ -55,7 +55,7 @@ export const FundingScreen: FC = () => {
             <Option
               title="Mint Ethereum"
               description="Only possible on devnets"
-              icon={<Ethereum width={6} height={6} />}
+              icon={<EthereumLogo width={6} height={6} />}
               onClick={async () => {
                 const success = await tryToMintFeeToken(account)
 
@@ -102,7 +102,7 @@ export const FundingScreen: FC = () => {
               <Option
                 title="From an exchange"
                 description={"Coinbase, Binance, etc"}
-                icon={<Coinbase width={6} height={6} />}
+                icon={<CoinbaseLogo width={6} height={6} />}
               />
             </A>
           )}
@@ -110,7 +110,7 @@ export const FundingScreen: FC = () => {
             <Option
               title="Bridge funds"
               description="From Ethereum and other chains"
-              icon={<Ethereum width={6} height={6} />}
+              icon={<EthereumLogo width={6} height={6} />}
               onClick={() => navigate(routes.fundingBridge(), { state })}
             />
           )}

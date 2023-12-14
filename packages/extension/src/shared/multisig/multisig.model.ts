@@ -1,7 +1,10 @@
 import { CallSchema } from "@argent/x-window"
 import { z } from "zod"
 import { multisigDataSchema } from "../wallet.model"
-import { pubkeySchema } from "../../ui/features/multisig/hooks/useCreateMultisigForm"
+
+export const pubkeySchema = z
+  .string()
+  .regex(/^[a-zA-Z0-9]{41,43}$/, "Incorrect signer pubkey")
 
 export const ApiMultisigContentSchema = z.object({
   address: z.string(),

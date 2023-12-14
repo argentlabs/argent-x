@@ -16,14 +16,14 @@ describe("FeeEstimation", () => {
     render(<FeeEstimation {...feeEstimationFixture1} />)
 
     expect(screen.getByText(/(Max 0.00063 ETH)/)).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.00021 ETH/)).toBeInTheDocument()
+    expect(screen.getByText(/0.00021 ETH/)).toBeInTheDocument()
   })
 
   it("should render scenario 2 as expected", async () => {
     render(<FeeEstimation {...feeEstimationFixture2} />)
 
     expect(screen.getByText(/(Max 0.000000000000063 ETH)/)).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.000000000000021 ETH/)).toBeInTheDocument()
+    expect(screen.getByText(/0.000000000000021 ETH/)).toBeInTheDocument()
   })
 
   it("should render scenario 3 as expected", async () => {
@@ -36,7 +36,7 @@ describe("FeeEstimation", () => {
     ).toBeInTheDocument()
 
     expect(screen.getByText(/(Max 0.000000000000063 ETH)/)).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.000000000000021 ETH/)).toBeInTheDocument()
+    expect(screen.getByText(/0.000000000000021 ETH/)).toBeInTheDocument()
 
     expect(window.scrollTo).toHaveBeenCalled()
   })
