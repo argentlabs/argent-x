@@ -43,7 +43,7 @@ export const OnboardingPasswordScreenContainer: FC = () => {
           status: "success",
           networkId: newAccount.networkId,
         })
-        // NOTE: this tracking call is legit, as it relies on information that's only accessable to the UI
+        // NOTE: this tracking call is legit, as it relies on information that's only accessible to the UI
         // NOTE: we're not interested in the return of this promise, we should indicate that with void
         void trackSuccess()
 

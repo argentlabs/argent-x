@@ -11,7 +11,7 @@ import { useRestorationState } from "./restoration.state"
  */
 
 const restorationStatePathnames: Array<string | PathPattern> = [
-  /** Some users will close the extension when navigating to webmail to retreive the OTP */
+  /** Some users will close the extension when navigating to webmail to retrieve the OTP */
   routes.shieldAccountOTP.path,
   routes.sendAmountAndAssetScreen.path,
 ]

@@ -25,7 +25,7 @@ import {
 } from "../../../shared/utils/accountsMultisigSort"
 import { usePartitionDeprecatedAccounts } from "./accountUpgradeCheck"
 
-/** TODO: we should be able to retreive all these account collections using queries from storage */
+/** TODO: we should be able to retrieve all these account collections using queries from storage */
 export const AccountListScreenContainer: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()

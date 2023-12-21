@@ -18,7 +18,7 @@ describe("atomWithSubscription", () => {
     defaults: [],
   })
 
-  it("should show inital value", async () => {
+  it("should show initial value", async () => {
     const atom = atomFromRepo(testRepo)
 
     const screen = render(<RenderAtom atom={atom} />)
