@@ -6,7 +6,7 @@ import {
   RpcProvider,
   constants,
 } from "starknet"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal, isEqualAddress } from "@argent/shared"
 import { getBatchProvider } from "@argent/x-multicall"
 import config from "../config"
 import { expect } from "@playwright/test"
@@ -27,23 +27,15 @@ if (!process.env.ARGENT_TESTNET_RPC_URL) {
 const provider = new RpcProvider({
   nodeUrl: process.env.ARGENT_TESTNET_RPC_URL,
   chainId: constants.StarknetChainId.SN_GOERLI,
+  headers: {
+    "argent-version": process.env.VERSION || "Unknown version",
+    "argent-client": "argent-x",
+  },
 })
 const tnkETH =
   "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7" // address of ETH
 
 const maxRetries = 4
-
-const isEqualAddress = (a: string, b: string) => {
-  try {
-    return (
-      num.hexToDecimalString(a.toLocaleLowerCase()) ===
-      num.hexToDecimalString(b.toLocaleLowerCase())
-    )
-  } catch {
-    // ignore parsing error
-  }
-  return false
-}
 
 const formatAmount = (amount: string) => {
   return parseInt(amount, 16) / Math.pow(10, 18)
@@ -142,6 +134,7 @@ export async function validateTx(
   reciever: string,
   amount?: number,
 ) {
+  console.log("txHash:", txHash)
   await provider.waitForTransaction(txHash)
   const txData = await provider.getTransaction(txHash)
   if (!("calldata" in txData)) {

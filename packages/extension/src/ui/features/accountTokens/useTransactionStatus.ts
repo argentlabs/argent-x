@@ -1,14 +1,15 @@
 import { memoize } from "lodash-es"
 import { useMemo } from "react"
 
-import { transactionsStore } from "../../../background/transactions/store"
-import { useArrayStorage } from "../../../shared/storage/hooks"
+import { transactionsStore } from "../../../shared/transactions/store"
+import { useArrayStorage } from "../../hooks/useStorage"
 import {
-  ExtendedTransactionStatus,
+  ExtendedFinalityStatus,
   Transaction,
 } from "../../../shared/transactions"
+import { getTransactionStatus } from "../../../shared/transactions/utils"
 
-function transformStatus(status: ExtendedTransactionStatus): Status {
+function transformStatus(status: ExtendedFinalityStatus): Status {
   return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"].includes(status)
     ? "SUCCESS"
     : ["REJECTED", "REVERTED"].includes(status)
@@ -36,9 +37,11 @@ export const useTransactionStatus = (
   )
 
   return useMemo(() => {
-    if (!transaction?.finalityStatus) {
+    const { finality_status } = getTransactionStatus(transaction)
+
+    if (!finality_status) {
       return "UNKNOWN"
     }
-    return transformStatus(transaction.finalityStatus)
+    return transformStatus(finality_status)
   }, [transaction])
 }

@@ -1,6 +1,7 @@
+import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
 import { CombinedFeeEstimationProps } from "../CombinedFeeEstimation"
 import { getParsedFeeError } from "../feeError"
-import { feeToken } from "./feeToken"
+import { feeTokenWithBalance } from "./feeToken"
 
 const parsedFeeEstimationError1 = getParsedFeeError(
   'Error in the called contract (0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7):\nError at pc=0:104:\nGot an exception while executing a hint.\nCairo traceback (most recent call last):\nUnknown location (pc=0:1678)\nUnknown location (pc=0:1664)\n\nError in the called contract (0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7):\nError at pc=0:9:\nGot an exception while executing a hint.\nCairo traceback (most recent call last):\nUnknown location (pc=0:1351)\nUnknown location (pc=0:1328)\nUnknown location (pc=0:915)\n\nTraceback (most recent call last):\n  File "<hint32>", line 3, in <module>\nAssertionError: assert_not_zero failed: 0 = 0.',
@@ -8,13 +9,18 @@ const parsedFeeEstimationError1 = getParsedFeeError(
 
 export const combinedFeeEstimationFixture1: CombinedFeeEstimationProps = {
   fee: {
-    amount: "115227362374192",
-    suggestedMaxFee: "691364174245152",
-    accountDeploymentFee: "491837039091068",
-    maxADFee: "1475511117273204",
+    transactions: {
+      amount: 10515252525n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
+    deployment: {
+      amount: 10515252525n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
   },
-  feeToken,
-  feeTokenBalance: BigInt("9875209405595349"),
+  feeToken: feeTokenWithBalance,
   showError: false,
   showEstimateError: false,
   showFeeError: false,
@@ -25,13 +31,18 @@ export const combinedFeeEstimationFixture1: CombinedFeeEstimationProps = {
 
 export const combinedFeeEstimationFixture2: CombinedFeeEstimationProps = {
   fee: {
-    amount: "11522",
-    suggestedMaxFee: "69136",
-    accountDeploymentFee: "49183",
-    maxADFee: "147551",
+    transactions: {
+      amount: 1051n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
+    deployment: {
+      amount: 1051n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
   },
-  feeToken,
-  feeTokenBalance: BigInt("9875209405595349"),
+  feeToken: feeTokenWithBalance,
   showError: false,
   showEstimateError: false,
   showFeeError: false,
@@ -42,13 +53,18 @@ export const combinedFeeEstimationFixture2: CombinedFeeEstimationProps = {
 
 export const combinedFeeEstimationFixture3: CombinedFeeEstimationProps = {
   fee: {
-    amount: "11522",
-    suggestedMaxFee: "69136",
-    accountDeploymentFee: "49183",
-    maxADFee: "147551",
+    transactions: {
+      amount: 1051n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
+    deployment: {
+      amount: 1051n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
   },
-  feeToken,
-  feeTokenBalance: BigInt("9875209405595349"),
+  feeToken: feeTokenWithBalance,
   showError: true,
   showEstimateError: false,
   showFeeError: true,
@@ -59,13 +75,18 @@ export const combinedFeeEstimationFixture3: CombinedFeeEstimationProps = {
 
 export const combinedFeeEstimationFixture4: CombinedFeeEstimationProps = {
   fee: {
-    amount: "11522",
-    suggestedMaxFee: "69136",
-    accountDeploymentFee: "49183",
-    maxADFee: "147551",
+    transactions: {
+      amount: 1051n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
+    deployment: {
+      amount: 1051n,
+      pricePerUnit: 20n,
+      feeTokenAddress: ETH_TOKEN_ADDRESS,
+    },
   },
-  feeToken,
-  feeTokenBalance: BigInt("9875209405595349"),
+  feeToken: feeTokenWithBalance,
   parsedFeeEstimationError: parsedFeeEstimationError1,
   showError: true,
   showEstimateError: true,
@@ -75,8 +96,7 @@ export const combinedFeeEstimationFixture4: CombinedFeeEstimationProps = {
 
 export const combinedFeeEstimationFixture5: CombinedFeeEstimationProps = {
   fee: undefined,
-  feeToken,
-  feeTokenBalance: BigInt("9875209405595349"),
+  feeToken: feeTokenWithBalance,
   parsedFeeEstimationError: parsedFeeEstimationError1,
   showError: true,
   showEstimateError: true,
@@ -86,8 +106,7 @@ export const combinedFeeEstimationFixture5: CombinedFeeEstimationProps = {
 
 export const combinedFeeEstimationFixture6: CombinedFeeEstimationProps = {
   fee: undefined,
-  feeToken,
-  feeTokenBalance: BigInt("9875209405595349"),
+  feeToken: feeTokenWithBalance,
   parsedFeeEstimationError: parsedFeeEstimationError1,
   showError: true,
   showEstimateError: true,

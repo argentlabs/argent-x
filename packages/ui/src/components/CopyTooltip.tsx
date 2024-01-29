@@ -1,5 +1,5 @@
 import { Box, Tooltip, TooltipProps } from "@chakra-ui/react"
-import { FC, PropsWithChildren, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
 import { useOnClickOutside } from "../hooks"

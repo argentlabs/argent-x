@@ -3,7 +3,6 @@ import { WarningIcon } from "@chakra-ui/icons"
 import { Center, Collapse } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
 
-import { normalizeAddress } from "../../../../services/addresses"
 import { MultisigPendingTxModal } from "../../../multisig/MultisigPendingTxModal"
 import { AccountNetworkInfoArgentX } from "./AccountNetworkInfoArgentX"
 import { BalanceChangeOverviewArgentX } from "./BalanceChangeOverviewArgentX"
@@ -14,6 +13,7 @@ import { SimulationLoadingBanner } from "./SimulationLoadingBanner"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionBanner } from "./TransactionBanner"
 import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
+import { normalizeAddress } from "@argent/shared"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   actionHash,

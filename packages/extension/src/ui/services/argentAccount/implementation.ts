@@ -1,7 +1,7 @@
 import { messageClient } from "../messaging/trpc"
-import { IArgentAccountServiceUI } from "../../../shared/argentAccount/service/interface"
+import { IArgentAccountServiceUI } from "../../../shared/argentAccount/interface"
 import { booleanToStringSchema } from "@argent/shared"
-import { EmailPreferences } from "./utils"
+import { EmailPreferences } from "../../../shared/argentAccount/schema"
 
 export class ArgentAccountService implements IArgentAccountServiceUI {
   constructor(private trpcMessageClient: typeof messageClient) {}

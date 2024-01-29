@@ -48,6 +48,8 @@ async function runXTimesPerMinute(
 }
 
 export class ChromeScheduleService implements IScheduleService {
+  private taskImplementationById: Record<string, ImplementedScheduledTask> = {}
+
   constructor(
     private readonly browser: MinimalBrowser,
     private readonly waitFn: (ms: number) => Promise<void> = wait,
@@ -55,13 +57,17 @@ export class ChromeScheduleService implements IScheduleService {
 
   async every(seconds: number, task: BaseScheduledTask): Promise<void> {
     const isSubMinute = seconds < 60
-    const runXTimesPerMinute = isSubMinute
+    const timesPerMinute = isSubMinute
       ? Math.max(Math.floor(60 / seconds - 1), 1)
       : 1
     const periodInMinutes = Math.max(Math.round(seconds / 60), 1)
-    await this.browser.alarms.create(`${task.id}::run${runXTimesPerMinute}`, {
+    await this.browser.alarms.create(`${task.id}::run${timesPerMinute}`, {
       periodInMinutes,
     })
+    if (isSubMinute) {
+      const taskImpl = this.taskImplementationById[task.id]
+      void runXTimesPerMinute(timesPerMinute, taskImpl.callback, this.waitFn)
+    }
   }
 
   async in(seconds: number, task: BaseScheduledTask): Promise<void> {
@@ -72,6 +78,7 @@ export class ChromeScheduleService implements IScheduleService {
   }
 
   async delete(task: BaseScheduledTask): Promise<void> {
+    delete this.taskImplementationById[task.id]
     const allAlarms = await this.browser.alarms.getAll()
     const alarmsToDelete = allAlarms
       .filter((alarm) => isEqualAlarmId(alarm.name, task.id))
@@ -83,6 +90,7 @@ export class ChromeScheduleService implements IScheduleService {
   }
 
   async registerImplementation(task: ImplementedScheduledTask): Promise<void> {
+    this.taskImplementationById[task.id] = task
     this.browser.alarms.onAlarm.addListener((alarm) => {
       if (isEqualAlarmId(alarm.name, task.id)) {
         const frequency = getFrequency(alarm.name)

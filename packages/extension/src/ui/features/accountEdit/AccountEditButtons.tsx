@@ -3,8 +3,8 @@ import { Spinner } from "@chakra-ui/react"
 import { useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
-import { settingsStore } from "../../../shared/settings"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
+// import { settingsStore } from "../../../shared/settings"
+// import { useKeyValueStorage } from "../../../shared/storage/hooks"
 import { isDeprecated } from "../../../shared/wallet.service"
 import { routes } from "../../routes"
 import {
@@ -12,7 +12,7 @@ import {
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { Account } from "../accounts/Account"
-import { useFeeTokenBalance } from "../accountTokens/useFeeTokenBalance"
+import { useHasFeeTokenBalance } from "../accountTokens/useFeeTokenBalance"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import {
   ChangeGuardian,
@@ -31,17 +31,17 @@ export const AccountEditButtons = () => {
   const blockExplorerTitle = useBlockExplorerTitle()
   const liveAccountGuardianState = useLiveAccountGuardianState(account)
 
-  const { feeTokenBalance } = useFeeTokenBalance(account)
+  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
 
   const canDeployAccount = useMemo(
-    () => account?.needsDeploy && feeTokenBalance && feeTokenBalance > 0n,
-    [account?.needsDeploy, feeTokenBalance],
+    () => account?.needsDeploy && hasFeeTokenBalance,
+    [account?.needsDeploy, hasFeeTokenBalance],
   )
 
-  const experimentalAllowChooseAccount = useKeyValueStorage(
-    settingsStore,
-    "experimentalAllowChooseAccount",
-  )
+  // const experimentalAllowChooseAccount = useKeyValueStorage(
+  //   settingsStore,
+  //   "experimentalAllowChooseAccount",
+  // )
 
   const showDelete =
     account && (isDeprecated(account) || account.networkId === "localhost")
@@ -135,6 +135,13 @@ export const AccountEditButtons = () => {
       {canDeployAccount && (
         <ButtonCell onClick={handleDeploy}>Deploy account</ButtonCell>
       )}
+      <ButtonCell
+        onClick={() =>
+          navigate(routes.settingsDappConnectionsAccount(account?.address))
+        }
+      >
+        Connected dapps
+      </ButtonCell>
       <ButtonCell
         color={"error.500"}
         onClick={() => navigate(routes.exportPrivateKey(accountAddress))}

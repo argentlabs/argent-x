@@ -1,8 +1,5 @@
-import {
-  Fetcher,
-  argentApiHeadersForNetwork,
-  fetcher,
-} from "../../shared/api/fetcher"
+import { Fetcher, fetcher } from "../../shared/api/fetcher"
+import { argentApiHeadersForNetwork } from "../../shared/api/headers"
 import { useAppState } from "../app.state"
 
 /**

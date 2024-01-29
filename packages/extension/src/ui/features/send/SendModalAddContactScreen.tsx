@@ -6,7 +6,7 @@ import { ModalSheet } from "../../components/ModalSheet"
 import {
   AddressBookAddOrEditScreenContainer,
   AddressBookAddOrEditScreenContainerProps,
-} from "../settings/AddressBookAddOrEditScreenContainer"
+} from "../settings/addressBook/AddressBookAddOrEditScreenContainer"
 
 interface SendModalAddContactScreenProps
   extends Omit<DrawerProps, "children">,

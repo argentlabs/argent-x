@@ -1,4 +1,4 @@
-import { bigDecimal } from "@argent/shared"
+import { TokenWithBalance, bigDecimal } from "@argent/shared"
 import { L1, P4, TextWithAmount } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
@@ -14,13 +14,14 @@ import { InsufficientFundsAccordion } from "./ui/InsufficientFundsAccordion"
 import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
 import { WaitingForFunds } from "./ui/WaitingForFunds"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
-import { Token } from "../../../../shared/token/__new/types/token.model"
+import { estimatedFeeToMaxFeeTotal } from "../../../../shared/transactionSimulation/utils"
+import { num } from "starknet"
 
 export interface CombinedFeeEstimationProps {
+  allowFeeTokenSelection?: boolean
   amountCurrencyValue?: string
   fee?: EstimatedFees
-  feeToken?: Token
-  feeTokenBalance?: bigint
+  feeToken?: TokenWithBalance
   parsedFeeEstimationError?: ParsedFeeError
   showError: boolean
   showEstimateError: boolean
@@ -32,10 +33,10 @@ export interface CombinedFeeEstimationProps {
 }
 
 export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
+  allowFeeTokenSelection,
   amountCurrencyValue,
   fee,
   feeToken,
-  feeTokenBalance,
   parsedFeeEstimationError,
   showError,
   showEstimateError,
@@ -50,20 +51,21 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
       return (
         <TooltipText
           feeToken={feeToken}
-          feeTokenBalance={feeTokenBalance}
           totalMaxFee={totalMaxFee}
-          maxAccountDeploymentFee={fee?.maxADFee}
-          maxNetworkFee={fee?.suggestedMaxFee}
+          maxAccountDeploymentFee={
+            fee?.deployment
+              ? num.toHex(estimatedFeeToMaxFeeTotal(fee.deployment))
+              : undefined
+          }
+          maxNetworkFee={
+            fee
+              ? num.toHex(estimatedFeeToMaxFeeTotal(fee.transactions))
+              : undefined
+          }
         />
       )
     }
-  }, [
-    fee?.maxADFee,
-    fee?.suggestedMaxFee,
-    feeToken,
-    feeTokenBalance,
-    totalMaxFee,
-  ])
+  }, [fee, feeToken, totalMaxFee])
   const primaryText = useMemo(() => {
     if (totalFee && totalMaxFee) {
       if (amountCurrencyValue !== undefined) {
@@ -116,6 +118,7 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
     return (
       <FeeEstimationBox>
         <FeeEstimationText
+          allowFeeTokenSelection={allowFeeTokenSelection}
           title={"Network fees"}
           tooltipText={tooltipText}
           subtitle={"Includes one-time activation fee"}
@@ -148,33 +151,26 @@ export const CombinedFeeEstimation: FC<CombinedFeeEstimationProps> = ({
 }
 
 interface FeeEstimationTooltipProps {
-  feeToken: Token
+  feeToken: TokenWithBalance
   maxNetworkFee?: string
   maxAccountDeploymentFee?: string
   totalMaxFee?: string
-  feeTokenBalance?: bigint
 }
 
 const TooltipText: FC<FeeEstimationTooltipProps> = ({
   feeToken,
-  feeTokenBalance,
   maxAccountDeploymentFee,
   maxNetworkFee,
   totalMaxFee,
 }) => {
-  if (
-    !maxNetworkFee ||
-    !maxAccountDeploymentFee ||
-    !totalMaxFee ||
-    !feeTokenBalance
-  ) {
+  if (!maxNetworkFee || !maxAccountDeploymentFee || !totalMaxFee || !feeToken) {
     return (
       <P4 color="neutrals.300" fontWeight={"normal"}>
         Network fee is still loading
       </P4>
     )
   }
-  if (feeTokenBalance >= BigInt(totalMaxFee)) {
+  if (feeToken.balance >= BigInt(totalMaxFee)) {
     return (
       <Flex flexDirection="column" gap={3} px={1} py={2}>
         <P4 color="neutrals.300" fontWeight={"normal"}>
@@ -218,7 +214,7 @@ const TooltipText: FC<FeeEstimationTooltipProps> = ({
   return (
     <P4 color="neutrals.500">
       Insufficient balance to pay network fees. You need at least $
-      {bigDecimal.formatEther(BigInt(totalMaxFee) - feeTokenBalance)} ETH more.
+      {bigDecimal.formatEther(BigInt(totalMaxFee) - feeToken.balance)} ETH more.
     </P4>
   )
 }

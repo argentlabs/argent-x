@@ -132,8 +132,14 @@ export const routes = {
     `/account/activity/transaction-detail/:txHash`,
   ),
   accountDeprecated: route("/account/account-deprecated"),
+  accountOwnerWarning: routeWithReturnTo("/account/account-owner-warning"),
   accountsHidden: route(
-    (networkId: string) => `/accounts/hidden/${networkId}`,
+    (networkId: string, returnTo?: string) =>
+      returnTo
+        ? `/accounts/hidden/${networkId}?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/accounts/hidden/${networkId}`,
     "/accounts/hidden/:networkId",
   ),
   accounts: routeWithReturnTo("/accounts"),
@@ -170,9 +176,6 @@ export const routes = {
   argentAccountLoggedIn: route(
     (accountAddress) => `/accounts/${accountAddress}/logged-in`,
     "/accounts/:accountAddress/logged-in",
-  ),
-  argentAccountEmailPreferences: routeWithReturnTo(
-    "/settings/email-preferences",
   ),
   shieldAccountOTP: route(
     (accountAddress: string, email: string, flow: Flow) =>
@@ -214,8 +217,19 @@ export const routes = {
   reset: route("/reset"),
   legacy: route("/legacy"),
   settings: routeWithReturnTo("/settings"),
+  settingsPreferences: routeWithReturnTo("/settings/preferences"),
+  settingsBlockExplorer: routeWithReturnTo(
+    "/settings/preferences/block-explorer",
+  ),
+  settingsNftMarketplace: routeWithReturnTo(
+    "/settings/preferences/nft-marketplace",
+  ),
+  settingsEmailNotifications: routeWithReturnTo(
+    "/settings/preferences/email-notifications",
+  ),
   settingsNetworks: route("/settings/developer-settings/networks"),
   settingsSeed: routeWithReturnTo("/settings/seed"),
+  settingsAutoLockTimer: routeWithReturnTo("/settings/auto-lock-timer"),
   settingsAddCustomNetwork: route("/settings/developer-settings/networks/add"),
   settingsEditCustomNetwork: route(
     (networkId) => `/settings/developer-settings/networks/${networkId}/edit`,
@@ -224,12 +238,15 @@ export const routes = {
   settingsRemoveCustomNetwork: route(
     "/settings/developer-settings/networks/remove",
   ),
-  settingsDappConnections: route("/settings/dapp-connections"),
-  settingsPrivacy: route("/settings/privacy"),
+  settingsDappConnectionsAccountList: route("/settings/dapp-connections"),
+  settingsDappConnectionsAccount: route(
+    (accountAddress) => `/settings/dapp-connections/${accountAddress}`,
+    "/settings/dapp-connections/:accountAddress",
+  ),
+  settingsPrivacy: routeWithReturnTo("/settings/privacy"),
   settingsDeveloper: route("/settings/developer-settings"),
   settingsExperimental: route("/settings/developer-settings/experimental"),
   settingsBetaFeatures: route("/settings/developer-settings/beta-features"),
-  settingsBlockExplorer: route("/settings/developer-settings/block-explorer"),
   settingsAddressBook: route("/settings/addressbook"),
   settingsAddressBookAddOrEdit: route(
     (contact?: AddressBookContact) =>

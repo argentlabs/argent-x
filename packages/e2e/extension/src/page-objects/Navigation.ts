@@ -20,10 +20,6 @@ export default class Navigation {
     return this.page.locator(`button:text-is("${lang.common.confirm}")`)
   }
 
-  get confirm() {
-    return this.page.locator(`button:text-is("${lang.common.confirm}")`)
-  }
-
   get next() {
     return this.page.locator(`button:text-is("${lang.common.next}")`)
   }
@@ -59,7 +55,7 @@ export default class Navigation {
   }
 
   get lockWallet() {
-    return this.page.locator(`[aria-label="${lang.common.lockWallet}"]`)
+    return this.page.locator(`//button//*[text()="${lang.common.lockWallet}"]`)
   }
 
   get reset() {
@@ -88,6 +84,10 @@ export default class Navigation {
 
   get menuActivity() {
     return this.page.locator('[aria-label="Activity"]')
+  }
+
+  get menuActivityActive() {
+    return this.page.locator('[aria-label="Activity"][class*="active"]')
   }
 
   get save() {

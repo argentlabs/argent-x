@@ -1,6 +1,6 @@
 import { ExtensionActionItemOfType } from "../shared/actionQueue/types"
-import { addTransaction } from "./transactions/store"
-import { checkTransactionHash } from "./transactions/transactionExecution"
+import { addTransaction } from "../shared/transactions/store"
+import { checkTransactionHash } from "../shared/transactions/utils"
 import { Wallet } from "./wallet"
 
 export const accountDeployAction = async (

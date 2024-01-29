@@ -1,7 +1,7 @@
 import { ArgentBackendNftService } from "@argent/shared"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
-import { beforeEach, describe, expect, vi } from "vitest"
+import { beforeEach, describe, expect, vi, Mocked } from "vitest"
 import { NFTService } from "../implementation"
 import {
   emptyJson,
@@ -17,15 +17,13 @@ import {
   nftsRepository,
 } from "../../storage/__new/repositories/nft"
 import { networkService } from "../../network/service"
+import type { KeyValueStorage } from "../../storage"
+import type { ISettingsStorage } from "../../settings/types"
 
 const BASE_URL_ENDPOINT = "https://api.hydrogen.argent47.net/v1"
 const INVALID_URL_ENDPOINT = BASE_URL_ENDPOINT + "INVALID"
 const EMPTY_URL_ENDPOINT = BASE_URL_ENDPOINT + "EMPTY"
 const BASE_URL_WITH_WILDCARD = BASE_URL_ENDPOINT + "*"
-
-/**
- * @vitest-environment jsdom
- */
 
 const server = setupServer(
   rest.get(INVALID_URL_ENDPOINT, (req, res, ctx) => {
@@ -46,21 +44,21 @@ const repositorytMock = {
   get: vi.fn().mockResolvedValue(expectedValidRes),
   upsert: vi.fn().mockResolvedValue(undefined),
   remove: vi.fn().mockResolvedValue(undefined),
-} as unknown as jest.Mocked<typeof nftsRepository>
+} as unknown as Mocked<typeof nftsRepository>
 
 const repositoryCollectionsRepositoryMock = {
   get: vi.fn().mockResolvedValue(expectedValidRes),
   upsert: vi.fn().mockResolvedValue(undefined),
-} as unknown as jest.Mocked<typeof nftsCollectionsRepository>
+} as unknown as Mocked<typeof nftsCollectionsRepository>
 
 const repositorytContractsMock = {
   get: vi.fn().mockResolvedValue(expectedValidRes),
   upsert: vi.fn().mockResolvedValue(undefined),
-} as unknown as jest.Mocked<typeof nftsContractsRepository>
+} as unknown as Mocked<typeof nftsContractsRepository>
 
 const argentNftServiceMock = {
   getNfts: vi.fn().mockResolvedValue(validJson),
-} as unknown as jest.Mocked<ArgentBackendNftService>
+} as unknown as Mocked<ArgentBackendNftService>
 
 const networkServiceMock = {
   getById: vi.fn().mockResolvedValue({
@@ -69,7 +67,11 @@ const networkServiceMock = {
     chainId: constants.StarknetChainId.SN_GOERLI,
     sequencerUrl: "https://alpha4.starknet.io",
   }),
-} as unknown as jest.Mocked<typeof networkService>
+} as unknown as Mocked<typeof networkService>
+
+const settingsStoreMock = {
+  get: vi.fn(),
+} as unknown as KeyValueStorage<ISettingsStorage>
 
 describe("NFTService", () => {
   let testClass: NFTService
@@ -81,6 +83,7 @@ describe("NFTService", () => {
       repositoryCollectionsRepositoryMock,
       repositorytContractsMock,
       argentNftServiceMock,
+      settingsStoreMock,
     )
   })
 
@@ -128,7 +131,11 @@ describe("NFTService", () => {
         get: vi.fn().mockResolvedValue(expectedValidRes2Accounts),
         upsert: vi.fn().mockResolvedValue(undefined),
         remove: vi.fn(),
-      } as unknown as jest.Mocked<typeof nftsRepository>
+      } as unknown as Mocked<typeof nftsRepository>
+
+      const settingsStoreMock = {
+        get: vi.fn(),
+      } as unknown as KeyValueStorage<ISettingsStorage>
 
       const nftService = new NFTService(
         networkServiceMock,
@@ -136,6 +143,7 @@ describe("NFTService", () => {
         repositoryCollectionsRepositoryMock,
         repositorytContractsMock,
         argentNftServiceMock,
+        settingsStoreMock,
       )
 
       const result = await nftService.getAssets(

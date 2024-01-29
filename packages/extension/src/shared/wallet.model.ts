@@ -41,6 +41,7 @@ export const walletAccountSchema = z
     showBlockingDeprecated: z.boolean().optional(),
     guardian: z.string().optional(),
     escape: escapeSchema.optional(),
+    owner: z.string().optional(),
   })
   .merge(withSignerSchema)
   .merge(baseWalletAccountSchema)

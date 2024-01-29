@@ -4,7 +4,7 @@ import { FC } from "react"
 
 const { AlertIcon } = icons
 
-export const AccountListItemDeprecatedBadge: FC = () => (
+export const AccountListItemWarningBadge: FC = () => (
   <Tooltip label="This account can no longer be used">
     <Circle
       position="absolute"

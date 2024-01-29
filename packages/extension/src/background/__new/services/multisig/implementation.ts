@@ -13,7 +13,7 @@ import {
   UpdateMultisigThresholdPayload,
 } from "../../../../shared/multisig/multisig.model"
 import { Wallet } from "../../../wallet"
-import { CallData, DeployAccountContractPayload } from "starknet"
+import { CallData } from "starknet"
 import { IBackgroundActionService } from "../action/interface"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import {
@@ -128,7 +128,7 @@ export default class BackgroundMultisigService implements IMultisigService {
     }
     const title = `Remove owner${
       signersToRemove.length > 1 ? "s" : ""
-    } and set confirmations to ${newThreshold}}`
+    } and set confirmations to ${newThreshold}`
     await this.actionService.add(
       {
         type: "TRANSACTION",

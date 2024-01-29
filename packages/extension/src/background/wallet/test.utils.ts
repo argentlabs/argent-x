@@ -22,14 +22,12 @@ import { WalletRecoveryStarknetService } from "./recovery/starknet.service"
 import { WalletSessionService } from "./session/session.service"
 import { Wallet } from "."
 import { MultisigBackendService } from "../../shared/multisig/service/backend/implementation"
-import { IScheduleService } from "../../shared/schedule/interface"
 import { WalletStorageProps } from "../../shared/wallet/walletStore"
 
 const isDev = true
 const isTest = true
 const isDevOrTest = isDev || isTest
 const SCRYPT_N = isDevOrTest ? 64 : 262144
-const SESSION_DURATION = isDev ? 24 * 60 * 60 : 30 * 60
 const defaultKeyValueStorage = {
   get: vi.fn(),
   set: vi.fn(),
@@ -102,15 +100,6 @@ export const backupServiceMock = new WalletBackupService(
   networkServiceMock,
 )
 
-const schedulingServiceMock: IScheduleService = {
-  in: vi.fn(),
-  every: vi.fn(),
-  delete: vi.fn(),
-  registerImplementation: vi.fn(),
-  onInstallAndUpgrade: vi.fn(),
-  onStartup: vi.fn(),
-}
-
 export const emitterMock = {
   anyEvent: vi.fn(),
   bindMethods: vi.fn(),
@@ -171,8 +160,6 @@ export const sessionServiceMock = new WalletSessionService(
   getSessionStoreMock(),
   backupServiceMock,
   recoverySharedServiceMock,
-  schedulingServiceMock,
-  SESSION_DURATION,
   SCRYPT_N,
 )
 

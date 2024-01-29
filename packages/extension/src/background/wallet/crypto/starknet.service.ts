@@ -1,4 +1,4 @@
-import { calldataSchema, isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/shared"
 import { CairoVersion, CallData, hash } from "starknet"
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { MultisigSigner } from "../../../shared/multisig/signer"
@@ -12,12 +12,11 @@ import {
   BaseMultisigWalletAccount,
   ArgentAccountType,
 } from "../../../shared/wallet.model"
+import { getStarkPair, generatePublicKeys } from "../../keys/keyDerivation"
 import {
-  getStarkPair,
   getNextPathIndex,
   getPathForIndex,
-  generatePublicKeys,
-} from "../../keys/keyDerivation"
+} from "../../../shared/utils/derivationPath"
 
 import { WalletAccountSharedService } from "../account/shared.service"
 import { getMultisigAccountFromBaseWallet } from "../../../shared/multisig/utils/baseMultisig"

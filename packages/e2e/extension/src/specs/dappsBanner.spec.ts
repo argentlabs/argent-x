@@ -4,22 +4,16 @@ import test from "../test"
 import config from "../config"
 
 test.describe("Banner", () => {
-  test("dapps banner should be visible after login", async ({ extension }) => {
+  test("avnu banner should be visible after login", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [{ initialBalance: 0.0001 }],
     })
 
     await expect(extension.network.networkSelector).toBeVisible()
-    await expect(extension.account.dappsBanner).toBeVisible()
-    let href = await extension.account.dappsBanner.getAttribute("href")
-    expect(href).toContain("https://www.dappland.com")
-    //check settings banner
-    await extension.navigation.showSettings.click()
-    href = await extension.account.dappsBanner.getAttribute("href")
-    expect(href).toContain("https://www.dappland.com")
+    await expect(extension.account.avnuBanner).toBeVisible()
   })
 
-  test("dapps banner should not be visible after dismissed", async ({
+  test("avnu banner should not be visible after dismissed", async ({
     extension,
   }) => {
     await extension.setupWallet({
@@ -27,16 +21,30 @@ test.describe("Banner", () => {
     })
 
     await expect(extension.network.networkSelector).toBeVisible()
-    await expect(extension.account.dappsBanner).toBeVisible()
-    await extension.account.dappsBannerClose.click()
-    await expect(extension.account.dappsBanner).toBeHidden()
+    await expect(extension.account.avnuBanner).toBeVisible()
+    await extension.account.avnuBannerClose.click()
+    await expect(extension.account.avnuBanner).toBeHidden()
   })
 
-  test("dapps banner shoud be visible after account recovery", async ({
+  test("avnu banner shoud be visible after account recovery", async ({
     extension,
   }) => {
     await extension.open()
     await extension.recoverWallet(config.testNetSeed1!)
-    await expect(extension.account.dappsBanner).toBeVisible()
+    await expect(extension.account.avnuBanner).toBeVisible()
+  })
+
+  test("ekubo banner should be visible after avnu banner has been dismissed", async ({
+    extension,
+  }) => {
+    await extension.setupWallet({
+      accountsToSetup: [{ initialBalance: 0.0001 }],
+    })
+
+    await expect(extension.network.networkSelector).toBeVisible()
+    await expect(extension.account.avnuBanner).toBeVisible()
+    await extension.account.avnuBannerClose.click()
+    await expect(extension.account.avnuBanner).toBeHidden()
+    await expect(extension.account.ekuboBanner).toBeVisible()
   })
 })

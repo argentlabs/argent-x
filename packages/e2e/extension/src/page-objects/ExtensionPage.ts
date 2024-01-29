@@ -120,7 +120,6 @@ export default class ExtensionPage {
   }
 
   async activate2fa(accountName: string, email: string, pin = "111111") {
-    //await this.page.pause()
     await this.account.ensureSelectedAccount(accountName)
     await this.navigation.showSettings.click()
     await this.settings.account(accountName).click()
@@ -159,10 +158,7 @@ export default class ExtensionPage {
   }) {
     await this.wallet.newWalletOnboarding()
     await this.open()
-    await this.account.accountAddressFromAssetsView.click()
-    const seed = await this.account
-      .saveRecoveryPhrase()
-      .then((adr) => String(adr))
+    const seed = await this.account.setupRecovery()
     const accountAddresses: string[] = []
 
     for (const [accIndex, acc] of accountsToSetup.entries()) {
@@ -196,15 +192,30 @@ export default class ExtensionPage {
     return { accountAddresses, seed }
   }
 
-  async validateTx(reciever: string, amount?: number) {
-    await this.navigation.menuActivity.click()
+  async validateTx(
+    txHash: string,
+    reciever: string,
+    amount?: number,
+    uniqLocator?: boolean,
+  ) {
+    await this.navigation.menuActivityActive
+      .isVisible()
+      .then(async (visible) => {
+        if (!visible) {
+          await this.navigation.menuActivity.click()
+        }
+      })
     if (amount) {
-      const activityAmount = await this.page
-        .locator("button[ data-tx-hash] [data-value]")
-        .first()
+      const activityAmountLocator = this.page.locator(
+        `button[data-tx-hash$="${txHash.substring(3)}"] [data-value]`,
+      )
+      let activityAmountElement = activityAmountLocator
+      if (uniqLocator) {
+        activityAmountElement = activityAmountLocator.first()
+      }
+      const activityAmount = await activityAmountElement
         .textContent()
-        .then((text) => text?.replace(/[^0-9.]+/, ""))
-
+        .then((text) => text?.match(/[\d|.]+/)![0])
       if (amount.toString().length > 6) {
         expect(activityAmount).toBe(
           parseFloat(amount.toString())
@@ -217,7 +228,43 @@ export default class ExtensionPage {
       }
     }
     await this.activity.ensureNoPendingTransactions()
-    const txs = await this.activity.activityTxHashs()
-    await validateTx(txs[0]!, reciever, amount)
+    await validateTx(txHash, reciever, amount)
+  }
+
+  async fundMultisigAccount({
+    accountName,
+    amount,
+  }: {
+    accountName: string
+    amount: number
+  }) {
+    await this.account.ensureSelectedAccount(accountName)
+    await this.account.copyAddress.click()
+    const accountAddress = await this.getClipboard().then((adr) => String(adr))
+    await transferEth(
+      `${amount * Math.pow(10, 18)}`, // amount Ethereum has 18 decimals
+      accountAddress, // reciever wallet address
+    )
+    await this.account.ensureAsset(accountName, "Ethereum", `${amount} ETH`)
+  }
+
+  async activateMultisig(accountName: string) {
+    await this.account.ensureSelectedAccount(accountName)
+    await expect(
+      this.page.locator("label:has-text('Not activated')"),
+    ).toBeVisible()
+    await this.page.locator('[data-testid="activate-multisig"]').click()
+    await this.navigation.confirm.click()
+    await expect(
+      this.page.locator('[data-testid="activating-multisig"]'),
+    ).toBeVisible()
+    await Promise.all([
+      expect(this.page.locator("label:has-text('Not activated')")).toBeHidden({
+        timeout: 60000,
+      }),
+      expect(
+        this.page.locator('[data-testid="activating-multisig"]'),
+      ).toBeHidden({ timeout: 60000 }),
+    ])
   }
 }

@@ -16,12 +16,15 @@ import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
 import { WaitingForFunds } from "./ui/WaitingForFunds"
 import { getTooltipText } from "./utils"
 import { FeeEstimationProps } from "./feeEstimation.model"
+import {
+  estimatedFeesToMaxFeeTotal,
+  estimatedFeesToTotal,
+} from "../../../../shared/transactionSimulation/utils"
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
   amountCurrencyValue,
   fee,
   feeToken,
-  feeTokenBalance,
   parsedFeeEstimationError,
   showError,
   showFeeError,
@@ -29,25 +32,27 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
   userClickedAddFunds,
   needsDeploy,
 }) => {
+  const amount = fee && estimatedFeesToTotal(fee)
+  const maxFee = fee && estimatedFeesToMaxFeeTotal(fee)
+
   const tooltipText = useMemo(() => {
-    if (fee) {
-      const suggestedMaxFeeBN = BigInt(fee.suggestedMaxFee)
-      return getTooltipText(suggestedMaxFeeBN, feeTokenBalance)
+    if (maxFee) {
+      return getTooltipText(maxFee, feeToken.balance)
     }
-  }, [fee, feeTokenBalance])
+  }, [feeToken.balance, maxFee])
   const primaryText = useMemo(() => {
-    if (fee) {
+    if (amount) {
       return (
-        <TextWithAmount amount={fee.amount} decimals={feeToken.decimals}>
+        <TextWithAmount amount={amount} decimals={feeToken.decimals}>
           <>
             {feeToken ? (
               prettifyTokenAmount({
-                amount: fee.amount,
+                amount,
                 decimals: feeToken.decimals,
                 symbol: feeToken.symbol,
               })
             ) : (
-              <>{fee.amount} Unknown</>
+              <>{amount} Unknown</>
             )}
             {amountCurrencyValue !== undefined &&
               ` (${prettifyCurrencyValue(amountCurrencyValue)})`}
@@ -55,24 +60,21 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
         </TextWithAmount>
       )
     }
-  }, [amountCurrencyValue, fee, feeToken])
+  }, [amount, amountCurrencyValue, feeToken])
   const secondaryText = useMemo(() => {
-    if (fee) {
+    if (maxFee) {
       return (
-        <TextWithAmount
-          amount={fee.suggestedMaxFee}
-          decimals={feeToken.decimals}
-        >
+        <TextWithAmount amount={maxFee} decimals={feeToken.decimals}>
           <>
             Max&nbsp;
             {feeToken ? (
               prettifyTokenAmount({
-                amount: fee.suggestedMaxFee,
+                amount: maxFee,
                 decimals: feeToken.decimals,
                 symbol: feeToken.symbol,
               })
             ) : (
-              <>{fee.suggestedMaxFee} Unknown</>
+              <>{maxFee} Unknown</>
             )}
             {suggestedMaxFeeCurrencyValue !== undefined &&
               ` (Max ${prettifyCurrencyValue(suggestedMaxFeeCurrencyValue)})`}
@@ -80,8 +82,8 @@ export const FeeEstimation: FC<FeeEstimationProps> = ({
         </TextWithAmount>
       )
     }
-  }, [fee, feeToken, suggestedMaxFeeCurrencyValue])
-  const isLoading = !fee || isUndefined(feeTokenBalance) // because 0n is a valid balance but falsy
+  }, [feeToken, maxFee, suggestedMaxFeeCurrencyValue])
+  const isLoading = !fee || isUndefined(feeToken.balance) // because 0n is a valid balance but falsy
 
   if (!showError) {
     return needsDeploy ? (

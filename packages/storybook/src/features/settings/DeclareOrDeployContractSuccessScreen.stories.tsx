@@ -1,4 +1,4 @@
-import { DeclareOrDeployContractSuccessScreen } from "@argent-x/extension/src/ui/features/settings/DeveloperSettings/DeclareOrDeployContractSuccessScreen"
+import { DeclareOrDeployContractSuccessScreen } from "@argent-x/extension/src/ui/features/settings/developerSettings/smartContractDevelopment/DeclareOrDeployContractSuccessScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 

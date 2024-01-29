@@ -1,4 +1,4 @@
-import { Call, TransactionFinalityStatus } from "starknet"
+import { Call } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import { Transaction } from "../../../../../../shared/transactions"
@@ -18,7 +18,8 @@ import {
   multisigAddOwner,
   multisigRemoveOwner,
   multisigReplaceOwner,
-} from "./__fixtures__/transaction-calls/goerli-alpha"
+} from "../../../../../../shared/call/__test__/__fixtures__/transaction-calls/goerli-alpha"
+import { ETH_TOKEN_ADDRESS } from "../../../../../../shared/network/constants"
 
 const accountAddress =
   "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
@@ -41,6 +42,7 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
         multicallAddress:
           "0x042a12c5a641619a6c58e623d5735273cdfb0e13df72c4bacb4e188892034bd6",
         name: "Goerli Testnet",
+        possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
         readonly: true,
       },
       networkId: "goerli-alpha",
@@ -53,7 +55,9 @@ const makeTransaction = (transactions: Call | Call[]): Transaction => {
     meta: {
       transactions,
     },
-    finalityStatus: TransactionFinalityStatus.ACCEPTED_ON_L2,
+    status: {
+      finality_status: "RECEIVED",
+    },
     timestamp: 1662047260,
   }
 }

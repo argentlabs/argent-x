@@ -103,7 +103,7 @@ export const severitySchema = z.union([
   z.literal("info"),
 ])
 
-const warningSchema = z.object({
+export const warningSchema = z.object({
   reason: reasonsSchema,
   details: z.record(z.string().or(z.number())).optional(),
   severity: severitySchema,
@@ -307,3 +307,5 @@ export function getMessageFromSimulationError(
   }
   return "Unknown error"
 }
+
+export type Warning = z.infer<typeof warningSchema>

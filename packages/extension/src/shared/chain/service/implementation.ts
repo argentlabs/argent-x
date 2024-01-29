@@ -54,13 +54,17 @@ export class StarknetChainService implements IChainService {
       finality_status === "ACCEPTED_ON_L2" ||
       finality_status === "ACCEPTED_ON_L1"
 
-    if (isFailed) {
-      // Only get the receipt if the transaction failed
-      const receipt = await provider.getTransactionReceipt(transaction.hash)
-      error_reason =
-        receipt.revert_reason ||
-        ("transaction_failure_reason" in receipt &&
-          (receipt.transaction_failure_reason as any)?.error_message)
+    try {
+      if (execution_status === "REVERTED") {
+        // Only get the receipt if the transaction reverted
+        const receipt = await provider.getTransactionReceipt(transaction.hash)
+        error_reason = receipt.revert_reason
+      }
+    } catch (e) {
+      console.warn(
+        `Failed to fetch transaction receipt for ${transaction.hash}`,
+        e,
+      )
     }
 
     error_reason =

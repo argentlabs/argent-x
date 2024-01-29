@@ -21,7 +21,7 @@ import { Multisig } from "./Multisig"
 import {
   multisigBaseWalletView,
   pendingMultisigsView,
-} from "../../../shared/multisig/view"
+} from "../../views/multisig"
 
 export const mapMultisigWalletAccountsToMultisig = (
   walletAccounts: MultisigWalletAccount[],

@@ -19,6 +19,7 @@ import { WalletRecoverySharedService } from "./recovery/shared.service"
 import { WalletSessionService } from "./session/session.service"
 import { WalletRecoveryStarknetService } from "./recovery/starknet.service"
 import { ProgressCallback } from "ethers"
+import { Address } from "@argent/shared"
 
 export class Wallet {
   constructor(
@@ -166,9 +167,13 @@ export class Wallet {
       transactionDetails,
     )
   }
-  public async getAccountDeploymentFee(walletAccount: WalletAccount) {
+  public async getAccountDeploymentFee(
+    walletAccount: WalletAccount,
+    feeTokenAddress?: Address,
+  ) {
     return this.walletDeploymentStarknetService.getAccountDeploymentFee(
       walletAccount,
+      feeTokenAddress,
     )
   }
   public async redeployAccount(account: WalletAccount) {

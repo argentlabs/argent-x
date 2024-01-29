@@ -1,9 +1,6 @@
 import { MessageType } from "../../shared/messages"
-import {
-  migratePreAuthorizations,
-  isPreAuthorized,
-} from "../../shared/preAuthorizations"
-import { migrateWallet } from "../../shared/wallet/storeMigration"
+import { preAuthorizationService } from "../../shared/preAuthorization/service"
+import { migrateWallet } from "../migrations/wallet/storeMigration"
 import { backgroundActionService } from "../__new/services/action"
 import { handleAccountMessage } from "../accountMessaging"
 import { handleActionMessage } from "../actionMessaging"
@@ -44,7 +41,7 @@ export const handleMessage = async (
   [msg, sender]: [MessageType, browser.runtime.MessageSender],
   port?: browser.runtime.Port,
 ) => {
-  await Promise.all([migrateWallet(), migratePreAuthorizations()]) // do migrations before handling messages
+  await Promise.all([migrateWallet()]) // do migrations before handling messages
 
   const messagingKeys = await getMessagingKeys()
 
@@ -62,7 +59,11 @@ export const handleMessage = async (
 
   const currentAccount = await walletSingleton.getSelectedAccount()
   const senderIsPreauthorized =
-    !!currentAccount && (await isPreAuthorized(currentAccount, origin))
+    !!currentAccount &&
+    (await preAuthorizationService.isPreAuthorized({
+      account: currentAccount,
+      host: origin,
+    }))
 
   if (
     !isSafeOrigin && // allow all messages from the extension itself

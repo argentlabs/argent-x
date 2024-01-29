@@ -1,4 +1,4 @@
-import { AddressBookAddOrEditScreen } from "@argent-x/extension/src/ui/features/settings/AddressBookAddOrEditScreen"
+import { AddressBookAddOrEditScreen } from "@argent-x/extension/src/ui/features/settings/addressBook/AddressBookAddOrEditScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 

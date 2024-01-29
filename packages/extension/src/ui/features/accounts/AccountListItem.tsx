@@ -1,4 +1,8 @@
-import { addressSchema, isStarknetDomainName } from "@argent/shared"
+import {
+  addressSchema,
+  formatTruncatedAddress,
+  isStarknetDomainName,
+} from "@argent/shared"
 import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
 import { Box, Circle, Flex, Switch, Tooltip, chakra } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
@@ -8,10 +12,9 @@ import {
   CustomButtonCellProps,
 } from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
-import { formatTruncatedAddress } from "../../services/addresses"
 import { AccountAvatar } from "./AccountAvatar"
 import { AccountLabel } from "./AccountLabel"
-import { AccountListItemDeprecatedBadge } from "./AccountListItemDeprecatedBadge"
+import { AccountListItemWarningBadge } from "./AccountListItemDeprecatedBadge"
 import { AccountListItemShieldBadgeContainer } from "./AccountListItemShieldBadgeContainer"
 import { AccountListItemUpgradeBadge } from "./AccountListItemUpgradeBadge"
 import { AccountListItemProps } from "./accountListItem.model"
@@ -50,6 +53,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   accountType,
   isClickable = true,
   isShield,
+  isOwner,
   deploying,
   upgrade,
   connectedHost,
@@ -66,8 +70,8 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   ...rest
 }) => {
   const getAvatarBadge = () => {
-    if (isDeprecated) {
-      return <AccountListItemDeprecatedBadge />
+    if (isDeprecated || isOwner === false) {
+      return <AccountListItemWarningBadge />
     }
     if (upgrade) {
       return <AccountListItemUpgradeBadge />
@@ -165,11 +169,17 @@ export const AccountListItem: FC<AccountListItemProps> = ({
         overflow={"hidden"}
         alignItems={"center"}
         justifyContent={"space-between"}
+        data-testid={accountName}
       >
         <Flex direction={"column"} overflow={"hidden"}>
           <Flex gap={2} alignItems={"center"}>
             {accountName && (
-              <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
+              <H6
+                data-testid="account-name"
+                overflow={"hidden"}
+                textOverflow={"ellipsis"}
+                pointerEvents="auto"
+              >
                 {accountName}
               </H6>
             )}
@@ -182,6 +192,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 borderWidth={1}
                 p="3px 5px"
                 borderRadius={4}
+                data-testid="confirmations"
               >
                 <L2 fontWeight={700} color="neutrals.300">
                   {accountExtraInfo}
@@ -192,7 +203,12 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           </Flex>
           {description && (
             <Flex gap={2} color={"neutrals.300"}>
-              <P4 fontWeight={"semibold"} w="full" sx={{ textWrap: "wrap" }}>
+              <P4
+                data-testid="description"
+                fontWeight={"semibold"}
+                w="full"
+                sx={{ textWrap: "wrap" }}
+              >
                 {description}
               </P4>
             </Flex>

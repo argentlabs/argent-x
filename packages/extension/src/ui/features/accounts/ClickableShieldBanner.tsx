@@ -1,6 +1,6 @@
-import { icons } from "@argent/ui"
+import { L2, icons } from "@argent/ui"
 
-import { Box, Flex, Text } from "@chakra-ui/react"
+import { Button, Flex, Text } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../routes"
 
@@ -12,26 +12,24 @@ export const ClickableShieldBanner = ({ address }: { address: string }) => {
     navigate(routes.shieldAccountStart(address))
   }
   return (
-    <Box
+    <Button
+      size="auto"
       onClick={handleClick}
-      p={2}
+      py={2}
       px={3}
-      backgroundColor="neutrals.700"
-      borderBottomRadius="lg"
-      cursor="pointer"
-      _hover={{ backgroundColor: "neutrals.600" }}
+      justifyContent="space-between"
+      alignItems="center"
+      w="full"
+      roundedTop="none"
+      roundedBottom="lg"
     >
-      <Flex justifyContent="space-between" alignItems="center">
-        <Flex alignItems="center">
-          <ArgentShieldIcon />{" "}
-          <Text fontSize="2xs" color="neutrals.300" ml={1}>
-            Argent Shield is not activated
-          </Text>
-        </Flex>
-        <Text fontSize="2xs" color="neutrals.500">
-          Click to enable
-        </Text>
+      <Flex alignItems="center" gap={1} color="neutrals.300">
+        <ArgentShieldIcon />
+        <L2 as={Text}>Argent Shield is not activated</L2>
       </Flex>
-    </Box>
+      <L2 as={Text} color="neutrals.500">
+        Click to enable
+      </L2>
+    </Button>
   )
 }

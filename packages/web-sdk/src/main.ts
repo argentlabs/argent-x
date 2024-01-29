@@ -20,14 +20,11 @@ function mapTargetUrlToNetworkId(target: string): constants.NetworkName {
     if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
       return DEVELOPMENT_NETWORK
     }
-    if (origin.includes("hydrogen")) {
+    if (origin.includes("hydrogen") || origin.includes("dev")) {
       return Network.SN_GOERLI
     }
     if (origin.includes("staging")) {
       return Network.SN_MAIN
-    }
-    if (origin.includes("dev")) {
-      return Network.SN_GOERLI2
     }
     if (origin.includes("argent.xyz")) {
       return Network.SN_MAIN

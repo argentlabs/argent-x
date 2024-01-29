@@ -1,12 +1,4 @@
 import { P4, TokenButton } from "@argent/ui"
-import {
-  Currency,
-  ETHER,
-  ETH_LOGO_URL,
-  SupportedNetworks,
-  WrappedTokenInfo,
-  wrappedCurrency,
-} from "@argent/x-swap"
 import { FC } from "react"
 
 import { prettifyCurrencyValue } from "../../../../shared/token/price"
@@ -15,20 +7,16 @@ import {
   useTokenAmountToCurrencyValue,
   useTokenPriceDetails,
 } from "../../accountTokens/tokenPriceHooks"
-import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 import { bigDecimal } from "@argent/shared"
+import { Token } from "../../../../shared/token/__new/types/token.model"
 
 interface TokenPriceProps {
-  currency: Currency
+  token: Token
   onClick: () => void
   showCurrencyValue?: boolean
 }
 
-const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
-  const network = useCurrentNetwork()
-
-  const token = wrappedCurrency(currency, network.id as SupportedNetworks)
-
+const TokenPrice: FC<TokenPriceProps> = ({ token, onClick }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
     bigDecimal.parseUnits("1", token?.decimals ?? 18).value,
@@ -40,13 +28,6 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
     return <></>
   }
 
-  const tokenImage =
-    token instanceof WrappedTokenInfo
-      ? token.image
-      : currency === ETHER
-      ? ETH_LOGO_URL
-      : undefined
-
   const displayCurrencyValue = prettifyCurrencyValue(currencyValue)
 
   const displayPriceDetails =
@@ -56,7 +37,7 @@ const TokenPrice: FC<TokenPriceProps> = ({ currency, onClick }) => {
     <TokenButton
       onClick={onClick}
       name={token.name || ""}
-      image={tokenImage || ""}
+      image={token.iconUrl || ""}
       getTokenIconUrl={getTokenIconUrl}
       symbol={token.symbol || ""}
       showTokenSymbol

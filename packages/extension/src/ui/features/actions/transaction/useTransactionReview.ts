@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { Call } from "starknet"
 
 import { ARGENT_TRANSACTION_REVIEW_API_ENABLED } from "../../../../shared/api/constants"
-import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
+import { argentApiNetworkForNetwork } from "../../../../shared/api/headers"
 import { fetchTransactionReview } from "../../../../shared/transactionReview.service"
 import { WalletAccount } from "../../../../shared/wallet.model"
 import { argentApiFetcher } from "../../../services/argentApiFetcher"

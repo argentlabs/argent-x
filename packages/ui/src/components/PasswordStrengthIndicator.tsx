@@ -3,7 +3,6 @@ import { zxcvbnOptions } from "@zxcvbn-ts/core"
 import { FC } from "react"
 
 import { usePasswordStrength } from "../hooks/usePasswordStrength"
-import { H6 } from "./Typography"
 import { PasswordStrengthIndicatorBar } from "./PasswordStrengthIndicatorBar"
 
 interface PasswordStrengthIndicatorProps {

@@ -1,6 +1,5 @@
-import { Address, NftItem, bigDecimal, getNftPicture } from "@argent/shared"
+import { NftItem, getNftPicture } from "@argent/shared"
 import {
-  B3,
   BarCloseButton,
   Button,
   CellStack,
@@ -18,38 +17,26 @@ import {
   Box,
   SimpleGrid,
 } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { FC } from "react"
 
-import { routes } from "../../routes"
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { NftImage } from "./NftImage"
-import { ViewOnMenu } from "./ViewOnMenu"
 
-const { SendIcon } = icons
+const { SendIcon, ViewIcon } = icons
 
 interface NftScreenProps {
-  contractAddress: Address
-  networkId: string
-  tokenId: string
   nft: NftItem
+  onViewNft: () => void | Promise<void>
+  onSendNft: () => void | Promise<void>
 }
 
 export const NftScreen: FC<NftScreenProps> = ({
-  contractAddress,
-  networkId,
-  tokenId,
   nft,
+  onViewNft,
+  onSendNft,
 }) => {
-  const navigate = useNavigate()
-  const onClick = useCallback(() => {
-    navigate(
-      routes.sendRecipientScreen({
-        tokenAddress: contractAddress,
-        tokenId,
-      }),
-    )
-  }, [contractAddress, navigate, tokenId])
+  const description = nft.description ?? nft.collection?.description
+  const hasDescription = description?.length > 0
   return (
     <>
       <NavigationContainer
@@ -87,20 +74,23 @@ export const NftScreen: FC<NftScreenProps> = ({
           </H5>
         </>
 
-        <CellStack pb="18">
-          <Accordion allowToggle>
-            <AccordionItem>
-              <AccordionButton justifyContent="space-between">
-                <P4 color="neutrals.300">Description</P4> <AccordionIcon />
-              </AccordionButton>
-              <AccordionPanel>
-                {nft.description.length > 0
-                  ? nft.description
-                  : nft.collection?.description}
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
-        </CellStack>
+        {hasDescription && (
+          <CellStack pb="18">
+            <Accordion allowToggle>
+              <AccordionItem>
+                <AccordionButton justifyContent="space-between">
+                  <P4 color="neutrals.300">Description</P4> <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  {nft.description.length > 0
+                    ? nft.description
+                    : nft.collection?.description}
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+          </CellStack>
+        )}
+
         <SimpleGrid
           bg="neutrals.900"
           position="fixed"
@@ -114,20 +104,21 @@ export const NftScreen: FC<NftScreenProps> = ({
           borderTop="solid 1px"
           borderColor="neutrals.800"
         >
-          <ViewOnMenu
-            contractAddress={contractAddress}
-            tokenId={tokenId}
-            networkId={networkId}
-          />
           <Button
             w="100%"
-            type="button"
-            onClick={onClick}
-            leftIcon={<SendIcon />}
-            bg="neutrals.700"
-            _hover={{ bg: "neutrals.600" }}
+            size="sm"
+            onClick={onViewNft}
+            leftIcon={<ViewIcon />}
           >
-            <B3>Send</B3>
+            View
+          </Button>
+          <Button
+            w="100%"
+            size="sm"
+            onClick={onSendNft}
+            leftIcon={<SendIcon />}
+          >
+            Send
           </Button>
         </SimpleGrid>
       </NavigationContainer>

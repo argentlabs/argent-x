@@ -6,7 +6,6 @@ import { Navigate, useNavigate } from "react-router-dom"
 import { setHasSeenTransaction } from "../../../shared/multisig/pendingTransactionsStore"
 import { useAppState } from "../../app.state"
 import { routes, useRouteRequestId } from "../../routes"
-import { formatTruncatedAddress } from "../../services/addresses"
 import { usePublicKey } from "../accounts/usePublicKey"
 import { MultisigBannerProps } from "../actions/transaction/ApproveTransactionScreen/MultisigBanner"
 import {
@@ -19,6 +18,7 @@ import { useView } from "../../views/implementation/react"
 import { selectedAccountView } from "../../views/account"
 import { ApproveScreenType } from "../actions/transaction/types"
 import { ApproveTransactionScreenContainer } from "../actions/transaction/ApproveTransactionScreen/ApproveTransactionScreenContainer"
+import { formatTruncatedAddress } from "@argent/shared"
 
 export const MultisigPendingTransactionDetailsScreen = () => {
   const selectedAccount = useView(selectedAccountView)

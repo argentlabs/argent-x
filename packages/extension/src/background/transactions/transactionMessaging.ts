@@ -12,17 +12,16 @@ import {
   SimulateDeployAccountRequest,
   SimulateInvokeRequest,
 } from "../../shared/transactionSimulation/types"
-import { getErrorObject } from "../../shared/utils/error"
 import { isAccountDeployed } from "../accountDeploy"
 import { HandleMessage, UnhandledMessage } from "../background"
-import { argentMaxFee } from "../../shared/utils/argentMaxFee"
-import { addEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
-import { transactionCallsAdapter } from "./transactionAdapter"
 import { AccountError } from "../../shared/errors/account"
 import { fetchTransactionBulkSimulation } from "../../shared/transactionSimulation/transactionSimulation.service"
 import { TransactionError } from "../../shared/errors/transaction"
-import { getEstimatedFeeFromSimulation } from "../../shared/transactionSimulation/utils"
+import { getEstimatedFeeFromBulkSimulation } from "../../shared/transactionSimulation/utils"
 import { isAccountV4, isAccountV5 } from "@argent/shared"
+import { EstimatedFees } from "../../shared/transactionSimulation/fees/fees.model"
+import { ETH_TOKEN_ADDRESS } from "../../shared/network/constants"
+import { addEstimatedFee } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
@@ -46,146 +45,6 @@ export const handleTransactionMessage: HandleMessage<
       })
     }
 
-    case "ESTIMATE_TRANSACTION_FEE": {
-      const selectedAccount = await wallet.getSelectedAccount()
-      const transactions = msg.data
-
-      if (!selectedAccount) {
-        throw new AccountError({ code: "NOT_FOUND" })
-      }
-
-      const starknetAccount = await wallet.getSelectedStarknetAccount()
-
-      try {
-        let txFee = "0",
-          maxTxFee = "0",
-          accountDeploymentFee: string | undefined,
-          maxADFee: string | undefined
-
-        const isDeployed = await isAccountDeployed(
-          selectedAccount,
-          starknetAccount.getClassAt.bind(starknetAccount),
-        )
-
-        if (!isDeployed) {
-          if ("estimateFeeBulk" in starknetAccount) {
-            const bulkTransactions: Invocations = [
-              {
-                type: TransactionType.DEPLOY_ACCOUNT,
-                payload: await wallet.getAccountDeploymentPayload(
-                  selectedAccount,
-                ),
-              },
-              {
-                type: TransactionType.INVOKE,
-                payload: transactions,
-              },
-            ]
-
-            const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
-              bulkTransactions,
-              { skipValidate: true },
-            )
-
-            accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
-            txFee = num.toHex(estimateFeeBulk[1].overall_fee)
-
-            maxADFee = argentMaxFee({
-              suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
-            })
-            maxTxFee = argentMaxFee({
-              suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
-            })
-          }
-        } else {
-          const { overall_fee, suggestedMaxFee } =
-            await starknetAccount.estimateFee(transactions, {
-              skipValidate: true,
-            })
-
-          txFee = num.toHex(overall_fee)
-          maxTxFee = num.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
-        }
-
-        const suggestedMaxFee = argentMaxFee({ suggestedMaxFee: maxTxFee })
-
-        await addEstimatedFees(
-          {
-            amount: txFee,
-            suggestedMaxFee,
-            accountDeploymentFee,
-            maxADFee,
-          },
-          transactions,
-        )
-        return respond({
-          type: "ESTIMATE_TRANSACTION_FEE_RES",
-          data: {
-            amount: txFee,
-            suggestedMaxFee,
-            accountDeploymentFee,
-            maxADFee,
-          },
-        })
-      } catch (error) {
-        const errorObject = getErrorObject(error, false)
-        console.error("ESTIMATE_TRANSACTION_FEE_REJ", error, errorObject)
-        return respond({
-          type: "ESTIMATE_TRANSACTION_FEE_REJ",
-          data: {
-            error: errorObject,
-          },
-        })
-      }
-    }
-
-    case "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE": {
-      const providedAccount = msg.data
-      const account = providedAccount
-        ? await wallet.getAccount(providedAccount)
-        : await wallet.getSelectedAccount()
-
-      if (!account) {
-        throw Error("no accounts")
-      }
-
-      try {
-        const { overall_fee, suggestedMaxFee } =
-          await wallet.getAccountDeploymentFee(account)
-
-        const maxADFee = argentMaxFee({ suggestedMaxFee })
-        return respond({
-          type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
-          data: {
-            amount: num.toHex(overall_fee),
-            maxADFee,
-          },
-        })
-      } catch (error) {
-        // FIXME: This is a temporary fix for the case where the user has a multisig account.
-        // Once starknet 0.11 is released, we can remove this.
-        if (account.type === "multisig") {
-          const fallbackPrice = num.toBigInt(10e14)
-          return respond({
-            type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES",
-            data: {
-              amount: num.toHex(fallbackPrice),
-              maxADFee: argentMaxFee({ suggestedMaxFee: fallbackPrice }),
-            },
-          })
-        }
-
-        const errorObject = getErrorObject(error, false)
-        console.error("ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ", error, errorObject)
-        return respond({
-          type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ",
-          data: {
-            error: errorObject,
-          },
-        })
-      }
-    }
-
     case "ESTIMATE_DECLARE_CONTRACT_FEE": {
       const { address, networkId, ...rest } = msg.data
 
@@ -199,10 +58,13 @@ export const handleTransactionMessage: HandleMessage<
         throw Error("no accounts")
       }
 
-      let txFee = "0",
-        maxTxFee = "0",
-        accountDeploymentFee: string | undefined,
-        maxADFee: string | undefined
+      const fees: EstimatedFees = {
+        transactions: {
+          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          amount: 0n,
+          pricePerUnit: 0n,
+        },
+      }
 
       try {
         if (
@@ -235,37 +97,58 @@ export const handleTransactionMessage: HandleMessage<
                 skipValidate: true,
               })
 
-            accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
-            txFee = num.toHex(estimateFeeBulk[1].overall_fee)
+            if (
+              !estimateFeeBulk[0].gas_consumed ||
+              !estimateFeeBulk[0].gas_price
+            ) {
+              throw Error(
+                "estimateFeeBulk[0].gas_consumed or estimateFeeBulk[0].gas_price is undefined",
+              )
+            }
 
-            maxADFee = argentMaxFee({
-              suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
-            })
-            maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
+            fees.deployment = {
+              feeTokenAddress: ETH_TOKEN_ADDRESS,
+              amount: num.toBigInt(estimateFeeBulk[0].gas_consumed),
+              pricePerUnit: num.toBigInt(estimateFeeBulk[0].gas_price),
+            }
+
+            if (
+              !estimateFeeBulk[1].gas_consumed ||
+              !estimateFeeBulk[1].gas_price
+            ) {
+              throw Error(
+                "estimateFeeBulk[1].gas_consumed or estimateFeeBulk[1].gas_price is undefined",
+              )
+            }
+
+            fees.transactions.amount = num.toBigInt(
+              estimateFeeBulk[1].gas_consumed,
+            )
+            fees.transactions.pricePerUnit = num.toBigInt(
+              estimateFeeBulk[1].gas_price,
+            )
           }
         } else {
           if ("estimateDeclareFee" in selectedStarknetAccount) {
-            const { overall_fee, suggestedMaxFee } =
+            const { gas_consumed, gas_price } =
               await selectedStarknetAccount.estimateDeclareFee({
                 ...rest,
               })
-            txFee = num.toHex(overall_fee)
-            maxTxFee = num.toHex(suggestedMaxFee)
+
+            if (!gas_consumed || !gas_price) {
+              throw Error("gas_consumed or gas_price is undefined")
+            }
+
+            fees.transactions.amount = num.toBigInt(gas_consumed)
+            fees.transactions.pricePerUnit = num.toBigInt(gas_price)
           } else {
             throw Error("estimateDeclareFee not supported")
           }
         }
 
-        const suggestedMaxFee = argentMaxFee({ suggestedMaxFee: maxTxFee }) // This add the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
-
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
-          data: {
-            amount: txFee,
-            suggestedMaxFee,
-            accountDeploymentFee,
-            maxADFee,
-          },
+          data: fees,
         })
       } catch (error) {
         console.error(error)
@@ -291,10 +174,13 @@ export const handleTransactionMessage: HandleMessage<
         throw Error("no accounts")
       }
 
-      let txFee = "0",
-        maxTxFee = "0",
-        accountDeploymentFee: string | undefined,
-        maxADFee: string | undefined
+      const fees: EstimatedFees = {
+        transactions: {
+          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          amount: 0n,
+          pricePerUnit: 0n,
+        },
+      }
 
       try {
         if (
@@ -326,40 +212,61 @@ export const handleTransactionMessage: HandleMessage<
             const estimateFeeBulk =
               await selectedStarknetAccount.estimateFeeBulk(bulkTransactions)
 
-            accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
-            txFee = num.toHex(estimateFeeBulk[1].overall_fee)
+            if (
+              !estimateFeeBulk[0].gas_consumed ||
+              !estimateFeeBulk[0].gas_price
+            ) {
+              throw Error(
+                "estimateFeeBulk[0].gas_consumed or estimateFeeBulk[0].gas_price is undefined",
+              )
+            }
 
-            maxADFee = argentMaxFee({
-              suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
-            })
-            maxTxFee = estimateFeeBulk[1].suggestedMaxFee.toString()
+            fees.deployment = {
+              feeTokenAddress: ETH_TOKEN_ADDRESS,
+              amount: num.toBigInt(estimateFeeBulk[0].gas_consumed),
+              pricePerUnit: num.toBigInt(estimateFeeBulk[0].gas_price),
+            }
+
+            if (
+              !estimateFeeBulk[1].gas_consumed ||
+              !estimateFeeBulk[1].gas_price
+            ) {
+              throw Error(
+                "estimateFeeBulk[1].gas_consumed or estimateFeeBulk[1].gas_price is undefined",
+              )
+            }
+
+            fees.transactions.amount = num.toBigInt(
+              estimateFeeBulk[1].gas_consumed,
+            )
+            fees.transactions.pricePerUnit = num.toBigInt(
+              estimateFeeBulk[1].gas_price,
+            )
           }
         } else {
           if ("estimateDeployFee" in selectedStarknetAccount) {
-            const { overall_fee, suggestedMaxFee } =
+            const { gas_consumed, gas_price } =
               await selectedStarknetAccount.estimateDeployFee({
                 classHash,
                 salt,
                 unique,
                 constructorCalldata,
               })
-            txFee = num.toHex(overall_fee)
-            maxTxFee = num.toHex(suggestedMaxFee)
+
+            if (!gas_consumed || !gas_price) {
+              throw Error("gas_consumed or gas_price is undefined")
+            }
+
+            fees.transactions.amount = num.toBigInt(gas_consumed)
+            fees.transactions.pricePerUnit = num.toBigInt(gas_price)
           } else {
             throw Error("estimateDeployFee not supported")
           }
         }
 
-        const suggestedMaxFee = argentMaxFee({ suggestedMaxFee: maxTxFee }) // This adds the 1.5x overhead. i.e: suggestedMaxFee = maxFee * 2x =  estimatedFee * 1.5x
-
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
-          data: {
-            amount: txFee,
-            suggestedMaxFee,
-            accountDeploymentFee,
-            maxADFee,
-          },
+          data: fees,
         })
       } catch (error) {
         console.log(error)
@@ -549,12 +456,12 @@ export const handleTransactionMessage: HandleMessage<
           chainId,
         })
 
-        const estimatedFee = getEstimatedFeeFromSimulation(result)
+        const estimatedFee = getEstimatedFeeFromBulkSimulation(result)
 
         let simulationWithFees = null
 
         if (result) {
-          await addEstimatedFees(estimatedFee, transactions)
+          await addEstimatedFee(estimatedFee, transactions)
           simulationWithFees = {
             simulation: result,
             feeEstimation: estimatedFee,

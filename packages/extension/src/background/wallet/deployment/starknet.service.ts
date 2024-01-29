@@ -1,4 +1,5 @@
 import {
+  Address,
   addressSchema,
   isAccountV5,
   isContractDeployed,
@@ -8,7 +9,6 @@ import {
   CallData,
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
-  EstimateFee,
   InvocationsDetails,
   hash,
 } from "starknet"
@@ -36,11 +36,11 @@ import {
   MULTISIG_DERIVATION_PATH,
   STANDARD_DERIVATION_PATH,
 } from "../../../shared/wallet.service"
+import { getStarkPair } from "../../keys/keyDerivation"
 import {
   getNextPathIndex,
   getPathForIndex,
-  getStarkPair,
-} from "../../keys/keyDerivation"
+} from "../../../shared/utils/derivationPath"
 import { getNonce, increaseStoredNonce } from "../../nonce"
 import { WalletAccountStarknetService } from "../account/starknet.service"
 import { WalletBackupService } from "../backup/backup.service"
@@ -51,9 +51,14 @@ import { PROXY_CONTRACT_CLASS_HASHES } from "../starknet.constants"
 import { IWalletDeploymentService } from "./interface"
 import { SessionError } from "../../../shared/errors/session"
 import { WalletError } from "../../../shared/errors/wallet"
-import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
+import {
+  ETH_TOKEN_ADDRESS,
+  STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
+} from "../../../shared/network/constants"
 import { AccountError } from "../../../shared/errors/account"
-import { argentMaxFee } from "../../../shared/utils/argentMaxFee"
+import { modifySnjsFeeOverhead } from "../../../shared/utils/argentMaxFee"
+import { EstimatedFee } from "../../../shared/transactionSimulation/fees/fees.model"
+import { estimatedFeeToMaxFeeTotal } from "../../../shared/transactionSimulation/utils"
 
 const { getSelectorFromName, calculateContractAddressFromHash } = hash
 
@@ -91,11 +96,12 @@ export class WalletDeploymentStarknetService
       throw new AccountError({ code: "CANNOT_DEPLOY_OLD_ACCOUNTS" })
     }
     const maxFee = transactionDetails?.maxFee
-      ? argentMaxFee({ suggestedMaxFee: transactionDetails?.maxFee })
-      : argentMaxFee({
-          suggestedMaxFee: (await this.getAccountDeploymentFee(walletAccount))
-            .suggestedMaxFee,
+      ? modifySnjsFeeOverhead({
+          suggestedMaxFee: transactionDetails.maxFee,
         })
+      : estimatedFeeToMaxFeeTotal(
+          await this.getAccountDeploymentFee(walletAccount),
+        )
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
       {
@@ -120,7 +126,8 @@ export class WalletDeploymentStarknetService
 
   public async getAccountDeploymentFee(
     walletAccount: WalletAccount,
-  ): Promise<EstimateFee> {
+    feeTokenAddress: Address = ETH_TOKEN_ADDRESS,
+  ): Promise<EstimatedFee> {
     const starknetAccount =
       await this.accountStarknetService.getStarknetAccount(walletAccount)
 
@@ -136,7 +143,22 @@ export class WalletDeploymentStarknetService
         code: "CANNOT_ESTIMATE_FEE_OLD_ACCOUNTS_DEPLOYMENT",
       })
     }
-    return starknetAccount.estimateAccountDeployFee(deployAccountPayload)
+    const { gas_consumed, gas_price } =
+      await starknetAccount.estimateAccountDeployFee(deployAccountPayload, {
+        skipValidate: true,
+      })
+
+    if (!gas_consumed || !gas_price) {
+      throw new AccountError({
+        code: "CANNOT_ESTIMATE_TRANSACTIONS",
+      })
+    }
+
+    return {
+      feeTokenAddress,
+      amount: gas_consumed,
+      pricePerUnit: gas_price,
+    }
   }
 
   public async redeployAccount(account: WalletAccount) {

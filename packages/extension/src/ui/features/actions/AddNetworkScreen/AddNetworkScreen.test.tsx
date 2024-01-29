@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 
 import { Network } from "../../../../shared/network"
 import { AddNetworkScreen, AddNetworkScreenProps } from "./AddNetworkScreen"
+import { ETH_TOKEN_ADDRESS } from "../../../../shared/network/constants"
 
 const network: Network = {
   id: "networkId",
@@ -11,6 +12,7 @@ const network: Network = {
   explorerUrl: "https://etherscan.io",
   blockExplorerUrl: "https://blockchair.com/ethereum",
   rpcUrl: "https://mainnet.infura.io/v3/123456-RPC",
+  possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
 }
 
 describe("AddNetworkScreen", () => {

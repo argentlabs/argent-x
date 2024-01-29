@@ -1,12 +1,14 @@
 import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useIsPreauthorized } from "../../../shared/preAuthorizations"
+import {
+  useIsPreauthorized,
+  useOriginatingPreAuthorizationHost,
+} from "../preAuthorizations/hooks"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { routes } from "../../routes"
 import { useAccountStatus } from "../accountTokens/useAccountStatus"
 import { usePrettyAccountBalance } from "../accountTokens/usePrettyAccountBalance"
-import { useOriginatingHost } from "../browser/useOriginatingHost"
 import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
 import { useMultisig } from "../multisig/multisig.state"
 import { Account } from "./Account"
@@ -14,6 +16,7 @@ import { AccountListScreenItem } from "./AccountListScreenItem"
 import { BoxProps } from "@chakra-ui/react"
 import { useIsDeprecatedTxV0 } from "./accountUpgradeCheck"
 import { clientAccountService } from "../../services/account"
+import { useAccountOwnerIsSelf } from "./useAccountOwner"
 
 interface AccountListScreenItemContainerProps
   extends Pick<BoxProps, "borderBottomRadius"> {
@@ -38,12 +41,13 @@ export const AccountListScreenItemContainer: FC<
 }) => {
   const prettyAccountBalance = usePrettyAccountBalance(account)
   const navigate = useNavigate()
-  const originatingHost = useOriginatingHost()
+  const originatingPreAuthorizationHost = useOriginatingPreAuthorizationHost()
   // TODO: should not be needed when data layer was restructered, as all properties can be considered real time at that point.
   const status = useAccountStatus(account, selectedAccount)
   // TODO: waiting for multisig refactor to use views and services
   const multisig = useMultisig(account)
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
+  const accountOwnerIsSelf = useAccountOwnerIsSelf(account)
   const isRemovedFromMultisig = useMemo(() => {
     if (multisig) {
       return !signerIsInMultisig
@@ -51,8 +55,10 @@ export const AccountListScreenItemContainer: FC<
     return false
   }, [multisig, signerIsInMultisig])
 
-  // TBD: this does not look wrong to me, but maybe a good example to think about how it should work
-  const isConnected = useIsPreauthorized(originatingHost || "", account)
+  const isConnected = useIsPreauthorized(
+    originatingPreAuthorizationHost,
+    account,
+  )
 
   const isDeprecated = useIsDeprecatedTxV0(account)
 
@@ -100,10 +106,11 @@ export const AccountListScreenItemContainer: FC<
       networkId={account.networkId}
       accountType={account.type}
       isShield={Boolean(account.guardian)}
+      isOwner={accountOwnerIsSelf}
       avatarOutlined={status.code === "CONNECTED"}
       deploying={status.code === "DEPLOYING"}
       upgrade={needsUpgrade}
-      connectedHost={isConnected ? originatingHost : undefined}
+      connectedHost={isConnected ? originatingPreAuthorizationHost : undefined}
       clickNavigateSettings={clickNavigateSettings}
       shouldDisplayGuardianBanner={shouldDisplayGuardianBanner}
       isDeprecated={isDeprecated}

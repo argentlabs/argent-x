@@ -1,12 +1,14 @@
 import {
   ARGENT_5_MINUTE_ESCAPE_TESTING_ACCOUNT_CLASS_HASH,
   BETTER_MULTICAL_ACCOUNT_CLASS_HASH,
-  FEE_TOKEN_ADDRESS_ETH,
+  ETH_TOKEN_ADDRESS,
+  STRK_TOKEN_ADDRESS,
   MULTICALL_CONTRACT_ADDRESS,
   MULTISIG_ACCOUNT_CLASS_HASH,
   PLUGIN_ACCOUNT_CLASS_HASH,
   STANDARD_ACCOUNT_CLASS_HASH,
   STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
+  TXV3_ACCOUNT_CLASS_HASH,
 } from "./constants"
 import type { Network, NetworkWithStatus } from "./type"
 import { getDefaultNetwork } from "./utils"
@@ -18,10 +20,12 @@ const DEV_ONLY_NETWORKS: Network[] = [
     chainId: "SN_GOERLI",
     rpcUrl: "https://cloud-dev.argent-api.com/v1/starknet/goerli/rpc/v0.6",
     accountClassHash: {
-      standard: STANDARD_ACCOUNT_CLASS_HASH,
+      standard: TXV3_ACCOUNT_CLASS_HASH,
     },
-    multicallAddress: MULTICALL_CONTRACT_ADDRESS,
-    feeTokenAddress: FEE_TOKEN_ADDRESS_ETH,
+    // multicallAddress: MULTICALL_CONTRACT_ADDRESS, // not defined on integration
+    possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS, STRK_TOKEN_ADDRESS],
+    explorerUrl: "https://integration.voyager.online",
+    readonly: true,
   },
 ]
 
@@ -53,7 +57,7 @@ export const defaultNetworks: Network[] = [
       multisig: MULTISIG_ACCOUNT_CLASS_HASH,
     },
     multicallAddress: MULTICALL_CONTRACT_ADDRESS,
-    feeTokenAddress: FEE_TOKEN_ADDRESS_ETH,
+    possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
     readonly: true,
   },
   {
@@ -73,7 +77,7 @@ export const defaultNetworks: Network[] = [
       multisig: MULTISIG_ACCOUNT_CLASS_HASH,
     },
     multicallAddress: MULTICALL_CONTRACT_ADDRESS,
-    feeTokenAddress: FEE_TOKEN_ADDRESS_ETH,
+    possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
     readonly: true,
   },
   ...(process.env.NODE_ENV === "development" ? DEV_ONLY_NETWORKS : []),
@@ -83,7 +87,7 @@ export const defaultNetworks: Network[] = [
     rpcUrl: "http://localhost:5050/rpc",
     explorerUrl: "https://devnet.starkscan.co",
     name: "Localhost 5050",
-    feeTokenAddress: FEE_TOKEN_ADDRESS_ETH,
+    possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
     accountClassHash: {
       standard: STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
     },

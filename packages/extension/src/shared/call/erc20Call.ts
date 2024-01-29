@@ -1,9 +1,7 @@
+import { normalizeAddress } from "@argent/shared"
 import { Call, constants, validateAndParseAddress } from "starknet"
 import { num, uint256 } from "starknet"
 
-import { normalizeAddress } from "../../ui/services/addresses"
-
-const { toBigInt } = num
 const { isUint256, uint256ToBN } = uint256
 
 export interface Erc20Call extends Call {

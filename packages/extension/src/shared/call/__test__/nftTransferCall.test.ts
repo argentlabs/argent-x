@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest"
 import {
   erc1155Transfer,
   erc721Transfer,
-} from "../../../ui/features/accountActivity/transform/transaction/__test__/__fixtures__/transaction-calls/goerli-alpha"
+} from "./__fixtures__/transaction-calls/goerli-alpha"
 import { NftTransferCall, parseNftTransferCall } from "../nftTransferCall"
 
 describe("nftTransferCall", () => {

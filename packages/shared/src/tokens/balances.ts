@@ -55,10 +55,6 @@ export const getTokens = async (): Promise<Token[]> => {
   return tokens as Token[]
 }
 
-export const getFeeToken = async (): Promise<Token | null> => {
-  return (tokens.find((t) => t.symbol === "ETH") as Token) || null
-}
-
 export const useToken = ({
   address,
   networkId,

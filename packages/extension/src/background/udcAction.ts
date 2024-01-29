@@ -12,13 +12,13 @@ import { ExtQueueItem } from "../shared/actionQueue/types"
 import { isAccountDeployed } from "./accountDeploy"
 import { analytics } from "./analytics"
 import { getNonce, increaseStoredNonce } from "./nonce"
-import { addTransaction } from "./transactions/store"
-import { checkTransactionHash } from "./transactions/transactionExecution"
-import { argentMaxFee } from "../shared/utils/argentMaxFee"
+import { addTransaction } from "../shared/transactions/store"
+import { modifySnjsFeeOverhead } from "../shared/utils/argentMaxFee"
 import { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
 import { WalletError } from "../shared/errors/wallet"
 import { UdcError } from "../shared/errors/udc"
+import { checkTransactionHash } from "../shared/transactions/utils"
 
 const { UDC } = constants
 
@@ -84,10 +84,10 @@ export const udcDeclareContract = async (
         { skipValidate: true },
       )
 
-      maxADFee = argentMaxFee({
+      maxADFee = modifySnjsFeeOverhead({
         suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
       })
-      maxDeclareFee = argentMaxFee({
+      maxDeclareFee = modifySnjsFeeOverhead({
         suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
       })
     }
@@ -128,7 +128,7 @@ export const udcDeclareContract = async (
           nonce: declareNonce,
         },
       )
-      maxDeclareFee = argentMaxFee({ suggestedMaxFee })
+      maxDeclareFee = modifySnjsFeeOverhead({ suggestedMaxFee })
     } else {
       throw new UdcError({ code: "NO_STARKNET_DECLARE_FEE" })
     }
@@ -219,10 +219,10 @@ export const udcDeployContract = async (
         { skipValidate: true },
       )
 
-      maxADFee = argentMaxFee({
+      maxADFee = modifySnjsFeeOverhead({
         suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
       })
-      maxDeployFee = argentMaxFee({
+      maxDeployFee = modifySnjsFeeOverhead({
         suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
       })
     }
@@ -268,7 +268,7 @@ export const udcDeployContract = async (
           nonce: deployNonce,
         },
       )
-      maxDeployFee = argentMaxFee({ suggestedMaxFee })
+      maxDeployFee = modifySnjsFeeOverhead({ suggestedMaxFee })
     } else {
       throw new UdcError({ code: "NO_STARKNET_DECLARE_FEE" })
     }

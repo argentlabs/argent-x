@@ -1,22 +1,25 @@
 import { z } from "zod"
 import { ChromeRepository } from "../../storage/__new/chrome"
-import { Call } from "starknet"
+import { addressSchema } from "@argent/shared"
 
-export const estimatedFeesSchema = z.object({
-  amount: z.string(),
-  suggestedMaxFee: z.string(),
-  accountDeploymentFee: z.string().optional(),
-  maxADFee: z.string().optional(),
+export const estimatedFeeSchema = z.object({
+  feeTokenAddress: addressSchema,
+  amount: z.bigint(),
+  pricePerUnit: z.bigint(),
+  watermarkedMaxFee: z.bigint().optional(), // TODO: Remove this once we have the watermark fee in the amount*pricePerUnit product
 })
 
-// export const EstimatedFeesEnrichedSchema = EstimatedFeesWithTxSchema.extend({
-//   timestamp: z.number(),
-// })
+export type EstimatedFee = z.infer<typeof estimatedFeeSchema>
+
+export const estimatedFeesSchema = z.object({
+  deployment: estimatedFeeSchema.optional(),
+  transactions: estimatedFeeSchema,
+})
 
 export type EstimatedFees = z.infer<typeof estimatedFeesSchema>
 
 export interface EstimatedFeesEnriched extends EstimatedFees {
-  transactions: Call[] // only use array as it is easier to compare
+  id: string
   timestamp: number
 }
 

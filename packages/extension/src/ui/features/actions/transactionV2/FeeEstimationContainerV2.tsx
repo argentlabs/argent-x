@@ -3,12 +3,19 @@ import { FC, useEffect, useMemo } from "react"
 
 import { useAccount } from "../../accounts/accounts.state"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { useNetworkFeeToken } from "../../accountTokens/tokens.state"
-import { useFeeTokenBalance } from "../../accountTokens/useFeeTokenBalance"
 import { FeeEstimation } from "../feeEstimation/FeeEstimation"
 import { ParsedFeeError, getParsedFeeError } from "../feeEstimation/feeError"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+
+import { useTokenBalance } from "../../accountTokens/tokens.state"
+import { Address } from "@argent/shared"
+import {
+  estimatedFeesToMaxFeeTotal,
+  estimatedFeesToTotal,
+} from "../../../../shared/transactionSimulation/utils"
+
 export interface FeeEstimationContainerV2Props {
+  feeTokenAddress: Address
   onChange?: (fee: bigint) => void
   onErrorChange?: (error: boolean) => void
   onFeeErrorChange?: (error: boolean) => void
@@ -23,6 +30,7 @@ export interface FeeEstimationContainerV2Props {
 }
 
 export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
+  feeTokenAddress,
   accountAddress,
   networkId,
   onErrorChange,
@@ -37,24 +45,24 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
     throw new Error("Account not found")
   }
 
-  const { feeTokenBalance } = useFeeTokenBalance(account)
+  const feeToken = useTokenBalance(feeTokenAddress, account)
 
   const enoughBalance = useMemo(
     () =>
       Boolean(
-        feeTokenBalance && feeTokenBalance >= BigInt(fee.suggestedMaxFee),
+        feeToken?.balance && feeToken?.balance >= estimatedFeesToTotal(fee),
       ),
-    [feeTokenBalance, fee.suggestedMaxFee],
+    [feeToken?.balance, fee],
   )
 
   const showFeeError = Boolean(
-    fee && typeof feeTokenBalance === "bigint" && !enoughBalance,
+    fee && typeof feeToken?.balance === "bigint" && !enoughBalance,
   )
   const showEstimateError =
     Boolean(error) || Boolean(transactionSimulationFeeError)
   const showError = showFeeError || showEstimateError
 
-  const hasError = !fee || !feeTokenBalance || !enoughBalance || showError
+  const hasError = !fee || !enoughBalance || showError
   useEffect(() => {
     onErrorChange?.(hasError)
   }, [hasError, onErrorChange])
@@ -76,15 +84,14 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
       parsedFeeEstimationError = getParsedFeeError(error)
     }
   }
-  const feeToken = useNetworkFeeToken(networkId)
 
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken || undefined,
-    fee?.amount,
+    estimatedFeesToTotal(fee),
   )
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     feeToken || undefined,
-    fee.suggestedMaxFee,
+    estimatedFeesToMaxFeeTotal(fee),
   )
 
   return (
@@ -94,7 +101,6 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
           amountCurrencyValue={amountCurrencyValue}
           fee={fee}
           feeToken={feeToken}
-          feeTokenBalance={feeTokenBalance}
           parsedFeeEstimationError={parsedFeeEstimationError}
           showError={showError}
           showEstimateError={showEstimateError}

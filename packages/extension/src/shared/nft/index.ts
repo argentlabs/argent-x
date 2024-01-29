@@ -7,6 +7,7 @@ import {
 } from "../storage/__new/repositories/nft"
 import { NFTService } from "./implementation"
 import { ARGENT_API_BASE_URL } from "../api/constants"
+import { settingsStore } from "../settings/store"
 
 export const argentNftService = new ArgentBackendNftService(
   ARGENT_API_BASE_URL,
@@ -24,4 +25,5 @@ export const nftService = new NFTService(
   nftsCollectionsRepository,
   nftsContractsRepository,
   argentNftService,
+  settingsStore,
 )

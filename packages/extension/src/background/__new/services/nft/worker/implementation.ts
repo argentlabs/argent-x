@@ -10,7 +10,7 @@ import { IScheduleService } from "../../../../../shared/schedule/interface"
 import { WalletStorageProps } from "../../../../../shared/wallet/walletStore"
 import { ArrayStorage, KeyValueStorage } from "../../../../../shared/storage"
 import { Transaction } from "../../../../../shared/transactions"
-import { transactionSucceeded } from "../../../../../shared/utils/transactionSucceeded"
+import { hasSuccessfulTransaction } from "../../../../../shared/utils/transactionSucceeded"
 import { everyWhenOpen } from "../../worker/schedule/decorators"
 import { pipe } from "../../worker/schedule/pipe"
 import { IDebounceService } from "../../../../../shared/debounce"
@@ -43,7 +43,7 @@ export class NftsWorker {
       if (!changeSet?.newValue) {
         return
       }
-      const hasSuccessTx = transactionSucceeded(
+      const hasSuccessTx = hasSuccessfulTransaction(
         changeSet.newValue,
         changeSet?.oldValue,
       )

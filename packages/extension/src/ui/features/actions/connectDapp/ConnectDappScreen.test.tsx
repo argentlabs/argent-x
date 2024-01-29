@@ -1,13 +1,9 @@
-import { act, screen } from "@testing-library/react"
+import { act, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { renderWithLegacyProviders } from "../../../test/utils"
 import { accounts } from "../__fixtures__"
 import { ConnectDappScreen, ConnectDappScreenProps } from "./ConnectDappScreen"
-
-/**
- * @vitest-environment jsdom
- */
 
 describe("ConnectDappScreen", () => {
   const onConnect = vi.fn()
@@ -24,8 +20,10 @@ describe("ConnectDappScreen", () => {
     onSelectedAccountChange,
   }
 
-  beforeEach(() => {
-    renderWithLegacyProviders(<ConnectDappScreen {...props} />)
+  beforeEach(async () => {
+    await act(async () => {
+      return renderWithLegacyProviders(<ConnectDappScreen {...props} />)
+    })
   })
 
   it("should render dapp information", () => {
@@ -37,7 +35,9 @@ describe("ConnectDappScreen", () => {
 
   it("should call onConnect when Continue button is clicked", async () => {
     await act(async () => {
-      await userEvent.click(screen.getByText("Continue"))
+      const continueButton = screen.getByText("Continue")
+      await waitFor(() => expect(continueButton).toBeEnabled())
+      await userEvent.click(continueButton)
     })
     expect(onConnect).toHaveBeenCalled()
   })
@@ -46,6 +46,6 @@ describe("ConnectDappScreen", () => {
     await act(async () => {
       await userEvent.click(screen.getByText("Disconnect"))
     })
-    expect(onConnect).toHaveBeenCalled()
+    expect(onDisconnect).toHaveBeenCalled()
   })
 })

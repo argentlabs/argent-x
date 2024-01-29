@@ -1,4 +1,4 @@
-import { ensureArray } from "@argent/shared"
+import { ensureArray } from "./ensureArray"
 import {
   Abi,
   Account,
@@ -144,10 +144,15 @@ export class OffchainSessionAccount
       dappSignature,
     )
 
-    return this.account?.execute(
-      transactionsWithSession,
-      abis,
-      transactionsDetail,
-    )
+    /*  
+      need to use the same values for transactionDetails (nonce, maxFee, version)
+      otherwise the cosign would fail most of the times 
+      since maxFee could change in a very short time if calculated in both this package and in webwallet
+    */
+    return this.account?.execute(transactionsWithSession, abis, {
+      nonce,
+      maxFee,
+      version,
+    })
   }
 }

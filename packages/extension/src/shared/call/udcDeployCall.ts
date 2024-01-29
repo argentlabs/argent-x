@@ -1,6 +1,5 @@
+import { isEqualAddress } from "@argent/shared"
 import { Call, constants, validateAndParseAddress } from "starknet"
-
-import { isEqualAddress } from "../../ui/services/addresses"
 
 const { UDC } = constants
 

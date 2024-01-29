@@ -18,6 +18,15 @@ export class AccountService implements IAccountService {
     return this.accountRepo.get(selector)
   }
 
+  async getFromBaseWalletAccounts(baseWalletAccounts: BaseWalletAccount[]) {
+    const accounts = await this.get((account) => {
+      return baseWalletAccounts.some((baseWalletAccount) =>
+        accountsEqual(account, baseWalletAccount),
+      )
+    })
+    return accounts
+  }
+
   async upsert(account: AllowArray<WalletAccount>): Promise<void> {
     await this.accountRepo.upsert(account)
   }

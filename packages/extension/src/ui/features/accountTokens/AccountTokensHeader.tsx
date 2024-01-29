@@ -35,7 +35,7 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
           borderRadius="base"
           mb="1.5"
         >
-          <B3 color="neutrals.200">
+          <B3 data-testid="confirmations" color="neutrals.200">
             {multisig.threshold}/{multisig.signers.length} multisig
           </B3>
         </Center>

@@ -10,8 +10,8 @@ import { Button, Flex } from "@chakra-ui/react"
 import copy from "copy-to-clipboard"
 import { FC, useCallback, useRef } from "react"
 
-import { formatFullAddress, normalizeAddress } from "../../services/addresses"
 import { QrCode } from "./QrCode"
+import { formatFullAddress, normalizeAddress } from "@argent/shared"
 
 const { CopyIcon } = icons
 

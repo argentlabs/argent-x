@@ -1,4 +1,4 @@
-import { addressOrEmptyUndefinedSchema } from "@argent/shared"
+import { addressOrEmptyUndefinedSchema, addressSchema } from "@argent/shared"
 import { z } from "zod"
 
 const REGEX_HEXSTRING = /^0x[a-f0-9]+$/i
@@ -24,7 +24,7 @@ export const networkSchema = baseNetworkSchema.extend({
         "chain id must be hexadecimal string, uppercase alphanumeric or underscore, like 'SN_GOERLI'",
     }),
   rpcUrl: z.string().url("RPC url must be a valid URL"),
-  feeTokenAddress: addressOrEmptyUndefinedSchema,
+  possibleFeeTokenAddresses: z.array(addressSchema).nonempty(), // z.array(addressSchema).min(1) but with better type
   accountImplementation: z.optional(
     z.string().regex(REGEX_HEXSTRING, {
       message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,

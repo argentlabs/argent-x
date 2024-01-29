@@ -1,4 +1,5 @@
 import { Network } from "../src/shared/network"
+import { ETH_TOKEN_ADDRESS } from "../src/shared/network/constants"
 import {
   ArgentAccountType,
   WalletAccount,
@@ -9,6 +10,7 @@ const defaultNetwork: Network = {
   id: "localhost",
   name: "localhostNetwork",
   chainId: "1",
+  possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
   rpcUrl: "rpcUrl",
 }
 const defaultSigner: WalletAccountSigner = {

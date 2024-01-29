@@ -26,7 +26,7 @@ const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
   </Box>
 )
 
-const EmptyCollections: FC<{ networkId: string }> = ({ networkId }) => (
+const EmptyCollections: FC<{ networkId: string }> = () => (
   <Flex
     direction="column"
     flex={1}

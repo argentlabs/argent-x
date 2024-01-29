@@ -1,31 +1,21 @@
-import { Button, CellStack, L2, icons } from "@argent/ui"
-import {
-  ALLOWED_PRICE_IMPACT_HIGH,
-  Currency,
-  CurrencyAmount,
-  Field,
-  JSBI,
-  SupportedNetworks,
-  USDC,
-  computeTradePriceBreakdown,
-  maxAmountSpend,
-  useDerivedSwapInfo,
-  useSwapActionHandlers,
-  useSwapCallback,
-  useSwapState,
-  useUserState,
-} from "@argent/x-swap"
-import { Box, Flex, IconButton, chakra, useDisclosure } from "@chakra-ui/react"
-import { keyframes } from "@chakra-ui/react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { Button, CellStack, icons } from "@argent/ui"
+import { Box, Flex, IconButton, chakra, keyframes } from "@chakra-ui/react"
+import { useCallback, useMemo, useState } from "react"
 
-import { analytics } from "../../../background/analytics"
-import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { HighPriceImpactModal } from "./ui/HighPriceImpactModal"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
-import { SwapWarning } from "./ui/SwapWarning"
-import { tokenService } from "../../services/tokens"
+import { SwapInputError, useSwapInfo } from "./hooks/useSwapInfo"
+import { bigDecimal } from "@argent/shared"
+import { Field, useSwapState } from "./state/fields"
+import { useSwapActionHandlers } from "./hooks/useSwapActionHandler"
+import { Token } from "../../../shared/token/__new/types/token.model"
+import { maxAmountSpendFromTokenBalance } from "./utils"
+import { SwapTradeLoading } from "./ui/SwapTradeLoading"
+import { useSwapCallback } from "./hooks/useSwapCallback"
+import { analytics } from "../../services/analytics"
+import { useAppState } from "../../app.state"
+import { useUserState } from "./state/user"
+import { SwapQuoteRefresh } from "./ui/SwapQuoteRefresh"
 
 const { SwitchDirectionIcon } = icons
 
@@ -36,6 +26,7 @@ const SwapContainer = chakra(CellStack, {
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
+    py: "8px",
   },
 })
 
@@ -67,157 +58,152 @@ const StyledSwitchDirectionIcon = chakra(SwitchDirectionIcon, {
   },
 })
 
-const spin = keyframes`
+export const spin = keyframes`
   from { transform: translate(-50%, -50%) rotate(0deg); }
   to { transform: translate(-50%, -50%) rotate(180deg); }
 `
 
 const Swap = () => {
   const {
-    currencies,
+    tokens,
+    tokenBalances,
     trade,
-    parsedAmount,
-    currencyBalances,
-    inputError: swapInputError,
     tradeLoading,
-  } = useDerivedSwapInfo()
-  const { id: networkId } = useCurrentNetwork()
-  const { independentField, typedValue, switchCurrencies } = useSwapState()
-  const { onCurrencySelection, onUserInput } = useSwapActionHandlers()
-  const [rotate, setRotate] = useState(false)
+    parsedAmount,
+    inputError: swapInputError,
+  } = useSwapInfo()
+  const { independentField, typedValue } = useSwapState()
+  const { onTokenSelection, onUserInput, onSwitchTokens } =
+    useSwapActionHandlers()
   const { userSlippageTolerance } = useUserState()
+  const { switcherNetworkId: networkId } = useAppState()
 
-  const {
-    isOpen: isPISopen,
-    onOpen: onPISopen,
-    onClose: onPISclose,
-  } = useDisclosure()
+  const [rotate, setRotate] = useState(false)
+  const [swapUnavailable, setSwapUnavailable] = useState<boolean>(false)
 
-  const parsedAmounts = {
-    [Field.INPUT]:
-      independentField === Field.INPUT ? parsedAmount : trade?.inputAmount,
-    [Field.OUTPUT]:
-      independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
-  }
+  const payToken = tokens[Field.PAY]
+  const receiveToken = tokens[Field.RECEIVE]
+
+  const parsedAmounts = useMemo(
+    () => ({
+      [Field.PAY]:
+        independentField === Field.PAY
+          ? parsedAmount
+          : BigInt(trade?.payAmount ?? 0),
+      [Field.RECEIVE]:
+        independentField === Field.RECEIVE
+          ? parsedAmount
+          : BigInt(trade?.receiveAmount ?? 0),
+    }),
+    [independentField, parsedAmount, trade],
+  )
 
   const handleTypeInput = useCallback(
     (value: string) => {
-      onUserInput(Field.INPUT, value)
+      onUserInput(Field.PAY, value)
     },
     [onUserInput],
   )
   const handleTypeOutput = useCallback(
     (value: string) => {
-      onUserInput(Field.OUTPUT, value)
+      onUserInput(Field.RECEIVE, value)
     },
     [onUserInput],
   )
 
   const dependentField: Field =
-    independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
+    independentField === Field.PAY ? Field.RECEIVE : Field.PAY
 
-  const formattedAmounts = {
-    [independentField]: typedValue,
-    [dependentField]: parsedAmounts[dependentField]?.toSignificant(6) ?? "",
-  }
-
-  const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(
-    currencyBalances[Field.INPUT],
+  const formattedAmounts = useMemo(
+    () => ({
+      [independentField]: typedValue,
+      [dependentField]: bigDecimal.formatUnits({
+        value: parsedAmounts[dependentField] ?? 0n,
+        decimals: tokens[dependentField]?.decimals ?? 18,
+      }),
+    }),
+    [dependentField, independentField, parsedAmounts, typedValue, tokens],
   )
 
+  const payTokenBalance = tokenBalances[Field.PAY]
+  const payAmount = parsedAmounts[Field.PAY]
+
+  const maxAmountInput = maxAmountSpendFromTokenBalance(payTokenBalance)
+
+  const hasZeroBalance = !payTokenBalance || payTokenBalance.balance === 0n
+
   const atMaxAmountInput = Boolean(
-    maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput),
+    maxAmountInput && payAmount && payAmount === maxAmountInput,
   )
 
   const handleInputSelect = useCallback(
-    (inputCurrency: Currency) => {
-      onCurrencySelection(Field.INPUT, inputCurrency)
+    (payToken: Token) => {
+      onTokenSelection(Field.PAY, payToken)
       handleTypeInput("")
     },
-    [handleTypeInput, onCurrencySelection],
+    [handleTypeInput, onTokenSelection],
   )
 
   const handleMaxInput = useCallback(() => {
-    maxAmountInput && onUserInput(Field.INPUT, maxAmountInput.toExact())
-  }, [maxAmountInput, onUserInput])
+    maxAmountInput &&
+      payToken?.decimals &&
+      onUserInput(
+        Field.PAY,
+        bigDecimal.formatUnits({
+          value: maxAmountInput,
+          decimals: payToken.decimals,
+        }),
+      )
+  }, [maxAmountInput, onUserInput, payToken?.decimals])
 
   const handleOutputSelect = useCallback(
-    (outputCurrency: Currency) =>
-      onCurrencySelection(Field.OUTPUT, outputCurrency),
-    [onCurrencySelection],
+    (receiveToken: Token) => onTokenSelection(Field.RECEIVE, receiveToken),
+    [onTokenSelection],
   )
 
   const noRoute = !trade?.route
 
+  const independentFieldAmount = parsedAmounts[independentField]
+
   const userHasSpecifiedInputOutput = Boolean(
-    currencies[Field.INPUT] &&
-      currencies[Field.OUTPUT] &&
-      parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0)),
+    payToken &&
+      receiveToken &&
+      independentFieldAmount &&
+      independentFieldAmount > 0n,
   )
 
   const insufficientLiquidityError =
     !tradeLoading && userHasSpecifiedInputOutput && noRoute
 
-  const isValid = !swapInputError && !insufficientLiquidityError
+  const isValid =
+    !swapInputError && !insufficientLiquidityError && !swapUnavailable
 
-  const { callback: swapCallback, error: swapCallbackError } = useSwapCallback(
-    trade,
-    userSlippageTolerance,
-  )
+  const swapCallback = useSwapCallback(trade, userSlippageTolerance)
 
-  const handleSwap = useCallback(async () => {
-    if (swapCallbackError) {
-      console.error(swapCallbackError)
-      return
-    }
-
+  const handleSwap = useCallback(() => {
     if (swapCallback) {
-      const swapCalls = swapCallback()
       void analytics.track("swapInitiated", {
         networkId,
-        pair:
-          trade?.inputAmount.currency.symbol +
-          "-" +
-          trade?.outputAmount.currency.symbol,
+        pair: payToken?.symbol + "-" + receiveToken?.symbol,
       })
-      await tokenService.swap(
-        swapCalls,
-        `Swap ${trade?.inputAmount.currency.symbol} to ${trade?.outputAmount.currency.symbol}`,
-      )
-
-      onUserInput(Field.INPUT, "")
+      return swapCallback()
+        .then(() => {
+          onUserInput(Field.PAY, "")
+        })
+        .catch(() => {
+          setSwapUnavailable(true)
+        })
     }
-  }, [
-    networkId,
-    onUserInput,
-    swapCallback,
-    swapCallbackError,
-    trade?.inputAmount.currency.symbol,
-    trade?.outputAmount.currency.symbol,
-  ])
+  }, [swapCallback, onUserInput, payToken, receiveToken, networkId])
 
-  useEffect(() => {
-    onCurrencySelection(
-      Field.OUTPUT,
-      networkId === SupportedNetworks.MAINNET
-        ? USDC[SupportedNetworks.MAINNET]
-        : USDC[SupportedNetworks.TESTNET],
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networkId])
-
-  const { priceImpactWithoutFee: priceImpact } = useMemo(
-    () => computeTradePriceBreakdown(trade),
-    [trade],
+  const showMaxButton = useMemo(
+    () => !atMaxAmountInput && !formattedAmounts[Field.PAY] && !hasZeroBalance,
+    [atMaxAmountInput, formattedAmounts, hasZeroBalance],
   )
-
-  const isPriceImpactHigh = useMemo(() => {
-    return priceImpact && !priceImpact.lessThan(ALLOWED_PRICE_IMPACT_HIGH)
-  }, [priceImpact])
 
   return (
     <>
-      <SwapContainer>
+      <SwapContainer data-testid="swap-container">
         <Flex
           position="relative"
           flexDirection="column"
@@ -227,26 +213,26 @@ const Swap = () => {
           <SwapInputPanel
             type="pay"
             id="swap-input-pay-panel"
-            currency={currencies[Field.INPUT]}
-            value={formattedAmounts[Field.INPUT]}
+            token={payToken}
+            value={formattedAmounts[Field.PAY]}
             onUserInput={handleTypeInput}
-            onCurrencySelect={handleInputSelect}
-            showMaxButton={!atMaxAmountInput && !formattedAmounts[Field.INPUT]}
+            onTokenSelect={handleInputSelect}
+            showMaxButton={showMaxButton}
             onMax={handleMaxInput}
-            otherCurrency={currencies[Field.OUTPUT]}
-            currentBalance={currencyBalances[Field.INPUT]}
+            otherToken={receiveToken}
+            currentBalance={payTokenBalance}
             tradeLoading={tradeLoading}
-            insufficientBalance={!isValid && !!formattedAmounts[Field.INPUT]}
+            insufficientBalance={!isValid && !!formattedAmounts[Field.PAY]}
           />
           <SwapInputPanel
             type="receive"
             id="swap-input-receive-panel"
-            currency={currencies[Field.OUTPUT]}
-            value={formattedAmounts[Field.OUTPUT]}
+            token={receiveToken}
+            value={formattedAmounts[Field.RECEIVE]}
             onUserInput={handleTypeOutput}
-            onCurrencySelect={handleOutputSelect}
-            otherCurrency={currencies[Field.INPUT]}
-            currentBalance={currencyBalances[Field.OUTPUT]}
+            onTokenSelect={handleOutputSelect}
+            otherToken={payToken}
+            currentBalance={tokenBalances[Field.RECEIVE]}
             tradeLoading={tradeLoading}
           />
           <SwitchDirectionButton
@@ -256,81 +242,69 @@ const Swap = () => {
             onClick={() => {
               setRotate(true)
               setTimeout(() => setRotate(false), 150)
-              switchCurrencies()
+              onSwitchTokens()
             }}
           />
         </Flex>
 
-        {trade && (
+        {!trade && !swapInputError && tradeLoading && <SwapTradeLoading />}
+
+        {trade && isValid && (
           <SwapPricesInfo
-            currencyIn={currencies[Field.INPUT]}
-            currencyOut={currencies[Field.OUTPUT]}
+            tokenIn={payToken}
+            tokenOut={receiveToken}
             trade={trade}
-            priceImpact={priceImpact}
-            isPriceImpactHigh={isPriceImpactHigh}
           />
         )}
 
-        <L2
-          textAlign="center"
-          mt="4"
-          as={"a"}
-          rounded={"lg"}
-          color={"neutrals.500"}
-          href="https://jediswap.xyz/"
-          title="JediSwap"
-          target="_blank"
-          _hover={{
-            textDecoration: "underline",
-          }}
-        >
-          Powered by JediSwap
-        </L2>
+        {isValid && (
+          <SwapQuoteRefresh
+            trade={trade}
+            tradeLoading={tradeLoading}
+            tradeError={swapInputError}
+          />
+        )}
       </SwapContainer>
       <Flex flex={1} />
       <Box mx="4">
         {isValid ? (
           <Button
-            isLoading={tradeLoading}
             w="100%"
             bg="primary.500"
-            mb="6"
-            disabled={
-              !formattedAmounts[Field.INPUT] || !formattedAmounts[Field.OUTPUT]
+            mb="3"
+            isDisabled={
+              !formattedAmounts[Field.PAY] ||
+              !formattedAmounts[Field.RECEIVE] ||
+              tradeLoading
             }
-            onClick={() => {
-              isPriceImpactHigh ? onPISopen() : handleSwap()
-            }}
+            onClick={handleSwap}
           >
             Review swap
           </Button>
         ) : (
           <Button
-            isLoading={tradeLoading}
             w="100%"
-            bg={swapInputError ? "primary.500" : "error.500"}
-            mb="6"
-            disabled
+            bg={
+              swapInputError === SwapInputError.NO_AMOUNT
+                ? "primary.500"
+                : "error.500"
+            }
+            mb="3"
+            isDisabled
+            data-testid="swap-error-button"
           >
             {swapInputError ? (
               <>{swapInputError}</>
             ) : insufficientLiquidityError ? (
               <>{insufficientLiquidityError}</>
+            ) : swapUnavailable ? (
+              <>Swap currently unavailable</>
             ) : (
               <>Unknown Error</>
             )}
           </Button>
         )}
       </Box>
-      <SwapWarning />
-
-      {isPISopen && (
-        <HighPriceImpactModal
-          isOpen={isPISopen}
-          onClose={onPISclose}
-          onAccept={handleSwap}
-        />
-      )}
     </>
   )
 }

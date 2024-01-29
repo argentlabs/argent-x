@@ -1,11 +1,16 @@
 import { PublicRpcNode } from "./type"
 
-export const FEE_TOKEN_ADDRESS_ETH =
+export const ETH_TOKEN_ADDRESS =
   "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+export const STRK_TOKEN_ADDRESS =
+  "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
 
 // This should always be the latest. If you need to use the old or custom one, don't use this constant.
 export const STANDARD_ACCOUNT_CLASS_HASH =
   "0x1a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003"
+
+export const TXV3_ACCOUNT_CLASS_HASH =
+  "0x028463df0e5e765507ae51f9e67d6ae36c7e5af793424eccc9bc22ad705fc09d"
 
 export const STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH =
   "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"

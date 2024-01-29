@@ -1,9 +1,9 @@
 import { memoize } from "lodash-es"
-import { useArrayStorage } from "../../../shared/storage/hooks"
+import { useArrayStorage } from "../../hooks/useStorage"
 import { Transaction } from "../../../shared/transactions"
-import { transactionsStore } from "../../../background/transactions/store"
+import { transactionsStore } from "../../../shared/transactions/store"
 import { useMemo } from "react"
-import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
+import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 type UseTransactionsOnNetwork = (networkId?: string) => {
   transactions: Transaction[]
@@ -29,12 +29,10 @@ export const useUpgradeTransactionsOnNetwork: UseTransactionsOnNetwork = (
     [transactions],
   )
 
-  const pendingTransactions = sortedTransactions.filter(
-    ({ finalityStatus, executionStatus, meta }) =>
-      finalityStatus === TransactionFinalityStatus.RECEIVED &&
-      executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
-      meta?.isUpgrade,
-  )
+  const pendingTransactions = sortedTransactions.filter((transaction) => {
+    const { finality_status } = getTransactionStatus(transaction)
+    return finality_status === "RECEIVED" && transaction.meta?.isUpgrade
+  })
 
   return { transactions, pendingTransactions }
 }

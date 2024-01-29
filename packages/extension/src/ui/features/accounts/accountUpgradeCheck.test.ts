@@ -6,7 +6,10 @@ import {
 import { WalletAccount } from "../../../shared/wallet.model"
 import { Network } from "../../../shared/network"
 import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
-import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
+import {
+  ETH_TOKEN_ADDRESS,
+  STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
+} from "../../../shared/network/constants"
 import { getMockNetwork } from "../../../../test/network.mock"
 
 describe("accountUpgradeCheck", () => {
@@ -32,6 +35,7 @@ describe("accountUpgradeCheck", () => {
         standardCairo0: STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
         // ... other properties if needed
       },
+      possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
     })
   })
 

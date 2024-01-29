@@ -44,4 +44,14 @@ export default class Activity extends Navigation {
     const loc = await this.page.locator("button[data-tx-hash]").all()
     return Promise.all(loc.map((el) => el.getAttribute("data-tx-hash")))
   }
+
+  async getLastTxHash() {
+    await this.menuActivityActive.isVisible().then(async (visible) => {
+      if (!visible) {
+        await this.menuActivity.click()
+      }
+    })
+    const txHashs = await this.activityTxHashs()
+    return txHashs[0]
+  }
 }

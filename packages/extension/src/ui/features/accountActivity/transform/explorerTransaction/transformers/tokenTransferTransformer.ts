@@ -1,4 +1,4 @@
-import { isEqualAddress } from "../../../../../services/addresses"
+import { isEqualAddress } from "@argent/shared"
 import { TokenTransferTransaction } from "../../type"
 import { getParameter } from "../getParameter"
 import { IExplorerTransactionTransformer } from "./type"

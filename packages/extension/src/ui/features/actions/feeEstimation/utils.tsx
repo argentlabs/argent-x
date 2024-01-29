@@ -2,17 +2,19 @@ import { bigDecimal, useConditionallyEnabledSWR } from "@argent/shared"
 import { Call, UniversalDeployerContractPayload } from "starknet"
 import useSWR from "swr"
 
-import { DeployAccountEstimateFeeResponse } from "../../../../shared/messages/TransactionMessage"
-import { DeclareContract } from "../../../../shared/udc/type"
+import { DeclareContract } from "../../../../shared/udc/schema"
 import { ErrorObject } from "../../../../shared/utils/error"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import {
   getAccountDeploymentEstimatedFee,
   getDeclareContractEstimatedFee,
   getDeployContractEstimatedFee,
-  getEstimatedFeeFromSequencer,
+  getEstimatedFee,
 } from "../../../services/backgroundTransactions"
-import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+import {
+  EstimatedFee,
+  EstimatedFees,
+} from "../../../../shared/transactionSimulation/fees/fees.model"
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
 import { RefreshInterval } from "../../../../shared/config"
 
@@ -21,8 +23,9 @@ interface UseMaxFeeEstimationReturnProps {
   error: ErrorObject | undefined
 }
 export const useMaxFeeEstimation = (
-  transactions: Call | Call[],
   actionHash: string,
+  account: BaseWalletAccount,
+  transactions: Call | Call[],
   transactionSimulation?: ApiTransactionBulkSimulationResponse,
   isSimulationLoading?: boolean,
 ): UseMaxFeeEstimationReturnProps => {
@@ -30,7 +33,7 @@ export const useMaxFeeEstimation = (
     !isSimulationLoading &&
       (!transactionSimulation || transactionSimulation.length === 0),
     [actionHash, "feeEstimation"],
-    () => transactions && getEstimatedFeeFromSequencer(transactions),
+    () => transactions && getEstimatedFee(transactions, account),
     {
       suspense: false,
       refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
@@ -41,7 +44,7 @@ export const useMaxFeeEstimation = (
 }
 
 interface UseMaxAccountDeploymentFeeEstimationReturnProps {
-  fee: DeployAccountEstimateFeeResponse | undefined
+  fee: EstimatedFee | undefined
   error: ErrorObject | undefined
 }
 

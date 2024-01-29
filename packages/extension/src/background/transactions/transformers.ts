@@ -10,6 +10,8 @@ export const mapVoyagerTransactionToTransaction = (
   hash: transaction.hash,
   account,
   meta,
-  finalityStatus: transaction.status as any,
+  status: {
+    finality_status: transaction.status as any,
+  },
   timestamp: transaction.timestamp,
 })

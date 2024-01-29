@@ -1,5 +1,6 @@
+import { includesAddress } from "@argent/shared"
+
 import untypedKnownDapps from "../assets/known-dapps.json"
-import { isEqualAddress } from "../ui/services/addresses"
 
 export interface KnownDapp {
   /** a unique internal id for this dapp e.g. mydapp-example-xyz */
@@ -21,10 +22,6 @@ export interface KnownDapp {
 const knownDapps: KnownDapp[] = untypedKnownDapps
 
 export { knownDapps }
-
-export const includesAddress = (needle: string, haystack: string[]) => {
-  return !!haystack.find((value) => isEqualAddress(value, needle))
-}
 
 export const isKnownDappForContractAddress = (
   address: string,

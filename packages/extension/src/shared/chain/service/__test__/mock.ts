@@ -16,7 +16,7 @@ export class MockChainService implements IChainService {
   }
 
   getTransactionStatus(
-    transaction: BaseTransaction,
+    _transaction: BaseTransaction,
   ): Promise<TransactionWithStatus> {
     throw new Error("Method not implemented.")
   }

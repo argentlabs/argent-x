@@ -1,4 +1,4 @@
-import { isEqualAddress } from "../ui/services/addresses"
+import { isEqualAddress } from "@argent/shared"
 import { BaseWalletAccount, WalletAccount } from "./wallet.model"
 
 // from https://community.starknet.io/t/account-keys-and-addresses-derivation-standard/1230

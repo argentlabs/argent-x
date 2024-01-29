@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 
 import { useAction } from "../../hooks/useAction"
 import { routes, useReturnTo } from "../../routes"
-import { assertNever } from "../../services/assertNever"
+import { assertNever } from "../../../shared/utils/assertNever"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import {
   AccountType,

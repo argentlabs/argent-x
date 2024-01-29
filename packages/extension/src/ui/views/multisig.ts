@@ -3,7 +3,11 @@ import { atomFamily } from "jotai/utils"
 
 import { atomFromRepo } from "./implementation/atomFromRepo"
 import { isEqualAddress } from "@argent/shared"
-import { multisigMetadataRepo } from "../../shared/multisig/repository"
+import {
+  multisigBaseWalletRepo,
+  multisigMetadataRepo,
+  pendingMultisigRepo,
+} from "../../shared/multisig/repository"
 import { BaseMultisigWalletAccount } from "../../shared/wallet.model"
 import { MultisigMetadata } from "../../shared/multisig/types"
 
@@ -31,3 +35,7 @@ export const creatorMultisigMetadataAtomFamily = (
 export const creatorMultisigMetadataView = creatorMultisigMetadataAtomFamily(
   allMultisigMetadataView,
 )
+
+export const pendingMultisigsView = atomFromRepo(pendingMultisigRepo)
+
+export const multisigBaseWalletView = atomFromRepo(multisigBaseWalletRepo)

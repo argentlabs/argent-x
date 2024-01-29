@@ -5,9 +5,8 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import styled from "styled-components"
 
 import { settingsStore } from "../../shared/settings"
-import { useKeyValueStorage } from "../../shared/storage/hooks"
+import { useKeyValueStorage } from "../hooks/useStorage"
 import { coerceErrorToString } from "../../shared/utils/error"
-import { SettingsItem, Title } from "../features/settings/SettingsScreen"
 import { makeClickable } from "../services/a11y"
 import { useHardResetAndReload } from "../services/resetAndReload"
 import { P } from "../theme/Typography"
@@ -22,6 +21,26 @@ import {
 } from "./Icons/MuiIcons"
 import { WarningIcon } from "./Icons/WarningIcon"
 import IOSSwitch from "./IOSSwitch"
+
+const Title = styled.h3`
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+  color: ${({ theme }) => theme.text1};
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  svg {
+    color: ${({ theme }) => theme.text2};
+    font-size: 12px;
+  }
+`
+
+const SettingsItem = styled.div`
+  padding: 24px 32px;
+`
 
 const MessageContainer = styled.div`
   display: flex;

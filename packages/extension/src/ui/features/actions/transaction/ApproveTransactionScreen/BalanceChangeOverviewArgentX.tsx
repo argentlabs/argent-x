@@ -16,7 +16,11 @@ import { motion } from "framer-motion"
 import { isEmpty, isString } from "lodash-es"
 import { FC, useMemo } from "react"
 
-import { bigDecimal } from "@argent/shared"
+import {
+  bigDecimal,
+  formatTruncatedAddress,
+  normalizeAddress,
+} from "@argent/shared"
 import {
   isUnlimitedAmount,
   prettifyCurrencyValue,
@@ -26,10 +30,6 @@ import {
   ApiTransactionReviewResponse,
   getTransactionReviewWithType,
 } from "../../../../../shared/transactionReview.service"
-import {
-  formatTruncatedAddress,
-  normalizeAddress,
-} from "../../../../services/addresses"
 import { useCurrentNetwork } from "../../../networks/hooks/useCurrentNetwork"
 import { useIsDefaultNetwork } from "../../../networks/hooks/useIsDefaultNetwork"
 import { UnknownTokenIcon } from "./DappHeader/TransactionIcon/UnknownTokenIcon"

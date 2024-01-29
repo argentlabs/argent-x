@@ -7,9 +7,7 @@ const { AlertFillIcon } = icons
 export const WarningRecoverySeedphraseBanner: FC = () => {
   return (
     <Flex
-      py={4}
-      mt={4}
-      px={4}
+      p={4}
       mb={2}
       direction={"column"}
       backgroundColor="error.900"

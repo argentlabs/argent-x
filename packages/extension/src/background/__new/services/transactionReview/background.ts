@@ -21,17 +21,18 @@ import type { StarknetTransactionTypes } from "../../../../shared/transactions"
 import { Wallet } from "../../../wallet"
 import {
   SimulateAndReview,
+  isTransactionSimulationError,
   simulateAndReviewSchema,
 } from "../../../../shared/transactionReview/schema"
 import { ReviewError } from "../../../../shared/errors/review"
-import { addEstimatedFees } from "../../../../shared/transactionSimulation/fees/estimatedFeesRepository"
-import { argentMaxFee } from "../../../../shared/utils/argentMaxFee"
+import { addEstimatedFee } from "../../../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import { AccountError } from "../../../../shared/errors/account"
-import { transactionCallsAdapter } from "../../../transactions/transactionAdapter"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { KeyValueStorage } from "../../../../shared/storage"
 import { ITransactionReviewWorker } from "./worker/interface"
 import { ARGENT_TRANSACTION_REVIEW_API_BASE_URL } from "../../../../shared/api/constants"
+import { ETH_TOKEN_ADDRESS } from "../../../../shared/network/constants"
+import { getEstimatedFeeFromSimulationAndRespectWatermarkFee } from "../../../../shared/transactionSimulation/utils"
 
 interface ApiTransactionReviewV2RequestBody {
   transactions: Array<{
@@ -72,15 +73,18 @@ export default class BackgroundTransactionReviewService
   }) {
     try {
       const selectedAccount = await this.wallet.getSelectedAccount()
-      const oldAccountTransactions = transactionCallsAdapter(calls)
 
       if (!selectedAccount) {
         throw new AccountError({ code: "NOT_FOUND" })
       }
-      let txFee = "0",
-        maxTxFee = "0",
-        accountDeploymentFee: string | undefined,
-        maxADFee: string | undefined
+
+      const fees: EstimatedFees = {
+        transactions: {
+          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          amount: 0n,
+          pricePerUnit: 0n,
+        },
+      }
 
       if (!isDeployed) {
         if ("estimateFeeBulk" in starknetAccount) {
@@ -96,48 +100,59 @@ export default class BackgroundTransactionReviewService
               payload: calls,
             },
           ]
-          const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
-            bulkTransactions,
-            { skipValidate: true },
-          )
+          const [deployEstimate, txEstimate] =
+            await starknetAccount.estimateFeeBulk(bulkTransactions, {
+              skipValidate: true,
+            })
 
-          accountDeploymentFee = num.toHex(estimateFeeBulk[0].overall_fee)
-          txFee = num.toHex(estimateFeeBulk[1].overall_fee)
+          if (
+            !deployEstimate.gas_consumed ||
+            !deployEstimate.gas_price ||
+            !txEstimate.gas_consumed ||
+            !txEstimate.gas_price
+          ) {
+            throw new ReviewError({
+              code: "ONCHAIN_FEE_ESTIMATION_FAILED",
+              message: "Missing gas_consumed or gas_price",
+            })
+          }
 
-          maxADFee = argentMaxFee({
-            suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
-          })
-          maxTxFee = argentMaxFee({
-            suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
-          })
+          fees.deployment = {
+            feeTokenAddress: ETH_TOKEN_ADDRESS,
+            amount: deployEstimate.gas_consumed,
+            pricePerUnit: deployEstimate.gas_price,
+          }
+          fees.transactions = {
+            feeTokenAddress: ETH_TOKEN_ADDRESS,
+            amount: txEstimate.gas_consumed,
+            pricePerUnit: txEstimate.gas_price,
+          }
         }
       } else {
-        const { overall_fee, suggestedMaxFee } =
-          await starknetAccount.estimateFee(calls, {
+        const { gas_consumed, gas_price } = await starknetAccount.estimateFee(
+          calls,
+          {
             skipValidate: true,
+          },
+        )
+
+        if (!gas_consumed || !gas_price) {
+          throw new ReviewError({
+            code: "ONCHAIN_FEE_ESTIMATION_FAILED",
+            message: "Missing gas_consumed or gas_price",
           })
+        }
 
-        txFee = num.toHex(overall_fee)
-        maxTxFee = num.toHex(suggestedMaxFee) // Here, maxFee = estimatedFee * 1.5x
+        fees.transactions = {
+          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          amount: gas_consumed,
+          pricePerUnit: gas_price,
+        }
       }
 
-      const suggestedMaxFee = argentMaxFee({ suggestedMaxFee: maxTxFee })
+      await addEstimatedFee(fees, calls)
 
-      await addEstimatedFees(
-        {
-          amount: txFee,
-          suggestedMaxFee,
-          accountDeploymentFee,
-          maxADFee,
-        },
-        calls,
-      )
-      return {
-        amount: txFee,
-        suggestedMaxFee,
-        accountDeploymentFee,
-        maxADFee,
-      }
+      return fees
     } catch (error) {
       throw new ReviewError({
         code: "ONCHAIN_FEE_ESTIMATION_FAILED",
@@ -197,39 +212,16 @@ export default class BackgroundTransactionReviewService
     simulateAndReviewResult: SimulateAndReview,
     isDeploymentTransaction: boolean,
   ): Promise<EstimatedFees> {
-    const { transactions } = simulateAndReviewResult
+    const fee = getEstimatedFeeFromSimulationAndRespectWatermarkFee(
+      simulateAndReviewResult,
+    )
 
-    let invokeTransaction, accountDeploymentFee, maxADFee
-
-    if (isDeploymentTransaction) {
-      invokeTransaction = transactions[1]
-      accountDeploymentFee =
-        transactions[0].simulation?.feeEstimation.maxFee.toString()
-      maxADFee = accountDeploymentFee || "0"
-    } else {
-      invokeTransaction = transactions[0]
-    }
-
-    const amount =
-      invokeTransaction.simulation?.feeEstimation.overallFee.toString() ?? "0"
-    const suggestedMaxFee =
-      invokeTransaction.simulation?.feeEstimation.maxFee ?? "0"
-
-    await addEstimatedFees(
-      {
-        amount,
-        suggestedMaxFee,
-        accountDeploymentFee,
-        maxADFee,
-      },
+    await addEstimatedFee(
+      fee,
       initialTransactions[isDeploymentTransaction ? 1 : 0].calls ?? [],
     )
-    return {
-      amount,
-      suggestedMaxFee,
-      accountDeploymentFee,
-      maxADFee,
-    }
+
+    return fee
   }
 
   async simulateAndReview({
@@ -283,6 +275,17 @@ export default class BackgroundTransactionReviewService
         },
         simulateAndReviewSchema,
       )
+
+      // if there is a simulation error then there is also no actual simulation
+      // or fee information, and no way to proceed with fee estimation
+      // returning the result will surface the error to the user in the ui
+      const hasSimulationError = result.transactions.some((transaction) =>
+        isTransactionSimulationError(transaction),
+      )
+      if (hasSimulationError) {
+        return result
+      }
+
       const enrichedFeeEstimation = await this.getEnrichedFeeEstimation(
         transactions,
         result,
@@ -293,7 +296,7 @@ export default class BackgroundTransactionReviewService
         enrichedFeeEstimation,
       }
     } catch (e) {
-      console.log(e)
+      console.error(e)
       try {
         const invokeCalls = isDeploymentTransaction
           ? this.getCallsFromTx(transactions[1])

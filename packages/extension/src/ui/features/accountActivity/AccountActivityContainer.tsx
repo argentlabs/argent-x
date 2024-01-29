@@ -1,6 +1,5 @@
 import { FC, useCallback, useMemo } from "react"
-import { get } from "lodash-es"
-import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
+import { get, uniqBy } from "lodash-es"
 import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/ui"
 import { Center, Skeleton } from "@chakra-ui/react"
 
@@ -22,7 +21,9 @@ import { PendingTransactions } from "./PendingTransactions"
 import { isVoyagerTransaction } from "./transform/is"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress, normalizeAddress } from "@argent/shared"
+import { getTransactionFailureReason } from "./getTransactionFailureReason"
+import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 const { ActivityIcon } = icons
 
@@ -90,12 +91,14 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
   const { transactions } = useAccountTransactions(account)
   const voyagerTransactions = useMemo(() => {
     // RECEIVED transactions are already shown as pending
-    return transactions.filter(
-      (transaction) =>
-        (transaction.finalityStatus !== TransactionFinalityStatus.RECEIVED ||
-          transaction.executionStatus ===
-            TransactionExecutionStatus.REJECTED) &&
-        !transaction.meta?.isDeployAccount,
+    return uniqBy(
+      transactions.filter((transaction) => {
+        const { finality_status } = getTransactionStatus(transaction)
+        return (
+          finality_status !== "RECEIVED" && !transaction.meta?.isDeployAccount
+        )
+      }),
+      (tx) => normalizeAddress(tx.hash),
     )
   }, [transactions])
   const mergedTransactions = useMemo(() => {
@@ -169,7 +172,7 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     const { transactions, transactionsWithoutTimestamp } = mergedTransactions
     let lastExplorerTransactionHash
     const submittedTransactions = transactions.filter(
-      (transaction) => transaction.finalityStatus !== "NOT_RECEIVED",
+      (transaction) => transaction.status !== "NOT_RECEIVED",
     )
 
     for (const transaction of submittedTransactions) {
@@ -179,20 +182,27 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
         mergedActivity[dateLabel] = []
       }
       if (isVoyagerTransaction(transaction)) {
-        const { hash, meta, finalityStatus, executionStatus } = transaction
-        const isRejected =
-          executionStatus === "REJECTED" || executionStatus === "REVERTED"
-        const isCancelled = finalityStatus === "CANCELLED"
+        const { hash, meta } = transaction
+        const failureReason = getTransactionFailureReason(transaction.status)
+
         const activityTransaction: ActivityTransaction = {
           hash,
           date,
           meta,
-          isRejected,
-          isCancelled,
+          failureReason,
         }
         mergedActivity[dateLabel].push(activityTransaction)
       } else {
-        mergedActivity[dateLabel].push(transaction)
+        const failureReason = getTransactionFailureReason({
+          finality_status: transaction.finalityStatus,
+          execution_status: transaction.executionStatus,
+        })
+
+        mergedActivity[dateLabel].push({
+          ...transaction,
+          failureReason,
+        })
+
         if (transaction.transactionHash) {
           lastExplorerTransactionHash = transaction.transactionHash
         }

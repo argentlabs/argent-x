@@ -6,42 +6,44 @@ import { useView } from "../../views/implementation/react"
 import {
   allTokensOnNetworkFamily,
   allTokensView,
-  networkFeeTokenOnNetworkFamily,
+  networkFeeTokensOnNetworkFamily,
   tokenFindFamily,
 } from "../../views/token"
 import { useAccount } from "../accounts/accounts.state"
 import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
 import { tokenBalanceForAccountView } from "../../views/tokenBalances"
-import { tokenRepo } from "../../../shared/token/__new/repository/token"
-import { networkRepo } from "../../../shared/network/store"
-import { isEqualAddress } from "@argent/shared"
+import { Address, isEqualAddress } from "@argent/shared"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { useAppState } from "../../app.state"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 
-export async function getNetworkFeeToken(networkId?: string) {
-  if (!networkId) {
-    return null
-  }
-  const [network] = await networkRepo.get((n) => n.id === networkId)
-  if (!network) {
-    return null
-  }
-  const [feeToken] = await tokenRepo.get(
-    (token) =>
-      token.address === network.feeTokenAddress &&
-      token.networkId === network.id,
-  )
-  return feeToken ?? null
-}
-
-export const useNetworkFeeToken = (networkId?: string) => {
-  const feeToken = useView(networkFeeTokenOnNetworkFamily(networkId))
-  return feeToken
+export const useNetworkFeeTokens = (networkId?: string) => {
+  const feeTokens = useView(networkFeeTokensOnNetworkFamily(networkId))
+  return feeTokens
 }
 
 export const useTokensInNetwork = (networkId: string) =>
   useView(allTokensOnNetworkFamily(networkId))
 
+export const useTokensInCurrentNetwork = () => {
+  const currentNetwork = useCurrentNetwork()
+  return useTokensInNetwork(currentNetwork?.id ?? "")
+}
+
+export const useTradableTokensInCurrentNetwork = () => {
+  const tokens = useTokensInCurrentNetwork()
+  return useMemo(() => tokens.filter((token) => token.tradable), [tokens])
+}
+
 export const useToken = (baseToken?: BaseToken): Token | undefined => {
+  return useView(tokenFindFamily(baseToken))
+}
+
+export const useTokenOnCurrentNetworkByAddress = (address?: Address) => {
+  const { switcherNetworkId } = useAppState()
+  const baseToken = address
+    ? { address, networkId: switcherNetworkId }
+    : undefined
   return useView(tokenFindFamily(baseToken))
 }
 
@@ -95,4 +97,17 @@ export const useTokensWithBalance = (account?: BaseWalletAccount) => {
         (token) => token.showAlways || (token.balance && token.balance > 0n),
       )
   }, [tokensInNetwork, accountBalances])
+}
+
+export const useTokenBalance = (
+  tokenAddress?: Address,
+  account?: BaseWalletAccount,
+) => {
+  const balances = useTokensWithBalance(account)
+
+  return useMemo(() => {
+    return balances.find((balance) =>
+      isEqualAddress(balance.address, tokenAddress),
+    )
+  }, [balances, tokenAddress])
 }

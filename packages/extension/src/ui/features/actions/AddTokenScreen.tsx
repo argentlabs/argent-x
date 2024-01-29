@@ -15,7 +15,6 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { ControlledInput } from "../../components/ControlledInput"
-import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import {
   RequestToken,
   RequestTokenSchema,

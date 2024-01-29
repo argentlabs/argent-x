@@ -1,23 +1,17 @@
-import { Button, H6, Input, L2, LoadingPulse, P4, icons } from "@argent/ui"
-import {
-  Currency,
-  CurrencyAmount,
-  ETHER,
-  TokenAmount,
-  WrappedTokenInfo,
-  useAllTokens,
-  useSwapProvider,
-  wrappedCurrency,
-} from "@argent/x-swap"
-import { Flex, useDisclosure } from "@chakra-ui/react"
 import { debounce } from "lodash-es"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
 
 import { isAllowedNumericInputValue } from "../../../components/utils/isAllowedNumericInputValue"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
-import { CurrencyValue } from "./CurrencyValue"
+import { TokenValue } from "./TokenValue"
 import { MaxEthModal } from "./MaxEthModal"
 import { SwapTokensModal } from "./SwapTokensModal"
+import { Token } from "../../../../shared/token/__new/types/token.model"
+import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import { isETH } from "../utils"
+import { useDisclosure, Flex, Input, Button } from "@chakra-ui/react"
+import { H6, L2, LoadingPulse, P4, icons } from "@argent/ui"
+import { prettifyTokenAmount } from "../../../../shared/token/price"
 
 const { ChevronDownIcon } = icons
 
@@ -26,11 +20,11 @@ interface SwapInputPanelProps {
   type: "pay" | "receive"
   onUserInput: (value: string) => void
   onMax?: () => void
-  currency?: Currency | undefined
+  token?: Token | undefined
   showMaxButton?: boolean
-  onCurrencySelect?: (currency: Currency) => void
-  currentBalance?: CurrencyAmount | TokenAmount
-  otherCurrency?: Currency | null
+  onTokenSelect?: (token: Token) => void
+  currentBalance?: TokenWithOptionalBigIntBalance
+  otherToken?: Token | null
   id: string
   tradeLoading: boolean
   insufficientBalance?: boolean
@@ -41,16 +35,14 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
   value,
   onUserInput,
   type,
-  currency,
+  token,
   currentBalance,
-  onCurrencySelect,
+  onTokenSelect,
   onMax,
   showMaxButton = false,
   tradeLoading,
   insufficientBalance,
 }) => {
-  const { networkId } = useSwapProvider()
-  const allTokens = useAllTokens()
   const {
     isOpen: isOpenEthModal,
     onOpen: onOpenEthModal,
@@ -64,33 +56,52 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
 
   const [inputValue, setInputValue] = useState("")
 
-  const token = useMemo(() => {
-    const wrapped = wrappedCurrency(currency, networkId)
-    return wrapped ? (allTokens[wrapped.address] as WrappedTokenInfo) : null
-  }, [allTokens, currency, networkId])
-
   const onMaxCheck = useCallback(() => {
-    if (currency === ETHER) {
+    if (token && isETH(token)) {
       onOpenEthModal()
     } else {
       onMax?.()
     }
-  }, [currency, onMax, onOpenEthModal])
+  }, [token, onMax, onOpenEthModal])
 
-  // eslint-disable-next-line
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const delayedOnChange = useCallback(
-    debounce((value: string) => {
-      if (isAllowedNumericInputValue(value)) {
-        onUserInput(value)
-      }
+    debounce((nextValue) => {
+      onUserInput(nextValue)
     }, 500),
-    [],
+    [onUserInput],
   )
 
+  useEffect(() => {
+    return () => {
+      delayedOnChange.cancel()
+    }
+  }, [delayedOnChange])
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value)
-    delayedOnChange(e.target.value)
+    if (isAllowedNumericInputValue(e.target.value)) {
+      setInputValue(e.target.value)
+      delayedOnChange(e.target.value)
+    }
   }
+
+  const prettyBalance = useMemo(() => {
+    const significantDigits = 6
+
+    if (!currentBalance) {
+      return "0"
+    }
+
+    const { balance, decimals } = currentBalance
+
+    return prettifyTokenAmount({
+      amount: balance ?? 0n,
+      decimals,
+      prettyConfigOverrides: {
+        minDecimalSignificantDigits: significantDigits,
+      },
+    })
+  }, [currentBalance])
 
   useEffect(() => {
     setInputValue(value)
@@ -125,6 +136,9 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
               lineHeight="26px"
               value={inputValue}
               onChange={onChange}
+              data-testid={id}
+              isDisabled={type === "receive"}
+              _disabled={{ opacity: 1, cursor: "default" }}
             />
           </LoadingPulse>
 
@@ -140,7 +154,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
                 leftIcon={
                   <TokenIcon
                     name={token?.name || "?"}
-                    url={token?.image}
+                    url={token?.iconUrl}
                     size="5"
                   />
                 }
@@ -167,7 +181,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
               </L2>
             )}
             {value && token && (
-              <CurrencyValue
+              <TokenValue
                 amount={value}
                 token={token}
                 approx={type === "receive"}
@@ -175,7 +189,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
             )}
           </Flex>
           <L2 fontWeight="500" color="neutrals.400">
-            Balance: {currentBalance?.toSignificant(6) ?? 0}
+            {`Balance: ${prettyBalance}`}
           </L2>
         </Flex>
       </Flex>
@@ -192,7 +206,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
         isOpen={isTokenListOpen}
         onClose={onCloseTokenList}
         isPay={type === "pay"}
-        onCurrencySelect={onCurrencySelect}
+        onTokenSelect={onTokenSelect}
       />
     </>
   )

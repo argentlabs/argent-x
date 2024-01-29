@@ -7,7 +7,6 @@ import { useAppState } from "../../app.state"
 import { routes } from "../../routes"
 import { fileToString } from "../../services/files"
 import { clientRecoveryService } from "../../services/recovery"
-import { useOnboardingScreen } from "./hooks/useOnboardingScreen"
 import { OnboardingRestoreBackupScreen } from "./OnboardingRestoreBackupScreen"
 
 export const OnboardingRestoreBackupScreenContainer: FC = () => {

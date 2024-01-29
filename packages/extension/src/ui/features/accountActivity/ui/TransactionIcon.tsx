@@ -11,6 +11,7 @@ import {
 } from "../transform/is"
 import { TransformedTransaction } from "../transform/type"
 import { DappIconContainer } from "../../actions/connectDapp/DappIconContainer"
+import { ActivityTransactionFailureReason } from "../getTransactionFailureReason"
 
 const {
   DocumentIcon,
@@ -32,7 +33,7 @@ const {
 export interface TransactionIconProps extends Omit<SquareProps, "outline"> {
   transaction: TransformedTransaction
   outline?: boolean
-  isCancelled?: boolean
+  failureReason?: ActivityTransactionFailureReason
   size?: number
 }
 
@@ -40,7 +41,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   transaction,
   size = 18,
   outline = false,
-  isCancelled = false,
+  failureReason,
   ...rest
 }) => {
   const badgeSize = Math.min(32, Math.round((size * 16) / 36))
@@ -131,7 +132,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       fontSize={iconSize}
       {...rest}
     >
-      {isCancelled ? <FailIcon /> : iconComponent}
+      {failureReason ? <FailIcon /> : iconComponent}
       {badgeComponent && (
         <Circle
           overflow={"hidden"}

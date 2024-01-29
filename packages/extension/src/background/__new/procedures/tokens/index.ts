@@ -6,7 +6,6 @@ import { getAccountBalanceProcedure } from "./getAccountBalance"
 import { getAllTokenBalancesProcedure } from "./getAllTokenBalances"
 import { getCurrencyValueForTokensProcedure } from "./getCurrencyValueForTokens"
 import { removeTokenProcedure } from "./removeToken"
-import { swapProcedure } from "./swap"
 
 export const tokensRouter = router({
   addToken: addTokenProcedure,
@@ -16,5 +15,4 @@ export const tokensRouter = router({
   getAccountBalance: getAccountBalanceProcedure,
   getAllTokenBalances: getAllTokenBalancesProcedure,
   getCurrencyValueForTokens: getCurrencyValueForTokensProcedure,
-  swap: swapProcedure,
 })

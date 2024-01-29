@@ -5,6 +5,8 @@ import { TokenListItem, TokenListItemProps } from "./TokenListItem"
 import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
 import { Token } from "../../../shared/token/__new/types/token.model"
+import { hideTokensWithNoBalanceView } from "../../views/settings"
+import { useView } from "../../views/implementation/react"
 
 export interface TokenListItemContainerProps
   extends Omit<TokenListItemProps, "currencyValue"> {
@@ -26,9 +28,10 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
     account,
   })
   const currencyValue = useTokenBalanceToCurrencyValue(tokenWithBalance)
+  const hideTokensWithNoBalance = useView(hideTokensWithNoBalanceView)
   const shouldShow =
     token.showAlways ||
-    token.custom ||
+    !hideTokensWithNoBalance ||
     (tokenWithBalance?.balance && tokenWithBalance.balance > 0n)
   if (!shouldShow || tokenWithBalance === undefined) {
     return null

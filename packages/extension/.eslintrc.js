@@ -15,7 +15,7 @@ module.exports = {
       },
     ],
     "@argent/local/code-import-patterns": [
-      "warn",
+      "error",
       {
         target: "packages/extension/src/ui/**",
         disallow: ["packages/extension/src/background/**"],

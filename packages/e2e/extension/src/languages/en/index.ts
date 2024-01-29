@@ -46,6 +46,7 @@ const texts = {
     shortAddressError: "Address must be 66 characters long",
     invalidCheckSumError: "Invalid address (checksum error)",
     invalidAddress: "Invalid address",
+    createMultisig: "Create multisig",
   },
   wallet: {
     //first screen
@@ -114,7 +115,8 @@ const texts = {
   dapps: {
     connect: "Connect",
     reject: "Reject",
-    resetAll: "Reset all dapp connections",
+    disconnectAll: "Disconnect all",
+    noConnectedDapps: "No connected dapps",
   },
 }
 

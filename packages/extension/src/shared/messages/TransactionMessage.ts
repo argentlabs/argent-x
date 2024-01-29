@@ -11,19 +11,9 @@ import {
   SimulateTransactionsRequest,
   TransactionSimulationWithFees,
 } from "../transactionSimulation/types"
-import { DeclareContract } from "../udc/type"
-import { ErrorObject } from "../utils/error"
-import { BaseWalletAccount } from "../wallet.model"
+import { DeclareContract } from "../udc/schema"
 import { TransactionError } from "../errors/transaction"
 import { EstimatedFees } from "../transactionSimulation/fees/fees.model"
-
-export interface DeployAccountEstimateFeeResponse
-  extends Omit<
-    EstimatedFees,
-    "suggestedMaxFee" | "accountDeploymentFee" | "theme"
-  > {
-  maxADFee: string
-}
 
 export interface ExecuteTransactionRequest {
   transactions: Call | Call[]
@@ -45,24 +35,6 @@ export type TransactionMessage =
   | {
       type: "TRANSACTION_FAILED"
       data: { actionHash: string; error?: string }
-    }
-  | { type: "ESTIMATE_TRANSACTION_FEE"; data: Call | Call[] }
-  | {
-      type: "ESTIMATE_TRANSACTION_FEE_REJ"
-      data: { error: ErrorObject | undefined }
-    }
-  | {
-      type: "ESTIMATE_TRANSACTION_FEE_RES"
-      data: EstimatedFees
-    }
-  | { type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE"; data?: BaseWalletAccount }
-  | {
-      type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ"
-      data: { error: ErrorObject | undefined }
-    }
-  | {
-      type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES"
-      data: DeployAccountEstimateFeeResponse
     }
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE"; data: DeclareContract }
   | { type: "ESTIMATE_DECLARE_CONTRACT_FEE_REJ"; data: { error: string } }

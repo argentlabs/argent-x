@@ -8,11 +8,13 @@ import {
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
 import { Multisig } from "./Multisig"
+import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 
 const defaultNetwork: Network = {
   id: "localhost",
   name: "localhostNetwork",
   chainId: "1",
+  possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
   rpcUrl: "rpcUrl",
 }
 const defaultSigner: WalletAccountSigner = {

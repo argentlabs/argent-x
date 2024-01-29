@@ -31,4 +31,5 @@ export interface INFTService {
     owner: Address,
     networkId: string,
   ) => Promise<void>
+  getNftMarketplaceUrl(nft: NftItem, networkId: string): Promise<string>
 }

@@ -1,4 +1,5 @@
 import { constants } from "starknet"
+import { MockedFunction } from "vitest"
 import { getMockNetwork } from "../../../../../test/network.mock"
 import {
   ApiMultisigAccountData,
@@ -18,7 +19,7 @@ const cancelMultisigPendingTransactionsSpy = vi.fn()
 const convertToTransactionSpy = vi.fn()
 
 const mockGetMultisigAccountFromBaseWallet =
-  getMultisigAccountFromBaseWallet as jest.MockedFunction<
+  getMultisigAccountFromBaseWallet as MockedFunction<
     typeof getMultisigAccountFromBaseWallet
   >
 

@@ -1,4 +1,4 @@
-import { IArgentAccountServiceBackground } from "../../../../shared/argentAccount/service/interface"
+import { IArgentAccountServiceBackground } from "../../../../shared/argentAccount/interface"
 import { ARGENT_SHIELD_NETWORK_ID } from "../../../../shared/shield/constants"
 import {
   addBackendAccount,
@@ -22,7 +22,7 @@ import { validateEmailForAccounts } from "../../../../shared/shield/validation/v
 import {
   PreferencesPayload,
   preferencesEndpointPayload,
-} from "../../procedures/argentAccount/updatePreferences.model"
+} from "../../../../shared/argentAccount/schema"
 import { IHttpService } from "@argent/shared"
 import urlJoin from "url-join"
 import { ARGENT_ACCOUNT_URL } from "../../../../shared/api/constants"

@@ -13,8 +13,9 @@ import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
 import { useMultisig } from "../multisig/multisig.state"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import { AccountTokensButtons } from "./AccountTokensButtons"
-import { useNetworkFeeToken } from "./tokens.state"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
+import { useToken } from "./tokens.state"
+import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 
 interface AccountTokensButtonsContainerProps {
   account: Account
@@ -29,7 +30,10 @@ export const AccountTokensButtonsContainer: FC<
   const multisig = useMultisig(account)
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
   const isMainnet = useIsMainnet()
-  const sendToken = useNetworkFeeToken(switcherNetworkId)
+  const sendToken = useToken({
+    address: ETH_TOKEN_ADDRESS,
+    networkId: switcherNetworkId,
+  })
 
   const hasSavedRecoverySeedPhrase = useView(hasSavedRecoverySeedPhraseView)
 

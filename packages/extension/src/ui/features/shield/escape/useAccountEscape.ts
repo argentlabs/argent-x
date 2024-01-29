@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 
 import { Escape } from "../../../../shared/account/details/escape.model"
-import { useArrayStorage } from "../../../../shared/storage/hooks"
+import { useArrayStorage } from "../../../hooks/useStorage"
 import { isNumeric } from "../../../../shared/utils/number"
 import {
   BaseWalletAccount,

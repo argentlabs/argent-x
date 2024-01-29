@@ -5,9 +5,6 @@ import { describe, expect, it } from "vitest"
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import { renderWithLegacyProviders } from "../../test/utils"
 
-/**
- * @vitest-environment jsdom
- */
 describe("AccountListScreenItem", async () => {
   const account = {
     accountName: "Account 1",

@@ -1,13 +1,11 @@
-import { difference } from "lodash-es"
 import browser from "webextension-polyfill"
 
 import { uiService } from "../shared/__new/services/ui"
 import { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
-import { isPreAuthorized, preAuthorizeStore } from "../shared/preAuthorizations"
 import { Opened, backgroundUIService } from "./__new/services/ui"
-import { sendMessageToHost } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
+import { preAuthorizationService } from "../shared/preAuthorization/service"
 
 export function getOriginFromSender(
   sender: browser.runtime.MessageSender,
@@ -19,16 +17,6 @@ export function getOriginFromSender(
   const { origin } = new URL(url) // Firefox uses url, Chrome uses origin
   return origin
 }
-
-preAuthorizeStore.subscribe(async (_, changeSet) => {
-  const removed = difference(changeSet.oldValue ?? [], changeSet.newValue ?? [])
-  for (const preAuthorization of removed) {
-    await sendMessageToHost(
-      { type: "DISCONNECT_ACCOUNT" },
-      preAuthorization.host,
-    )
-  }
-})
 
 export const handlePreAuthorizationMessage: HandleMessage<
   PreAuthorisationMessage
@@ -49,7 +37,10 @@ export const handlePreAuthorizationMessage: HandleMessage<
         }
       }
 
-      const isAuthorized = await isPreAuthorized(selectedAccount, origin)
+      const isAuthorized = await preAuthorizationService.isPreAuthorized({
+        account: selectedAccount,
+        host: origin,
+      })
 
       if (!isAuthorized) {
         /** Prompt user to connect to dapp */
@@ -103,7 +94,10 @@ export const handlePreAuthorizationMessage: HandleMessage<
         return respond({ type: "IS_PREAUTHORIZED_RES", data: false })
       }
 
-      const valid = await isPreAuthorized(selectedAccount, origin)
+      const valid = await preAuthorizationService.isPreAuthorized({
+        account: selectedAccount,
+        host: origin,
+      })
 
       return respond({ type: "IS_PREAUTHORIZED_RES", data: valid })
     }

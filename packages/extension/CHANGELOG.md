@@ -1,5 +1,69 @@
 # @argent-x/extension
 
+## 6.12.8
+
+### Patch Changes
+
+- 74b9f9a1a: Release
+
+## 6.12.7
+
+### Patch Changes
+
+- 34a7190b3: Release
+
+## 6.12.6
+
+### Patch Changes
+
+- 0971a5d80: Release
+
+## 6.12.5
+
+### Patch Changes
+
+- 6e01d0331: Release
+- Updated dependencies [6e01d0331]
+  - @argent/x-sessions@6.5.2
+
+## 6.12.4
+
+### Patch Changes
+
+- ce8935719: Release
+- Updated dependencies [ce8935719]
+  - @argent/x-sessions@6.5.1
+
+## 6.12.3
+
+### Patch Changes
+
+- 3b6c526af: Release
+
+## 6.12.2
+
+### Patch Changes
+
+- 90be4c4c6: Release
+
+## 6.12.1
+
+### Patch Changes
+
+- e459cea52: Release
+
+## 6.12.0
+
+### Minor Changes
+
+- 5e36dfc39: Release
+
+## 6.11.1
+
+### Patch Changes
+
+- 8cec95de4: Release
+
 ## 6.11.0
 
 ### Minor Changes

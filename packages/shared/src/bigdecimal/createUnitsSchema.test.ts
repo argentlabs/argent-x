@@ -5,7 +5,7 @@ describe("createUnitsSchema", () => {
   const schemaFor2Decimals = createUnitsSchema(2)
 
   it("should allow valid number formats", () => {
-    test.each([
+    const validNumbers = [
       "123",
       "-123",
       "123.45",
@@ -13,13 +13,14 @@ describe("createUnitsSchema", () => {
       "0.45",
       "-0.45",
       "0.000000000001",
-    ])(`%s`, (input) => {
+    ]
+    validNumbers.forEach((input) => {
       expect(() => schemaFor2Decimals.parse(input)).not.toThrow()
     })
   })
 
   it("should reject invalid number formats", () => {
-    test.each([
+    const invalidNumbers = [
       "123..",
       "-123..45",
       "abc",
@@ -28,7 +29,8 @@ describe("createUnitsSchema", () => {
       ".123",
       "-.123",
       "--123",
-    ])(`%s`, (input) => {
+    ]
+    invalidNumbers.forEach((input) => {
       expect(() => schemaFor2Decimals.parse(input)).toThrow(z.ZodError)
 
       const result = schemaFor2Decimals.safeParse(input)

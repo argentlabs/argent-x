@@ -5,7 +5,7 @@ import { FC } from "react"
 const { NetworkIcon } = icons
 
 type NetworkWarningScreenProps = {
-  onClick: () => void
+  onClick?: () => void
 }
 export const NetworkWarningScreen: FC<NetworkWarningScreenProps> = ({
   onClick,

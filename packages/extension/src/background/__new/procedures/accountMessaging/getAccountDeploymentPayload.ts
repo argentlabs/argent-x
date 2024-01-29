@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { extensionOnlyProcedure } from "../permissions"
+import { connectedDappsProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 import { SessionError } from "../../../../shared/errors/session"
@@ -11,9 +11,11 @@ import {
   rawArgsSchema,
 } from "@argent/shared"
 
-const getAccountDeploymentPayloadInputSchema = z.object({
-  account: baseWalletAccountSchema,
-})
+const getAccountDeploymentPayloadInputSchema = z
+  .object({
+    account: baseWalletAccountSchema,
+  })
+  .optional()
 
 const deployAccountContractSchema = z.object({
   classHash: z.string(),
@@ -22,12 +24,12 @@ const deployAccountContractSchema = z.object({
   contractAddress: addressSchema.optional(),
 })
 
-export const getAccountDeploymentPayloadProcedure = extensionOnlyProcedure
+export const getAccountDeploymentPayloadProcedure = connectedDappsProcedure
   .input(getAccountDeploymentPayloadInputSchema)
   .output(deployAccountContractSchema)
   .query(
     async ({
-      input: { account },
+      input,
       ctx: {
         services: { wallet },
       },
@@ -38,7 +40,9 @@ export const getAccountDeploymentPayloadProcedure = extensionOnlyProcedure
         })
       }
       try {
-        const walletAccount = await wallet.getAccount(account)
+        const walletAccount = input?.account
+          ? await wallet.getAccount(input.account)
+          : await wallet.getSelectedAccount()
         if (!walletAccount) {
           throw new AccountError({
             code: "NOT_FOUND",

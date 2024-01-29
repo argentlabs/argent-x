@@ -1,9 +1,9 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { formatTruncatedAddress, normalizeAddress } from "../services/addresses"
 import { CopyTooltip } from "./CopyTooltip"
 import { ContentCopyIcon } from "./Icons/MuiIcons"
+import { normalizeAddress, formatTruncatedAddress } from "@argent/shared"
 
 export const AccountAddressWrapper = styled.span`
   display: flex;

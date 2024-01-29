@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/react"
 import { useEffect } from "react"
 
 import { settingsStore } from "../../shared/settings"
-import { useKeyValueStorage } from "../../shared/storage/hooks"
+import { useKeyValueStorage } from "../hooks/useStorage"
 
 export const useSentryInit = () => {
   const enableErrorReporting = useKeyValueStorage(

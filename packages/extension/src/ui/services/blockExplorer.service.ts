@@ -7,7 +7,7 @@ import {
   defaultBlockExplorerKey,
   defaultBlockExplorers,
 } from "../../shared/settings/defaultBlockExplorers"
-import { useKeyValueStorage } from "../../shared/storage/hooks"
+import { useKeyValueStorage } from "../hooks/useStorage"
 import { getNetworkIdFromChainId } from "../../shared/network/utils"
 
 export const useBlockExplorerTitle = () => {

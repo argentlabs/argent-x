@@ -7,36 +7,37 @@ on:
     tags:
       - "**"
 
-env:
-  FEATURE_PRIVACY_SETTINGS: "true"
-  FEATURE_EXPERIMENTAL_SETTINGS: "false"
-  FEATURE_BETA_FEATURES: "false"
-  FEATURE_BANXA: "true"
-  FEATURE_LAYERSWAP: "true"
-  FEATURE_ORBITER: "true"
-  FEATURE_VERIFIED_DAPPS: "true"
-  ARGENT_SHIELD_NETWORK_ID: "mainnet-alpha"
-  FEATURE_MULTISIG: "true"
-  SENTRY_ENVIRONMENT: "production"
-  NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-  SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
-  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-  RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
-  FILENAME: argent-extension
-  SAFE_ENV_VARS: true
-  ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
-  ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
-  ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
-  ARGENT_X_ENVIRONMENT: "prod"
-  MULTICALL_MAX_BATCH_SIZE: 20
-  FAST: 20 # 20s
-  MEDIUM: 60 # 60s
-  SLOW: 60 * 5 # 5m
-  VERY_SLOW: 24 * 60 * 60 # 1d
-
 jobs:
   build:
+    environment: "prod"
+    env:
+      FEATURE_PRIVACY_SETTINGS: "true"
+      FEATURE_EXPERIMENTAL_SETTINGS: "false"
+      FEATURE_BETA_FEATURES: "false"
+      FEATURE_BANXA: "true"
+      FEATURE_LAYERSWAP: "true"
+      FEATURE_ORBITER: "true"
+      FEATURE_VERIFIED_DAPPS: "true"
+      ARGENT_SHIELD_NETWORK_ID: "mainnet-alpha"
+      FEATURE_MULTISIG: "true"
+      SENTRY_ENVIRONMENT: "production"
+      NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+      SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
+      FILENAME: argent-extension
+      SAFE_ENV_VARS: true
+      ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+      ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
+      ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_X_ENVIRONMENT: "prod"
+      MULTICALL_MAX_BATCH_SIZE: 20
+      FAST: 20 # 20s
+      MEDIUM: 60 # 60s
+      SLOW: 60 * 5 # 5m
+      VERY_SLOW: 24 * 60 * 60 # 1d
+
     if: ${{ !startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'extension') }}
     runs-on: ubuntu-latest
     permissions:

@@ -1,7 +1,5 @@
-import { ModalDialog, P4, icons } from "@argent/ui"
+import { ModalDialog, P4 } from "@argent/ui"
 import { ComponentProps } from "react"
-
-const { CopyIcon } = icons
 
 export default {
   component: ModalDialog,

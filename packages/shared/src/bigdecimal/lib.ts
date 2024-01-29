@@ -4,7 +4,7 @@ export const toFixedDecimals = (
   amount: BigDecimal,
   decimals: number,
 ): BigDecimal => ({
-  decimals: decimals,
+  decimals,
   value:
     decimals >= amount.decimals
       ? amount.value * BigInt(10) ** BigInt(decimals - amount.decimals)
@@ -12,12 +12,18 @@ export const toFixedDecimals = (
 })
 
 export const toTiniestPossibleDecimal = (amount: BigDecimal): BigDecimal => {
-  const decimalsReduction = amount.value
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((acc, char) => (char === "0" ? acc + 1 : acc), 0)
-  return toFixedDecimals(amount, amount.decimals - decimalsReduction)
+  const reverseAmount = amount.value.toString().split("").reverse()
+  let trailingZerosCount = 0
+
+  for (let i = 0; i < reverseAmount.length; i++) {
+    if (reverseAmount[i] !== "0") {
+      break
+    }
+    trailingZerosCount++
+  }
+
+  const newDecimals = amount.decimals - trailingZerosCount
+  return toFixedDecimals(amount, newDecimals)
 }
 
 const getAdjustedValues = (

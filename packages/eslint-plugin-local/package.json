@@ -19,6 +19,6 @@
     "dev": "tsc --build --watch",
     "build": "tsc --build",
     "lint": "eslint . --cache --ext .ts",
-    "setup": "yarn build"
+    "setup": "pnpm build"
   }
 }

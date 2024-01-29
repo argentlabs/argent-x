@@ -121,6 +121,7 @@ export const transfer: TransactionActionFixture = {
         gasPrice: 1000000010,
         gasUsage: 3744,
         unit: "wei",
+        maxFee: 6744000037440,
       },
     },
   ],

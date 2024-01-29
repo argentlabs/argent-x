@@ -5,18 +5,15 @@ import { useNavigate } from "react-router-dom"
 import { defaultNetwork } from "../../../shared/network"
 import { routes } from "../../routes"
 import { clientAccountService } from "../../services/account"
-import {
-  analytics,
-  useTimeSpentWithSuccessTracking,
-} from "../../services/analytics"
+import { analytics } from "../../services/analytics"
 import { OnboardingPasswordScreen } from "./OnboardingPasswordScreen"
 import { sessionService } from "../../services/session"
 
 export const OnboardingPasswordScreenContainer: FC = () => {
-  const { trackSuccess } = useTimeSpentWithSuccessTracking(
-    "onboardingStepFinished",
-    { stepId: "newWalletPassword" },
-  )
+  // const { trackSuccess } = useTimeSpentWithSuccessTracking(
+  //   "onboardingStepFinished",
+  //   { stepId: "newWalletPassword" },
+  // )
 
   const navigate = useNavigate()
   const onBack = useNavigateBack()
@@ -45,7 +42,7 @@ export const OnboardingPasswordScreenContainer: FC = () => {
         })
         // NOTE: this tracking call is legit, as it relies on information that's only accessable to the UI
         // NOTE: we're not interested in the return of this promise, we should indicate that with void
-        void trackSuccess()
+        // void trackSuccess() // TODO: temporary disabled
 
         // NOTE: return the navigate promise, to make sure the form waits for it to finish
         return navigate(routes.onboardingFinish.path, { replace: true })
@@ -61,7 +58,7 @@ export const OnboardingPasswordScreenContainer: FC = () => {
         throw error
       }
     },
-    [navigate, networkId, trackSuccess],
+    [navigate, networkId],
   )
 
   return (

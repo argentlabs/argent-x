@@ -1,46 +1,30 @@
-import {
-  constants,
-  num,
-  TransactionFinalityStatus,
-  TransactionExecutionStatus,
-} from "starknet"
+import { num } from "starknet"
 import {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
 import {
-  ExtendedTransactionStatus,
+  ExtendedFinalityStatus,
   TransactionRequest,
   nameTransaction,
 } from "../../shared/transactions"
-import { WalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { isAccountDeployed } from "../accountDeploy"
 import { analytics } from "../analytics"
 import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
 import { Wallet } from "../wallet"
 import { getEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
-import { addTransaction, transactionsStore } from "./store"
+import {
+  addTransaction,
+  transactionsStore,
+} from "../../shared/transactions/store"
 import { getMultisigAccountFromBaseWallet } from "../../shared/multisig/utils/baseMultisig"
+import {
+  checkTransactionHash,
+  getTransactionStatus,
+} from "../../shared/transactions/utils"
 import { isAccountV5 } from "@argent/shared"
-
-export const checkTransactionHash = (
-  transactionHash?: num.BigNumberish,
-  account?: WalletAccount,
-): boolean => {
-  try {
-    if (!transactionHash) {
-      throw Error("transactionHash not defined")
-    }
-    const bn = num.toBigInt(transactionHash)
-    if (bn <= constants.ZERO && account?.type !== "multisig") {
-      throw Error("transactionHash needs to be >0")
-    }
-    return true
-  } catch {
-    return false
-  }
-}
+import { estimatedFeeToMaxFeeTotal } from "../../shared/transactionSimulation/utils"
 
 export type TransactionAction = ExtQueueItem<{
   type: "TRANSACTION"
@@ -60,15 +44,18 @@ export const executeTransactionAction = async (
   }
 
   const suggestedMaxFee =
-    transactionsDetail?.maxFee ?? preComputedFees.suggestedMaxFee
-  const suggestedMaxADFee = preComputedFees.maxADFee ?? "0"
+    transactionsDetail?.maxFee ??
+    estimatedFeeToMaxFeeTotal(preComputedFees.transactions)
+  const suggestedMaxADFee = preComputedFees.deployment
+    ? estimatedFeeToMaxFeeTotal(preComputedFees.deployment)
+    : 0n
 
   const maxFee = suggestedMaxFee
   const maxADFee = suggestedMaxADFee
 
-  void analytics.track("executeTransaction", {
-    usesCachedFees: Boolean(preComputedFees),
-  })
+  // void analytics.track("executeTransaction", {
+  //   usesCachedFees: Boolean(preComputedFees),
+  // }) // TODO: temporary disabled
 
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
@@ -84,12 +71,13 @@ export const executeTransactionAction = async (
       ? await getMultisigAccountFromBaseWallet(selectedAccount)
       : undefined
 
-  const pendingAccountTransactions = allTransactions.filter(
-    (tx) =>
-      tx.finalityStatus === TransactionFinalityStatus.RECEIVED &&
-      tx.executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
-      accountsEqual(tx.account, selectedAccount),
-  )
+  const pendingAccountTransactions = allTransactions.filter((tx) => {
+    const { finality_status } = getTransactionStatus(tx)
+    return (
+      finality_status === "RECEIVED" &&
+      accountsEqual(tx.account, selectedAccount)
+    )
+  })
 
   const hasUpgradePending = pendingAccountTransactions.some(
     (tx) => tx.meta?.isUpgrade,
@@ -162,10 +150,8 @@ export const executeTransactionAction = async (
 
   const title = nameTransaction(transactions)
 
-  const finalityStatus: ExtendedTransactionStatus =
-    multisig && multisig.threshold > 1
-      ? TransactionFinalityStatus.NOT_RECEIVED
-      : TransactionFinalityStatus.RECEIVED
+  const finalityStatus: ExtendedFinalityStatus =
+    multisig && multisig.threshold > 1 ? "NOT_RECEIVED" : "RECEIVED"
 
   const tx: TransactionRequest = {
     hash: transaction.transaction_hash,
@@ -179,12 +165,9 @@ export const executeTransactionAction = async (
   }
 
   // Add transaction with finality status NOT_RECEIVED for multisig transactions with threshold > 1
-  await addTransaction(tx, finalityStatus)
+  await addTransaction(tx, { finality_status: finalityStatus })
 
-  if (
-    !nonceWasProvidedByUI &&
-    finalityStatus === TransactionFinalityStatus.RECEIVED
-  ) {
+  if (!nonceWasProvidedByUI && finalityStatus === "RECEIVED") {
     await increaseStoredNonce(selectedAccount)
   }
 

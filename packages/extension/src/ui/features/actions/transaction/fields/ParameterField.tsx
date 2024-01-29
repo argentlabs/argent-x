@@ -1,4 +1,4 @@
-import { isValidAddress } from "@argent/shared"
+import { formatTruncatedAddress, isValidAddress } from "@argent/shared"
 import { chakra } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -6,7 +6,6 @@ import { IExplorerTransactionParameters } from "../../../../../shared/explorer/t
 import { entryPointToHumanReadable } from "../../../../../shared/transactions"
 import { CopyIconButton } from "../../../../components/CopyIconButton"
 import { Field, FieldKey, FieldValue } from "../../../../components/Fields"
-import { formatTruncatedAddress } from "../../../../services/addresses"
 import { AccountAddressField } from "./AccountAddressField"
 
 interface ParameterFieldProps {

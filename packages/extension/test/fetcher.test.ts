@@ -13,10 +13,6 @@ const BASE_URL_ENDPOINT = "http://foo/v1/bar"
 const INVALID_URL_ENDPOINT = "http://foo/v1/bar/invalid"
 const INVALID_PAYLOAD_URL_ENDPOINT = "http://foo/v1/bar/invalid/payload"
 
-/**
- * @vitest-environment jsdom
- */
-
 const server = setupServer(
   rest.get(BASE_URL_ENDPOINT, (req, res, ctx) => {
     return res(ctx.json({ foo: "bar" }))

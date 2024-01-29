@@ -4,9 +4,8 @@ import { accountService } from "../shared/account/service"
 import { ExtensionActionItem } from "../shared/actionQueue/types"
 import { MessageType } from "../shared/messages"
 import { networkService } from "../shared/network/service"
-import { preAuthorize } from "../shared/preAuthorizations"
 import { isEqualWalletAddress } from "../shared/wallet.service"
-import { assertNever } from "../ui/services/assertNever"
+import { assertNever } from "../shared/utils/assertNever"
 import { accountDeployAction } from "./accountDeployAction"
 import { analytics } from "./analytics"
 import { addMultisigDeployAction } from "./multisig/multisigDeployAction"
@@ -17,6 +16,7 @@ import {
 } from "./transactions/transactionExecution"
 import { udcDeclareContract, udcDeployContract } from "./udcAction"
 import { Wallet } from "./wallet"
+import { preAuthorizationService } from "../shared/preAuthorization/service"
 import { networkSchema } from "../shared/network"
 import { encodeChainId } from "../shared/utils/encodeChainId"
 
@@ -33,10 +33,10 @@ const handleTransactionAction = async ({
   const actionHash = action.meta.hash
 
   try {
-    void analytics.track("signedTransaction", {
-      networkId,
-      host,
-    })
+    // void analytics.track("signedTransaction", {
+    //   networkId,
+    //   host,
+    // }) // TODO: temporary disabled
 
     const response = await executeTransactionAction(action, wallet)
 
@@ -85,7 +85,10 @@ export const handleActionApproval = async (
         networkId,
       })
 
-      await preAuthorize(selectedAccount, host)
+      await preAuthorizationService.add({
+        account: selectedAccount,
+        host,
+      })
 
       return { type: "CONNECT_DAPP_RES", data: selectedAccount }
     }
@@ -96,9 +99,9 @@ export const handleActionApproval = async (
 
     case "DEPLOY_ACCOUNT": {
       try {
-        void analytics.track("signedTransaction", {
-          networkId,
-        })
+        // void analytics.track("signedTransaction", {
+        //   networkId,
+        // }) // TODO: temporary disabled
 
         const txHash = await accountDeployAction(action, wallet)
 
@@ -143,11 +146,11 @@ export const handleActionApproval = async (
 
     case "DEPLOY_MULTISIG": {
       try {
-        void analytics.track("signedTransaction", {
-          networkId,
-        })
+        // void analytics.track("signedTransaction", {
+        //   networkId,
+        // }) // TODO: temporary disabled
 
-        const txHash = await addMultisigDeployAction(action, wallet)
+        await addMultisigDeployAction(action, wallet)
 
         void analytics.track("deployMultisig", {
           status: "success",
@@ -182,10 +185,7 @@ export const handleActionApproval = async (
     }
 
     case "SIGN": {
-      const {
-        typedData,
-        options: { skipDeploy = false },
-      } = action.payload
+      const { typedData } = action.payload
       if (!(await wallet.isSessionOpen())) {
         throw new Error("you need an open session")
       }

@@ -1,6 +1,8 @@
-import { BasicContractClass } from "../../../background/__new/procedures/udc/getConstructorParams"
-import { ParameterField } from "../../../ui/features/settings/DeveloperSettings/deploySmartContractForm.model"
-import { DeclareContractBackgroundPayload } from "../type"
+import type {
+  BasicContractClass,
+  DeclareContractBackgroundPayload,
+  ParameterField,
+} from "../schema"
 
 export type DeployContractPayload = {
   address: string
@@ -15,6 +17,6 @@ export interface IUdcService {
     networkId: string,
     classHash: string,
   ): Promise<BasicContractClass>
-  deployContract(data: DeployContractPayload): Promise<string>
+  deployContract(data: DeployContractPayload): Promise<void>
   declareContract(data: DeclareContractBackgroundPayload): Promise<string>
 }

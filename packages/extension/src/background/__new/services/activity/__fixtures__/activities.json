@@ -1,0 +1,2148 @@
+[
+  {
+    "compositeId": "d257fa8ee26fd90062573fd37c0dd22bd3ddc8436487cd7fc9e35de13de4a825",
+    "id": "ccd8d9c0-dbed-493f-b796-f3c36410d4f8",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1701947828000,
+    "lastModified": 1701964096841,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x047e71b2f1e595efc3ef754a141dbbbedab556fc2a51f15c0f991ba08abd2e0b",
+      "status": "success",
+      "blockNumber": 914561,
+      "transactionIndex": 11
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0x25a2751133d109a5c876c87d9fd29d04c9d1f28de6790831c068f4c2fbc565e",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "100000000000000",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.22
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3771333487118",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3771333487118",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x025a2751133d109a5c876c87d9fd29d04c9d1f28de6790831c068f4c2fbc565e",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x25a2751133d109a5c876c87d9fd29d04c9d1f28de6790831c068f4c2fbc565e",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.22
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "444f8ce1f72061c8f51125464a146742226478f7ca9e52bad5584f91a2a56fa0",
+    "id": "e757f6c8-d89f-4abf-9e33-86ebedf5daa4",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1701868429000,
+    "lastModified": 1701885843056,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x06e5d6e6cd73c1129e07f94601639da05ecd01151d080f9c165d62a5f835a9ad",
+      "status": "success",
+      "blockNumber": 914059,
+      "transactionIndex": 3
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2539000035546",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2539000035546",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "10283988337752476",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 23.25
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "aa4d322615da31e23e4d76ad60c5780204cdb52c1382ec2303a87c95e759340d",
+    "id": "055a2ecd-db8d-48b6-b2d1-4d546d03a3e6",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1700564497000,
+    "lastModified": 1700584362613,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x023f593dc1d10e313f9b800f1c08150555b39fb3e383e67670ad191211d61447",
+      "status": "success",
+      "blockNumber": 906675,
+      "transactionIndex": 40
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2539000025390",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2539000025390",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.2
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "c934a0a11e9d0b5f425a459e85f51e5df37c72be5351bc5714f42a33142d21cc",
+    "id": "32d81c94-9bd3-4449-89f3-1e0aa988d972",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05423191fc5efcf4059a84acfae794cab61d49936d5dace7a3737a842bb65e67",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1700250732000,
+    "lastModified": 1700268135759,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x07a6c8297e10fdfe61a0228fe384cf41b969a5fef2d0ca43d16a4861ed02911f",
+      "status": "success",
+      "blockNumber": 904739,
+      "transactionIndex": 9
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "credit",
+        "counterparty": "0x5423191fc5efcf4059a84acfae794cab61d49936d5dace7a3737a842bb65e67",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "83470058948591",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.16
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x05423191fc5efcf4059a84acfae794cab61d49936d5dace7a3737a842bb65e67",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5423191fc5efcf4059a84acfae794cab61d49936d5dace7a3737a842bb65e67",
+      "leg": "credit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "83470058948591",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.16
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "d1b263313accb2c79e5fc512e3e9210c141d7d0e205fc46897c1c3740a596cd1",
+    "id": "e0332caf-b48d-4375-b2ba-1177e456839c",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1700238496000,
+    "lastModified": 1700253857254,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x06bbc4ccb21a12b8277db0f587cd95a1919383363fa62754f3117bec8d4e9e20",
+      "status": "success",
+      "blockNumber": 904664,
+      "transactionIndex": 6
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0x5423191fc5efcf4059a84acfae794cab61d49936d5dace7a3737a842bb65e67",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "100000000000000",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.19
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000041393",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000041393",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x05423191fc5efcf4059a84acfae794cab61d49936d5dace7a3737a842bb65e67",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5423191fc5efcf4059a84acfae794cab61d49936d5dace7a3737a842bb65e67",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "eda0b4d9c7033893714d5b7def8e65f24c37899a95d608642863e57db29d7a7c",
+    "id": "64087afe-2727-44cd-95e4-7c0389809ff4",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699957134000,
+    "lastModified": 1699969998380,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x015b3557ce857d59750c78bdba3b75dba1d474ee5e214763aa9cdb3a4c8b9942",
+      "status": "failure",
+      "blockNumber": 902813,
+      "transactionIndex": 6
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2520000022680",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2520000022680",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.2
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "f0f2d4e9d342ec46a95e3d894f07d5faba300a46e75ce3087b0c444957907f7e",
+    "id": "1eeecdef-f727-40e3-83ca-8c0b1a53f00d",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699613442000,
+    "lastModified": 1699627086865,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x0468061d0a7aadb58d3b29fd5ebd4d05b059bdd782b2f9ee489e1759831709f0",
+      "status": "failure",
+      "blockNumber": 900698,
+      "transactionIndex": 9
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2520000027720",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2520000027720",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.21
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "1919d61d69a4d29c4c9aafc4b78fbf4a007d406fff97aff1bc51c1677ef74fe7",
+    "id": "354ff579-2e34-4b5a-b87f-7e61d00f8ae2",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699610621000,
+    "lastModified": 1699627037326,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x0721d43a37097ba4c6ee35239a09968e66c5f73f2ef4a7c0e342fcef764d3a3c",
+      "status": "failure",
+      "blockNumber": 900683,
+      "transactionIndex": 5
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000037440",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000037440",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x03d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x3d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.21
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "5d380c4c0d80c1232764c8f5fa2840504538f4ad2d763fc77bdf96349c356438",
+    "id": "d49a8bdc-e698-422f-8634-293868d3243e",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699610621000,
+    "lastModified": 1699627037326,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x036b728f18c496b96d7abd5d994e50d1808c38cd599a1e736d2e1a9e3be953e9",
+      "status": "failure",
+      "blockNumber": 900683,
+      "transactionIndex": 1
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000037440",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000037440",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x03d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x3d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.21
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "af04edd447d7e706d38079543430f9de276f1d64976ba9db42a61aa14883a412",
+    "id": "36c2a331-ddca-4a20-8924-da8cdc0c3ce4",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699530030000,
+    "lastModified": 1699548126958,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x06c6ce1b0cace53d8620df056b3cd1671382b53494bb09a1c0545df76b3f6c0b",
+      "status": "success",
+      "blockNumber": 900203,
+      "transactionIndex": 15
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0x39b90d5c8fbf32641bd117664952b10905f421792cf04b584517c2c430f7b5e",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "100000000000000",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.19
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000037630",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000037630",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x039b90d5c8fbf32641bd117664952b10905f421792cf04b584517c2c430f7b5e",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x39b90d5c8fbf32641bd117664952b10905f421792cf04b584517c2c430f7b5e",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "f9461599915d5d6ffac7316b398f77c73a97783318e48a45980177c1dcfc31cb",
+    "id": "c54f5221-7a29-4e9a-833d-64f2410ca05a",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699530030000,
+    "lastModified": 1699548126864,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x0750814e784adec407073be4f96e9a5c5449e23047f4d65690f954152459a7bd",
+      "status": "success",
+      "blockNumber": 900203,
+      "transactionIndex": 9
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0x84eb567d4248c184dcf6ba57032ac9e15cbea151b76c5d535b2abda5a6a21d",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "100000000000000",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.19
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000037630",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000037630",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x0084eb567d4248c184dcf6ba57032ac9e15cbea151b76c5d535b2abda5a6a21d",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x84eb567d4248c184dcf6ba57032ac9e15cbea151b76c5d535b2abda5a6a21d",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "c282178ad183a2a723ee08508b8b36d2c3e21fe6907265ae68f989106d6f7065",
+    "id": "6cde791a-3e0a-4b3c-b071-96159a6770bc",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699529848000,
+    "lastModified": 1699548126746,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x0689a52526acc1b4579cc4f6bef83e73b5efe5c3c629666bfc8b1145a71d9289",
+      "status": "failure",
+      "blockNumber": 900202,
+      "transactionIndex": 10
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000041184",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000041184",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x0084eb567d4248c184dcf6ba57032ac9e15cbea151b76c5d535b2abda5a6a21d",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x84eb567d4248c184dcf6ba57032ac9e15cbea151b76c5d535b2abda5a6a21d",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "e8ece55cdc0dcd1615d2e9651bbc000273671495cce2870de3375b8a38a51b94",
+    "id": "d232436b-8395-4903-bafc-1ed7e0cb0984",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699461905000,
+    "lastModified": 1699481419775,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x0603c9caa9ed25d46815d467eeef6d4a7b8247b27737be1bd9b4d161f7bfd52f",
+      "status": "success",
+      "blockNumber": 899717,
+      "transactionIndex": 3
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0x1cf2a3112c54821398a8544736108b8491a72dfd9d0687759037bc0792097ec",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "100000000000000",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.19
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000041393",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000041393",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x01cf2a3112c54821398a8544736108b8491a72dfd9d0687759037bc0792097ec",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x1cf2a3112c54821398a8544736108b8491a72dfd9d0687759037bc0792097ec",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "86083434b85e7774a40693d51bca6b86c4b20e2ce7c3570fc710db404e1a82d0",
+    "id": "0d51f7ad-eac9-4f55-90dc-b658ee6be2af",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699451519000,
+    "lastModified": 1699472358357,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x00f58e861afffd3b7ac11156f80b58312d4e4df6aa7c4ee7d33a01458b324b57",
+      "status": "success",
+      "blockNumber": 899639,
+      "transactionIndex": 7
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0x3d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "100000000000000",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.19
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000048919",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000048919",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x03d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x3d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "5cddeda2dfacefff97560accb4b35cc840c35fa9ffc640eb1bcb2f762040bb46",
+    "id": "7a5e5a6d-d46e-4038-a9fa-fb788b3e090e",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699450942000,
+    "lastModified": 1699472309743,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x061bda619732292ea9f147e06f9df315d81c578426e812a945a43ab006caa749",
+      "status": "failure",
+      "blockNumber": 899628,
+      "transactionIndex": 7
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000048672",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000048672",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05eabc4165024d9e3da1be66688bfe70f1d8d8b234844ff9463172505df2dae8",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5eabc4165024d9e3da1be66688bfe70f1d8d8b234844ff9463172505df2dae8",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "0a927d3fd65c6963bd2f0b001ef45e48c6c564f0b90cf0de124a398ed9fcad96",
+    "id": "7b375f79-b6ee-4245-96e9-f06620a0eaa3",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699450433000,
+    "lastModified": 1699472298516,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x04a4795d3df0b925993f12fa79bf336ef3a82b86ebbcaf95646437c990c2c09e",
+      "status": "failure",
+      "blockNumber": 899623,
+      "transactionIndex": 1
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000052416",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000052416",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x03d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x3d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "3f095c636c85c1677cdb3852bb73ca00d07ad5b8e3538167306fa17fe540e0a7",
+    "id": "4ba575e8-8e2e-4a45-9742-22bf03fc23ff",
+    "status": "failure",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699450079000,
+    "lastModified": 1699472272589,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x05288371893343243d9b8ecd53b341157b0b4fba1ac92d76a745ab041b30739d",
+      "status": "failure",
+      "blockNumber": 899619,
+      "transactionIndex": 3
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000052416",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3744000052416",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x03d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x3d98fe1fecdd2020fce7869b5451f6395fb942789459752a8a4ea55a578345d",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "100000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 0.19
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "d30af894450b8a1effce9008bbdb43e775c664e7801066f5058360e6ec8280ac",
+    "id": "3b970744-c1f4-462c-a2d0-81f5177da3c8",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x00a00018122f54123d4003db254cd2054679d92eeefaa7c2d94c27abb9143b35",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699365853000,
+    "lastModified": 1699382319139,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x05735a29c5b5cf39f9f47f7255cc29cc8311b662036da842c6cb6989e1d47af5",
+      "status": "success",
+      "blockNumber": 898895,
+      "transactionIndex": 5
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "credit",
+        "counterparty": "0xa00018122f54123d4003db254cd2054679d92eeefaa7c2d94c27abb9143b35",
+        "asset": {
+          "type": "nft",
+          "tokenAddress": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+          "tokenId": 59,
+          "collectionName": "Xplorer",
+          "nftName": "Box #4AD373",
+          "nftPreviewImage": "https://static.hydrogen.argent47.net/moments/images/07c22dad-5e2d-4b76-8f52-974e373772cb.png"
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x00a00018122f54123d4003db254cd2054679d92eeefaa7c2d94c27abb9143b35",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0xa00018122f54123d4003db254cd2054679d92eeefaa7c2d94c27abb9143b35",
+      "leg": "credit",
+      "asset": {
+        "type": "nft",
+        "tokenAddress": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+        "tokenId": "59",
+        "collectionName": "Xplorer",
+        "collectionPreviewImage": null,
+        "nftName": "Box #4AD373",
+        "nftPreviewImage": "https://static.hydrogen.argent47.net/moments/images/07c22dad-5e2d-4b76-8f52-974e373772cb.png"
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "cfb424ebc07f47c070c8654bca4af349b9a30d2cf41b391db8d1fb1317886be6",
+    "id": "ea1e2a21-fe09-46bb-ba9e-a5e70d99ced6",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1699365753000,
+    "lastModified": 1699382319032,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x03e70772c6c277685e5322eaa2e82004ee3d4035fe8f5c852626a20e64fe6cb7",
+      "status": "success",
+      "blockNumber": 898894,
+      "transactionIndex": 19
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0xa00018122f54123d4003db254cd2054679d92eeefaa7c2d94c27abb9143b35",
+        "asset": {
+          "type": "nft",
+          "tokenAddress": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+          "tokenId": 59,
+          "collectionName": "Xplorer",
+          "nftName": "Box #4AD373",
+          "nftPreviewImage": "https://static.hydrogen.argent47.net/moments/images/07c22dad-5e2d-4b76-8f52-974e373772cb.png"
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "7445000074450",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "7445000074450",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x00a00018122f54123d4003db254cd2054679d92eeefaa7c2d94c27abb9143b35",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+        "network": "starknet",
+        "type": "token"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0xa00018122f54123d4003db254cd2054679d92eeefaa7c2d94c27abb9143b35",
+      "leg": "debit",
+      "asset": {
+        "type": "nft",
+        "tokenAddress": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+        "tokenId": "59",
+        "collectionName": "Xplorer",
+        "collectionPreviewImage": null,
+        "nftName": "Box #4AD373",
+        "nftPreviewImage": "https://static.hydrogen.argent47.net/moments/images/07c22dad-5e2d-4b76-8f52-974e373772cb.png"
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "50a46e6806c0d800f269d4f8f0090b9635683e6fce11ca88fbe42f895e5b450c",
+    "id": "c343bbe8-b5f2-4a2b-81b8-581480b1f2dc",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "security",
+    "group": "security",
+    "submitted": 1698332676000,
+    "lastModified": 1698350216501,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x04df353d391993f37797889809305bc70025bf2355f8ee0d54c4f1ffbd070b53",
+      "status": "success",
+      "blockNumber": 890649,
+      "transactionIndex": 3
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3754000060064",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3754000060064",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "action": "guardianChanged",
+      "context": {
+        "newGuardian": "0x0"
+      },
+      "type": "security"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "f3c2fbc576c2fd9db4344174862fb1e00b68ee3710078454b81821325f1be0d9",
+    "id": "5fbbbbf5-4fdf-4c9f-ade9-d4b223437e9b",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "security",
+    "group": "security",
+    "submitted": 1698331888000,
+    "lastModified": 1698349381611,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x03493edc5a2ac8e99c5abc12e5289bd81d2aff44521679a8b68988a25b252283",
+      "status": "success",
+      "blockNumber": 890638,
+      "transactionIndex": 26
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3752000060032",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3752000060032",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "action": "guardianChanged",
+      "context": {
+        "newGuardian": "0x456b5d3566f20a09d4de73f2dc315a07ce7d0b28c61828a690a567971b58286"
+      },
+      "type": "security"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "de54e4e65475c071d86b24ef23c420ba7edb4c7114163cdab0d735f5985ebe3c",
+    "id": "5ee91c1b-e694-4139-b394-2f3ba0f51021",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1698226081000,
+    "lastModified": 1698242447946,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x04420cd3ff8d9a44d9c4704ba3670340483e32666d847f18c331520313ea9e41",
+      "status": "success",
+      "blockNumber": 889471,
+      "transactionIndex": 8
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "credit",
+        "counterparty": "0x0",
+        "asset": {
+          "type": "nft",
+          "tokenAddress": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+          "tokenId": 59,
+          "collectionName": "Xplorer",
+          "nftName": "Box #4AD373",
+          "nftPreviewImage": "https://static.hydrogen.argent47.net/moments/images/07c22dad-5e2d-4b76-8f52-974e373772cb.png"
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "7442002083760",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "7442002083760",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+        "network": "starknet",
+        "type": "token"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "leg": "credit",
+      "asset": {
+        "type": "nft",
+        "tokenAddress": "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+        "tokenId": "59",
+        "collectionName": "Xplorer",
+        "collectionPreviewImage": null,
+        "nftName": "Box #4AD373",
+        "nftPreviewImage": "https://static.hydrogen.argent47.net/moments/images/07c22dad-5e2d-4b76-8f52-974e373772cb.png"
+      },
+      "context": {
+        "isMint": true
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "e025a68566cbba3946f293589e9b6cc2d9fb6317ab21f9311bc7eaf073320280",
+    "id": "06910688-52c4-4ab3-a99b-4a6f67aee865",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1697464096000,
+    "lastModified": 1697487786473,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x00452bf7a66d1730988410efaa7dca542aac586ace25edbe9c2fd80c678054a3",
+      "status": "success",
+      "blockNumber": 883986,
+      "transactionIndex": 7
+    },
+    "transfers": [
+      {
+        "type": "payment",
+        "leg": "debit",
+        "counterparty": "0x216fd9638a25f6d1acbafb470d5161e64221d903b3e51268239b495250fc6ed",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "1000000000000000",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 1.59
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      },
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000048919",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "3763000048919",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.01
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      },
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x0216fd9638a25f6d1acbafb470d5161e64221d903b3e51268239b495250fc6ed",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x216fd9638a25f6d1acbafb470d5161e64221d903b3e51268239b495250fc6ed",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "1000000000000000",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 1.59
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  },
+  {
+    "compositeId": "86138392277f15d6fe9130066f2c6442d1efb5fb2c7f6998bd2fd6706e13c22f",
+    "id": "9496ad98-b22e-4aeb-9f48-59414324af44",
+    "status": "success",
+    "wallet": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "payment",
+    "group": "finance",
+    "submitted": 1697103943000,
+    "lastModified": 1697123360105,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x043c52b46fe52d2281d12d72496c47217b2c1d1c9de5d5f3344122ae4b51a9ea",
+      "status": "success",
+      "blockNumber": 881834,
+      "transactionIndex": 12
+    },
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2539000035546",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "2539000035546",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [
+      {
+        "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "network": "starknet",
+        "type": "token"
+      },
+      {
+        "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+        "network": "starknet",
+        "type": "wallet"
+      }
+    ],
+    "networkDetails": {
+      "ethereumNetwork": "goerli",
+      "chainId": "TESTNET"
+    },
+    "details": {
+      "counterparty": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      "leg": "debit",
+      "asset": {
+        "type": "token",
+        "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "amount": "11778071281732457",
+        "fiatAmount": {
+          "currency": "USD",
+          "currencyAmount": 18.31
+        }
+      },
+      "type": "payment",
+      "counterpartyNetwork": "starknet"
+    },
+    "network": "starknet"
+  }
+]

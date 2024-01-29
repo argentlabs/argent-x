@@ -64,6 +64,7 @@ export const AddOwnersForm = ({
                 />
                 <InputRightElement my="auto">
                   <RoundButton
+                    data-testid={`closeButton.${index}`}
                     onClick={() => {
                       if (!isNewMultisig && fields.length === 1) {
                         addOwner()
@@ -95,6 +96,7 @@ export const AddOwnersForm = ({
       )}
       <Center width="100%">
         <Button
+          data-testid="addOwnerButton"
           variant="link"
           onClick={addOwner}
           size="xs"

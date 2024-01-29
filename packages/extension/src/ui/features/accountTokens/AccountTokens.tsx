@@ -1,5 +1,6 @@
-import { CellStack, DapplandBanner, Empty, icons } from "@argent/ui"
-import dapplandBanner from "@argent/ui/assets/dapplandBannerBackground.png"
+import { CellStack, Banner, Empty, icons } from "@argent/ui"
+import avnuBanner from "@argent/ui/assets/avnuBannerBackground.png"
+import ekuboBanner from "@argent/ui/assets/ekuboBannerBackground.png"
 import { Center, Flex, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -15,17 +16,20 @@ import { SaveRecoverySeedphraseBanner } from "./SaveRecoverySeedphraseBanner"
 import { TokenList } from "./TokenList"
 import { TokenListItemVariant } from "./TokenListItem"
 import { UpgradeBanner } from "./UpgradeBanner"
-import { AccountDeprecatedBanner } from "./AccountDeprecatedBanner"
+import { AccountDeprecatedBanner } from "./warning/AccountDeprecatedBanner"
+import { classHashSupportsTxV3 } from "../../../shared/network/txv3"
+import { AccountOwnerBanner } from "./warning/AccountOwnerBanner"
 
 const { MultisigIcon, WalletIcon } = icons
 
 export interface AccountTokensProps {
   account: Account
   showTokensAndBanners: boolean
-  showDapplandBanner: boolean
-  setDappLandBannerSeen: () => void
+  showEkuboBanner: boolean
+  showAvnuBanner: boolean
   hasEscape: boolean
   accountGuardianIsSelf: boolean | null
+  accountOwnerIsSelf?: boolean
   showUpgradeBanner: boolean
   showNoBalanceForUpgrade: boolean
   onUpgradeBannerClick?: () => void
@@ -33,18 +37,23 @@ export interface AccountTokensProps {
   multisig?: Multisig
   showAddFundsBackdrop?: boolean
   tokenListVariant?: TokenListItemVariant
-  feeTokenBalance?: bigint
+  hasFeeTokenBalance?: boolean
   showSaveRecoverySeedphraseBanner: boolean
   isDeprecated?: boolean
+  setEkuboBannerSeen: () => void
+  setAvnuBannerSeen: () => void
+  onAvnuClick?: () => void
+  returnTo?: string
 }
 
 export const AccountTokens: FC<AccountTokensProps> = ({
   account,
-  showDapplandBanner,
+  showEkuboBanner,
+  showAvnuBanner,
   showTokensAndBanners,
-  setDappLandBannerSeen,
   hasEscape,
   accountGuardianIsSelf,
+  accountOwnerIsSelf,
   showUpgradeBanner,
   showNoBalanceForUpgrade,
   onUpgradeBannerClick,
@@ -52,10 +61,16 @@ export const AccountTokens: FC<AccountTokensProps> = ({
   multisig,
   showAddFundsBackdrop,
   tokenListVariant,
-  feeTokenBalance,
+  hasFeeTokenBalance,
   showSaveRecoverySeedphraseBanner,
   isDeprecated = false,
+  setEkuboBannerSeen,
+  setAvnuBannerSeen,
+  onAvnuClick,
+  returnTo,
 }) => {
+  const supportsStrkAsFeeToken = classHashSupportsTxV3(account.classHash)
+  const feeTokenCurrency = supportsStrkAsFeeToken ? "ETH or STRK" : "ETH"
   return (
     <Flex direction={"column"} data-testid="account-tokens">
       <VStack spacing={6} mt={4} mb={6}>
@@ -67,11 +82,23 @@ export const AccountTokens: FC<AccountTokensProps> = ({
       </VStack>
       {showTokensAndBanners ? (
         <CellStack pt={0}>
-          {showDapplandBanner && (
-            <DapplandBanner
-              backgroundImageUrl={dapplandBanner}
-              href="https://www.dappland.com?utm_source=argent&utm_medium=extension&utm_content=banner"
-              onClose={setDappLandBannerSeen}
+          {showEkuboBanner && (
+            <Banner
+              backgroundImageUrl={ekuboBanner}
+              href="https://ekubo.org/"
+              onClose={setEkuboBannerSeen}
+              title="Provide liquidity on Ekubo"
+              subTitle="Starknet's most powerful AMM"
+              dark
+            />
+          )}
+          {showAvnuBanner && (
+            <Banner
+              backgroundImageUrl={avnuBanner}
+              title="Swap with AVNU"
+              subTitle="Get the best rate on Argent X"
+              onClose={setAvnuBannerSeen}
+              onClick={onAvnuClick}
             />
           )}
           {showSaveRecoverySeedphraseBanner && <SaveRecoverySeedphraseBanner />}
@@ -87,9 +114,12 @@ export const AccountTokens: FC<AccountTokensProps> = ({
           )}
           {isDeprecated && (
             <AccountDeprecatedBanner
-              to={routes.accountDeprecated()}
+              to={routes.accountDeprecated(returnTo)}
               state={{ from: location.pathname }}
             />
+          )}
+          {!accountOwnerIsSelf && (
+            <AccountOwnerBanner to={routes.accountOwnerWarning(returnTo)} />
           )}
           {showNoBalanceForUpgrade && !isDeprecated && (
             <UpgradeBanner
@@ -101,7 +131,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({
           {multisig && (
             <MultisigBanner
               multisig={multisig}
-              feeTokenBalance={feeTokenBalance}
+              hasFeeTokenBalance={hasFeeTokenBalance}
             />
           )}
           {showAddFundsBackdrop && (
@@ -111,8 +141,8 @@ export const AccountTokens: FC<AccountTokensProps> = ({
             >
               <Center textAlign={"center"}>
                 {multisig
-                  ? "You will need some ETH to activate the multisig account"
-                  : "You will need some ETH to use the account"}
+                  ? `You will need some ${feeTokenCurrency} to activate the multisig account`
+                  : `You will need some ${feeTokenCurrency} to use the account`}
               </Center>
             </Empty>
           )}

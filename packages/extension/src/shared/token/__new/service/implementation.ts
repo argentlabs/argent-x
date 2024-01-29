@@ -10,17 +10,20 @@ import {
   Token,
 } from "../types/token.model"
 import { convertTokenAmountToCurrencyValue, equalToken } from "../utils"
-import { BaseTokenWithBalance } from "../types/tokenBalance.model"
-import { BaseWalletAccount } from "../../../wallet.model"
+import {
+  BaseTokenWithBalance,
+  TokenWithBalance,
+} from "../types/tokenBalance.model"
+import { BaseWalletAccount, WalletAccount } from "../../../wallet.model"
 import {
   ApiPriceDataResponseSchema,
   TokenPriceDetails,
   TokenWithBalanceAndPrice,
 } from "../types/tokenPrice.model"
 import { accountsEqual } from "../../../utils/accountsEqual"
-import { groupBy } from "lodash-es"
+import { groupBy, uniq } from "lodash-es"
 import { SelectorFn } from "../../../storage/__new/interface"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal, ensureArray, isEqualAddress } from "@argent/shared"
 import { INetworkService } from "../../../network/service/interface"
 import { getMulticallForNetwork } from "../../../multicall"
 import { getProvider } from "../../../network/provider"
@@ -28,6 +31,12 @@ import { Network, defaultNetwork } from "../../../network"
 import { fetcherWithArgentApiHeadersForNetwork } from "../../../api/fetcher"
 import { getAccountIdentifier } from "../../../wallet.service"
 import { TokenError } from "../../../errors/token"
+import {
+  classHashSupportsTxV3,
+  feeTokenNeedsTxV3Support,
+} from "../../../network/txv3"
+
+const FEE_TOKEN_PREFERENCE_BY_SYMBOL = ["STRK", "ETH"]
 
 /**
  * TokenService class implements ITokenService interface.
@@ -160,6 +169,7 @@ export class TokenService implements ITokenService {
           networkId,
           custom: cached?.custom,
           popular: token.popular || cached?.popular,
+          tradable: token.tradable || cached?.tradable,
         }
       })
 
@@ -169,16 +179,24 @@ export class TokenService implements ITokenService {
   /**
    * Fetches token balances from the blockchain.
    * @param {BaseWalletAccount[]} accounts - The accounts for which to fetch token balances.
-   * @param {Token[]} tokens - The tokens for which to fetch balances. If not provided, fetches for all tokens.
+   * @param {Token[]} tokens - The tokens for which to fetch balances. If not provided, finds all relevant tokens for the accounts
    * @returns {Promise<BaseTokenWithBalance[]>} - The fetched token balances.
    */
   async fetchTokenBalancesFromOnChain(
     accounts: AllowArray<BaseWalletAccount>,
     tokens?: AllowArray<Token>,
   ): Promise<BaseTokenWithBalance[]> {
-    const accountsArray = Array.isArray(accounts) ? accounts : [accounts]
-    tokens = tokens || (await this.getTokens())
-    const tokensArray = Array.isArray(tokens) ? tokens : [tokens]
+    const accountsArray = ensureArray(accounts)
+    // by default, find all the relevant tokens for all the accounts
+    if (!tokens) {
+      // create an array of all networks covered by accounts
+      const networkIds = uniq(accountsArray.map((account) => account.networkId))
+      // create an array of all tokens covered by the networks
+      tokens = await this.getTokens((token) =>
+        networkIds.includes(token.networkId),
+      )
+    }
+    const tokensArray = ensureArray(tokens)
 
     const accountsGroupedByNetwork = groupBy(accountsArray, "networkId")
     const tokensGroupedByNetwork = groupBy(tokensArray, "networkId")
@@ -528,5 +546,67 @@ export class TokenService implements ITokenService {
     }
 
     return totalCurrencyBalanceForAccounts
+  }
+
+  async getFeeTokens(
+    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
+  ): Promise<TokenWithBalance[]> {
+    const tokens = await this.getTokens()
+    const network = await this.networkService.getById(account.networkId)
+    const networkFeeTokens = tokens.filter((token) =>
+      network.possibleFeeTokenAddresses.some((ft) =>
+        isEqualAddress(ft, token.address),
+      ),
+    )
+    const accountFeeTokens = networkFeeTokens.filter((token) => {
+      if (feeTokenNeedsTxV3Support(token)) {
+        return classHashSupportsTxV3(account.classHash)
+      }
+      return true
+    })
+    const feeTokenBalances = await this.getTokenBalancesForAccount(
+      account,
+      accountFeeTokens,
+    )
+    const feeTokensWithBalances: TokenWithBalance[] = accountFeeTokens.map(
+      (token) => {
+        const tokenBalance = feeTokenBalances.find((tb) =>
+          equalToken(tb, token),
+        ) ?? {
+          balance: "0",
+          account: { address: account.address, networkId: account.networkId },
+        }
+        return {
+          ...token,
+          ...tokenBalance,
+        }
+      },
+    )
+    // sort by fee token preference defined in FEE_TOKEN_PREFERENCE_BY_SYMBOL
+    return feeTokensWithBalances.sort((a, b) => {
+      const [aIndex, bIndex] = [a, b].map((token) =>
+        FEE_TOKEN_PREFERENCE_BY_SYMBOL.indexOf(token.symbol),
+      )
+      return aIndex === -1 ? 1 : bIndex === -1 ? -1 : aIndex - bIndex
+    })
+  }
+
+  async getBestFeeToken(
+    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
+  ): Promise<TokenWithBalance> {
+    const possibleFeeTokenWithBalances = await this.getFeeTokens(account)
+
+    if (possibleFeeTokenWithBalances.length === 1) {
+      return possibleFeeTokenWithBalances[0]
+    }
+
+    // we expect the fee tokens to be sorted by preference
+    // so we return the first one that has a balance
+    // if none have a balance, we return the first one (prefered one)
+    return (
+      possibleFeeTokenWithBalances.find(
+        (token) => bigDecimal.parseCurrency(token.balance).value > 0n,
+      ) ?? possibleFeeTokenWithBalances[0]
+    )
   }
 }

@@ -1,7 +1,7 @@
 import { Page, expect } from "@playwright/test"
 
 import { lang } from "../languages"
-import Navigation from "./Navigation"
+import Activity from "./Activity"
 
 type TokenName = "Ethereum"
 export interface IAsset {
@@ -10,12 +10,14 @@ export interface IAsset {
   unit: string
 }
 
-export default class Account extends Navigation {
+export default class Account extends Activity {
   constructor(page: Page) {
     super(page)
   }
   accountName1 = "Account 1"
   accountName2 = "Account 2"
+  accountNameMulti1 = "Multisig 1"
+  accountNameMulti2 = "Multisig 2"
 
   get noAccountBanner() {
     return this.page.locator(`div h5:has-text("${lang.account.noAccounts}")`)
@@ -69,6 +71,18 @@ export default class Account extends Navigation {
     return this.page.locator('[aria-label="Standard Account"]')
   }
 
+  get addMultisigAccountFromNewAccountScreen() {
+    return this.page.locator('[aria-label="Multisig Account"]')
+  }
+
+  get createNewMultisig() {
+    return this.page.locator('[aria-label="Create new multisig"]')
+  }
+
+  get joinExistingMultisig() {
+    return this.page.locator('[aria-label="Join existing multisig"]')
+  }
+
   get assetsList() {
     return this.page.locator('button[role="alert"] ~ button')
   }
@@ -107,16 +121,9 @@ export default class Account extends Navigation {
     return this.page.locator('[data-testid="account-tokens"] h2')
   }
 
-  /** FIME: revert to this function once testnet starknet id is returing a 'not found' state */
-  _invalidStarkIdError(id: string) {
+  invalidStarkIdError(id: string) {
     return this.page.locator(
       `form label:has-text('${id}${lang.account.invalidStarkIdError}')`,
-    )
-  }
-
-  invalidStarkIdError(_id: string) {
-    return this.page.locator(
-      `form label:has-text('Could not get address from stark name')`,
     )
   }
 
@@ -366,12 +373,16 @@ export default class Account extends Navigation {
     return this.page.locator(`div h6:text-is("${label}")`)
   }
 
-  get dappsBanner() {
-    return this.page.locator('[title="Dappland"]')
+  get avnuBanner() {
+    return this.page.locator('p:text-is("Swap with AVNU")')
   }
 
-  get dappsBannerClose() {
-    return this.page.locator('[title="Dappland"] svg')
+  get ekuboBanner() {
+    return this.page.locator('p:text-is("Provide liquidity on Ekubo")')
+  }
+
+  get avnuBannerClose() {
+    return this.page.locator('[data-testid="close-banner"]')
   }
 
   async saveRecoveryPhrase() {
@@ -433,7 +444,157 @@ export default class Account extends Navigation {
     await this.pinInput.first().fill(pin)
   }
 
+  async setupRecovery() {
+    await this.accountAddressFromAssetsView.click()
+    return this.saveRecoveryPhrase().then((adr) => String(adr))
+  }
+
+  // Multisig
   get deployNeededWarning() {
     return this.page.locator(`p:has-text("${lang.account.deployFirst}")`)
+  }
+
+  get increaseThreshold() {
+    return this.page.locator(`[data-testid="increase-threshold"]`)
+  }
+
+  get decreaseThreshold() {
+    return this.page.locator(`[data-testid="decrease-threshold"]`)
+  }
+
+  get manageOwners() {
+    return this.page.locator(`button:text-is("Manage owners")`)
+  }
+
+  get setConfirmationsLocator() {
+    return this.page.locator(`button:has-text("Set confirmations")`)
+  }
+
+  async addMultisigAccount({
+    signers = [],
+    confirmations = 1,
+  }: {
+    signers?: string[]
+    confirmations?: number
+  }) {
+    await this.accountListSelector.click()
+    await this.addANewccountFromAccountList.click()
+    await this.addMultisigAccountFromNewAccountScreen.click()
+
+    const [pages] = await Promise.all([
+      this.page.context().waitForEvent("page"),
+      this.createNewMultisig.click(),
+    ])
+    const tabs = pages.context().pages()
+    await tabs[1].waitForLoadState("load")
+    await expect(tabs[1].locator('[name^="signerKeys.0.key"]')).toHaveCount(1)
+    if (signers.length > 0) {
+      for (let index = 0; index < signers.length; index++) {
+        await tabs[1]
+          .locator(`[name="signerKeys\\.${index}\\.key"]`)
+          .isVisible()
+          .then(async (visible) => {
+            if (!visible) {
+              await tabs[1].locator('[data-testid="addOwnerButton"]').click()
+            }
+          })
+        await tabs[1]
+          .locator(`[name="signerKeys.${index}.key"]`)
+          .fill(signers[index])
+      }
+    }
+
+    //remove empty inputs
+    const locs = await tabs[1].locator('[name^="signerKeys"]').all()
+    if (locs.length > signers.length) {
+      for (let index = locs.length; index > signers.length + 1; index--) {
+        await tabs[1]
+          .locator(`[data-testid="closeButton.${index - 2}"]`)
+          .click()
+      }
+    }
+
+    await tabs[1].locator('button:text-is("Next")').click()
+    const currentTheshold = await tabs[1]
+      .locator('[data-testid="threshold"]')
+      .innerText()
+      .then((v) => parseInt(v!))
+
+    //set confirmations
+    if (confirmations > currentTheshold) {
+      for (let i = currentTheshold; i < confirmations; i++) {
+        await tabs[1].locator('[data-testid="increase-threshold"]').click()
+      }
+    }
+
+    await tabs[1]
+      .locator(`button:text-is("${lang.account.createMultisig}")`)
+      .click()
+    await tabs[1].locator(`button:text-is("${lang.wallet.finish}")`).click()
+  }
+
+  async joinMultisig() {
+    await this.accountListSelector.click()
+    await this.addANewccountFromAccountList.click()
+    await this.addMultisigAccountFromNewAccountScreen.click()
+
+    await this.joinExistingMultisig.click()
+    await this.page.locator('[data-testid="copy-pubkey"]').click()
+    await this.page.locator('[data-testid="button-done"]').click()
+    return String(await this.page.evaluate(`navigator.clipboard.readText()`))
+  }
+
+  ensureMultisigActivated() {
+    return Promise.all([
+      expect(this.page.locator("label:has-text('Not activated')")).toBeHidden({
+        timeout: 60000,
+      }),
+      expect(
+        this.page.locator('[data-testid="activating-multisig"]'),
+      ).toBeHidden({ timeout: 60000 }),
+    ])
+  }
+
+  accountListConfirmations(accountName: string) {
+    return this.page.locator(
+      `[aria-label="Select ${accountName}"] [data-testid="confirmations"]`,
+    )
+  }
+
+  get accountViewConfirmations() {
+    return this.page.locator('[data-testid="confirmations"]')
+  }
+
+  async acceptTx(tx: string) {
+    await this.menuActivity.click()
+    await this.page.locator(`[data-tx-hash="${tx}"]`).click()
+    await this.confirm.click()
+  }
+
+  async setConfirmations(accountName: string, confirmations: number) {
+    await this.ensureSelectedAccount(accountName)
+    await this.showSettings.click()
+    await this.account(accountName).click()
+    await this.setConfirmationsLocator.click()
+
+    const currentTheshold = await this.page
+      .locator('[data-testid="threshold"]')
+      .innerText()
+      .then((v) => parseInt(v!))
+    if (confirmations > currentTheshold) {
+      for (let i = currentTheshold; i < confirmations; i++) {
+        await this.increaseThreshold.click()
+      }
+    } else if (confirmations < currentTheshold) {
+      for (let i = currentTheshold; i > confirmations; i--) {
+        await this.decreaseThreshold.click()
+      }
+    }
+    await this.page.locator('[data-testid="update-confirmations"]').click()
+    await this.confirm.click()
+    await Promise.all([
+      expect(this.confirm).toBeHidden(),
+      expect(this.menuActivity).toBeVisible(),
+    ])
   }
 }

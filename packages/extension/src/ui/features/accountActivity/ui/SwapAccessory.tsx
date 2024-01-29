@@ -7,9 +7,13 @@ import { SwapTransaction } from "../transform/type"
 
 export interface SwapAccessoryProps {
   transaction: SwapTransaction
+  failed?: boolean
 }
 
-export const SwapAccessory: FC<SwapAccessoryProps> = ({ transaction }) => {
+export const SwapAccessory: FC<SwapAccessoryProps> = ({
+  transaction,
+  failed,
+}) => {
   const { fromAmount, fromToken, toAmount, toToken } = transaction
   return (
     <Flex direction={"column"} overflow="hidden">
@@ -19,6 +23,7 @@ export const SwapAccessory: FC<SwapAccessoryProps> = ({ transaction }) => {
           textOverflow={"ellipsis"}
           textAlign={"right"}
           color={"secondary.500"}
+          textDecoration={failed ? "line-through" : undefined}
         >
           <>+</>
           {toToken ? (
@@ -39,6 +44,7 @@ export const SwapAccessory: FC<SwapAccessoryProps> = ({ transaction }) => {
           overflow="hidden"
           textOverflow={"ellipsis"}
           textAlign={"right"}
+          textDecoration={failed ? "line-through" : undefined}
         >
           &minus;
           {fromToken ? (

@@ -25,6 +25,7 @@ import { useEstimatedFees } from "../../feeEstimation/useEstimatedFees"
 import { WithActionScreenErrorFooter } from "./WithActionScreenErrorFooter"
 import { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
 import { ensureArray } from "@argent/shared"
+import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
 
 export const ApproveTransactionScreenContainer: FC<
   ApproveTransactionScreenContainerProps
@@ -250,6 +251,7 @@ export const ApproveTransactionScreenContainer: FC<
         <WithActionScreenErrorFooter isTransaction>
           {selectedAccount.needsDeploy ? (
             <CombinedFeeEstimationContainer
+              feeTokenAddress={ETH_TOKEN_ADDRESS}
               onErrorChange={setDisableConfirm}
               onFeeErrorChange={onShowAddFunds}
               accountAddress={selectedAccount.address}
@@ -264,6 +266,7 @@ export const ApproveTransactionScreenContainer: FC<
             />
           ) : (
             <FeeEstimationContainer
+              feeTokenAddress={ETH_TOKEN_ADDRESS}
               onErrorChange={setDisableConfirm}
               onFeeErrorChange={onShowAddFunds}
               accountAddress={selectedAccount.address}

@@ -1,5 +1,5 @@
+import { formatTruncatedAddress } from "@argent/shared"
 import { transactionNamesToTitle } from "../../../../../../shared/transactions"
-import { formatTruncatedAddress } from "../../../../../services/addresses"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
 import { ITransactionTransformer } from "./type"
 

@@ -1,7 +1,5 @@
-import { SupportedNetworks, SwapProvider } from "@argent/x-swap"
-import { FC, ReactNode, useMemo } from "react"
+import { FC, ReactNode } from "react"
 
-import { getMulticallForNetwork } from "../../../shared/multicall"
 import { AccountActivityContainer } from "../accountActivity/AccountActivityContainer"
 import { AccountCollectionsContainer } from "../accountNfts/AccountCollectionsContainer"
 import { AccountTokensContainer } from "../accountTokens/AccountTokensContainer"
@@ -14,6 +12,7 @@ import { useAccount } from "./accounts.state"
 import { AccountScreenEmptyContainer } from "./AccountScreenEmptyContainer"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
+import { useIsDefaultNetwork } from "../networks/hooks/useIsDefaultNetwork"
 
 interface AccountScreenProps {
   tab: "tokens" | "collections" | "activity" | "swap"
@@ -27,17 +26,9 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   const shouldShowFullScreenStatusMessage =
     useShouldShowFullScreenStatusMessage()
 
+  const isDefaultNetwork = useIsDefaultNetwork()
+
   const hasAccount = account !== undefined
-
-  const multicall = account && getMulticallForNetwork(account?.network)
-
-  const noSwap = useMemo(
-    () =>
-      ![SupportedNetworks.MAINNET, SupportedNetworks.TESTNET].includes(
-        account?.networkId as any,
-      ),
-    [account?.networkId],
-  )
 
   if (shouldShowFullScreenStatusMessage) {
     return <StatusMessageFullScreenContainer />
@@ -53,18 +44,7 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
   } else if (tab === "activity") {
     body = <AccountActivityContainer account={account} />
   } else if (tab === "swap") {
-    body = noSwap ? (
-      <NoSwap />
-    ) : (
-      <SwapProvider
-        selectedAccount={account}
-        multicall={multicall}
-        rpcUrl={account.network.rpcUrl}
-        chainId={account.network.chainId}
-      >
-        <Swap />
-      </SwapProvider>
-    )
+    body = isDefaultNetwork ? <Swap /> : <NoSwap /> // Swap is only available on default network
   } else {
     tab satisfies never
   }

@@ -7,7 +7,7 @@ import { urlWithQuery } from "../../../shared/utils/url"
 import { useAppState } from "../../app.state"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { routes } from "../../routes"
-import { assertNever } from "../../services/assertNever"
+import { assertNever } from "../../../shared/utils/assertNever"
 import { useCreatePendingMultisig } from "./hooks/useCreatePendingMultisig"
 import { uiService } from "../../../shared/__new/services/ui"
 

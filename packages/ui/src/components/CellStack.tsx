@@ -70,10 +70,12 @@ export const ButtonCell: ButtonCellComponent = ({
         alignItems={"center"}
         textAlign={"left"}
       >
-        {leftIcon && <Flex fontSize="base">{leftIcon}</Flex>}
-        <H6>{children}</H6>
+        {leftIcon && <Flex fontSize="xl">{leftIcon}</Flex>}
+        <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
+          {children}
+        </H6>
         {rightIcon && (
-          <Flex ml={"auto"} fontSize="base">
+          <Flex ml={"auto"} fontSize="base" color={"text.secondary"}>
             {rightIcon}
           </Flex>
         )}

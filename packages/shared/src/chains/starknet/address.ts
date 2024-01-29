@@ -8,6 +8,7 @@ import {
 import { z } from "zod"
 
 import { Hex } from "../../utils/hex"
+import { memoize } from "lodash-es"
 
 export type TxHash = Hex
 export type Address = Hex
@@ -73,7 +74,7 @@ export const addressSchemaArgentBackend = addressSchemaBase.transform(
   },
 )
 
-export const isAddress = (string: string): string is Address =>
+export const isAddress = (string?: string): string is Address =>
   addressSchema.safeParse(string).success
 
 export const isValidAddress = isAddress
@@ -126,3 +127,27 @@ export const isZeroAddress = (address: string) => {
   }
   return false
 }
+
+export const includesAddress = (needle: string, haystack?: string[]) => {
+  return Boolean(haystack?.some((value) => isEqualAddress(value, needle)))
+}
+
+export const formatTruncatedSignerKey = memoize((signerKey: string) => {
+  const start = signerKey.slice(0, 6)
+  const end = signerKey.slice(-4)
+  return `${start}…${end}`
+})
+
+export const formatTruncatedString = memoize(
+  (string: string, targetLength: number) => {
+    if (string.length < targetLength) {
+      return string
+    }
+
+    const startEndLength = Math.floor((targetLength - 1) / 2)
+    const start = string.slice(0, startEndLength)
+    const end = string.slice(-startEndLength)
+
+    return `${start}…${end}`
+  },
+)

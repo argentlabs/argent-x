@@ -1,9 +1,9 @@
-import { Box, SquareProps } from "@chakra-ui/react"
+import { Box, BoxProps } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { DappDisplayAttributes } from "./useDappDisplayAttributes"
 
-interface DappIconProps extends SquareProps {
+interface DappIconProps extends BoxProps {
   dappDisplayAttributes?: DappDisplayAttributes
 }
 

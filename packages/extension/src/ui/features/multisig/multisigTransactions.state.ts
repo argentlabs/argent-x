@@ -6,7 +6,7 @@ import {
   byAccountSelector,
   multisigPendingTransactionsStore,
 } from "../../../shared/multisig/pendingTransactionsStore"
-import { useArrayStorage } from "../../../shared/storage/hooks"
+import { useArrayStorage } from "../../hooks/useStorage"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useMultisig } from "./multisig.state"
 import { num } from "starknet"

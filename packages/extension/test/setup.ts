@@ -39,4 +39,9 @@ vi.stubGlobal("chrome", {
       addListener: noop,
     },
   },
+  tabs: {
+    onRemoved: {
+      addListener: noop,
+    },
+  },
 })

@@ -1,12 +1,18 @@
 import { createTRPCProxyClient } from "@trpc/client"
 import { chromeLink } from "trpc-browser/link"
 import { autoReconnect } from "trpc-browser/shared/chrome"
+import superjson from "superjson"
 import browser from "webextension-polyfill"
 
+/**
+ * This is safe as it's explicity importing a type which can only reasonably be created in background trpc router
+ */
+// eslint-disable-next-line @argent/local/code-import-patterns
 import type { AppRouter } from "../../../background/__new/router"
 
 const initalPort = browser.runtime.connect()
 let _messageClient = createTRPCProxyClient<AppRouter>({
+  transformer: superjson,
   links: [chromeLink({ port: initalPort })],
 })
 
@@ -21,6 +27,7 @@ void autoReconnect(
   (newPort) => {
     console.log("Reconnecting to new port", newPort.name)
     _messageClient = createTRPCProxyClient<AppRouter>({
+      transformer: superjson,
       links: [chromeLink({ port: newPort })],
     })
   },

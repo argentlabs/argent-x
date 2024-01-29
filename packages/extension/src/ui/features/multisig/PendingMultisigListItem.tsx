@@ -6,9 +6,9 @@ import {
   CustomButtonCell,
   CustomButtonCellProps,
 } from "../../components/CustomButtonCell"
-import { formatTruncatedAddress } from "../../services/addresses"
 import { AccountAvatar } from "../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
+import { formatTruncatedAddress } from "@argent/shared"
 
 const { ViewIcon } = icons
 

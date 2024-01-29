@@ -23,3 +23,11 @@ export const TokenWithOptionalBigIntBalanceSchema = TokenSchema.extend({
 export type TokenWithOptionalBigIntBalance = z.infer<
   typeof TokenWithOptionalBigIntBalanceSchema
 >
+
+export const TokenWithBigIntBalanceSchema = TokenSchema.extend({
+  balance: z.bigint(),
+})
+
+export type TokenWithBigIntBalance = z.infer<
+  typeof TokenWithBigIntBalanceSchema
+>

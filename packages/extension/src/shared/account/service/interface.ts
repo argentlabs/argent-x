@@ -4,6 +4,9 @@ import { BaseWalletAccount, WalletAccount } from "../../wallet.model"
 export interface IAccountService {
   // Repo methods
   get(selector?: SelectorFn<WalletAccount>): Promise<WalletAccount[]>
+  getFromBaseWalletAccounts(
+    baseWalletAccounts: BaseWalletAccount[],
+  ): Promise<WalletAccount[]>
   upsert(account: AllowArray<WalletAccount>): Promise<void>
   remove(baseAccount: BaseWalletAccount): Promise<void>
 

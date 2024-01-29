@@ -1,9 +1,8 @@
 import { Address } from "@argent/shared"
 
-import { Network } from "../../../../shared/network"
-import { mockNetworks } from "../../../features/networks/NetworkSwitcher/NetworkSwitcher.test"
 import { messageClient } from "../../messaging/trpc"
 import { TokenService } from "../implementation"
+import { Mocked } from "vitest"
 
 const messageClientMock = {
   tokens: {
@@ -32,7 +31,7 @@ const messageClientMock = {
       ]),
     },
   },
-} as unknown as jest.Mocked<typeof messageClient>
+} as unknown as Mocked<typeof messageClient>
 
 describe("TokenService", () => {
   let testClass: TokenService
@@ -165,129 +164,6 @@ describe("TokenService", () => {
         accountAddress: "0x789",
         networkId: "1",
       })
-    })
-  })
-
-  describe("fetchFeeTokenBalance", () => {
-    it("should return the fee token balance for an account", async () => {
-      // Mock the trpcMessageClient.tokens.getAccountBalance.query method
-      vi.mock("../../../features/accountTokens/tokens.state", () => ({
-        getNetworkFeeToken: vi.fn().mockReturnValue(
-          Promise.resolve({
-            address: "0x123",
-            symbol: "TKN",
-            networkId: "1",
-            name: "Token",
-            decimals: 18,
-          }),
-        ),
-      }))
-      messageClientMock.tokens.getAccountBalance.query = vi
-        .fn()
-        .mockResolvedValue({
-          address: "0x123",
-          networkId: "1",
-          account: {
-            address: "0x789",
-            networkId: "1",
-          },
-          balance: "500",
-        })
-
-      const result = await testClass.fetchFeeTokenBalance("0x123", "1")
-
-      expect(result).toEqual("500")
-      expect(
-        messageClientMock.tokens.getAccountBalance.query,
-      ).toHaveBeenCalledWith({
-        tokenAddress: expect.any(String),
-        accountAddress: "0x123",
-        networkId: "1",
-      })
-    })
-  })
-
-  describe("fetchFeeTokenBalanceForAllAccounts", () => {
-    it("should return the fee token balances for all accounts", async () => {
-      // Mock the trpcMessageClient.tokens.getAccountBalance.query method
-      messageClientMock.tokens.getAccountBalance.query = vi
-        .fn()
-        .mockImplementation(({ accountAddress }) => {
-          if (accountAddress === "0x789") {
-            return Promise.resolve({
-              address: "0x123",
-              networkId: "2",
-              account: {
-                address: "0x789",
-                networkId: "2",
-              },
-              balance: "1000",
-            })
-          }
-          if (accountAddress === "0xabc") {
-            return Promise.resolve({
-              address: "0x123",
-              networkId: "2",
-              account: {
-                address: "0xabc",
-                networkId: "2",
-              },
-              balance: "2000",
-            })
-          }
-        })
-
-      const network: Network = {
-        ...mockNetworks[1],
-        multicallAddress: "0xmulticall",
-      }
-
-      const result = await testClass.fetchFeeTokenBalanceForAllAccounts(
-        ["0x789", "0xabc"],
-        network,
-      )
-
-      expect(result).toEqual({
-        "0x789": BigInt(1000).toString(),
-        "0xabc": BigInt(2000).toString(),
-      })
-      expect(
-        messageClientMock.tokens.getAccountBalance.query,
-      ).toHaveBeenCalledTimes(2)
-      expect(
-        messageClientMock.tokens.getAccountBalance.query,
-      ).toHaveBeenNthCalledWith(1, {
-        tokenAddress: expect.any(String),
-        accountAddress: "0x789",
-        networkId: "2",
-      })
-      expect(
-        messageClientMock.tokens.getAccountBalance.query,
-      ).toHaveBeenNthCalledWith(2, {
-        tokenAddress: expect.any(String),
-        accountAddress: "0xabc",
-        networkId: "2",
-      })
-    })
-  })
-  describe("fetchFeeTokenBalance", () => {
-    it("should throw an error if fee token is not found", async () => {
-      const module = await import(
-        "../../../features/accountTokens/tokens.state"
-      )
-      module.getNetworkFeeToken = vi.fn().mockResolvedValueOnce(null)
-      const network: Network = {
-        ...mockNetworks[0],
-        multicallAddress: "0xmulticall",
-        feeTokenAddress: undefined,
-      }
-
-      await expect(() =>
-        testClass.fetchFeeTokenBalanceForAllAccounts(
-          ["0x789", "0xabc"],
-          network,
-        ),
-      ).rejects.toThrowError("Fee token not found")
     })
   })
 })

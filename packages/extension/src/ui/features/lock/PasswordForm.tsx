@@ -1,16 +1,17 @@
 import { FieldError, Input, icons } from "@argent/ui"
-import { Box, Text } from "@chakra-ui/react"
+import { Box, Flex, FlexProps, Text } from "@chakra-ui/react"
 import { isEmpty, isString } from "lodash-es"
 import { FC, ReactNode, useEffect } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { validatePassword } from "../recovery/seedRecovery.state"
+import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 
 interface FieldValues {
   password: string
 }
 
-interface PasswordFormProps {
+export interface PasswordFormProps extends Omit<FlexProps, "children"> {
   error?: string
   verifyPassword: (password: string) => Promise<boolean>
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
@@ -20,6 +21,7 @@ export const PasswordForm: FC<PasswordFormProps> = ({
   error,
   verifyPassword,
   children,
+  ...rest
 }) => {
   const { control, formState, handleSubmit, clearErrors, setError } =
     useForm<FieldValues>()
@@ -43,8 +45,16 @@ export const PasswordForm: FC<PasswordFormProps> = ({
       setError("password", { message: "Invalid password" })
     }
   }
+
+  const inputRef = useAutoFocusInputRef<HTMLInputElement>()
+
   return (
-    <form onSubmit={handleSubmit(handlePassword)}>
+    <Flex
+      as="form"
+      direction="column"
+      onSubmit={handleSubmit(handlePassword)}
+      {...rest}
+    >
       <Controller
         name="password"
         control={control}
@@ -52,11 +62,14 @@ export const PasswordForm: FC<PasswordFormProps> = ({
         defaultValue=""
         render={({ field: { ref, ...field } }) => (
           <Input
-            autoFocus
             placeholder="Password"
             type="password"
             {...field}
             isInvalid={!isEmpty(errors.password)}
+            ref={(e) => {
+              ref(e)
+              inputRef.current = e
+            }}
           />
         )}
       />
@@ -83,6 +96,6 @@ export const PasswordForm: FC<PasswordFormProps> = ({
         </Box>
       )}
       {children?.({ isDirty, isSubmitting })}
-    </form>
+    </Flex>
   )
 }

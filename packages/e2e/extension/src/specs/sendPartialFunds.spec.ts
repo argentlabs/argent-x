@@ -14,8 +14,8 @@ test.describe("Send funds", () => {
       tokenName: "Ethereum",
       amount: 0.005,
     })
-
-    await extension.validateTx(accountAddresses[1], amountTrx)
+    const txHash = await extension.activity.getLastTxHash()
+    await extension.validateTx(txHash!, accountAddresses[1], amountTrx)
     await extension.navigation.menuTokens.click()
 
     //ensure that balance is updated
@@ -47,7 +47,8 @@ test.describe("Send funds", () => {
       fillRecipientAddress: "typing",
     })
 
-    await extension.validateTx(config.destinationAddress!, amountTrx)
+    const txHash = await extension.activity.getLastTxHash()
+    await extension.validateTx(txHash!, config.destinationAddress!, amountTrx)
     await extension.navigation.menuTokens.click()
 
     //ensure that balance is updated
@@ -79,6 +80,7 @@ test.describe("Send funds", () => {
       tokenName: "Ethereum",
       amount: "MAX",
     })
-    await extension.validateTx(config.account1Seed3!, amountTrx)
+    const txHash = await extension.activity.getLastTxHash()
+    await extension.validateTx(txHash!, config.account1Seed3!, amountTrx)
   })
 })

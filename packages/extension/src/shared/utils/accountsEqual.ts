@@ -1,9 +1,9 @@
 import { isEqualAddress } from "@argent/shared"
 import type { BaseWalletAccount, WalletAccount } from "../wallet.model"
 
-export const accountsEqual = (a: BaseWalletAccount, b?: BaseWalletAccount) => {
+export const accountsEqual = (a?: BaseWalletAccount, b?: BaseWalletAccount) => {
   try {
-    if (!b) {
+    if (!a || !b) {
       return false
     }
     return isEqualAddress(a.address, b.address) && a.networkId === b.networkId

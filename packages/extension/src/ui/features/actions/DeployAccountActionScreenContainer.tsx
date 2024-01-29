@@ -25,7 +25,11 @@ export const DeployAccountActionScreenContainer: FC = () => {
     if (isObject(result) && "error" in result) {
       // stay on error screen
     } else {
-      if (isObject(result) && "txHash" in result) {
+      if (
+        isObject(result) &&
+        "txHash" in result &&
+        typeof result.txHash === "string"
+      ) {
         accountWithDeployState?.updateDeployTx(result.txHash)
       }
       void closePopupIfLastAction()

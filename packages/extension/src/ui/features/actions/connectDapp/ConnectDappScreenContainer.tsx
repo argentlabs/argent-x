@@ -1,9 +1,6 @@
 import { FC, useCallback, useMemo, useState } from "react"
 
-import {
-  removePreAuthorization,
-  useIsPreauthorized,
-} from "../../../../shared/preAuthorizations"
+import { useIsPreauthorized } from "../../preAuthorizations/hooks"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { useAppState } from "../../../app.state"
@@ -13,10 +10,10 @@ import { useActionScreen } from "../hooks/useActionScreen"
 import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { ConnectDappScreen } from "./ConnectDappScreen"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
-import { useDisclosure } from "@chakra-ui/react"
 import { NavigationBar } from "@argent/ui"
 import { NetworkSwitcherContainer } from "../../networks/NetworkSwitcher/NetworkSwitcherContainer"
 import { clientAccountService } from "../../../services/account"
+import { preAuthorizationService } from "../../../../shared/preAuthorization/service"
 
 export const ConnectDappScreenContainer: FC = () => {
   const {
@@ -66,7 +63,10 @@ export const ConnectDappScreenContainer: FC = () => {
 
   const onDisconnect = useCallback(async () => {
     if (selectedAccount) {
-      await removePreAuthorization(action.payload.host, selectedAccount)
+      await preAuthorizationService.remove({
+        account: selectedAccount,
+        host: action.payload.host,
+      })
     }
     await reject()
   }, [action.payload.host, reject, selectedAccount])

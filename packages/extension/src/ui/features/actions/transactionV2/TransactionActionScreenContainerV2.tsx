@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 
 import { useTransactionReviewV2 } from "./useTransactionReviewV2"
 import { useActionScreen } from "../hooks/useActionScreen"
@@ -11,6 +11,7 @@ import {
   AccordionPanel,
   Box,
   Divider,
+  useDisclosure,
 } from "@chakra-ui/react"
 import { isArray } from "lodash-es"
 import { TransactionHeader } from "./TransactionHeader"
@@ -44,6 +45,11 @@ import {
 import { TransactionReviewLabel } from "./TransactionReviewLabel"
 
 const { AlertIcon } = icons
+import { ETH_TOKEN_ADDRESS } from "../../../../shared/network/constants"
+import { warningSchema } from "../../../../shared/transactionReview/schema"
+import { z } from "zod"
+import { ConfirmationModal } from "./warning/ConfirmationModal"
+import { getHighestSeverity } from "./warning/helper"
 
 export interface TransactionActionScreenContainerV2Props
   extends ConfirmScreenProps {
@@ -66,6 +72,11 @@ export const TransactionActionScreenContainerV2: FC<
       "TransactionActionScreenContainer used with incompatible action.type",
     )
   }
+  const {
+    isOpen: isConfirmationModalOpen,
+    onOpen: onConfirmationModalOpen,
+    onClose: onConfirmationModalClose,
+  } = useDisclosure()
 
   const navigate = useNavigate()
   const [disableConfirm, setDisableConfirm] = useState(true)
@@ -73,6 +84,7 @@ export const TransactionActionScreenContainerV2: FC<
   const [userClickedAddFunds, setUserClickedAddFunds] = useAtom(
     userClickedAddFundsAtom,
   )
+  const [askForConfirmation, setAskForConfirmation] = useState(false)
 
   const onSubmit = useCallback(async () => {
     const result = await approve()
@@ -198,24 +210,41 @@ export const TransactionActionScreenContainerV2: FC<
     })
   }, [transactionReview])
 
+  const warnings = transactionReview?.transactions.flatMap((transaction) => {
+    return transaction.reviewOfTransaction?.warnings
+  })
+
+  const warningsWithoutUndefined = z
+    .array(warningSchema)
+    .safeParse(
+      warnings?.filter((warning) => !isEmpty(warning) && warning !== undefined),
+    )
+
+  const highestSeverityWarning =
+    warningsWithoutUndefined.success &&
+    getHighestSeverity(warningsWithoutUndefined.data)
+
+  useEffect(() => {
+    if (
+      highestSeverityWarning &&
+      (highestSeverityWarning.severity === "critical" ||
+        highestSeverityWarning.severity === "high")
+    ) {
+      setAskForConfirmation(true)
+    }
+  }, [highestSeverityWarning])
+
   const transactionReviewWarnings = useMemo(() => {
-    return transactionReview?.transactions.flatMap((transaction, index) => {
-      if (isEmpty(transaction.reviewOfTransaction?.warnings)) {
-        return false
-      }
-      return (
-        <>
-          {transaction.reviewOfTransaction?.warnings?.map((warnings) => (
-            <WarningBanner
-              key={`warning-${index}-${warnings.reason}`}
-              reason={warnings.reason}
-              severity={warnings.severity}
-            />
-          ))}
-        </>
-      )
-    })
-  }, [transactionReview])
+    if (!warningsWithoutUndefined.success) {
+      return null
+    }
+    return (
+      <WarningBanner
+        warnings={warningsWithoutUndefined.data}
+        onReject={() => void reject()}
+      />
+    )
+  }, [warningsWithoutUndefined, reject])
 
   const transactionReviewFallback = useMemo(
     () =>
@@ -261,6 +290,11 @@ export const TransactionActionScreenContainerV2: FC<
     [setUserClickedAddFunds, userClickedAddFunds],
   )
 
+  const onConfirm = () => {
+    onConfirmationModalClose()
+    void onSubmit()
+  }
+
   const onSubmitWithChecks = () => {
     if (hasInsufficientFunds) {
       navigate(routes.funding(), { state: { showOnTop: true } })
@@ -273,6 +307,10 @@ export const TransactionActionScreenContainerV2: FC<
       multisigModalDisclosure.onOpen()
       return
     }
+    if (askForConfirmation) {
+      onConfirmationModalOpen()
+      return
+    }
     void onSubmit()
   }
 
@@ -282,10 +320,11 @@ export const TransactionActionScreenContainerV2: FC<
     <WithActionScreenErrorFooter isTransaction>
       {selectedAccount && transactionReview?.enrichedFeeEstimation && (
         <FeeEstimationContainerV2
+          feeTokenAddress={ETH_TOKEN_ADDRESS}
           onErrorChange={setDisableConfirm}
           onFeeErrorChange={onShowAddFunds}
           transactionSimulationLoading={isValidating}
-          fee={transactionReview?.enrichedFeeEstimation}
+          fee={transactionReview.enrichedFeeEstimation}
           networkId={selectedAccount.networkId}
           accountAddress={selectedAccount.address}
           needsDeploy={selectedAccount.needsDeploy}
@@ -318,6 +357,7 @@ export const TransactionActionScreenContainerV2: FC<
         showHeader={true}
         onReject={() => void reject()}
         footer={footer}
+        destructive={askForConfirmation}
         {...rest}
       >
         {multisigModal}
@@ -339,6 +379,11 @@ export const TransactionActionScreenContainerV2: FC<
         {transactionReviewActions}
         {loadingOrErrorState}
       </ConfirmScreen>
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={onConfirmationModalClose}
+        onConfirm={onConfirm}
+      />
     </WithArgentShieldVerified>
   )
 }

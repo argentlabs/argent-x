@@ -41,11 +41,11 @@ export const useActionScreen = () => {
 
   const reject = useCallback(async () => {
     /** TODO: refactor: move tracking into service or action handler */
-    await analytics.track("rejectedTransaction", {
+    void analytics.track("rejectedTransaction", {
       networkId: selectedAccount?.networkId || "unknown",
       host: await getOriginatingHost(),
     })
-    action && (await clientActionService.reject(action.meta.hash))
+    action && void clientActionService.reject(action.meta.hash)
   }, [action, selectedAccount?.networkId])
 
   const rejectAndClose = useCallback(async () => {

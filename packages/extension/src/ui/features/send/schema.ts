@@ -5,7 +5,7 @@ import { useQuery } from "../../hooks/useQuery"
 
 export const sendQuerySchema = z.object({
   recipientAddress: addressOrDomainSchema.optional(),
-  tokenAddress: addressSchema.optional(),
+  tokenAddress: addressSchema,
   tokenId: z.string().optional(),
   amount: z.string().optional(),
   returnTo: z.string().optional(),

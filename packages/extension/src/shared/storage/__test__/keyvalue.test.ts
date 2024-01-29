@@ -153,6 +153,8 @@ describe("when invalid", () => {
         { foo: "bar" },
         { namespace: "test", areaName: "invalid" as any },
       )
-    }).toThrowErrorMatchingInlineSnapshot('"Unknown storage area: invalid"')
+    }).toThrowErrorMatchingInlineSnapshot(
+      `[Error: Unknown storage area: invalid]`,
+    )
   })
 })

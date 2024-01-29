@@ -2,7 +2,7 @@ import { AddNewAccountScreen } from "@argent-x/extension/src/ui/features/account
 import {
   AccountType,
   AccountTypeId,
-} from "@argent-x/extension/src/ui/features/accounts/AddNewAccountScreenContainer"
+} from "@argent-x/extension/src/ui/features/accounts/AddNewAccountScreen"
 import { icons } from "@argent/ui"
 
 import { decorators } from "../../decorators/routerDecorators"

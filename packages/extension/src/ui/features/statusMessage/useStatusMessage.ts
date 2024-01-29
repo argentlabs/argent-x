@@ -6,7 +6,7 @@ import {
 } from "../../../shared/api/constants"
 import { statusMessageStore } from "../../../shared/statusMessage/storage"
 import { IStatusMessage } from "../../../shared/statusMessage/types"
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { useKeyValueStorage } from "../../hooks/useStorage"
 import { argentApiFetcher } from "../../services/argentApiFetcher"
 import {
   useConditionallyEnabledSWR,

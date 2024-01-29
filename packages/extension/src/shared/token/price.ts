@@ -1,6 +1,7 @@
 import { uint256, BigNumberish } from "starknet"
 
 import {
+  IPrettifyNumberConfig,
   isNumeric,
   prettifyCurrencyNumber,
   prettifyTokenNumber,
@@ -216,6 +217,7 @@ export interface IPrettifyTokenAmount {
   showPlusSign?: boolean
   withSymbol?: boolean
   unlimitedText?: string
+  prettyConfigOverrides?: Partial<IPrettifyNumberConfig>
 }
 
 export const prettifyTokenAmount = ({
@@ -225,6 +227,7 @@ export const prettifyTokenAmount = ({
   showPlusSign = false,
   withSymbol = true,
   unlimitedText = PRETTY_UNLIMITED,
+  prettyConfigOverrides,
 }: IPrettifyTokenAmount) => {
   if (!isNumeric(amount)) {
     return null
@@ -243,7 +246,7 @@ export const prettifyTokenAmount = ({
         : balance.toString()
     prettyValue =
       decimalsNumber > 0
-        ? prettifyTokenNumber(balanceFullString)
+        ? prettifyTokenNumber(balanceFullString, prettyConfigOverrides)
         : balanceFullString
   }
 

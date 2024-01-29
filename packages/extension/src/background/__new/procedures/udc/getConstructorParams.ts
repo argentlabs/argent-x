@@ -4,20 +4,11 @@ import { getProvider } from "../../../../shared/network"
 import { networkService } from "../../../../shared/network/service"
 import { extensionOnlyProcedure } from "../permissions"
 import { UdcError } from "../../../../shared/errors/udc"
-
-const getConstructorParamsSchema = z.object({
-  networkId: z.string(),
-  classHash: z.string(),
-})
-
-const basicContractClassSchema = z.object({
-  abi: z.array(z.any()),
-  contract_class_version: z.string(),
-  entry_points_by_type: z.any().optional(),
-  sierra_program: z.array(z.string()).optional(),
-})
-
-export type BasicContractClass = z.infer<typeof basicContractClassSchema>
+import {
+  getConstructorParamsSchema,
+  basicContractClassSchema,
+  BasicContractClass,
+} from "../../../../shared/udc/schema"
 
 export const getConstructorParamsProcedure = extensionOnlyProcedure
   .input(getConstructorParamsSchema)

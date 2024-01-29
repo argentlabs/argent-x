@@ -11,17 +11,13 @@ const { MultisigIcon } = icons
 
 export const MultisigBanner: FC<{
   multisig: Multisig
-  feeTokenBalance?: bigint
-}> = ({ multisig, feeTokenBalance }) => {
+  hasFeeTokenBalance?: boolean
+}> = ({ multisig, hasFeeTokenBalance }) => {
   const isMultisigDeploying = useIsMultisigDeploying(multisig)
 
   const showActivateMultisigBanner = useMemo(
-    () =>
-      !isMultisigDeploying &&
-      multisig.needsDeploy &&
-      feeTokenBalance &&
-      feeTokenBalance > 0n,
-    [feeTokenBalance, isMultisigDeploying, multisig.needsDeploy],
+    () => !isMultisigDeploying && multisig.needsDeploy && hasFeeTokenBalance,
+    [hasFeeTokenBalance, isMultisigDeploying, multisig.needsDeploy],
   )
 
   const onActivateMultisig = useCallback(async () => {
@@ -33,6 +29,7 @@ export const MultisigBanner: FC<{
   if (showActivateMultisigBanner) {
     return (
       <AlertButton
+        data-testid="activate-multisig"
         size="md"
         title="Activate multisig"
         description="Click to activate the multisig"
@@ -47,6 +44,7 @@ export const MultisigBanner: FC<{
   if (isMultisigDeploying) {
     return (
       <AlertButton
+        data-testid="activating-multisig"
         colorScheme={"warning"}
         title="Activating multisig"
         description="Waiting for the multisig to be activated"

@@ -1,6 +1,5 @@
 import {
   DeployAccountContractPayload as StarknetDeployAccountContractPayload,
-  EstimateFee as StarknetEstimateFee,
   InvocationsDetails as StarknetInvocationDetails,
 } from "starknet"
 import {
@@ -9,10 +8,11 @@ import {
   MultisigData,
   WalletAccount,
 } from "../../../shared/wallet.model"
+import { EstimatedFee } from "../../../shared/transactionSimulation/fees/fees.model"
+import { Address } from "@argent/shared"
 
 // Extend to support multichain
 type InvocationsDetails = StarknetInvocationDetails
-type EstimateFee = StarknetEstimateFee
 type DeployAccountContractPayload = StarknetDeployAccountContractPayload
 
 export interface IWalletDeploymentService {
@@ -20,7 +20,10 @@ export interface IWalletDeploymentService {
     walletAccount: WalletAccount,
     transactionDetails?: InvocationsDetails | undefined,
   ): Promise<{ account: WalletAccount; txHash: string }>
-  getAccountDeploymentFee(walletAccount: WalletAccount): Promise<EstimateFee>
+  getAccountDeploymentFee(
+    walletAccount: WalletAccount,
+    feeTokenAddress?: Address,
+  ): Promise<EstimatedFee>
   redeployAccount(
     account: WalletAccount,
   ): Promise<{ account: WalletAccount; txHash: string }>

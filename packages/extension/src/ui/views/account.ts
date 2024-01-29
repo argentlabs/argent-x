@@ -63,7 +63,7 @@ export const hiddenAccountsOnNetworkFamily =
   accountsOnNetworkFamilyFactory(hiddenAccountsView)
 
 export const accountFindFamily = atomFamily(
-  (baseAccount: BaseWalletAccount) =>
+  (baseAccount?: BaseWalletAccount) =>
     atom(async (get) => {
       const accounts = await get(allAccountsView)
       return accounts.find((account) => accountsEqual(account, baseAccount))

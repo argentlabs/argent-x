@@ -21,7 +21,6 @@ import {
   SectionHeader,
 } from "../../components/Fields"
 import { ContentCopyIcon } from "../../components/Icons/MuiIcons"
-import { formatTruncatedAddress } from "../../services/addresses"
 import {
   openBlockExplorerAddress,
   openBlockExplorerTransaction,
@@ -53,6 +52,9 @@ import { TransferTitle } from "./ui/TransferTitle"
 import { useTransactionFees } from "./useTransactionFees"
 import { useTransactionNonce } from "./useTransactionNonce"
 import { Token } from "../../../shared/token/__new/types/token.model"
+import { formatTruncatedAddress } from "@argent/shared"
+import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
+import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 const { ActivityIcon } = icons
 
@@ -169,12 +171,17 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
   const txNonce = useTransactionNonce({ hash, network })
   const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
   const { action, date, displayName, dapp } = transactionTransformed
+
+  const { finality_status, execution_status } =
+    getTransactionStatus(transaction)
+
   const isReverted =
     upperCase(explorerTransaction?.executionStatus) === "REVERTED" ||
-    transaction?.executionStatus === "REVERTED"
+    execution_status === "REVERTED"
   const isRejected =
     upperCase(explorerTransaction?.executionStatus) === "REJECTED" ||
-    transaction?.executionStatus === "REJECTED"
+    finality_status === "REJECTED"
+
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
   const isNFT = isNFTTransaction(transactionTransformed)
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
@@ -419,7 +426,13 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         )}
         {dapp && <DappContractField knownContract={dapp} />}
         {additionalFields}
-        {txFee && <FeeField fee={txFee} networkId={network.id} />}
+        {txFee && (
+          <FeeField
+            feeTokenAddress={ETH_TOKEN_ADDRESS}
+            fee={txFee}
+            networkId={network.id}
+          />
+        )}
         {txNonce && (
           <Field>
             <FieldKey>Nonce</FieldKey>

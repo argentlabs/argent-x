@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom"
 import { isAccountHidden } from "../../../shared/wallet.service"
 import { useAppState } from "../../app.state"
 import { routes, useReturnTo } from "../../routes"
-import { isEqualAddress } from "../../services/addresses"
 import {
   selectedAccountView,
   allAccountsOnNetworkFamily,
@@ -24,6 +23,7 @@ import {
   sortMultisigByDerivationPath,
 } from "../../../shared/utils/accountsMultisigSort"
 import { usePartitionDeprecatedAccounts } from "./accountUpgradeCheck"
+import { isEqualAddress } from "@argent/shared"
 
 /** TODO: we should be able to retreive all these account collections using queries from storage */
 export const AccountListScreenContainer: FC = () => {

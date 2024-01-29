@@ -1,4 +1,4 @@
-import { addressSchema } from "@argent/shared"
+import { addressSchema, isEqualAddress } from "@argent/shared"
 import type { Dictionary } from "lodash"
 import {
   flatten,
@@ -19,17 +19,20 @@ import {
   TokenDetails,
   TransactionSimulationTransfer,
 } from "../../../../shared/transactionSimulation/types"
-import { isEqualAddress } from "../../../services/addresses"
 import { useContractAddresses } from "../../accountNfts/nfts.state"
 import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useTokensRecord } from "../../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 import { bigDecimal } from "@argent/shared"
-import { num } from "starknet"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { Token } from "../../../../shared/token/__new/types/token.model"
-import { FEE_OVERHEAD } from "../../../../shared/utils/argentMaxFee"
+import {
+  estimatedFeesToMaxFeeTotal,
+  estimatedFeesToTotal,
+  getEstimatedFeeFromBulkSimulation,
+} from "../../../../shared/transactionSimulation/utils"
+import { num } from "starknet"
 
 interface CommonSimulationData {
   token: Token
@@ -83,11 +86,6 @@ export type ValidatedTokenApproval = Omit<
 function partitionIncomingOutgoingTransfers(transfers: AggregatedSimData[]) {
   return partition(transfers, (t) => t.amount > 0n)
 }
-
-const FEE_MULTIPLIER = FEE_OVERHEAD
-const scale = 10
-const scaledMultiplier = Math.round(FEE_MULTIPLIER * scale)
-const FEE_MULTIPLIER_BIGINT = BigInt(scaledMultiplier)
 
 function orderAggregatedSimData(
   simData: AggregatedSimData[],
@@ -148,70 +146,21 @@ export const useSimulationPreprocessor = (
 
 export const useAggregatedTxFeesData = (
   transactionSimulation?: ApiTransactionBulkSimulationResponse,
-  feeSimulation?: EstimatedFees,
-  feeSequencer?: EstimatedFees,
-  needsDeploy?: boolean,
+  providedFee?: EstimatedFees,
 ) => {
-  const totalFee = useMemo(() => {
-    if (needsDeploy && feeSequencer?.accountDeploymentFee) {
-      return num.toHex(
-        num.toBigInt(feeSequencer.accountDeploymentFee) +
-          num.toBigInt(feeSequencer.amount),
-      )
-    }
-    return feeSequencer?.amount
-  }, [needsDeploy, feeSequencer?.accountDeploymentFee, feeSequencer?.amount])
+  const fee = transactionSimulation
+    ? getEstimatedFeeFromBulkSimulation(transactionSimulation)
+    : providedFee
 
-  const totalMaxFee = useMemo(() => {
-    if (needsDeploy && feeSequencer?.maxADFee) {
-      return num.toHex(
-        num.toBigInt(feeSequencer.maxADFee) +
-          num.toBigInt(feeSequencer.suggestedMaxFee),
-      )
-    }
-    return feeSequencer?.suggestedMaxFee
-  }, [needsDeploy, feeSequencer?.maxADFee, feeSequencer?.suggestedMaxFee])
-
-  if (!transactionSimulation || transactionSimulation.length === 0) {
-    return {
-      fee: feeSequencer,
-      totalFee,
-      totalMaxFee,
-    }
-  }
-
-  if (!feeSimulation) {
-    return {
-      fee: feeSequencer,
-      totalFee,
-      totalMaxFee,
-    }
-  }
-
-  const { amount } = feeSimulation
-
-  const suggestedMaxFee =
-    (BigInt(amount) * BigInt(FEE_MULTIPLIER_BIGINT)) / BigInt(scale) // add 1.5x overhead
-  let maxADFee = num.toBigInt(0)
-  let accountDeploymentFee = num.toBigInt(0)
-
-  if (needsDeploy && transactionSimulation[0].feeEstimation) {
-    accountDeploymentFee = num.toBigInt(
-      transactionSimulation[0].feeEstimation.overallFee,
-    )
-    maxADFee =
-      (accountDeploymentFee.valueOf() * FEE_MULTIPLIER_BIGINT) / BigInt(scale) // add 1.5x overhead
-  }
+  const totalFee = fee ? num.toHex(estimatedFeesToTotal(fee)) : undefined
+  const totalMaxFee = fee
+    ? num.toHex(estimatedFeesToMaxFeeTotal(fee))
+    : undefined
 
   return {
-    fee: {
-      amount: amount.toString(),
-      suggestedMaxFee: suggestedMaxFee.toString(),
-      accountDeploymentFee: maxADFee.toString(),
-      maxADFee: maxADFee.toString(),
-    },
-    totalFee: amount.toString(),
-    totalMaxFee: suggestedMaxFee.toString(),
+    fee,
+    totalFee,
+    totalMaxFee,
   }
 }
 
@@ -224,6 +173,7 @@ const DEFAULT_TRANSACTION_SIMULATION = [
       gasUsage: 0,
       overallFee: 0,
       unit: "wei",
+      maxFee: 0,
     },
   },
 ]

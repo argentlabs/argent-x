@@ -1,13 +1,13 @@
 import { memoize } from "lodash-es"
 import { useMemo } from "react"
 
-import { transactionsStore } from "../../../background/transactions/store"
-import { useArrayStorage } from "../../../shared/storage/hooks"
+import { transactionsStore } from "../../../shared/transactions/store"
+import { useArrayStorage } from "../../hooks/useStorage"
 import { Transaction } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
 import { getAccountIdentifier } from "@argent/shared"
+import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 type UseAccountTransactions = (account?: BaseWalletAccount) => {
   transactions: Transaction[]
@@ -31,12 +31,10 @@ export const useAccountTransactions: UseAccountTransactions = (account) => {
     [transactions],
   )
 
-  const pendingTransactions = sortedTransactions.filter(
-    ({ finalityStatus, meta, executionStatus }) =>
-      finalityStatus === TransactionFinalityStatus.RECEIVED &&
-      executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
-      !meta?.isDeployAccount,
-  )
+  const pendingTransactions = sortedTransactions.filter((transaction) => {
+    const { finality_status } = getTransactionStatus(transaction)
+    return finality_status === "RECEIVED" && !transaction.meta?.isDeployAccount
+  })
 
   return { transactions, pendingTransactions }
 }
@@ -54,12 +52,10 @@ export const useDeployAccountTransactions: UseAccountTransactions = (
     [transactions],
   )
 
-  const pendingTransactions = sortedTransactions.filter(
-    ({ finalityStatus, executionStatus, meta }) =>
-      finalityStatus === TransactionFinalityStatus.RECEIVED &&
-      executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
-      meta?.isDeployAccount,
-  )
+  const pendingTransactions = sortedTransactions.filter((transaction) => {
+    const { finality_status } = getTransactionStatus(transaction)
+    return finality_status === "RECEIVED" && transaction.meta?.isDeployAccount
+  })
 
   return { transactions, pendingTransactions }
 }
@@ -77,12 +73,10 @@ export const useUpgradeAccountTransactions: UseAccountTransactions = (
     [transactions],
   )
 
-  const pendingTransactions = sortedTransactions.filter(
-    ({ finalityStatus, executionStatus, meta }) =>
-      finalityStatus === TransactionFinalityStatus.RECEIVED &&
-      executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
-      meta?.isUpgrade,
-  )
+  const pendingTransactions = sortedTransactions.filter((transaction) => {
+    const { finality_status } = getTransactionStatus(transaction)
+    return finality_status === "RECEIVED" && transaction.meta?.isUpgrade
+  })
 
   return { transactions, pendingTransactions }
 }

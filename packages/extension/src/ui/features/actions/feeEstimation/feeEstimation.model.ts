@@ -1,12 +1,11 @@
-import { Token } from "../../../../shared/token/__new/types/token.model"
+import { TokenWithBalance } from "@argent/shared"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { ParsedFeeError } from "./feeError"
 
 export interface FeeEstimationProps {
   amountCurrencyValue?: string
   fee?: EstimatedFees
-  feeToken: Token
-  feeTokenBalance?: bigint
+  feeToken: TokenWithBalance
   parsedFeeEstimationError?: ParsedFeeError
   showError: boolean
   showEstimateError: boolean

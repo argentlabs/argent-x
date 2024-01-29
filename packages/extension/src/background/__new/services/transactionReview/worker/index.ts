@@ -1,5 +1,5 @@
 import { transactionReviewLabelsStore } from "../../../../../shared/transactionReview/store"
-import { httpService } from "../../http/singleton"
+import { httpService } from "../../../../../shared/http/singleton"
 import { backgroundUIService } from "../../ui"
 import { TransactionReviewWorker } from "./implementation"
 

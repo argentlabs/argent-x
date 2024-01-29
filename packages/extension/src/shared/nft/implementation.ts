@@ -8,8 +8,8 @@ import {
 } from "@argent/shared"
 import { differenceWith, groupBy, isEqual } from "lodash-es"
 import { AllowArray, constants, num, shortString } from "starknet"
-import { INFTService } from "./interface"
-import {
+import type { INFTService } from "./interface"
+import type {
   ContractAddress,
   INftsCollectionsRepository,
   INftsContractsRepository,
@@ -17,6 +17,14 @@ import {
 } from "../storage/__new/repositories/nft"
 import { Network } from "../network"
 import { NetworkService } from "../network/service/implementation"
+import type { KeyValueStorage } from "../storage"
+import type { ISettingsStorage } from "../settings/types"
+import {
+  defaultNftMarketplaces,
+  ekuboMarketplace,
+  isEkuboNft,
+  type NftMarketplace,
+} from "./marketplaces"
 
 const chainIdToPandoraNetwork = (chainId: string): "mainnet" | "goerli" => {
   const encodedChainId = num.isHex(chainId)
@@ -39,6 +47,7 @@ export class NFTService implements INFTService {
     private readonly nftsCollectionsRepository: INftsCollectionsRepository,
     private readonly nftsContractsRepository: INftsContractsRepository,
     private readonly argentNftService: ArgentBackendNftService,
+    private readonly settingsStore: KeyValueStorage<ISettingsStorage>,
   ) {}
 
   isSupported(network: Network) {
@@ -197,5 +206,25 @@ export class NFTService implements INFTService {
     }
 
     await this.nftsRepository.upsert(nfts)
+  }
+
+  async getNftMarketplaceUrl(nft: NftItem, networkId: string) {
+    let nftMarketplace: NftMarketplace
+    if (isEkuboNft(nft)) {
+      nftMarketplace = ekuboMarketplace
+    } else {
+      const nftMarketplaceKey = await this.settingsStore.get(
+        "nftMarketplaceKey",
+      )
+      nftMarketplace = defaultNftMarketplaces[nftMarketplaceKey]
+    }
+    if (!nftMarketplace.url[networkId]) {
+      throw new Error(
+        `${nftMarketplace.title} is not available on ${networkId}`,
+      )
+    }
+    const urlFn = nftMarketplace.url[networkId]
+    const url = urlFn(nft.contract_address, nft.token_id)
+    return url
   }
 }

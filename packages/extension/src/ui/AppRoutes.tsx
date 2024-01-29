@@ -11,7 +11,7 @@ import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
 import { CollectionNftsContainer } from "./features/accountNfts/CollectionNftsContainer"
 import { NftScreenContainer } from "./features/accountNfts/NftScreenContainer"
 import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
-import { AccountDeprecatedModal } from "./features/accounts/AccountDeprecatedModal"
+import { AccountDeprecatedModal } from "./features/accountTokens/warning/AccountDeprecatedModal"
 import { AccountListHiddenScreenContainer } from "./features/accounts/AccountListHiddenScreenContainer"
 import { AccountListScreenContainer } from "./features/accounts/AccountListScreenContainer"
 import { AccountScreen } from "./features/accounts/AccountScreen"
@@ -54,24 +54,18 @@ import { SendAmountAndAssetScreenContainer } from "./features/send/SendAmountAnd
 import { SendAssetScreen } from "./features/send/SendAssetScreen"
 import { SendCollectionNftsScreenContainer } from "./features/send/SendCollectionNftsScreenContainer"
 import { SendRecipientScreenContainer } from "./features/send/SendRecipientScreenContainer"
-import { AddressBookAddOrEditScreenContainer } from "./features/settings/AddressBookAddOrEditScreenContainer"
-import { AddressBookSettingsScreenContainer } from "./features/settings/AddressBookSettingsScreenContainer"
-import { BeforeYouContinueScreen } from "./features/settings/BeforeYouContinueScreen"
-import { BlockExplorerSettingsScreen } from "./features/settings/BlockExplorerSettingsScreen"
-import { DappConnectionsSettingsScreen } from "./features/settings/DappConnectionsSettingsScreen"
-import { DeveloperSettings } from "./features/settings/DeveloperSettings"
-import { DeclareOrDeployContractSuccessScreenContainer } from "./features/settings/DeveloperSettings/DeclareOrDeployContractSuccessScreenContainer"
-import { DeclareSmartContractScreen } from "./features/settings/DeveloperSettings/DeclareSmartContractScreen"
-import { DeploySmartContractScreen } from "./features/settings/DeveloperSettings/DeploySmartContractScreen"
-import { PrivacyExperimentalSettings } from "./features/settings/ExperimentalSettings"
-import { NetworkSettingsEditScreen } from "./features/settings/NetworkSettingsEditScreen"
-import { NetworkSettingsFormScreenContainer } from "./features/settings/NetworkSettingsFormScreenContainer"
-import { NetworkSettingsScreen } from "./features/settings/NetworkSettingsScreen"
-import { PrivacySettingsScreen } from "./features/settings/PrivacySettingsScreen"
-import { SeedSettingsScreen } from "./features/settings/SeedSettingsScreen"
+import { AddressBookAddOrEditScreenContainer } from "./features/settings/addressBook/AddressBookAddOrEditScreenContainer"
+import { AddressBookSettingsScreenContainer } from "./features/settings/addressBook/AddressBookSettingsScreenContainer"
+import { BeforeYouContinueScreen } from "./features/settings/securityAndPrivacy/BeforeYouContinueScreen"
+import { DappConnectionsAccountScreenContainer } from "./features/settings/connectedDapps/DappConnectionsAccountScreenContainer"
+import { DeclareOrDeployContractSuccessScreenContainer } from "./features/settings/developerSettings/smartContractDevelopment/DeclareOrDeployContractSuccessScreenContainer"
+import { DeclareSmartContractScreen } from "./features/settings/developerSettings/smartContractDevelopment/DeclareSmartContractScreen"
+import { DeploySmartContractScreen } from "./features/settings/developerSettings/smartContractDevelopment/DeploySmartContractScreen"
+import { NetworkSettingsEditScreen } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsEditScreen"
+import { NetworkSettingsFormScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsFormScreenContainer"
+import { SeedSettingsScreenContainer } from "./features/settings/securityAndPrivacy/SeedSettingsScreenContainer"
 import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
-import { SettingsScreen } from "./features/settings/SettingsScreen"
-import { SmartContractDevelopmentScreen } from "./features/settings/SmartContractDevelopmentScreen"
+import { SmartContractDevelopmentScreen } from "./features/settings/developerSettings/smartContractDevelopment/SmartContractDevelopmentScreen"
 import { EscapeWarningScreen } from "./features/shield/escape/EscapeWarningScreen"
 import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
 import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
@@ -87,16 +81,26 @@ import { hasActionsView } from "./views/actions"
 import { useView } from "./views/implementation/react"
 import { ArgentAccountEmailScreen } from "./features/argentAccount/ArgentAccountEmailScreen"
 import { ArgentAccountLoggedInScreenContainer } from "./features/argentAccount/ArgentAccountLoggedInScreenContainer"
-import { ArgentAccountEmailNotificationsScreenContainer } from "./features/argentAccount/ArgentAccountEmailNotificationsScreenContainer"
+import { EmailNotificationsSettingsScreenContainer } from "./features/settings/preferences/EmailNotificationsSettingsScreenContainer"
 import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
 import { SuspenseScreen } from "./components/SuspenseScreen"
-// import { BetaFeaturesSettings } from "./features/settings/BetaFeatureSettings"
+import { BetaFeaturesSettingsScreenContainer } from "./features/settings/developerSettings/betaFeatures/BetaFeaturesSettingsScreenContainer"
 import { ChangeAccountImplementationScreen } from "./features/accountEdit/ChangeAccountImplementationScreen"
 import { MultisigReplaceOwnerScreen } from "./features/multisig/MultisigReplaceOwnerScreen"
 import { FundingQrCodeScreenContainer } from "./features/funding/FundingQrCodeScreenContainer"
 import { AppBackgroundError } from "./AppBackgroundError"
 import { isRecoveringView } from "./views/recovery"
-import { BetaFeaturesSettings } from "./features/settings/BetaFeatureSettings"
+import { SettingsScreenContainer } from "./features/settings/SettingsScreenContainer"
+import { PreferencesSettingsContainer } from "./features/settings/preferences/PreferencesSettingsContainer"
+import { BlockExplorerSettingsScreenContainer } from "./features/settings/preferences/BlockExplorerSettingsScreenContainer"
+import { NftMarketplaceSettingsScreenContainer } from "./features/settings/preferences/NftMarketplaceSettingsScreenContainer"
+import { SecurityAndPrivacySettingsScreenContainer } from "./features/settings/securityAndPrivacy/SecurityAndPrivacySettingsScreenContainer"
+import { AutoLockTimerSettingsScreenContainer } from "./features/settings/securityAndPrivacy/AutoLockTimerSettingsScreenContainer"
+import { DappConnectionsAccountListScreenContainer } from "./features/settings/connectedDapps/DappConnectionsAccountListScreenContainer"
+import { DeveloperSettingsScreenContainer } from "./features/settings/developerSettings/DeveloperSettingsScreenContainer"
+import { ExperimentalSettingsScreenContainer } from "./features/settings/developerSettings/experimental/ExperimentalSettingsScreenContainer"
+import { NetworkSettingsScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsScreenContainer"
+import { AccountOwnerWarningScreen } from "./features/accountTokens/warning/AccountOwnerWarningScreen"
 
 interface LocationWithState extends Location {
   state: {
@@ -238,12 +242,8 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
-      path={routes.argentAccountEmailPreferences.path}
-      element={
-        <SuspenseScreen>
-          <ArgentAccountEmailNotificationsScreenContainer />
-        </SuspenseScreen>
-      }
+      path={routes.settingsEmailNotifications.path}
+      element={<EmailNotificationsSettingsScreenContainer />}
     />
     <Route
       presentation="push"
@@ -269,14 +269,19 @@ const walletRoutes = (
       path={routes.settings.path}
       element={
         <SuspenseScreen>
-          <SettingsScreen />
+          <SettingsScreenContainer />
         </SuspenseScreen>
       }
     />
     <Route
       presentation="push"
+      path={routes.settingsPreferences.path}
+      element={<PreferencesSettingsContainer />}
+    />
+    <Route
+      presentation="push"
       path={routes.settingsPrivacy.path}
-      element={<PrivacySettingsScreen />}
+      element={<SecurityAndPrivacySettingsScreenContainer />}
     />
     <Route
       presentation="push"
@@ -291,13 +296,40 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.settingsBlockExplorer.path}
-      element={<BlockExplorerSettingsScreen />}
+      element={<BlockExplorerSettingsScreenContainer />}
     />
-    <Route path={routes.settingsSeed.path} element={<SeedSettingsScreen />} />
     <Route
       presentation="push"
-      path={routes.settingsDappConnections.path}
-      element={<DappConnectionsSettingsScreen />}
+      path={routes.settingsNftMarketplace.path}
+      element={<NftMarketplaceSettingsScreenContainer />}
+    />
+    <Route
+      presentation="push"
+      path={routes.settingsSeed.path}
+      element={<SeedSettingsScreenContainer />}
+    />
+    <Route
+      presentation="push"
+      path={routes.settingsAutoLockTimer.path}
+      element={<AutoLockTimerSettingsScreenContainer />}
+    />
+    <Route
+      presentation="push"
+      path={routes.settingsDappConnectionsAccountList.path}
+      element={
+        <SuspenseScreen list>
+          <DappConnectionsAccountListScreenContainer />
+        </SuspenseScreen>
+      }
+    />
+    <Route
+      presentation="push"
+      path={routes.settingsDappConnectionsAccount.path}
+      element={
+        <SuspenseScreen list>
+          <DappConnectionsAccountScreenContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
@@ -322,7 +354,7 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.settingsDeveloper.path}
-      element={<DeveloperSettings />}
+      element={<DeveloperSettingsScreenContainer />}
     />
     <Route
       presentation="push"
@@ -347,17 +379,17 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.settingsExperimental.path}
-      element={<PrivacyExperimentalSettings />}
+      element={<ExperimentalSettingsScreenContainer />}
     />
     <Route
       presentation="push"
       path={routes.settingsBetaFeatures.path}
-      element={<BetaFeaturesSettings />}
+      element={<BetaFeaturesSettingsScreenContainer />}
     />
     <Route
       presentation="push"
       path={routes.settingsNetworks.path}
-      element={<NetworkSettingsScreen />}
+      element={<NetworkSettingsScreenContainer />}
     />
     <Route
       presentation="push"
@@ -428,9 +460,18 @@ const walletRoutes = (
       element={<AccountDeprecatedModal />}
     />
     <Route
+      presentation="modal"
+      path={routes.accountOwnerWarning.path}
+      element={<AccountOwnerWarningScreen />}
+    />
+    <Route
       presentation="push"
       path={routes.accountsHidden.path}
-      element={<AccountListHiddenScreenContainer />}
+      element={
+        <SuspenseScreen>
+          <AccountListHiddenScreenContainer />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation={"modal"}

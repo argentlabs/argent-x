@@ -2,6 +2,7 @@
 
 import { defaultNetwork } from "../network"
 import { walletStore } from "../wallet/walletStore"
+import { argentApiHeadersForNetwork } from "./headers"
 
 export type Fetcher = <T>(
   input: RequestInfo | URL,
@@ -93,23 +94,4 @@ export const fetcherWithArgentApiHeaders = async (
   const networkId = selected?.networkId ?? defaultNetwork.id
   const fetcher = fetcherWithArgentApiHeadersForNetwork(networkId, fetcherImpl)
   return fetcher
-}
-
-/** convert KnownNetworksType to 'goerli' or 'mainnet' expected by API */
-
-export const argentApiNetworkForNetwork = (network: string) => {
-  return network === "goerli-alpha"
-    ? "goerli"
-    : network === "mainnet-alpha"
-    ? "mainnet"
-    : null
-}
-
-export const argentApiHeadersForNetwork = (network: string) => {
-  const argentNetwork = argentApiNetworkForNetwork(network)
-  return {
-    "argent-version": process.env.VERSION || "Unknown version",
-    "argent-client": "argent-x",
-    ...(argentNetwork && { "argent-network": argentNetwork }),
-  }
 }

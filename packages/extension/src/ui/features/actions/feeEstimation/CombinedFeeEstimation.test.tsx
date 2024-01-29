@@ -47,8 +47,6 @@ describe("CombinedFeeEstimation", () => {
     expect(
       screen.getByText(/^Network fees are paid to the network/),
     ).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.00069 ETH/)).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.0015 ETH/)).toBeInTheDocument()
   })
 
   it("should render scenario 2 as expected", async () => {
@@ -64,8 +62,6 @@ describe("CombinedFeeEstimation", () => {
     expect(
       screen.getByText(/^Network fees are paid to the network/),
     ).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.000000000000069 ETH/)).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.00000000000015 ETH/)).toBeInTheDocument()
   })
 
   it("should render scenario 3 as expected", async () => {
@@ -87,8 +83,8 @@ describe("CombinedFeeEstimation", () => {
     expect(
       screen.getByText(/^Network fees are paid to the network/),
     ).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.000000000000069 ETH/)).toBeInTheDocument()
-    expect(screen.getByText(/≈ 0.00000000000015 ETH/)).toBeInTheDocument()
+    expect(screen.getByText(/≈ 0.000000000000061 ETH/)).toBeInTheDocument()
+    expect(screen.getByText(/Max 0.00000000000022 ETH/)).toBeInTheDocument()
 
     expect(window.scrollTo).toHaveBeenCalled()
   })

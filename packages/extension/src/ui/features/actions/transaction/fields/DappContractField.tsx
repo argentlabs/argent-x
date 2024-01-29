@@ -30,7 +30,7 @@ export const DappContractField: FC<DappContractFieldProps> = ({
     <Field>
       <FieldKey>Dapp</FieldKey>
       <DappFieldValue>
-        <DappIcon dappDisplayAttributes={dappDisplayAttributes} size={6} />
+        <DappIcon dappDisplayAttributes={dappDisplayAttributes} w={6} h={6} />
         <LeftPaddedField>
           {dappDisplayAttributes?.title || host}
         </LeftPaddedField>

@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill"
-import { isEqual } from "lodash-es"
-
-import { AllowArray, Call } from "starknet"
+import { ensureArray } from "@argent/shared"
+import { deserialize, serialize } from "superjson"
+import type { AllowArray, Call } from "starknet"
 
 import { ChromeRepository } from "../../storage/__new/chrome"
 import {
@@ -9,59 +9,56 @@ import {
   EstimatedFeesEnriched,
   IEstimatedFeesRepository,
 } from "./fees.model"
-
-export function isEqualTransactions(
-  transactionA: Call | Call[],
-  transactionB: Call | Call[],
-): boolean {
-  const transactionAArray = Array.isArray(transactionA)
-    ? transactionA
-    : [transactionA]
-  const transactionBArray = Array.isArray(transactionB)
-    ? transactionB
-    : [transactionB]
-  return isEqual(transactionAArray, transactionBArray)
-}
+import { objectHash } from "../../objectHash"
 
 export const estimatedFeesRepo: IEstimatedFeesRepository =
   new ChromeRepository<EstimatedFeesEnriched>(browser, {
-    namespace: "core:estimatedFees2",
+    namespace: "core:estimatedFees4",
     areaName: "local",
-    compare: (a, b) => isEqualTransactions(a.transactions, b.transactions),
+    compare: (a, b) => a.id === b.id,
+    // we need to serialize/deserialize as we store bigints
+    serialize,
+    deserialize,
   })
 
-export const addEstimatedFees = async (
-  estimatedFees: EstimatedFees,
+// always use array as it is easier to compare
+export function getIdForTransactions(transactions: AllowArray<Call>) {
+  const transactionsArray = ensureArray(transactions)
+  const id = objectHash(transactionsArray)
+  return id
+}
+
+export const addEstimatedFee = async (
+  estimatedFee: EstimatedFees,
   transactions: AllowArray<Call>,
 ) => {
-  // always use array as it is easier to compare
-  const transactionsArray = Array.isArray(transactions)
-    ? transactions
-    : [transactions]
+  const id = getIdForTransactions(transactions)
 
   // If a transaction is already in the store, we update it with the new fees and timestamp
   // Otherwise, we add it to the store
-  const newEstimatedFees = {
-    ...estimatedFees,
-    transactions: transactionsArray,
+  const newEstimatedFees: EstimatedFeesEnriched = {
+    ...estimatedFee,
+    id,
     timestamp: Date.now(),
   }
 
   await estimatedFeesRepo.upsert(newEstimatedFees)
+
   return newEstimatedFees
 }
 
 export const getEstimatedFees = async (
   transactions: AllowArray<Call>,
 ): Promise<EstimatedFeesEnriched | null> => {
-  const [fees] = await estimatedFeesRepo.get(
-    (fees) => isEqualTransactions(fees.transactions, transactions), // No need to explicitly make an array as isEqualTransactions does it for us
+  const id = getIdForTransactions(transactions)
+  const [fee] = await estimatedFeesRepo.get(
+    (estimatedFee) => estimatedFee.id === id,
   )
 
-  if (!fees) {
+  if (!fee) {
     console.error(`No fees found for transactions: `, transactions)
     return null
   }
 
-  return fees
+  return fee
 }

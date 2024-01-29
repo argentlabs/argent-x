@@ -130,7 +130,9 @@ jobs:
 
     services:
       devnet:
-        image: shardlabs/starknet-devnet-rs:latest-seed0
+        # Temporary pin the previous version of the devnet image to avoid a bug introduced in the latest version
+        image: shardlabs/starknet-devnet-rs:78527decb3f76c4c808fa35f46228557af3df385-seed0
+        # image: shardlabs/starknet-devnet-rs:latest-seed0
         ports:
           - 5050:5050
 

@@ -175,7 +175,11 @@ export const BaseMultisigConfirmations = ({
             existingThreshold={threshold || multisig?.threshold}
             totalSigners={totalSigners}
           />
-          <Button colorScheme="primary" onClick={handleNextClick}>
+          <Button
+            data-testid="update-confirmations"
+            colorScheme="primary"
+            onClick={handleNextClick}
+          >
             {buttonTitle}
           </Button>
         </Flex>

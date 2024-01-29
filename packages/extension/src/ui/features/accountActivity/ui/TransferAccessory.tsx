@@ -14,10 +14,12 @@ export interface TransferAccessoryProps {
     | TokenTransferTransaction
     | TokenMintTransaction
     | TokenApproveTransaction
+  failed?: boolean
 }
 
 export const TransferAccessory: FC<TransferAccessoryProps> = ({
   transaction,
+  failed,
 }) => {
   const { action, amount, tokenAddress } = transaction
   const { displayAmount, displayValue } = useDisplayTokenAmountAndCurrencyValue(
@@ -36,6 +38,7 @@ export const TransferAccessory: FC<TransferAccessoryProps> = ({
           textOverflow={"ellipsis"}
           textAlign={"right"}
           color={action === "RECEIVE" ? "secondary.500" : undefined}
+          textDecoration={failed ? "line-through" : undefined}
         >
           {prefix}
           {displayAmount}
@@ -48,6 +51,7 @@ export const TransferAccessory: FC<TransferAccessoryProps> = ({
           overflow="hidden"
           textOverflow={"ellipsis"}
           textAlign={"right"}
+          textDecoration={failed ? "line-through" : undefined}
         >
           {prefix}
           {displayValue}

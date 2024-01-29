@@ -8,20 +8,36 @@ export default class Dapps extends Navigation {
     super(page)
   }
 
+  account(accountName: string) {
+    return this.page.locator(`[data-testid="${accountName}"]`)
+  }
+
+  connectedDapps(accountName: string, nbrConnectedDapps: number) {
+    return nbrConnectedDapps > 1
+      ? this.page.locator(
+          `[data-testid="${accountName}"]:has-text("${nbrConnectedDapps} dapps connected")`,
+        )
+      : this.page.locator(
+          `[data-testid="${accountName}"]:has-text("${nbrConnectedDapps} dapp connected")`,
+        )
+  }
+
+  get noConnectedDapps() {
+    return this.page.locator(`text=${lang.dapps.noConnectedDapps}`)
+  }
+
   connected(url: string) {
-    return this.page.locator(
-      `//button/*[contains(text(),'${url.slice(0, 30)}')]`,
-    )
+    return this.page.locator(`//div/*[contains(text(),'${url.slice(8, 30)}')]`)
   }
 
   disconnect(url: string) {
     return this.page.locator(
-      `//button/*[contains(text(),'${url.slice(0, 30)}')]/following::button[1]`,
+      `//div/*[contains(text(),'${url.slice(8, 30)}')]/following::button[1]`,
     )
   }
 
-  resetAll() {
-    return this.page.locator(`button:text-is("${lang.dapps.resetAll}")`)
+  disconnectAll() {
+    return this.page.locator(`p:text-is("${lang.dapps.disconnectAll}")`)
   }
 
   get accept() {

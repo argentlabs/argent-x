@@ -8,8 +8,7 @@ import { mapImplementationToArgentAccountType } from "../../network/utils"
 import { ArgentAccountType, WalletAccount } from "../../wallet.model"
 import { accountsEqual } from "../../utils/accountsEqual"
 import { addressSchema } from "@argent/shared"
-import { tryGetClassHash } from "./tryGetClassHashFromMulticall"
-import { tryGetClassHashFromProvider } from "./tryGetClassHashFromProvider"
+import { tryGetClassHash } from "./tryGetClassHash"
 import {
   MULTISIG_ACCOUNT_CLASS_HASH,
   STANDARD_ACCOUNT_CLASS_HASH,
@@ -21,6 +20,9 @@ export type AccountClassHashFromChain = Pick<
 >
 
 const getDefaultClassHash = (account: WalletAccount) => {
+  if (account.network.accountClassHash?.standard) {
+    return account.network.accountClassHash?.standard
+  }
   if (account.type === "multisig") {
     return MULTISIG_ACCOUNT_CLASS_HASH
   }
@@ -99,8 +101,8 @@ export async function getAccountClassHashFromChain(
           }
           /** fallback to single calls */
           const responses = await Promise.all(
-            classHashWithCalls.map(({ call }) =>
-              tryGetClassHashFromProvider(call, provider),
+            classHashWithCalls.map(({ classHash, call }) =>
+              tryGetClassHash(call, provider, classHash),
             ),
           )
           const results: string[] = responses.map((res) => num.toHex(res))

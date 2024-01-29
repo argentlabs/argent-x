@@ -32,8 +32,7 @@ import { useFilteredTokens } from "./useFilteredTokens"
 const { SearchIcon, WalletIcon, NftIcon } = icons
 
 export const SendAssetScreen: FC = () => {
-  const { recipientAddress, tokenAddress, tokenId, amount, returnTo } =
-    useSendQuery()
+  const { recipientAddress, tokenId, amount, returnTo } = useSendQuery()
   const navigate = useNavigate()
   const account = useView(selectedAccountView)
   const { watch, register } = useForm({

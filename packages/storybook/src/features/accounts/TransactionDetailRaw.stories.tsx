@@ -1,6 +1,3 @@
-import { defaultNetwork } from "@argent-x/extension/src/shared/network"
-import { Transaction } from "@argent-x/extension/src/shared/transactions"
-import { TransactionDetail } from "@argent-x/extension/src/ui/features/accountActivity/TransactionDetail"
 import {
   erc20MintTestToken,
   erc20SwapAlphaRoad,
@@ -9,7 +6,10 @@ import {
   erc20Transfer,
   erc721MintAspect,
   erc721Transfer,
-} from "@argent-x/extension/src/ui/features/accountActivity/transform/transaction/__test__/__fixtures__/transaction-calls/goerli-alpha"
+} from "@argent-x/extension/src/shared/call/__test__/__fixtures__/transaction-calls/goerli-alpha"
+import { defaultNetwork } from "@argent-x/extension/src/shared/network"
+import { Transaction } from "@argent-x/extension/src/shared/transactions"
+import { TransactionDetail } from "@argent-x/extension/src/ui/features/accountActivity/TransactionDetail"
 import { Account } from "@argent-x/extension/src/ui/features/accounts/Account"
 import { ComponentProps } from "react"
 import { Call } from "starknet"
@@ -28,7 +28,9 @@ const makeTransaction = (transactions?: Call | Call[]): Transaction => {
     meta: {
       transactions,
     },
-    status: "ACCEPTED_ON_L2",
+    status: {
+      finality_status: "ACCEPTED_ON_L2",
+    },
     timestamp: 1662047260,
   }
 }

@@ -28,7 +28,7 @@ import { coerceErrorToString } from "../../../shared/utils/error"
 import { ControlledPinInput } from "../../components/ControlledPinInput"
 import { useRouteFlow } from "../../routes"
 import { argentAccountService } from "../../services/argentAccount"
-import { useYupValidationResolver } from "../settings/useYupValidationResolver"
+import { useYupValidationResolver } from "./useYupValidationResolver"
 import { ShieldValidationErrorScreen } from "./ShieldValidationErrorScreen"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 

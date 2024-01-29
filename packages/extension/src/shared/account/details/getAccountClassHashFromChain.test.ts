@@ -1,6 +1,6 @@
+import { Mocked, MockedFunction } from "vitest"
 import { getAccountClassHashFromChain } from "./getAccountClassHashFromChain"
-import { tryGetClassHash } from "./tryGetClassHashFromMulticall"
-import { tryGetClassHashFromProvider } from "./tryGetClassHashFromProvider"
+import { tryGetClassHash } from "./tryGetClassHash"
 import { networkService } from "../../network/service"
 import { getProvider } from "../../network"
 import { getMulticallForNetwork } from "../../multicall"
@@ -18,20 +18,16 @@ import {
 vi.mock("../../network/service")
 vi.mock("../../multicall")
 vi.mock("../../network")
-vi.mock("./tryGetClassHashFromMulticall")
-vi.mock("./tryGetClassHashFromProvider")
+vi.mock("./tryGetClassHash")
 
-const mockNetworkService = networkService as jest.Mocked<typeof networkService>
-const mockGetMulticallForNetwork =
-  getMulticallForNetwork as jest.MockedFunction<typeof getMulticallForNetwork>
-const mockGetProvider = getProvider as jest.MockedFunction<typeof getProvider>
-const mockTryGetClassHashFromMulticall = tryGetClassHash as jest.MockedFunction<
+const mockNetworkService = networkService as Mocked<typeof networkService>
+const mockGetMulticallForNetwork = getMulticallForNetwork as MockedFunction<
+  typeof getMulticallForNetwork
+>
+const mockGetProvider = getProvider as MockedFunction<typeof getProvider>
+const mockTryGetClassHash = tryGetClassHash as MockedFunction<
   typeof tryGetClassHash
 >
-const mockTryGetClassHashFromProvider =
-  tryGetClassHashFromProvider as jest.MockedFunction<
-    typeof tryGetClassHashFromProvider
-  >
 
 describe("getAccountClassHashFromChain", () => {
   beforeEach(() => {
@@ -56,9 +52,7 @@ describe("getAccountClassHashFromChain", () => {
       }),
     ]
 
-    mockTryGetClassHashFromMulticall.mockResolvedValueOnce(
-      STANDARD_ACCOUNT_CLASS_HASH,
-    )
+    mockTryGetClassHash.mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH)
 
     const call = {
       contractAddress: accounts[0].address,
@@ -84,13 +78,13 @@ describe("getAccountClassHashFromChain", () => {
       addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
     )
 
-    expect(mockTryGetClassHashFromMulticall).toHaveBeenCalledWith(
+    expect(mockTryGetClassHash).toHaveBeenCalledWith(
       call,
       expect.objectContaining({
         callContract: expect.any(Function),
         getClassHashAt: expect.any(Function),
       }),
-      STANDARD_ACCOUNT_CLASS_HASH,
+      "standard",
     )
 
     expect(results[0]).toEqual({
@@ -128,7 +122,7 @@ describe("getAccountClassHashFromChain", () => {
       }),
     ]
 
-    mockTryGetClassHashFromMulticall
+    mockTryGetClassHash
       .mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH)
       .mockResolvedValueOnce(MULTISIG_ACCOUNT_CLASS_HASH)
 
@@ -166,7 +160,7 @@ describe("getAccountClassHashFromChain", () => {
       addressSchema.parse(MULTISIG_ACCOUNT_CLASS_HASH),
     )
 
-    expect(mockTryGetClassHashFromMulticall).toHaveBeenNthCalledWith(
+    expect(mockTryGetClassHash).toHaveBeenNthCalledWith(
       1,
       first_call,
       expect.objectContaining({
@@ -176,7 +170,7 @@ describe("getAccountClassHashFromChain", () => {
       STANDARD_ACCOUNT_CLASS_HASH,
     )
 
-    expect(mockTryGetClassHashFromMulticall).toHaveBeenNthCalledWith(
+    expect(mockTryGetClassHash).toHaveBeenNthCalledWith(
       2,
       second_call,
       expect.objectContaining({
@@ -219,15 +213,6 @@ describe("getAccountClassHashFromChain", () => {
       }),
     ]
 
-    const call = {
-      contractAddress: accounts[0].address,
-      entrypoint: "get_implementation",
-    }
-
-    mockTryGetClassHashFromProvider.mockResolvedValueOnce(
-      STANDARD_ACCOUNT_CLASS_HASH,
-    )
-
     mockGetProvider.mockReturnValueOnce({
       callContract: vi
         .fn()
@@ -236,18 +221,15 @@ describe("getAccountClassHashFromChain", () => {
         .fn()
         .mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH),
     } as any)
+    mockTryGetClassHash.mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH)
 
     const results = await getAccountClassHashFromChain(accounts)
 
-    expect(mockTryGetClassHashFromProvider).toBeCalledWith(
-      call,
-      mockGetProvider.mock.results[0].value,
-    )
     expect(results[0].classHash).not.toBeUndefined()
     expect(results[0].classHash).toEqual(
       addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
     )
-    expect(mockTryGetClassHashFromMulticall).not.toHaveBeenCalled()
+    expect(mockTryGetClassHash).toHaveBeenCalledTimes(1)
     expect(results[0]).toEqual({
       address: accounts[0].address,
       networkId: accounts[0].networkId,

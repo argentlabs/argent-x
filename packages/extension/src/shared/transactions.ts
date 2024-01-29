@@ -1,43 +1,43 @@
 import { lowerCase, uniq, upperFirst } from "lodash-es"
-import {
-  Call,
-  TransactionExecutionStatus,
-  TransactionFinalityStatus,
-  TransactionType,
-  num,
-} from "starknet"
+import { Call, TransactionType, num, RPC } from "starknet"
 
 import { WalletAccount } from "./wallet.model"
 import {
   MultisigEntryPointType,
   MultisigTransactionType,
 } from "./multisig/types"
+import { getTransactionStatus } from "./transactions/utils"
 
-export type ExtendedTransactionStatus =
-  | TransactionFinalityStatus
+export type FinaliyStatus = RPC.SPEC.TXN_STATUS
+export type ExecutionStatus = RPC.SPEC.TXN_EXECUTION_STATUS
+
+export type ExtendedFinalityStatus =
+  | FinaliyStatus
   | "PENDING" // For backward compatibility on mainnet
-  | "REJECTED" // For backward compatibility on mainnet
-  | "CANCELLED"
+  | "CANCELLED" // Required for multisig
+  | "NOT_RECEIVED" // Required for multisig
+
+// Extends RPC.TransactionStatus from starknet.js
+export type ExtendedTransactionStatus = {
+  finality_status?: ExtendedFinalityStatus
+  execution_status?: ExecutionStatus
+}
 
 // Global Constants for Transactions
-export const SUCCESS_STATUSES: ExtendedTransactionStatus[] = [
+export const SUCCESS_STATUSES: ExtendedFinalityStatus[] = [
   "PENDING", // For backward compatibility on mainnet
-  TransactionFinalityStatus.ACCEPTED_ON_L2,
-  TransactionFinalityStatus.ACCEPTED_ON_L1,
+  "ACCEPTED_ON_L2",
+  "ACCEPTED_ON_L1",
 ]
 
-export const FAILED_STATUS: (
-  | TransactionExecutionStatus
-  | ExtendedTransactionStatus
-)[] = [
-  TransactionExecutionStatus.REJECTED,
-  TransactionExecutionStatus.REVERTED,
+export const FAILED_STATUS: (ExtendedFinalityStatus | ExecutionStatus)[] = [
+  "REJECTED",
+  "REVERTED",
   "CANCELLED",
 ]
 
-export const TRANSACTION_STATUSES_TO_TRACK: ExtendedTransactionStatus[] = [
-  TransactionFinalityStatus.RECEIVED,
-  TransactionFinalityStatus.NOT_RECEIVED,
+export const TRANSACTION_STATUSES_TO_TRACK: ExtendedFinalityStatus[] = [
+  "RECEIVED",
 ]
 
 export type StarknetTransactionTypes = keyof typeof TransactionType
@@ -72,8 +72,7 @@ export interface TransactionRequest extends TransactionBase {
 }
 
 export interface Transaction extends TransactionRequest {
-  finalityStatus: ExtendedTransactionStatus
-  executionStatus?: TransactionExecutionStatus
+  status: ExtendedTransactionStatus
   failureReason?: { code: string; error_message: string }
   revertReason?: string
   timestamp: number
@@ -95,13 +94,12 @@ export function entryPointToHumanReadable(entryPoint: string): string {
 export const getInFlightTransactions = (
   transactions: Transaction[],
 ): Transaction[] =>
-  transactions.filter(
-    ({ finalityStatus, meta }) =>
-      finalityStatus &&
-      (TRANSACTION_STATUSES_TO_TRACK.includes(finalityStatus) ||
-        (meta?.isDeployAccount &&
-          finalityStatus === TransactionFinalityStatus.ACCEPTED_ON_L2)),
-  )
+  transactions.filter((transaction) => {
+    const { finality_status } = getTransactionStatus(transaction)
+    return (
+      finality_status && TRANSACTION_STATUSES_TO_TRACK.includes(finality_status)
+    )
+  })
 
 export function nameTransaction(calls: Call | Call[]) {
   const callsArray = Array.isArray(calls) ? calls : [calls]

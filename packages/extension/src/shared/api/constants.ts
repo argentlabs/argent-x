@@ -79,3 +79,7 @@ export const ARGENT_ACCOUNT_DISCOVERY_URL = ARGENT_API_ENABLED
 export const ARGENT_MULTISIG_DISCOVERY_URL = ARGENT_MULTISIG_URL
   ? urlJoin(ARGENT_MULTISIG_URL)
   : undefined
+
+export const ARGENT_SWAP_BASE_URL = ARGENT_API_ENABLED
+  ? urlJoin(ARGENT_API_BASE_URL, "tokens/swap")
+  : undefined

@@ -1,145 +1,283 @@
-import { HTTPService, IHttpService } from "@argent/shared"
+import {
+  getAccountIdentifier,
+  includesAddress,
+  stripAddressZeroPadding,
+  type Address,
+  type IHttpService,
+} from "@argent/shared"
+import type Emittery from "emittery"
 
-import { Activity, ActivityResponse } from "./model"
-import { IActivityService } from "./interface"
-import { IActivity, IActivityStorage } from "../../../../shared/activity/types"
-import { argentApiNetworkForNetwork } from "../../../../shared/api/fetcher"
+import type { IAccountService } from "../../../../shared/account/service/interface"
+import type { IActivityStorage } from "../../../../shared/activity/types"
+import { ARGENT_API_BASE_URL } from "../../../../shared/api/constants"
+import { argentApiNetworkForNetwork } from "../../../../shared/api/headers"
+import { RefreshInterval } from "../../../../shared/config"
+import type { IDebounceService } from "../../../../shared/debounce"
 import { ActivityError } from "../../../../shared/errors/activity"
-import { KeyValueStorage } from "../../../../shared/storage"
+import type { IScheduleService } from "../../../../shared/schedule/interface"
+import type { IObjectStore } from "../../../../shared/storage/__new/interface"
+import type { INftsContractsRepository } from "../../../../shared/storage/__new/repositories/nft"
+import type { ITokenService } from "../../../../shared/token/__new/service/interface"
+import { urlWithQuery } from "../../../../shared/utils/url"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { Wallet } from "../../../wallet"
+import type { IBackgroundUIService } from "../ui/interface"
+import { everyWhenOpen } from "../worker/schedule/decorators"
+import { pipe } from "../worker/schedule/pipe"
+import {
+  AccountUpgradedActivity,
+  Activities,
+  CancelEscapeActivity,
+  EscapeGuardianActivity,
+  EscapeSignerActivity,
+  GuardianBackupChangedActivity,
+  GuardianChangedActivity,
+  MultisigConfigurationUpdatedActivity,
+  NftActivity,
+  SignerChangedActivity,
+  TokenActivity,
+  TriggerEscapeGuardianActivity,
+  TriggerEscapeSignerActivity,
+  type ActivitiesPayload,
+  type Events,
+  type IActivityService,
+} from "./interface"
+import {
+  isActivityDetailsAction,
+  type ActivityDetailsAction,
+  type ActivityResponse,
+} from "./schema"
+import { getOverallLastModified } from "./utils/getOverallLastModified"
+import { parseFinanceActivities } from "./utils/parseFinanceActivities"
+import { parseSecurityActivities } from "./utils/parseSecurityActivities"
+
+/** maps activity details action to an equivalent Event to emit */
+
+const eventByActivityDetailsAction: Record<
+  ActivityDetailsAction,
+  keyof Events
+> = {
+  triggerEscapeGuardian: TriggerEscapeGuardianActivity,
+  triggerEscapeSigner: TriggerEscapeSignerActivity,
+  escapeGuardian: EscapeGuardianActivity,
+  escapeSigner: EscapeSignerActivity,
+  guardianChanged: GuardianChangedActivity,
+  guardianBackupChanged: GuardianBackupChangedActivity,
+  signerChanged: SignerChangedActivity,
+  cancelEscape: CancelEscapeActivity,
+  accountUpgraded: AccountUpgradedActivity,
+  multisigConfigurationUpdated: MultisigConfigurationUpdatedActivity,
+} as const
 
 export class ActivityService implements IActivityService {
-  private readonly httpService: IHttpService
-
   constructor(
-    protected readonly apiBase: string,
-    private readonly activityStore: KeyValueStorage<IActivityStorage>,
-    private readonly headers: HeadersInit | undefined,
-  ) {
-    this.httpService = new HTTPService({ headers: this.headers }, "json")
+    readonly emitter: Emittery<Events>,
+    private readonly activityStore: IObjectStore<IActivityStorage>,
+    private readonly walletSingleton: Wallet,
+    private readonly accountService: IAccountService,
+    private readonly tokenService: ITokenService,
+    private readonly nftsContractsRepository: INftsContractsRepository,
+    private readonly httpService: IHttpService,
+    private readonly scheduleService: IScheduleService,
+    private readonly backgroundUIService: IBackgroundUIService,
+    private readonly debounceService: IDebounceService,
+  ) {}
+
+  runUpdateSelectedAccountActivities = pipe(
+    everyWhenOpen(
+      this.backgroundUIService,
+      this.scheduleService,
+      this.debounceService,
+      RefreshInterval.FAST,
+      "ActivityService.updateSelectedAccountActivities",
+    ),
+  )(async () => {
+    await this.updateSelectedAccountActivities()
+  })
+
+  async updateSelectedAccountActivities() {
+    const result = await this.fetchSelectedAccountActivities()
+    if (!result?.activities?.length) {
+      return
+    }
+    await this.processAndEmitActivities(result)
   }
 
-  async fetchActivities({
-    address,
-    networkId,
-    lastModified,
-  }: {
-    address: string
-    networkId: string
-    lastModified?: number
-  }) {
-    const endpoint = `${this.apiBase}/${argentApiNetworkForNetwork(
-      networkId,
-    )}/account/${address}/activities${
-      lastModified ? `?modifiedAfter=${lastModified}` : ""
-    }`
+  async fetchSelectedAccountActivities(): Promise<
+    ActivitiesPayload | undefined
+  > {
+    const account = await this.walletSingleton.getSelectedAccount()
+    if (!account) {
+      return
+    }
+    const activities = await this.fetchAccountActivities(account)
+    if (!activities) {
+      return
+    }
+    return {
+      account,
+      activities,
+    }
+  }
 
-    const response = await this.httpService.get<ActivityResponse>(endpoint)
+  async fetchAccountActivities(
+    account?: BaseWalletAccount,
+    updateModifiedAfter = true,
+  ) {
+    const apiBaseUrl = ARGENT_API_BASE_URL
+    if (!account || !apiBaseUrl) {
+      return
+    }
+    const argentApiNetwork = argentApiNetworkForNetwork(account.networkId)
+    if (!argentApiNetwork) {
+      return
+    }
+    const modifiedAfter = (await this.getModifiedAfter(account)) ?? 0
+    const url = urlWithQuery(
+      [
+        apiBaseUrl,
+        "activity",
+        "starknet",
+        argentApiNetwork,
+        "account",
+        stripAddressZeroPadding(account.address),
+        "activities",
+      ],
+      {
+        modifiedAfter,
+      },
+    )
+    const response = await this.httpService.get<ActivityResponse>(url)
     if (!response) {
       throw new ActivityError({ code: "FETCH_FAILED" })
     }
-    return response.activities
-    // TODO uncomment this once we have the final API
-    // const parsedActivities = activityResponseSchema.safeParse(response)
 
-    // if (!parsedActivities.success) {
-    //   throw new ActivityError({
-    //     code: "PARSING_FAILED",
-    //   })
-    // }
-    // return parsedActivities.data.activities
-  }
-
-  findLatestBalanceChangingTransaction(
-    activities: Activity[],
-  ): Activity | null {
-    if (!activities || activities.length === 0) {
-      return null
-    }
-
-    // All balance changing transactions have transfers
-    const balanceChangingActivities = activities.filter(
-      (activity) => activity.transfers && activity.transfers.length > 0,
-    )
-
-    if (balanceChangingActivities.length === 0) {
-      return null
-    }
-
-    const [latestBalanceChangingTransaction] = balanceChangingActivities.sort(
-      (a, b) => {
-        // Check if any of the transactions are pending
-        const aIsPending = a.transaction.status === "pending"
-        const bIsPending = b.transaction.status === "pending"
-
-        // Prioritize pending transactions
-        if (aIsPending && !bIsPending) {
-          return -1
-        } else if (!aIsPending && bIsPending) {
-          return 1
-        } else if (aIsPending && bIsPending) {
-          // If both are pending, sort by transactionIndex
-          return b.transaction.transactionIndex - a.transaction.transactionIndex
-        } else {
-          // If neither is pending, sort by blockNumber then transactionIndex
-          if (
-            a.transaction.blockNumber &&
-            b.transaction.blockNumber &&
-            a.transaction.blockNumber !== b.transaction.blockNumber
-          ) {
-            return b.transaction.blockNumber - a.transaction.blockNumber
-          } else {
-            return (
-              b.transaction.transactionIndex - a.transaction.transactionIndex
-            )
-          }
-        }
-      },
-    )
-    return latestBalanceChangingTransaction
-  }
-
-  async shouldUpdateBalance({
-    address,
-    networkId,
-  }: {
-    address: string
-    networkId: string
-  }) {
-    const latestBalanceChangingActivity = (
-      await this.activityStore.get("latestBalanceChangingActivity")
-    )?.[address]
-    const activities = await this.fetchActivities({
-      address,
-      networkId,
-      lastModified: latestBalanceChangingActivity?.lastModified,
-    })
-    const latestActivity = this.findLatestBalanceChangingTransaction(activities)
-    const shouldUpdate =
-      !latestBalanceChangingActivity?.id ||
-      latestActivity?.id !== latestBalanceChangingActivity?.id
-
-    if (shouldUpdate && latestActivity) {
-      return {
-        shouldUpdate,
-        lastModified: latestActivity.lastModified,
-        id: latestActivity.id,
+    const { activities } = response
+    if (updateModifiedAfter) {
+      const overallLastModified = getOverallLastModified(activities)
+      if (overallLastModified) {
+        await this.setModifiedAfter(account, overallLastModified)
       }
     }
-    return { shouldUpdate: false }
+    return activities
   }
 
-  async addActivityToStore({
-    address,
-    lastModified,
-    id,
-  }: IActivity & {
-    address: string
-  }) {
-    await this.activityStore.set("latestBalanceChangingActivity", {
-      [address]: {
-        id: id,
-        lastModified: lastModified,
-      },
+  async processAndEmitActivities({
+    account: activityAccount,
+    activities,
+  }: ActivitiesPayload) {
+    /** emit raw activities first */
+    void this.emitter.emit(Activities, {
+      account: activityAccount,
+      activities,
     })
+
+    const accountsOnNetwork = await this.accountService.get(
+      (a) => a.networkId === activityAccount.networkId,
+    )
+    const tokensOnNetwork = await this.tokenService.getTokens(
+      (a) => a.networkId === activityAccount.networkId,
+    )
+    const nftsOnNetwork = await this.nftsContractsRepository.get(
+      (contract) => contract.networkId === activityAccount.networkId,
+    )
+
+    /**
+     * activities payload is always for a single network,
+     * so we use only addresses for simplicity
+     * then rehydrate back to instances before emitting
+     */
+
+    const accountAddressesOnNetwork = accountsOnNetwork.map(
+      (account) => account.address as Address,
+    )
+    const tokenAddressesOnNetwork = tokensOnNetwork.map(
+      (token) => token.address,
+    )
+    const nftAddressesOnNetwork = nftsOnNetwork.map(
+      (nft) => nft.contractAddress as Address,
+    )
+
+    /** ignore any "failure" */
+
+    const filteredActivities = activities.filter(
+      (activity) => activity.status !== "failure",
+    )
+    if (!filteredActivities.length) {
+      return
+    }
+
+    /** finance events */
+
+    const { nftActivity, tokenActivity } = parseFinanceActivities({
+      activities: filteredActivities,
+      accountAddressesOnNetwork,
+      tokenAddressesOnNetwork,
+      nftAddressesOnNetwork,
+    })
+
+    /** rehydrate the assets and accounts - these are already filtered to same network */
+
+    const tokenAccounts = accountsOnNetwork.filter((account) =>
+      includesAddress(account.address, tokenActivity.accountAddresses),
+    )
+    const tokens = tokensOnNetwork.filter((token) =>
+      includesAddress(token.address, tokenActivity.tokenAddresses),
+    )
+
+    const nftAccounts = accountsOnNetwork.filter((account) =>
+      includesAddress(account.address, nftActivity.accountAddresses),
+    )
+    const nfts = nftsOnNetwork.filter((token) =>
+      includesAddress(token.contractAddress, nftActivity.tokenAddresses),
+    )
+
+    if (tokenAccounts.length && tokens.length) {
+      void this.emitter.emit(TokenActivity, {
+        accounts: tokenAccounts,
+        tokens,
+      })
+    }
+
+    if (nftAccounts.length && nfts.length) {
+      void this.emitter.emit(NftActivity, {
+        accounts: nftAccounts,
+        nfts,
+      })
+    }
+
+    /** security */
+
+    const accountAddressesByAction = parseSecurityActivities({
+      activities: filteredActivities,
+      accountAddressesOnNetwork,
+    })
+    Object.entries(accountAddressesByAction).forEach(([action, addresses]) => {
+      if (isActivityDetailsAction(action)) {
+        const event = eventByActivityDetailsAction[action]
+        /** rehydrate accounts */
+        const accounts = accountsOnNetwork.filter((account) =>
+          includesAddress(account.address, addresses),
+        )
+        if (accounts.length) {
+          void this.emitter.emit(event, accounts)
+        }
+      }
+    })
+  }
+
+  async getModifiedAfter(
+    account: BaseWalletAccount,
+  ): Promise<number | undefined> {
+    const { modifiedAfter } = await this.activityStore.get()
+    const key = getAccountIdentifier(account)
+    return modifiedAfter[key]
+  }
+
+  async setModifiedAfter(account: BaseWalletAccount, value: number) {
+    const { modifiedAfter } = await this.activityStore.get()
+    const key = getAccountIdentifier(account)
+    modifiedAfter[key] = value
+    await this.activityStore.set({ modifiedAfter })
   }
 }

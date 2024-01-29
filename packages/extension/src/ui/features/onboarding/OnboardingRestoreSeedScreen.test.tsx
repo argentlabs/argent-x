@@ -1,13 +1,15 @@
 import { generateMnemonic } from "@scure/bip39"
 import { wordlist as en } from "@scure/bip39/wordlists/english"
-import { act, fireEvent, render, waitFor } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import {
+  act,
+  fireEvent,
+  render,
+  waitFor,
+  getByTestId,
+} from "@testing-library/react"
+import { describe, expect, it, vi } from "vitest"
 
 import { OnboardingRestoreSeedScreen } from "./OnboardingRestoreSeedScreen"
-
-/**
- * @vitest-environment jsdom
- */
 
 describe("OnboardingRestoreSeedScreen", async () => {
   it("onRestore is called with the seed input", async () => {
@@ -18,7 +20,8 @@ describe("OnboardingRestoreSeedScreen", async () => {
     const screen = render(<OnboardingRestoreSeedScreen onRestore={onRestore} />)
     const { container } = screen
 
-    const focusedInput = container.querySelector(":focus")
+    const focusedInput = getByTestId(container, "seed-input-0")
+    expect(focusedInput).toHaveFocus()
     if (focusedInput) {
       await act(async () => {
         fireEvent.blur(focusedInput)

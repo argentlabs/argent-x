@@ -6,12 +6,12 @@ import { useNavigate } from "react-router-dom"
 
 import { VisibilityOff } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
-import { normalizeAddress } from "../../services/addresses"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { normalizeAddress } from "@argent/shared"
 
 const { MoreIcon } = icons
 

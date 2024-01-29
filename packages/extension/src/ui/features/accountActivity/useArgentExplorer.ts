@@ -7,7 +7,7 @@ import {
   ARGENT_EXPLORER_BASE_URL,
   ARGENT_EXPLORER_ENABLED,
 } from "../../../shared/api/constants"
-import { argentApiNetworkForNetwork } from "../../../shared/api/fetcher"
+import { argentApiNetworkForNetwork } from "../../../shared/api/headers"
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { urlWithQuery } from "../../../shared/utils/url"
 import { argentApiFetcher } from "../../services/argentApiFetcher"
@@ -15,7 +15,7 @@ import {
   useConditionallyEnabledSWR,
   withPolling,
 } from "../../services/swr.service"
-import { stripAddressZeroPadding } from "../accounts/accounts.service"
+import { stripAddressZeroPadding } from "@argent/shared"
 import { RefreshInterval } from "../../../shared/config"
 
 export const useArgentExplorerEnabled = () => {

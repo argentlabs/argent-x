@@ -31,7 +31,7 @@ export default class DeveloperSettings {
 
   // Manage networks
   get addNetwork() {
-    return this.page.locator('[data-testid="AddIcon"]')
+    return this.page.locator('button[aria-label="add"]')
   }
 
   get networkName() {
@@ -61,12 +61,12 @@ export default class DeveloperSettings {
   }
 
   networkByName(name: string) {
-    return this.page.locator(`button:has-text("${name}")`)
+    return this.page.locator(`h6:has-text("${name}")`)
   }
 
   deleteNetworkByName(name: string) {
     return this.page.locator(
-      `//button/*[contains(text(),'${name}')]/following::button[1]`,
+      `//div/*[contains(text(),'${name}')]/following::button[1]`,
     )
   }
 }

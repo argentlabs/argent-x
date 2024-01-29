@@ -1,58 +1,60 @@
-import { FloatingForm, L1, P4, icons } from "@argent/ui"
+import { L1, P4, icons } from "@argent/ui"
+import { Box, Flex, Text, Tooltip, useDisclosure } from "@chakra-ui/react"
+import { FC, useCallback, useMemo, useState } from "react"
 import {
-  Currency,
-  ONE_BIPS,
-  Percent,
-  Trade,
-  basisPointsToPercent,
-  formatExecutionPriceWithFee,
-  useUserState,
-} from "@argent/x-swap"
-import { Box, Flex, Text, Tooltip } from "@chakra-ui/react"
-import { FC, useCallback, useState } from "react"
+  formatExecutionPrice,
+  minimumAmountOutFromTrade,
+} from "../utils/prices"
+import { Token } from "../../../../shared/token/__new/types/token.model"
+import { useUserState } from "../state/user"
+import { getProvidersFromTradeRoute } from "../utils"
+import { prettifyTokenAmount } from "../../../../shared/token/price"
+import { SlippageModal } from "./SlippageModal"
+import { Trade } from "../../../../shared/swap/model/trade.model"
 
-const { InfoIcon, SettingsIcon } = icons
-
-const MAX_SLIPPAGE = 1_000
+const { InfoIcon, EditIcon } = icons
 
 interface SwapPricesInfoProps {
-  currencyIn?: Currency
-  currencyOut?: Currency
+  tokenIn?: Token
+  tokenOut?: Token
   trade: Trade
-  priceImpact?: Percent
-  isPriceImpactHigh?: boolean
 }
 
 export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
-  currencyOut,
+  tokenOut,
   trade,
-  priceImpact,
-  isPriceImpactHigh,
 }) => {
   const [inverted, setInverted] = useState(false)
-  const [showSlippageForm, setShowSlippageForm] = useState(false)
-  const { userSlippageTolerance, updateUserSlippageTolerance } = useUserState()
+  const { userSlippageTolerance } = useUserState()
   const switchRate = useCallback(() => {
     setInverted(!inverted)
   }, [inverted])
 
-  const showSlippage = useCallback(() => {
-    setShowSlippageForm(!showSlippageForm)
-  }, [showSlippageForm])
-  const reduceSlippage = () => {
-    const updatedValue = userSlippageTolerance - 20
-    updateUserSlippageTolerance(updatedValue < 0 ? 0 : updatedValue)
-  }
-  const changeSlippage = (newSlippage: number) => {
-    const value = +newSlippage > 10 ? MAX_SLIPPAGE : +newSlippage * 100
-    updateUserSlippageTolerance(value)
-  }
-  const increaseSlippage = () => {
-    const updatedValue = userSlippageTolerance + 20
-    updateUserSlippageTolerance(
-      updatedValue > MAX_SLIPPAGE ? MAX_SLIPPAGE : updatedValue,
+  const {
+    isOpen: isSlippageModalOpen,
+    onOpen: onOpenSlippageModal,
+    onClose: onCloseSlippageModal,
+  } = useDisclosure()
+
+  const prettifiedMinReceived = useMemo(() => {
+    const { value, decimals } = minimumAmountOutFromTrade(
+      trade,
+      userSlippageTolerance,
     )
-  }
+
+    return prettifyTokenAmount({
+      amount: value,
+      decimals,
+      symbol: tokenOut?.symbol,
+    })
+  }, [trade, userSlippageTolerance, tokenOut?.symbol])
+
+  const executionPrice = useMemo(
+    /** Execution price taking fees into account */
+    () => formatExecutionPrice({ trade, inverted, includeFee: false }),
+    [trade, inverted],
+  )
+
   return (
     <>
       <Flex
@@ -62,18 +64,25 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
         borderColor="neutrals.700"
         borderRadius="lg"
         w="100%"
-        mt="4"
+        mt="2"
         p="3"
         gap="3"
+        data-testid="swap-prices-info"
       >
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Rate</P4>
-            <Tooltip label="Includes JediSwap's 0.3% protocol fee">
+            <P4 color="neutrals.300">Min received (incl. fees) </P4>
+            <Tooltip label="The minimum amount of tokens you're guaranteed to receive given the slippage percentage">
               <Text color="neutrals.300" cursor="pointer">
                 <InfoIcon />
               </Text>
             </Tooltip>
+          </Flex>
+          <P4 fontWeight="bold">{prettifiedMinReceived}</P4>
+        </Flex>
+        <Flex justifyContent="space-between">
+          <Flex alignItems="center" gap="1">
+            <P4 color="neutrals.300">Rate</P4>
           </Flex>
           <P4
             fontWeight="bold"
@@ -81,95 +90,43 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
             _hover={{ color: "accent.500" }}
             onClick={switchRate}
           >
-            {formatExecutionPriceWithFee(trade, inverted, "≈")}
+            {executionPrice}
           </P4>
         </Flex>
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Min received</P4>
-            <Tooltip label="The minimum amount of tokens you're guaranteed to receive given the slippage percentage">
+            <P4 color="neutrals.300">Max Slippage</P4>
+            <Tooltip label="Maximum allowed slippage for the trade">
               <Text color="neutrals.300" cursor="pointer">
                 <InfoIcon />
               </Text>
             </Tooltip>
           </Flex>
-          <Flex gap={2}>
-            <Box position="relative">
-              <Flex
-                cursor="pointer"
-                _hover={{ color: "accent.500" }}
-                gap="1"
-                alignItems="center"
-                onClick={showSlippage}
-              >
-                <SettingsIcon />
-                <P4 fontWeight="500" color="neutrals.300">
-                  Slippage {userSlippageTolerance / 100}%
-                </P4>
-              </Flex>
-              {showSlippageForm && (
-                <FloatingForm
-                  onClose={() => setShowSlippageForm(false)}
-                  onChange={changeSlippage}
-                  onIncrease={increaseSlippage}
-                  onReduce={reduceSlippage}
-                  value={userSlippageTolerance / 100}
-                  min={0}
-                  max={MAX_SLIPPAGE}
-                />
-              )}
-            </Box>
-            <P4 fontWeight="bold">
-              {trade
-                .minimumAmountOut(basisPointsToPercent(userSlippageTolerance))
-                .toSignificant(6)}
-              {currencyOut?.symbol}
-            </P4>
-          </Flex>
+          <Box position="relative">
+            <Flex
+              cursor="pointer"
+              _hover={{ color: "accent.500" }}
+              gap="2"
+              alignItems="center"
+              onClick={onOpenSlippageModal}
+            >
+              <EditIcon />
+              <P4 fontWeight="500">{userSlippageTolerance / 100}%</P4>
+            </Flex>
+          </Box>
         </Flex>
         <Flex justifyContent="space-between">
-          <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Price impact</P4>
-            <Tooltip label="Difference between the market price and estimated price due to trade size">
-              <Text color="neutrals.300" cursor="pointer">
-                <InfoIcon />
-              </Text>
-            </Tooltip>
-          </Flex>
-          <Flex alignItems="center" gap="1">
-            {isPriceImpactHigh && (
-              <Tooltip label={<HighPriceImpactLabel />} placement="top-start">
-                <Text color="neutrals.300" cursor="pointer">
-                  <InfoIcon color="#CC3247" />
-                  {/** Using Hex here because error.500 is not working for some reason */}
-                </Text>
-              </Tooltip>
-            )}
-            <P4
-              fontWeight="bold"
-              color={isPriceImpactHigh ? "error.500" : "white"}
-            >
-              {priceImpact
-                ? priceImpact.lessThan(ONE_BIPS)
-                  ? "<0.01%"
-                  : `${priceImpact.toFixed(2)}%`
-                : "-"}
-            </P4>
-          </Flex>
+          <P4 color="neutrals.300">Providers</P4>
+          <P4 fontWeight="bold">
+            {getProvidersFromTradeRoute(trade.route).join(", ")}
+          </P4>
         </Flex>
-        {/** Keeping this here, might be useful in future. }
-         <Flex justifyContent="space-between">
-          <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Estimated Fees</P4>
-            <Tooltip label="A portion of each trade (0.30%) goes to JediSwap liquidity providers as a protocol incentive">
-              <Text color="neutrals.300" cursor="pointer">
-                <InfoIcon />
-              </Text>
-            </Tooltip>
-          </Flex>
-          <P4 fontWeight="bold">TODO</P4>
-        </Flex> */}
       </Flex>
+
+      <SlippageModal
+        isOpen={isSlippageModalOpen}
+        onClose={onCloseSlippageModal}
+      />
     </>
   )
 }

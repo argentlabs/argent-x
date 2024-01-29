@@ -10,7 +10,10 @@ const mockProps = {
   account: getMockAccount({}),
   status: { text: "active", code: "CONNECTED" },
   onRedeploy: vi.fn(),
-  showDapplandBanner: true,
+  showAvnuBanner: false,
+  showEkuboBanner: true,
+  setAvnuBannerSeen: vi.fn(),
+  setEkuboBannerSeen: vi.fn(),
   showTokensAndBanners: true,
   setDappLandBannerSeen: vi.fn(),
   hasEscape: true,
@@ -40,7 +43,7 @@ describe("AccountTokens", () => {
       await screen.findByText("You can no longer use this account"),
     ).toBeInTheDocument()
   })
-  it("calls the setDappLandBannerSeen function when the DappLand banner is closed", async () => {
+  it("calls the setEkuboBannerSeen function when the ekubo banner is closed", async () => {
     const props = {
       ...mockProps,
       showTokensAndBanners: true,
@@ -52,10 +55,10 @@ describe("AccountTokens", () => {
       </BrowserRouter>,
     )
 
-    const closeButton = await screen.findByTestId("close-dappland-banner")
+    const closeButton = await screen.findByTestId("close-banner")
     await userEvent.click(closeButton)
 
-    expect(props.setDappLandBannerSeen).toHaveBeenCalled()
+    expect(props.setEkuboBannerSeen).toHaveBeenCalled()
   })
   it("renders the component with the account deprecated banner, when isDeprecated is true", async () => {
     const props = {

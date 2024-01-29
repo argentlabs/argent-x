@@ -3,7 +3,7 @@ import { FC } from "react"
 
 import { ErrorBoundaryState } from "./components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "./components/ErrorBoundaryFallbackWithCopyError"
-import { SupportFooter } from "./features/settings/SupportFooter"
+import { SupportFooter } from "./features/settings/ui/SupportFooter"
 
 const AppErrorBoundaryFallback: FC<ErrorBoundaryState> = ({
   error,

@@ -1,16 +1,6 @@
-import { z } from "zod"
-
 import { extensionOnlyProcedure } from "../permissions"
 import { UdcError } from "../../../../shared/errors/udc"
-
-const deployContractSchema = z.object({
-  address: z.string(),
-  networkId: z.string(),
-  classHash: z.string(),
-  constructorCalldata: z.array(z.string()),
-  salt: z.string().optional(),
-  unique: z.boolean().optional(),
-})
+import { deployContractSchema } from "../../../../shared/udc/schema"
 
 export const deployContractProcedure = extensionOnlyProcedure
   .input(deployContractSchema)

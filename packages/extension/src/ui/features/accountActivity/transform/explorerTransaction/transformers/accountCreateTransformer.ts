@@ -1,4 +1,5 @@
 import { IExplorerTransactionTransformer } from "./type"
+import { getActualFee } from "../getActualFee"
 
 export default function ({
   explorerTransaction,
@@ -6,7 +7,9 @@ export default function ({
   fingerprint,
 }: IExplorerTransactionTransformer) {
   if (fingerprint === "events[Upgraded]" || fingerprint === "events[]") {
-    const { maxFee, actualFee } = explorerTransaction
+    const { maxFee } = explorerTransaction
+    const actualFee = getActualFee(explorerTransaction)
+
     if (!maxFee && actualFee === "0x0") {
       const entity = "ACCOUNT"
       const action = "CREATE"

@@ -44,7 +44,7 @@ export const ShieldAccountOTPScreen: FC = () => {
           replace: true,
         })
       case "emailPreferences":
-        return navigate(routes.argentAccountEmailPreferences(), {
+        return navigate(routes.settingsEmailNotifications(), {
           replace: true,
         })
     }

@@ -9,12 +9,11 @@ import {
   useDisclosure,
 } from "@chakra-ui/react"
 
-import { formatTruncatedSignerKey } from "../../services/addresses"
 import { MultisigOwnerNameModal } from "./MultisigOwnerNameModal"
 import { FC, PropsWithChildren, useMemo } from "react"
 import { Account } from "../accounts/Account"
 import { noop } from "lodash-es"
-import { encodeBase58 } from "@argent/shared"
+import { encodeBase58, formatTruncatedSignerKey } from "@argent/shared"
 import { SignerMetadata } from "../../../shared/multisig/types"
 import { MultisigRemoveOwnerModal } from "./MultisigRemoveOwnerModal"
 import { useNavigate } from "react-router-dom"

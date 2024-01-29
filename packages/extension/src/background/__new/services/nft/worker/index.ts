@@ -2,7 +2,7 @@ import { nftService } from "../../../../../shared/nft"
 import { debounceService } from "../../../../../shared/debounce"
 import { chromeScheduleService } from "../../../../../shared/schedule"
 import { old_walletStore } from "../../../../../shared/wallet/walletStore"
-import { transactionsStore } from "../../../../transactions/store"
+import { transactionsStore } from "../../../../../shared/transactions/store"
 import {
   recoverySharedService,
   sessionService,

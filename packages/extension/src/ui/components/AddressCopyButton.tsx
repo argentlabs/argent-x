@@ -1,11 +1,11 @@
 import { Button, CopyTooltip } from "@argent/ui"
 import { FC } from "react"
 
-import { formatTruncatedAddress, normalizeAddress } from "../services/addresses"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../routes"
 import { useView } from "../views/implementation/react"
 import { hasSavedRecoverySeedPhraseView } from "../views/account"
+import { normalizeAddress, formatTruncatedAddress } from "@argent/shared"
 
 export interface AddressCopyButtonProps {
   address: string

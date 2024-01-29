@@ -1,5 +1,4 @@
 import { isAddress } from "@argent/shared"
-import { Token as SwapToken } from "@argent/x-swap"
 import { useMemo } from "react"
 
 import {
@@ -95,7 +94,7 @@ export const usePriceAndTokenData = ARGENT_API_ENABLED
 /** @returns individual price details for the token */
 
 export const useTokenPriceDetails = (
-  token?: Token | TokenWithOptionalBigIntBalance | SwapToken,
+  token?: Token | TokenWithOptionalBigIntBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   const { pricesData, tokenData } = usePriceAndTokenDataImpl()
@@ -121,7 +120,7 @@ export const useTokenPriceDetails = (
  */
 
 export const useTokenUnitAmountToCurrencyValue = (
-  token?: Token | TokenWithOptionalBigIntBalance | SwapToken,
+  token?: Token | TokenWithOptionalBigIntBalance,
   unitAmount?: BigNumberish,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
@@ -143,7 +142,7 @@ export const useTokenUnitAmountToCurrencyValue = (
  */
 
 export const useTokenAmountToCurrencyValue = (
-  token?: Token | TokenWithOptionalBigIntBalance | SwapToken,
+  token?: Token | TokenWithOptionalBigIntBalance,
   amount?: BigNumberish,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {

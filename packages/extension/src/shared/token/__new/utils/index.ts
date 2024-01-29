@@ -58,14 +58,3 @@ export const parsedDefaultTokens: Token[] = defaultTokens.map((token) => ({
   networkId: token.network,
   decimals: parseInt(token.decimals, 10),
 }))
-
-export const getFeeToken = (networkId: string) =>
-  parsedDefaultTokens.find(
-    ({ symbol, networkId: network }) =>
-      symbol === "ETH" && network === networkId,
-  )
-
-export const testDappToken = (networkId: string) =>
-  defaultTokens.find(
-    ({ name, network }) => name === "Test Token" && network === networkId,
-  )

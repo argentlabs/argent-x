@@ -3,10 +3,10 @@ import { Flex, MenuItem, MenuList, MenuListProps } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network, NetworkStatus } from "../../../../shared/network"
-import {
-  StatusIndicator,
-  mapNetworkStatusToColor,
-} from "../../../components/StatusIndicator"
+// import {
+//   StatusIndicator,
+//   mapNetworkStatusToColor,
+// } from "../../../components/StatusIndicator"
 
 export interface NetworkSwitcherListProps extends MenuListProps {
   currentNetwork: Network
@@ -22,7 +22,7 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
 }) => {
   return (
     <MenuList {...rest}>
-      {allNetworks.map(({ id, name, status, rpcUrl, readonly }) => {
+      {allNetworks.map(({ id, name, status: _status, rpcUrl, readonly }) => {
         const isCurrent = id === currentNetwork.id
         return (
           <MenuItem
@@ -61,15 +61,9 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
                 {rpcUrl && !readonly && (
                   <L2
                     sx={{
-                      color: "neutrals.400",
-                      _groupHover: { color: "neutrals.300" },
+                      color: "neutrals.100",
+                      _groupHover: { color: "white" },
                     }}
-                    noOfLines={1}
-                    display="block"
-                    overflow={"hidden"}
-                    textOverflow={"ellipsis"}
-                    maxWidth={"180px"}
-                    whiteSpace={"nowrap"}
                   >
                     {rpcUrl}
                   </L2>

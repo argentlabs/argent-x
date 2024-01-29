@@ -9,9 +9,9 @@ import {
   FieldValue,
   LeftPaddedField,
 } from "../../../../components/Fields"
-import { isEqualAddress } from "../../../../services/addresses"
 import { TokenIcon } from "../../../accountTokens/TokenIcon"
 import { Token } from "../../../../../shared/token/__new/types/token.model"
+import { isEqualAddress } from "@argent/shared"
 
 interface TokenFieldProps {
   label: string

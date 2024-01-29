@@ -19,6 +19,7 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   avatarOutlined?: boolean
   avatarSize?: number
   isShield?: boolean
+  isOwner?: boolean
   isClickable?: boolean
   isDeprecated?: boolean
   displayArgentShieldBanner?: boolean

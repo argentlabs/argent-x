@@ -1,10 +1,11 @@
-import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
 import { getProvider } from "../../../shared/network"
 import {
+  ExtendedFinalityStatus,
   Transaction,
   getInFlightTransactions,
 } from "../../../shared/transactions"
 import { getTransactionsStatusUpdate } from "../determineUpdates"
+import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 export async function getTransactionsUpdate(transactions: Transaction[]) {
   const transactionsToCheck = getInFlightTransactions(transactions)
@@ -17,55 +18,50 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
       const { finality_status, execution_status } =
         await provider.getTransactionStatus(transaction.hash)
 
-      const isFailed =
-        execution_status === "REVERTED" || finality_status === "REJECTED"
-      if (!isFailed) {
-        return {
-          ...transaction,
-          finalityStatus: finality_status as TransactionFinalityStatus,
-          executionStatus: execution_status as TransactionExecutionStatus,
+      try {
+        if (execution_status === "REVERTED") {
+          const tx = await provider.getTransactionReceipt(transaction.hash)
+
+          if ("revert_reason" in tx) {
+            return {
+              ...transaction,
+              revertReason: tx.revert_reason,
+              status: {
+                finality_status,
+                execution_status,
+              },
+            }
+          }
         }
+      } catch (e) {
+        console.warn(
+          `Failed to fetch transaction receipt for ${transaction.hash}`,
+          e,
+        )
       }
 
-      const tx = await provider.getTransactionReceipt(transaction.hash)
-
-      // Handle Reverted transaction
-      if ("revert_reason" in tx) {
-        const finalityStatus =
-          (tx.finality_status as TransactionFinalityStatus) ||
-          "status" in tx ||
-          TransactionFinalityStatus.NOT_RECEIVED // For backward compatibility on mainnet
-
-        return {
-          ...transaction,
-          finalityStatus,
-          revertReason: tx.revert_reason,
-        }
-
-        // Handle Rejected transaction
-      } else if ("transaction_failure_reason" in tx) {
-        const anyTx = tx as any
-        return {
-          ...transaction,
-          finalityStatus: anyTx.status ?? TransactionFinalityStatus.RECEIVED,
-          executionStatus: TransactionExecutionStatus.REJECTED,
-          failureReason: anyTx.transaction_failure_reason,
-        }
+      return {
+        ...transaction,
+        status: {
+          finality_status,
+          execution_status,
+        },
       }
-
-      return transaction
     }),
   )
 
   const updatedTransactions = fetchedTransactions.reduce<Transaction[]>(
     (acc, transaction) => {
       if (transaction.status === "fulfilled") {
+        const { finality_status, execution_status } = getTransactionStatus(
+          transaction.value,
+        )
         acc.push({
           ...transaction.value,
-          finalityStatus:
-            transaction.value.finalityStatus ??
-            TransactionFinalityStatus.RECEIVED,
-          executionStatus: transaction.value.executionStatus,
+          status: {
+            finality_status: finality_status ?? "RECEIVED",
+            execution_status,
+          },
         })
       }
       return acc

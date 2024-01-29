@@ -1,6 +1,6 @@
 import { initTRPC } from "@trpc/server"
 
-import type { IArgentAccountServiceBackground } from "../../shared/argentAccount/service/interface"
+import type { IArgentAccountServiceBackground } from "../../shared/argentAccount/interface"
 import { BaseError } from "../../shared/errors/baseError"
 import { BaseError as SharedBaseError } from "@argent/shared"
 import type { IMultisigService } from "../../shared/multisig/service/messaging/interface"
@@ -11,6 +11,8 @@ import type { ITransactionReviewService } from "../../shared/transactionReview/i
 import type { IRecoveryService } from "../../shared/recovery/service/interface"
 import type { IStarknetAddressService } from "@argent/shared"
 import type { INetworkService } from "../../shared/network/service/interface"
+import { ISharedSwapService } from "../../shared/swap/service/interface"
+import superjson from "superjson"
 
 interface Context {
   sender?: chrome.runtime.MessageSender
@@ -23,12 +25,14 @@ interface Context {
     transactionReviewService: ITransactionReviewService
     recoveryService: IRecoveryService
     starknetAddressService: IStarknetAddressService
+    swapService: ISharedSwapService
     networkService: INetworkService
   }
 }
 
 const t = initTRPC.context<Context>().create({
   isServer: false,
+  transformer: superjson,
   allowOutsideOfServer: true,
   errorFormatter: (opts) => {
     const { shape, error } = opts

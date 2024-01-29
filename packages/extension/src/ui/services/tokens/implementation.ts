@@ -1,8 +1,6 @@
 import { Address } from "@argent/shared"
 
-import { Network } from "../../../shared/network"
 import { TokenView } from "../../features/accountTokens/tokens.service"
-import { getNetworkFeeToken } from "../../features/accountTokens/tokens.state"
 import { messageClient } from "../messaging/trpc"
 import { ITokensService } from "./interface"
 import { formatTokenBalance } from "./utils"
@@ -12,7 +10,6 @@ import {
   BaseTokenWithBalance,
   TokenWithOptionalBigIntBalance,
 } from "../../../shared/token/__new/types/tokenBalance.model"
-import { TokenError } from "../../../shared/errors/token"
 import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
 
 export const DEFAULT_TOKEN_LENGTH = 9
@@ -122,53 +119,6 @@ export class TokenService implements ITokensService {
     }, {})
   }
 
-  async fetchFeeTokenBalance(accountAddress: Address, networkId: string) {
-    // todo move to constructor
-    const token = await getNetworkFeeToken(networkId)
-    if (!token) {
-      return "0x0"
-    }
-
-    const { balance } = await this.getAccountBalance(
-      token.address,
-      accountAddress,
-      networkId,
-    )
-
-    return balance
-  }
-
-  async fetchFeeTokenBalanceForAllAccounts(
-    accountAddresses: Address[],
-    network: Network,
-  ) {
-    const token = await getNetworkFeeToken(network.id)
-    if (!token) {
-      throw new TokenError({
-        code: "FEE_TOKEN_NOT_FOUND",
-      })
-    }
-
-    const balances = (
-      await Promise.all(
-        accountAddresses.map((accountAddress) =>
-          this.trpcMessageClient.tokens.getAccountBalance.query({
-            tokenAddress: token.address,
-            accountAddress,
-            networkId: network.id,
-          }),
-        ),
-      )
-    ).map(({ balance }) => balance)
-
-    return accountAddresses.reduce<Record<string, string>>((acc, addr, i) => {
-      return {
-        ...acc,
-        [addr]: balances[i],
-      }
-    }, {})
-  }
-
   async send({
     to,
     method,
@@ -190,13 +140,6 @@ export class TokenService implements ITokensService {
       },
       title,
       subtitle,
-    })
-  }
-
-  async swap(transactions: Call[], title: string) {
-    await this.trpcMessageClient.tokens.swap.mutate({
-      transactions,
-      title,
     })
   }
 }

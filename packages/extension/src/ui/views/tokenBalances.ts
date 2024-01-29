@@ -6,7 +6,7 @@ import { BaseWalletAccount } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { BaseToken } from "../../shared/token/__new/types/token.model"
 import { equalToken } from "../../shared/token/__new/utils"
-import { networkFeeTokenOnNetworkFamily } from "./token"
+import { networkFeeTokensOnNetworkFamily } from "./token"
 
 const tokenBalancesAtom = atomFromRepo(tokenBalanceRepo)
 
@@ -45,18 +45,18 @@ export const tokenBalanceForTokenView = atomFamily(
   (a, b) => !!a && !!b && equalToken(a, b),
 )
 
-export const feeTokenBalanceView = atomFamily(
+export const feeTokenBalancesView = atomFamily(
   (account?: BaseWalletAccount) => {
     return atom(async (get) => {
       const tokenBalances = await get(tokenBalanceForAccountView(account))
       if (!account || !tokenBalances) {
         return
       }
-      const feeToken = await get(
-        networkFeeTokenOnNetworkFamily(account.networkId),
+      const feeTokens = await get(
+        networkFeeTokensOnNetworkFamily(account.networkId),
       )
-      return tokenBalances.find(
-        (tokenBalance) => feeToken && equalToken(tokenBalance, feeToken),
+      return tokenBalances.filter((tokenBalance) =>
+        feeTokens?.some((token) => equalToken(token, tokenBalance)),
       )
     })
   },

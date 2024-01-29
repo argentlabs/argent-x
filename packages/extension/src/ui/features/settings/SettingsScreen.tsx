@@ -1,34 +1,28 @@
 import {
   BarCloseButton,
-  BarIconButton,
   Button,
   CellStack,
   NavigationContainer,
+  NavigationContainerProps,
   SpacerCell,
   icons,
 } from "@argent/ui"
-import { Box, Center } from "@chakra-ui/react"
-import { FC } from "react"
-import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import { Center, Flex } from "@chakra-ui/react"
+import { FC, ReactEventHandler } from "react"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { routes, useCurrentPathnameWithQuery } from "../../routes"
-import { useStopSession } from "../../services/useStopSession"
-import { H2 } from "../../theme/Typography"
-import { selectedAccountView } from "../../views/account"
-import { useView } from "../../views/implementation/react"
+import { routes } from "../../routes"
+import { Account } from "../accounts/Account"
 import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
-import { useAccount } from "../accounts/accounts.state"
-import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
-import { DapplandFooter } from "./DapplandFooter"
-import { SettingsMenuItem } from "./SettingsMenuItem"
-import { SupportFooter } from "./SupportFooter"
-import { useShieldVerifiedEmail } from "../shield/useShieldVerifiedEmail"
-import { useArgentAccountTokenExpired } from "../argentAccount/hooks/useArgentAccountTokenExpired"
-import { formatTruncatedString } from "../../services/addresses"
 import { ClickableShieldBanner } from "../accounts/ClickableShieldBanner"
-import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
+import { DapplandFooter } from "./ui/DapplandFooter"
+import {
+  SettingsMenuItem,
+  SettingsMenuItemGroup,
+  SettingsMenuItemLink,
+} from "./ui/SettingsMenuItem"
+import { SupportFooter } from "./ui/SupportFooter"
+import { formatTruncatedString } from "@argent/shared"
 
 const {
   LockIcon,
@@ -37,103 +31,50 @@ const {
   ExpandIcon,
   ExtendedIcon,
   LinkIcon,
-  PasswordIcon,
   ShieldIcon,
   EmailIcon,
   ChevronRightIcon,
+  PreferencesIcon,
 } = icons
 
-export const Title = styled.h3`
-  font-weight: 600;
-  font-size: 17px;
-  line-height: 22px;
-  color: ${({ theme }) => theme.text1};
+interface SettingsScreenProps extends NavigationContainerProps {
+  onBack: ReactEventHandler
+  onLock: ReactEventHandler
+  onNavigateToAccount: ReactEventHandler
+  account?: Account
+  shouldDisplayGuardianBanner: boolean
+  isSignedIn: boolean
+  onSignIn: ReactEventHandler
+  extensionIsInTab: boolean
+  openExtensionInTab: ReactEventHandler
+  returnTo: string
+  verifiedEmail?: string | null
+}
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  svg {
-    color: ${({ theme }) => theme.text2};
-    font-size: 12px;
-  }
-`
-
-export const P = styled.p`
-  font-size: 15px;
-  color: ${({ theme }) => theme.text2};
-  margin-top: 16px;
-`
-
-export const SettingsItem = styled.div`
-  padding: 24px 32px;
-`
-
-// TODO: remove this when we have a proper settings page
-export const SettingsScreenWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 0 0 24px 0;
-
-  ${H2} {
-    margin: 0 32px 32px 32px;
-  }
-
-  hr {
-    border: none;
-    height: 1px;
-    background-color: ${({ theme }) => theme.bg2};
-  }
-`
-
-export const SettingsScreen: FC = () => {
-  const onBack = useNavigateReturnToOrBack()
-  const openExtensionInTab = useOpenExtensionInTab()
-  const extensionIsInTab = useExtensionIsInTab()
-  const selectedAccount = useView(selectedAccountView)
-  const returnTo = useCurrentPathnameWithQuery()
-  const account = useAccount(selectedAccount)
-  const navigate = useNavigate()
-  const stopSession = useStopSession()
-  const verifiedEmail = useShieldVerifiedEmail()
-  const { data: isArgentAccountTokenExpired } = useArgentAccountTokenExpired()
-
-  const isSignedIn = verifiedEmail && !isArgentAccountTokenExpired
-  const handleSignin = () => {
-    navigate(
-      routes.argentAccountEmail(
-        selectedAccount?.address,
-        "argentAccount",
-        returnTo,
-      ),
-    )
-  }
-  const navigateToAccount = () => {
-    navigate(routes.argentAccountLoggedIn(selectedAccount?.address))
-  }
-
-  const shouldDisplayGuardianBanner =
-    account && !account.guardian && account.type !== "multisig"
-
+export const SettingsScreen: FC<SettingsScreenProps> = ({
+  onBack,
+  onLock,
+  onNavigateToAccount,
+  account,
+  shouldDisplayGuardianBanner,
+  isSignedIn,
+  onSignIn,
+  extensionIsInTab,
+  openExtensionInTab,
+  returnTo,
+  verifiedEmail,
+}) => {
   return (
     <>
       <NavigationContainer
         rightButton={<BarCloseButton onClick={onBack} />}
         title={"Settings"}
-        leftButton={
-          <BarIconButton
-            onClick={() => void stopSession(true)}
-            aria-label="Lock wallet"
-          >
-            <LockIcon />
-          </BarIconButton>
-        }
         scrollKey={"settings/SettingsScreen"}
       >
         <CellStack>
           {account && (
             <>
-              <Box w={"full"}>
+              <Flex direction={"column"} w={"full"} gap={"1px"}>
                 <AccountListScreenItemContainer
                   account={account}
                   clickNavigateSettings
@@ -144,64 +85,56 @@ export const SettingsScreen: FC = () => {
                 {shouldDisplayGuardianBanner && (
                   <ClickableShieldBanner address={account.address} />
                 )}
-              </Box>
+              </Flex>
               <SpacerCell />
             </>
           )}
-          {!extensionIsInTab && (
-            <SettingsMenuItem
-              leftIcon={<ExtendedIcon />}
-              rightIcon={<ExpandIcon />}
-              to={routes.settings()}
-              onClick={openExtensionInTab}
-              title="Extended view"
+          <SettingsMenuItemGroup>
+            <SettingsMenuItemLink
+              leftIcon={<PreferencesIcon />}
+              to={routes.settingsPreferences(returnTo)}
+              title="Preferences"
             />
-          )}
-          <SettingsMenuItem
-            leftIcon={<EmailIcon />}
-            to={
-              isSignedIn
-                ? routes.argentAccountEmailPreferences(returnTo)
-                : routes.argentAccountEmail(
-                    selectedAccount?.address,
-                    "emailPreferences",
-                    returnTo,
-                  )
-            }
-            title="Email notifications"
-          />
-
-          <SettingsMenuItem
-            leftIcon={<AddressBookIcon />}
-            to={routes.settingsAddressBook()}
-            title="Address book"
-          />
-
-          <SettingsMenuItem
-            leftIcon={<LinkIcon />}
-            to={routes.settingsDappConnections()}
-            title="Connected dapps"
-          />
-
-          <SettingsMenuItem
-            leftIcon={<PasswordIcon />}
-            to={routes.settingsSeed(returnTo)}
-            title="Recovery phrase"
-          />
-
-          <SettingsMenuItem
+            {isPrivacySettingsEnabled && (
+              <SettingsMenuItemLink
+                leftIcon={<ShieldIcon />}
+                to={routes.settingsPrivacy(returnTo)}
+                title="Security & privacy"
+              />
+            )}
+          </SettingsMenuItemGroup>
+          <SettingsMenuItemGroup>
+            <SettingsMenuItemLink
+              leftIcon={<AddressBookIcon />}
+              to={routes.settingsAddressBook()}
+              title="Address book"
+            />
+            <SettingsMenuItemLink
+              leftIcon={<LinkIcon />}
+              to={routes.settingsDappConnectionsAccountList()}
+              title="Connected dapps"
+            />
+          </SettingsMenuItemGroup>
+          <SettingsMenuItemLink
             leftIcon={<CodeIcon />}
             to={routes.settingsDeveloper()}
             title="Developer settings"
           />
-
-          {isPrivacySettingsEnabled && (
+          <SettingsMenuItemGroup>
+            {!extensionIsInTab && (
+              <SettingsMenuItem
+                leftIcon={<ExtendedIcon />}
+                rightIcon={<ExpandIcon />}
+                onClick={openExtensionInTab}
+                title="Extended view"
+              />
+            )}
             <SettingsMenuItem
-              leftIcon={<ShieldIcon />}
-              to={routes.settingsPrivacy()}
-              title="Privacy"
+              leftIcon={<LockIcon />}
+              title="Lock wallet"
+              onClick={onLock}
             />
-          )}
+          </SettingsMenuItemGroup>
           <DapplandFooter />
           <SupportFooter />
         </CellStack>
@@ -214,7 +147,7 @@ export const SettingsScreen: FC = () => {
           boxShadow="menu"
         >
           <Button
-            onClick={navigateToAccount}
+            onClick={onNavigateToAccount}
             size="md"
             colorScheme="transparent"
             color="white"
@@ -227,7 +160,9 @@ export const SettingsScreen: FC = () => {
             textOverflow={"ellipsis"}
             overflow={"hidden"}
           >
-            {formatTruncatedString(verifiedEmail, 28)}
+            {verifiedEmail
+              ? formatTruncatedString(verifiedEmail, 28)
+              : "No email"}
           </Button>
         </Center>
       ) : (
@@ -238,7 +173,7 @@ export const SettingsScreen: FC = () => {
           boxShadow="menu"
         >
           <Button
-            onClick={handleSignin}
+            onClick={onSignIn}
             size="md"
             colorScheme="transparent"
             color="white"

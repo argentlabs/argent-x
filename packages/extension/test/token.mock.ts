@@ -4,7 +4,10 @@ import {
   BaseToken,
   Token,
 } from "../src/shared/token/__new/types/token.model"
-import { TokenWithBalance } from "../src/shared/token/__new/types/tokenBalance.model"
+import {
+  TokenWithBalance,
+  TokenWithOptionalBigIntBalance,
+} from "../src/shared/token/__new/types/tokenBalance.model"
 import {
   TokenPriceDetails,
   TokenWithPrice,
@@ -47,6 +50,11 @@ const defaultTokenWithBalance: TokenWithBalance = {
   ...defaultToken,
   balance: BigInt(100).toString(),
   account: getMockWalletAccount({}),
+}
+
+const defaultTokenWithOptionalBigIntBalance: TokenWithOptionalBigIntBalance = {
+  ...defaultToken,
+  balance: BigInt(100),
 }
 
 export const defaultTokenWithPrice: TokenWithPrice = {
@@ -92,6 +100,13 @@ export const getMockTokenWithBalance = (
   overrides?: Partial<TokenWithBalance>,
 ) => ({
   ...defaultTokenWithBalance,
+  ...(overrides ?? {}),
+})
+
+export const getMockTokenWithOptionalBigIntBalance = (
+  overrides?: Partial<TokenWithOptionalBigIntBalance>,
+) => ({
+  ...defaultTokenWithOptionalBigIntBalance,
   ...(overrides ?? {}),
 })
 

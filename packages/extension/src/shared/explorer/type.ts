@@ -1,6 +1,5 @@
-import { TransactionExecutionStatus } from "starknet"
-
-import { ExtendedTransactionStatus } from "../transactions"
+import { ExecutionStatus, ExtendedFinalityStatus } from "../transactions"
+import { z } from "zod"
 
 export interface IExplorerTransactionParameters {
   /** @example tokenId @example response_len */
@@ -22,6 +21,17 @@ export interface IExplorerTransactionCall {
   parameters: IExplorerTransactionParameters[]
 }
 
+export const explorerTransactionActualFeeSchema = z.object({
+  /** @example 0x490b183da37 */
+  amount: z.string(),
+  /** @example WEI */
+  unit: z.string(),
+})
+
+export type ExplorerTransactionActualFee = z.infer<
+  typeof explorerTransactionActualFeeSchema
+>
+
 export interface IExplorerTransaction {
   /** @example 0x1e122f27e74c51082bc19377a76002889fa6b4b00508398f23f9dedc9f56b5c */
   id: string
@@ -38,11 +48,12 @@ export interface IExplorerTransaction {
   /** @example 0x6d90a45c752 */
   maxFee?: string
   /** @example 0x490b183da37 */
-  actualFee: string
+  actualFee: string | ExplorerTransactionActualFee
   /** TODO: remove legacy status field */
-  status?: ExtendedTransactionStatus
-  finalityStatus: ExtendedTransactionStatus
-  executionStatus?: TransactionExecutionStatus
+  status?: ExtendedFinalityStatus
+  finalityStatus: ExtendedFinalityStatus
+  executionStatus?: ExecutionStatus
+  failureReason?: "REJECTED" | "REVERTED" | "CANCELLED"
   statusData: string
   events: IExplorerTransactionEvent[]
   calls?: IExplorerTransactionCall[]

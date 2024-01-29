@@ -15,13 +15,6 @@ export const allTokensView = atom(async (get) => {
   return tokens
 })
 
-export const tokensToShowView = atom(async (get) => {
-  const tokens = await get(allTokensAtom)
-  return tokens.filter(
-    (token) => token.showAlways || token.popular || token.custom,
-  )
-})
-
 /**
  * @returns ETH for ALL networks
  */
@@ -69,22 +62,23 @@ export const allTokensOnNetworkFamily =
 /**
  * @returns Fee Token for a given network
  */
-export const networkFeeTokenOnNetworkFamily = atomFamily((networkId?: string) =>
-  atom(async (get) => {
-    if (!networkId) {
-      return
-    }
-    const tokens = await get(allTokensView)
-    const network = await get(networkView(networkId))
-    if (!network?.feeTokenAddress) {
-      return
-    }
-    return tokens.find(
-      (token) =>
-        token.address === network.feeTokenAddress &&
-        token.networkId === networkId,
-    )
-  }),
+export const networkFeeTokensOnNetworkFamily = atomFamily(
+  (networkId?: string) =>
+    atom(async (get) => {
+      if (!networkId) {
+        return
+      }
+      const tokens = await get(allTokensView)
+      const network = await get(networkView(networkId))
+      if (!network) {
+        return
+      }
+      return tokens.filter(
+        (token) =>
+          network.possibleFeeTokenAddresses.includes(token.address) &&
+          token.networkId === networkId,
+      )
+    }),
 )
 
 export const tokenFindFamily = atomFamily(

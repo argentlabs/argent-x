@@ -2,6 +2,7 @@ import { parseUnits } from "./parseUnits"
 import { formatUnits } from "./formatUnits"
 import { BigDecimal } from "./types"
 import { abs } from "./lib"
+import { BigNumberish } from "starknet"
 
 /**
  * Formats a BigInt representing wei into a string representing ether,
@@ -74,4 +75,21 @@ export function absBigInt(num: bigint): bigint {
  */
 export function parseCurrencyAbs(amount: string): BigDecimal {
   return abs(parseCurrency(amount))
+}
+
+/**
+ * Converts a BigNumberish to a BigDecimal.
+ *
+ * This is unsafe, please use with caution.
+ * @param {BigNumberish} value - The number to be converted to a BigDecimal.
+ * @returns {BigDecimal} The converted number.
+ */
+export function toBigDecimal(
+  value: BigNumberish,
+  decimals: number,
+): BigDecimal {
+  return {
+    value: BigInt(value),
+    decimals,
+  }
 }

@@ -19,11 +19,11 @@ describe("error", () => {
           /** 'false' excludes the stack trace which is environment-specific */
           expect(coerceErrorToString(error, false)).toMatchInlineSnapshot(`
           "{
-            \\"message\\": \\"Error message\\",
-            \\"url\\": \\"http://foo/v1/bar\\",
-            \\"status\\": 123,
-            \\"statusText\\": \\"Foo bar\\",
-            \\"responseText\\": \\"Foo bar baz\\"
+            "message": "Error message",
+            "url": "http://foo/v1/bar",
+            "status": 123,
+            "statusText": "Foo bar",
+            "responseText": "Foo bar baz"
           }"
         `)
         })
@@ -33,15 +33,15 @@ describe("error", () => {
           expect(coerceErrorToString({})).toMatchInlineSnapshot('"{}"')
           expect(coerceErrorToString({ foo: "bar" })).toMatchInlineSnapshot(`
           "{
-            \\"foo\\": \\"bar\\"
+            "foo": "bar"
           }"
         `)
           expect(coerceErrorToString([1, 2, 3])).toMatchInlineSnapshot(`
           "{
-            \\"0\\": 1,
-            \\"1\\": 2,
-            \\"2\\": 3,
-            \\"length\\": 3
+            "0": 1,
+            "1": 2,
+            "2": 3,
+            "length": 3
           }"
         `)
         })

@@ -1,7 +1,7 @@
 import { memoize } from "lodash-es"
-import { AllowArray, TransactionFinalityStatus } from "starknet"
+import { AllowArray } from "starknet"
 
-import { addTransaction } from "../../background/transactions/store"
+import { addTransaction } from "../transactions/store"
 import { ArrayStorage } from "../storage"
 import { SelectorFn } from "../storage/types"
 import { ExtendedTransactionType } from "../transactions"
@@ -93,6 +93,8 @@ export async function multisigPendingTransactionToTransaction(
     throw new Error("Transaction is still awaiting signatures")
   }
 
+  const finalityStatus = state === "CANCELLED" ? "CANCELLED" : "RECEIVED"
+
   await addTransaction(
     {
       hash: transactionHash,
@@ -102,7 +104,7 @@ export async function multisigPendingTransactionToTransaction(
         transactions: transaction.calls,
       },
     },
-    state === "CANCELLED" ? "CANCELLED" : TransactionFinalityStatus.RECEIVED,
+    { finality_status: finalityStatus },
   )
 
   await removeFromMultisigPendingTransactions(pendingTxn)

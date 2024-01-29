@@ -1,6 +1,5 @@
+import { normalizeAddress } from "@argent/shared"
 import { Call, CallData, num, uint256, validateAndParseAddress } from "starknet"
-
-import { normalizeAddress } from "../../ui/services/addresses"
 
 const { uint256ToBN } = uint256
 

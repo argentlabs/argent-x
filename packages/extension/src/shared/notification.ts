@@ -30,14 +30,14 @@ export function sendTransactionNotification(
 ) {
   const id = `TX:${hash}`
   const title = `${meta?.title || "Transaction"} ${
-    ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2"].includes(status)
+    ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2"].includes(status?.finality_status ?? "")
       ? "succeeded"
       : "rejected"
   }`
   return browser.notifications.create(id, {
     type: "basic",
     title,
-    message: `${hash}\nStatus: ${status}`,
+    message: `${hash}\nStatus: ${status?.finality_status}`,
     iconUrl: "./assets/logo.png",
     eventTime: Date.now(),
   })

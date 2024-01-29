@@ -17,10 +17,6 @@ import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
 import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
 
-/**
- * @vitest-environment jsdom
- */
-
 const renderWithProps = async (
   props: TransactionActionFixture &
     Pick<ApproveTransactionScreenProps, "onReject" | "onSubmit">,

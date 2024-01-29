@@ -1,9 +1,6 @@
 import { FC, useCallback, useMemo } from "react"
 
-import {
-  equalPreAuthorization,
-  usePreAuthorizations,
-} from "../../../../shared/preAuthorizations"
+import { usePreAuthorizations } from "../../preAuthorizations/hooks"
 import {
   BaseWalletAccount,
   WalletAccount,
@@ -11,6 +8,7 @@ import {
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { AccountListItemProps } from "../../accounts/accountListItem.model"
 import { AccountSelect } from "../../accounts/AccountSelect"
+import { isEqualPreAuthorization } from "../../../../shared/preAuthorization/schema"
 
 export interface ConnectDappAccountSelectProps {
   accounts: WalletAccount[]
@@ -31,7 +29,7 @@ export const ConnectDappAccountSelect: FC<ConnectDappAccountSelectProps> = ({
       const accountName = account.name
       const connected = Boolean(
         preAuths.some((preAuth) =>
-          equalPreAuthorization(preAuth, {
+          isEqualPreAuthorization(preAuth, {
             host,
             account,
           }),

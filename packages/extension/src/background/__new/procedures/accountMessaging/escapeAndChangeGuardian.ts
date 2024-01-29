@@ -2,7 +2,6 @@ import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
-import { isEqualAddress } from "../../../../ui/services/addresses"
 import { constants, num, Account } from "starknet"
 import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
@@ -10,6 +9,7 @@ import { AccountError } from "../../../../shared/errors/account"
 import {
   changeGuardianCalldataSchema,
   escapeGuardianCalldataSchema,
+  isEqualAddress,
 } from "@argent/shared"
 
 const escapeAndChangeGuardianSchema = z.object({

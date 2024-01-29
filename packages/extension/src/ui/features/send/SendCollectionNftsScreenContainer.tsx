@@ -10,8 +10,7 @@ import { useSendQuery } from "./schema"
 
 export const SendCollectionNftsScreenContainer: FC = () => {
   const navigate = useNavigate()
-  const { recipientAddress, tokenAddress, tokenId, amount, returnTo } =
-    useSendQuery()
+  const { recipientAddress, tokenAddress, returnTo } = useSendQuery()
 
   const collection = useCollection(addressSchema.parse(tokenAddress))
   const nfts = useCollectionNfts(

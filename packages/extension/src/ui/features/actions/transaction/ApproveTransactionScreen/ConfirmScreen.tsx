@@ -5,6 +5,7 @@ import {
   ScrollContainer,
   StickyGroup,
   useNavigateBack,
+  icons,
 } from "@argent/ui"
 import { Box, Flex } from "@chakra-ui/react"
 import {
@@ -18,7 +19,9 @@ import {
 import Measure, { ContentRect } from "react-measure"
 
 import { WalletAccount } from "../../../../../shared/wallet.model"
-import { formatTruncatedAddress } from "../../../../services/addresses"
+import { formatTruncatedAddress } from "@argent/shared"
+
+const { AlertFillIcon } = icons
 
 export interface ConfirmPageProps {
   onSubmit?: (e: FormEvent<HTMLFormElement>) => void
@@ -135,18 +138,30 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                           colorScheme={
                             !showConfirmButton ? "primary" : undefined
                           }
+                          sx={{
+                            pointerEvents: "auto !important",
+                          }}
                         >
                           {rejectButtonText}
                         </Button>
                       )}
                       {showConfirmButton && (
                         <Button
+                          id={confirmButtonText}
                           isDisabled={confirmButtonDisabled}
                           colorScheme={destructive ? "danger" : "primary"}
                           w="full"
                           type="submit"
                           isLoading={confirmButtonIsLoading}
                           loadingText={confirmButtonLoadingText}
+                          leftIcon={
+                            destructive ? (
+                              <AlertFillIcon color="white" />
+                            ) : undefined
+                          }
+                          sx={{
+                            pointerEvents: "auto !important",
+                          }}
                         >
                           {confirmButtonText}
                         </Button>

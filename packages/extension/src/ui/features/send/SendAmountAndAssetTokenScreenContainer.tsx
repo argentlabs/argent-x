@@ -27,7 +27,7 @@ import { getUint256CalldataFromBN } from "../../services/transactions"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useTokenUnitAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
-import { useNetworkFeeToken, useToken } from "../accountTokens/tokens.state"
+import { useToken } from "../accountTokens/tokens.state"
 import { useMaxFeeEstimateForTransfer } from "../accountTokens/useMaxFeeForTransfer"
 import { amountInputSchema } from "./amountInput"
 import {
@@ -41,6 +41,10 @@ import { tokenService } from "../../services/tokens"
 import { useLiveTokenBalanceForAccount } from "../accountTokens/useLiveTokenBalanceForAccount"
 import { Spinner } from "@chakra-ui/react"
 import { clientStarknetAddressService } from "../../services/address"
+import {
+  pickBestFeeToken,
+  useFeeTokenBalances,
+} from "../accountTokens/useFeeTokenBalance"
 
 const formSchema = z.object({
   amount: amountInputSchema,
@@ -52,11 +56,6 @@ export const SendAmountAndAssetTokenScreenContainer: FC<
   SendAmountAndAssetScreenProps
 > = ({ tokenAddress, ...rest }) => {
   const account = useView(selectedAccountView)
-  const feeToken = useNetworkFeeToken(account?.networkId)
-  /** default to fee token if no token was selected yet */
-  if (!tokenAddress) {
-    tokenAddress = feeToken?.address || "0x0"
-  }
   const token = useToken({
     address: tokenAddress,
     networkId: account?.networkId || "Unknown",
@@ -114,25 +113,33 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     handleSubmit,
     setError,
   } = useForm<FormType>({
-    defaultValues: { amount: propAmount || "" },
+    defaultValues: {
+      amount: propAmount || "",
+    },
     resolver: zodResolver(formSchema),
   })
   const hasAmountError = "amount" in errors
-  const inputAmount = watch().amount
+  const { amount: inputAmount } = watch()
   const { ref, onChange, ...amountInputRest } = register("amount")
   const inputRef = useAutoFocusInputRef<HTMLInputElement>()
 
   const network = useCurrentNetwork()
 
-  const feeToken = useNetworkFeeToken(account?.networkId)
+  const feeTokens = useFeeTokenBalances(account)
+  const feeToken = pickBestFeeToken(feeTokens, { avoid: [tokenAddress] })
 
   const currencyValue = useTokenUnitAmountToCurrencyValue(token, inputAmount)
 
   const {
-    maxFee,
+    data: maxFee,
     error: maxFeeError,
-    loading: maxFeeLoading,
-  } = useMaxFeeEstimateForTransfer(tokenAddress, balance, account)
+    isValidating: maxFeeLoading,
+  } = useMaxFeeEstimateForTransfer(
+    feeToken.address,
+    tokenAddress,
+    balance,
+    account,
+  )
 
   const onSubmit = useCallback(async () => {
     if (token && recipientAddress && inputAmount) {
@@ -172,18 +179,14 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
         tokenDecimals,
       )
 
-      const maxAmount =
-        account?.networkId ===
-        "localhost" /** FIXME: workaround for localhost fee estimate with devnet 0.3.4 */
-          ? balance - BigInt(maxFee) - 100000000000000n
-          : balance - BigInt(maxFee)
+      const maxAmount = balance - BigInt(maxFee)
 
       const formattedMaxAmount = formatUnits(maxAmount, tokenDecimals)
       setValue("amount", maxAmount <= 0n ? tokenBalance : formattedMaxAmount, {
         shouldDirty: true,
       })
     }
-  }, [balance, maxFee, token.decimals, account?.networkId, setValue])
+  }, [balance, maxFee, token.decimals, setValue])
 
   const parsedInputAmount = parseAmount(
     inputAmount || "0",

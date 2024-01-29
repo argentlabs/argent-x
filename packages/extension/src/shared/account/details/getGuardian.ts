@@ -12,7 +12,7 @@ export const getGuardianForAccount = async (
   account: BaseWalletAccount,
 ): Promise<string | undefined> => {
   const network = await networkService.getById(account.networkId)
-  // Prioritize Cairo 1 get_guardian over cairo 0 get_guardian
+  // Prioritize Cairo 1 get_guardian over cairo 0 getGuardian
   const call: Call = {
     contractAddress: account.address,
     entrypoint: "get_guardian",

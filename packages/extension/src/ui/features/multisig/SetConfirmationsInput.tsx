@@ -39,6 +39,7 @@ export const SetConfirmationsInput = ({
                   mb="1.5"
                 >
                   <Button
+                    data-testid="decrease-threshold"
                     borderRadius="full"
                     backgroundColor="neutrals.900"
                     onClick={() =>
@@ -48,8 +49,11 @@ export const SetConfirmationsInput = ({
                   >
                     <MinusIcon />
                   </Button>
-                  <H1 defaultValue={existingThreshold}>{field.value}</H1>
+                  <H1 data-testid="threshold" defaultValue={existingThreshold}>
+                    {field.value}
+                  </H1>
                   <Button
+                    data-testid="increase-threshold"
                     borderRadius="90"
                     backgroundColor="neutrals.900"
                     onClick={() =>

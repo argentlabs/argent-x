@@ -16,12 +16,11 @@ import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
-import { normalizeAddress } from "../../services/addresses"
 import { trackAddFundsService } from "../../services/analytics"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
-import { isFeatureEnabled } from "@argent/shared"
+import { isFeatureEnabled, normalizeAddress } from "@argent/shared"
 import { Grid } from "@chakra-ui/react"
 
 const { RampLogo, BanxaLogo } = logos

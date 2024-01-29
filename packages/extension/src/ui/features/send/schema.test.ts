@@ -1,6 +1,10 @@
 import { describe, expect, test } from "vitest"
 
 import { parseQuery, sendQuerySchema } from "./schema"
+import { stark } from "starknet"
+import { addressSchema } from "@argent/shared"
+
+const mockTokenAddress = addressSchema.parse(stark.randomAddress())
 
 describe("send", () => {
   describe("schema", () => {
@@ -13,11 +17,13 @@ describe("send", () => {
           parseQuery(
             new URLSearchParams({
               tokenId: "123",
+              tokenAddress: mockTokenAddress,
             }),
             sendQuerySchema,
           ),
         ).toEqual({
           tokenId: "123",
+          tokenAddress: mockTokenAddress,
         })
       })
     })
@@ -31,11 +37,13 @@ describe("send", () => {
             new URLSearchParams({
               foo: "bar",
               tokenId: "123",
+              tokenAddress: mockTokenAddress,
             }),
             sendQuerySchema,
           ),
         ).toEqual({
           tokenId: "123",
+          tokenAddress: mockTokenAddress,
         })
       })
     })

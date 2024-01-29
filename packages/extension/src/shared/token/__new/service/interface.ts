@@ -1,5 +1,5 @@
 import { AllowArray, SelectorFn } from "../../../storage/__new/interface"
-import { BaseWalletAccount } from "../../../wallet.model"
+import { BaseWalletAccount, WalletAccount } from "../../../wallet.model"
 import { BaseToken, Token } from "../types/token.model"
 import { BaseTokenWithBalance } from "../types/tokenBalance.model"
 import {
@@ -66,4 +66,11 @@ export interface ITokenService {
   getTotalCurrencyBalanceForAccounts: (
     accounts: BaseWalletAccount[],
   ) => Promise<{ [key: string]: string }>
+
+  getFeeTokens: (
+    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
+  ) => Promise<Token[]>
+  getBestFeeToken: (
+    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
+  ) => Promise<Token>
 }

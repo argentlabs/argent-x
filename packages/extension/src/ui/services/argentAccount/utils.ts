@@ -1,13 +1,9 @@
 import { stringToBooleanSchema } from "@argent/shared"
 import { z } from "zod"
-import { preferencesEndpointPayload } from "../../../background/__new/procedures/argentAccount/updatePreferences.model"
-
-export const emailPreferencesSchema = z.object({
-  isNewsletterEnabled: z.boolean(),
-  isAnnouncementsEnabled: z.boolean(),
-})
-
-export type EmailPreferences = z.infer<typeof emailPreferencesSchema>
+import {
+  preferencesEndpointPayload,
+  emailPreferencesSchema,
+} from "../../../shared/argentAccount/schema"
 
 export const preferencesToEmailPreferences =
   preferencesEndpointPayload.transform((val) => {

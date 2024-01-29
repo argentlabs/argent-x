@@ -13,14 +13,3 @@ export const parsedDeprecatedTokens: Token[] = defaultTokens.map((token) => ({
   decimals: parseInt(token.decimals, 10),
   image: token.iconUrl,
 }))
-
-export const testDappToken = (networkId: string) =>
-  defaultTokens.find(
-    ({ name, network }) => name === "Test Token" && network === networkId,
-  )
-
-export const getFeeToken = (networkId: string) =>
-  parsedDeprecatedTokens.find(
-    ({ symbol, networkId: network }) =>
-      symbol === "ETH" && network === networkId,
-  )

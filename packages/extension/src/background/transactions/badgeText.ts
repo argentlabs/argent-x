@@ -16,17 +16,19 @@ import {
 } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { old_walletStore } from "../../shared/wallet/walletStore"
-import { transactionsStore } from "./store"
-import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
+import { getTransactionStatus } from "../../shared/transactions/utils"
 
 // selects transactions that are pending and match the provided account
 
 export const pendingAccountTransactionsSelector = memoize(
-  (account: BaseWalletAccount) => (transaction: Transaction) =>
-    transaction.finalityStatus === TransactionFinalityStatus.RECEIVED &&
-    transaction.executionStatus !== TransactionExecutionStatus.REJECTED && // Rejected transactions have finality status RECEIVED
-    !transaction.meta?.isDeployAccount &&
-    accountsEqual(account, transaction.account),
+  (account: BaseWalletAccount) => (transaction: Transaction) => {
+    const { finality_status } = getTransactionStatus(transaction)
+    return (
+      finality_status === "RECEIVED" &&
+      !transaction.meta?.isDeployAccount &&
+      accountsEqual(account, transaction.account)
+    )
+  },
 )
 
 export const multisigPendingTransactionSelector = memoize(
@@ -48,26 +50,20 @@ export const updateBadgeText = async () => {
 
   const multisig = await getMultisigAccountFromBaseWallet(selectedWalletAccount)
 
-  const transactionSelector = pendingAccountTransactionsSelector(
-    selectedWalletAccount,
-  )
-  const pendingAccountTransactions = await transactionsStore.get(
-    transactionSelector,
-  )
-
-  let multisigTransactionsLength = 0
-
-  if (multisig) {
-    const multisigTransactionSelector =
-      multisigPendingTransactionSelector(multisig)
-
-    multisigTransactionsLength = (
-      await multisigPendingTransactionsStore.get(multisigTransactionSelector)
-    ).length
+  if (!multisig) {
+    hideNotificationBadge()
+    return
   }
 
-  const badgeSize =
-    pendingAccountTransactions.length + multisigTransactionsLength
+  let multisigTransactionsLength = 0
+  const multisigTransactionSelector =
+    multisigPendingTransactionSelector(multisig)
+
+  multisigTransactionsLength = (
+    await multisigPendingTransactionsStore.get(multisigTransactionSelector)
+  ).length
+
+  const badgeSize = multisigTransactionsLength
 
   if (badgeSize) {
     showNotificationBadge(badgeSize)
@@ -78,10 +74,6 @@ export const updateBadgeText = async () => {
 
 export const initBadgeText = () => {
   old_walletStore.subscribe("selected", () => {
-    updateBadgeText()
-  })
-
-  transactionsStore.subscribe(() => {
     updateBadgeText()
   })
 

@@ -1,10 +1,10 @@
+import { DeclareContractBackgroundPayload } from "../../../shared/udc/schema"
 import {
   DeployContractPayload,
   IUdcService,
 } from "../../../shared/udc/service/interface"
 import { messageClient } from "../messaging/trpc"
 import { z } from "zod"
-import { DeclareContractBackgroundPayload } from "../../../shared/udc/type"
 
 export class UdcService implements IUdcService {
   constructor(private trpcMessageClient: typeof messageClient) {}

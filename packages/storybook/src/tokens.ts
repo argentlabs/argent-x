@@ -1,7 +1,5 @@
-import {
-  getFeeToken,
-  parsedDefaultTokens,
-} from "@argent-x/extension/src/shared/token/__new/utils"
+import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/__new/utils"
+import { getFeeToken } from "@argent-x/extension/src/ui/features/actions/feeEstimation/__fixtures__/feeToken"
 
 export const tokensByNetwork = parsedDefaultTokens.filter(
   ({ networkId }) => networkId === "goerli-alpha",

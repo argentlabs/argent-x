@@ -5,13 +5,15 @@ import { extensionOnlyProcedure } from "../permissions"
 import { transactionReviewTransactionsSchema } from "../../../../shared/transactionReview/interface"
 import { enrichedSimulateAndReviewSchema } from "../../../../shared/transactionReview/schema"
 
-const approveActionSchema = z.array(transactionReviewTransactionsSchema)
+const simulateAndReviewSchema = z.array(transactionReviewTransactionsSchema)
 
 export const simulateAndReviewProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
-  .input(approveActionSchema)
+  .input(simulateAndReviewSchema)
   .output(enrichedSimulateAndReviewSchema)
   .query(async ({ input, ctx: { services } }) => {
     const { transactionReviewService } = services
-    return transactionReviewService.simulateAndReview({ transactions: input })
+    return transactionReviewService.simulateAndReview({
+      transactions: input,
+    })
   })

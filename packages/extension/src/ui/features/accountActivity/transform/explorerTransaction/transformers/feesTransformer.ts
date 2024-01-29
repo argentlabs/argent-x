@@ -1,6 +1,7 @@
 import { number } from "starknet"
 
 import { IExplorerTransactionTransformer } from "./type"
+import { getActualFee } from "../getActualFee"
 
 /** fees */
 
@@ -8,7 +9,9 @@ export default function ({
   explorerTransaction,
   result,
 }: IExplorerTransactionTransformer) {
-  const { maxFee, actualFee } = explorerTransaction
+  const { maxFee } = explorerTransaction
+  const actualFee = getActualFee(explorerTransaction)
+
   if (maxFee && actualFee) {
     result = {
       ...result,

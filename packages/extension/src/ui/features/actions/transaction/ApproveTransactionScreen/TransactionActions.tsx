@@ -11,9 +11,9 @@ import { FC } from "react"
 import { CallData, num } from "starknet"
 
 import { entryPointToHumanReadable } from "../../../../../shared/transactions"
-import { formatTruncatedAddress } from "../../../../services/addresses"
 import { TransactionActionsType } from "../types"
 import { formatCalldataSafe } from "../../utils"
+import { formatTruncatedAddress } from "@argent/shared"
 
 export interface TransactionActionsProps {
   action: TransactionActionsType

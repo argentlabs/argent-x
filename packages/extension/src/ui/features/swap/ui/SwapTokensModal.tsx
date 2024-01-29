@@ -1,5 +1,4 @@
 import { CellStack, H5, SearchInput } from "@argent/ui"
-import { Currency, Token, useAllTokens } from "@argent/x-swap"
 import {
   Modal,
   ModalBody,
@@ -12,17 +11,19 @@ import { useForm } from "react-hook-form"
 
 import { OwnedToken } from "./OwnedToken"
 import { TokenPrice } from "./TokenPrice"
+import { Token } from "../../../../shared/token/__new/types/token.model"
+import { useTradableTokensInCurrentNetwork } from "../../accountTokens/tokens.state"
 
 interface SwapTokensModalProps {
   onClose: () => void
-  onCurrencySelect?: (currency: Currency) => void
+  onTokenSelect?: (token: Token) => void
   isOpen: boolean
   isPay: boolean
 }
 
 const SwapTokensModal: FC<SwapTokensModalProps> = ({
   onClose,
-  onCurrencySelect,
+  onTokenSelect,
   isOpen,
   isPay,
 }) => {
@@ -30,7 +31,7 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
     defaultValues: { query: "" },
   })
   const currentQueryValue = watch("query")
-  const tokens = useAllTokens()
+  const tokens = useTradableTokensInCurrentNetwork()
 
   const filteredTokens: Token[] = useMemo(() => {
     if (!currentQueryValue) {
@@ -46,11 +47,11 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
   }, [tokens, currentQueryValue])
 
   const selectToken = useCallback(
-    (currency: Currency) => {
-      onCurrencySelect?.(currency)
+    (token: Token) => {
+      onTokenSelect?.(token)
       onClose()
     },
-    [onCurrencySelect, onClose],
+    [onTokenSelect, onClose],
   )
 
   if (!filteredTokens) {
@@ -59,7 +60,7 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="full">
+      <Modal isOpen={isOpen} onClose={onClose} size="full" motionPreset="none">
         <ModalContent bg="neutrals.900">
           <ModalHeader>
             <H5 fontWeight="600" textAlign="center">
@@ -76,7 +77,7 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
                   {isPay ? (
                     <OwnedToken
                       key={token.address}
-                      currency={token}
+                      token={token}
                       onClick={() => {
                         selectToken(token)
                       }}
@@ -87,7 +88,7 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
                       onClick={() => {
                         selectToken(token)
                       }}
-                      currency={token}
+                      token={token}
                     />
                   )}
                 </Fragment>

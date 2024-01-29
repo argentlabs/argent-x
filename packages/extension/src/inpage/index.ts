@@ -1,4 +1,4 @@
-import { assertNever } from "./../ui/services/assertNever"
+import { assertNever } from "../shared/utils/assertNever"
 import type { WindowMessageType } from "../shared/messages"
 import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"

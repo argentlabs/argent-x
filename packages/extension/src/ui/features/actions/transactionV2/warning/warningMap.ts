@@ -11,11 +11,28 @@ export const riskToColorMap: Record<z.infer<typeof severitySchema>, string> = {
   critical: "error.500",
 }
 
+export const riskToInvertedColorMap: Record<
+  z.infer<typeof severitySchema>,
+  string
+> = {
+  info: "black",
+  caution: "black",
+  high: "white",
+  critical: "white",
+}
+
 export const riskToHeaderMap: Record<z.infer<typeof severitySchema>, string> = {
   info: "Double check",
   caution: "Caution",
   high: "High risk transaction",
   critical: "Critical risk transaction",
+}
+
+export const riskToBadgeMap: Record<z.infer<typeof severitySchema>, string> = {
+  info: "Info",
+  caution: "Caution",
+  high: "High risk",
+  critical: "Critical risk",
 }
 export const warningMap: Record<
   z.infer<typeof reasonsSchema>,

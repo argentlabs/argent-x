@@ -12,9 +12,9 @@ import { PageWrapper } from "../../components/Page"
 import { routes } from "../../routes"
 import { Alert } from "@argent/ui"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { formatTruncatedAddress } from "../../services/addresses"
 import { A } from "../../components/TrackingLink"
 import { Grid } from "@chakra-ui/react"
+import { formatTruncatedAddress } from "@argent/shared"
 
 const { DocumentIcon } = icons
 

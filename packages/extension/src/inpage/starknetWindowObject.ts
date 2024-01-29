@@ -5,13 +5,14 @@ import type {
   WalletEvents,
 } from "@argent/x-window"
 
-import { assertNever } from "./../ui/services/assertNever"
+import { assertNever } from "../shared/utils/assertNever"
 import { ArgentXAccount } from "./ArgentXAccount"
 import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./messaging"
 import {
   handleAddNetworkRequest,
   handleAddTokenRequest,
+  handleDeploymentData,
   handleSwitchNetworkRequest,
 } from "./requestMessageHandlers"
 import { ArgentXAccount4 } from "./ArgentXAccount4"
@@ -47,6 +48,14 @@ export const starknetWindowObject: StarknetWindowObject = {
       "chainId" in call.params
     ) {
       return await handleSwitchNetworkRequest(call.params)
+    } else if (
+      // Currently not part of the spec
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      call.type === "wallet_deploymentData"
+    ) {
+      console.warn("Using non-standard wallet_deploymentData")
+      return (await handleDeploymentData()) as any
     }
     throw Error("Not implemented")
   },

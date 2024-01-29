@@ -2,7 +2,7 @@ import { constants } from "starknet"
 import { isEqualAddress } from "@argent/shared"
 
 import type { ArgentAccountType } from "../wallet.model"
-import type { DefaultNetworkId, Network, PublicRpcNode } from "./type"
+import type { Network, PublicRpcNode } from "./type"
 import { PUBLIC_RPC_NODES } from "./constants"
 
 // LEGACY ⬇️
@@ -44,28 +44,27 @@ export function getNetworkIdFromChainId(
 
 export function getDefaultNetworkId() {
   const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
-  let defaultNetworkId: DefaultNetworkId
 
   if (!argentXEnv) {
     throw new Error("ARGENT_X_ENVIRONMENT not set")
   }
 
   switch (argentXEnv.toLowerCase()) {
+    case "dev":
+    case "integration":
+      return "integration"
+
     case "prod":
     case "staging":
-      defaultNetworkId = "mainnet-alpha"
-      break
+      return "mainnet-alpha"
 
     case "hydrogen":
     case "test":
-      defaultNetworkId = "goerli-alpha"
-      break
+      return "goerli-alpha"
 
     default:
       throw new Error(`Unknown ARGENTX_ENVIRONMENT: ${argentXEnv}`)
   }
-
-  return defaultNetworkId
 }
 
 export function getDefaultNetwork(defaultNetworks: Network[]): Network {

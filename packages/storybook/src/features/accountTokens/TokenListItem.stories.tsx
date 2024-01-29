@@ -1,5 +1,4 @@
 import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens/TokenListItem"
-import { TokenDetailsWithBalance } from "@argent-x/extension/src/ui/features/accountTokens/tokens.state"
 import { CellStack } from "@argent/ui"
 import { ComponentProps } from "react"
 import { tokenWithBalance, tokenWithSymbol } from "../../tokens"

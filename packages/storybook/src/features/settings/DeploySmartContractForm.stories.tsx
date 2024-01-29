@@ -1,4 +1,4 @@
-import { DeploySmartContractForm } from "@argent-x/extension/src/ui/features/settings/DeveloperSettings/DeploySmartContractForm"
+import { DeploySmartContractForm } from "@argent-x/extension/src/ui/features/settings/developerSettings/smartContractDevelopment/DeploySmartContractForm"
 
 import { decorators } from "../../decorators/routerDecorators"
 

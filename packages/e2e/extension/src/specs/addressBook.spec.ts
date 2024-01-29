@@ -43,7 +43,8 @@ test.describe("Address Book", () => {
     await extension.navigation.reviewSend.click()
     await extension.navigation.confirm.click()
 
-    await extension.validateTx(config.account1Seed2!)
+    const txHash = await extension.activity.getLastTxHash()
+    await extension.validateTx(txHash!, config.account1Seed2!)
 
     //delete address
     await extension.navigation.menuTokens.click()
@@ -78,8 +79,8 @@ test.describe("Address Book", () => {
     await extension.account.sendMax.click()
     await extension.navigation.reviewSend.click()
     await extension.navigation.confirm.click()
-
-    await extension.validateTx(config.account1Seed2!)
+    const txHash = await extension.activity.getLastTxHash()
+    await extension.validateTx(txHash!, config.account1Seed2!)
   })
 
   test("Add address from send window", async ({ extension }) => {
@@ -106,6 +107,7 @@ test.describe("Address Book", () => {
     await extension.navigation.reviewSend.click()
     await extension.navigation.confirm.click()
 
-    await extension.validateTx(config.account1Seed2!)
+    const txHash = await extension.activity.getLastTxHash()
+    await extension.validateTx(txHash!, config.account1Seed2!)
   })
 })

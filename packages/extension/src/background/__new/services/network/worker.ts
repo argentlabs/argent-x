@@ -1,7 +1,7 @@
 import { IScheduleService } from "../../../../shared/schedule/interface"
 import { IBackgroundNetworkService } from "./interface"
-import { RefreshInterval } from "../../../../shared/config"
-import { everyWhenOpen } from "../worker/schedule/decorators"
+// import { RefreshInterval } from "../../../../shared/config"
+// import { everyWhenOpen } from "../worker/schedule/decorators"
 import { IBackgroundUIService } from "../ui/interface"
 import { IDebounceService } from "../../../../shared/debounce"
 

@@ -9,6 +9,24 @@ export const FEE_OVERHEAD = process.env.FEE_OVERHEAD
 const SN_JS_DEFAULT_MULTIPLIER = 1.5
 const scale = 10
 
+export const argentMaxFee = ({
+  estimatedFee,
+  overheadMultiplier = FEE_OVERHEAD,
+}: {
+  estimatedFee: num.BigNumberish
+  overheadMultiplier?: number
+}) => {
+  // Convert suggestedMaxFee to BigInt for calculation
+  const estimatedFeeBigInt = num.toBigInt(estimatedFee)
+
+  // Apply the overhead multiplier
+  const maxFeeWithOverhead =
+    (estimatedFeeBigInt * BigInt(overheadMultiplier * scale)) / BigInt(scale)
+
+  // Convert the result back to hex
+  return num.toHex(maxFeeWithOverhead)
+}
+
 /**
  * Calculate the max fee with an overhead multiplier.
  *
@@ -16,7 +34,7 @@ const scale = 10
  * @param overheadMultiplier: the multiplier to apply as overhead (default to 1.5)
  * @returns: the maximum fee considering the overhead
  */
-export const argentMaxFee = ({
+export const modifySnjsFeeOverhead = ({
   suggestedMaxFee,
   overheadMultiplier = FEE_OVERHEAD,
   starknetJsOverheadMultiplier = SN_JS_DEFAULT_MULTIPLIER,
@@ -33,9 +51,5 @@ export const argentMaxFee = ({
     BigInt(starknetJsOverheadMultiplier * scale)
 
   // Apply the overhead multiplier
-  const maxFeeWithOverhead =
-    (estimatedFee * BigInt(overheadMultiplier * scale)) / BigInt(scale)
-
-  // Convert the result back to hex
-  return num.toHex(maxFeeWithOverhead)
+  return argentMaxFee({ estimatedFee, overheadMultiplier })
 }

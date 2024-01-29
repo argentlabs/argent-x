@@ -19,10 +19,13 @@ import { backgroundArgentAccountService } from "./services/argentAccount"
 import { backgroundMultisigService } from "./services/multisig"
 import { backgroundTransactionReviewService } from "./services/transactionReview"
 import { router } from "./trpc"
+import { swapRouter } from "./procedures/swap"
 import { backgroundRecoveryService } from "./services/recovery"
 import { addressRouter } from "./procedures/address"
 import { backgroundStarknetAddressService } from "./services/address"
 import { networkService } from "../../shared/network/service"
+import { sharedSwapService } from "../../shared/swap/service"
+import { transactionEstimateRouter } from "./procedures/transactionEstimate"
 
 const appRouter = router({
   account: accountRouter,
@@ -34,7 +37,9 @@ const appRouter = router({
   multisig: multisigRouter,
   recovery: recoveryRouter,
   session: sessionRouter,
+  swap: swapRouter,
   tokens: tokensRouter,
+  transactionEstimate: transactionEstimateRouter,
   transactionReview: transactionReviewRouter,
   transfer: transferRouter,
   udc: udcRouter,
@@ -55,6 +60,7 @@ createChromeHandler({
       multisigService: backgroundMultisigService,
       recoveryService: backgroundRecoveryService,
       transactionReviewService: backgroundTransactionReviewService,
+      swapService: sharedSwapService,
       starknetAddressService: backgroundStarknetAddressService,
       networkService,
     },

@@ -6,23 +6,29 @@ import {
   sendTransactionNotification,
 } from "../../../shared/notification"
 import { TransactionUpdateListener } from "./type"
+import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 export const notifyAboutCompletedTransactions: TransactionUpdateListener =
   async (transactions) => {
     for (const transaction of transactions) {
-      const { hash, finalityStatus, executionStatus, meta, account } =
-        transaction
+      const { hash, meta, account } = transaction
+      const { finality_status, execution_status } =
+        getTransactionStatus(transaction)
       if (
-        (SUCCESS_STATUSES.includes(finalityStatus) ||
-          (executionStatus && FAILED_STATUS.includes(executionStatus))) &&
+        ((finality_status && SUCCESS_STATUSES.includes(finality_status)) ||
+          (execution_status && FAILED_STATUS.includes(execution_status))) &&
         !(await hasShownNotification(hash))
       ) {
         void addToAlreadyShown(hash)
 
         if (!account.hidden && !meta?.isDeployAccount) {
           await decrementTransactionsBeforeReview()
-          finalityStatus &&
-            sendTransactionNotification(hash, finalityStatus, meta)
+          finality_status &&
+            sendTransactionNotification(
+              hash,
+              { execution_status, finality_status },
+              meta,
+            )
         }
       }
     }

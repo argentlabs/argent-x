@@ -53,6 +53,9 @@ export const buttonTheme = defineStyleConfig({
       minHeight: 10,
       px: 5,
       py: 2,
+      ".chakra-button__icon": {
+        fontSize: "base",
+      },
     },
     md: {
       ...typographyStyles.B2,

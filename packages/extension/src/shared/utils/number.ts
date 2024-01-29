@@ -36,12 +36,24 @@ export const prettifyNumberConfig: Record<string, IPrettifyNumberConfig> = {
   },
 }
 
-export const prettifyCurrencyNumber = (number: BigNumberish) => {
-  return prettifyNumber(number, prettifyNumberConfig.CURRENCY)
+export const prettifyCurrencyNumber = (
+  number: BigNumberish,
+  overrides?: Partial<IPrettifyNumberConfig>,
+) => {
+  return prettifyNumber(number, {
+    ...prettifyNumberConfig.CURRENCY,
+    ...(overrides || {}),
+  })
 }
 
-export const prettifyTokenNumber = (number: BigNumberish) => {
-  return prettifyNumber(number, prettifyNumberConfig.TOKEN)
+export const prettifyTokenNumber = (
+  number: BigNumberish,
+  overrides?: Partial<IPrettifyNumberConfig>,
+) => {
+  return prettifyNumber(number, {
+    ...prettifyNumberConfig.TOKEN,
+    ...(overrides || {}),
+  })
 }
 
 /**

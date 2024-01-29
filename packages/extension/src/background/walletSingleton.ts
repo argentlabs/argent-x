@@ -6,7 +6,6 @@ import {
   pendingMultisigRepo,
 } from "../shared/multisig/repository"
 import { networkService } from "../shared/network/service"
-import { chromeScheduleService } from "../shared/schedule"
 import { walletStore } from "../shared/wallet/walletStore"
 import { Wallet } from "./wallet"
 import { WalletAccountSharedService } from "./wallet/account/shared.service"
@@ -31,7 +30,6 @@ const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
 const isDevOrTest = isDev || isTest
 const SCRYPT_N = isDevOrTest ? 64 : 262144
-const SESSION_DURATION = isDev ? 24 * 60 * 60 : 30 * 60 // 30 mins in prod, 24 hours in dev
 
 export const walletSessionServiceEmitter = new Emittery<SessionEvents>()
 export const walletRecoverySharedServiceEmitter =
@@ -81,8 +79,6 @@ export const sessionService = new WalletSessionService(
   sessionRepo,
   backupService,
   recoverySharedService,
-  chromeScheduleService,
-  SESSION_DURATION,
   SCRYPT_N,
 )
 

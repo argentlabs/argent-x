@@ -43,6 +43,7 @@ export interface ILanguage {
     shortAddressError: string
     invalidCheckSumError: string
     invalidAddress: string
+    createMultisig: string
   }
   wallet: {
     //first screen
@@ -106,6 +107,7 @@ export interface ILanguage {
   dapps: {
     connect: string
     reject: string
-    resetAll: string
+    disconnectAll: string
+    noConnectedDapps: string
   }
 }

@@ -19,7 +19,7 @@ const localStoragePatterns: Pattern[] = [
   new RegExp(`${ARGENT_EXPLORER_BASE_URL}`, "i"),
   /"useTransactionReviewV2"/,
   /"simulateAndReview"/,
-  /"maxEthTransferEstimate"/,
+  /"maxFeeEstimateForTransfer"/,
   /"accountDeploymentFeeEstimation"/,
   /"nonce"/,
   /"fee"/,

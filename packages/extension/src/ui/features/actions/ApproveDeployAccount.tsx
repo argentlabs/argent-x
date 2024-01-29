@@ -16,6 +16,7 @@ import {
 } from "./transactionV2/TransactionHeader"
 import { TransactionReviewActions } from "./transactionV2/action/TransactionReviewActions"
 import { ReviewOfTransaction } from "../../../shared/transactionReview/schema"
+import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit">,
@@ -92,6 +93,7 @@ export const ApproveDeployAccountScreen: FC<
       footer={
         <WithActionScreenErrorFooter isTransaction>
           <DeployAccountFeeEstimation
+            feeTokenAddress={ETH_TOKEN_ADDRESS}
             onErrorChange={setDisableConfirm}
             accountAddress={selectedAccount.address}
             networkId={selectedAccount.networkId}

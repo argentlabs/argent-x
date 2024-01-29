@@ -46,8 +46,8 @@ export const NftInput: FC<NftInputProps> = ({
         h={14}
         fit={"cover"}
       />
-      <Flex direction={"column"} gap={1} flex={1}>
-        <H6>{title}</H6>
+      <Flex direction={"column"} gap={1} flex={1} overflow={"hidden"}>
+        <H6 whiteSpace="initial">{title}</H6>
         <P4 color={"neutrals.400"}>{subtitle}</P4>
       </Flex>
       <Circle size={7} bg={"neutrals.900"}>

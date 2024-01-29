@@ -2,22 +2,28 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import { describe, expect, it } from "vitest"
+import copy from "copy-to-clipboard"
 
 import { FundingQrCodeScreen } from "./FundingQrCodeScreen"
+import { normalizeAddress } from "@argent/shared"
 
-/**
- * @vitest-environment jsdom
- */
+vi.mock("copy-to-clipboard", () => ({
+  __esModule: true,
+  default: vi.fn(),
+}))
+
+const accountAddress =
+  "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
+
 describe("FundingQrCodeScreen", () => {
   it("renders the component with correctly formatted address", async () => {
-    /** provides a stub for navigator.clipboard, requires jsdom */
     const user = userEvent.setup()
 
     const { container } = render(
       <BrowserRouter>
         <FundingQrCodeScreen
           accountName="Account 1"
-          accountAddress="0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
+          accountAddress={accountAddress}
         />
       </BrowserRouter>,
     )
@@ -42,10 +48,12 @@ describe("FundingQrCodeScreen", () => {
 
     /** in production app, this address will be formatted */
     await user.click(formattedAddress)
-    await user.copy()
-    const text = await navigator.clipboard.readText()
-    expect(text).toEqual(
-      "0x 07E0 0d49 6E32 4876 BbC8 531f 2D9A 82bf 154d 1A04 a502 18eE 74Cd D372 F75a 551A",
-    )
+
+    // Need to change the test a bit to make it work with happy-dom
+    // See issue: https://github.com/capricorn86/happy-dom/issues/1153
+    const normalizedAddress = normalizeAddress(accountAddress)
+    const copyButton = screen.getByRole("button", { name: /copy address/i })
+    await user.click(copyButton)
+    expect(copy).toHaveBeenCalledWith(normalizedAddress)
   })
 })

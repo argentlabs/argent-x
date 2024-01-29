@@ -3,7 +3,7 @@ import { FC } from "react"
 import { CopyTooltip } from "../../../../components/CopyTooltip"
 import { Field, FieldKey, FieldValue } from "../../../../components/Fields"
 import { ContentCopyIcon } from "../../../../components/Icons/MuiIcons"
-import { formatTruncatedAddress } from "../../../../services/addresses"
+import { formatTruncatedAddress } from "@argent/shared"
 
 interface ContractFieldProps {
   contractAddress?: string

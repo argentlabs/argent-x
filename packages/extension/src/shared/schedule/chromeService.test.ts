@@ -116,10 +116,16 @@ describe("ChromeScheduleService", () => {
     await service.registerImplementation(task)
     expect(mockBrowser.alarms.onAlarm.addListener).toBeCalled()
     expect(cb).toBeDefined()
+
+    const mockBrowserAlarmFired = vi.fn()
     mockBrowser.alarms.create.mockImplementationOnce((name, options) => {
       expect(name).toBe("test::run5")
       expect(options).toEqual({ periodInMinutes: 1 })
-      cb?.({ name })
+      // simulate the 1-minute delay in browser alarms
+      setTimeout(() => {
+        mockBrowserAlarmFired()
+        cb?.({ name })
+      }, 2)
     })
     await service.every(10, task)
     expect(mockBrowser.alarms.create).toBeCalledTimes(1)
@@ -127,8 +133,18 @@ describe("ChromeScheduleService", () => {
     // wait for next tick
     await new Promise((resolve) => setTimeout(resolve, 0))
 
+    // sub-minute runs before alarm fires
+    expect(mockBrowserAlarmFired).toBeCalledTimes(0)
     expect(waitFn).toBeCalledTimes(4)
     expect(task.callback).toBeCalledTimes(5)
+
+    // wait for next tick
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    // alarm-based runs after 1 minute
+    expect(mockBrowserAlarmFired).toBeCalledTimes(1)
+    expect(waitFn).toBeCalledTimes(8)
+    expect(task.callback).toBeCalledTimes(10)
   })
 
   // add tests for service.onStartup and service.onInstallAndUpgrade

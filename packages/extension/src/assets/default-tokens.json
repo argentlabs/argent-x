@@ -40,6 +40,15 @@
     "showAlways": true
   },
   {
+    "id": 2,
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "name": "Stark",
+    "symbol": "STRK",
+    "decimals": "18",
+    "network": "integration",
+    "showAlways": true
+  },
+  {
     "id": 6,
     "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
     "name": "DAI",
@@ -110,30 +119,5 @@
     "decimals": "6",
     "network": "goerli-alpha",
     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
-  },
-  {
-    "address": "0x0148f970a06fc95ee0682140e23a980351be8fad26168c5f0465e63940c46514",
-    "name": "Angle agEUR",
-    "symbol": "agEUR",
-    "decimals": "18",
-    "network": "mainnet-alpha",
-    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/ageur.png"
-  },
-  {
-    "address": "0x05ef98e7dc5865f49bcec200df508d27669b3ef7f9d2439decd127350359f291",
-    "name": "Wrapped Lido ETH",
-    "symbol": "wstETH",
-    "decimals": "18",
-    "network": "mainnet-alpha",
-    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/steth.png"
-  },
-  {
-    "id": 270,
-    "address": "0x0319111a5037cbec2b3e638cc34a3474e2d2608299f3e62866e9cc683208c610",
-    "name": "Rocket Pool ETH",
-    "symbol": "rETH",
-    "decimals": "18",
-    "network": "mainnet-alpha",
-    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/reth.png"
   }
 ]

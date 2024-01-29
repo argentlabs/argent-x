@@ -22,8 +22,13 @@ import { INetworkRepo } from "../../../network/store"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 import { GatewayError, shortString, stark } from "starknet"
-import { addressSchema } from "@argent/shared"
+import { Address, addressSchema } from "@argent/shared"
 import { TokenError } from "../../../errors/token"
+import {
+  ETH_TOKEN_ADDRESS,
+  STRK_TOKEN_ADDRESS,
+  TXV3_ACCOUNT_CLASS_HASH,
+} from "../../../network/constants"
 
 const BASE_INFO_ENDPOINT = "https://token.info.argent47.net/v1"
 const BASE_INFO_ENDPOINT_INVALID = "https://token.info.argent47.net/v2"
@@ -34,9 +39,6 @@ const BASE_PRICES_ENDPOINT = "https://token.prices.argent47.net/v1"
 const randomAddress1 = addressSchema.parse(stark.randomAddress())
 const randomAddress2 = addressSchema.parse(stark.randomAddress())
 
-/**
- * @vitest-environment jsdom
- */
 const server = setupServer(
   rest.get(BASE_INFO_ENDPOINT, (req, res, ctx) => {
     return res(
@@ -163,6 +165,7 @@ describe("TokenService", () => {
         custom: undefined,
         popular: defaultMockApiTokeDetails.popular,
         pricingId: defaultMockApiTokeDetails.pricingId,
+        tradable: true,
       })
       const mockToken2 = getMockToken({
         id: 2,
@@ -173,6 +176,7 @@ describe("TokenService", () => {
         custom: undefined,
         popular: defaultMockApiTokeDetails.popular,
         pricingId: 2,
+        tradable: true,
       })
       const mockTokens = [mockToken1, mockToken2]
       mockTokenRepo.get.mockResolvedValueOnce(mockTokens)
@@ -721,5 +725,156 @@ describe("TokenService", () => {
     expect(result).toEqual({
       [`${mockAccount.address}:${mockAccount.networkId}`]: "2200",
     })
+  })
+
+  test("getFeeTokens returns the correct fee tokens and respects order preference", async () => {
+    const mockAccount = {
+      classHash: TXV3_ACCOUNT_CLASS_HASH as Address,
+      address: randomAddress1,
+      networkId: defaultNetwork.id,
+    }
+    const mockNetwork = getMockNetwork()
+    const mockBaseTokens = [
+      getMockBaseToken({ networkId: mockNetwork.id }),
+      getMockBaseToken({ address: "0x456", networkId: mockNetwork.id }),
+    ]
+
+    const mockTokens = [
+      getMockTokenWithBalance({
+        ...mockBaseTokens[0],
+        symbol: "ETH",
+        balance: BigInt(10e17).toString(),
+        account: mockAccount,
+        address: ETH_TOKEN_ADDRESS,
+      }),
+      getMockTokenWithBalance({
+        ...mockBaseTokens[1],
+        balance: BigInt(10e16).toString(),
+        account: mockAccount,
+      }),
+
+      getMockTokenWithBalance({
+        ...mockBaseTokens[1],
+        balance: BigInt(20e18).toString(),
+        symbol: "STRK",
+        account: mockAccount,
+        address: STRK_TOKEN_ADDRESS,
+      }),
+    ]
+
+    mockNetworkService.getById = vi.fn().mockResolvedValueOnce(mockNetwork)
+    mockTokenBalanceRepo.get.mockResolvedValueOnce(mockTokens)
+    mockTokenRepo.get.mockResolvedValueOnce(mockTokens)
+
+    const result = await tokenService.getFeeTokens(mockAccount)
+    expect(result).toEqual([mockTokens[2], mockTokens[0]])
+  })
+
+  test("should return the correct fee tokens given a mock account", async () => {
+    const mockAccount = {
+      classHash: TXV3_ACCOUNT_CLASS_HASH as Address,
+      address: randomAddress1,
+      networkId: defaultNetwork.id,
+    }
+    const mockNetwork = getMockNetwork()
+    const mockBaseTokens = [
+      getMockBaseToken({ networkId: mockNetwork.id }),
+      getMockBaseToken({ address: "0x456", networkId: mockNetwork.id }),
+    ]
+
+    const mockTokens = [
+      getMockTokenWithBalance({
+        ...mockBaseTokens[1],
+        balance: BigInt(20e18).toString(),
+        symbol: "STRK",
+        account: mockAccount,
+        address: STRK_TOKEN_ADDRESS,
+      }),
+      getMockTokenWithBalance({
+        ...mockBaseTokens[0],
+        balance: BigInt(10e17).toString(),
+        account: mockAccount,
+        symbol: "ETH",
+        address: ETH_TOKEN_ADDRESS,
+      }),
+    ]
+
+    mockNetworkService.getById = vi.fn().mockResolvedValueOnce(mockNetwork)
+    mockTokenBalanceRepo.get.mockResolvedValueOnce(mockTokens)
+    mockTokenRepo.get.mockResolvedValueOnce(mockTokens)
+
+    const result = await tokenService.getFeeTokens(mockAccount)
+    expect(result).toEqual(mockTokens)
+  })
+
+  test("getBestFeeToken returns the correct fee token", async () => {
+    const mockAccount = {
+      classHash: "0x123" as Address,
+      address: randomAddress1,
+      networkId: defaultNetwork.id,
+    }
+    const mockNetwork = getMockNetwork()
+    const mockBaseTokens = [
+      getMockBaseToken({ networkId: mockNetwork.id }),
+      getMockBaseToken({ address: "0x456", networkId: mockNetwork.id }),
+    ]
+
+    const mockTokens = [
+      getMockTokenWithBalance({
+        ...mockBaseTokens[0],
+        balance: BigInt(10e17).toString(),
+        account: mockAccount,
+        address: ETH_TOKEN_ADDRESS,
+      }),
+      getMockTokenWithBalance({
+        ...mockBaseTokens[1],
+        balance: BigInt(10e16).toString(),
+        account: mockAccount,
+      }),
+    ]
+
+    mockNetworkService.getById = vi.fn().mockResolvedValueOnce(mockNetwork)
+    mockTokenBalanceRepo.get.mockResolvedValueOnce(mockTokens)
+    mockTokenRepo.get.mockResolvedValueOnce(mockTokens)
+
+    const result = await tokenService.getBestFeeToken(mockAccount)
+    expect(result).toEqual(mockTokens[0])
+  })
+
+  test("getBestFeeToken returns the token with the highest balance", async () => {
+    const mockAccount = {
+      classHash: TXV3_ACCOUNT_CLASS_HASH as Address,
+      address: randomAddress1,
+      networkId: defaultNetwork.id,
+    }
+    const mockNetwork = getMockNetwork()
+    const mockBaseTokens = [
+      getMockBaseToken({ networkId: mockNetwork.id }),
+      getMockBaseToken({ address: "0x456", networkId: mockNetwork.id }),
+    ]
+
+    const mockTokens = [
+      getMockTokenWithBalance({
+        ...mockBaseTokens[0],
+        balance: BigInt(10e17).toString(),
+        account: mockAccount,
+        symbol: "ETH",
+        address: ETH_TOKEN_ADDRESS,
+      }),
+      getMockTokenWithBalance({
+        ...mockBaseTokens[1],
+        balance: BigInt(10e18).toString(),
+        symbol: "STRK",
+        account: mockAccount,
+        address: STRK_TOKEN_ADDRESS,
+      }),
+    ]
+
+    mockNetworkService.getById = vi.fn().mockResolvedValueOnce(mockNetwork)
+    mockTokenBalanceRepo.get.mockResolvedValueOnce(mockTokens)
+    mockTokenRepo.get.mockResolvedValueOnce(mockTokens)
+
+    const result = await tokenService.getBestFeeToken(mockAccount)
+    expect(result).toEqual(mockTokens[1])
   })
 })

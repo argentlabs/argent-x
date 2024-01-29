@@ -79,6 +79,7 @@ export type TransactionSimulationFeesEstimation = {
   gasUsage: number
   overallFee: number
   unit: string
+  maxFee: number
 }
 
 export type ApiTransactionSimulationResponse = {

@@ -1,11 +1,14 @@
 /**
  * All of this file should probably go into the data model for accounts, either as a field which gets updated from a worker, or as a computed field, if we have such a concept.
  */
-import { num } from "starknet"
 import useSWR from "swr"
 
 import { updateAccountDetails } from "../../../shared/account/update"
-import { generateAvatarImage, id } from "@argent/shared"
+import {
+  generateAvatarImage,
+  id,
+  stripAddressZeroPadding,
+} from "@argent/shared"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { withPolling } from "../../services/swr.service"
@@ -13,8 +16,6 @@ import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { Account } from "./Account"
 import { RefreshInterval } from "../../../shared/config"
-
-const { toBigInt } = num
 
 const argentColorsArray = [
   "02BBA8",
@@ -42,15 +43,6 @@ export const getAccountImageUrl = (
     networkId: account.networkId,
     accountAddress: account.address,
   })
-}
-
-export const stripAddressZeroPadding = (accountAddress: string) => {
-  try {
-    return num.toHex(toBigInt(num.hexToDecimalString(accountAddress)))
-  } catch {
-    // ignore parsing errors
-  }
-  return ""
 }
 
 export const getNetworkAccountImageUrl = ({

@@ -2,10 +2,10 @@ import { Button, ButtonProps, MenuButton } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network, NetworkStatus } from "../../../../shared/network"
-import {
-  StatusIndicator,
-  mapNetworkStatusToColor,
-} from "../../../components/StatusIndicator"
+// import {
+//   StatusIndicator,
+//   mapNetworkStatusToColor,
+// } from "../../../components/StatusIndicator"
 
 interface NetworkSwitcherButtonProps extends ButtonProps {
   disabled?: boolean

@@ -8,7 +8,6 @@ import {
 import { noop, throttle } from "lodash-es"
 
 import { SessionError } from "../../../shared/errors/session"
-import { IScheduleService } from "../../../shared/schedule/interface"
 import { ObjectStorage } from "../../../shared/storage"
 import { IObjectStore } from "../../../shared/storage/__new/interface"
 import { adaptObjectStorage } from "../../../shared/storage/__new/object"
@@ -17,10 +16,8 @@ import {
   WalletStorageProps,
 } from "../backup/backup.service"
 import { WalletRecoverySharedService } from "../recovery/shared.service"
-import { Events, Locked } from "./interface"
 import { walletToKeystore } from "../utils"
-
-type TaskId = "sessionTimeout"
+import { Events, Locked } from "./interface"
 
 /**
  * @deprecated use `sessionRepo` instead
@@ -47,8 +44,6 @@ export class WalletSessionService {
     readonly sessionStore: IObjectStore<WalletSession | null>,
     private readonly backupService: WalletBackupService,
     private readonly recoverySharedService: WalletRecoverySharedService,
-    private readonly scheduleService: IScheduleService<TaskId>,
-    private SESSION_DURATION: number,
     private SCRYPT_N: number,
   ) {
     void (async () => {
@@ -143,16 +138,6 @@ export class WalletSessionService {
 
   async setSession(secret: string, password: string) {
     await this.sessionStore.set({ secret, password })
-
-    void this.scheduleService.registerImplementation({
-      id: "sessionTimeout",
-      callback: this.lock.bind(this),
-    })
-
-    void this.scheduleService.in(this.SESSION_DURATION * 6e3, {
-      id: "sessionTimeout",
-    })
-
     this.locked = false
   }
 

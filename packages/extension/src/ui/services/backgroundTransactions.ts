@@ -2,26 +2,25 @@ import { Call, UniversalDeployerContractPayload } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
-import { DeclareContract } from "../../shared/udc/type"
 import { BaseWalletAccount } from "../../shared/wallet.model"
+import { messageClient } from "./messaging/trpc"
+import { ETH_TOKEN_ADDRESS } from "../../shared/network/constants"
+import { DeclareContract } from "../../shared/udc/schema"
 
 export const executeTransaction = (data: ExecuteTransactionRequest) => {
   return sendMessage({ type: "EXECUTE_TRANSACTION", data })
 }
 
-export const getEstimatedFeeFromSequencer = async (call: Call | Call[]) => {
-  void sendMessage({ type: "ESTIMATE_TRANSACTION_FEE", data: call })
-
-  const response = await Promise.race([
-    waitForMessage("ESTIMATE_TRANSACTION_FEE_RES"),
-    waitForMessage("ESTIMATE_TRANSACTION_FEE_REJ"),
-  ])
-
-  if ("error" in response) {
-    throw response.error
-  }
-
-  return response
+export const getEstimatedFee = async (
+  call: Call | Call[],
+  account: BaseWalletAccount,
+  feeTokenAddress: string = ETH_TOKEN_ADDRESS,
+) => {
+  return messageClient.transactionEstimate.estimateTransaction.query({
+    transactions: call,
+    account,
+    feeTokenAddress,
+  })
 }
 
 export const getSimulationEstimatedFee = async (call: Call | Call[]) => {
@@ -46,23 +45,16 @@ export const getSimulationEstimatedFee = async (call: Call | Call[]) => {
 
 export const getAccountDeploymentEstimatedFee = async (
   account?: BaseWalletAccount,
+  feeTokenAddress: string = ETH_TOKEN_ADDRESS,
 ) => {
-  sendMessage({ type: "ESTIMATE_ACCOUNT_DEPLOYMENT_FEE", data: account })
-
-  const response = await Promise.race([
-    waitForMessage("ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_RES"),
-    waitForMessage("ESTIMATE_ACCOUNT_DEPLOYMENT_FEE_REJ"),
-  ])
-
-  if ("error" in response) {
-    throw response.error
-  }
-
-  return response
+  return messageClient.transactionEstimate.estimateAccountDeploy.query({
+    account,
+    feeTokenAddress,
+  })
 }
 
 export const getDeclareContractEstimatedFee = async (data: DeclareContract) => {
-  sendMessage({ type: "ESTIMATE_DECLARE_CONTRACT_FEE", data })
+  void sendMessage({ type: "ESTIMATE_DECLARE_CONTRACT_FEE", data })
 
   const response = await Promise.race([
     waitForMessage("ESTIMATE_DECLARE_CONTRACT_FEE_RES"),
@@ -79,7 +71,7 @@ export const getDeclareContractEstimatedFee = async (data: DeclareContract) => {
 export const getDeployContractEstimatedFee = async (
   data: UniversalDeployerContractPayload,
 ) => {
-  sendMessage({ type: "ESTIMATE_DEPLOY_CONTRACT_FEE", data })
+  void sendMessage({ type: "ESTIMATE_DEPLOY_CONTRACT_FEE", data })
 
   const response = await Promise.race([
     waitForMessage("ESTIMATE_DEPLOY_CONTRACT_FEE_RES"),

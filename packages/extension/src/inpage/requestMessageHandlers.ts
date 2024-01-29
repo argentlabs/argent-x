@@ -6,6 +6,8 @@ import type {
 
 import type { Network } from "../shared/network/type"
 import { sendMessage, waitForMessage } from "./messageActions"
+import { ETH_TOKEN_ADDRESS } from "../shared/network/constants"
+import { inpageMessageClient } from "./trpcClient"
 
 export async function handleAddTokenRequest(
   callParams: WatchAssetParameters,
@@ -70,6 +72,9 @@ export async function handleAddNetworkRequest(
       rpcUrl: callParams.rpcUrls?.[0] ?? "",
       explorerUrl: callParams.blockExplorerUrls?.[0],
       accountClassHash: (callParams as any).accountImplementation,
+      possibleFeeTokenAddresses: [
+        (callParams.nativeCurrency?.address as Address) ?? ETH_TOKEN_ADDRESS,
+      ],
     },
   })
 
@@ -167,4 +172,42 @@ export async function handleSwitchNetworkRequest(callParams: {
   }
 
   return true
+}
+
+interface GetDeploymentDataResult {
+  address: string // Represented as 'felt252'
+  class_hash: string // Represented as 'felt252'
+  salt: string // Represented as 'felt252'
+  calldata: string[] // Array of 'felt252', length := calldata_len
+}
+
+const toHex = (x: bigint) => `0x${x.toString(16)}`
+
+const isStringArray = (x: any): x is string[] =>
+  x.every((y: any) => typeof y === "string")
+
+export async function handleDeploymentData(): Promise<GetDeploymentDataResult> {
+  const deploymentData =
+    await inpageMessageClient.accountMessaging.getAccountDeploymentPayload.query()
+
+  const { classHash, constructorCalldata, addressSalt, contractAddress } =
+    deploymentData
+
+  if (!classHash || !constructorCalldata || !addressSalt || !contractAddress) {
+    throw new Error("Deployment data not found")
+  }
+
+  if (!isStringArray(constructorCalldata)) {
+    throw new Error("Constructor calldata is not an array of hex strings")
+  }
+
+  const _addressSalt = toHex(BigInt(addressSalt))
+  const _callData = constructorCalldata.map((x) => toHex(BigInt(x)))
+
+  return {
+    address: contractAddress,
+    class_hash: classHash,
+    salt: _addressSalt,
+    calldata: _callData,
+  }
 }

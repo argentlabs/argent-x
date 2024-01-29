@@ -3,23 +3,26 @@ import { Box } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
-import { useNetworkFeeToken } from "../../../accountTokens/tokens.state"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
+import { useToken } from "../../../accountTokens/tokens.state"
+import { Address } from "@argent/shared"
 
 interface FeeFieldProps {
   title?: string
+  feeTokenAddress: Address
   fee: string
   networkId: string
 }
 
 export const FeeField: FC<FeeFieldProps> = ({
   title = "Network fee",
+  feeTokenAddress,
   fee,
   networkId,
 }) => {
-  const feeToken = useNetworkFeeToken(networkId)
+  const feeToken = useToken({ address: feeTokenAddress, networkId })
   const { displayAmount, displayValue } = useDisplayTokenAmountAndCurrencyValue(
-    { amount: fee, tokenAddress: feeToken?.address },
+    { amount: fee, tokenAddress: feeTokenAddress },
   )
   if (!feeToken) {
     return null

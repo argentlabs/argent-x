@@ -24,6 +24,8 @@ import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
 import { PrettyAccountAddressArgentX } from "../accounts/PrettyAccountAddressArgentX"
+import { ActivityTransactionFailureReason } from "./getTransactionFailureReason"
+import { lowerCase, upperFirst } from "lodash-es"
 
 export interface TransactionListItemProps extends CustomButtonCellProps {
   transactionTransformed: TransformedTransaction
@@ -31,7 +33,7 @@ export interface TransactionListItemProps extends CustomButtonCellProps {
   highlighted?: boolean
   children?: ReactNode | ReactNode[]
   txHash: string
-  isCancelled?: boolean
+  failureReason?: ActivityTransactionFailureReason
 }
 
 export const TransactionListItem: FC<TransactionListItemProps> = ({
@@ -39,7 +41,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   network,
   highlighted,
   txHash,
-  isCancelled,
+  failureReason,
   onClick,
   _active,
   children,
@@ -75,30 +77,45 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
               networkId={network.id}
               icon={false}
             />
-            {isCancelled && <> ∙ </>}
           </P4>
-
-          {isCancelled && (
-            <P4
-              color="error.500"
-              fontWeight="semibold"
-              overflow="hidden"
-              textOverflow="ellipsis"
-            >
-              Cancelled
-            </P4>
-          )}
         </Flex>
       )
     }
     if (dapp) {
-      return <>{dapp.title}</>
+      return (
+        <P4
+          color="neutrals.300"
+          fontWeight="semibold"
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
+          {dapp.title}
+        </P4>
+      )
     }
     if (isDeclareContract) {
-      return <>{transactionTransformed.classHash}</>
+      return (
+        <P4
+          color="neutrals.300"
+          fontWeight="semibold"
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
+          {transactionTransformed.classHash}
+        </P4>
+      )
     }
     if (isDeployContract) {
-      return <>{transactionTransformed.contractAddress}</>
+      return (
+        <P4
+          color="neutrals.300"
+          fontWeight="semibold"
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
+          {transactionTransformed.contractAddress}
+        </P4>
+      )
     }
     return null
   }, [
@@ -110,8 +127,28 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     action,
     transactionTransformed,
     network.id,
-    isCancelled,
   ])
+
+  const subtitleWithFailureReason = useMemo(() => {
+    if (!failureReason) {
+      return subtitle
+    }
+
+    return (
+      <Flex alignItems="center">
+        {subtitle}
+        {<> ∙ </>}
+        <P4
+          color="error.500"
+          fontWeight="semibold"
+          overflow="hidden"
+          textOverflow="ellipsis"
+        >
+          {upperFirst(lowerCase(failureReason))}
+        </P4>
+      </Flex>
+    )
+  }, [failureReason, subtitle])
 
   const icon = useMemo(() => {
     if (isNFT) {
@@ -131,33 +168,56 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     }
     if (isSwap) {
       return (
-        <SwapTransactionIcon transaction={transactionTransformed} size={9} />
+        <SwapTransactionIcon
+          transaction={transactionTransformed}
+          size={9}
+          failureReason={failureReason}
+        />
       )
     }
     return (
       <TransactionIcon
         transaction={transactionTransformed}
         size={9}
-        isCancelled={isCancelled}
+        failureReason={failureReason}
       />
     )
-  }, [isNFT, isSwap, transactionTransformed, isCancelled, network.id])
+  }, [isNFT, isSwap, transactionTransformed, failureReason, network.id])
 
   const accessory = useMemo(() => {
     if (isTransfer || isTokenMint || isTokenApprove) {
-      return <TransferAccessory transaction={transactionTransformed} />
+      return (
+        <TransferAccessory
+          transaction={transactionTransformed}
+          failed={Boolean(failureReason)}
+        />
+      )
     }
     if (isSwap) {
-      return <SwapAccessory transaction={transactionTransformed} />
+      return (
+        <SwapAccessory
+          transaction={transactionTransformed}
+          failed={Boolean(failureReason)}
+        />
+      )
     }
     return null
-  }, [isTransfer, isTokenMint, isTokenApprove, isSwap, transactionTransformed])
+  }, [
+    isTransfer,
+    isTokenMint,
+    isTokenApprove,
+    isSwap,
+    transactionTransformed,
+    failureReason,
+  ])
+
+  const isCancelled = failureReason === "CANCELLED"
 
   return (
     <CustomButtonCell
       data-tx-hash={txHash}
       highlighted={highlighted}
-      onClick={(e) => !isCancelled && onClick?.(e)}
+      onClick={(e) => !isCancelled && onClick?.(e)} // disable navigation to transaction detail if cancelled
       _hover={{ cursor: isCancelled ? "default" : "pointer" }}
       _active={!isCancelled ? _active : {}}
       {...props}
@@ -174,7 +234,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
           <H6 overflow="hidden" textOverflow={"ellipsis"}>
             {displayName}
           </H6>
-          {subtitle}
+          {subtitleWithFailureReason}
         </Flex>
       </Flex>
       {accessory}

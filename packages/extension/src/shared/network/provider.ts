@@ -3,10 +3,15 @@ import { RpcProvider, constants, shortString } from "starknet"
 import { RpcProvider as RpcProviderV4 } from "starknet4"
 
 import { Network } from "./type"
+import { argentXHeaders } from "../api/headers"
 
 export const getProviderForRpcUrlAndChainId = memoize(
   (rpcUrl: string, chainId: constants.StarknetChainId): RpcProvider => {
-    return new RpcProvider({ nodeUrl: rpcUrl, chainId })
+    return new RpcProvider({
+      nodeUrl: rpcUrl,
+      chainId,
+      headers: argentXHeaders,
+    })
   },
   (a: string, b: string) => `${a}::${b}`,
 )
@@ -27,7 +32,10 @@ export function getProvider(network: Network): RpcProvider {
 /** ======================================================================== */
 
 export function getProviderv4(network: Network): RpcProviderV4 {
-  return new RpcProviderV4({ nodeUrl: network.rpcUrl })
+  return new RpcProviderV4({
+    nodeUrl: network.rpcUrl,
+    headers: argentXHeaders,
+  })
 }
 
 /** ======================================================================== */

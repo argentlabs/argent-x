@@ -10,7 +10,7 @@ import {
   withPolling,
 } from "../src/ui/services/swr.service"
 
-const getTimeout = (retryCount: number) => 100 // no need for backoff in testing
+const getTimeout = (_retryCount: number) => 100 // no need for backoff in testing
 
 describe("swr", () => {
   describe("useConditionallyEnabledSWR()", () => {

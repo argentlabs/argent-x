@@ -16,6 +16,7 @@ import { Account } from "../accounts/Account"
 import { SendQuery, isSendQuery } from "../send/schema"
 import { useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
+import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 
 interface AddFundsDialogContextProps {
   onSend: (queryOrTo?: SendQuery | To) => void
@@ -68,6 +69,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
           navigate(
             routes.sendRecipientScreen({
               returnTo,
+              tokenAddress: ETH_TOKEN_ADDRESS,
             }),
           )
         }

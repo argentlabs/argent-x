@@ -32,7 +32,9 @@ const swrPersistedCache: Cache = {
       setItemWithStorageQuotaExceededStrategy(
         unstable_serialize(key),
         JSON.stringify(value, (_key, value) =>
-          typeof value === "bigint" ? value.toString() : value,
+          typeof value === "bigint"
+            ? { __type: "bigint", value: value.toString() }
+            : value,
         ),
       )
     } catch (e) {
@@ -97,7 +99,7 @@ export function useConditionallyEnabledSWR<Data = any, Error = any>(
   /** reset the cache when disabled */
   useEffect(() => {
     if (!enabled) {
-      result.mutate()
+      void result.mutate()
       cache.delete(key)
     }
     // dont add result to dependencies to avoid revalidating on every render

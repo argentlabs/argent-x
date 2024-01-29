@@ -14,17 +14,17 @@
     "@argent/ui": "^6.3.1",
     "@argent/x-sessions": "^6.3.1",
     "@chakra-ui/react": "^2.6.1",
-    "@starknet-react/chains": "0.1.0-next.1",
-    "@starknet-react/core": "2.0.0-next.6",
+    "@starknet-react/chains": "0.1.0",
+    "@starknet-react/core": "2.1.1",
     "micro-starknet": "^0.2.3",
     "next": "^13.4.6",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "starknet": "5.24.3",
-    "starknetkit": "^1.0.21"
+    "starknetkit": "^1.0.22"
   },
   "devDependencies": {
-    "@types/node": "20.8.10",
+    "@types/node": "20.10.4",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "eslint": "8",

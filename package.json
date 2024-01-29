@@ -19,8 +19,8 @@
     "ts-node": "^10.9.1"
   },
   "resolutions": {
-    "@babel/preset-react": "7.22.15",
-    "@babel/plugin-transform-react-jsx": "7.22.15"
+    "@babel/preset-react": "7.23.3",
+    "@babel/plugin-transform-react-jsx": "7.23.4"
   },
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",

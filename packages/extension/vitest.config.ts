@@ -8,6 +8,7 @@ import viteConfig from "./vite.config"
 export default mergeConfig(viteConfig, {
   test: {
     environment: "happy-dom",
+    pool: "forks",
     globals: true,
     setupFiles: "test/setup.ts",
     testTimeout: 50 * 60 * 1000,
@@ -37,7 +38,7 @@ export default mergeConfig(viteConfig, {
       reporter: ["text", "lcov"],
       all: true,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      provider: "istanbul",
+      provider: "v8",
     },
     /** TODO: remove after refactor: this allows testing of components that import .svg directly */
     alias: [

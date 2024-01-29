@@ -3,9 +3,9 @@ import { FC, useMemo } from "react"
 
 import type { AddressBookContact } from "../../../shared/addressBook/type"
 import { useAddressBook } from "../../hooks/useAddressBook"
-import { isEqualAddress } from "../../services/addresses"
 import { accountFindFamily } from "../../views/account"
 import { useView } from "../../views/implementation/react"
+import { isEqualAddress } from "@argent/shared"
 
 const getContactNameForAddress = (
   accountAddress: string,

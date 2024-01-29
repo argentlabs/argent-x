@@ -1,14 +1,10 @@
 import { partition } from "lodash-es"
-import oHash from "object-hash"
 
 import type { IRepository } from "../../storage/__new/interface"
 import type { ActionQueueItemMeta } from "../schema"
 import { isTransactionActionItem, type ExtQueueItem } from "../types"
 import type { IActionQueue } from "./interface"
-
-function objectHash(obj: object | null) {
-  return oHash(obj, { unorderedArrays: true })
-}
+import { objectHash } from "../../objectHash"
 
 type AllObjects = Record<string | number | symbol, unknown>
 

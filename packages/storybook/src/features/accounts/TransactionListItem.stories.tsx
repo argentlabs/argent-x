@@ -242,3 +242,48 @@ export const Erc721Receive = {
       "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
   },
 }
+
+export const CancelledErc20Transfer = {
+  ...Default,
+  args: {
+    explorerTransaction: erc20Transfer as IExplorerTransaction,
+    network,
+    failureReason: "CANCELLED",
+  },
+}
+
+export const RejectedErc20Transfer = {
+  ...Default,
+  args: {
+    explorerTransaction: erc20Transfer as IExplorerTransaction,
+    network,
+    failureReason: "REJECTED",
+  },
+}
+
+export const RevertedErc20Transfer = {
+  ...Default,
+  args: {
+    explorerTransaction: erc20Transfer as IExplorerTransaction,
+    network,
+    failureReason: "REVERTED",
+  },
+}
+
+export const RevertedErc20SwapJediswap = {
+  ...Default,
+  args: {
+    explorerTransaction: erc20SwapJediswap as IExplorerTransaction,
+    network,
+    failureReason: "REVERTED",
+  },
+}
+
+export const RevertedDappBriq = {
+  ...Default,
+  args: {
+    explorerTransaction: dappBriq as IExplorerTransaction,
+    network,
+    failureReason: "REVERTED",
+  },
+}

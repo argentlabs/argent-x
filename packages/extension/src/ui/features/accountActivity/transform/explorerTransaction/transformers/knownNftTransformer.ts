@@ -1,5 +1,5 @@
-import { includesAddress } from "../../../../../../shared/knownDapps"
-import { isEqualAddress } from "../../../../../services/addresses"
+import { isEqualAddress, includesAddress } from "@argent/shared"
+
 import { NFTTransferTransaction } from "../../type"
 import { IExplorerTransactionTransformer } from "./type"
 

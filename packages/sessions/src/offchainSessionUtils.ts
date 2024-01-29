@@ -1,5 +1,6 @@
-import { Hex } from "@argent/shared"
 import { AccountInterface, Signature } from "starknet"
+
+export type Hex = `0x${string}`
 
 export interface GasFees {
   tokenAddress: Hex

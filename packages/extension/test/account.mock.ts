@@ -8,11 +8,13 @@ import {
   WalletAccountSigner,
 } from "../src/shared/wallet.model"
 import { Account } from "../src/ui/features/accounts/Account"
+import { ETH_TOKEN_ADDRESS } from "../src/shared/network/constants"
 
 const defaultNetwork: Network = {
   id: "localhost",
   name: "localhostNetwork",
   chainId: "1",
+  possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
   rpcUrl: "rpcUrl",
 }
 const defaultSigner: WalletAccountSigner = {

@@ -1,11 +1,14 @@
 import { KeyValueStorage } from "../storage"
-import { IActivityStorage } from "./types"
+import { adaptKeyValue } from "../storage/__new/keyvalue"
+import type { IActivityStorage } from "./types"
 
-export const activityStore = new KeyValueStorage<IActivityStorage>(
+const keyValueStorage = new KeyValueStorage<IActivityStorage>(
   {
-    latestBalanceChangingActivity: null,
+    modifiedAfter: {},
   },
   {
     namespace: "service:activity",
   },
 )
+
+export const activityStore = adaptKeyValue(keyValueStorage)

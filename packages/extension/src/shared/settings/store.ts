@@ -1,6 +1,7 @@
 import { KeyValueStorage } from "../storage"
+import { defaultAutoLockTimeMinutes } from "./defaultAutoLockTimes"
 import { defaultBlockExplorerKey } from "./defaultBlockExplorers"
-import { ISettingsStorage } from "./types"
+import type { ISettingsStorage } from "./types"
 
 export const settingsStore = new KeyValueStorage<ISettingsStorage>(
   {
@@ -10,6 +11,9 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
     privacyAutomaticErrorReporting: false,
     experimentalAllowChooseAccount: false,
     blockExplorerKey: defaultBlockExplorerKey,
+    nftMarketplaceKey: "unframed",
+    hideTokensWithNoBalance: true,
+    autoLockTimeMinutes: defaultAutoLockTimeMinutes,
   },
   "core:settings",
 )

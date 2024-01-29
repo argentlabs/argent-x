@@ -1,10 +1,10 @@
 import { num } from "starknet"
 
 import { ExtensionActionItemOfType } from "../../shared/actionQueue/types"
-import { addTransaction } from "../transactions/store"
-import { checkTransactionHash } from "../transactions/transactionExecution"
-import { argentMaxFee } from "../../shared/utils/argentMaxFee"
+import { addTransaction } from "../../shared/transactions/store"
 import { Wallet } from "../wallet"
+import { estimatedFeeToMaxFeeTotal } from "../../shared/transactionSimulation/utils"
+import { checkTransactionHash } from "../../shared/transactions/utils"
 
 export const addMultisigDeployAction = async (
   action: ExtensionActionItemOfType<"DEPLOY_MULTISIG">,
@@ -22,18 +22,10 @@ export const addMultisigDeployAction = async (
     throw Error("Account already deployed")
   }
 
-  let maxFee: string
-
-  try {
-    const { suggestedMaxFee } = await wallet.getAccountDeploymentFee(
-      selectedMultisig,
-    )
-
-    maxFee = argentMaxFee({ suggestedMaxFee: suggestedMaxFee })
-  } catch (error) {
-    const fallbackPrice = num.toBigInt(10e14)
-    maxFee = argentMaxFee({ suggestedMaxFee: fallbackPrice })
-  }
+  const maxFee = await wallet
+    .getAccountDeploymentFee(selectedMultisig)
+    .then(estimatedFeeToMaxFeeTotal)
+    .catch(() => num.toBigInt(20e14))
 
   const { account, txHash } = await wallet.deployAccount(selectedMultisig, {
     maxFee,

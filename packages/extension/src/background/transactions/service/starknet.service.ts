@@ -11,6 +11,7 @@ import {
 } from "../../../shared/transactions/interface"
 import {
   getTransactionIdentifier,
+  getTransactionStatus,
   identifierToBaseTransaction,
 } from "../../../shared/transactions/utils"
 import { IRepository } from "../../../shared/storage/__new/interface"
@@ -22,18 +23,17 @@ import uniqWith from "lodash-es/uniqWith"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { getTransactionHistory } from "../sources/voyager"
 import { getTransactionsUpdate } from "../sources/onchain"
-import { transactionsStore } from "../store"
+import { transactionsStore } from "../../../shared/transactions/store"
 import { accountService } from "../../../shared/account/service"
-import { delay } from "../../../shared/utils/delay"
-import { TransactionFinalityStatus } from "starknet"
 import { RefreshInterval } from "../../../shared/config"
+import { pipe } from "../../__new/services/worker/schedule/pipe"
+import { everyWhenOpen } from "../../__new/services/worker/schedule/decorators"
+import { IBackgroundUIService } from "../../__new/services/ui/interface"
+import { IDebounceService } from "../../../shared/debounce"
 
 function isFinalStatus(status: TransactionStatus): boolean {
   return status.status === "confirmed" || status.status === "failed"
 }
-
-const DEFAULT_POLLING_INTERVAL = 15
-const LOCAL_POLLING_INTERVAL = 5
 
 export class TransactionTrackerWorker
   extends BaseTransactionTrackingService<BaseTransaction, TransactionStatus>
@@ -41,69 +41,71 @@ export class TransactionTrackerWorker
 {
   constructor(
     private readonly schedulingService: IScheduleService<
-      "starknetTransactionTracker" | "loadHistory" | "trackTransactionsUpdates"
+      | "starknetTransactionTracker"
+      | "loadHistory"
+      | "trackTransactionsUpdates"
+      | "cleanupStaleTransactions"
     >,
     private readonly chainService: IChainService,
     private readonly transactionsRepo: IRepository<Transaction>,
+    private readonly backgroundUIService: IBackgroundUIService,
+    private readonly debounceService: IDebounceService,
   ) {
     super({ status: "pending" }, getTransactionIdentifier)
-
-    void this.schedulingService.registerImplementation({
-      id: "starknetTransactionTracker",
-      callback: this.update.bind(this),
-    })
 
     void this.schedulingService.registerImplementation({
       id: "loadHistory",
       callback: this.loadHistory.bind(this),
     })
 
-    void this.schedulingService.registerImplementation({
-      id: "trackTransactionsUpdates",
-      callback: this.trackTransactionsUpdates.bind(this),
-    })
-
-    void this.schedulingService.every(RefreshInterval.FAST, {
-      id: "starknetTransactionTracker",
-    })
     void this.schedulingService.every(RefreshInterval.SLOW, {
       id: "loadHistory",
     })
-    void this.schedulingService.every(RefreshInterval.MEDIUM, {
-      id: "trackTransactionsUpdates",
-    })
+
     this.subscribeToRepoChange()
   }
 
-  async trackTransactionsUpdates() {
-    // the config below will run transaction updates 4x per minute, if there are in-flight transactions
-    // By default it will update on second 0, 15, 30 and 45 but by updating WAIT_TIME we can change the number of executions
-    const maxExecutionTimeInMs = 60000 // 1 minute max execution time
-    let transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
-    const startTime = Date.now()
-    let inFlightTransactions = await this.syncTransactionRepo()
-    while (
-      inFlightTransactions.length > 0 &&
-      Date.now() - startTime < maxExecutionTimeInMs
-    ) {
-      const localTransaction = inFlightTransactions.find(
-        (tx) => tx.account.networkId === "localhost",
-      )
-      if (localTransaction) {
-        transactionPollingIntervalInS = LOCAL_POLLING_INTERVAL
-      } else {
-        transactionPollingIntervalInS = DEFAULT_POLLING_INTERVAL
-      }
-      console.info(
-        `~> waiting ${transactionPollingIntervalInS}s for transaction updates`,
-      )
-      await delay(transactionPollingIntervalInS * 1000)
-      console.info(
-        "~> fetching transaction updates as pending transactions were detected",
-      )
-      inFlightTransactions = await this.syncTransactionRepo()
-    }
+  async cleanupStaleTransactions() {
+    const now = Math.floor(Date.now() / 1000)
+
+    const staleTransactions = await this.transactionsRepo.get((transaction) => {
+      const { finality_status, execution_status } =
+        getTransactionStatus(transaction)
+      const isFailed =
+        execution_status === "REVERTED" || finality_status === "REJECTED"
+      const isSuccessful =
+        finality_status === "ACCEPTED_ON_L2" ||
+        finality_status === "ACCEPTED_ON_L1"
+
+      const isPending = !isFailed && !isSuccessful
+      const isStale = now - transaction.timestamp > 3600 // older than 1 hour
+      return isStale && isPending
+    })
+    await this.transactionsRepo.remove(staleTransactions)
   }
+
+  async trackTransactionsUpdates() {
+    await this.syncTransactionRepo()
+  }
+
+  runTrackTransactionUpdates = pipe(
+    everyWhenOpen(
+      this.backgroundUIService,
+      this.schedulingService,
+      this.debounceService,
+      RefreshInterval.FAST,
+      "TransactionTrackerWorker.trackTransactionsUpdates",
+    ),
+  )(async () => {
+    try {
+      await this.trackTransactionsUpdates()
+      await this.update()
+    } catch (error) {
+      console.warn("Failed to update transactions", error)
+    } finally {
+      await this.cleanupStaleTransactions()
+    }
+  })
 
   protected async update() {
     const oldTransactionStatuses = Object.fromEntries(
@@ -163,10 +165,10 @@ export class TransactionTrackerWorker
       const newAddedTransactions =
         changeset.newValue
           ?.filter(({ hash }) => !oldTransactions.includes(hash))
-          .filter(
-            ({ finalityStatus }) =>
-              finalityStatus === TransactionFinalityStatus.RECEIVED,
-          ) ?? []
+          .filter((transaction) => {
+            const { finality_status } = getTransactionStatus(transaction)
+            return finality_status === "RECEIVED"
+          }) ?? []
 
       if (newAddedTransactions.length > 0) {
         setTimeout(() => {

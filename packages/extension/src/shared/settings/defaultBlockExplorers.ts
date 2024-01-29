@@ -1,6 +1,17 @@
-export const defaultBlockExplorers = {
+import { logos } from "@argent/ui"
+
+export interface BlockExplorer {
+  title: string
+  logo: keyof typeof logos
+  url: Record<string, string>
+}
+
+export type BlockExplorers = Record<string, BlockExplorer>
+
+export const defaultBlockExplorers: BlockExplorers = {
   starkScan: {
     title: "StarkScan",
+    logo: "StarknetLogo",
     url: {
       "mainnet-alpha": "https://starkscan.co",
       "goerli-alpha": "https://testnet.starkscan.co",
@@ -9,13 +20,14 @@ export const defaultBlockExplorers = {
   },
   voyager: {
     title: "Voyager",
+    logo: "VoyagerLogo",
     url: {
       "mainnet-alpha": "https://voyager.online",
       "goerli-alpha": "https://goerli.voyager.online",
       localhost: "https://goerli.voyager.online/local-version",
     },
   },
-}
+} as const
 
 export type BlockExplorerKey = keyof typeof defaultBlockExplorers
 

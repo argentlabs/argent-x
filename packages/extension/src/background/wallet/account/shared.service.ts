@@ -18,7 +18,7 @@ import {
   IRepository,
 } from "../../../shared/storage/__new/interface"
 import { accountsEqual } from "./../../../shared/utils/accountsEqual"
-import { getPathForIndex } from "../../keys/keyDerivation"
+import { getPathForIndex } from "../../../shared/utils/derivationPath"
 import { AccountError } from "../../../shared/errors/account"
 import { MULTISIG_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
 import type { WalletStorageProps } from "../../../shared/wallet/walletStore"

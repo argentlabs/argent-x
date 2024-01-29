@@ -67,7 +67,7 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
 }) => {
   const navigate = useNavigate()
   if (isActivityTransaction(transaction)) {
-    const { hash, isRejected, isCancelled } = transaction
+    const { hash, failureReason } = transaction
     const transactionTransformed = transformTransaction({
       transaction,
       accountAddress: account.address,
@@ -81,9 +81,9 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
           transactionTransformed={transactionTransformed}
           network={account.network}
           onClick={() => navigate(routes.transactionDetail(hash))}
-          isCancelled={isCancelled}
+          failureReason={failureReason}
         >
-          {isRejected ? (
+          {failureReason ? (
             <div style={{ display: "flex" }}>
               <TransactionStatusIndicator color={"red"} />
             </div>
@@ -110,6 +110,7 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
             transactionTransformed={explorerTransactionTransformed}
             network={account.network}
             onClick={() => navigate(routes.transactionDetail(transactionHash))}
+            failureReason={transaction.failureReason}
           />
           {loadMore && <LoadMoreTrigger onLoadMore={onLoadMore} mt={-2} />}
         </>

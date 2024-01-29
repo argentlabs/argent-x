@@ -1,4 +1,4 @@
-import { argentMaxFee } from "./argentMaxFee"
+import { modifySnjsFeeOverhead } from "./argentMaxFee"
 import { num } from "starknet"
 
 describe("argentMaxFee function tests", () => {
@@ -20,7 +20,7 @@ describe("argentMaxFee function tests", () => {
         BigInt(SCALE)
       const expectedFee = num.toHex(suggestedMaxFeeBigInt)
       expect(
-        argentMaxFee({
+        modifySnjsFeeOverhead({
           suggestedMaxFee: num.toBigInt(suggestedFee),
           overheadMultiplier: overheadMultiplier,
         }),
@@ -38,7 +38,7 @@ describe("argentMaxFee function tests", () => {
     "given suggestedFee %s overheadMultiplier %f and default multiplier %f should return %s",
     (suggestedFee, overheadMultiplier, snjsMultiplier, expectedHex) => {
       expect(
-        argentMaxFee({
+        modifySnjsFeeOverhead({
           suggestedMaxFee: num.toBigInt(suggestedFee),
           overheadMultiplier,
           starknetJsOverheadMultiplier: snjsMultiplier,

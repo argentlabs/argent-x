@@ -48,7 +48,7 @@ describe("url", () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         expect(() => urlWithQuery({})).toThrowErrorMatchingInlineSnapshot(
-          '"Url must be a string. Received undefined"',
+          "[TypeError: Url must be a string. Received undefined]",
         )
       })
     })

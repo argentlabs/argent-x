@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server"
 
 import { procedure } from "../trpc"
+import { preAuthorizationService } from "../../../shared/preAuthorization/service"
 
 // TODO: ⬇ should be service
 function getOrigin(url: string) {
@@ -22,6 +23,39 @@ function matchOrigin(urlToMatch: string, url?: string) {
 }
 
 export const publicProcedure = procedure
+
+export const connectedDappsProcedure = publicProcedure.use(
+  async ({ ctx, next }) => {
+    const sender = ctx.sender
+    const senderUrl = sender?.url ?? sender?.origin
+    const origin = senderUrl && getOrigin(senderUrl)
+    const account = await ctx.services.wallet.getSelectedAccount()
+
+    const isPreauthorized = await preAuthorizationService.isPreAuthorized({
+      account,
+      host: origin,
+    })
+
+    const extensionUrl = chrome.runtime.getURL("")
+    const fromExtension = matchOrigin(extensionUrl, senderUrl)
+
+    const isFromPreauthorizedDappOrExtension = isPreauthorized || fromExtension
+
+    if (!sender || !isFromPreauthorizedDappOrExtension) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Reserved for preauthorized calls or extension",
+      })
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        sender, // by passing it after checking, every method after this middleware will have a mandatory sender
+      },
+    })
+  },
+)
 
 export const extensionOnlyProcedure = publicProcedure.use(
   async ({ ctx, next }) => {

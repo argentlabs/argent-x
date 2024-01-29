@@ -2,7 +2,7 @@ import { Center, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { H4, P3 } from "@argent/ui"
-import { SupportFooter } from "./features/settings/SupportFooter"
+import { SupportFooter } from "./features/settings/ui/SupportFooter"
 
 export const AppBackgroundError: FC = () => {
   return (

@@ -1,6 +1,6 @@
 import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
-import { preferencesEndpointPayload } from "./updatePreferences.model"
+import { preferencesEndpointPayload } from "../../../../shared/argentAccount/schema"
 
 export const updatePreferencesProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)

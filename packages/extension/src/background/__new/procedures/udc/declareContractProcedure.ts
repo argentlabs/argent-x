@@ -2,8 +2,7 @@ import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"
 import { UdcError } from "../../../../shared/errors/udc"
-
-import { declareContractSchema } from "../../../../shared/udc/type"
+import { declareContractSchema } from "../../../../shared/udc/schema"
 
 export const declareContractProcedure = extensionOnlyProcedure
   .input(declareContractSchema)

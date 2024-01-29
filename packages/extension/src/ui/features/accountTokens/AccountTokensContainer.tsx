@@ -1,9 +1,9 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useKeyValueStorage } from "../../../shared/storage/hooks"
+import { useKeyValueStorage } from "../../hooks/useStorage"
 import { userReviewStore } from "../../../shared/userReview"
-import { routes } from "../../routes"
+import { routes, useCurrentPathnameWithQuery } from "../../routes"
 import { hasSavedRecoverySeedPhraseView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { Account } from "../accounts/Account"
@@ -19,11 +19,13 @@ import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import { accountHasEscape } from "../shield/escape/accountHasEscape"
 import { useAccountGuardianIsSelf } from "../shield/useAccountGuardian"
 import { AccountTokens } from "./AccountTokens"
-import { useDapplandBanner } from "./dappland/banner.state"
+import { hasSeenAvnuAtom, hasSeenEkuboAtom } from "./banner/banner.state"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { AddFundsDialogProvider } from "./useAddFundsDialog"
-import { useFeeTokenBalance } from "./useFeeTokenBalance"
+import { useHasFeeTokenBalance } from "./useFeeTokenBalance"
 import { clientAccountService } from "../../services/account"
+import { useAtom } from "jotai"
+import { useAccountOwnerIsSelf } from "../accounts/useAccountOwner"
 
 interface AccountTokensContainerProps {
   account: Account
@@ -33,8 +35,10 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   account,
 }) => {
   const navigate = useNavigate()
+  const returnTo = useCurrentPathnameWithQuery()
   const { pendingTransactions } = useAccountTransactions(account)
-  const { hasSeenBanner } = useDapplandBanner()
+  const [hasSeenEkuboBanner, setHasSeenEkuboBanner] = useAtom(hasSeenEkuboAtom)
+  const [hasSeenAvnuBanner, setHasSeenAvnuBanner] = useAtom(hasSeenAvnuAtom)
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const transactionsBeforeReview = useKeyValueStorage(
     userReviewStore,
@@ -49,13 +53,17 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
-    if (!userHasReviewed && transactionsBeforeReview === 0) {
+    if (
+      !userHasReviewed &&
+      transactionsBeforeReview === 0 &&
+      !(window as any).PLAYWRIGHT
+    ) {
       timeoutId = setTimeout(() => navigate(routes.userReview()), 1000)
     }
     return () => timeoutId && clearTimeout(timeoutId)
   }, [navigate, transactionsBeforeReview, userHasReviewed])
 
-  const { feeTokenBalance } = useFeeTokenBalance(account)
+  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
 
   const needsUpgrade = useCheckUpgradeAvailable(account)
   const multisig = useMultisig(account)
@@ -71,13 +79,13 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   const showNoBalanceForUpgrade = Boolean(
     needsUpgrade &&
       !hasPendingTransactions &&
-      feeTokenBalance &&
-      !account.needsDeploy &&
-      feeTokenBalance <= 0n,
+      !hasFeeTokenBalance &&
+      !account.needsDeploy,
   )
 
   const hasEscape = accountHasEscape(account)
   const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
+  const accountOwnerIsSelf = useAccountOwnerIsSelf(account)
 
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
 
@@ -96,15 +104,10 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   }, [hasSavedRecoverySeedPhrase, isMainnet])
 
   const showAddFundsBackdrop = useMemo(() => {
-    return (
-      !showSaveRecoverySeedphraseBanner &&
-      feeTokenBalance !== undefined &&
-      feeTokenBalance <= 0n
-    )
-  }, [feeTokenBalance, showSaveRecoverySeedphraseBanner])
+    return !showSaveRecoverySeedphraseBanner && !hasFeeTokenBalance
+  }, [hasFeeTokenBalance, showSaveRecoverySeedphraseBanner])
 
-  const showDapplandBanner =
-    !hasSeenBanner &&
+  const shouldShowDappBanner =
     !showAddFundsBackdrop &&
     !showSaveRecoverySeedphraseBanner &&
     !needsUpgrade &&
@@ -112,13 +115,18 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
     !hasEscape &&
     !multisig?.needsDeploy
 
-  const hadPendingTransactions = useRef(false)
+  const showAvnuBanner = !hasSeenAvnuBanner && shouldShowDappBanner
+  // Show Ekubo banner only after Avnu banner has been dismissed
+  const showEkuboBanner =
+    !hasSeenEkuboBanner && shouldShowDappBanner && hasSeenAvnuBanner
+  const setAvnuBannerSeen = useCallback(() => {
+    setHasSeenAvnuBanner(true)
+  }, [setHasSeenAvnuBanner])
+  const setEkuboBannerSeen = useCallback(() => {
+    setHasSeenEkuboBanner(true)
+  }, [setHasSeenEkuboBanner])
 
-  const setDappLandBannerSeen = useCallback(() => {
-    useDapplandBanner.setState({
-      hasSeenBanner: true,
-    })
-  }, [])
+  const hadPendingTransactions = useRef(false)
 
   useEffect(() => {
     if (hasPendingTransactions) {
@@ -141,15 +149,16 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
     setUpgradeLoading(false)
   }, [account, navigate, showNoBalanceForUpgrade])
 
+  const onAvnuClick = () => navigate(routes.swap())
+
   return (
     <AddFundsDialogProvider account={account}>
       <AccountTokens
         account={account}
         showTokensAndBanners={showTokensAndBanners}
-        showDapplandBanner={showDapplandBanner}
-        setDappLandBannerSeen={setDappLandBannerSeen}
         hasEscape={hasEscape}
         accountGuardianIsSelf={accountGuardianIsSelf}
+        accountOwnerIsSelf={accountOwnerIsSelf}
         showUpgradeBanner={showUpgradeBanner}
         showNoBalanceForUpgrade={showNoBalanceForUpgrade}
         onUpgradeBannerClick={() => void onUpgradeBannerClick()}
@@ -157,9 +166,15 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
         multisig={multisig}
         showAddFundsBackdrop={showAddFundsBackdrop}
         tokenListVariant={tokenListVariant}
-        feeTokenBalance={feeTokenBalance}
+        hasFeeTokenBalance={hasFeeTokenBalance}
         showSaveRecoverySeedphraseBanner={showSaveRecoverySeedphraseBanner}
         isDeprecated={isDeprecated}
+        showEkuboBanner={showEkuboBanner}
+        showAvnuBanner={showAvnuBanner}
+        setAvnuBannerSeen={setAvnuBannerSeen}
+        setEkuboBannerSeen={setEkuboBannerSeen}
+        onAvnuClick={onAvnuClick}
+        returnTo={returnTo}
       />
     </AddFundsDialogProvider>
   )

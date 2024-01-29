@@ -21,10 +21,13 @@ import {
   deserializeFactory,
   serialize,
 } from "../src/shared/account/store/serialize"
+import { tryToMintFeeToken } from "../src/shared/devnet/mintFeeToken"
+import { WalletError } from "../src/shared/errors/wallet"
+import { MultisigBackendService } from "../src/shared/multisig/service/backend/implementation"
 import { PendingMultisig } from "../src/shared/multisig/types"
+import { pendingMultisigEqual } from "../src/shared/multisig/utils/selectors"
 import { Network } from "../src/shared/network"
 import { INetworkService } from "../src/shared/network/service/interface"
-import { chromeScheduleService } from "../src/shared/schedule"
 import {
   ArrayStorage,
   KeyValueStorage,
@@ -37,18 +40,14 @@ import {
 import { adaptKeyValue } from "../src/shared/storage/__new/keyvalue"
 import { adaptObjectStorage } from "../src/shared/storage/__new/object"
 import { adaptArrayStorage } from "../src/shared/storage/__new/repository"
+import { accountsEqual } from "../src/shared/utils/accountsEqual"
 import {
   BaseMultisigWalletAccount,
   WalletAccount,
 } from "../src/shared/wallet.model"
-import { accountsEqual } from "../src/shared/utils/accountsEqual"
 import { WalletStorageProps } from "../src/shared/wallet/walletStore"
-import backupWrong from "./backup_wrong.mock.json"
 import backup from "./backup.mock.json"
-import { WalletError } from "../src/shared/errors/wallet"
-import { pendingMultisigEqual } from "../src/shared/multisig/utils/selectors"
-import { tryToMintFeeToken } from "../src/shared/devnet/mintFeeToken"
-import { MultisigBackendService } from "../src/shared/multisig/service/backend/implementation"
+import backupWrong from "./backup_wrong.mock.json"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
@@ -118,7 +117,6 @@ const getPendingMultisigStore = (
 const REGEX_HEXSTRING = /^0x[a-fA-F0-9]+/i
 
 const SCRYPT_N = 262144
-const SESSION_DURATION = 24 * 60 * 60
 
 const getWallet = ({
   storage,
@@ -177,8 +175,6 @@ const getWallet = ({
     sessionStore,
     defaultBackUpService,
     defaultRecoverySharedService,
-    chromeScheduleService,
-    SESSION_DURATION,
     SCRYPT_N,
   )
 
