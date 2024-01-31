@@ -28,7 +28,7 @@
     "dev:ui": "NODE_ENV=development pnpm --parallel run dev:ui ",
     "dev:extension": "NODE_ENV=development pnpm run --filter @argent-x/extension -r --stream --parallel dev",
     "build-storybook": "pnpm run --filter @argent-x/storybook build-storybook",
-    "clean": "rm -rf packages/extension/dist packages/get-starket/dist",
+    "clean": "rm -rf packages/extension/dist packages/get-starknet/dist",
     "build": "pnpm run -r --parallel --stream build",
     "build:extension": "pnpm run --filter @argent-x/extension build",
     "build:web": "pnpm run --filter @argent/web build",
