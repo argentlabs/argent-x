@@ -59,7 +59,7 @@ export class TransactionReviewWorker implements ITransactionReviewWorker {
       await this.labelsStore.set("updatedAt", updatedAt)
     } catch (error) {
       // ignore error - will retry next time
-      console.warn("Error fetching trasnaction review labels", error)
+      console.warn("Error fetching transaction review labels", error)
     }
   }
 }
