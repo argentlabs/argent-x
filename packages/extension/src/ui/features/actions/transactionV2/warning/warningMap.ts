@@ -69,7 +69,7 @@ export const warningMap: Record<
   recipient_is_black_listed: {
     title: "Recipient on unsafe list",
     description:
-      "You are sending to an unsafe contract that is blacklisted for the the following reason: [...].",
+      "You are sending to an unsafe contract that is blacklisted for the following reason: [...].",
   },
   spender_is_black_listed: {
     title: "Spender on unsafe list",
@@ -94,7 +94,7 @@ export const warningMap: Record<
   account_state_change: {
     title: "Loss of funds due to ownership change",
     description:
-      "You’re about to change the owner of your account. If you proceed with the transaction, you loose access to your funds. We strongly recommend that you reject the transaction.",
+      "You’re about to change the owner of your account. If you proceed with the transaction, you lose access to your funds. We strongly recommend that you reject the transaction.",
   },
   amount_mismatch_too_low: {
     title: "Poor trade/swap of tokens",
