@@ -16,8 +16,10 @@ import { InjectedConnector } from "starknetkit/injected"
 import { WebWalletConnector } from "starknetkit/webwallet"
 import { Header } from "../components/Header"
 
+import { H2 } from "@argent/ui"
 import { Flex, Image } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
+import { useStarknetkitConnectModal } from "starknetkit"
 import { InfoRow } from "../components/InfoRow"
 import { TokenDapp } from "../components/TokenDapp"
 import { truncateAddress } from "../services/address.service"
@@ -39,9 +41,13 @@ const StarknetReactDappContent = () => {
   const chains = [goerli]
 
   const { account, status } = useAccount()
-  const { connect, connectors } = useConnect()
+  const { connectAsync, connectors } = useConnect()
   const { disconnect } = useDisconnect()
   const [isClient, setIsClient] = useState(false)
+
+  const { starknetkitConnectModal } = useStarknetkitConnectModal({
+    connectors: availableConnectors,
+  })
 
   /* https://nextjs.org/docs/messages/react-hydration-error#solution-1-using-useeffect-to-run-on-the-client-only
   starknet react had an issue with the `available` method
@@ -79,6 +85,7 @@ const StarknetReactDappContent = () => {
       ) : (
         <>
           <Header />
+
           <Flex direction="column" gap="3">
             {connectors.filter(inAppBrowserFilter).map((connector) => {
               if (!connector.available()) {
@@ -92,7 +99,7 @@ const StarknetReactDappContent = () => {
                   as="button"
                   key={connector.id}
                   borderRadius="full"
-                  onClick={() => connect({ connector })}
+                  onClick={async () => connectAsync({ connector })}
                   alignItems="center"
                   background="neutrals.700"
                   _hover={{
@@ -118,6 +125,30 @@ const StarknetReactDappContent = () => {
                 </Flex>
               )
             })}
+          </Flex>
+
+          <H2 mt="8">Starknetkit modal + starknet-react</H2>
+          <Flex
+            as="button"
+            borderRadius="full"
+            onClick={async () => {
+              const { connector } = await starknetkitConnectModal()
+              if (!connector) return // or throw error
+              await connectAsync({ connector })
+            }}
+            alignItems="center"
+            background="neutrals.700"
+            _hover={{
+              background: "neutrals.600",
+            }}
+            cursor="pointer"
+            maxW="350px"
+            gap="2"
+            py="2"
+            px="4"
+            mt="2"
+          >
+            Starknetkit modal with starknet-react
           </Flex>
         </>
       )}

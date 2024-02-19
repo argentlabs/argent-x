@@ -14,6 +14,7 @@ import { CreateAccountType } from "../../../shared/wallet.model"
 export enum AccountTypeId {
   STANDARD,
   MULTISIG,
+  STANDARD_CAIRO_0,
   // LEDGER,
 }
 
@@ -23,7 +24,6 @@ export interface AccountType {
   title: string
   subtitle?: string
   icon?: React.ReactNode
-  enabled?: boolean
 }
 
 interface AddNewAccountScreenProps {

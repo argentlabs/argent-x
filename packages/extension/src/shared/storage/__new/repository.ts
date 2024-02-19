@@ -17,8 +17,11 @@ export function adaptArrayStorage<T>(storage: ArrayStorage<T>): IRepository<T> {
       return storage.get(selector)
     },
 
-    async upsert(value: AllowArray<T> | SetterFn<T>): Promise<UpsertResult> {
-      await storage.push(value)
+    async upsert(
+      value: AllowArray<T> | SetterFn<T>,
+      insertMode: "push" | "unshift" = "push",
+    ): Promise<UpsertResult> {
+      await storage[insertMode](value)
       return { created: Date.now(), updated: Date.now() }
     },
 

@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test"
 
-import config from "../config"
+import config from "../../../shared/config"
 import { lang } from "../languages"
 import Navigation from "./Navigation"
 
@@ -40,12 +40,8 @@ export default class Wallet extends Navigation {
     )
   }
 
-  get privacyStatement() {
-    return this.page.getByRole("link", { name: "Privacy statement" })
-  }
-
-  get privacyStatementText() {
-    return this.page.locator('[aria-label="privacyStatementText"]')
+  get privacyPolicyLink() {
+    return this.page.getByRole("link", { name: "Privacy Policy" })
   }
 
   //third screen
@@ -93,21 +89,6 @@ export default class Wallet extends Navigation {
       expect(this.restoreExistingWallet).toBeVisible(),
     ])
     await this.createNewWallet.click()
-
-    await Promise.all([
-      expect(this.banner2).toBeVisible(),
-      expect(this.description2).toBeVisible(),
-    ])
-    await expect(this.privacyStatement).toBeVisible()
-    await this.privacyStatement.click()
-    await expect(this.privacyStatementText).toHaveText(
-      lang.common.privacyStatement,
-    )
-
-    await this.page.locator('button:text-is("Back")').click()
-    await this.disclaimerLostOfFunds.click()
-    await this.disclaimerAlphaVersion.click()
-    await this.continue.click()
 
     await Promise.all([
       expect(this.banner3).toBeVisible(),

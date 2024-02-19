@@ -1,5 +1,10 @@
-import { bigDecimal, useConditionallyEnabledSWR } from "@argent/shared"
-import { Call, UniversalDeployerContractPayload } from "starknet"
+import {
+  Address,
+  TransactionAction,
+  bigDecimal,
+  useConditionallyEnabledSWR,
+} from "@argent/shared"
+import { TransactionType, UniversalDeployerContractPayload } from "starknet"
 import useSWR from "swr"
 
 import { DeclareContract } from "../../../../shared/udc/schema"
@@ -25,15 +30,42 @@ interface UseMaxFeeEstimationReturnProps {
 export const useMaxFeeEstimation = (
   actionHash: string,
   account: BaseWalletAccount,
-  transactions: Call | Call[],
+  transactionAction: TransactionAction,
+  feeTokenAddress: Address,
   transactionSimulation?: ApiTransactionBulkSimulationResponse,
   isSimulationLoading?: boolean,
 ): UseMaxFeeEstimationReturnProps => {
   const { data: fee, error } = useConditionallyEnabledSWR(
     !isSimulationLoading &&
       (!transactionSimulation || transactionSimulation.length === 0),
-    [actionHash, "feeEstimation"],
-    () => transactions && getEstimatedFee(transactions, account),
+    [actionHash, feeTokenAddress, "feeEstimation"],
+    () => {
+      switch (transactionAction.type) {
+        case TransactionType.INVOKE:
+          return getEstimatedFee(
+            transactionAction.payload,
+            account,
+            feeTokenAddress,
+          )
+
+        case TransactionType.DECLARE:
+          return getDeclareContractEstimatedFee({
+            payload: transactionAction.payload,
+            feeTokenAddress,
+            account,
+          })
+
+        case TransactionType.DEPLOY:
+          return getDeployContractEstimatedFee({
+            payload: transactionAction.payload,
+            feeTokenAddress,
+            account,
+          })
+
+        default:
+          return
+      }
+    },
     {
       suspense: false,
       refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
@@ -46,22 +78,28 @@ export const useMaxFeeEstimation = (
 interface UseMaxAccountDeploymentFeeEstimationReturnProps {
   fee: EstimatedFee | undefined
   error: ErrorObject | undefined
+  loading: boolean
 }
 
 export const useMaxAccountDeploymentFeeEstimation = (
   account: BaseWalletAccount | undefined,
   actionHash: string,
+  feeTokenAddress: string,
 ): UseMaxAccountDeploymentFeeEstimationReturnProps => {
-  const { data: fee, error } = useSWR(
-    [actionHash, "accountDeploymentFeeEstimation"],
-    () => getAccountDeploymentEstimatedFee(account),
+  const {
+    data: fee,
+    error,
+    isValidating,
+  } = useSWR(
+    [actionHash, "accountDeploymentFeeEstimation", feeTokenAddress],
+    () => getAccountDeploymentEstimatedFee(feeTokenAddress, account),
     {
       suspense: false,
       refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
-  return { fee, error }
+  return { fee, error, loading: !fee && isValidating }
 }
 
 export const useMaxDeclareContractFeeEstimation = (
@@ -69,7 +107,11 @@ export const useMaxDeclareContractFeeEstimation = (
   actionHash: string,
 ) => {
   const { data: fee, error } = useSWR(
-    [actionHash, "declareContractFeeEstimation"],
+    [
+      actionHash,
+      "declareContractFeeEstimation",
+      declareContractPayload.feeTokenAddress,
+    ],
     () => getDeclareContractEstimatedFee(declareContractPayload),
     {
       suspense: false,
@@ -82,11 +124,18 @@ export const useMaxDeclareContractFeeEstimation = (
 
 export const useMaxDeployContractFeeEstimation = (
   declareContractPayload: UniversalDeployerContractPayload,
+  account: BaseWalletAccount,
+  feeTokenAddress: Address,
   actionHash: string,
 ) => {
   const { data: fee, error } = useSWR(
     [actionHash, "deployContractFeeEstimation"],
-    () => getDeployContractEstimatedFee(declareContractPayload),
+    () =>
+      getDeployContractEstimatedFee({
+        payload: declareContractPayload,
+        account,
+        feeTokenAddress,
+      }),
     {
       suspense: false,
       refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds

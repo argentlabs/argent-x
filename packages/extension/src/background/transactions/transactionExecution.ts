@@ -1,4 +1,4 @@
-import { num } from "starknet"
+import { TransactionType, num } from "starknet"
 import {
   ExtQueueItem,
   TransactionActionPayload,
@@ -24,7 +24,12 @@ import {
   getTransactionStatus,
 } from "../../shared/transactions/utils"
 import { isAccountV5 } from "@argent/shared"
-import { estimatedFeeToMaxFeeTotal } from "../../shared/transactionSimulation/utils"
+import { estimatedFeeToMaxResourceBounds } from "../../shared/transactionSimulation/utils"
+import { SessionError } from "../../shared/errors/session"
+import { AccountError } from "../../shared/errors/account"
+import { getTxVersionFromFeeToken } from "../../shared/utils/getTransactionVersion"
+import { TransactionError } from "../../shared/errors/transaction"
+import { isSafeUpgradeTransaction } from "../../shared/utils/isUpgradeTransaction"
 
 export type TransactionAction = ExtQueueItem<{
   type: "TRANSACTION"
@@ -37,33 +42,26 @@ export const executeTransactionAction = async (
 ) => {
   const { transactions, abis, transactionsDetail, meta = {} } = action.payload
   const allTransactions = await transactionsStore.get()
-  const preComputedFees = await getEstimatedFees(transactions)
+  const preComputedFees = await getEstimatedFees({
+    type: TransactionType.INVOKE,
+    payload: transactions,
+  })
 
   if (!preComputedFees) {
-    throw Error("PreComputedFees not defined")
+    throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
   }
-
-  const suggestedMaxFee =
-    transactionsDetail?.maxFee ??
-    estimatedFeeToMaxFeeTotal(preComputedFees.transactions)
-  const suggestedMaxADFee = preComputedFees.deployment
-    ? estimatedFeeToMaxFeeTotal(preComputedFees.deployment)
-    : 0n
-
-  const maxFee = suggestedMaxFee
-  const maxADFee = suggestedMaxADFee
 
   // void analytics.track("executeTransaction", {
   //   usesCachedFees: Boolean(preComputedFees),
   // }) // TODO: temporary disabled
 
   if (!(await wallet.isSessionOpen())) {
-    throw Error("you need an open session")
+    throw new SessionError({ code: "NO_OPEN_SESSION" })
   }
   const selectedAccount = await wallet.getSelectedAccount()
 
   if (!selectedAccount) {
-    throw Error("no accounts")
+    throw new AccountError({ code: "NOT_FOUND" })
   }
 
   const multisig =
@@ -80,7 +78,7 @@ export const executeTransactionAction = async (
   })
 
   const hasUpgradePending = pendingAccountTransactions.some(
-    (tx) => tx.meta?.isUpgrade,
+    isSafeUpgradeTransaction,
   )
 
   const starknetAccount = await wallet.getStarknetAccount(
@@ -101,9 +99,14 @@ export const executeTransactionAction = async (
     ? num.toHex(transactionsDetail?.nonce || 0)
     : await getNonce(selectedAccount, starknetAccount)
 
-  if (accountNeedsDeploy) {
+  const version = getTxVersionFromFeeToken(
+    preComputedFees.transactions.feeTokenAddress,
+  )
+
+  if (accountNeedsDeploy && preComputedFees.deployment) {
     const { account, txHash } = await wallet.deployAccount(selectedAccount, {
-      maxFee: maxADFee,
+      version,
+      ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
     })
     if (!checkTransactionHash(txHash)) {
       throw Error(
@@ -141,7 +144,8 @@ export const executeTransactionAction = async (
   const transaction = await acc.execute(transactions, abis, {
     ...transactionsDetail,
     nonce,
-    maxFee,
+    version,
+    ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),
   })
 
   if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
@@ -169,10 +173,6 @@ export const executeTransactionAction = async (
 
   if (!nonceWasProvidedByUI && finalityStatus === "RECEIVED") {
     await increaseStoredNonce(selectedAccount)
-  }
-
-  if ("isUpgrade" in meta && meta.isUpgrade) {
-    await resetStoredNonce(selectedAccount) // reset nonce after upgrade. This is needed because nonce was managed by AccountContract before 0.10.0
   }
 
   return transaction

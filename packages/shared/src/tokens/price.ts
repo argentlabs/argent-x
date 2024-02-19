@@ -12,6 +12,7 @@ import {
 import { Token, TokenWithBalance } from "./token"
 import { formatUnits, parseCurrency, parseUnits } from "../bigdecimal"
 import { bigDecimal } from ".."
+import { DEFAULT_TOKEN_DECIMALS } from "./constants"
 
 const { UINT_256_MAX } = uint256
 
@@ -154,9 +155,10 @@ export const convertTokenAmountToCurrencyValue = ({
   const currencyValue =
     BigInt(amount) * parseCurrency(unitCurrencyValue.toString()).value
   /** keep as string to avoid loss of precision elsewhere */
+
   return bigDecimal.formatUnits({
     value: currencyValue,
-    decimals: decimalsNumber + 6,
+    decimals: decimalsNumber + DEFAULT_TOKEN_DECIMALS,
   })
 }
 

@@ -81,6 +81,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
                   borderBottomRadius={
                     shouldDisplayGuardianBanner ? 0 : "undefined"
                   }
+                  showRightElements={false}
                 />
                 {shouldDisplayGuardianBanner && (
                   <ClickableShieldBanner address={account.address} />

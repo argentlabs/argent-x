@@ -24,27 +24,27 @@ export default class AddressBook extends Navigation {
     return this.page.locator('[aria-label="network-selector"]')
   }
 
-  get save() {
+  get saveLocator() {
     return this.page.locator(`button:text-is("${lang.common.save}")`)
   }
 
-  get cancel() {
+  get cancelLocator() {
     return this.page.locator(`button:text-is("${lang.common.cancel}")`)
   }
 
-  networkOption(name: "Localhost 5050" | "Testnet" | "Mainnet") {
+  networkOption(name: "Localhost 5050" | "Goerli" | "Mainnet") {
     return this.page.locator(`button[role="menuitem"]:text-is("${name}")`)
   }
 
   get nameRequired() {
     return this.page.locator(
-      `//input[@name="name"]/following::label[contains(text(), '${lang.address.nameRequired}')]`,
+      `//input[@name="name"]/following::label[contains(text(), '${lang.settings.addressBook.nameRequired}')]`,
     )
   }
 
   get addressRequired() {
     return this.page.locator(
-      `//textarea[@name="address"]/following::label[contains(text(), '${lang.address.addressRequired}')]`,
+      `//textarea[@name="address"]/following::label[contains(text(), '${lang.settings.addressBook.addressRequired}')]`,
     )
   }
 
@@ -56,15 +56,19 @@ export default class AddressBook extends Navigation {
 
   get deleteAddress() {
     return this.page.locator(
-      `button[aria-label="${lang.address.removeAddress}"]`,
+      `button[aria-label="${lang.settings.addressBook.removeAddress}"]`,
     )
   }
 
   get delete() {
-    return this.page.locator(`button:text-is("${lang.address.delete}")`)
+    return this.page.locator(
+      `button:text-is("${lang.settings.addressBook.delete}")`,
+    )
   }
 
   get addressBook() {
-    return this.page.locator(`button:text-is("${lang.address.addressBook}")`)
+    return this.page.locator(
+      `button:text-is("${lang.settings.addressBook.addressBook}")`,
+    )
   }
 }

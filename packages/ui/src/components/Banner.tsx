@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react"
+import { Box, BoxProps } from "@chakra-ui/react"
 import { FC, MouseEventHandler } from "react"
 
 import { ButtonCell } from "./CellStack"
@@ -7,39 +7,23 @@ import { P3, P4 } from "./Typography"
 
 interface CloseButtonProps {
   onClick?: MouseEventHandler<HTMLDivElement>
-}
-
-interface ThemedBanner {
   dark?: boolean
 }
 
-interface BannerProps {
+interface BannerProps extends BoxProps {
   href?: string
-  backgroundImageUrl: string
+  backgroundImageUrl?: string
   title?: string
   subTitle?: string
   onClose?: () => void
   onClick?: () => void
+  dark?: boolean
 }
 
-const Scrim: FC<ThemedBanner> = ({ dark }) => (
-  <Box
-    position="absolute"
-    top="0"
-    left="0"
-    right="0"
-    bottom="0"
-    background={
-      dark
-        ? `linear-gradient(180deg, rgba(0, 0, 0, 0.50) 0%, rgba(255, 255, 255, 0.00) 20%)`
-        : `linear-gradient(180deg, rgba(255, 255, 255, 0.50) 0%, rgba(255, 255, 255, 0.00) 100%)`
-    }
-  />
+const Scrim: FC<BannerProps> = ({ dark, ...rest }) => (
+  <Box position="absolute" top="0" left="0" right="0" bottom="0" {...rest} />
 )
-const CloseButton: FC<CloseButtonProps & ThemedBanner> = ({
-  dark,
-  ...props
-}) => (
+const CloseButton: FC<CloseButtonProps> = ({ dark, ...props }) => (
   <Box
     position="absolute"
     top="0"
@@ -47,8 +31,8 @@ const CloseButton: FC<CloseButtonProps & ThemedBanner> = ({
     width="24px"
     height="24px"
     zIndex="1"
-    background={dark ? "white" : "black"}
-    color={dark ? "black" : "white"}
+    background={"black"}
+    color={"white"}
     borderRadius={"50%"}
     m={1}
     display="flex"
@@ -60,7 +44,7 @@ const CloseButton: FC<CloseButtonProps & ThemedBanner> = ({
   </Box>
 )
 
-export const Banner: FC<BannerProps & ThemedBanner> = ({
+export const Banner: FC<BannerProps> = ({
   href,
   backgroundImageUrl,
   title = "Discover",
@@ -68,6 +52,7 @@ export const Banner: FC<BannerProps & ThemedBanner> = ({
   onClose,
   dark,
   onClick,
+  ...rest
 }) => {
   return (
     <ButtonCell
@@ -93,6 +78,8 @@ export const Banner: FC<BannerProps & ThemedBanner> = ({
       }}
       href={href}
       onClick={onClick}
+      whiteSpace="initial"
+      {...rest}
     >
       <Scrim dark={dark} />
       <P3 zIndex="1" color={dark ? "white" : "black"} fontWeight="extrabold">

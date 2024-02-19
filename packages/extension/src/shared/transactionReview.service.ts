@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address, ArgentBackendNetworkId } from "@argent/shared"
 import { isArray, lowerCase } from "lodash-es"
 import { Call } from "starknet"
 
@@ -112,11 +112,10 @@ export interface ApiTransactionReview {
 }
 
 export type ApiTransactionReviewNetwork =
-  | "mainnet"
+  | ArgentBackendNetworkId
   | "morden"
   | "ropsten"
   | "rinkeby"
-  | "goerli"
   | "kovan"
 
 export interface ApiTransactionReviewRequestBody {

@@ -13,6 +13,10 @@ import type { IStarknetAddressService } from "@argent/shared"
 import type { INetworkService } from "../../shared/network/service/interface"
 import { ISharedSwapService } from "../../shared/swap/service/interface"
 import superjson from "superjson"
+import { ITokenService } from "../../shared/token/__new/service/interface"
+import { IRiskAssessmentService } from "../../shared/riskAssessment/interface"
+import { IFeeTokenService } from "../../shared/feeToken/service/interface"
+import { IProvisionService } from "../../shared/provision/interface"
 
 interface Context {
   sender?: chrome.runtime.MessageSender
@@ -26,7 +30,11 @@ interface Context {
     recoveryService: IRecoveryService
     starknetAddressService: IStarknetAddressService
     swapService: ISharedSwapService
+    tokenService: ITokenService
+    feeTokenService: IFeeTokenService
     networkService: INetworkService
+    riskAssessmentService: IRiskAssessmentService
+    provisionService: IProvisionService
   }
 }
 

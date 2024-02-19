@@ -5,11 +5,13 @@ import type { MessagingKeys } from "./keys/messagingKeys"
 import type { Respond } from "./respond"
 import { Wallet } from "./wallet"
 import { TransactionTrackerWorker } from "./transactions/service/starknet.service"
+import { IFeeTokenService } from "../shared/feeToken/service/interface"
 
 export interface BackgroundService {
   wallet: Wallet
   transactionTrackerWorker: TransactionTrackerWorker
   actionService: IBackgroundActionService
+  feeTokenService: IFeeTokenService
 }
 
 export class UnhandledMessage extends Error {

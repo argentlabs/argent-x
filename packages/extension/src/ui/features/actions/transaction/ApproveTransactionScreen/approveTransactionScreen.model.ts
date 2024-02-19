@@ -13,23 +13,24 @@ import { ApproveScreenType, TransactionActionsType } from "../types"
 import { AggregatedSimData } from "../useTransactionSimulatedData"
 import { ConfirmScreenProps } from "./ConfirmScreen"
 import { MultisigBannerProps } from "./MultisigBanner"
+import { TransactionAction } from "@argent/shared"
 
 export interface ApproveTransactionScreenContainerProps
   extends Omit<ConfirmScreenProps, "onSubmit"> {
   actionHash: string
   actionIsApproving?: boolean
   actionErrorApproving?: string
-  onSubmit: (transactions: Call | Call[]) => void
+  onSubmit: (transactionAction: TransactionAction) => void
   approveScreenType: ApproveScreenType
   declareOrDeployType?: "declare" | "deploy"
   selectedAccount?: WalletAccount
-  transactions: Call | Call[]
+  transactionAction: TransactionAction
   onRejectWithoutClose?: () => void
   multisigBannerProps?: MultisigBannerProps
   hideFooter?: boolean
   multisigModalDisclosure?: UseDisclosureReturn
   transactionContext?: "STANDARD_EXECUTE" | "MULTISIG_ADD_SIGNATURE"
-  onConfirmAnyway?: (transactions: Call | Call[]) => void
+  onConfirmAnyway?: (transactionAction: TransactionAction) => void
 }
 
 export interface ApproveTransactionScreenProps

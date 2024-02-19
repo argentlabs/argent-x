@@ -18,6 +18,7 @@ export type TransformedTransactionAction =
   | "REMOVE"
   | "CHANGE"
   | "REPLACE"
+  | "PROVISION"
 
 export type TransformedTransactionEntity =
   | "UNKNOWN"
@@ -43,6 +44,16 @@ export interface BaseTransformedTransaction {
 
 export interface TokenTransferTransaction extends BaseTransformedTransaction {
   action: "TRANSFER" | "SEND" | "RECEIVE"
+  entity: "TOKEN"
+  amount: string
+  fromAddress: string
+  toAddress: string
+  tokenAddress: string
+  token: Token
+}
+
+export interface ProvisionTransaction extends BaseTransformedTransaction {
+  action: "PROVISION"
   entity: "TOKEN"
   amount: string
   fromAddress: string

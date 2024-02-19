@@ -29,7 +29,7 @@ export const AccountDeprecatedModal = () => {
       <Flex py={4} px={5} direction="column" flex={1}>
         <Warning
           title="Account deprecated"
-          subtitle="This is a deprecated account that can’t be upgraded or used any longer. Please contact StarkNet for more information"
+          subtitle="This is a deprecated account that can’t be upgraded or used any longer. Please contact Starknet for more information"
         >
           <Button
             as={"a"}
@@ -40,7 +40,7 @@ export const AccountDeprecatedModal = () => {
             href="https://starknet.io/discord/"
             target="_blank"
           >
-            StarkNet discord
+            Starknet discord
           </Button>
         </Warning>
         <Button onClick={navigateToHiddenAccounts} colorScheme="primary">

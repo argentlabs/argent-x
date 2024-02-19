@@ -1,7 +1,10 @@
 import { z } from "zod"
 
 import { connectedDappsProcedure } from "../permissions"
-import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
+import {
+  baseWalletAccountSchema,
+  cairoVersionSchema,
+} from "../../../../shared/wallet.model"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 import { SessionError } from "../../../../shared/errors/session"
 import { AccountError } from "../../../../shared/errors/account"
@@ -17,12 +20,15 @@ const getAccountDeploymentPayloadInputSchema = z
   })
   .optional()
 
-const deployAccountContractSchema = z.object({
-  classHash: z.string(),
-  constructorCalldata: rawArgsSchema,
-  addressSalt: bigNumberishSchema.optional(),
-  contractAddress: addressSchema.optional(),
-})
+const deployAccountContractSchema = z
+  .object({
+    classHash: z.string(),
+    constructorCalldata: rawArgsSchema,
+    addressSalt: bigNumberishSchema.optional(),
+    contractAddress: addressSchema.optional(),
+    version: cairoVersionSchema.optional(),
+  })
+  .or(z.null())
 
 export const getAccountDeploymentPayloadProcedure = connectedDappsProcedure
   .input(getAccountDeploymentPayloadInputSchema)
@@ -32,6 +38,7 @@ export const getAccountDeploymentPayloadProcedure = connectedDappsProcedure
       input,
       ctx: {
         services: { wallet },
+        senderType,
       },
     }) => {
       if (!(await wallet.isSessionOpen())) {
@@ -49,11 +56,15 @@ export const getAccountDeploymentPayloadProcedure = connectedDappsProcedure
           })
         }
 
+        if (senderType !== "extension" && walletAccount.needsDeploy === false) {
+          return null
+        }
+
         return await wallet.getAccountDeploymentPayload(walletAccount)
       } catch (e) {
         throw new AccountMessagingError({
           options: { error: e },
-          code: "GET_ENCRYPTED_KEY_FAILED",
+          code: "ACCOUNT_DEPLOYMENT_PAYLOAD_FAILED",
         })
       }
     },

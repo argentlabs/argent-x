@@ -1,11 +1,11 @@
-import { Button, CellStack, icons } from "@argent/ui"
+import { Button, CellStack, L2, icons } from "@argent/ui"
 import { Box, Flex, IconButton, chakra, keyframes } from "@chakra-ui/react"
 import { useCallback, useMemo, useState } from "react"
 
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 import { SwapInputError, useSwapInfo } from "./hooks/useSwapInfo"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal, ensureDecimals } from "@argent/shared"
 import { Field, useSwapState } from "./state/fields"
 import { useSwapActionHandlers } from "./hooks/useSwapActionHandler"
 import { Token } from "../../../shared/token/__new/types/token.model"
@@ -119,7 +119,7 @@ const Swap = () => {
       [independentField]: typedValue,
       [dependentField]: bigDecimal.formatUnits({
         value: parsedAmounts[dependentField] ?? 0n,
-        decimals: tokens[dependentField]?.decimals ?? 18,
+        decimals: ensureDecimals(tokens[dependentField]?.decimals),
       }),
     }),
     [dependentField, independentField, parsedAmounts, typedValue, tokens],
@@ -248,6 +248,12 @@ const Swap = () => {
         </Flex>
 
         {!trade && !swapInputError && tradeLoading && <SwapTradeLoading />}
+
+        {!trade && !isValid && (
+          <L2 color="neutrals.500" mt="2">
+            Powered by AVNU
+          </L2>
+        )}
 
         {trade && isValid && (
           <SwapPricesInfo

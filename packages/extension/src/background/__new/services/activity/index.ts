@@ -11,6 +11,7 @@ import type { Events } from "./interface"
 import { accountService } from "../../../../shared/account/service"
 import { tokenService } from "../../../../shared/token/__new/service"
 import { nftsContractsRepository } from "../../../../shared/storage/__new/repositories/nft"
+import { old_walletStore } from "../../../../shared/wallet/walletStore"
 
 export { Activities as Activities } from "./interface"
 
@@ -27,4 +28,5 @@ export const activityService = new ActivityService(
   chromeScheduleService,
   backgroundUIService,
   debounceService,
+  old_walletStore,
 )

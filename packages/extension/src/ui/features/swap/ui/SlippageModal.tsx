@@ -21,7 +21,7 @@ import { useCallback, useState } from "react"
 import { isAllowedNumericInputValue } from "../../../components/utils/isAllowedNumericInputValue"
 import { isNumber } from "lodash-es"
 
-const { AddIcon, MinusIcon, TickIcon } = icons
+const { AddIcon, RemoveIcon, TickIcon } = icons
 
 const MAX_SLIPPAGE = 10000
 
@@ -85,7 +85,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
                 const updatedValue = localSlippage - 10
                 localSlippageHandler(Math.max(updatedValue, 0))
               }}
-              icon={<MinusIcon />}
+              icon={<RemoveIcon />}
             />
             <InputGroup
               flexGrow="1"

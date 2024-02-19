@@ -3,13 +3,18 @@ import {
   bigDecimal,
   isEqualAddress,
   isNumeric,
+  DEFAULT_TOKEN_DECIMALS,
 } from "@argent/shared"
 import { BaseToken, Token } from "../types/token.model"
 import { BigNumberish } from "starknet"
 import defaultTokens from "../../../../assets/default-tokens.json"
 
-export const equalToken = (a: BaseToken, b: BaseToken) =>
-  a.networkId === b.networkId && isEqualAddress(a.address, b.address)
+export const equalToken = (a?: BaseToken, b?: BaseToken) => {
+  if (!a || !b) {
+    return false
+  }
+  return a.networkId === b.networkId && isEqualAddress(a.address, b.address)
+}
 
 export interface IConvertTokenAmountToCurrencyValue {
   /** the token decimal amount */
@@ -43,12 +48,13 @@ export const convertTokenAmountToCurrencyValue = ({
   /** multiply to convert to currency */
   const currencyValue =
     BigInt(amount) *
-    bigDecimal.parseUnits(unitCurrencyValue.toString(), 6).value
+    bigDecimal.parseUnits(unitCurrencyValue.toString(), DEFAULT_TOKEN_DECIMALS)
+      .value
 
   /** keep as string to avoid loss of precision elsewhere */
   return bigDecimal.formatUnits({
     value: currencyValue,
-    decimals: decimalsNumber + 6,
+    decimals: decimalsNumber + DEFAULT_TOKEN_DECIMALS,
   })
 }
 

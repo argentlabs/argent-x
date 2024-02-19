@@ -6,6 +6,10 @@ export default class Navigation {
     this.page = page
   }
 
+  get backupPassword() {
+    return this.page.locator(`button:text-is("I've backed up my password")`)
+  }
+
   get continue() {
     return this.page.locator(`button:text-is("Continue")`)
   }

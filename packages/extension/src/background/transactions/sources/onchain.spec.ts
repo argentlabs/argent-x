@@ -35,7 +35,9 @@ describe("getTransactionsUpdate", () => {
         getTransactionStatus: () => ({
           finality_status: status,
         }),
-        getTransactionReceipt,
+        getTransactionReceipt: () => ({
+          finality_status: status,
+        }),
       })
 
       const test = await getTransactionsUpdate([mockTransaction])
@@ -86,9 +88,11 @@ describe("getTransactionsUpdate", () => {
       account: { address: "0x1", networkId: "goerli-alpha" } as WalletAccount,
     }
 
-    const getTransactionReceipt = vi
-      .fn()
-      .mockResolvedValue({ revert_reason: "foo" })
+    const getTransactionReceipt = vi.fn().mockResolvedValue({
+      revert_reason: "foo",
+      execution_status: "REVERTED",
+      finality_status: "RECEIVED",
+    })
 
     vi.mocked(mocks).getProvider.mockReturnValue({
       getTransactionStatus: () => ({

@@ -1,7 +1,7 @@
 import { IScheduleService } from "../../../../shared/schedule/interface"
 import { IBackgroundNetworkService } from "./interface"
-// import { RefreshInterval } from "../../../../shared/config"
-// import { everyWhenOpen } from "../worker/schedule/decorators"
+import { RefreshInterval } from "../../../../shared/config"
+import { everyWhenOpen } from "../worker/schedule/decorators"
 import { IBackgroundUIService } from "../ui/interface"
 import { IDebounceService } from "../../../../shared/debounce"
 
@@ -15,14 +15,13 @@ export class NetworkWorker {
     private readonly debounceService: IDebounceService<typeof TASK_ID>,
   ) {}
 
-  // Temp: This is commented out until we have a final decision on RPC provider
-  //updateNetworkStatuses = everyWhenOpen(
-  //  this.backgroundUIService,
-  //  this.scheduleService,
-  //  this.debounceService,
-  //  RefreshInterval.MEDIUM,
-  //  "NetworkWorker.updateNetworkStatuses",
-  //)(async (): Promise<void> => {
-  //  await this.backgroundNetworkService.updateStatuses()
-  //})
+  updateNetworkStatuses = everyWhenOpen(
+    this.backgroundUIService,
+    this.scheduleService,
+    this.debounceService,
+    RefreshInterval.MEDIUM,
+    "NetworkWorker.updateNetworkStatuses",
+  )(async (): Promise<void> => {
+    await this.backgroundNetworkService.updateStatuses()
+  })
 }

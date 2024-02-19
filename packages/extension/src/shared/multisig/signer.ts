@@ -1,12 +1,11 @@
 import {
-  Abi,
   Call,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
   Signer,
   stark,
-} from "starknet"
+} from "starknet6"
 
 export class MultisigSigner extends Signer {
   constructor(pk: Uint8Array | string) {
@@ -30,12 +29,10 @@ export class MultisigSigner extends Signer {
   public async signTransaction(
     transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,
-    abis?: Abi[] | undefined,
   ): Promise<Signature> {
     const signatures = await super.signTransaction(
       transactions,
       transactionsDetail,
-      abis,
     )
 
     const formattedSignatures = stark.signatureToDecimalArray(signatures)

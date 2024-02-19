@@ -26,7 +26,10 @@ import { RefreshInterval } from "../../../shared/config"
 import { useView } from "../../views/implementation/react"
 import { tokenPricesView } from "../../views/tokenPrices"
 import { allTokensView } from "../../views/token"
-import { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
+import {
+  TokenWithBalance,
+  TokenWithOptionalBigIntBalance,
+} from "../../../shared/token/__new/types/tokenBalance.model"
 import {
   BaseTokenSchema,
   Token,
@@ -173,7 +176,7 @@ export const useTokenAmountToCurrencyValue = (
  */
 
 export const useTokenBalanceToCurrencyValue = (
-  token?: TokenWithOptionalBigIntBalance,
+  token?: TokenWithBalance | TokenWithOptionalBigIntBalance,
   usePriceAndTokenDataImpl = usePriceAndTokenData,
 ) => {
   return useTokenAmountToCurrencyValue(

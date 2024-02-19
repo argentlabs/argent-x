@@ -25,6 +25,7 @@ import { handleUdcMessaging } from "../udcMessaging"
 import { walletSingleton } from "../walletSingleton"
 import { safeMessages, safeIfPreauthorizedMessages } from "./messages"
 import browser from "webextension-polyfill"
+import { feeTokenService } from "../../shared/feeToken/service"
 
 const handlers = [
   handleAccountMessage,
@@ -50,6 +51,7 @@ export const handleMessage = async (
     wallet: walletSingleton,
     transactionTrackerWorker: transactionTrackerWorker,
     actionService: backgroundActionService,
+    feeTokenService,
   }
 
   const extensionUrl = browser.runtime.getURL("")

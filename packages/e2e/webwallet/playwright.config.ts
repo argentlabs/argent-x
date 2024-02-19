@@ -1,7 +1,5 @@
 import type { PlaywrightTestConfig } from "@playwright/test"
-import config from "./src/config"
-
-const isCI = Boolean(process.env.CI)
+import { artifactsDir, isCI } from "../shared/cfg/test"
 
 const playwrightConfig: PlaywrightTestConfig = {
   projects: [
@@ -17,12 +15,13 @@ const playwrightConfig: PlaywrightTestConfig = {
         browserName: "firefox",
       },
     },
-    {
+    /*{
       name: "WebWallet - WebKit",
       use: {
         browserName: "webkit",
       },
     },
+    */
   ],
   expect: {
     timeout: 20 * 1000, // 20 seconds
@@ -37,8 +36,9 @@ const playwrightConfig: PlaywrightTestConfig = {
   reporter: isCI ? [["github"], ["blob"]] : "list",
 
   forbidOnly: isCI,
-  outputDir: config.artifactsDir,
+  outputDir: artifactsDir,
   preserveOutput: isCI ? "failures-only" : "never",
+  globalTeardown: "../shared/cfg/global.teardown.ts",
 }
 
 export default playwrightConfig

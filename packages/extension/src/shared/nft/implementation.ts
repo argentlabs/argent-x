@@ -1,10 +1,12 @@
 import {
-  Address,
+  type Address,
+  type ArgentBackendNetworkId,
   ArgentBackendNftService,
-  Collection,
-  NftItem,
-  PaginatedItems,
+  type Collection,
+  type NftItem,
+  type PaginatedItems,
   isEqualAddress,
+  PaginatedCollections,
 } from "@argent/shared"
 import { differenceWith, groupBy, isEqual } from "lodash-es"
 import { AllowArray, constants, num, shortString } from "starknet"
@@ -26,7 +28,7 @@ import {
   type NftMarketplace,
 } from "./marketplaces"
 
-const chainIdToPandoraNetwork = (chainId: string): "mainnet" | "goerli" => {
+const chainIdToPandoraNetwork = (chainId: string): ArgentBackendNetworkId => {
   const encodedChainId = num.isHex(chainId)
     ? chainId
     : shortString.encodeShortString(chainId)
@@ -36,6 +38,8 @@ const chainIdToPandoraNetwork = (chainId: string): "mainnet" | "goerli" => {
       return "mainnet"
     case constants.StarknetChainId.SN_GOERLI:
       return "goerli"
+    case constants.StarknetChainId.SN_SEPOLIA:
+      return "sepolia"
   }
   throw new Error(`Unsupported network ${chainId}`)
 }
@@ -102,7 +106,7 @@ export class NFTService implements INFTService {
 
   private async fetchNftsUrl(
     chain: string,
-    network: "mainnet" | "goerli",
+    network: ArgentBackendNetworkId,
     accountAddress: string,
     page = 1,
   ): Promise<PaginatedItems> {
@@ -128,6 +132,35 @@ export class NFTService implements INFTService {
     return paginateditems
   }
 
+  private async fetchCollectionsUrl(
+    chain: string,
+    network: ArgentBackendNetworkId,
+    accountAddress: string,
+    page = 1,
+  ): Promise<PaginatedCollections> {
+    const paginateditems: PaginatedCollections =
+      await this.argentNftService.getProfileCollections(
+        chain,
+        network,
+        accountAddress,
+        page,
+      )
+    if (page < paginateditems.totalPages) {
+      const nextPage: PaginatedCollections = await this.fetchCollectionsUrl(
+        chain,
+        network,
+        accountAddress,
+        paginateditems.page + 1,
+      )
+
+      return {
+        ...paginateditems,
+        collections: paginateditems.collections.concat(nextPage.collections),
+      }
+    }
+    return paginateditems
+  }
+
   async getCollection(
     chain: string,
     networkId: string,
@@ -148,26 +181,32 @@ export class NFTService implements INFTService {
     chain: string,
     networkId: string,
     contractsAddresses: ContractAddress[],
+    accountAddress: string,
   ) {
     const axNetwork = await this.networkService.getById(networkId)
 
     const pandoraNetwork = chainIdToPandoraNetwork(axNetwork.chainId)
     await this.nftsContractsRepository.upsert(contractsAddresses)
-    const collections = groupBy(
+    const collectionsRepository = groupBy(
       await this.nftsCollectionsRepository.get(),
       "contractAddress",
     )
 
     const toPush: Collection[] = []
-    for (const contract of contractsAddresses) {
-      if (!collections[contract.contractAddress]) {
-        const { nfts, ...rest } = await this.argentNftService.getCollection(
-          chain,
-          pandoraNetwork,
-          contract.contractAddress,
-        )
-        toPush.push({ ...rest, networkId })
+
+    const { collections } = await this.fetchCollectionsUrl(
+      chain,
+      pandoraNetwork,
+      accountAddress,
+    )
+
+    for (const collection of collections) {
+      // already stored
+      if (collectionsRepository[collection.contractAddress]) {
+        continue
       }
+
+      toPush.push({ ...collection, networkId })
     }
 
     if (toPush.length > 0) {

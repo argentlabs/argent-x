@@ -32,6 +32,19 @@
     "linkTitle": "Upgrade now",
     "linkUrl": "https://argent.xyz/announcements/034"
   },
+  "upgrade": {
+    "id": "bec6093a-73dc-4f0f-8dd5-06fcdcd1e884",
+    "updatedAt": "2023-12-13T15:19:12.987Z",
+    "minVersion": null,
+    "maxVersion": "5.10.5",
+    "level": "danger",
+    "dismissable": false,
+    "fullScreen": true,
+    "summary": "This is an old version of Argent\u00a0X",
+    "message": "On December 19th, it will no longer work. Update to the latest version of the Argent X extension now",
+    "linkTitle": "Update now",
+    "linkUrl": "https://support.argent.xyz/hc/en-us/articles/15422895291037-How-to-update-Argent-X-extension-to-the-latest-version-"
+  },
   "null": {
     "id": "310e899a-8f19-43c1-990d-95d87acaecf3",
     "updatedAt": "2022-07-19T10:39:30.288Z",

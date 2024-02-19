@@ -1,4 +1,6 @@
-import { Address } from "../chains"
+import { BackendResponsePageable } from "../argent/interface"
+import type { ArgentBackendNetworkId } from "../argent/type"
+import type { Address } from "../chains"
 
 export interface Page<T> {
   page: number // current page
@@ -36,8 +38,6 @@ export interface NftItem extends BaseNftItem {
   animation_uri?: string
   networkId?: string
 
-  collection?: Collection // return the current collection of the item, but without the items of that collection to avoid infinite recursion
-
   owner: {
     account_address?: string
   }
@@ -67,6 +67,13 @@ export interface Collection {
   nfts?: Page<Omit<NftItem, "collection">>
 }
 
+export type PaginatedCollections = {
+  page: number
+  totalPages: number
+  count: number
+  collections: Omit<Collection, "nfts" | "totalItems">[]
+}
+
 export type PaginatedItems = {
   page: number
   totalPages: number
@@ -78,22 +85,29 @@ export interface NFTService {
   // GET /account/nfts/${address}
   getNfts(
     chain: string,
-    network: "mainnet" | "goerli",
+    network: ArgentBackendNetworkId,
     address: string,
     page?: number,
   ): Promise<PaginatedItems>
   // GET /nfts/${collectionAddress}
   getCollection(
     chain: string,
-    network: "mainnet" | "goerli",
+    network: ArgentBackendNetworkId,
     collectionAddress: string,
     page?: number,
   ): Promise<Collection>
   // GET /nfts/${collectionAddress}/${itemId}
   getNft(
     chain: string,
-    network: "mainnet" | "goerli",
+    network: ArgentBackendNetworkId,
     collectionAddress: string,
     itemId: string,
   ): Promise<NftItem>
+  getProfileCollections(
+    chain: string,
+    network: ArgentBackendNetworkId,
+    address: Address,
+    page?: number,
+    withMetrics?: boolean,
+  ): Promise<PaginatedCollections>
 }

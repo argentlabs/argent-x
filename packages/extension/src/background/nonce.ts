@@ -1,4 +1,4 @@
-import { num, Account } from "starknet"
+import { num, Account } from "starknet6"
 
 import { KeyValueStorage } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
@@ -17,8 +17,15 @@ export async function getNonce(
   starknetAccount: Account,
 ): Promise<string> {
   const storageAddress = getAccountIdentifier(account)
-  const result = await starknetAccount.getNonce()
-  const nonceBn = num.toBigInt(result)
+  let nonceBn = BigInt(0)
+
+  try {
+    const result = await starknetAccount.getNonce()
+    nonceBn = num.toBigInt(result)
+  } catch {
+    console.warn("Onchain getNonce failed, using stored nonce.")
+  }
+
   const storedNonce = await nonceStore.get(storageAddress)
 
   if (account.type === "multisig") {

@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Network, NetworkStatus } from "../../../../shared/network"
-import { mapNetworkStatusToColor } from "../../../components/StatusIndicator"
+import { statusMapping } from "../../../components/StatusIndicator"
 import { NetworkSwitcherList } from "./NetworkSwitcherList"
 
 export const mockNetworks = [
@@ -12,28 +12,28 @@ export const mockNetworks = [
     name: "Mainnet",
     rpcUrl: "https://mainnet.infura.io",
     chainId: "chainId",
-    status: "ok",
+    status: "green",
   },
   {
     id: "2",
     name: "Rinkeby",
     rpcUrl: "https://rinkeby.infura.io",
     chainId: "chainId",
-    status: "error",
+    status: "amber",
   },
   {
     id: "3",
     name: "Kovan",
     rpcUrl: "https://kovan.infura.io",
     chainId: "chainId",
-    status: "degraded",
+    status: "red",
   },
 ] as (Network & { status: NetworkStatus })[]
 
 const mockNetworkStatuses = {
-  "1": "ok",
-  "2": "degraded",
-  "3": "error",
+  "1": "green",
+  "2": "amber",
+  "3": "red",
 } as Partial<Record<string, NetworkStatus>>
 
 const mockCurrentNetwork = mockNetworks[0]
@@ -77,8 +77,7 @@ describe("NetworkSwitcherList", () => {
     expect(handleChangeNetwork).toHaveBeenCalledWith(networkToSelect.id)
   })
 
-  // Temp: This is commented out until we have a final decision on RPC provider
-  it.skip("displays the network status indicator for each network", () => {
+  it("displays the network status indicator for each network", () => {
     const handleChangeNetwork = vi.fn()
     render(
       <Menu>
@@ -93,7 +92,9 @@ describe("NetworkSwitcherList", () => {
     mockNetworks.forEach(({ id }) => {
       const networkStatus = mockNetworkStatuses[id]
       const statusIndicator = screen.getByTestId(
-        `status-indicator-${mapNetworkStatusToColor(networkStatus)}`,
+        `status-indicator-${
+          statusMapping[networkStatus as NetworkStatus].color
+        }`,
       )
 
       expect(statusIndicator).toBeInTheDocument()

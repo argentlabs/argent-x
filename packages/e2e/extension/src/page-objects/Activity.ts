@@ -21,7 +21,7 @@ export default class Activity extends Navigation {
       this.page.locator(
         `h6 div:text-is("${lang.account.pendingTransactions}") >> div`,
       ),
-    ).not.toBeVisible({ timeout: 60000 })
+    ).not.toBeVisible()
   }
 
   activityByDestination(destination: string) {
@@ -32,7 +32,7 @@ export default class Activity extends Navigation {
 
   checkActivity(nbr: number) {
     return Promise.all([
-      this.menuPendingTransactionsIndicator.click(),
+      this.menuPendingTransactionsIndicatorLocator.click(),
       this.ensurePendingTransactions(nbr),
     ])
   }
@@ -46,9 +46,9 @@ export default class Activity extends Navigation {
   }
 
   async getLastTxHash() {
-    await this.menuActivityActive.isVisible().then(async (visible) => {
+    await this.menuActivityActiveLocator.isVisible().then(async (visible) => {
       if (!visible) {
-        await this.menuActivity.click()
+        await this.menuActivityLocator.click()
       }
     })
     const txHashs = await this.activityTxHashs()

@@ -2,7 +2,6 @@ import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
-import { Account } from "starknet"
 import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 
@@ -20,8 +19,8 @@ export const cancelEscapeProcedure = extensionOnlyProcedure
       },
     }) => {
       try {
-        const starknetAccount =
-          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+        const starknetAccount = await wallet.getSelectedStarknetAccount()
+
         await actionService.add(
           {
             type: "TRANSACTION",

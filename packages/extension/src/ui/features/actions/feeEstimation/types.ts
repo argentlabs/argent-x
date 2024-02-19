@@ -1,10 +1,9 @@
-import { Call } from "starknet"
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
-import { Address } from "@argent/shared"
+import { TokenWithBalance, TransactionAction } from "@argent/shared"
 export interface TransactionsFeeEstimationProps {
-  feeTokenAddress: Address
-  transactions: Call | Call[]
+  feeToken: TokenWithBalance
+  transactionAction: TransactionAction
   defaultMaxFee?: bigint
   onChange?: (fee: bigint) => void
   onErrorChange?: (error: boolean) => void
@@ -18,4 +17,6 @@ export interface TransactionsFeeEstimationProps {
   transactionSimulationLoading: boolean
   transactionSimulationFeeError?: Error
   needsDeploy?: boolean
+  allowFeeTokenSelection?: boolean
+  onFeeTokenPickerOpen?: () => void
 }

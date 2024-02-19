@@ -7,12 +7,8 @@ export const baseNetworkSchema = z.object({
   id: z.string().min(2).max(31),
 })
 
-export const networkStatusSchema = z.enum([
-  "ok",
-  "degraded",
-  "error",
-  "unknown",
-])
+export const networkStatusSchema = z.enum(["red", "amber", "green", "unknown"])
+
 export const networkSchema = baseNetworkSchema.extend({
   name: z.string().min(2).max(128),
   chainId: z
@@ -33,6 +29,12 @@ export const networkSchema = baseNetworkSchema.extend({
   accountClassHash: z.union([
     z.object({
       standard: z
+        .string()
+        .regex(REGEX_HEXSTRING, {
+          message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,
+        })
+        .optional(),
+      txv1Standard: z
         .string()
         .regex(REGEX_HEXSTRING, {
           message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,

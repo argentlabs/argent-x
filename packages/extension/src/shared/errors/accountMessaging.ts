@@ -9,6 +9,7 @@ export enum ACCOUNT_MESSAGING_ERROR_MESSAGES {
   GET_NEXT_PUBLIC_KEY_FAILED = "Get next public key failed",
   GET_PUBLIC_KEY_FAILED = "Get public key failed",
   TRIGGER_ESCAPE_FAILED = "Trigger escape failed",
+  ACCOUNT_DEPLOYMENT_PAYLOAD_FAILED = "Account deployment payload failed",
 }
 export type AccountMessagingErrorMessage =
   keyof typeof ACCOUNT_MESSAGING_ERROR_MESSAGES

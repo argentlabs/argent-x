@@ -59,6 +59,7 @@ export function getActionQueue<T extends AllObjects>(
   async function add<U extends T>(
     item: U,
     meta?: Partial<ActionQueueItemMeta>,
+    front = false,
   ): Promise<ExtQueueItem<U>> {
     if (isTransactionActionItem(item) && !item.payload.createdAt) {
       /**
@@ -78,14 +79,24 @@ export function getActionQueue<T extends AllObjects>(
       },
     }
 
-    await storage.upsert(newItem)
+    await storage.upsert(newItem, front ? "unshift" : "push")
 
     return newItem
   }
 
-  async function updateMeta(
+  async function addFront<U extends T>(
+    item: U,
+    meta?: Partial<ActionQueueItemMeta>,
+  ): Promise<ExtQueueItem<U>> {
+    return add(item, meta, true)
+  }
+
+  async function update(
     hash: string,
-    meta: Partial<Omit<ActionQueueItemMeta, "hash" | "expires">>,
+    updatedItem: Partial<{
+      meta: Partial<Omit<ActionQueueItemMeta, "hash" | "expires">>
+    }> &
+      Partial<T>,
   ): Promise<ExtQueueItem<T> | null> {
     const item = await get(hash)
 
@@ -95,15 +106,26 @@ export function getActionQueue<T extends AllObjects>(
 
     const newItem = {
       ...item,
+      ...updatedItem,
       meta: {
         ...item.meta,
-        ...meta,
+        ...updatedItem.meta,
       },
     }
 
     await storage.upsert(newItem)
 
     return newItem
+  }
+
+  async function updateMeta(
+    hash: string,
+    meta: Partial<Omit<ActionQueueItemMeta, "hash" | "expires">>,
+  ): Promise<ExtQueueItem<T> | null> {
+    return update(hash, { meta } as Partial<{
+      meta: Partial<Omit<ActionQueueItemMeta, "hash" | "expires">>
+    }> &
+      Partial<T>)
   }
 
   async function remove(hash: string): Promise<ExtQueueItem<T> | null> {
@@ -119,6 +141,8 @@ export function getActionQueue<T extends AllObjects>(
     get,
     getAll,
     add,
+    addFront,
+    update,
     updateMeta,
     remove,
     removeAll,

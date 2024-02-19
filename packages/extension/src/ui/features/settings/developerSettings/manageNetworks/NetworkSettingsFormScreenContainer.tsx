@@ -8,18 +8,18 @@ import { settingsStore } from "../../../../../shared/settings"
 import { defaultBlockExplorers } from "../../../../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../../../../hooks/useStorage"
 import { slugify } from "./slugify"
-import { addressSchema } from "@argent/shared"
+import { addressSchema, isArgentNetworkId } from "@argent/shared"
 import { addAddressPadding } from "starknet"
 import { NetworkSettingsFormScreen } from "./NetworkSettingsFormScreen"
 import {
-  ETH_TOKEN_ADDRESS,
   MULTICALL_CONTRACT_ADDRESS,
-  STANDARD_ACCOUNT_CLASS_HASH,
+  TXV1_ACCOUNT_CLASS_HASH,
 } from "../../../../../shared/network/constants"
 import { networkService } from "../../../../../shared/network/service"
 import { Token } from "../../../../../shared/token/__new/types/token.model"
 import { TokenSchema } from "../../../../../shared/token/__new/types/token.model"
 import { tokenService } from "../../../../services/tokens"
+import { useFeeTokenPreference } from "../../../actions/useFeeTokenPreference"
 
 type NetworkSettingsFormScreenContainerProps =
   | {
@@ -38,6 +38,8 @@ export const NetworkSettingsFormScreenContainer: FC<
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
   const settingsBlockExplorer = defaultBlockExplorers[blockExplorerKey]
 
+  const { prefer: preferredFeeToken } = useFeeTokenPreference()
+
   const defaultNetwork = useMemo<Network>(() => {
     if (props.mode === "add") {
       return {
@@ -47,19 +49,15 @@ export const NetworkSettingsFormScreenContainer: FC<
         rpcUrl: "",
         status: "unknown",
         accountClassHash: {
-          standard: STANDARD_ACCOUNT_CLASS_HASH,
+          standard: TXV1_ACCOUNT_CLASS_HASH,
         },
-        possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
+        possibleFeeTokenAddresses: [preferredFeeToken], // TODO: let the user add feetokens
         // should we add a default for this or use undefined? For better UX, its a good idea to have a default imo - Dhruv
         multicallAddress: MULTICALL_CONTRACT_ADDRESS,
       }
     }
     /** display selected block explorer url from settings for readonly network */
-    if (
-      props.network.readonly &&
-      (props.network.id === "mainnet-alpha" ||
-        props.network.id === "goerli-alpha")
-    ) {
+    if (props.network.readonly && isArgentNetworkId(props.network.id)) {
       const blockExplorerUrl = settingsBlockExplorer.url[props.network.id]
       return {
         ...props.network,

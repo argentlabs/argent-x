@@ -3,7 +3,7 @@ import { Box, Button, ButtonProps, Flex, Text } from "@chakra-ui/react"
 import { FC, PropsWithChildren, ReactEventHandler } from "react"
 import { Link, LinkProps } from "react-router-dom"
 
-const { ChevronRightIcon, MinusIcon } = icons
+const { ChevronRightIcon, RemoveIcon } = icons
 
 export interface SettingsMenuItemProps extends ButtonProps {
   title: string
@@ -38,11 +38,13 @@ export interface SettingsMenuItemRemoveProps extends SettingsMenuItemProps {
 
 export const SettingsMenuItemRemove: FC<SettingsMenuItemRemoveProps> = ({
   onRemoveClick,
+  onClick,
   ...rest
 }) => (
   <SettingsMenuItem
     as={Box}
     py={3}
+    onClick={onClick}
     rightIcon={
       <Button
         rounded={"full"}
@@ -56,10 +58,9 @@ export const SettingsMenuItemRemove: FC<SettingsMenuItemRemoveProps> = ({
           onRemoveClick(e)
         }}
       >
-        <MinusIcon fontSize={"base"} />
+        <RemoveIcon fontSize={"base"} />
       </Button>
     }
-    pointerEvents={"none"}
     _hover={{}}
     _active={{}}
     {...rest}

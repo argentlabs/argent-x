@@ -1,29 +1,37 @@
-import { Button, Center, Circle, Text } from "@chakra-ui/react"
-import { ComponentProps, FC, PropsWithChildren, ReactNode } from "react"
+import { Button, Center, CenterProps, Circle, Text } from "@chakra-ui/react"
+import { ComponentProps, FC, ReactNode } from "react"
 
 import * as icons from "./icons"
-import { H5 } from "./Typography"
+import { H5, P4 } from "./Typography"
 
 const { HelpIcon } = icons
 
-export interface EmptyProps extends PropsWithChildren {
+export interface EmptyProps extends Omit<CenterProps, "title"> {
   icon?: ReactNode
   title?: ReactNode
+  subtitle?: ReactNode
 }
 
 export const Empty: FC<EmptyProps> = ({
   icon = <HelpIcon />,
   title = "Nothing to show",
+  subtitle,
   children,
+  ...rest
 }) => (
-  <Center flex={1} py={4} px={14}>
-    <Center flexDirection={"column"} color={"neutrals.500"}>
-      <Circle backgroundColor={"panel"} size={20}>
+  <Center flex={1} py={4} px={14} {...rest}>
+    <Center
+      flexDirection={"column"}
+      color={"neutrals.400"}
+      textAlign={"center"}
+    >
+      <Circle backgroundColor={"panel"} size={19}>
         <Text fontSize={"5xl"}>{icon}</Text>
       </Circle>
-      <H5 textAlign={"center"} pt={4} pb={4}>
-        {title}
-      </H5>
+      <Center py={4} gap={1} flexDirection={"column"}>
+        {title && <H5>{title}</H5>}
+        {subtitle && <P4 fontWeight={"bold"}>{subtitle}</P4>}
+      </Center>
       {children}
     </Center>
   </Center>

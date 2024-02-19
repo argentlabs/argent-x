@@ -12,4 +12,8 @@ export class ClientRecoveryService implements IRecoveryService {
     const jwe = await encryptForBackground(message)
     await messageClient.recovery.recoverSeedPhrase.mutate({ jwe })
   }
+
+  async clearErrorRecovering() {
+    return messageClient.recovery.clearErrorRecovering.mutate()
+  }
 }

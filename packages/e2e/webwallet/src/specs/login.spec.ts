@@ -1,9 +1,20 @@
 import { expect } from "@playwright/test"
 
-import config from "../config"
+import config from "../../../shared/config"
 import test from "../test"
+import { generateEmail } from "../page-objects/WebWalletPage"
 
 test.describe(`Login page`, () => {
+  test("create new wallet", async ({ webWallet }) => {
+    await webWallet.login.createWallet({
+      email: generateEmail(),
+      pin: config.validLogin.pin,
+      password: config.validLogin.password,
+    })
+    await webWallet.navigation.backupPassword.click()
+    await expect(webWallet.navigation.backupPassword).not.toBeVisible()
+  })
+
   test("can log in", async ({ webWallet }) => {
     await webWallet.login.success()
   })

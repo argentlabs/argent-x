@@ -4,12 +4,12 @@ import {
   Invocations,
   ProviderInterface,
   TransactionType,
-} from "starknet"
+} from "starknet6"
 import { isAccountDeployed } from "../../../accountDeploy"
 import type { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import type { WalletAccount } from "../../../../shared/wallet.model"
 import type { Wallet } from "../../../wallet"
-import { ETH_TOKEN_ADDRESS } from "../../../../shared/network/constants"
+import type { Address } from "@argent/shared"
 
 type Invocation = Invocations[number]
 
@@ -22,20 +22,15 @@ export function callsToInvocation(calls: Call[]): Invocation {
 
 export function estimatedFeesToResponse(
   estimatedFees: EstimateFeeBulk,
-  invocations: Invocations,
+  feeTokenAddress: Address,
 ): EstimatedFees {
-  // check length is same
-  if (estimatedFees.length !== invocations.length) {
-    throw new Error("estimatedFeesToResponse: length mismatch")
-  }
-
   if (estimatedFees.length !== 1 && estimatedFees.length !== 2) {
     throw new Error("estimatedFeesToResponse: length must be 1 or 2")
   }
 
   const fees: EstimatedFees = {
     transactions: {
-      feeTokenAddress: ETH_TOKEN_ADDRESS,
+      feeTokenAddress,
       amount: 0n,
       pricePerUnit: 0n,
     },
@@ -50,7 +45,7 @@ export function estimatedFeesToResponse(
     }
 
     fees.deployment = {
-      feeTokenAddress: ETH_TOKEN_ADDRESS,
+      feeTokenAddress,
       amount: gas_consumed,
       pricePerUnit: gas_price,
     }
@@ -66,7 +61,7 @@ export function estimatedFeesToResponse(
   }
 
   fees.transactions = {
-    feeTokenAddress: ETH_TOKEN_ADDRESS,
+    feeTokenAddress,
     amount: gas_consumed,
     pricePerUnit: gas_price,
   }

@@ -3,9 +3,17 @@ import {
   formatTruncatedAddress,
   isStarknetDomainName,
 } from "@argent/shared"
-import { H6, L2, P4, icons, typographyStyles } from "@argent/ui"
-import { Box, Circle, Flex, Switch, Tooltip, chakra } from "@chakra-ui/react"
-import { FC, useMemo } from "react"
+import { BarIconButton, H6, L2, P4, icons, typographyStyles } from "@argent/ui"
+import {
+  Box,
+  Circle,
+  Flex,
+  Link,
+  Switch,
+  Tooltip,
+  chakra,
+} from "@chakra-ui/react"
+import { FC, useMemo, useState } from "react"
 
 import {
   CustomButtonCell,
@@ -19,8 +27,10 @@ import { AccountListItemShieldBadgeContainer } from "./AccountListItemShieldBadg
 import { AccountListItemUpgradeBadge } from "./AccountListItemUpgradeBadge"
 import { AccountListItemProps } from "./accountListItem.model"
 import { getNetworkAccountImageUrl } from "./accounts.service"
+import { useAccount } from "./accounts.state"
+import { useOnSettingsAccountNavigate } from "./useOnSettingsNavigate"
 
-const { LinkIcon } = icons
+const { LinkIcon, MoreIcon } = icons
 
 const NetworkStatusWrapper = chakra(Flex, {
   baseStyle: {
@@ -42,6 +52,69 @@ const notClickableProps: CustomButtonCellProps = {
   _active: {
     transform: undefined,
   },
+}
+
+const AccountListRightElements: FC<
+  AccountListItemProps & { isHovering: boolean }
+> = ({
+  accountAddress,
+  networkId,
+  deploying,
+  connectedHost,
+  prettyAccountBalance,
+  connectedTooltipLabel,
+  isHovering,
+  hidden,
+}) => {
+  const account = useAccount({ address: accountAddress, networkId: networkId })
+  const onSettingsClick = useOnSettingsAccountNavigate(account)
+
+  const handleButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.stopPropagation()
+    void onSettingsClick()
+  }
+  if (deploying) {
+    return (
+      <NetworkStatusWrapper>
+        <TransactionStatusIndicator status="amber" />
+        Deploying
+      </NetworkStatusWrapper>
+    )
+  }
+  if (connectedHost || prettyAccountBalance) {
+    return (
+      <Flex alignItems="center" gap={3} data-testid="connected-dapp">
+        {isHovering ? (
+          <BarIconButton
+            as={Link}
+            onClick={handleButtonClick}
+            backgroundColor="neutrals.900"
+          >
+            <MoreIcon />
+          </BarIconButton>
+        ) : (
+          <>
+            {prettyAccountBalance && <H6>{prettyAccountBalance}</H6>}
+            {connectedHost && (
+              <Tooltip
+                label={connectedTooltipLabel || `Connected to ${connectedHost}`}
+              >
+                <Circle size={6} bg={"secondary.500"} color={"white"} p={1}>
+                  <LinkIcon />
+                </Circle>
+              </Tooltip>
+            )}
+          </>
+        )}
+      </Flex>
+    )
+  }
+  if (typeof hidden === "boolean") {
+    return <Switch size={"lg"} isChecked={hidden} />
+  }
+  return null
 }
 
 export const AccountListItem: FC<AccountListItemProps> = ({
@@ -67,8 +140,16 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   connectedTooltipLabel,
   prettyAccountBalance,
   accountExtraInfo,
+  showRightElements = false,
   ...rest
 }) => {
+  const [isHovering, setIsHovering] = useState(false)
+  const handleMouseEnter = () => {
+    setIsHovering(true)
+  }
+  const handleMouseLeave = () => {
+    setIsHovering(false)
+  }
   const getAvatarBadge = () => {
     if (isDeprecated || isOwner === false) {
       return <AccountListItemWarningBadge />
@@ -87,44 +168,6 @@ export const AccountListItem: FC<AccountListItemProps> = ({
     return null
   }
 
-  const rightElements = useMemo(() => {
-    if (deploying) {
-      return (
-        <NetworkStatusWrapper>
-          <TransactionStatusIndicator color="orange" />
-          Deploying
-        </NetworkStatusWrapper>
-      )
-    }
-    if (connectedHost || prettyAccountBalance) {
-      return (
-        <Flex alignItems="center" gap={3}>
-          {prettyAccountBalance && <H6>{prettyAccountBalance}</H6>}
-          {connectedHost && (
-            <Tooltip
-              label={connectedTooltipLabel || `Connected to ${connectedHost}`}
-            >
-              <Circle size={6} bg={"secondary.500"} color={"white"} p={1}>
-                <LinkIcon />
-              </Circle>
-            </Tooltip>
-          )}
-        </Flex>
-      )
-    }
-
-    if (hidden !== undefined) {
-      return <Switch size={"lg"} isChecked={hidden} />
-    }
-    return null
-  }, [
-    connectedHost,
-    connectedTooltipLabel,
-    deploying,
-    hidden,
-    prettyAccountBalance,
-  ])
-
   const description = useMemo(() => {
     const descriptionElements = []
     if (accountDescription) {
@@ -141,10 +184,17 @@ export const AccountListItem: FC<AccountListItemProps> = ({
     descriptionElements.push(networkName)
     return descriptionElements.filter(Boolean).join("  ∙  ")
   }, [accountAddress, accountDescription, networkName])
-
   const additionalProps = isClickable ? {} : notClickableProps
   return (
-    <CustomButtonCell {...additionalProps} {...rest}>
+    <CustomButtonCell
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      {...additionalProps}
+      {...rest}
+      _active={{
+        transform: "none",
+      }}
+    >
       {avatarIcon ? (
         <Flex position={"relative"} flexShrink={0}>
           <Circle size={avatarSize} bg={"neutrals.600"} fontSize={"xl"}>
@@ -215,7 +265,17 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           )}
         </Flex>
         <Flex direction="column" {...rightElementFlexProps}>
-          {rightElements}
+          {showRightElements && (
+            <AccountListRightElements
+              accountAddress={accountAddress}
+              accountName={accountName}
+              networkId={networkId}
+              isHovering={isHovering}
+              prettyAccountBalance={prettyAccountBalance}
+              connectedHost={connectedHost}
+              hidden={hidden}
+            />
+          )}
           {children}
         </Flex>
       </Flex>

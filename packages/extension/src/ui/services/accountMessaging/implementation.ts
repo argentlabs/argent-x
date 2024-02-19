@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill"
 import { messageClient } from "../messaging/trpc"
 import { IAccountMessagingService } from "./interface"
 import {
@@ -5,8 +6,14 @@ import {
   baseWalletAccountSchema,
 } from "../../../shared/wallet.model"
 import { decryptFromBackground, generateEncryptedSecret } from "../crypto"
+import { resetDevice } from "../../../shared/shield/jwt"
+import { clientRecoveryService } from "../recovery"
+import { IRecoveryStorage } from "../../../shared/recovery/types"
+import { IObjectStore } from "../../../shared/storage/__new/interface"
+import { recoveredAtKeyValueStore } from "../../../shared/recovery/storage"
 
 export class AccountMessagingService implements IAccountMessagingService {
+  constructor(private recoveryStore: IObjectStore<IRecoveryStorage>) {}
   async getPrivateKey(account: BaseWalletAccount) {
     const { secret, encryptedSecret } = await generateEncryptedSecret()
 
@@ -90,5 +97,31 @@ export class AccountMessagingService implements IAccountMessagingService {
       start,
       buffer,
     })
+  }
+
+  async getDeploymentData() {
+    return messageClient.accountMessaging.getAccountDeploymentPayload.query()
+  }
+
+  async clearLocalStorageAndRecoverAccounts(password: string) {
+    await this.recoveryStore.set({ isClearingStorage: true })
+    const seedPhrase = await this.getSeedPhrase()
+    try {
+      await browser.storage.sync.clear()
+      await browser.storage.managed.clear()
+      await browser.storage.session.clear()
+    } catch (e) {
+      console.log(e)
+      // Ignore browser.storage.session error "This is a read-only store"
+    }
+    try {
+      await resetDevice()
+      localStorage.clear()
+      await clientRecoveryService.bySeedPhrase(seedPhrase, password)
+      await this.recoveryStore.set({ isClearingStorage: false })
+      void recoveredAtKeyValueStore.set("lastRecoveredAt", Date.now())
+    } catch (e) {
+      await this.recoveryStore.set({ isClearingStorage: false })
+    }
   }
 }

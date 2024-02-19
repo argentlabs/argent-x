@@ -6,6 +6,16 @@ import { renderWithLegacyProviders } from "../../test/utils"
 import { Account } from "./Account"
 import { AccountListHiddenScreen } from "./AccountListHiddenScreen"
 
+vi.mock("./accounts.state", () => {
+  return { useAccount: vi.fn() }
+})
+vi.mock("./useOnSettingsNavigate", () => {
+  return {
+    useOnSettingsNavigate: vi.fn(),
+    useOnSettingsAccountNavigate: vi.fn(),
+  }
+})
+
 describe("AccountListHiddenScreen", () => {
   it("Calls expected method when account is clicked", async () => {
     const onToggleHiddenAccount = vi.fn()

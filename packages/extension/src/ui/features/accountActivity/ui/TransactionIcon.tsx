@@ -4,6 +4,7 @@ import { FC } from "react"
 
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import {
+  isProvisionTransaction,
   isSwapTransaction,
   isTokenApproveTransaction,
   isTokenMintTransaction,
@@ -28,6 +29,7 @@ const {
   MultisigRemoveIcon,
   MultisigReplaceIcon,
   FailIcon,
+  ParachuteIcon,
 } = icons
 
 export interface TransactionIconProps extends Omit<SquareProps, "outline"> {
@@ -91,6 +93,9 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     case "APPROVE":
       iconComponent = <ApproveIcon />
       break
+    case "PROVISION":
+      iconComponent = <ParachuteIcon />
+      break
   }
 
   if (entity === "CONTRACT" && (action === "DEPLOY" || action === "DECLARE")) {
@@ -100,7 +105,8 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   if (
     isTokenTransferTransaction(transaction) ||
     isTokenMintTransaction(transaction) ||
-    isTokenApproveTransaction(transaction)
+    isTokenApproveTransaction(transaction) ||
+    isProvisionTransaction(transaction)
   ) {
     const { token } = transaction
     if (token) {

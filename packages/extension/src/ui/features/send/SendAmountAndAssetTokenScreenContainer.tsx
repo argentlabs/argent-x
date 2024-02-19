@@ -1,13 +1,12 @@
 import {
   formatAddress,
   isAddress,
+  nonNullable,
   parseAmount,
-  prettifyTokenNumber,
   transferCalldataSchema,
 } from "@argent/shared"
 import { FieldError } from "@argent/ui"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { formatUnits } from "ethers"
 import { FC, useCallback, useMemo } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
@@ -21,33 +20,31 @@ import type { Token } from "../../../shared/token/__new/types/token.model"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 import { routes } from "../../routes"
-import { DEFAULT_TOKEN_LENGTH } from "../../services/tokens/implementation"
 import { formatTokenBalance } from "../../services/tokens/utils"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useTokenUnitAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
 import { useToken } from "../accountTokens/tokens.state"
-import { useMaxFeeEstimateForTransfer } from "../accountTokens/useMaxFeeForTransfer"
 import { amountInputSchema } from "./amountInput"
 import {
   SendAmountAndAssetScreen,
   SendAmountAndAssetScreenProps,
 } from "./SendAmountAndAssetScreen"
 import { TokenAmountInput } from "./TokenAmountInput"
-import { genericErrorSchema } from "../actions/feeEstimation/feeError"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { tokenService } from "../../services/tokens"
-import { useLiveTokenBalanceForAccount } from "../accountTokens/useLiveTokenBalanceForAccount"
-import { Spinner } from "@chakra-ui/react"
 import { clientStarknetAddressService } from "../../services/address"
-import {
-  pickBestFeeToken,
-  useFeeTokenBalances,
-} from "../accountTokens/useFeeTokenBalance"
+import { useMaxFeeEstimateForTransfer } from "../accountTokens/useMaxFeeForTransfer"
+import { useBestFeeToken } from "../actions/useBestFeeToken"
+import { formatUnits } from "ethers"
+import { genericErrorSchema } from "../actions/feeEstimation/feeError"
+import { tokenBalanceForAccountAndTokenView } from "../../views/tokenBalances"
+import { prettifyTokenNumber } from "../../../shared/utils/number"
 
 const formSchema = z.object({
   amount: amountInputSchema,
+  isMaxSend: z.boolean(),
 })
 
 type FormType = z.infer<typeof formSchema>
@@ -60,8 +57,10 @@ export const SendAmountAndAssetTokenScreenContainer: FC<
     address: tokenAddress,
     networkId: account?.networkId || "Unknown",
   })
-  const { tokenWithBalance, tokenBalanceLoading } =
-    useLiveTokenBalanceForAccount({ token, account })
+  const tokenWithBalance = useView(
+    tokenBalanceForAccountAndTokenView({ token, account }),
+  )
+
   if (!token) {
     return null
   }
@@ -76,8 +75,7 @@ export const SendAmountAndAssetTokenScreenContainer: FC<
     <GuardedSendAmountAndAssetTokenScreenContainer
       tokenAddress={tokenAddress}
       token={token}
-      balance={tokenWithBalance.balance}
-      tokenBalanceLoading={tokenBalanceLoading}
+      balance={BigInt(tokenWithBalance.balance)}
       account={account}
       {...rest}
     />
@@ -88,21 +86,12 @@ interface GuardedSendAmountAndAssetTokenScreenContainerProps
   extends SendAmountAndAssetScreenProps {
   token: Token
   balance?: bigint
-  tokenBalanceLoading: boolean
   account: WalletAccount
 }
 
 const GuardedSendAmountAndAssetTokenScreenContainer: FC<
   GuardedSendAmountAndAssetTokenScreenContainerProps
-> = ({
-  onCancel,
-  returnTo,
-  token,
-  balance,
-  tokenBalanceLoading,
-  account,
-  ...rest
-}) => {
+> = ({ onCancel, returnTo, token, balance, account, ...rest }) => {
   const navigate = useNavigate()
   const { recipientAddress, tokenAddress, amount: propAmount } = rest
   const {
@@ -115,21 +104,20 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
   } = useForm<FormType>({
     defaultValues: {
       amount: propAmount || "",
+      isMaxSend: false,
     },
     resolver: zodResolver(formSchema),
   })
   const hasAmountError = "amount" in errors
-  const { amount: inputAmount } = watch()
+  const { amount: inputAmount, isMaxSend } = watch()
   const { ref, onChange, ...amountInputRest } = register("amount")
   const inputRef = useAutoFocusInputRef<HTMLInputElement>()
 
   const network = useCurrentNetwork()
 
-  const feeTokens = useFeeTokenBalances(account)
-  const feeToken = pickBestFeeToken(feeTokens, { avoid: [tokenAddress] })
-
   const currencyValue = useTokenUnitAmountToCurrencyValue(token, inputAmount)
 
+  const feeToken = useBestFeeToken(account)
   const {
     data: maxFee,
     error: maxFeeError,
@@ -137,8 +125,8 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
   } = useMaxFeeEstimateForTransfer(
     feeToken.address,
     tokenAddress,
-    balance,
     account,
+    balance,
   )
 
   const onSubmit = useCallback(async () => {
@@ -154,6 +142,7 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
       const formattedRecipient = isAddress(recipient)
         ? formatAddress(recipient)
         : recipient
+
       await tokenService.send({
         to: token.address,
         method: "transfer",
@@ -165,23 +154,21 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
         }),
         title: `Send ${prettifyTokenNumber(inputAmount)} ${token.symbol}`,
         subtitle: `to ${formattedRecipient}`,
+        isMaxSend,
       })
     }
     onCancel()
-  }, [network, inputAmount, onCancel, recipientAddress, token])
+  }, [token, recipientAddress, inputAmount, onCancel, network.id, isMaxSend])
 
   const onMaxClick = useCallback(() => {
-    if (balance && maxFee) {
+    if (balance && nonNullable(maxFee)) {
       const tokenDecimals = token.decimals
-      const tokenBalance = formatTokenBalance(
-        DEFAULT_TOKEN_LENGTH,
-        balance,
-        tokenDecimals,
-      )
+      const tokenBalance = formatTokenBalance(Infinity, balance, tokenDecimals)
 
-      const maxAmount = balance - BigInt(maxFee)
-
+      const maxAmount = balance - maxFee
       const formattedMaxAmount = formatUnits(maxAmount, tokenDecimals)
+
+      setValue("isMaxSend", true)
       setValue("amount", maxAmount <= 0n ? tokenBalance : formattedMaxAmount, {
         shouldDirty: true,
       })
@@ -192,25 +179,10 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     inputAmount || "0",
     token.decimals,
   ).value
-
-  const parsedTokenBalance = balance || 0n
-
+  const parsedTokenBalance = balance ?? 0n
   const isInputAmountGtBalance = useMemo(() => {
-    return (
-      parsedInputAmount > (balance ?? 0n) ||
-      (feeToken?.address === token.address &&
-        (inputAmount === balance?.toString() ||
-          parsedInputAmount + BigInt(maxFee ?? 0) > parsedTokenBalance))
-    )
-  }, [
-    feeToken?.address,
-    inputAmount,
-    maxFee,
-    parsedInputAmount,
-    parsedTokenBalance,
-    token.address,
-    balance,
-  ])
+    return parsedInputAmount > parsedTokenBalance
+  }, [parsedInputAmount, parsedTokenBalance])
 
   const onAmountInputSubmit: SubmitHandler<FormType> = useCallback(
     (_data) => {
@@ -244,7 +216,9 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
 
   const hasInputAmount = parsedInputAmount !== 0n
 
-  const showMaxButton = !hasInputAmount && !maxFeeError && !tokenBalanceLoading
+  const validBalance = balance !== undefined && balance > 0n
+
+  const showMaxButton = !hasInputAmount && !maxFeeError && validBalance
   const leftText = useMemo(() => {
     if (!maxFeeError) {
       return prettifyCurrencyValue(currencyValue)
@@ -257,13 +231,12 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     return <FieldError>Unable to estimate max</FieldError>
   }, [currencyValue, maxFeeError])
 
-  const rightTextOrLoading = balance ? (
-    <span data-testid="tokenBalance">
-      Balance: {prettifyTokenBalance({ ...token, balance })}
-    </span>
-  ) : tokenBalanceLoading ? (
-    <Spinner color="neutrals.500" w={2} h={2} thickness={"1px"} />
-  ) : null
+  const rightText =
+    balance !== undefined ? (
+      <span data-testid="tokenBalance">
+        Balance: {prettifyTokenBalance({ ...token, balance })}
+      </span>
+    ) : null
 
   const isInvalid =
     hasAmountError ||
@@ -294,14 +267,15 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
               onChange={(e) => {
                 /** Disallow non-schema characters */
                 if (amountInputSchema.safeParse(e.target.value).success) {
-                  onChange(e)
+                  setValue("isMaxSend", false)
+                  void onChange(e)
                 }
               }}
               token={token}
               showMaxButton={showMaxButton}
               isMaxLoading={maxFeeLoading}
               leftText={leftText}
-              rightText={rightTextOrLoading}
+              rightText={rightText}
               onMaxClick={onMaxClick}
               onTokenClick={onTokenClick}
               isInvalid={isInvalid}

@@ -1,9 +1,13 @@
-import { icons } from "@argent/ui"
-import { Circle, SimpleGrid } from "@chakra-ui/react"
+import { P4, icons } from "@argent/ui"
+import { Circle, Flex, Link, SimpleGrid } from "@chakra-ui/react"
 import { FC, MouseEventHandler } from "react"
 
 import { OnboardingRectButton } from "./ui/OnboardingRectButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
+import {
+  ARGENT_X_LEGAL_PRIVACY_POLICY_URL,
+  ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL,
+} from "../../../shared/api/constants"
 
 const { WalletIcon, RestoreIcon } = icons
 
@@ -20,12 +24,39 @@ export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
 }) => {
   return (
     <OnboardingScreen
-      length={4}
+      length={3}
       currentIndex={0}
       title="Welcome to Argent X"
-      subtitle="Enjoy the security of Ethereum with the scale of StarkNet"
+      subtitle="Enjoy the security of Ethereum with the scale of Starknet"
     >
-      <SimpleGrid columns={2} gap={3} w={"full"}>
+      <Flex
+        alignItems={"center"}
+        px={4}
+        py={3}
+        bg={"surface.elevated"}
+        rounded={"lg"}
+        w={"full"}
+      >
+        <P4>
+          By creating or restoring a wallet, you agree to Argent’s{" "}
+          <Link
+            href={ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL}
+            target="_blank"
+            color="primary.500"
+          >
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link
+            href={ARGENT_X_LEGAL_PRIVACY_POLICY_URL}
+            target="_blank"
+            color="primary.500"
+          >
+            Privacy Policy
+          </Link>
+        </P4>
+      </Flex>
+      <SimpleGrid columns={2} gap={3} w={"full"} mt={8}>
         <OnboardingRectButton onClick={onCreate}>
           <Circle size={16} bg={"primary.500"}>
             <WalletIcon fontSize={"2xl"} />

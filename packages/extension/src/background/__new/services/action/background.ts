@@ -19,6 +19,7 @@ import type { Respond } from "../../../respond"
 import { Wallet } from "../../../wallet"
 import type { IBackgroundActionService } from "./interface"
 import { ActionError } from "../../../../shared/errors/action"
+import { IFeeTokenService } from "../../../../shared/feeToken/service/interface"
 
 const getResultData = (resultMessage?: MessageType) => {
   if (resultMessage && "data" in resultMessage) {
@@ -39,6 +40,7 @@ export default class BackgroundActionService
   constructor(
     private queue: IActionQueue<ActionItem>,
     private wallet: Wallet,
+    private feeTokenService: IFeeTokenService,
     private respond: Respond,
   ) {}
 
@@ -55,7 +57,7 @@ export default class BackgroundActionService
     /**
      * Don't await handleActionApproval, this allows for existing patterns to use 'waitForMessage' after calling await clientActionService.approve(...)
      */
-    handleActionApproval(action, this.wallet)
+    handleActionApproval(action, this.wallet, this.feeTokenService)
       .then((resultMessage) => {
         const error = getResultDataError(resultMessage)
         if (error) {
@@ -86,7 +88,11 @@ export default class BackgroundActionService
       startedApproving: Date.now(),
       errorApproving: undefined,
     })
-    const resultMessage = await handleActionApproval(action, this.wallet)
+    const resultMessage = await handleActionApproval(
+      action,
+      this.wallet,
+      this.feeTokenService,
+    )
     const error = getResultDataError(resultMessage)
     if (error) {
       await this.queue.updateMeta(actionHash, {
@@ -147,6 +153,13 @@ export default class BackgroundActionService
     meta?: Partial<ActionQueueItemMeta>,
   ): Promise<ExtQueueItem<T>> {
     return this.queue.add(action, meta)
+  }
+
+  async addFront<T extends ActionItem>(
+    action: T,
+    meta?: Partial<ActionQueueItemMeta>,
+  ): Promise<ExtQueueItem<T>> {
+    return this.queue.addFront(action, meta)
   }
 
   async remove(actionHash: string): Promise<ExtQueueItem<ActionItem> | null> {

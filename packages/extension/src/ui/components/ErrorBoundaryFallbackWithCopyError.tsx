@@ -1,4 +1,4 @@
-import { useToast } from "@argent/ui"
+import { useToast, icons } from "@argent/ui"
 import { Collapse } from "@mui/material"
 import * as Sentry from "@sentry/react"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
@@ -21,6 +21,9 @@ import {
 } from "./Icons/MuiIcons"
 import { WarningIcon } from "./Icons/WarningIcon"
 import IOSSwitch from "./IOSSwitch"
+import { useClearLocalStorage } from "../features/settings/developerSettings/clearLocalStorage/useClearLocalStorage"
+import { useDisclosure } from "@chakra-ui/react"
+import { ClearStorageModal } from "./ClearStorageModal"
 
 const Title = styled.h3`
   font-weight: 600;
@@ -126,6 +129,7 @@ const fallbackErrorPayload = `v${version}
 Unable to parse error
 `
 
+const { BroomIcon } = icons
 export interface IErrorBoundaryFallbackWithCopyError
   extends ErrorBoundaryState {
   message?: string
@@ -144,8 +148,19 @@ const ErrorBoundaryFallbackWithCopyError: FC<
   const [viewLogs, setViewLogs] = useState(false)
 
   const toast = useToast()
+  const {
+    isOpen: isClearStorageModalOpen,
+    onOpen: onClearStorageModalOpen,
+    onClose: onClearStorageModalClose,
+  } = useDisclosure()
 
   const hardResetAndReload = useHardResetAndReload()
+  const onClearStorageSuccess = async () => {
+    await hardResetAndReload()
+    onClearStorageModalClose()
+  }
+  const { verifyPasswordAndClearStorage, isClearingStorage } =
+    useClearLocalStorage(onClearStorageSuccess)
   const errorPayload = useMemo(() => {
     try {
       const displayError = coerceErrorToString(error)
@@ -263,7 +278,17 @@ ${displayStack}
             <span>Report error</span>
           </ActionContainer>
         )}
+        <ActionContainer {...makeClickable(onClearStorageModalOpen)}>
+          <BroomIcon />
+          <span>Clear storage</span>
+        </ActionContainer>
       </ActionsWrapper>
+      <ClearStorageModal
+        isOpen={isClearStorageModalOpen}
+        onClose={onClearStorageModalClose}
+        onConfirm={verifyPasswordAndClearStorage}
+        isClearingStorage={isClearingStorage}
+      />
 
       {privacyErrorReporting && (
         <StyledSettingsItem>

@@ -1,3 +1,4 @@
+import { describe, test, expect } from "vitest"
 import { formatUnits } from "./formatUnits"
 
 describe("formatUnits function", () => {
@@ -15,6 +16,9 @@ describe("formatUnits function", () => {
     expect(formatUnits({ value: 123456789n, decimals: 2 })).toBe("1234567.89")
     expect(formatUnits({ value: 123456789n, decimals: 3 })).toBe("123456.789")
     expect(formatUnits({ value: 123456789n, decimals: 4 })).toBe("12345.6789")
+    expect(formatUnits({ value: 9999990228523712194n, decimals: 18 })).toBe(
+      "9.999990228523712194",
+    )
   })
 
   test("Should correctly pad and format the value", () => {

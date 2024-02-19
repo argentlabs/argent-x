@@ -1,6 +1,15 @@
-import browser from "webextension-polyfill"
 import * as Sentry from "@sentry/browser"
+import browser from "webextension-polyfill"
+
 import { getBrowserAction } from "../shared/browser"
+import { sentryWorker } from "./__new/services/sentry"
+
+try {
+  // Try to start Sentry immediately
+  initSentryWorker()
+} catch (error) {
+  console.error("Exception while initialising sentryWorker", error)
+}
 
 try {
   // catch any errors from init.ts
@@ -15,4 +24,11 @@ try {
       popup: "index.html?goto=background-error",
     })
   }, 0)
+}
+
+// Prevent tree-shaking unused worker variables
+function initSentryWorker() {
+  return {
+    sentryWorker,
+  }
 }

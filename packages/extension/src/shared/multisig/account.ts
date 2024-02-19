@@ -10,13 +10,27 @@ import {
   ProviderInterface,
   ProviderOptions,
   TransactionType,
-  hash,
   num,
-} from "starknet"
+} from "starknet6"
 import { MultisigPendingTransaction } from "./pendingTransactionsStore"
 import { MultisigSigner } from "./signer"
 import { IMultisigBackendService } from "./service/backend/interface"
 import { isAccountV5 } from "@argent/shared"
+import {
+  txVersionSchema,
+  TransactionVersion,
+} from "../utils/transactionVersion"
+
+function denyTxV3(
+  version: TransactionVersion,
+): asserts version is Exclude<
+  TransactionVersion,
+  "0x3" | "0x100000000000000000000000000000003"
+> {
+  if (version === "0x3" || version === "0x100000000000000000000000000000003") {
+    throw Error("Only txv1 is supported")
+  }
+}
 
 export class MultisigAccount extends Account {
   public readonly multisigBackendService: IMultisigBackendService
@@ -71,29 +85,67 @@ export class MultisigAccount extends Account {
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls]
     const nonce = num.toHex(transactionsDetail.nonce ?? (await this.getNonce()))
-    const version = num.toBigInt(hash.transactionVersion).toString()
+    const version = txVersionSchema.parse(transactionsDetail.version)
     const chainId = await this.getChainId()
 
     const maxFee =
       transactionsDetail.maxFee ??
-      (await this.getSuggestedMaxFee(
-        {
-          type: TransactionType.INVOKE,
-          payload: calls,
-        },
-        {
-          skipValidate: true,
-          nonce,
-        },
-      ))
+      (
+        await this.getSuggestedFee(
+          {
+            type: TransactionType.INVOKE,
+            payload: calls,
+          },
+          {
+            version: "0x1", // TODO: this should be "0x3
+            skipValidate: true,
+            nonce,
+          },
+        )
+      ).suggestedMaxFee
 
-    const signerDetails: InvocationsSignerDetails = {
+    // TODO: enable once TXV3 is supported
+    // const signerDetails: InvocationsSignerDetails =
+    //   version !== "0x3" && version !== "0x100000000000000000000000000000003"
+    //     ? ({
+    //         // txv2 and below
+    //         ...transactionsDetail,
+    //         walletAddress: this.address,
+    //         chainId,
+    //         nonce,
+    //         version,
+    //         cairoVersion: this.cairoVersion,
+    //         maxFee,
+    //       } satisfies V2InvocationsSignerDetails)
+    //     : ({
+    //         // txv3
+    //         ...transactionsDetail,
+    //         walletAddress: this.address,
+    //         chainId,
+    //         nonce,
+    //         version,
+    //         cairoVersion: this.cairoVersion,
+    //         accountDeploymentData: [],
+    //         feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
+    //         nonceDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
+    //         paymasterData: [],
+    //         resourceBounds: {
+    //           l1_gas: { max_amount: "0x0", max_price_per_unit: "0x0" },
+    //           l2_gas: { max_amount: "0x0", max_price_per_unit: "0x0" },
+    //         },
+    //         tip: 0,
+    //       } satisfies V3InvocationsSignerDetails)
+
+    denyTxV3(version)
+
+    const signerDetails = {
+      ...transactionsDetail,
       walletAddress: this.address,
-      chainId,
+      chainId: chainId as any, // TODO: migrate to snjsv6 completely
       nonce,
       version,
-      maxFee,
       cairoVersion: this.cairoVersion,
+      maxFee,
     }
 
     const signature = await this.signer.signTransaction(
@@ -115,7 +167,15 @@ export class MultisigAccount extends Account {
   ) {
     const chainId = await this.getChainId()
 
-    const { calls, maxFee, nonce, version } = transactionToSign.transaction
+    const {
+      calls,
+      maxFee,
+      nonce,
+      version: transactionsDetailVersion,
+    } = transactionToSign.transaction
+    const version = txVersionSchema.parse(transactionsDetailVersion)
+
+    denyTxV3(version)
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
@@ -131,7 +191,7 @@ export class MultisigAccount extends Account {
     return this.multisigBackendService.addRequestSignature({
       address: this.address,
       transactionToSign,
-      chainId,
+      chainId: chainId as any, // TODO: migrate to snjsv6 completely
       signature,
     })
   }

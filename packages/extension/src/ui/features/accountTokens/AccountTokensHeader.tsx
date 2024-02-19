@@ -3,11 +3,9 @@ import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { AddressCopyButton } from "../../components/AddressCopyButton"
-import { useStarknetId } from "../../services/useStarknetId"
 import { useMultisig } from "../multisig/multisig.state"
-import { StarknetIdCopyButton } from "./StarknetIdCopyButton"
 import { usePrettyAccountBalance } from "./usePrettyAccountBalance"
+import { StarknetIdOrAddressCopyButton } from "../../components/StarknetIdOrAddressCopyButton"
 
 interface AccountSubheaderProps {
   account: BaseWalletAccount
@@ -19,10 +17,7 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
   accountName,
 }) => {
   const prettyAccountBalance = usePrettyAccountBalance(account)
-  const accountAddress = account.address
   const multisig = useMultisig(account) // This will be undefined if the account is not a multisig
-
-  const { data: starknetId } = useStarknetId(account)
 
   return (
     <VStack spacing={0.5}>
@@ -41,14 +36,7 @@ export const AccountTokensHeader: FC<AccountSubheaderProps> = ({
         </Center>
       )}
       <H2>{prettyAccountBalance || accountName}</H2>
-      {starknetId ? (
-        <StarknetIdCopyButton
-          starknetId={starknetId}
-          address={accountAddress}
-        />
-      ) : (
-        <AddressCopyButton address={accountAddress} />
-      )}
+      <StarknetIdOrAddressCopyButton account={account} />
     </VStack>
   )
 }

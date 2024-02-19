@@ -66,7 +66,8 @@ describe("transactionReview/schema", () => {
       test("returns true", () => {
         expect(
           isNotTransactionSimulationError(
-            simulationResponse.transactions[0] as TransactionReviewTransaction,
+            simulationResponse
+              .transactions[0] as unknown as TransactionReviewTransaction,
           ),
         ).toBeTruthy()
       })
@@ -97,7 +98,8 @@ describe("transactionReview/schema", () => {
       test("returns false", () => {
         expect(
           isTransactionSimulationError(
-            simulationResponse.transactions[0] as TransactionReviewTransaction,
+            simulationResponse
+              .transactions[0] as unknown as TransactionReviewTransaction,
           ),
         ).toBeFalsy()
       })

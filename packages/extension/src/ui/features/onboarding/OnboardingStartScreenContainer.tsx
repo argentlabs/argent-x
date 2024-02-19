@@ -15,7 +15,7 @@ export const OnboardingStartScreenContainer: FC = () => {
 
   const onCreate = useCallback(() => {
     // void trackSuccess()
-    void navigate(routes.onboardingDisclaimer())
+    void navigate(routes.onboardingPassword())
   }, [navigate])
 
   const onRestore = useCallback(() => {

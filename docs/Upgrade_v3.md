@@ -35,9 +35,9 @@ As a user of Argent X 2.x, after upgrading to version 3.0.0, your extension will
 
 4. Disable Argent X 3.0.0 by switching off the toggle in the lower right corner of the Argent X panel in the Chrome extensions page.
 
-5. Open the extension v2.2.3 and restore from your backup file, the one you downloaded in step 1. Now you can transfer all your tokens to your new address, the one you copied at step 2. For ERC721 assets, you'll have to do it in [Voyager](https://voyager.online/), the StarkNet block explorer, by connecting your wallet and transferring manually.
+5. Open the extension v2.2.3 and restore from your backup file, the one you downloaded in step 1. Now you can transfer all your tokens to your new address, the one you copied at step 2. For ERC721 assets, you'll have to do it in [Voyager](https://voyager.online/), the Starknet block explorer, by connecting your wallet and transferring manually.
 
-## What does it mean as a StarkNet dapp developer?
+## What does it mean as a Starknet dapp developer?
 
 The `starknet` object (returned by `get-starknet`) will now expose an `account` object instead of a `signer` object. This `account` object implements the [AccountInterface](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts), specifically it exposes the methods `execute()` and `signMessage()`:
 
@@ -51,9 +51,9 @@ where `Call` is defined by:
 
 ```typescript
 interface Call {
-    contractAddress: string;
-    entrypoint: string;
-    calldata?: BigNumberish[];
+  contractAddress: string
+  entrypoint: string
+  calldata?: BigNumberish[]
 }
 ```
 

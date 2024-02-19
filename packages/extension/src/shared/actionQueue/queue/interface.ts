@@ -8,6 +8,17 @@ export interface IActionQueue<T> {
     item: U,
     meta?: Partial<ActionQueueItemMeta>,
   ) => Promise<ExtQueueItem<U>>
+  addFront: <U extends T>(
+    item: U,
+    meta?: Partial<ActionQueueItemMeta>,
+  ) => Promise<ExtQueueItem<U>>
+  update: (
+    hash: string,
+    updatedItem: Partial<{
+      meta: Partial<Omit<ActionQueueItemMeta, "hash" | "expires">>
+    }> &
+      Partial<T>,
+  ) => Promise<ExtQueueItem<T> | null>
   updateMeta: (
     hash: string,
     meta: Partial<Omit<ActionQueueItemMeta, "hash" | "expires">>,

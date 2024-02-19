@@ -30,6 +30,7 @@ export const colors = {
   success: makeColorVariants("#3ed373"),
   error: makeColorVariants("#cc3247"),
   errorText: "#E95F72",
+  redText: "#DB3B4E",
   skyBlue: makeColorVariants("#29c5ff"),
   neutrals: {
     100: "#b7b7b9",

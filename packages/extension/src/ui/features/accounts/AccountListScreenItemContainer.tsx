@@ -17,6 +17,7 @@ import { BoxProps } from "@chakra-ui/react"
 import { useIsDeprecatedTxV0 } from "./accountUpgradeCheck"
 import { clientAccountService } from "../../services/account"
 import { useAccountOwnerIsSelf } from "./useAccountOwner"
+import { useStarknetId } from "../../services/useStarknetId"
 
 interface AccountListScreenItemContainerProps
   extends Pick<BoxProps, "borderBottomRadius"> {
@@ -25,7 +26,7 @@ interface AccountListScreenItemContainerProps
   needsUpgrade?: boolean
   clickNavigateSettings?: boolean
   returnTo?: string
-  shouldDisplayGuardianBanner?: boolean
+  showRightElements?: boolean
 }
 
 export const AccountListScreenItemContainer: FC<
@@ -36,8 +37,8 @@ export const AccountListScreenItemContainer: FC<
   needsUpgrade,
   clickNavigateSettings,
   returnTo,
-  shouldDisplayGuardianBanner,
   borderBottomRadius,
+  showRightElements,
 }) => {
   const prettyAccountBalance = usePrettyAccountBalance(account)
   const navigate = useNavigate()
@@ -66,7 +67,7 @@ export const AccountListScreenItemContainer: FC<
     if (clickNavigateSettings) {
       const routeTo = isRemovedFromMultisig
         ? routes.multisigRemovedSettings(account.address)
-        : routes.editAccount(account.address)
+        : routes.settingsAccount(account.address)
 
       navigate(routeTo)
     } else {
@@ -88,8 +89,12 @@ export const AccountListScreenItemContainer: FC<
     returnTo,
   ])
 
+  const { data: starknetId } = useStarknetId(account)
+
   const accountDescription = isRemovedFromMultisig
     ? "Removed from multisig"
+    : starknetId
+    ? starknetId
     : undefined
 
   const accountExtraInfo = multisig
@@ -112,12 +117,12 @@ export const AccountListScreenItemContainer: FC<
       upgrade={needsUpgrade}
       connectedHost={isConnected ? originatingPreAuthorizationHost : undefined}
       clickNavigateSettings={clickNavigateSettings}
-      shouldDisplayGuardianBanner={shouldDisplayGuardianBanner}
       isDeprecated={isDeprecated}
       prettyAccountBalance={
         !clickNavigateSettings ? prettyAccountBalance : undefined
       }
       borderBottomRadius={borderBottomRadius}
+      showRightElements={showRightElements ?? true}
     />
   )
 }

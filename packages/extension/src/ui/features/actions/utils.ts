@@ -1,9 +1,10 @@
-import { RawArgs } from "starknet"
+import { Call, CallData, RawArgs, num } from "starknet"
 import { ActionQueueItem } from "../../../shared/actionQueue/schema"
 import { TransactionActionPayload } from "../../../shared/actionQueue/types"
 import { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
 import { ApproveScreenType } from "./transaction/types"
 import { MultisigTransactionType } from "../../../shared/multisig/types"
+import { TXV3_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
 
 export const getApproveScreenTypeFromAction = (
   action: ActionQueueItem & {
@@ -59,4 +60,14 @@ export const formatCalldataSafe = (calldata?: RawArgs) => {
   return calldata && Array.isArray(calldata)
     ? calldata.map((cd) => cd.toString())
     : calldata
+}
+
+export function getV3UpgradeCall(calls: Call[]) {
+  return calls
+    .filter((call) => call.entrypoint === "upgrade")
+    .find((call) =>
+      CallData.toCalldata(call.calldata).some(
+        (cd) => num.toBigInt(cd) === num.toBigInt(TXV3_ACCOUNT_CLASS_HASH),
+      ),
+    )
 }

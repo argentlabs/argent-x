@@ -1,0 +1,41 @@
+{
+  "lastModified": "2024-01-24T13:55:37.000000Z",
+  "news": [
+    {
+      "title": "Provide liquidity with Ekubo",
+      "description": "Get 15% boost on your points by providing liquidity to the most efficient AMM on Starknet",
+      "created": "2024-01-24T13:55:37.000000Z",
+      "modified": "2024-01-24T13:55:37.000000Z",
+      "startTime": "2024-01-24T13:55:37.000000Z",
+      "endTime": "2024-02-24T13:55:37.000000Z",
+      "badgeText": "",
+      "backgroundImageUrl": "https://static.hydrogen.argent47.net/news/images/ekubo.jpg",
+      "linkUrl": "https://www.argent.xyz",
+      "dappId": "7e37894d-ceb1-49f9-8ddb-6e4e14ffce4f"
+    },
+    {
+      "title": "Provide liquidity with Ekubo",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
+      "created": "2024-01-24T13:55:37.000000Z",
+      "modified": "2024-01-24T13:55:37.000000Z",
+      "startTime": "2024-01-24T13:55:37.000000Z",
+      "endTime": "2024-02-24T13:55:37.000000Z",
+      "badgeText": "Lorem ipsum",
+      "backgroundImageUrl": "https://static.hydrogen.argent47.net/news/images/ekubo.jpg",
+      "linkUrl": "https://www.argent.xyz",
+      "dappId": "7e37894d-ceb1-49f9-8ddb-6e4e14ffce4f"
+    },
+    {
+      "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
+      "description": "Get 15% boost on your points by providing liquidity to the most efficient AMM on Starknet",
+      "created": "2024-01-24T13:55:37.000000Z",
+      "modified": "2024-01-24T13:55:37.000000Z",
+      "startTime": "2024-01-24T13:55:37.000000Z",
+      "endTime": "2024-02-24T13:55:37.000000Z",
+      "badgeText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+      "backgroundImageUrl": "",
+      "linkUrl": "https://www.argent.xyz",
+      "dappId": "7e37894d-ceb1-49f9-8ddb-6e4e14ffce4f"
+    }
+  ]
+}

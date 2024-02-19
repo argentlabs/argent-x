@@ -1,4 +1,4 @@
-import { Account, InvocationsDetails } from "starknet"
+import { Account, InvocationsDetails } from "starknet6"
 
 import {
   ArgentAccountType,
@@ -169,7 +169,7 @@ export class Wallet {
   }
   public async getAccountDeploymentFee(
     walletAccount: WalletAccount,
-    feeTokenAddress?: Address,
+    feeTokenAddress: Address,
   ) {
     return this.walletDeploymentStarknetService.getAccountDeploymentFee(
       walletAccount,

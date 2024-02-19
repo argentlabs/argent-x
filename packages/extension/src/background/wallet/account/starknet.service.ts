@@ -1,8 +1,8 @@
-import { Account } from "starknet"
+import { getProvider6 } from "../../../shared/network"
+import { Account } from "starknet6"
 
 import { MultisigAccount } from "../../../shared/multisig/account"
 import { PendingMultisig } from "../../../shared/multisig/types"
-import { getProvider } from "../../../shared/network"
 import { INetworkService } from "../../../shared/network/service/interface"
 import { IRepository } from "../../../shared/storage/__new/interface"
 import { getAccountCairoVersion } from "../../../shared/utils/argentAccountVersion"
@@ -40,7 +40,7 @@ export class WalletAccountStarknetService {
       throw new AccountError({ code: "NOT_FOUND" })
     }
 
-    const provider = getProvider(
+    const provider = getProvider6(
       account.network && account.network.rpcUrl
         ? account.network
         : await this.networkService.getById(selector.networkId),
@@ -59,7 +59,7 @@ export class WalletAccountStarknetService {
       const starknetAccount = new Account(
         provider,
         account.address,
-        pkOrSigner,
+        pkOrSigner as any, // TODO: migrate to snjsv6 completely
         cairoVersion,
       )
 
@@ -70,7 +70,7 @@ export class WalletAccountStarknetService {
       const starknetAccount = new Account(
         provider,
         account.address,
-        pkOrSigner,
+        pkOrSigner as any, // TODO: migrate to snjsv6 completely
         "1",
       )
 
@@ -96,7 +96,7 @@ export class WalletAccountStarknetService {
     const starknetAccount = new Account(
       provider,
       account.address,
-      pkOrSigner,
+      pkOrSigner as any, // TODO: migrate to snjsv6 completely
       accountCairoVersion,
     )
 

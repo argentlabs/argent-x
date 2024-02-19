@@ -1,3 +1,4 @@
+import { ProvisionActivityPayload } from "../../activity/types"
 import { AllowArray, SelectorFn } from "../../storage/__new/interface"
 import { BaseWalletAccount, WalletAccount } from "../../wallet.model"
 
@@ -16,4 +17,7 @@ export interface IAccountService {
 
   // getters
   getDeployed(baseAccount: BaseWalletAccount): Promise<boolean>
+
+  // handlers
+  handleProvisionedAccount(payload: ProvisionActivityPayload): Promise<void>
 }

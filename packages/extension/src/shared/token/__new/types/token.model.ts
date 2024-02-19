@@ -1,4 +1,4 @@
-import { addressSchema } from "@argent/shared"
+import { addressSchema, addressSchemaArgentBackend } from "@argent/shared"
 import { z } from "zod"
 
 export const BaseTokenSchema = z.object(
@@ -33,28 +33,22 @@ export const TokenSchema = RequestTokenSchema.required().extend({
 
 export type Token = z.infer<typeof TokenSchema>
 
-export const ApiTokenDetailsSchema = z.object({
-  id: z.number(),
-  address: addressSchema,
-  name: z.string(),
-  symbol: z.string(),
-  decimals: z.number(),
-  iconUrl: z.string().optional(),
-  sendable: z.boolean(),
-  popular: z.boolean(),
-  refundable: z.boolean(),
-  listed: z.boolean(),
-  tradable: z.boolean(),
-  category: z.union([
-    z.literal("tokens"),
-    z.literal("currencies"),
-    z.literal("savings"),
-  ]),
-  pricingId: z.number().optional(),
-})
+export const apiAccountTokenBalancesSchema = z
+  .object({
+    status: z.literal("initialising"),
+  })
+  .or(
+    z.object({
+      status: z.literal("initialised"),
+      balances: z.array(
+        z.object({
+          tokenAddress: addressSchemaArgentBackend,
+          tokenBalance: z.string(),
+        }),
+      ),
+    }),
+  )
 
-export type ApiTokenDetails = z.infer<typeof ApiTokenDetailsSchema>
-export const ApiTokenDataResponseSchema = z.object({
-  tokens: z.array(ApiTokenDetailsSchema),
-})
-export type ApiTokenDataResponse = z.infer<typeof ApiTokenDataResponseSchema>
+export type ApiAccountTokenBalances = z.infer<
+  typeof apiAccountTokenBalancesSchema
+>

@@ -1,7 +1,10 @@
 import { DeclareContract } from "../udc/schema"
 
 export type UdcMessage =
-  | { type: "REQUEST_DECLARE_CONTRACT"; data: DeclareContract }
+  | {
+      type: "REQUEST_DECLARE_CONTRACT"
+      data: Omit<DeclareContract, "feeTokenAddress">
+    }
   | { type: "REQUEST_DECLARE_CONTRACT_RES"; data: { actionHash: string } }
   | {
       type: "REQUEST_DECLARE_CONTRACT_REJ"

@@ -43,13 +43,14 @@ export const useStatusMessage = () => {
 
 // Uncomment the functions below to test messages locally
 
-// import statusMessages from "@argent-x/storybook/src/features/statusMessage/__fixtures__/status-messages.json"
+// import statusMessages from "../../../../../storybook/src/features/statusMessage/__fixtures__/status-messages.json"
 
 // export const useStatusMessageEnabled = () => {
 //   return true
 // }
 
 // export const useStatusMessage = () => {
+//   return statusMessages.upgrade as IStatusMessage
 //   return statusMessages.danger as IStatusMessage
 //   return statusMessages.warn as IStatusMessage
 //   return statusMessages.info as IStatusMessage

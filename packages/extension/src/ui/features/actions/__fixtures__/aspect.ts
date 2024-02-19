@@ -203,7 +203,7 @@ export const aspect: TransactionActionFixture = {
         overallFee: 3744000037440,
         gasPrice: 1000000010,
         gasUsage: 3744,
-        unit: "wei",
+        unit: "WEI",
         maxFee: 6744000037440,
       },
     },

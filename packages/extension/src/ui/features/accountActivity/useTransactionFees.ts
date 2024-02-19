@@ -1,6 +1,6 @@
 import useSWR from "swr"
 
-import { Network, getProvider } from "../../../shared/network"
+import { Network, getProvider6 } from "../../../shared/network"
 import { TransformedTransaction } from "./transform/type"
 
 export const useTransactionFees = ({
@@ -16,12 +16,17 @@ export const useTransactionFees = ({
     if (!hash) {
       return
     }
-    const receipt = await getProvider(network).getTransactionReceipt(hash)
+    // TODO: TXV3 - use actual fee from transactionTransformed as soon as backend supports the fee for both tokens
+    // if (transactionTransformed.actualFee) {
+    //   return transactionTransformed.actualFee
+    // }
+
+    const receipt = await getProvider6(network).getTransactionReceipt(hash)
 
     const transactionFees =
       "actual_fee" in receipt ? receipt.actual_fee : undefined
 
-    return transactionTransformed.actualFee ?? transactionFees
+    return transactionFees
   }
 
   const { data: txFee } = useSWR(

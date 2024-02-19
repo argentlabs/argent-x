@@ -1,7 +1,6 @@
 import {
   CallData,
   DeclareContractPayload,
-  Invocations,
   TransactionType,
   UniversalDeployerContractPayload,
   constants,
@@ -13,12 +12,18 @@ import { isAccountDeployed } from "./accountDeploy"
 import { analytics } from "./analytics"
 import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "../shared/transactions/store"
-import { modifySnjsFeeOverhead } from "../shared/utils/argentMaxFee"
 import { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
 import { WalletError } from "../shared/errors/wallet"
 import { UdcError } from "../shared/errors/udc"
 import { checkTransactionHash } from "../shared/transactions/utils"
+import { getEstimatedFees } from "../shared/transactionSimulation/fees/estimatedFeesRepository"
+import {
+  getTxVersionFromFeeToken,
+  getTxVersionFromFeeTokenForDeclareContract,
+} from "../shared/utils/getTransactionVersion"
+import { estimatedFeeToMaxResourceBounds } from "../shared/transactionSimulation/utils"
+import { TransactionError } from "../shared/errors/transaction"
 
 const { UDC } = constants
 
@@ -54,47 +59,35 @@ export const udcDeclareContract = async (
     networkId: selectedAccount.networkId,
   })
 
-  let maxADFee = "0"
-  let maxDeclareFee = "0"
+  const preComputedFees = await getEstimatedFees({
+    type: TransactionType.DECLARE,
+    payload,
+  })
 
-  const declareNonce = selectedAccount.needsDeploy
+  if (!preComputedFees) {
+    throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
+  }
+
+  const version = getTxVersionFromFeeTokenForDeclareContract(
+    preComputedFees.transactions.feeTokenAddress,
+    payload,
+  )
+
+  const accountNeedsDeploy = !(await isAccountDeployed(
+    selectedAccount,
+    starknetAccount.getClassAt.bind(starknetAccount),
+  ))
+
+  const declareNonce = accountNeedsDeploy
     ? num.toHex(1)
     : await getNonce(selectedAccount, starknetAccount)
 
-  if (
-    selectedAccount.needsDeploy &&
-    !(await isAccountDeployed(
-      selectedAccount,
-      starknetAccount.getClassAt.bind(starknetAccount),
-    ))
-  ) {
-    if ("estimateFeeBulk" in starknetAccount) {
-      const bulkTransactions: Invocations = [
-        {
-          type: TransactionType.DEPLOY_ACCOUNT,
-          payload: await wallet.getAccountDeploymentPayload(selectedAccount),
-        },
-        {
-          type: TransactionType.DECLARE,
-          payload,
-        },
-      ]
-      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
-        bulkTransactions,
-        { skipValidate: true },
-      )
-
-      maxADFee = modifySnjsFeeOverhead({
-        suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
-      })
-      maxDeclareFee = modifySnjsFeeOverhead({
-        suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
-      })
-    }
+  if (accountNeedsDeploy && preComputedFees.deployment) {
     const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
       selectedAccount,
       {
-        maxFee: maxADFee,
+        version,
+        ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
       },
     )
 
@@ -102,7 +95,7 @@ export const udcDeclareContract = async (
       throw new UdcError({ code: "DEPLOY_TX_NOT_ADDED" })
     }
 
-    analytics.track("deployAccount", {
+    void analytics.track("deployAccount", {
       status: "success",
       trigger: "transaction",
       networkId: account.networkId,
@@ -117,32 +110,18 @@ export const udcDeclareContract = async (
         type: TransactionType.DEPLOY_ACCOUNT,
       },
     })
-  } else {
-    if ("getSuggestedMaxFee" in starknetAccount) {
-      const suggestedMaxFee = await starknetAccount.getSuggestedMaxFee(
-        {
-          type: TransactionType.DECLARE,
-          payload,
-        },
-        {
-          nonce: declareNonce,
-        },
-      )
-      maxDeclareFee = modifySnjsFeeOverhead({ suggestedMaxFee })
-    } else {
-      throw new UdcError({ code: "NO_STARKNET_DECLARE_FEE" })
-    }
   }
 
   if ("declareIfNot" in starknetAccount) {
     const { transaction_hash: declareTxHash, class_hash: deployedClassHash } =
       await starknetAccount.declareIfNot(payload, {
         nonce: declareNonce,
-        maxFee: maxDeclareFee,
+        version,
+        ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),
       })
 
     if (!checkTransactionHash(declareTxHash)) {
-      throw new UdcError({ code: "DEPLOY_TX_NOT_ADDED" })
+      throw new UdcError({ code: "CONTRACT_ALREADY_DECLARED" })
     }
 
     await increaseStoredNonce(selectedAccount)
@@ -184,52 +163,34 @@ export const udcDeployContract = async (
     networkId: selectedAccount.networkId,
   })
 
-  let maxADFee = "0"
-  let maxDeployFee = "0"
+  const preComputedFees = await getEstimatedFees({
+    type: TransactionType.DEPLOY,
+    payload,
+  })
 
-  const deployNonce = selectedAccount.needsDeploy
+  if (!preComputedFees) {
+    throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
+  }
+
+  const version = getTxVersionFromFeeToken(
+    preComputedFees.transactions.feeTokenAddress,
+  )
+
+  const accountNeedsDeploy = !(await isAccountDeployed(
+    selectedAccount,
+    starknetAccount.getClassAt.bind(starknetAccount),
+  ))
+
+  const deployNonce = accountNeedsDeploy
     ? num.toHex(num.toBigInt(1))
     : await getNonce(selectedAccount, starknetAccount)
 
-  if (
-    selectedAccount.needsDeploy &&
-    !(await isAccountDeployed(
-      selectedAccount,
-      starknetAccount.getClassAt.bind(starknetAccount),
-    ))
-  ) {
-    if ("estimateFeeBulk" in starknetAccount) {
-      const bulkTransactions: Invocations = [
-        {
-          type: TransactionType.DEPLOY_ACCOUNT,
-          payload: await wallet.getAccountDeploymentPayload(selectedAccount),
-        },
-        {
-          type: TransactionType.DEPLOY,
-          payload: {
-            classHash: payload.classHash,
-            constructorCalldata: payload.constructorCalldata,
-            salt: payload.salt,
-            unique: payload.unique,
-          },
-        },
-      ]
-      const estimateFeeBulk = await starknetAccount.estimateFeeBulk(
-        bulkTransactions,
-        { skipValidate: true },
-      )
-
-      maxADFee = modifySnjsFeeOverhead({
-        suggestedMaxFee: estimateFeeBulk[0].suggestedMaxFee,
-      })
-      maxDeployFee = modifySnjsFeeOverhead({
-        suggestedMaxFee: estimateFeeBulk[1].suggestedMaxFee,
-      })
-    }
+  if (accountNeedsDeploy && preComputedFees.deployment) {
     const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
       selectedAccount,
       {
-        maxFee: maxADFee,
+        version,
+        ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
       },
     )
 
@@ -237,7 +198,7 @@ export const udcDeployContract = async (
       throw new UdcError({ code: "DEPLOY_TX_NOT_ADDED" })
     }
 
-    analytics.track("deployAccount", {
+    void analytics.track("deployAccount", {
       status: "success",
       trigger: "transaction",
       networkId: account.networkId,
@@ -252,26 +213,6 @@ export const udcDeployContract = async (
         type: "DEPLOY_ACCOUNT",
       },
     })
-  } else {
-    if ("getSuggestedMaxFee" in starknetAccount) {
-      const suggestedMaxFee = await starknetAccount.getSuggestedMaxFee(
-        {
-          type: TransactionType.DEPLOY,
-          payload: {
-            classHash: payload.classHash,
-            constructorCalldata: payload.constructorCalldata,
-            salt: payload.salt,
-            unique: payload.unique,
-          },
-        },
-        {
-          nonce: deployNonce,
-        },
-      )
-      maxDeployFee = modifySnjsFeeOverhead({ suggestedMaxFee })
-    } else {
-      throw new UdcError({ code: "NO_STARKNET_DECLARE_FEE" })
-    }
   }
 
   if ("deploy" in starknetAccount) {
@@ -291,12 +232,13 @@ export const udcDeployContract = async (
         },
         {
           nonce: deployNonce,
-          maxFee: maxDeployFee,
+          version,
+          ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),
         },
       )
 
     if (!checkTransactionHash(deployTxHash)) {
-      throw new UdcError({ code: "DEPLOY_TX_NOT_ADDED" })
+      throw new UdcError({ code: "NO_DEPLOY_CONTRACT" })
     }
 
     const contractAddress = contract_address[0]

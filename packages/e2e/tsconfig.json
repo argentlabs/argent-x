@@ -14,8 +14,9 @@
     "inlineSourceMap": true,
     "composite": true,
     "types": ["node"],
-    "noEmit": true
+    "noEmit": true,
+    "skipLibCheck": true
   },
-  "include": ["**/src"],
+  "include": ["**/src", "**/shared"],
   "exclude": ["node_modules"]
 }

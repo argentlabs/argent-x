@@ -1,7 +1,7 @@
 import { Address } from "@argent/shared"
 
 import { TokenView } from "../../features/accountTokens/tokens.service"
-import { Call, RawArgs } from "starknet"
+import { RawArgs } from "starknet"
 import { BalancesMap } from "./types"
 import {
   BaseTokenWithBalance,

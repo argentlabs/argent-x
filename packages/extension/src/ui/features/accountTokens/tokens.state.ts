@@ -11,7 +11,7 @@ import {
 } from "../../views/token"
 import { useAccount } from "../accounts/accounts.state"
 import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
-import { tokenBalanceForAccountView } from "../../views/tokenBalances"
+import { tokenBalancesForAccountView } from "../../views/tokenBalances"
 import { Address, isEqualAddress } from "@argent/shared"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { useAppState } from "../../app.state"
@@ -22,7 +22,7 @@ export const useNetworkFeeTokens = (networkId?: string) => {
   return feeTokens
 }
 
-export const useTokensInNetwork = (networkId: string) =>
+export const useTokensInNetwork = (networkId?: string) =>
   useView(allTokensOnNetworkFamily(networkId))
 
 export const useTokensInCurrentNetwork = () => {
@@ -74,7 +74,7 @@ export const useTokensWithBalance = (account?: BaseWalletAccount) => {
     return selectedAccount?.networkId ?? ""
   }, [selectedAccount?.networkId])
   const tokensInNetwork = useTokensInNetwork(networkId)
-  const balances = useView(tokenBalanceForAccountView(account))
+  const balances = useView(tokenBalancesForAccountView(account))
 
   const accountBalances = useMemo(
     () =>
@@ -85,7 +85,7 @@ export const useTokensWithBalance = (account?: BaseWalletAccount) => {
   return useMemo(() => {
     return tokensInNetwork
       .map((token) => {
-        const balance = accountBalances?.find((balance) =>
+        const balance = accountBalances.find((balance) =>
           isEqualAddress(balance.address, token.address),
         )?.balance
         return {

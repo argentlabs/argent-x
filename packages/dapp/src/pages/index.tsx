@@ -1,36 +1,53 @@
 import { supportsSessions } from "@argent/x-sessions"
 import type { StarknetWindowObject } from "get-starknet-core"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { AccountInterface } from "starknet"
 import { Header } from "../components/Header"
+import {
+  Button,
+  Code,
+  Flex,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from "@chakra-ui/react"
+import { ChevronDownIcon, CheckIcon } from "@chakra-ui/icons"
 
-import { Button } from "@argent/ui"
 import { InfoRow } from "../components/InfoRow"
 import { truncateAddress } from "../services/address.service"
 import {
-  addWalletChangeListener,
+  addWalletAccountsChangedListener,
+  addWalletNetworkChangedListener,
   connectWallet,
   disconnectWallet,
   getChainId,
-  removeWalletChangeListener,
+  removeWalletAccountsChangedListener,
+  removeWalletNetworkChangedListener,
   silentConnectWallet,
+  switchNetwork,
 } from "../services/wallet.service"
 import { TokenDapp } from "../components/TokenDapp"
-import { Flex } from "@chakra-ui/react"
+
+const chainIds = ["SN_MAIN", "SN_GOERLI", "SN_SEPOLIA"]
 
 const StarknetKitDapp = () => {
   const [supportSessions, setSupportsSessions] = useState<boolean | null>(null)
-  const [chain, setChain] = useState<string | undefined>(undefined)
+  const [chainId, setChainId] = useState<string | undefined>(undefined)
   const [isConnected, setConnected] = useState(false)
   const [account, setAccount] = useState<AccountInterface | null>(null)
   const [isSilentConnect, setIsSilentConnect] = useState(true)
 
   useEffect(() => {
-    const handler = async () => {
+    const onAccountsChanged = async () => {
       try {
         const wallet = await silentConnectWallet()
         const chainId = await getChainId(wallet?.provider as any)
-        setChain(chainId)
+        if (chainId && !chainIds.includes(chainId)) {
+          chainIds.push(chainId)
+        }
+        setChainId(chainId)
         setConnected(!!wallet?.isConnected)
         if (wallet?.account) {
           setAccount(wallet.account as any)
@@ -54,13 +71,27 @@ const StarknetKitDapp = () => {
       }
     }
 
+    const onNetworkChanged = (chainId?: any) => {
+      setChainId(chainId)
+    }
+
     ;(async () => {
-      await handler()
-      addWalletChangeListener(handler)
+      await onAccountsChanged()
+      addWalletAccountsChangedListener(onAccountsChanged)
+      addWalletNetworkChangedListener(onNetworkChanged)
     })()
 
     return () => {
-      removeWalletChangeListener(handler)
+      removeWalletAccountsChangedListener(onAccountsChanged)
+      removeWalletNetworkChangedListener(onNetworkChanged)
+    }
+  }, [])
+
+  const handleNetworkClick = useCallback(async (chainId: string) => {
+    try {
+      await switchNetwork(chainId)
+    } catch (e) {
+      console.error(e)
     }
   }, [])
 
@@ -74,7 +105,7 @@ const StarknetKitDapp = () => {
       async () => {
         const wallet = await connectWallet(enableWebWallet)
         const chainId = await getChainId(wallet?.provider as any)
-        setChain(chainId)
+        setChainId(chainId)
         setConnected(!!wallet?.isConnected)
         if (wallet?.account) {
           setAccount(wallet.account as any)
@@ -99,7 +130,7 @@ const StarknetKitDapp = () => {
     () => async () => {
       try {
         await disconnectWallet()
-        setChain(undefined)
+        setChainId(undefined)
         setConnected(false)
         setAccount(null)
         setSupportsSessions(null)
@@ -109,6 +140,32 @@ const StarknetKitDapp = () => {
     },
     [],
   )
+
+  const chainMenu = useMemo(() => {
+    return (
+      <Menu size={"2xs"}>
+        <MenuButton as={Text} cursor={"pointer"}>
+          <Code color="white" bg={"transparent"}>
+            {chainId ?? "undefined"} <ChevronDownIcon />
+          </Code>
+        </MenuButton>
+        <MenuList>
+          {chainIds.map((id) => {
+            const checked = id === chainId
+            return (
+              <MenuItem
+                key={id}
+                onClick={() => handleNetworkClick(id)}
+                icon={<CheckIcon visibility={checked ? "visible" : "hidden"} />}
+              >
+                {id}
+              </MenuItem>
+            )
+          })}
+        </MenuList>
+      </Menu>
+    )
+  }, [chainId, handleNetworkClick])
 
   if (isSilentConnect) {
     return (
@@ -140,6 +197,7 @@ const StarknetKitDapp = () => {
         {isConnected ? (
           <>
             <Header isConnected disconnectFn={handleDisconnect()} />
+            <InfoRow title="Chain id:" content={chainMenu} />
             <InfoRow
               title="Wallet address:"
               content={account?.address && truncateAddress(account?.address)}
@@ -148,7 +206,6 @@ const StarknetKitDapp = () => {
               title="Supports sessions:"
               content={`${supportSessions}`}
             />
-            <InfoRow title="Url:" content={chain} />
             {account && (
               <TokenDapp account={account} showSession={supportSessions} />
             )}

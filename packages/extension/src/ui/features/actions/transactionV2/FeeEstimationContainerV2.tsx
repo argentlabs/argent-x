@@ -1,21 +1,20 @@
 import { isFunction } from "lodash-es"
 import { FC, useEffect, useMemo } from "react"
-
+import { TokenWithBalance } from "@argent/shared"
 import { useAccount } from "../../accounts/accounts.state"
-import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
+import {
+  useCurrencyDisplayEnabled,
+  useTokenAmountToCurrencyValue,
+} from "../../accountTokens/tokenPriceHooks"
 import { FeeEstimation } from "../feeEstimation/FeeEstimation"
 import { ParsedFeeError, getParsedFeeError } from "../feeEstimation/feeError"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
-
-import { useTokenBalance } from "../../accountTokens/tokens.state"
-import { Address } from "@argent/shared"
 import {
   estimatedFeesToMaxFeeTotal,
   estimatedFeesToTotal,
 } from "../../../../shared/transactionSimulation/utils"
 
 export interface FeeEstimationContainerV2Props {
-  feeTokenAddress: Address
   onChange?: (fee: bigint) => void
   onErrorChange?: (error: boolean) => void
   onFeeErrorChange?: (error: boolean) => void
@@ -24,13 +23,14 @@ export interface FeeEstimationContainerV2Props {
   transactionSimulationLoading: boolean
   transactionSimulationFeeError?: Error
   needsDeploy?: boolean
-
   error?: any
   fee: EstimatedFees
+  feeToken: TokenWithBalance
+  onOpenFeeTokenPicker?: () => void
+  allowFeeTokenSelection?: boolean
 }
 
 export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
-  feeTokenAddress,
   accountAddress,
   networkId,
   onErrorChange,
@@ -39,19 +39,17 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
   needsDeploy = false,
   error,
   fee,
+  feeToken,
+  onOpenFeeTokenPicker,
+  allowFeeTokenSelection = true,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
     throw new Error("Account not found")
   }
 
-  const feeToken = useTokenBalance(feeTokenAddress, account)
-
   const enoughBalance = useMemo(
-    () =>
-      Boolean(
-        feeToken?.balance && feeToken?.balance >= estimatedFeesToTotal(fee),
-      ),
+    () => feeToken.balance >= estimatedFeesToMaxFeeTotal(fee),
     [feeToken?.balance, fee],
   )
 
@@ -85,12 +83,15 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
     }
   }
 
+  const showCurrencyValue = useCurrencyDisplayEnabled()
+
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken || undefined,
+    showCurrencyValue && feeToken ? feeToken : undefined,
     estimatedFeesToTotal(fee),
-  )
+  ) // will return undefined if no feeToken or showCurrencyValue is false
+
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
-    feeToken || undefined,
+    showCurrencyValue && feeToken ? feeToken : undefined,
     estimatedFeesToMaxFeeTotal(fee),
   )
 
@@ -107,6 +108,8 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
           showFeeError={showFeeError}
           suggestedMaxFeeCurrencyValue={suggestedMaxFeeCurrencyValue}
           needsDeploy={needsDeploy}
+          onOpenFeeTokenPicker={onOpenFeeTokenPicker}
+          allowFeeTokenSelection={allowFeeTokenSelection}
         />
       )}
     </>

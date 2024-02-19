@@ -7,21 +7,34 @@ import { getColor } from "../accounts/accounts.service"
 export interface TokenIconProps extends Pick<SquareProps, "size">, ImageProps {
   name: string
   url?: string
+  iconUrl?: string
+  image?: string
 }
 
 export const getTokenIconUrl = ({
-  url,
   name,
-}: Pick<TokenIconProps, "url" | "name">) => {
-  if (url && url.length) {
-    return url
+  url,
+  iconUrl,
+  image,
+}: Pick<TokenIconProps, "name" | "url" | "iconUrl" | "image">) => {
+  const imgUrl = url || iconUrl || image
+  if (imgUrl && imgUrl.length) {
+    return imgUrl
   }
+
   const background = getColor(name)
   return generateAvatarImage(name, { background })
 }
 
-export const TokenIcon: FC<TokenIconProps> = ({ name, url, size, ...rest }) => {
-  const src = getTokenIconUrl({ url, name })
+export const TokenIcon: FC<TokenIconProps> = ({
+  name,
+  url,
+  iconUrl,
+  image,
+  size,
+  ...rest
+}) => {
+  const src = getTokenIconUrl({ url, iconUrl, image, name })
   return (
     <Circle position={"relative"} overflow={"hidden"} size={size} {...rest}>
       <Image

@@ -172,7 +172,7 @@ const DEFAULT_TRANSACTION_SIMULATION = [
       gasPrice: 0,
       gasUsage: 0,
       overallFee: 0,
-      unit: "wei",
+      unit: "WEI" as const,
       maxFee: 0,
     },
   },

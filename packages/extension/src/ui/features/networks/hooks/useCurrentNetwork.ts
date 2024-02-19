@@ -19,6 +19,6 @@ export const useCurrentNetworkWithStatus = () => {
   )
   return {
     ...network,
-    status: networkWithStatus?.status ?? "unknown",
+    status: networkWithStatus?.status,
   }
 }

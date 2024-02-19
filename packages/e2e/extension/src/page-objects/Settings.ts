@@ -10,22 +10,26 @@ export default class Settings {
   }
 
   get addressBook() {
-    return this.page.locator(`//a//*[text()="${lang.settings.addresBook}"]`)
+    return this.page.locator(
+      `//a//*[text()="${lang.settings.addressBook.addressBook}"]`,
+    )
   }
 
   get connectedDapps() {
-    return this.page.locator(`//a//*[text()="${lang.settings.connectedDapps}"]`)
-  }
-
-  get showRecoveryPhase() {
     return this.page.locator(
-      `//a//*[text()="${lang.settings.showRecoveryPhase}"]`,
+      `//a//*[text()="${lang.settings.account.connectedDapps.connectedDapps}"]`,
     )
   }
 
   get developerSettings() {
     return this.page.locator(
-      `//a//*[text()="${lang.settings.developerSettings}"]`,
+      `//a//*[text()="${lang.settings.developerSettings.developerSettings}"]`,
+    )
+  }
+
+  get preferences() {
+    return this.page.locator(
+      `//a//*[text()="${lang.settings.preferences.preferences}"]`,
     )
   }
 
@@ -36,19 +40,19 @@ export default class Settings {
 
   get exportPrivateKey() {
     return this.page.locator(
-      `//button//*[text()="${lang.settings.exportPrivateKey}"]`,
+      `//button//*[text()="${lang.settings.account.exportPrivateKey}"]`,
     )
   }
 
   get deployAccount() {
     return this.page.locator(
-      `//button//*[text()="${lang.settings.deployAccount}"]`,
+      `//button//*[text()="${lang.settings.account.deployAccount}"]`,
     )
   }
 
   get hideAccount() {
     return this.page.locator(
-      `//button//*[text()="${lang.settings.hideAccount}"]`,
+      `//button//*[text()="${lang.settings.account.hideAccount}"]`,
     )
   }
 
@@ -63,12 +67,10 @@ export default class Settings {
   }
 
   get confirmHide() {
-    return this.page.locator(`button:text-is("${lang.settings.hide}")`)
+    return this.page.locator(`button:text-is("${lang.common.hide}")`)
   }
   get hiddenAccounts() {
-    return this.page.locator(
-      `button:text-is("${lang.settings.hiddenAccounts}")`,
-    )
+    return this.page.locator(`button:text-is("${lang.common.hiddenAccounts}")`)
   }
 
   unhideAccount(accountName: string) {
@@ -80,11 +82,11 @@ export default class Settings {
   }
 
   get privateKey() {
-    return this.page.locator('[data-testid="privateKey"]')
+    return this.page.locator('[aria-label="Private key"]')
   }
 
   get copy() {
-    return this.page.locator(`button:text-is("${lang.settings.copy}")`)
+    return this.page.locator(`button:text-is("${lang.common.copy}")`)
   }
 
   get help() {
@@ -99,11 +101,9 @@ export default class Settings {
     return this.page.getByRole("link", { name: "Github" })
   }
 
-  get privacyStatement() {
-    return this.page.getByRole("link", { name: "Privacy statement" })
-  }
-
-  get privacyStatementText() {
-    return this.page.locator('[aria-label="privacyStatementText"]')
+  get viewOnStarkScanLocator() {
+    return this.page.getByRole("button", {
+      name: lang.settings.account.viewOnStarkScan,
+    })
   }
 }

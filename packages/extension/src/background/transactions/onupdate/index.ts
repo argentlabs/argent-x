@@ -8,8 +8,8 @@ import { TransactionUpdateListener } from "./type"
 import { handleUpgradeTransaction } from "./upgrade"
 
 const addedOrUpdatedHandlers: TransactionUpdateListener[] = [
-  handleUpgradeTransaction,
   handleDeployAccountTransaction,
+  handleUpgradeTransaction,
   handleDeclareContractTransaction,
   handleChangeGuardianTransaction,
   handleMultisigUpdates,
@@ -19,9 +19,11 @@ const addedOrUpdatedHandlers: TransactionUpdateListener[] = [
 export const runAddedOrUpdatedHandlers: TransactionUpdateListener = async (
   updates,
 ) => {
-  await Promise.allSettled(
-    addedOrUpdatedHandlers.map((handler) => handler(updates)),
-  )
+  // We need this in serial and not parallel because some handlers depend on the
+  // results of others (e.g. the upgrade handler needs the account to be deployed)
+  for (const handler of addedOrUpdatedHandlers) {
+    await handler(updates)
+  }
 }
 
 const changedStatusHandlers: TransactionUpdateListener[] = [

@@ -1,5 +1,3 @@
-import { RpcProvider, TransactionStatus as StarknetTxStatus } from "starknet"
-
 import { getProvider } from "../../network"
 import { INetworkService } from "../../network/service/interface"
 import {
@@ -9,24 +7,7 @@ import {
 } from "../../transactions/interface"
 import { BaseContract, IChainService } from "./interface"
 import { isContractDeployed } from "@argent/shared"
-
-function starknetStatusToTransactionStatus<T extends StarknetTxStatus>(
-  status: T,
-  error: T extends "REJECTED" | "REVERTED" ? () => Error : never,
-): TransactionStatus {
-  switch (status) {
-    case StarknetTxStatus.RECEIVED:
-      return { status: "pending" }
-    case StarknetTxStatus.ACCEPTED_ON_L2:
-    case StarknetTxStatus.ACCEPTED_ON_L1:
-      return { status: "confirmed" }
-    case StarknetTxStatus.REJECTED:
-    case StarknetTxStatus.REVERTED:
-      return { status: "failed", reason: error() }
-    default:
-      throw new Error(`Unknown status: ${status}`)
-  }
-}
+import { SUCCESS_STATUSES } from "../../transactions"
 
 export class StarknetChainService implements IChainService {
   constructor(private networkService: Pick<INetworkService, "getById">) {}
@@ -50,15 +31,23 @@ export class StarknetChainService implements IChainService {
     // TODO: Use constants
     const isFailed =
       execution_status === "REVERTED" || finality_status === "REJECTED"
-    const isSuccessful =
-      finality_status === "ACCEPTED_ON_L2" ||
-      finality_status === "ACCEPTED_ON_L1"
+    let isSuccessful = false
 
+    // getTransactionStatus goes straight to the sequencer, hence it's much faster than the RPC nodes
+    // because of that we need to wait for the RPC nodes to have a receipt as well
     try {
-      if (execution_status === "REVERTED") {
+      if (
+        execution_status === "REVERTED" ||
+        SUCCESS_STATUSES.includes(finality_status)
+      ) {
         // Only get the receipt if the transaction reverted
         const receipt = await provider.getTransactionReceipt(transaction.hash)
-        error_reason = receipt.revert_reason
+
+        if ("revert_reason" in receipt) {
+          error_reason = receipt.revert_reason
+        }
+
+        isSuccessful = SUCCESS_STATUSES.includes(receipt.finality_status)
       }
     } catch (e) {
       console.warn(

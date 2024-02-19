@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 import { EnrichedSimulateAndReview } from "./schema"
-import { callSchema, hexSchema } from "@argent/shared"
+import { Address, callSchema, hexSchema } from "@argent/shared"
 
 export const transactionReviewTransactionsSchema = z.object({
   type: z
@@ -21,8 +21,10 @@ export type TransactionReviewTransactions = z.infer<
 export interface ITransactionReviewService {
   simulateAndReview({
     transactions,
+    feeTokenAddress,
   }: {
     transactions: TransactionReviewTransactions[]
+    feeTokenAddress: Address
   }): Promise<EnrichedSimulateAndReview>
   getLabels(): Promise<ITransactionReviewLabel[] | undefined>
 }

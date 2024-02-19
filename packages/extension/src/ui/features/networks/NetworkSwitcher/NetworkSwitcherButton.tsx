@@ -2,10 +2,7 @@ import { Button, ButtonProps, MenuButton } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network, NetworkStatus } from "../../../../shared/network"
-// import {
-//   StatusIndicator,
-//   mapNetworkStatusToColor,
-// } from "../../../components/StatusIndicator"
+import { StatusIndicator } from "../../../components/StatusIndicator"
 
 interface NetworkSwitcherButtonProps extends ButtonProps {
   disabled?: boolean
@@ -27,12 +24,7 @@ export const NetworkSwitcherButton: FC<NetworkSwitcherButtonProps> = ({
       colorScheme={"neutrals"}
       size={"2xs"}
       as={Button}
-      // Temp: This is commented out until we have a final decision on RPC provider
-      // rightIcon={
-      //   <StatusIndicator
-      //     color={mapNetworkStatusToColor(currentNetworkStatus)}
-      //   />
-      // }
+      rightIcon={<StatusIndicator status={currentNetworkStatus} />}
       {...rest}
     >
       {currentNetwork.name}

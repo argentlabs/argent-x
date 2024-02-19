@@ -14,6 +14,7 @@ export const defaultBlockExplorers: BlockExplorers = {
     logo: "StarknetLogo",
     url: {
       "mainnet-alpha": "https://starkscan.co",
+      "sepolia-alpha": "https://sepolia.starkscan.co",
       "goerli-alpha": "https://testnet.starkscan.co",
       localhost: "https://devnet.starkscan.co",
     },
@@ -23,6 +24,7 @@ export const defaultBlockExplorers: BlockExplorers = {
     logo: "VoyagerLogo",
     url: {
       "mainnet-alpha": "https://voyager.online",
+      "sepolia-alpha": "https://sepolia.voyager.online",
       "goerli-alpha": "https://goerli.voyager.online",
       localhost: "https://goerli.voyager.online/local-version",
     },

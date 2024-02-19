@@ -106,7 +106,7 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
   }, [tokenDetails, tokensInNetwork])
 
   const error = fetchTokenError
-    ? `Unable to validate token - please check that this is a valid ECR20 contract address for this network`
+    ? `Unable to validate token - please check that this is a valid ERC20 contract address for this network`
     : undefined
 
   return (

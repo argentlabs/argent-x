@@ -6,7 +6,7 @@ import {
   prettifyCurrencyNumber,
   prettifyTokenNumber,
 } from "../utils/number"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal, DEFAULT_TOKEN_DECIMALS } from "@argent/shared"
 import { TokenPriceDetails } from "./__new/types/tokenPrice.model"
 import { BaseToken, Token } from "./__new/types/token.model"
 import { equalToken } from "./__new/utils"
@@ -163,7 +163,7 @@ export const convertTokenAmountToCurrencyValue = ({
   /** keep as string to avoid loss of precision elsewhere */
   return bigDecimal.formatUnits({
     value: currencyValue,
-    decimals: decimalsNumber + 6,
+    decimals: decimalsNumber + DEFAULT_TOKEN_DECIMALS,
   })
 }
 

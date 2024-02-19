@@ -1,6 +1,6 @@
 import { expect, type Page } from "@playwright/test"
 
-import Messages from "../utils/Messages"
+import Messages from "./Messages"
 import Account from "./Account"
 import Activity from "./Activity"
 import AddressBook from "./AddressBook"
@@ -10,8 +10,17 @@ import Navigation from "./Navigation"
 import Network from "./Network"
 import Settings from "./Settings"
 import Wallet from "./Wallet"
-import config from "../config"
-import { transferEth, AccountsToSetup, validateTx } from "../utils/account"
+import config from "../../../shared/config"
+import Nfts from "./Nfts"
+import Preferences from "./Preferences"
+import {
+  transferTokens,
+  AccountsToSetup,
+  validateTx,
+  isScientific,
+  convertScientificToDecimal,
+  FeeTokens,
+} from "../../../shared/src/assets"
 
 export default class ExtensionPage {
   page: Page
@@ -25,6 +34,8 @@ export default class ExtensionPage {
   developerSettings: DeveloperSettings
   addressBook: AddressBook
   dapps: Dapps
+  nfts: Nfts
+  preferences: Preferences
   constructor(page: Page, private extensionUrl: string) {
     this.page = page
     this.wallet = new Wallet(page)
@@ -38,6 +49,8 @@ export default class ExtensionPage {
     this.developerSettings = new DeveloperSettings(page)
     this.addressBook = new AddressBook(page)
     this.dapps = new Dapps(page)
+    this.nfts = new Nfts(page)
+    this.preferences = new Preferences(page)
   }
 
   async open() {
@@ -45,10 +58,10 @@ export default class ExtensionPage {
   }
 
   async resetExtension() {
-    await this.navigation.showSettings.click()
-    await this.navigation.lockWallet.click()
-    await this.navigation.reset.click()
-    await this.navigation.confirmReset.click()
+    await this.navigation.showSettingsLocator.click()
+    await this.navigation.lockWalletLocator.click()
+    await this.navigation.resetLocator.click()
+    await this.navigation.confirmResetLocator.click()
   }
 
   async paste() {
@@ -69,15 +82,13 @@ export default class ExtensionPage {
     await this.wallet.restoreExistingWallet.click()
     await this.setClipBoardContent(seed)
     await this.pasteSeed()
-    await this.navigation.continue.click()
+    await this.navigation.continueLocator.click()
 
     await this.wallet.password.fill(password ?? config.password)
     await this.wallet.repeatPassword.fill(password ?? config.password)
 
-    await this.navigation.continue.click()
-    await expect(this.wallet.finish.first()).toBeVisible({
-      timeout: 180000,
-    })
+    await this.navigation.continueLocator.click()
+    await expect(this.wallet.finish.first()).toBeVisible()
 
     await this.open()
     await expect(this.network.networkSelector).toBeVisible()
@@ -95,51 +106,67 @@ export default class ExtensionPage {
     return accountAddress
   }
 
-  async deployAccount(accountName: string) {
+  async deployAccount(accountName: string, feeToken?: FeeTokens) {
     if (accountName) {
       await this.account.ensureSelectedAccount(accountName)
     }
-    await this.navigation.showSettings.click()
-    await this.page.locator(`text=${accountName}`).click()
+    await this.navigation.showSettingsLocator.click()
+    await this.page.locator(`[data-testid="${accountName}"]`).click()
     await this.settings.deployAccount.click()
-    await this.navigation.confirm.click()
-    await this.navigation.back.click()
-    await this.navigation.close.click()
-    await this.navigation.menuActivity.click()
+    if (feeToken) {
+      await this.account.selectFeeToken(feeToken)
+    }
+    await this.account.confirmTransaction()
+    await this.navigation.backLocator.click()
+    await this.navigation.closeLocator.click()
+    await this.navigation.menuActivityLocator.click()
     await expect(
       this.page.getByText(
         /(Account created and transfer|Contract interaction)/,
       ),
-    ).toBeVisible({ timeout: 120000 })
-    await this.navigation.showSettings.click()
-    await expect(this.page.getByText("Deploying")).toBeHidden({
-      timeout: 90000,
-    })
-    await this.navigation.close.click()
-    await this.navigation.menuTokens.click()
+    ).toBeVisible()
+    await this.navigation.showSettingsLocator.click()
+    await expect(this.page.getByText("Deploying")).toBeHidden()
+    await this.navigation.closeLocator.click()
+    await this.navigation.menuTokensLocator.click()
   }
 
-  async activate2fa(accountName: string, email: string, pin = "111111") {
+  async activate2fa({
+    accountName,
+    email,
+    pin = "111111",
+    validSession = false,
+  }: {
+    accountName: string
+    email: string
+    pin?: string
+    validSession?: boolean
+  }) {
     await this.account.ensureSelectedAccount(accountName)
-    await this.navigation.showSettings.click()
+    await this.navigation.showSettingsLocator.click()
     await this.settings.account(accountName).click()
     await this.settings.argentShield().click()
-    await this.navigation.next.click()
-    await this.account.email.fill(email)
-    await this.navigation.next.first().click()
-    await this.account.fillPin(pin)
-    await this.navigation.addArgentShield.click()
-    await this.navigation.confirm.click()
-    await this.navigation.dismiss.click()
-    await this.navigation.back.click()
-    await this.navigation.close.click()
+    await this.navigation.nextLocator.click()
+    if (!validSession) {
+      await this.account.email.fill(email)
+      await this.navigation.nextLocator.first().click()
+      await this.account.fillPin(pin)
+    }
+    await this.navigation.addArgentShieldLocator.click()
+    await this.account.confirmTransaction()
+    await expect(this.account.addedArgentShieldLocator).toBeVisible()
+    await this.navigation.doneLocator.click()
+    await this.navigation.backLocator.click()
+    await this.navigation.closeLocator.click()
     await Promise.all([
-      expect(this.activity.menuPendingTransactionsIndicator).toBeHidden(),
+      expect(
+        this.activity.menuPendingTransactionsIndicatorLocator,
+      ).toBeHidden(),
       expect(
         this.page.locator('[data-testid="shield-on-account-view"]'),
       ).toBeVisible(),
     ])
-    await this.navigation.showSettings.click()
+    await this.navigation.showSettingsLocator.click()
     await expect(
       this.page.locator('[data-testid="shield-on-settings"]'),
     ).toBeVisible()
@@ -147,8 +174,71 @@ export default class ExtensionPage {
     await expect(
       this.page.locator('[data-testid="shield-switch"]'),
     ).toBeEnabled()
-    await this.navigation.back.click()
-    await this.navigation.close.click()
+    await this.navigation.backLocator.click()
+    await this.navigation.closeLocator.click()
+  }
+
+  async disable2fa({
+    accountName,
+    email,
+    pin = "111111",
+    validSession = false,
+  }: {
+    accountName: string
+    email: string
+    pin?: string
+    validSession?: boolean
+  }) {
+    await this.account.ensureSelectedAccount(accountName)
+    await this.navigation.showSettingsLocator.click()
+    await this.settings.account(accountName).click()
+    await this.settings.argentShield().click()
+    await this.navigation.nextLocator.click()
+    if (!validSession) {
+      await this.account.email.fill(email)
+      await this.navigation.nextLocator.first().click()
+      await this.account.fillPin(pin)
+    }
+    await this.navigation.removeArgentShieldLocator.click()
+    await this.account.confirmTransaction()
+    await expect(this.account.removedArgentShieldLocator).toBeVisible()
+    await this.navigation.doneLocator.click()
+    await this.navigation.backLocator.click()
+    await this.navigation.closeLocator.click()
+    await this.account.ensure2FANotEnabled(accountName)
+  }
+
+  async fundAccount(
+    acc: AccountsToSetup,
+    accountAddress: string,
+    accIndex: number,
+  ) {
+    let expectedTokenValue
+    for (const [assetIndex, asset] of acc.assets.entries()) {
+      console.log({ op: "fundAccount", assetIndex, asset })
+      if (asset.balance > 0) {
+        await transferTokens(
+          asset.balance,
+          accountAddress, // receiver wallet address
+          asset.token,
+        )
+        expectedTokenValue = `${asset.balance} ${asset.token}`
+        if (isScientific(asset.balance)) {
+          expectedTokenValue = `${convertScientificToDecimal(asset.balance)} ${
+            asset.token
+          }`
+        }
+        await this.account.ensureAsset(
+          `Account ${accIndex + 1}`,
+          asset.token,
+          expectedTokenValue,
+        )
+      }
+    }
+
+    if (acc.deploy) {
+      await this.deployAccount(`Account ${accIndex + 1}`, acc.feeToken)
+    }
   }
 
   async setupWallet({
@@ -162,7 +252,6 @@ export default class ExtensionPage {
     const accountAddresses: string[] = []
 
     for (const [accIndex, acc] of accountsToSetup.entries()) {
-      console.log(accIndex, acc)
       if (accIndex !== 0) {
         await this.account.addAccount({ firstAccount: false })
       }
@@ -172,40 +261,48 @@ export default class ExtensionPage {
       )
       expect(accountAddress).toMatch(/^0x0/)
       accountAddresses.push(accountAddress)
-
-      if (acc.initialBalance > 0) {
-        await transferEth(
-          `${acc.initialBalance * Math.pow(10, 18)}`, // amount Ethereum has 18 decimals
-          accountAddress, // reciever wallet address
-        )
-        await this.account.ensureAsset(
-          `Account ${accIndex + 1}`,
-          "Ethereum",
-          `${acc.initialBalance} ETH`,
-        )
-        if (acc.deploy) {
-          await this.deployAccount(`Account ${accIndex + 1}`)
-        }
+      if (acc.assets[0].balance > 0) {
+        await this.fundAccount(acc, accountAddress, accIndex)
       }
     }
-    console.log(accountAddresses.length, accountAddresses, seed)
+    console.log({
+      op: "setupWallet",
+      accountsNbr: accountAddresses.length,
+      accountAddresses,
+      seed,
+    })
     return { accountAddresses, seed }
   }
 
-  async validateTx(
-    txHash: string,
-    reciever: string,
-    amount?: number,
-    uniqLocator?: boolean,
-  ) {
-    await this.navigation.menuActivityActive
+  async validateTx({
+    txHash,
+    receiver,
+    sendAmountFE,
+    sendAmountTX,
+    uniqLocator,
+  }: {
+    txHash: string
+    receiver: string
+    sendAmountFE?: string
+    sendAmountTX?: number
+    uniqLocator?: boolean
+  }) {
+    console.log({
+      op: "validateTx",
+      txHash,
+      receiver,
+      sendAmountFE,
+      sendAmountTX,
+      uniqLocator,
+    })
+    await this.navigation.menuActivityActiveLocator
       .isVisible()
       .then(async (visible) => {
         if (!visible) {
-          await this.navigation.menuActivity.click()
+          await this.navigation.menuActivityLocator.click()
         }
       })
-    if (amount) {
+    if (sendAmountFE) {
       const activityAmountLocator = this.page.locator(
         `button[data-tx-hash$="${txHash.substring(3)}"] [data-value]`,
       )
@@ -216,19 +313,21 @@ export default class ExtensionPage {
       const activityAmount = await activityAmountElement
         .textContent()
         .then((text) => text?.match(/[\d|.]+/)![0])
-      if (amount.toString().length > 6) {
+      if (sendAmountFE.toString().length > 6) {
         expect(activityAmount).toBe(
-          parseFloat(amount.toString())
+          parseFloat(sendAmountFE.toString())
             .toFixed(4)
             .toString()
             .match(/[\d\\.]+[^0]+/)?.[0],
         )
       } else {
-        expect(activityAmount).toBe(parseFloat(amount.toString()).toString())
+        expect(activityAmount).toBe(
+          parseFloat(sendAmountFE.toString()).toString(),
+        )
       }
     }
     await this.activity.ensureNoPendingTransactions()
-    await validateTx(txHash, reciever, amount)
+    await validateTx(txHash, receiver, sendAmountTX)
   }
 
   async fundMultisigAccount({
@@ -241,11 +340,11 @@ export default class ExtensionPage {
     await this.account.ensureSelectedAccount(accountName)
     await this.account.copyAddress.click()
     const accountAddress = await this.getClipboard().then((adr) => String(adr))
-    await transferEth(
-      `${amount * Math.pow(10, 18)}`, // amount Ethereum has 18 decimals
-      accountAddress, // reciever wallet address
+    await transferTokens(
+      amount,
+      accountAddress, // receiver wallet address
     )
-    await this.account.ensureAsset(accountName, "Ethereum", `${amount} ETH`)
+    await this.account.ensureAsset(accountName, "ETH", `${amount} ETH`)
   }
 
   async activateMultisig(accountName: string) {
@@ -254,17 +353,21 @@ export default class ExtensionPage {
       this.page.locator("label:has-text('Not activated')"),
     ).toBeVisible()
     await this.page.locator('[data-testid="activate-multisig"]').click()
-    await this.navigation.confirm.click()
+    await this.account.confirmTransaction()
     await expect(
       this.page.locator('[data-testid="activating-multisig"]'),
     ).toBeVisible()
     await Promise.all([
-      expect(this.page.locator("label:has-text('Not activated')")).toBeHidden({
-        timeout: 60000,
-      }),
+      expect(this.page.locator("label:has-text('Not activated')")).toBeHidden(),
       expect(
         this.page.locator('[data-testid="activating-multisig"]'),
-      ).toBeHidden({ timeout: 60000 }),
+      ).toBeHidden(),
     ])
+  }
+
+  async removeMultisigOwner(accountName: string) {
+    await this.account.ensureSelectedAccount(accountName)
+    await this.navigation.showSettingsLocator.click()
+    await this.settings.account(accountName).click()
   }
 }

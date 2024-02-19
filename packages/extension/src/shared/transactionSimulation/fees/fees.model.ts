@@ -2,11 +2,18 @@ import { z } from "zod"
 import { ChromeRepository } from "../../storage/__new/chrome"
 import { addressSchema } from "@argent/shared"
 
+const maxFeeSchema = z
+  .object({
+    amount: z.bigint(),
+    pricePerUnit: z.bigint(),
+  })
+  .or(z.object({ maxFee: z.bigint() }))
+
 export const estimatedFeeSchema = z.object({
   feeTokenAddress: addressSchema,
   amount: z.bigint(),
   pricePerUnit: z.bigint(),
-  watermarkedMaxFee: z.bigint().optional(), // TODO: Remove this once we have the watermark fee in the amount*pricePerUnit product
+  max: maxFeeSchema.optional(),
 })
 
 export type EstimatedFee = z.infer<typeof estimatedFeeSchema>

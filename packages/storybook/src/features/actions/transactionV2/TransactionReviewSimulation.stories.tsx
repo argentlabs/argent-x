@@ -3,12 +3,12 @@ import { ComponentProps } from "react"
 
 import { TransactionReviewSimulation } from "@argent-x/extension/src/ui/features/actions/transactionV2/simulation/TransactionReviewSimulation"
 
-import mintNft from "./__fixtures__/mint-nft.json"
-import nonNativeJediswap from "./__fixtures__/non-native-jediswap.json"
-import sendNftSelf from "./__fixtures__/send-nft-self.json"
-import sendNft from "./__fixtures__/send-nft.json"
-import send from "./__fixtures__/send.json"
-import swap from "./__fixtures__/swap.json"
+import mintNft from "@argent-x/extension/src/shared/transactionReview/__fixtures__/mint-nft.json"
+import nonNativeJediswap from "@argent-x/extension/src/shared/transactionReview/__fixtures__/non-native-jediswap.json"
+import sendNftSelf from "@argent-x/extension/src/shared/transactionReview/__fixtures__/send-nft-self.json"
+import sendNft from "@argent-x/extension/src/shared/transactionReview/__fixtures__/send-nft.json"
+import send from "@argent-x/extension/src/shared/transactionReview/__fixtures__/send.json"
+import swap from "@argent-x/extension/src/shared/transactionReview/__fixtures__/swap.json"
 
 export default {
   component: TransactionReviewSimulation,

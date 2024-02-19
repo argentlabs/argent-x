@@ -25,7 +25,9 @@ export const ClickableShieldBanner = ({ address }: { address: string }) => {
     >
       <Flex alignItems="center" gap={1} color="neutrals.300">
         <ArgentShieldIcon />
-        <L2 as={Text}>Argent Shield is not activated</L2>
+        <L2 data-testid="shield-not-activated" as={Text}>
+          Argent Shield is not activated
+        </L2>
       </Flex>
       <L2 as={Text} color="neutrals.500">
         Click to enable

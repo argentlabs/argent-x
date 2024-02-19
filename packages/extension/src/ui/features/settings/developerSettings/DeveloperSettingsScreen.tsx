@@ -33,6 +33,14 @@ export const DeveloperSettingsScreen: FC<DeveloperSettingsScreenProps> = ({
           to={routes.settingsSmartContractDevelopment()}
           title="Smart contract development"
         />
+        <SettingsMenuItemLink
+          to={routes.settingsClearLocalStorage()}
+          title="Clear local storage"
+        />
+        <SettingsMenuItemLink
+          to={routes.deploymentData()}
+          title="Deployment data"
+        />
         {showExperimentalSettings && (
           <SettingsMenuItemLink
             to={routes.settingsExperimental()}

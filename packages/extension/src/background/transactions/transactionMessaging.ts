@@ -2,7 +2,6 @@ import {
   CallData,
   Invocations,
   TransactionType,
-  hash,
   num,
   transaction,
 } from "starknet"
@@ -20,12 +19,21 @@ import { TransactionError } from "../../shared/errors/transaction"
 import { getEstimatedFeeFromBulkSimulation } from "../../shared/transactionSimulation/utils"
 import { isAccountV4, isAccountV5 } from "@argent/shared"
 import { EstimatedFees } from "../../shared/transactionSimulation/fees/fees.model"
-import { ETH_TOKEN_ADDRESS } from "../../shared/network/constants"
 import { addEstimatedFee } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
+import {
+  getSimulationTxVersionFromFeeToken,
+  getTxVersionFromFeeToken,
+  getTxVersionFromFeeTokenForDeclareContract,
+} from "../../shared/utils/getTransactionVersion"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
-> = async ({ msg, origin, background: { wallet, actionService }, respond }) => {
+> = async ({
+  msg,
+  origin,
+  background: { wallet, actionService, feeTokenService },
+  respond,
+}) => {
   switch (msg.type) {
     case "EXECUTE_TRANSACTION": {
       const { meta } = await actionService.add(
@@ -46,13 +54,12 @@ export const handleTransactionMessage: HandleMessage<
     }
 
     case "ESTIMATE_DECLARE_CONTRACT_FEE": {
-      const { address, networkId, ...rest } = msg.data
+      const { account, feeTokenAddress, payload } = msg.data
 
       const selectedAccount = await wallet.getSelectedAccount()
-      const selectedStarknetAccount =
-        address && networkId
-          ? await wallet.getStarknetAccount({ address, networkId })
-          : await wallet.getSelectedStarknetAccount()
+      const selectedStarknetAccount = account
+        ? await wallet.getStarknetAccount(account)
+        : await wallet.getSelectedStarknetAccount()
 
       if (!selectedStarknetAccount) {
         throw Error("no accounts")
@@ -60,13 +67,18 @@ export const handleTransactionMessage: HandleMessage<
 
       const fees: EstimatedFees = {
         transactions: {
-          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          feeTokenAddress,
           amount: 0n,
           pricePerUnit: 0n,
         },
       }
 
       try {
+        const version = getTxVersionFromFeeTokenForDeclareContract(
+          feeTokenAddress,
+          payload,
+        )
+
         if (
           selectedAccount?.needsDeploy &&
           !(await isAccountDeployed(
@@ -86,15 +98,14 @@ export const handleTransactionMessage: HandleMessage<
               },
               {
                 type: TransactionType.DECLARE,
-                payload: {
-                  ...rest,
-                },
+                payload,
               },
             ]
 
             const estimateFeeBulk =
               await selectedStarknetAccount.estimateFeeBulk(bulkTransactions, {
                 skipValidate: true,
+                version,
               })
 
             if (
@@ -107,7 +118,7 @@ export const handleTransactionMessage: HandleMessage<
             }
 
             fees.deployment = {
-              feeTokenAddress: ETH_TOKEN_ADDRESS,
+              feeTokenAddress,
               amount: num.toBigInt(estimateFeeBulk[0].gas_consumed),
               pricePerUnit: num.toBigInt(estimateFeeBulk[0].gas_price),
             }
@@ -131,8 +142,8 @@ export const handleTransactionMessage: HandleMessage<
         } else {
           if ("estimateDeclareFee" in selectedStarknetAccount) {
             const { gas_consumed, gas_price } =
-              await selectedStarknetAccount.estimateDeclareFee({
-                ...rest,
+              await selectedStarknetAccount.estimateDeclareFee(payload, {
+                version,
               })
 
             if (!gas_consumed || !gas_price) {
@@ -145,6 +156,11 @@ export const handleTransactionMessage: HandleMessage<
             throw Error("estimateDeclareFee not supported")
           }
         }
+
+        await addEstimatedFee(fees, {
+          type: TransactionType.DECLARE,
+          payload,
+        })
 
         return respond({
           type: "ESTIMATE_DECLARE_CONTRACT_FEE_RES",
@@ -165,10 +181,12 @@ export const handleTransactionMessage: HandleMessage<
     }
 
     case "ESTIMATE_DEPLOY_CONTRACT_FEE": {
-      const { classHash, constructorCalldata, salt, unique } = msg.data
+      const { payload, account, feeTokenAddress } = msg.data
 
       const selectedAccount = await wallet.getSelectedAccount()
-      const selectedStarknetAccount = await wallet.getSelectedStarknetAccount()
+      const selectedStarknetAccount = account
+        ? await wallet.getStarknetAccount(account)
+        : await wallet.getSelectedStarknetAccount()
 
       if (!selectedStarknetAccount || !selectedAccount) {
         throw Error("no accounts")
@@ -176,11 +194,13 @@ export const handleTransactionMessage: HandleMessage<
 
       const fees: EstimatedFees = {
         transactions: {
-          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          feeTokenAddress,
           amount: 0n,
           pricePerUnit: 0n,
         },
       }
+
+      const version = getTxVersionFromFeeToken(feeTokenAddress)
 
       try {
         if (
@@ -200,12 +220,7 @@ export const handleTransactionMessage: HandleMessage<
               },
               {
                 type: TransactionType.DEPLOY,
-                payload: {
-                  classHash,
-                  salt,
-                  unique,
-                  constructorCalldata,
-                },
+                payload,
               },
             ]
 
@@ -222,7 +237,7 @@ export const handleTransactionMessage: HandleMessage<
             }
 
             fees.deployment = {
-              feeTokenAddress: ETH_TOKEN_ADDRESS,
+              feeTokenAddress,
               amount: num.toBigInt(estimateFeeBulk[0].gas_consumed),
               pricePerUnit: num.toBigInt(estimateFeeBulk[0].gas_price),
             }
@@ -246,11 +261,8 @@ export const handleTransactionMessage: HandleMessage<
         } else {
           if ("estimateDeployFee" in selectedStarknetAccount) {
             const { gas_consumed, gas_price } =
-              await selectedStarknetAccount.estimateDeployFee({
-                classHash,
-                salt,
-                unique,
-                constructorCalldata,
+              await selectedStarknetAccount.estimateDeployFee(payload, {
+                version,
               })
 
             if (!gas_consumed || !gas_price) {
@@ -263,6 +275,11 @@ export const handleTransactionMessage: HandleMessage<
             throw Error("estimateDeployFee not supported")
           }
         }
+
+        await addEstimatedFee(fees, {
+          type: TransactionType.DEPLOY,
+          payload,
+        })
 
         return respond({
           type: "ESTIMATE_DEPLOY_CONTRACT_FEE_RES",
@@ -300,17 +317,14 @@ export const handleTransactionMessage: HandleMessage<
           })
         }
 
-        let nonce
-
-        try {
-          nonce = await starknetAccount.getNonce()
-        } catch {
-          nonce = "0"
-        }
+        const nonce = await starknetAccount.getNonce().catch(() => "0")
 
         const chainId = await starknetAccount.getChainId()
 
-        const version = num.toHex(hash.feeTransactionVersion)
+        const bestFeeToken = await feeTokenService.getBestFeeToken(
+          selectedAccount,
+        )
+        const version = getSimulationTxVersionFromFeeToken(bestFeeToken.address)
 
         const calldata = transaction.getExecuteCalldata(
           transactions,
@@ -375,7 +389,9 @@ export const handleTransactionMessage: HandleMessage<
     }
 
     case "SIMULATE_TRANSACTIONS": {
-      const transactions = Array.isArray(msg.data) ? msg.data : [msg.data]
+      const transactions = Array.isArray(msg.data.call)
+        ? msg.data.call
+        : [msg.data.call]
 
       try {
         const selectedAccount = await wallet.getSelectedAccount()
@@ -396,18 +412,13 @@ export const handleTransactionMessage: HandleMessage<
           })
         }
 
-        let nonce
-
-        try {
-          nonce = await starknetAccount.getNonce()
-        } catch {
-          nonce = "0"
-        }
+        const nonce = await starknetAccount.getNonce().catch(() => "0")
 
         const chainId = await starknetAccount.getChainId()
 
-        const version = num.toHex(hash.feeTransactionVersion)
-
+        const version = getSimulationTxVersionFromFeeToken(
+          msg.data.feeTokenAddress,
+        )
         const calldata = transaction.getExecuteCalldata(
           transactions,
           starknetAccount.cairoVersion,
@@ -453,7 +464,7 @@ export const handleTransactionMessage: HandleMessage<
 
         const result = await fetchTransactionBulkSimulation({
           invocations,
-          chainId,
+          chainId: chainId as any, // TODO: migrate to snjsv6 completely
         })
 
         const estimatedFee = getEstimatedFeeFromBulkSimulation(result)
@@ -461,7 +472,10 @@ export const handleTransactionMessage: HandleMessage<
         let simulationWithFees = null
 
         if (result) {
-          await addEstimatedFee(estimatedFee, transactions)
+          await addEstimatedFee(estimatedFee, {
+            type: TransactionType.INVOKE,
+            payload: transactions,
+          })
           simulationWithFees = {
             simulation: result,
             feeEstimation: estimatedFee,

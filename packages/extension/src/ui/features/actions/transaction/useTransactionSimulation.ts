@@ -1,6 +1,10 @@
-import { swrRefetchDisabledConfig } from "@argent/shared"
+import {
+  Address,
+  TransactionAction,
+  swrRefetchDisabledConfig,
+} from "@argent/shared"
 import { useCallback } from "react"
-import { Call } from "starknet"
+import { TransactionType } from "starknet"
 
 import { sendMessage, waitForMessage } from "../../../../shared/messages"
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
@@ -8,7 +12,8 @@ import { useConditionallyEnabledSWR } from "../../../services/swr.service"
 import { ARGENT_TRANSACTION_SIMULATION_API_ENABLED } from "./../../../../shared/api/constants"
 
 export interface IUseTransactionSimulation {
-  transactions: Call | Call[]
+  transactionAction: TransactionAction
+  feeTokenAddress: Address
   actionHash?: string
 }
 
@@ -17,12 +22,21 @@ export const useTransactionSimulationEnabled = () => {
 }
 
 export const useTransactionSimulation = ({
-  transactions,
+  transactionAction,
+  feeTokenAddress,
   actionHash = "",
 }: IUseTransactionSimulation) => {
   const transactionSimulationEnabled = useTransactionSimulationEnabled()
   const transactionSimulationFetcher = useCallback(async () => {
-    void sendMessage({ type: "SIMULATE_TRANSACTIONS", data: transactions })
+    if (transactionAction.type !== TransactionType.INVOKE) {
+      // Backend Tx simulation only supports INVOKE transactions
+      return undefined
+    }
+
+    void sendMessage({
+      type: "SIMULATE_TRANSACTIONS",
+      data: { call: transactionAction.payload, feeTokenAddress },
+    })
 
     const result = await Promise.race([
       waitForMessage("SIMULATE_TRANSACTIONS_RES"),
@@ -41,7 +55,7 @@ export const useTransactionSimulation = ({
     }
 
     return result.simulation
-  }, [transactions]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [transactionAction]) // eslint-disable-line react-hooks/exhaustive-deps
   return useConditionallyEnabledSWR<
     ApiTransactionBulkSimulationResponse | undefined
   >(

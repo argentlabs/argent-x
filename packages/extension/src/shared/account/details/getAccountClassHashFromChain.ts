@@ -11,7 +11,7 @@ import { addressSchema } from "@argent/shared"
 import { tryGetClassHash } from "./tryGetClassHash"
 import {
   MULTISIG_ACCOUNT_CLASS_HASH,
-  STANDARD_ACCOUNT_CLASS_HASH,
+  TXV1_ACCOUNT_CLASS_HASH,
 } from "../../network/constants"
 
 export type AccountClassHashFromChain = Pick<
@@ -26,7 +26,7 @@ const getDefaultClassHash = (account: WalletAccount) => {
   if (account.type === "multisig") {
     return MULTISIG_ACCOUNT_CLASS_HASH
   }
-  return STANDARD_ACCOUNT_CLASS_HASH
+  return TXV1_ACCOUNT_CLASS_HASH
 }
 
 /**

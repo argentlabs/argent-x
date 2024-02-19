@@ -10,12 +10,14 @@ import {
   jediswap,
   jediswapUnsafe,
   transfer,
+  transferV3,
 } from "../../__fixtures__"
 import { TransactionActionFixture } from "../../__fixtures__/types"
 import { ApproveScreenType } from "../types"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
 import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
+import { TransactionType } from "starknet"
 
 const renderWithProps = async (
   props: TransactionActionFixture &
@@ -52,6 +54,10 @@ const renderWithProps = async (
         hasPendingMultisigTransactions={false}
         selectedAccount={accounts[0]}
         approveScreenType={ApproveScreenType.TRANSACTION}
+        transactionAction={{
+          type: TransactionType.INVOKE,
+          payload: props.transactions,
+        }}
         setShowTxDetails={() => undefined}
         showTxDetails={false}
         {...props}
@@ -126,6 +132,27 @@ describe("ApproveTransactionScreen", () => {
 
     await renderWithProps({
       ...transfer,
+      transactionActionsType: {
+        type: "INVOKE_FUNCTION",
+        payload: jediswap.transactions,
+      },
+      onReject,
+      onSubmit,
+    })
+
+    expect(
+      screen.getByText(/This transaction has been flagged as dangerous/),
+    ).toBeInTheDocument()
+  })
+
+  it("should render transfer v3 scenario as expected", async () => {
+    window.scrollTo = vi.fn(noop)
+
+    const onReject = vi.fn()
+    const onSubmit = vi.fn()
+
+    await renderWithProps({
+      ...transferV3,
       transactionActionsType: {
         type: "INVOKE_FUNCTION",
         payload: jediswap.transactions,

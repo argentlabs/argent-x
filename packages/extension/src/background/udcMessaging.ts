@@ -12,20 +12,18 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
     // TODO: refactor after we have a plan for inpage
     case "REQUEST_DECLARE_CONTRACT": {
       const { data } = msg
-      const { address, networkId, ...rest } = data
-      if (address && networkId) {
+      const { account, payload } = data
+      if (account) {
         await wallet.selectAccount({
-          address,
-          networkId,
+          address: account.address,
+          networkId: account.networkId,
         })
       }
 
       const action = await actionService.add(
         {
           type: "DECLARE_CONTRACT",
-          payload: {
-            ...rest,
-          },
+          payload,
         },
         {
           origin,

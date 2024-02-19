@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { AddNetworkScreenContainer } from "./AddNetworkScreen/AddNetworkScreenContainer"
+import { AddNetworkScreenContainer } from "./AddNetworkScreenContainer"
 import { AddTokenActionScreenContainer } from "./AddTokenActionScreenContainer"
 import { ConnectDappScreenContainer } from "./connectDapp/ConnectDappScreenContainer"
 import { DeclareContractActionScreenContainer } from "./DeclareContractActionScreenContainer"
@@ -10,6 +10,7 @@ import { DeployMultisigActionScreenContainer } from "./DeployMultisigActionScree
 import { useActionScreen } from "./hooks/useActionScreen"
 import { TransactionActionScreenContainerV2 } from "./transactionV2/TransactionActionScreenContainerV2"
 import { SignActionScreenContainerV2 } from "./transactionV2/SignActionScreenContainerV2"
+import { SwitchNetworkScreenContainer } from "./SwitchNetworkScreenContainer"
 
 /** TODO: refactor: actual file should be renamed `ActionScreenContainer.tsx` */
 
@@ -23,10 +24,10 @@ export const ActionScreenContainer: FC = () => {
       return <AddTokenActionScreenContainer />
 
     case "REQUEST_ADD_CUSTOM_NETWORK":
-      return <AddNetworkScreenContainer mode="add" />
+      return <AddNetworkScreenContainer />
 
     case "REQUEST_SWITCH_CUSTOM_NETWORK":
-      return <AddNetworkScreenContainer mode="switch" />
+      return <SwitchNetworkScreenContainer />
 
     case "TRANSACTION":
       return <TransactionActionScreenContainerV2 />

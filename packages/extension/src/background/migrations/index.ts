@@ -18,12 +18,12 @@ enum WalletMigrations {
 }
 
 enum NetworkMigrations {
-  rpcEverywhere = "network:rpcEverywhere",
+  rpcEverywhere = "network:rpcEverywhere:r2",
 }
 
 enum TokenMigrations {
   v59 = "token:v59",
-  v510 = "token:v510:r2",
+  v510 = "token:v510:r3",
 }
 
 enum PreAuthorizationMigrations {

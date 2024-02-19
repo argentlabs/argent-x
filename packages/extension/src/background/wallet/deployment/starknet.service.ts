@@ -7,11 +7,10 @@ import {
 } from "@argent/shared"
 import {
   CallData,
-  DeployAccountContractPayload,
   DeployAccountContractTransaction,
-  InvocationsDetails,
+  EstimateFeeDetails,
   hash,
-} from "starknet"
+} from "starknet6"
 
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { PendingMultisig } from "../../../shared/multisig/types"
@@ -47,20 +46,48 @@ import { WalletBackupService } from "../backup/backup.service"
 import { WalletCryptoStarknetService } from "../crypto/starknet.service"
 import { WalletSessionService } from "../session/session.service"
 import type { WalletSession } from "../session/walletSession.model"
-import { PROXY_CONTRACT_CLASS_HASHES } from "../starknet.constants"
-import { IWalletDeploymentService } from "./interface"
+import {
+  IWalletDeploymentService,
+  DeployAccountContractPayload,
+} from "./interface"
 import { SessionError } from "../../../shared/errors/session"
 import { WalletError } from "../../../shared/errors/wallet"
 import {
   ETH_TOKEN_ADDRESS,
-  STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
+  STRK_TOKEN_ADDRESS,
 } from "../../../shared/network/constants"
 import { AccountError } from "../../../shared/errors/account"
-import { modifySnjsFeeOverhead } from "../../../shared/utils/argentMaxFee"
 import { EstimatedFee } from "../../../shared/transactionSimulation/fees/fees.model"
-import { estimatedFeeToMaxFeeTotal } from "../../../shared/transactionSimulation/utils"
+import { estimatedFeeToMaxResourceBounds } from "../../../shared/transactionSimulation/utils"
+import { BigNumberish, num, constants, CairoVersion } from "starknet"
+import { getTxVersionFromFeeToken } from "../../../shared/utils/getTransactionVersion"
+import {
+  Implementation,
+  findImplementationForAccount,
+  getAccountDeploymentPayload,
+} from "../findImplementationForAddress"
 
-const { getSelectorFromName, calculateContractAddressFromHash } = hash
+const { calculateContractAddressFromHash } = hash
+
+// TODO: import from starknet6 when available
+const BN_TRANSACTION_VERSION_3 = 3n
+const BN_FEE_TRANSACTION_VERSION_3 = 2n ** 128n + BN_TRANSACTION_VERSION_3
+
+function mapVersionToFeeToken(version: BigNumberish): Address {
+  if (
+    num.toBigInt(version) === constants.BN_TRANSACTION_VERSION_1 ||
+    num.toBigInt(version) === constants.BN_FEE_TRANSACTION_VERSION_1
+  ) {
+    return ETH_TOKEN_ADDRESS
+  }
+  if (
+    num.toBigInt(version) === BN_TRANSACTION_VERSION_3 ||
+    num.toBigInt(version) === BN_FEE_TRANSACTION_VERSION_3
+  ) {
+    return STRK_TOKEN_ADDRESS
+  }
+  throw new Error("Unsupported tx version for fee token mapping")
+}
 
 export class WalletDeploymentStarknetService
   implements IWalletDeploymentService
@@ -80,7 +107,7 @@ export class WalletDeploymentStarknetService
 
   public async deployAccount(
     walletAccount: WalletAccount,
-    transactionDetails?: InvocationsDetails | undefined,
+    transactionDetails?: EstimateFeeDetails | undefined,
   ): Promise<{ account: WalletAccount; txHash: string }> {
     const starknetAccount =
       await this.accountStarknetService.getStarknetAccount(walletAccount)
@@ -95,18 +122,25 @@ export class WalletDeploymentStarknetService
     if (!isAccountV5(starknetAccount)) {
       throw new AccountError({ code: "CANNOT_DEPLOY_OLD_ACCOUNTS" })
     }
-    const maxFee = transactionDetails?.maxFee
-      ? modifySnjsFeeOverhead({
-          suggestedMaxFee: transactionDetails.maxFee,
-        })
-      : estimatedFeeToMaxFeeTotal(
-          await this.getAccountDeploymentFee(walletAccount),
-        )
+
+    const maxFeeOrBounds =
+      transactionDetails?.maxFee || transactionDetails?.resourceBounds
+        ? {
+            maxFee: transactionDetails?.maxFee,
+            resourceBounds: transactionDetails?.resourceBounds,
+          }
+        : estimatedFeeToMaxResourceBounds(
+            await this.getAccountDeploymentFee(
+              walletAccount,
+              mapVersionToFeeToken(transactionDetails?.version ?? "0x1"),
+            ),
+          )
+
     const { transaction_hash } = await starknetAccount.deployAccount(
       deployAccountPayload,
       {
         ...transactionDetails,
-        maxFee,
+        ...maxFeeOrBounds,
       },
     )
 
@@ -126,7 +160,7 @@ export class WalletDeploymentStarknetService
 
   public async getAccountDeploymentFee(
     walletAccount: WalletAccount,
-    feeTokenAddress: Address = ETH_TOKEN_ADDRESS,
+    feeTokenAddress: Address,
   ): Promise<EstimatedFee> {
     const starknetAccount =
       await this.accountStarknetService.getStarknetAccount(walletAccount)
@@ -143,9 +177,13 @@ export class WalletDeploymentStarknetService
         code: "CANNOT_ESTIMATE_FEE_OLD_ACCOUNTS_DEPLOYMENT",
       })
     }
+
+    const version = getTxVersionFromFeeToken(feeTokenAddress)
+
     const { gas_consumed, gas_price } =
       await starknetAccount.estimateAccountDeployFee(deployAccountPayload, {
         skipValidate: true,
+        version,
       })
 
     if (!gas_consumed || !gas_price) {
@@ -193,107 +231,27 @@ export class WalletDeploymentStarknetService
 
     const starkPub = starkPair.pubKey
 
-    // Try to get the account class hash from walletAccount if it exists
-    // If it doesn't exist, get it from the network object
-    const accountClassHash =
-      walletAccount.classHash ??
-      (await this.cryptoStarknetService.getAccountClassHashForNetwork(
-        walletAccount.network,
-        walletAccount.type,
-      ))
-
-    const constructorCallData = {
-      implementation: accountClassHash,
-      selector: getSelectorFromName("initialize"),
-      calldata: CallData.compile({ signer: starkPub, guardian: "0" }),
+    // If no class hash is provided by the account, we want to add the network implementation to check
+    const networkImplementation: Implementation = {
+      cairoVersion: "1",
+      accountClassHash:
+        await this.cryptoStarknetService.getAccountClassHashForNetwork(
+          walletAccount.network,
+          walletAccount.type,
+        ),
     }
 
-    const deployAccountPayloadCairo0 = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+    const { accountClassHash, cairoVersion } = findImplementationForAccount(
+      starkPub,
+      walletAccount,
+      [networkImplementation],
+    )
+
+    return {
+      ...getAccountDeploymentPayload(cairoVersion, accountClassHash, starkPub),
+      version: cairoVersion as CairoVersion,
       contractAddress: walletAccount.address,
-      constructorCalldata: CallData.compile(constructorCallData),
-      addressSalt: starkPub,
     }
-
-    const deployAccountPayloadCairo1 = {
-      classHash: accountClassHash,
-      contractAddress: walletAccount.address,
-      constructorCalldata: CallData.compile({
-        signer: starkPub,
-        guardian: "0",
-      }),
-      addressSalt: starkPub,
-    }
-
-    let deployAccountPayload
-
-    if (walletAccount.type === "standardCairo0") {
-      deployAccountPayload = deployAccountPayloadCairo0
-    } else {
-      deployAccountPayload = deployAccountPayloadCairo1
-    }
-
-    const calculatedAccountAddress = calculateContractAddressFromHash(
-      deployAccountPayload.addressSalt,
-      deployAccountPayload.classHash,
-      deployAccountPayload.constructorCalldata,
-      0,
-    )
-
-    if (isEqualAddress(walletAccount.address, calculatedAccountAddress)) {
-      return deployAccountPayload
-    }
-
-    // Warn if the account was created using Cairo 0 implementation and the address does not match
-    console.warn(
-      "Calculated address does not match Cairo 1 account address. Trying Cairo 0 implementation",
-    )
-
-    const cairo0Calldata = CallData.compile({
-      ...constructorCallData,
-      implementation: STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH, // last Cairo 0 implementation
-    })
-
-    // Try to deploy using Cairo 0 implementation
-    const cairo0CalculatedAccountAddress = calculateContractAddressFromHash(
-      deployAccountPayloadCairo0.addressSalt,
-      deployAccountPayloadCairo0.classHash,
-      cairo0Calldata,
-      0,
-    )
-
-    if (isEqualAddress(walletAccount.address, cairo0CalculatedAccountAddress)) {
-      console.warn("Address matches Cairo 0 implementation")
-      deployAccountPayloadCairo0.constructorCalldata = cairo0Calldata
-      return deployAccountPayloadCairo0
-    }
-
-    console.warn(
-      "Calculated address does not match Cairo 0 account address. Trying old implementation",
-    )
-
-    // In the end, try to deploy using the old implementation
-    const oldCalldata = CallData.compile({
-      ...constructorCallData,
-      implementation:
-        "0x1a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f", // old implementation, ask @janek why
-    })
-
-    const oldCalculatedAddress = calculateContractAddressFromHash(
-      deployAccountPayload.addressSalt,
-      deployAccountPayload.classHash,
-      oldCalldata,
-      0,
-    )
-
-    if (isEqualAddress(oldCalculatedAddress, walletAccount.address)) {
-      console.warn("Address matches old implementation")
-      deployAccountPayload.constructorCalldata = oldCalldata
-    } else {
-      throw new AccountError({ code: "CALCULATED_ADDRESS_NO_MATCH" })
-    }
-
-    return deployAccountPayload
   }
 
   public async getMultisigDeploymentPayload(
@@ -346,7 +304,7 @@ export class WalletDeploymentStarknetService
       throw new AccountError({ code: "CALCULATED_ADDRESS_NO_MATCH" })
     }
 
-    return deployMultisigPayload
+    return { ...deployMultisigPayload, version: "1" }
   }
 
   // TODO: remove this once testing of cairo 1 is done
@@ -378,17 +336,7 @@ export class WalletDeploymentStarknetService
         "standardCairo0",
       )
 
-    const payload = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      constructorCalldata: CallData.compile({
-        implementation: accountClassHash,
-        selector: getSelectorFromName("initialize"),
-        calldata: CallData.compile({ signer: pubKey, guardian: "0" }),
-      }),
-      addressSalt: pubKey,
-    }
-
-    return payload
+    return getAccountDeploymentPayload("0", accountClassHash, pubKey)
   }
 
   public async getDeployContractPayloadForAccountIndex(
@@ -419,16 +367,7 @@ export class WalletDeploymentStarknetService
         "standard",
       )
 
-    const payload = {
-      classHash: accountClassHash,
-      constructorCalldata: CallData.compile({
-        signer: pubKey,
-        guardian: "0",
-      }),
-      addressSalt: pubKey,
-    }
-
-    return payload
+    return getAccountDeploymentPayload("1", accountClassHash, pubKey)
   }
 
   public async getDeployContractPayloadForMultisig({
@@ -556,7 +495,7 @@ export class WalletDeploymentStarknetService
       },
       type,
       classHash: addressSchema.parse(payload.classHash), // This is only true for new Cairo 1 accounts. For Cairo 0, this is the proxy contract class hash
-      cairoVersion: "1",
+      cairoVersion: type === "standardCairo0" ? "0" : "1",
       needsDeploy: !isDeployed,
     }
 

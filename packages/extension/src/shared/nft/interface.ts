@@ -25,6 +25,7 @@ export interface INFTService {
     chain: string,
     networkId: string,
     contractsAddresses: ContractAddress[],
+    accountAddress: string,
   ) => Promise<void>
   upsert: (
     nfts: AllowArray<NftItem>,

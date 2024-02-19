@@ -8,32 +8,33 @@ import { ParsedFeeError, getParsedFeeError } from "./feeError"
 import { FeeEstimation } from "./FeeEstimation"
 import { TransactionsFeeEstimationProps } from "./types"
 import { useMaxFeeEstimation } from "./utils"
-import { useTokenBalance } from "../../accountTokens/tokens.state"
 
 export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
-  feeTokenAddress,
+  feeToken,
   accountAddress,
   networkId,
   onErrorChange,
   onFeeErrorChange,
-  transactions,
+  transactionAction,
   actionHash,
   userClickedAddFunds,
   transactionSimulation,
   transactionSimulationFeeError,
   transactionSimulationLoading,
   needsDeploy = false,
+  allowFeeTokenSelection,
+  onFeeTokenPickerOpen,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
     throw new Error("Account not found")
   }
 
-  const feeToken = useTokenBalance(feeTokenAddress, account)
   const { fee: feeSequencer, error } = useMaxFeeEstimation(
     actionHash,
     account,
-    transactions,
+    transactionAction,
+    feeToken?.address,
     transactionSimulation,
     transactionSimulationLoading,
   )
@@ -106,6 +107,8 @@ export const FeeEstimationContainer: FC<TransactionsFeeEstimationProps> = ({
           suggestedMaxFeeCurrencyValue={suggestedMaxFeeCurrencyValue}
           userClickedAddFunds={userClickedAddFunds}
           needsDeploy={needsDeploy}
+          onOpenFeeTokenPicker={onFeeTokenPickerOpen}
+          allowFeeTokenSelection={allowFeeTokenSelection}
         />
       )}
     </>

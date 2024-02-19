@@ -10,7 +10,6 @@ export interface ILanguage {
     no: string
     unlock: string
     showSettings: string
-    lockWallet: string
     reset: string
     confirmReset: string
     save: string
@@ -19,8 +18,20 @@ export interface ILanguage {
     privacyStatement: string
     approve: string
     addArgentShield: string
+    removeArgentShield: string
+    argentShieldAdded: string
+    argentShieldRemoved: string
     dismiss: string
     reviewSend: string
+    hide: string
+    hiddenAccounts: string
+    copy: string
+    beforeYouContinue: string
+    seedWarning: string
+    revealSeedPhrase: string
+    copied: string
+    confirmRecovery: string
+    remove: string
   }
   account: {
     noAccounts: string
@@ -44,6 +55,16 @@ export interface ILanguage {
     invalidCheckSumError: string
     invalidAddress: string
     createMultisig: string
+    activateAccount: string
+    notEnoughFoundsFee: string
+    newToken: string
+    argentShield: {
+      wrong2faCode: string
+      failed2faCode: string
+      codeNotRequested2fa: string
+      emailInUse: string
+    }
+    removedFromMultisig: string
   }
   wallet: {
     //first screen
@@ -70,44 +91,57 @@ export interface ILanguage {
     finish: string
   }
   settings: {
-    addresBook: string
-    connectedDapps: string
-    showRecoveryPhase: string
-    developerSettings: string
-    privacy: string
-    hideAccount: string
-    deleteAccount: string //only available for local network
-    exportPrivateKey: string
+    account: {
+      manageOwners: {
+        manageOwners: string
+        removeOwner: string
+        replaceOwner: string
+      }
+      setConfirmations: string
+      viewOnStarkScan: string
+      viewOnVoyager: string
+      hideAccount: string
+      deployAccount: string
+      connectedDapps: {
+        connectedDapps: string
+        connect: string
+        reject: string
+        disconnectAll: string
+        noConnectedDapps: string
+      }
+      exportPrivateKey: string
+    }
+    preferences: {
+      preferences: string
+      hideTokens: string
+      defaultBlockExplorer: string
+      defaultNFTMarket: string
+      emailNotifications: string
+    }
+    securityPrivacy: {
+      securityPrivacy: string
+      autoLockTimer: string
+      recoveryPhase: string
+      automaticErrorReporting: string
+      shareAnonymousData: string
+    }
+    addressBook: {
+      addressBook: string
+      nameRequired: string
+      addressRequired: string
+      removeAddress: string
+      delete: string
+    }
+    developerSettings: {
+      developerSettings: string
+      manageNetworks: {
+        manageNetworks: string
+        restoreDefaultNetworks: string
+      }
+      smartContractDevelopment: string
+      experimental: string
+    }
     extendedView: string
-    hide: string
-    hiddenAccounts: string
-    delete: string
-    copy: string
-    copied: string
-    confirmRecovery: string
-    revealSeedPhrase: string
-    beforeYouContinue: string
-    seedWarning: string
-    deployAccount: string
-  }
-  developerSettings: {
-    manageNetworks: string
-    blockExplorer: string
-    smartContractDevelopment: string
-    experimental: string
-    restoreDefaultNetworks: string
-  }
-  address: {
-    nameRequired: string
-    addressRequired: string
-    removeAddress: string
-    delete: string
-    addressBook: string
-  }
-  dapps: {
-    connect: string
-    reject: string
-    disconnectAll: string
-    noConnectedDapps: string
+    lockWallet: string
   }
 }

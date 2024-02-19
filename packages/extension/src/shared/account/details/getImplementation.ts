@@ -3,7 +3,7 @@ import { accountsEqual } from "../../utils/accountsEqual"
 
 import { getMulticallForNetwork } from "../../multicall"
 import { getProvider } from "../../network"
-import { STANDARD_ACCOUNT_CLASS_HASH } from "../../network/constants"
+import { TXV1_ACCOUNT_CLASS_HASH } from "../../network/constants"
 import { networkService } from "../../network/service"
 import { BaseWalletAccount } from "../../wallet.model"
 import { IAccountService } from "../service/interface"
@@ -40,7 +40,7 @@ export const getImplementationForAccount = async (
 
       return (
         walletAccount.network.accountClassHash?.[walletAccount.type] ??
-        STANDARD_ACCOUNT_CLASS_HASH
+        TXV1_ACCOUNT_CLASS_HASH
       )
     }
   }

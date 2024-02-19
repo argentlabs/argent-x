@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
-import { constants, num, Account } from "starknet"
+import { constants, num } from "starknet"
 import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 import { changeGuardianCalldataSchema } from "@argent/shared"
@@ -23,8 +23,8 @@ export const changeGuardianProcedure = extensionOnlyProcedure
     }) => {
       try {
         const newGuardian = num.hexToDecimalString(guardian)
-        const starknetAccount =
-          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+        const starknetAccount = await wallet.getSelectedStarknetAccount()
+
         const isRemoveGuardian = num.toBigInt(newGuardian) === constants.ZERO
         await actionService.add(
           {
@@ -48,7 +48,6 @@ export const changeGuardianProcedure = extensionOnlyProcedure
             },
           },
           {
-            origin,
             title: isRemoveGuardian
               ? "Remove Argent Shield"
               : "Add Argent Shield",

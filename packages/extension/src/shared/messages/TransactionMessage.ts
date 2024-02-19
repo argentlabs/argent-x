@@ -1,19 +1,14 @@
-import type {
-  Abi,
-  AllowArray,
-  Call,
-  InvocationsDetails,
-  UniversalDeployerContractPayload,
-} from "starknet"
+import type { Abi, AllowArray, Call, InvocationsDetails } from "starknet"
 
 import { Transaction } from "../transactions"
 import {
   SimulateTransactionsRequest,
   TransactionSimulationWithFees,
 } from "../transactionSimulation/types"
-import { DeclareContract } from "../udc/schema"
+import { DeclareContract, DeployContract } from "../udc/schema"
 import { TransactionError } from "../errors/transaction"
 import { EstimatedFees } from "../transactionSimulation/fees/fees.model"
+import { Address } from "@argent/shared"
 
 export interface ExecuteTransactionRequest {
   transactions: Call | Call[]
@@ -44,7 +39,7 @@ export type TransactionMessage =
     }
   | {
       type: "ESTIMATE_DEPLOY_CONTRACT_FEE"
-      data: UniversalDeployerContractPayload
+      data: DeployContract
     }
   | { type: "ESTIMATE_DEPLOY_CONTRACT_FEE_REJ"; data: { error: string } }
   | {
@@ -68,7 +63,7 @@ export type TransactionMessage =
     }
   | {
       type: "SIMULATE_TRANSACTIONS"
-      data: AllowArray<Call>
+      data: { call: AllowArray<Call>; feeTokenAddress: Address }
     }
   | {
       type: "SIMULATE_TRANSACTIONS_RES"

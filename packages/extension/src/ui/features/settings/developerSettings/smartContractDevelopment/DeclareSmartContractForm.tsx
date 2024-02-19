@@ -2,7 +2,7 @@ import { CellStack, ErrorMessage, P3, Select, SpacerCell } from "@argent/ui"
 import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { CompiledSierraCasm, hash, isSierra } from "starknet"
+import { CompiledSierraCasm, hash, isSierra } from "starknet6"
 import { chakra } from "@chakra-ui/react"
 
 import { readFileAsString } from "@argent/shared"

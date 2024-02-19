@@ -7,7 +7,7 @@ import { getMulticallForNetwork } from "../../multicall"
 import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import {
   MULTISIG_ACCOUNT_CLASS_HASH,
-  STANDARD_ACCOUNT_CLASS_HASH,
+  TXV1_ACCOUNT_CLASS_HASH,
 } from "../../network/constants"
 import { addressSchema } from "@argent/shared"
 import {
@@ -40,7 +40,7 @@ describe("getAccountClassHashFromChain", () => {
     mockNetworkService.getById.mockResolvedValueOnce({
       ...mockNetwork,
       accountClassHash: {
-        standard: STANDARD_ACCOUNT_CLASS_HASH,
+        standard: TXV1_ACCOUNT_CLASS_HASH,
       },
     })
 
@@ -52,7 +52,7 @@ describe("getAccountClassHashFromChain", () => {
       }),
     ]
 
-    mockTryGetClassHash.mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH)
+    mockTryGetClassHash.mockResolvedValueOnce(TXV1_ACCOUNT_CLASS_HASH)
 
     const call = {
       contractAddress: accounts[0].address,
@@ -60,22 +60,18 @@ describe("getAccountClassHashFromChain", () => {
     }
 
     mockGetMulticallForNetwork.mockReturnValueOnce({
-      callContract: vi
-        .fn()
-        .mockResolvedValueOnce([STANDARD_ACCOUNT_CLASS_HASH]),
+      callContract: vi.fn().mockResolvedValueOnce([TXV1_ACCOUNT_CLASS_HASH]),
     } as any)
 
     mockGetProvider.mockReturnValueOnce({
-      getClassHashAt: vi
-        .fn()
-        .mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH),
+      getClassHashAt: vi.fn().mockResolvedValueOnce(TXV1_ACCOUNT_CLASS_HASH),
     } as any)
 
     const results = await getAccountClassHashFromChain(accounts)
 
     expect(results[0].classHash).not.toBeUndefined()
     expect(results[0].classHash).toEqual(
-      addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
+      addressSchema.parse(TXV1_ACCOUNT_CLASS_HASH),
     )
 
     expect(mockTryGetClassHash).toHaveBeenCalledWith(
@@ -91,7 +87,7 @@ describe("getAccountClassHashFromChain", () => {
       address: accounts[0].address,
       networkId: accounts[0].networkId,
       type: "standard",
-      classHash: addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
+      classHash: addressSchema.parse(TXV1_ACCOUNT_CLASS_HASH),
     })
   })
 
@@ -101,7 +97,7 @@ describe("getAccountClassHashFromChain", () => {
     mockNetworkService.getById.mockResolvedValueOnce({
       ...mockNetwork,
       accountClassHash: {
-        standard: STANDARD_ACCOUNT_CLASS_HASH,
+        standard: TXV1_ACCOUNT_CLASS_HASH,
         multisig: MULTISIG_ACCOUNT_CLASS_HASH,
       },
     })
@@ -111,7 +107,7 @@ describe("getAccountClassHashFromChain", () => {
         address: "0x01",
         networkId: mockNetwork.id,
         network: mockNetwork,
-        classHash: STANDARD_ACCOUNT_CLASS_HASH,
+        classHash: TXV1_ACCOUNT_CLASS_HASH,
       }),
       getMockWalletAccount({
         address: "0x02",
@@ -123,7 +119,7 @@ describe("getAccountClassHashFromChain", () => {
     ]
 
     mockTryGetClassHash
-      .mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH)
+      .mockResolvedValueOnce(TXV1_ACCOUNT_CLASS_HASH)
       .mockResolvedValueOnce(MULTISIG_ACCOUNT_CLASS_HASH)
 
     const first_call = {
@@ -137,22 +133,18 @@ describe("getAccountClassHashFromChain", () => {
     }
 
     mockGetMulticallForNetwork.mockReturnValueOnce({
-      callContract: vi
-        .fn()
-        .mockResolvedValueOnce([STANDARD_ACCOUNT_CLASS_HASH]),
+      callContract: vi.fn().mockResolvedValueOnce([TXV1_ACCOUNT_CLASS_HASH]),
     } as any)
 
     mockGetProvider.mockReturnValueOnce({
-      getClassHashAt: vi
-        .fn()
-        .mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH),
+      getClassHashAt: vi.fn().mockResolvedValueOnce(TXV1_ACCOUNT_CLASS_HASH),
     } as any)
 
     const results = await getAccountClassHashFromChain(accounts)
 
     expect(results[0].classHash).not.toBeUndefined()
     expect(results[0].classHash).toEqual(
-      addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
+      addressSchema.parse(TXV1_ACCOUNT_CLASS_HASH),
     )
 
     expect(results[1].classHash).not.toBeUndefined()
@@ -167,7 +159,7 @@ describe("getAccountClassHashFromChain", () => {
         callContract: expect.any(Function),
         getClassHashAt: expect.any(Function),
       }),
-      STANDARD_ACCOUNT_CLASS_HASH,
+      TXV1_ACCOUNT_CLASS_HASH,
     )
 
     expect(mockTryGetClassHash).toHaveBeenNthCalledWith(
@@ -184,7 +176,7 @@ describe("getAccountClassHashFromChain", () => {
       address: accounts[0].address,
       networkId: accounts[0].networkId,
       type: "standard",
-      classHash: addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
+      classHash: addressSchema.parse(TXV1_ACCOUNT_CLASS_HASH),
     })
 
     expect(results[1]).toEqual({
@@ -201,7 +193,7 @@ describe("getAccountClassHashFromChain", () => {
     mockNetworkService.getById.mockResolvedValueOnce({
       ...mockNetwork,
       accountClassHash: {
-        standard: STANDARD_ACCOUNT_CLASS_HASH,
+        standard: TXV1_ACCOUNT_CLASS_HASH,
       },
     })
 
@@ -216,25 +208,23 @@ describe("getAccountClassHashFromChain", () => {
     mockGetProvider.mockReturnValueOnce({
       callContract: vi
         .fn()
-        .mockResolvedValueOnce({ result: [STANDARD_ACCOUNT_CLASS_HASH] }),
-      getClassHashAt: vi
-        .fn()
-        .mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH),
+        .mockResolvedValueOnce({ result: [TXV1_ACCOUNT_CLASS_HASH] }),
+      getClassHashAt: vi.fn().mockResolvedValueOnce(TXV1_ACCOUNT_CLASS_HASH),
     } as any)
-    mockTryGetClassHash.mockResolvedValueOnce(STANDARD_ACCOUNT_CLASS_HASH)
+    mockTryGetClassHash.mockResolvedValueOnce(TXV1_ACCOUNT_CLASS_HASH)
 
     const results = await getAccountClassHashFromChain(accounts)
 
     expect(results[0].classHash).not.toBeUndefined()
     expect(results[0].classHash).toEqual(
-      addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
+      addressSchema.parse(TXV1_ACCOUNT_CLASS_HASH),
     )
     expect(mockTryGetClassHash).toHaveBeenCalledTimes(1)
     expect(results[0]).toEqual({
       address: accounts[0].address,
       networkId: accounts[0].networkId,
       type: "standard",
-      classHash: addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
+      classHash: addressSchema.parse(TXV1_ACCOUNT_CLASS_HASH),
     })
   })
 })

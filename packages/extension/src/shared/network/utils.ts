@@ -1,9 +1,14 @@
 import { constants } from "starknet"
-import { isEqualAddress } from "@argent/shared"
+import {
+  isEqualAddress,
+  type ArgentNetworkId,
+  isArgentNetworkId,
+} from "@argent/shared"
 
 import type { ArgentAccountType } from "../wallet.model"
-import type { Network, PublicRpcNode } from "./type"
+import type { DefaultNetworkId, Network, PublicRpcNode } from "./type"
 import { PUBLIC_RPC_NODES } from "./constants"
+import { argentApiNetworkForNetwork } from "../api/headers"
 
 // LEGACY ⬇️
 export function mapImplementationToArgentAccountType(
@@ -29,7 +34,7 @@ export function mapImplementationToArgentAccountType(
 
 export function getNetworkIdFromChainId(
   encodedChainId: string,
-): "mainnet-alpha" | "goerli-alpha" {
+): ArgentNetworkId {
   switch (encodedChainId) {
     case constants.StarknetChainId.SN_MAIN:
       return "mainnet-alpha"
@@ -37,12 +42,15 @@ export function getNetworkIdFromChainId(
     case constants.StarknetChainId.SN_GOERLI:
       return "goerli-alpha"
 
+    case constants.StarknetChainId.SN_SEPOLIA:
+      return "sepolia-alpha"
+
     default:
       throw new Error(`Unknown chainId: ${encodedChainId}`)
   }
 }
 
-export function getDefaultNetworkId() {
+export function getDefaultNetworkId(): DefaultNetworkId {
   const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
 
   if (!argentXEnv) {
@@ -82,7 +90,7 @@ export function getDefaultNetwork(defaultNetworks: Network[]): Network {
 }
 
 export function isArgentNetwork(network: Network) {
-  return network.id === "mainnet-alpha" || network.id === "goerli-alpha"
+  return isArgentNetworkId(network.id)
 }
 
 export function getRandomPublicRPCNode(network: Network) {
@@ -101,13 +109,11 @@ export function getPublicRPCNodeUrls(network: Network) {
   if (!isArgentNetwork) {
     throw new Error(`Not an Argent network: ${network.id}`)
   }
-  const key: keyof PublicRpcNode =
-    network.id === "mainnet-alpha" ? "mainnet" : "testnet"
-  const nodeUrls = PUBLIC_RPC_NODES.map((node) => node[key])
-
-  if (!nodeUrls) {
+  const key = argentApiNetworkForNetwork(network.id)
+  if (!key) {
     throw new Error(`No nodes found for network: ${network.id}`)
   }
+  const nodeUrls = PUBLIC_RPC_NODES.map((node) => node[key])
 
   return nodeUrls
 }

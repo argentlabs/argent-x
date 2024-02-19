@@ -28,7 +28,7 @@ export async function getAccountCairoVersionFromChain(
             return {
               address: accs[i].address,
               networkId,
-              cairoVersion: response,
+              cairoVersion: response || accs[i].cairoVersion, // If the onchain call fails, keep the cached one
             }
           })
           return result

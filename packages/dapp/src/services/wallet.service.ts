@@ -29,7 +29,7 @@ export let windowStarknet: StarknetWindowObjectV5 | null = null
 export const starknetVersion = "v5"
 
 export const silentConnectWallet = async () => {
-  const _windowStarknet = await connect({
+  const { wallet } = await connect({
     modalMode: "neverAsk",
     webWalletUrl,
     argentMobileOptions: {
@@ -40,12 +40,12 @@ export const silentConnectWallet = async () => {
   // comment this when using webwallet -- enable is already done by @argent/get-starknet and webwallet is currently using only v4
   // to remove when @argent/get-starknet will support both v4 and v5
   //await _windowStarknet?.enable({ starknetVersion })
-  windowStarknet = _windowStarknet as StarknetWindowObjectV5 | null
+  windowStarknet = wallet as StarknetWindowObjectV5 | null
   return windowStarknet ?? undefined
 }
 
 export const connectWallet = async () => {
-  const _windowStarknet = await connect({
+  const { wallet } = await connect({
     webWalletUrl, // TODO: remove hardcoding
     argentMobileOptions: {
       dappName: "Example dapp",
@@ -56,7 +56,7 @@ export const connectWallet = async () => {
   // comment this when using webwallet -- enable is already done by @argent/get-starknet and webwallet is currently using only v4
   // to remove when @argent/get-starknet will support both v4 and v5
   //await _windowStarknet?.enable({ starknetVersion })
-  windowStarknet = _windowStarknet as StarknetWindowObjectV5 | null
+  windowStarknet = wallet as StarknetWindowObjectV5 | null
   return windowStarknet ?? undefined
 }
 
@@ -168,7 +168,7 @@ export const waitForTransaction = async (hash: string) => {
   return windowStarknet.provider.waitForTransaction(hash)
 }
 
-export const addWalletChangeListener = async (
+export const addWalletAccountsChangedListener = async (
   handleEvent: (accounts: string[]) => void,
 ) => {
   if (!windowStarknet?.isConnected) {
@@ -177,13 +177,31 @@ export const addWalletChangeListener = async (
   windowStarknet.on("accountsChanged", handleEvent)
 }
 
-export const removeWalletChangeListener = async (
+export const removeWalletAccountsChangedListener = async (
   handleEvent: (accounts: string[]) => void,
 ) => {
   if (!windowStarknet?.isConnected) {
     return
   }
   windowStarknet.off("accountsChanged", handleEvent)
+}
+
+export const addWalletNetworkChangedListener = async (
+  handleEvent: (network?: string) => void,
+) => {
+  if (!windowStarknet?.isConnected) {
+    return
+  }
+  windowStarknet.on("networkChanged", handleEvent)
+}
+
+export const removeWalletNetworkChangedListener = async (
+  handleEvent: (network?: string) => void,
+) => {
+  if (!windowStarknet?.isConnected) {
+    return
+  }
+  windowStarknet.off("networkChanged", handleEvent)
 }
 
 export const declare = async (
@@ -226,5 +244,17 @@ export const addNetwork = async (params: AddStarknetChainParameters) => {
   await windowStarknet.request({
     type: "wallet_addStarknetChain",
     params,
+  })
+}
+
+export const switchNetwork = async (chainId: string) => {
+  if (!windowStarknet?.isConnected) {
+    throw Error("starknet wallet not connected")
+  }
+  await windowStarknet.request({
+    type: "wallet_switchStarknetChain",
+    params: {
+      chainId,
+    },
   })
 }

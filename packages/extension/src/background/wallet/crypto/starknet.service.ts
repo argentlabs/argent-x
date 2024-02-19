@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { Hex, isEqualAddress } from "@argent/shared"
 import { CairoVersion, CallData, hash } from "starknet"
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { MultisigSigner } from "../../../shared/multisig/signer"
@@ -31,17 +31,20 @@ import {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import {
-  ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-  PROXY_CONTRACT_CLASS_HASHES,
-} from "../starknet.constants"
 import { decodeBase58Array } from "@argent/shared"
 import { MULTISIG_DERIVATION_PATH } from "../../../shared/wallet.service"
 import { sortMultisigByDerivationPath } from "../../../shared/utils/accountsMultisigSort"
 import { SessionError } from "../../../shared/errors/session"
 import { getAccountCairoVersion } from "../../../shared/utils/argentAccountVersion"
 import { AccountError } from "../../../shared/errors/account"
-import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
+import {
+  ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
+  C0_PROXY_CONTRACT_CLASS_HASHES,
+} from "../../../shared/account/starknet.constants"
+import {
+  Implementation,
+  findImplementationForAccount,
+} from "../findImplementationForAddress"
 const { getSelectorFromName, calculateContractAddressFromHash } = hash
 
 export class WalletCryptoStarknetService {
@@ -144,9 +147,7 @@ export class WalletCryptoStarknetService {
       account.signer.derivationPath,
     )
 
-    const starkPub = starkPair.pubKey
-
-    return { publicKey: starkPub, account }
+    return { publicKey: starkPair.pubKey, account }
   }
 
   /**
@@ -226,12 +227,10 @@ export class WalletCryptoStarknetService {
   async getAccountClassHashForNetwork(
     network: Network,
     accountType: ArgentAccountType,
-  ): Promise<string> {
+  ): Promise<Hex> {
     if (network.accountClassHash && network.accountClassHash.standard) {
-      return (
-        network.accountClassHash[accountType] ??
-        network.accountClassHash.standard
-      )
+      return (network.accountClassHash[accountType] ??
+        network.accountClassHash.standard) as Hex
     }
 
     const deployerAccount = await getPreDeployedAccount(network)
@@ -242,58 +241,10 @@ export class WalletCryptoStarknetService {
         this.loadContracts,
       )
 
-      return accountClassHash
+      return accountClassHash as Hex
     }
 
-    return ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0]
-  }
-
-  public getCairo0AccountContractAddress(
-    accountClassHash: string,
-    pubKey: string,
-  ): string {
-    const constructorCallData = {
-      implementation: accountClassHash,
-      selector: getSelectorFromName("initialize"),
-      calldata: CallData.compile({
-        signer: pubKey,
-        guardian: "0",
-      }),
-    }
-
-    const deployAccountPayload = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
-      constructorCalldata: CallData.compile(constructorCallData),
-      addressSalt: pubKey,
-    }
-
-    return calculateContractAddressFromHash(
-      deployAccountPayload.addressSalt,
-      deployAccountPayload.classHash,
-      deployAccountPayload.constructorCalldata,
-      0,
-    )
-  }
-
-  public getCairo1AccountContractAddress(
-    accountClassHash: string,
-    pubKey: string,
-  ) {
-    const deployAccountPayload = {
-      classHash: accountClassHash,
-      constructorCalldata: CallData.compile({
-        signer: pubKey,
-        guardian: "0",
-      }),
-      addressSalt: pubKey,
-    }
-
-    return calculateContractAddressFromHash(
-      deployAccountPayload.addressSalt,
-      deployAccountPayload.classHash,
-      deployAccountPayload.constructorCalldata,
-      0,
-    )
+    return ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES.CAIRO_1[0] as Hex
   }
 
   public async getUndeployedAccountCairoVersion(
@@ -317,37 +268,30 @@ export class WalletCryptoStarknetService {
       return "1" // multisig is always Cairo 1
     }
 
-    const accountClassHash =
-      account.classHash ??
-      (await this.getAccountClassHashForNetwork(account.network, account.type))
-
     const { publicKey } = await this.getPublicKey(account)
 
-    const cairo1Address = this.getCairo1AccountContractAddress(
-      accountClassHash,
-      publicKey,
-    )
-
-    if (isEqualAddress(account.address, cairo1Address)) {
-      console.log("Undeployed Account is a Cairo 1 account")
-      return "1"
+    // If no class hash is provided by the account, we want to add the network implementation to check
+    const networkImplementation: Implementation = {
+      cairoVersion: "1",
+      accountClassHash: await this.getAccountClassHashForNetwork(
+        account.network,
+        account.type,
+      ),
     }
 
-    const cairo0Address = this.getCairo0AccountContractAddress(
-      STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH, // last Cairo 0 implementation
-      publicKey,
-    )
-
-    if (isEqualAddress(account.address, cairo0Address)) {
-      console.log("Undeployed Account is a Cairo 0 account")
-      return "0"
+    try {
+      const { cairoVersion } = findImplementationForAccount(
+        publicKey,
+        account,
+        [networkImplementation],
+      )
+      return cairoVersion
+    } catch (error) {
+      throw new AccountError({
+        code: "UNDEPLOYED_ACCOUNT_CAIRO_VERSION_NOT_FOUND",
+        options: { error },
+      })
     }
-
-    // We don't check for bad class hash 0x01a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f
-    // because it's deprecated, so we should not have any account with this class hash that should need this function
-    throw new AccountError({
-      code: "UNDEPLOYED_ACCOUNT_CAIRO_VERSION_NOT_FOUND",
-    })
   }
 
   public async getCalculatedMultisigAddress(
@@ -386,7 +330,7 @@ export class WalletCryptoStarknetService {
     }
 
     const deployMultisigPayload = {
-      classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+      classHash: C0_PROXY_CONTRACT_CLASS_HASHES[0],
       constructorCalldata: CallData.compile(constructorCallData),
       addressSalt: starkPub,
     }

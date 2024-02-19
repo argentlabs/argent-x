@@ -1,5 +1,7 @@
 import { Page, expect } from "@playwright/test"
-type NetworkName = "Localhost 5050" | "Testnet" | "Mainnet" | "My Network"
+
+type NetworkName = "Devnet" | "Goerli" | "Mainnet" | "My Network"
+
 export function getDefaultNetwork() {
   const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
 
@@ -39,6 +41,12 @@ export default class Network {
     await this.networkOption(networkName).click()
   }
 
+  async selectDefaultNetwork() {
+    const networkName = this.getDefaultNetworkName()
+    await this.networkSelector.click()
+    await this.networkOption(networkName).click()
+  }
+
   async ensureAvailableNetworks(networks: string[]) {
     await this.networkSelector.click()
     const availableNetworks = await this.page
@@ -52,8 +60,10 @@ export default class Network {
     switch (defaultNetworkId.toLowerCase()) {
       case "mainnet-alpha":
         return "Mainnet"
+      case "sepolia-alpha":
+        return "Sepolia"
       case "goerli-alpha":
-        return "Testnet"
+        return "Goerli"
       default:
         throw new Error(`Unknown ARGENTX_Network: ${defaultNetworkId}`)
     }

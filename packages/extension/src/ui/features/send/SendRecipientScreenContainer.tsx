@@ -10,9 +10,15 @@ import { FC, useCallback, useEffect, useMemo } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
+import { partition } from "lodash-es"
 import type { AddressBookContact } from "../../../shared/addressBook/type"
-import type { WalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
+import {
+  sortAccountsByDerivationPath,
+  sortMultisigByDerivationPath,
+} from "../../../shared/utils/accountsMultisigSort"
+import { IS_DEV } from "../../../shared/utils/dev"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { useAppState } from "../../app.state"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
 import { routes, useCurrentPathnameWithQuery } from "../../routes"
@@ -21,11 +27,10 @@ import { useView } from "../../views/implementation/react"
 import { AccountAddressListItem } from "../accounts/AccountAddressListItem"
 import { SendRecipientScreen } from "./SendRecipientScreen"
 import { useSendQuery } from "./schema"
+import { FormType, formSchema } from "./sendRecipientScreen.model"
 import { useFilteredAccounts } from "./useFilteredAccounts"
 import { useFilteredContacts } from "./useFilteredContacts"
 import { useGetAddressFromDomainNameInput } from "./useGetAddressFromDomainName"
-import { IS_DEV } from "../../../shared/utils/dev"
-import { FormType, formSchema } from "./sendRecipientScreen.model"
 
 export const SendRecipientScreenContainer: FC = () => {
   const returnTo = useCurrentPathnameWithQuery()
@@ -111,14 +116,29 @@ export const SendRecipientScreenContainer: FC = () => {
   const includeSelfAccount =
     Boolean(IS_DEV) /** Boolean guards against minification error */
 
-  const filteredAccounts = includeSelfAccount
-    ? allFilteredAccounts
-    : allFilteredAccounts.filter((a) => !accountsEqual(a, account))
-
   /** > 1 because excluding current account */
   const hasAccounts = includeSelfAccount
     ? accounts.length > 0
     : accounts.length > 1
+
+  const [multisigAccounts, standardAccounts] = partition(
+    allFilteredAccounts,
+    (account) => account.type === "multisig",
+  )
+
+  const sortedMultisigAccounts = useMemo(
+    () => [...multisigAccounts].sort(sortMultisigByDerivationPath),
+    [multisigAccounts],
+  )
+
+  const sortedStandardAccounts = useMemo(() => {
+    const sortedAccounts = [...standardAccounts].sort(
+      sortAccountsByDerivationPath,
+    )
+    return includeSelfAccount
+      ? sortedAccounts
+      : sortedAccounts.filter((a) => !accountsEqual(a, account))
+  }, [standardAccounts, includeSelfAccount, account])
 
   useEffect(() => {
     if (starknetDomainError) {
@@ -196,7 +216,8 @@ export const SendRecipientScreenContainer: FC = () => {
     <SendRecipientScreen
       errors={errors}
       hasAccounts={hasAccounts}
-      filteredAccounts={filteredAccounts}
+      multisigAccounts={sortedMultisigAccounts}
+      standardAccounts={sortedStandardAccounts}
       filteredContacts={filteredContacts}
       hasQueryError={hasQueryError}
       isLoading={isLoading}

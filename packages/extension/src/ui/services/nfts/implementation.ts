@@ -73,9 +73,7 @@ export class ClientNftService implements IClientNftService {
 
       transactions.calldata = compiledCalldata
     }
-    const title = nft.collection?.name
-      ? `Send ${nft.collection?.name} ${nft.name}`
-      : `Send ${nft.name}`
+    const title = `Send ${nft.name}`
     const formattedRecipient = isAddress(recipient)
       ? formatAddress(recipient)
       : recipient

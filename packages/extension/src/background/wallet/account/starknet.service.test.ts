@@ -9,7 +9,7 @@ import {
   cryptoStarknetServiceMock,
   sessionServiceMock,
 } from "../test.utils"
-import { Account } from "starknet"
+import { Account } from "starknet6"
 import { grindKey } from "../../keys/keyDerivation"
 import { MultisigSigner } from "../../../shared/multisig/signer"
 

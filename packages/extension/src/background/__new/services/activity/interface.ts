@@ -3,7 +3,11 @@ import type Emittery from "emittery"
 
 import type { ContractAddress } from "../../../../shared/storage/__new/repositories/nft"
 import type { BaseWalletAccount } from "../../../../shared/wallet.model"
-import type { Activity } from "./schema"
+import type { Activity } from "../../../../shared/activity/schema"
+import {
+  ActivitiesPayload,
+  ProvisionActivityPayload,
+} from "../../../../shared/activity/types"
 
 /** raw */
 export const Activities = Symbol("Activities")
@@ -12,7 +16,8 @@ export const Activities = Symbol("Activities")
 export const TokenActivity = Symbol("TokenActivity")
 export const NftActivity = Symbol("NftActivity")
 
-/** security */
+/** account */
+export const AccountDeployActivity = Symbol("AccountDeployActivity")
 export const TriggerEscapeGuardianActivity = Symbol(
   "TriggerEscapeGuardianActivity",
 )
@@ -30,10 +35,8 @@ export const MultisigConfigurationUpdatedActivity = Symbol(
   "MultisigConfigurationUpdatedActivity",
 )
 
-export type ActivitiesPayload = {
-  account: BaseWalletAccount
-  activities: Activity[]
-}
+/** Provision */
+export const ProvisionActivity = Symbol("ProvisionActivity")
 
 export type TokenActivityPayload = {
   accounts: BaseWalletAccount[]
@@ -45,7 +48,7 @@ export type NftActivityPayload = {
   nfts: ContractAddress[]
 }
 
-export type SecurityActivityPayload = BaseWalletAccount[]
+export type AccountActivityPayload = BaseWalletAccount[]
 
 /**
  * Fired when new activities are discovered on an individual account
@@ -55,16 +58,18 @@ export type Events = {
   [Activities]: ActivitiesPayload
   [TokenActivity]: TokenActivityPayload
   [NftActivity]: NftActivityPayload
-  [TriggerEscapeGuardianActivity]: SecurityActivityPayload
-  [TriggerEscapeSignerActivity]: SecurityActivityPayload
-  [EscapeGuardianActivity]: SecurityActivityPayload
-  [EscapeSignerActivity]: SecurityActivityPayload
-  [GuardianChangedActivity]: SecurityActivityPayload
-  [GuardianBackupChangedActivity]: SecurityActivityPayload
-  [SignerChangedActivity]: SecurityActivityPayload
-  [CancelEscapeActivity]: SecurityActivityPayload
-  [AccountUpgradedActivity]: SecurityActivityPayload
-  [MultisigConfigurationUpdatedActivity]: SecurityActivityPayload
+  [AccountDeployActivity]: AccountActivityPayload
+  [TriggerEscapeGuardianActivity]: AccountActivityPayload
+  [TriggerEscapeSignerActivity]: AccountActivityPayload
+  [EscapeGuardianActivity]: AccountActivityPayload
+  [EscapeSignerActivity]: AccountActivityPayload
+  [GuardianChangedActivity]: AccountActivityPayload
+  [GuardianBackupChangedActivity]: AccountActivityPayload
+  [SignerChangedActivity]: AccountActivityPayload
+  [CancelEscapeActivity]: AccountActivityPayload
+  [AccountUpgradedActivity]: AccountActivityPayload
+  [MultisigConfigurationUpdatedActivity]: AccountActivityPayload
+  [ProvisionActivity]: ProvisionActivityPayload
 }
 
 export interface IActivityService {

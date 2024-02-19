@@ -12,7 +12,7 @@ export const ShieldAccountFinishScreen: FC = () => {
   const accountName = account ? account.name : undefined
 
   /** TODO: find a nice way to preserve the original 'returnTo' tab route from settings screen */
-  const returnRoute = routes.editAccount(
+  const returnRoute = routes.settingsAccount(
     accountAddress,
     routes.settings(routes.accountTokens()),
   )

@@ -31,7 +31,7 @@ export const NetworkWarningScreen: FC<NetworkWarningScreenProps> = ({
           Network issues
         </H3>
         <P3 color="neutrals.100">
-          StarkNet is in Alpha and is experiencing degraded network performance.
+          Starknet is in Alpha and is experiencing degraded network performance.
           Your transactions may fail.
         </P3>
       </Center>

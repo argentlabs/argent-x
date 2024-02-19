@@ -3,6 +3,8 @@ import { encode } from "starknet"
 
 import { CreateAccountType } from "./wallet.model"
 import { KeyValueStorage } from "./storage"
+import { isEmpty } from "lodash-es"
+import { settingsStore } from "./settings"
 
 const SEGMENT_TRACK_URL = "https://api.segment.io/v1/track"
 
@@ -270,7 +272,13 @@ export function getAnalytics(
   }
   return {
     track: async (event, ...[data]) => {
-      if (!SEGMENT_WRITE_KEY) {
+      const privacyShareAnalyticsData = await settingsStore.get(
+        "privacyShareAnalyticsData",
+      )
+      if (!privacyShareAnalyticsData) {
+        return
+      }
+      if (isEmpty(SEGMENT_WRITE_KEY)) {
         console.groupCollapsed(`Analytics: ${event}`)
         console.log("You see this log because no SEGMENT_WRITE_KEY is set")
         console.log(data)

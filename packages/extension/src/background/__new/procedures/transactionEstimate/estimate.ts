@@ -11,6 +11,7 @@ import {
 } from "./helpers"
 import { estimatedFeesSchema } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { AccountError } from "../../../../shared/errors/account"
+import { getTxVersionFromFeeToken } from "../../../../shared/utils/getTransactionVersion"
 
 const estimateRequestSchema = z.object({
   account: baseWalletAccountSchema,
@@ -51,21 +52,15 @@ export const estimateTransactionProcedure = extensionOnlyProcedure
         wallet,
       )
 
-      // TODO: consider selected fee token
+      const version = getTxVersionFromFeeToken(feeTokenAddress)
+
       const estimatedFees = await snAccount.estimateFeeBulk(allInvocations, {
-        skipValidate: true,
+        // skipValidate is true by default
+        version,
       })
 
       try {
-        const aggregatedResponse = estimatedFeesToResponse(
-          estimatedFees,
-          allInvocations,
-        )
-
-        return {
-          ...aggregatedResponse,
-          feeTokenAddress,
-        }
+        return estimatedFeesToResponse(estimatedFees, feeTokenAddress)
       } catch (e) {
         throw new AccountError({
           code: "CANNOT_ESTIMATE_TRANSACTIONS",

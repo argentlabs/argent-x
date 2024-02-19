@@ -21,15 +21,16 @@ describe("Utility functions", () => {
   })
 
   test("formatCurrency function should correctly format BigInt to currency string", () => {
-    expect(formatCurrency(1000000n)).toBe("1")
-    expect(formatCurrency(1234567n)).toBe("1.234567")
-    expect(formatCurrency(-1000000n)).toBe("-1")
+    expect(formatCurrency(1000000n)).toBe("0.000000000001")
+    expect(formatCurrency(1234567n)).toBe("0.000000000001234567")
+    expect(formatCurrency(-1000000n)).toBe("-0.000000000001")
   })
 
   test("parseCurrency function should correctly parse currency string to BigInt", () => {
-    expect(parseCurrency("1").value).toBe(1000000n)
-    expect(parseCurrency("1.234567").value).toBe(1234567n)
-    expect(parseCurrency("-1").value).toBe(-1000000n)
+    expect(parseCurrency("1").value).toBe(1000000000000000000n)
+    expect(parseCurrency("1.234567").value).toBe(1234567000000000000n)
+    expect(parseCurrency("-1").value).toBe(-1000000000000000000n)
+    expect(parseCurrency("0.000000002887").value).toBe(2887000000n)
   })
 
   test("absBigInt function should return absolute value of BigInt", () => {
@@ -39,8 +40,8 @@ describe("Utility functions", () => {
   })
 
   test("parseCurrencyAbs function should return absolute value of parsed currency string", () => {
-    expect(parseCurrencyAbs("1").value).toBe(1000000n)
-    expect(parseCurrencyAbs("1.234567").value).toBe(1234567n)
-    expect(parseCurrencyAbs("-1").value).toBe(1000000n)
+    expect(parseCurrencyAbs("1").value).toBe(1000000000000000000n)
+    expect(parseCurrencyAbs("1.234567").value).toBe(1234567000000000000n)
+    expect(parseCurrencyAbs("-1").value).toBe(1000000000000000000n)
   })
 })

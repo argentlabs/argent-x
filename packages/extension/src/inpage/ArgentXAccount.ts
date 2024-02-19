@@ -88,10 +88,12 @@ export class ArgentXAccount extends Account {
     sendMessage({
       type: "REQUEST_DECLARE_CONTRACT",
       data: {
-        contract,
-        classHash,
-        casm,
-        compiledClassHash,
+        payload: {
+          contract,
+          classHash,
+          casm,
+          compiledClassHash,
+        },
       },
     })
     const { actionHash } = await waitForMessage(

@@ -4,10 +4,6 @@ import urlJoin from "url-join"
 
 import { Network, getProvider } from "../../shared/network"
 import { LoadContracts } from "../wallet/loadContracts"
-import {
-  ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES,
-  PROXY_CONTRACT_CLASS_HASHES,
-} from "../wallet/starknet.constants"
 
 interface PreDeployedAccount {
   address: string
@@ -71,7 +67,7 @@ export const declareContracts = memoize(
 
     if (!isProxyClassDeclared) {
       const proxy = await deployAccount.declare({
-        classHash: PROXY_CONTRACT_CLASS_HASHES[0],
+        classHash: computedProxyClassHash,
         contract: proxyContract,
       })
 
@@ -84,7 +80,7 @@ export const declareContracts = memoize(
 
     if (!isAccountClassDeclared) {
       const account = await deployAccount.declare({
-        classHash: ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES[0],
+        classHash: computedAccountClassHash,
         contract: accountContract,
       })
 

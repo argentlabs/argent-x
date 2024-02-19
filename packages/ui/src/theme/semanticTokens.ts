@@ -20,7 +20,7 @@ export const semanticTokens = {
     },
     panel: {
       default: "gray.50",
-      _dark: "black",
+      _dark: "neutrals.800",
     },
     /** TODO: this is a simple working example - these need mapping properly from Figma */
     surface: {

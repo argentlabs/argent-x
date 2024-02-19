@@ -10,6 +10,7 @@ import {
 import React, { FC, PropsWithChildren } from "react"
 
 import { useActionScreen } from "../../hooks/useActionScreen"
+import { usePrettyError } from "../../hooks/usePrettyError"
 
 const { AlertIcon } = icons
 
@@ -21,10 +22,13 @@ export const WithActionScreenErrorFooter: FC<
   WithActionScreenErrorFooterProps
 > = ({ children, isTransaction }) => {
   const { action } = useActionScreen()
-  if (!action?.meta.errorApproving) {
+  const { errorMessage, title } = usePrettyError(
+    action?.meta.errorApproving,
+    isTransaction,
+  )
+  if (!errorMessage) {
     return <>{children}</>
   }
-  const message = isTransaction ? "Transaction failed" : "Action failed"
   return (
     <>
       {children}
@@ -33,11 +37,11 @@ export const WithActionScreenErrorFooter: FC<
           <AccordionButton>
             <AlertIcon display={"inline-block"} fontSize={"base"} mr={1} />{" "}
             <Box as="span" flex="1" textAlign="left">
-              {message}
+              {title}
             </Box>
             <AccordionIcon />
           </AccordionButton>
-          <AccordionPanel>{action.meta.errorApproving}</AccordionPanel>
+          <AccordionPanel>{errorMessage}</AccordionPanel>
         </AccordionItem>
       </Accordion>
     </>

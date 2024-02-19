@@ -4,6 +4,7 @@ import { FC } from "react"
 
 import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 import {
+  ProvisionTransaction,
   TokenApproveTransaction,
   TokenMintTransaction,
   TokenTransferTransaction,
@@ -14,6 +15,7 @@ export interface TransferAccessoryProps {
     | TokenTransferTransaction
     | TokenMintTransaction
     | TokenApproveTransaction
+    | ProvisionTransaction
   failed?: boolean
 }
 
@@ -28,8 +30,8 @@ export const TransferAccessory: FC<TransferAccessoryProps> = ({
   if (!displayAmount) {
     return null
   }
-  const prefix =
-    action === "SEND" ? <>&minus;</> : action === "RECEIVE" ? <>+</> : null
+  const isInflux = action === "RECEIVE" || action === "PROVISION"
+  const prefix = action === "SEND" ? <>&minus;</> : isInflux ? <>+</> : null
   return (
     <Flex direction={"column"} overflow="hidden">
       <TextWithAmount amount={amount}>
@@ -37,7 +39,7 @@ export const TransferAccessory: FC<TransferAccessoryProps> = ({
           overflow="hidden"
           textOverflow={"ellipsis"}
           textAlign={"right"}
-          color={action === "RECEIVE" ? "secondary.500" : undefined}
+          color={isInflux ? "secondary.500" : undefined}
           textDecoration={failed ? "line-through" : undefined}
         >
           {prefix}

@@ -3,35 +3,24 @@ import { useEffect } from "react"
 
 import { settingsStore } from "../../shared/settings"
 import { useKeyValueStorage } from "../hooks/useStorage"
+import { baseSentryOptions } from "../../shared/sentry/options"
 
 export const useSentryInit = () => {
-  const enableErrorReporting = useKeyValueStorage(
+  const privacyErrorReporting = useKeyValueStorage(
     settingsStore,
     "privacyErrorReporting",
   )
-  const automaticErrorReporting = useKeyValueStorage(
+  const privacyAutomaticErrorReporting = useKeyValueStorage(
     settingsStore,
     "privacyAutomaticErrorReporting",
   )
 
-  const environment = process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV
-
-  let release = process.env.npm_package_version
-  const commitHash = process.env.COMMIT_HASH
-
-  if (environment === "staging" && commitHash) {
-    release = `${release}-rc__${commitHash}`
-  }
-
   useEffect(() => {
     Sentry.init({
-      dsn: process.env.SENTRY_DSN,
-      environment,
-      release,
-      autoSessionTracking: false, // don't want to track user sessions.
-      enabled: enableErrorReporting,
+      ...baseSentryOptions,
+      enabled: privacyErrorReporting,
       beforeSend(event) {
-        if (automaticErrorReporting) {
+        if (privacyAutomaticErrorReporting) {
           return event
         }
         if (event.extra?.submittedManually) {
@@ -40,5 +29,5 @@ export const useSentryInit = () => {
         return null
       },
     })
-  }, [automaticErrorReporting, enableErrorReporting, environment, release])
+  }, [privacyAutomaticErrorReporting, privacyErrorReporting])
 }

@@ -27,4 +27,5 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   connectedTooltipLabel?: string
   prettyAccountBalance?: string
   accountExtraInfo?: string
+  showRightElements?: boolean
 }

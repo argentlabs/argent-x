@@ -1,5 +1,6 @@
 import { B3, P4, icons } from "@argent/ui"
 import { Flex, Image, Square } from "@chakra-ui/react"
+import { ensureDecimals } from "@argent/shared"
 
 import { SimulationSummary } from "../../../../../../shared/transactionReview/schema"
 import { TokenIcon } from "../../../../accountTokens/TokenIcon"
@@ -61,7 +62,7 @@ function TokenSummary(summary: SimulationSummary) {
   const { value, usdValue, token } = summary
   const displayAmount = prettifyTokenAmount({
     amount: value || 0,
-    decimals: token?.decimals || 18,
+    decimals: ensureDecimals(token?.decimals),
     symbol: token?.symbol || "Unknown token",
   })
   const { color, prefix } = getAttributes(summary)
@@ -72,7 +73,7 @@ function TokenSummary(summary: SimulationSummary) {
         <B3>{token.name}</B3>
       </Flex>
       <Flex ml="auto" gap={1} direction={"column"} textAlign={"right"}>
-        <B3 color={color} data-testid={value}>
+        <B3 color={color} data-tx-value={value} data-fe-value={displayAmount}>
           {prefix}
           {displayAmount}
         </B3>

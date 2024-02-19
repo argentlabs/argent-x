@@ -5,7 +5,7 @@
 
 ---
 
-<h3 align='center' style='margin: 1em;'>⬇️ Get <b>Argent X</b> for StarkNet today:</h3>
+<h3 align='center' style='margin: 1em;'>⬇️ Get <b>Argent X</b> for Starknet today:</h3>
 
 <p align="center">
   <a href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb/">
@@ -44,7 +44,7 @@ The example dapp is also contained in this repository.
 
 ## 🌐 Usage with your dapp
 
-If you want to use this StarkNet Wallet extension with your dapp, the easiest way is to checkout the [starknetkit](https://github.com/argentlabs/starknetkit) package
+If you want to use this Starknet Wallet extension with your dapp, the easiest way is to checkout the [starknetkit](https://github.com/argentlabs/starknetkit) package
 
 ```bash
 # starknet.js is a peer dependency

@@ -11,6 +11,7 @@ const sendSchema = z.object({
   }),
   title: z.string(),
   subtitle: z.string().optional(),
+  isMaxSend: z.boolean().optional(),
 })
 
 export const sendProcedure = extensionOnlyProcedure
@@ -18,7 +19,7 @@ export const sendProcedure = extensionOnlyProcedure
   .output(z.string())
   .mutation(
     async ({
-      input: { transactions, title, subtitle },
+      input: { transactions, title, subtitle, isMaxSend },
       ctx: {
         services: { actionService },
       },
@@ -28,6 +29,9 @@ export const sendProcedure = extensionOnlyProcedure
           type: "TRANSACTION",
           payload: {
             transactions,
+            meta: {
+              isMaxSend,
+            },
           },
         },
         {

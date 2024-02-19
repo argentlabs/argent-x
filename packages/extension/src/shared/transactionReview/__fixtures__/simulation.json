@@ -130,7 +130,7 @@
           "overallFee": "2520000100800",
           "gasPrice": "1000000040",
           "gasUsage": "2520",
-          "unit": "wei",
+          "unit": "WEI",
           "maxFee": "5040003826577"
         }
       }

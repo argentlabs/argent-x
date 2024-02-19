@@ -7,7 +7,10 @@ import type { IAccountService } from "../../../../shared/account/service/interfa
 import type { IActivityStorage } from "../../../../shared/activity/types"
 import type { IDebounceService } from "../../../../shared/debounce"
 import { createScheduleServiceMock } from "../../../../shared/schedule/mock"
-import { InMemoryObjectStore } from "../../../../shared/storage/__new/__test__/inmemoryImplementations"
+import {
+  InMemoryKeyValueStore,
+  InMemoryObjectStore,
+} from "../../../../shared/storage/__new/__test__/inmemoryImplementations"
 import type {
   ContractAddress,
   INftsContractsRepository,
@@ -19,8 +22,9 @@ import type { IBackgroundUIService } from "../ui/interface"
 import { ActivityService } from "./implementation"
 import { GuardianChangedActivity, NftActivity, type Events } from "./interface"
 
-import activities from "./__fixtures__/activities.json"
-import state from "./__fixtures__/state.json"
+import activities from "../../../../shared/activity/__fixtures__/activities.json"
+import state from "../../../../shared/activity/__fixtures__/state.json"
+import { WalletStorageProps } from "../../../wallet/backup/backup.service"
 
 describe("ActivityService", () => {
   const makeService = () => {
@@ -33,6 +37,10 @@ describe("ActivityService", () => {
       defaults: {
         modifiedAfter: {},
       },
+    })
+
+    const walletStore = new InMemoryKeyValueStore<WalletStorageProps>({
+      namespace: "wallet",
     })
 
     const walletSingleton = {
@@ -76,6 +84,7 @@ describe("ActivityService", () => {
       scheduleService,
       backgroundUIService,
       debounceService,
+      walletStore,
     )
     return {
       emitter,

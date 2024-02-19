@@ -21,7 +21,10 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
       width={20}
       height={20}
     >
-      <path d="M4.29028 6.04238H23.597V25.4359H4.29028V6.04238Z" fill="white" />
+      <path
+        d="M4.29028 6.04238H23.597V25.4359H4.29028V6.04238Z"
+        fill="currentColor"
+      />
     </mask>
     <g mask="url(#mask0_1103_253)">
       <mask
@@ -58,7 +61,10 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
       width={28}
       height={29}
     >
-      <path d="M3.21722 0.61288H30.645V28.0406H3.21722V0.61288Z" fill="white" />
+      <path
+        d="M3.21722 0.61288H30.645V28.0406H3.21722V0.61288Z"
+        fill="currentColor"
+      />
     </mask>
     <g mask="url(#mask2_1103_253)">
       <mask
@@ -74,7 +80,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
       >
         <path
           d="M18.3445 28L3.26 15.7544L15.5056 0.669803L30.5902 12.9155L18.3445 28Z"
-          fill="white"
+          fill="currentColor"
         />
       </mask>
       <g mask="url(#mask3_1103_253)">
@@ -113,7 +119,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
       width={28}
       height={28}
     >
-      <path d="M0 0H27.4277V27.4277H0V0Z" fill="white" />
+      <path d="M0 0H27.4277V27.4277H0V0Z" fill="currentColor" />
     </mask>
     <g mask="url(#mask5_1103_253)">
       <mask
@@ -129,7 +135,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
       >
         <path
           d="M27.4386 14.3565L13.0705 27.4353L-0.00836024 13.0666L14.3597 -0.0121715L27.4386 14.3565Z"
-          fill="white"
+          fill="currentColor"
         />
       </mask>
       <g mask="url(#mask6_1103_253)">

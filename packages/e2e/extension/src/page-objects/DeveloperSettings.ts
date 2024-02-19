@@ -7,25 +7,25 @@ export default class DeveloperSettings {
 
   get manageNetworks() {
     return this.page.locator(
-      `//a//*[text()="${lang.developerSettings.manageNetworks}"]`,
+      `//a//*[text()="${lang.settings.developerSettings.manageNetworks.manageNetworks}"]`,
     )
   }
 
   get blockExplorer() {
     return this.page.locator(
-      `//a//*[text()="${lang.developerSettings.blockExplorer}"]`,
+      `//a//*[text()="${lang.settings.preferences.defaultBlockExplorer}"]`,
     )
   }
 
   get smartCOntractDevelopment() {
     return this.page.locator(
-      `//a//*[text()="${lang.developerSettings.smartContractDevelopment}"]`,
+      `//a//*[text()="${lang.settings.developerSettings.smartContractDevelopment}"]`,
     )
   }
 
   get experimental() {
     return this.page.locator(
-      `//a//*[text()="${lang.developerSettings.experimental}"]`,
+      `//a//*[text()="${lang.settings.developerSettings.experimental}"]`,
     )
   }
 
@@ -56,7 +56,7 @@ export default class DeveloperSettings {
 
   get restoreDefaultNetworks() {
     return this.page.locator(
-      `button:has-text("${lang.developerSettings.restoreDefaultNetworks}")`,
+      `button:has-text("${lang.settings.developerSettings.manageNetworks.restoreDefaultNetworks}")`,
     )
   }
 

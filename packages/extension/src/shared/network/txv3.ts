@@ -4,7 +4,7 @@ import { BaseToken } from "../token/__new/types/token.model"
 
 const tokensRequireTxV3Support = [STRK_TOKEN_ADDRESS]
 
-export function feeTokenNeedsTxV3Support(token: BaseToken) {
+export function feeTokenNeedsTxV3Support(token: Pick<BaseToken, "address">) {
   return tokensRequireTxV3Support.some((address) =>
     isEqualAddress(address, token.address),
   )

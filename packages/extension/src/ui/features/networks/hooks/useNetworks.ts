@@ -8,12 +8,15 @@ export const useNetworks = () => {
   const networks = useView(allNetworksView)
   return networks
 }
+
 const expectedNetworkOrder = [
   "mainnet-alpha",
+  "sepolia-alpha",
   "goerli-alpha",
   "localhost",
   "integration",
 ]
+
 export const useNetworksWithStatuses = () => {
   const networks = useView(allNetworksWithStatusesView)
   const sortedNetworks = networks.sort((a, b) => {

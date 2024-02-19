@@ -1,7 +1,7 @@
 import { Button, H6, icons } from "@argent/ui"
 import { FC } from "react"
 
-const { MinusIcon } = icons
+const { RemoveIcon } = icons
 
 interface SettingsNetworkListItemProps {
   host: string
@@ -44,7 +44,7 @@ export const SettingsNetworkListItem: FC<SettingsNetworkListItemProps> = ({
             onRemoveClick?.()
           }}
         >
-          <MinusIcon fontSize={"xl"} />
+          <RemoveIcon fontSize={"xl"} />
         </Button>
       )}
     </Button>

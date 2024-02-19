@@ -77,7 +77,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         classHash,
         constructorCalldata: parameters,
         unique,
-        salt: salt ?? "",
+        salt: !salt ? "0" : salt, // Using empty string will cause toBigInt to fail. Therefore we use 0 salt.
       }
 
       await udcService.deployContract(payload)

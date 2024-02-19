@@ -1,7 +1,8 @@
-import { Call } from "starknet"
+import type { Call } from "starknet"
 
-import { Address } from "../chains"
-import { ApiData } from "../http/apiData"
+import type { Address } from "../chains"
+import type { ApiData } from "../http/apiData"
+import type { ArgentBackendNetworkId } from "../argent/type"
 
 export interface ApiTransactionReview {
   assessment: ApiTransactionReviewAssessment
@@ -127,11 +128,10 @@ export type ApiTransactionReviewTargettedDapp = {
 }
 
 export type ApiTransactionReviewNetwork =
-  | "mainnet"
+  | ArgentBackendNetworkId
   | "morden"
   | "ropsten"
   | "rinkeby"
-  | "goerli"
   | "kovan"
 
 export interface ApiTransactionReviewRequestBody {

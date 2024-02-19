@@ -31,7 +31,7 @@ describe("FundingQrCodeScreen", () => {
     expect(await screen.findByText("Account 1")).toBeInTheDocument()
 
     /** read the attribute passed into the qr code */
-    const qrCode = container.querySelector(`[class="qrcode"]`)
+    const qrCode = container.querySelector(`[data-testid="qr-code"]`)
     if (!qrCode) {
       throw new Error("QR code not found")
     }

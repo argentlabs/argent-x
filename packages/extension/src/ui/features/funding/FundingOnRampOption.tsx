@@ -47,7 +47,7 @@ export const FundingOnRampOption: FC<FundingOnRampOptionProps> = ({
         <Option
           title="Get test ETH"
           icon={<StarknetLogo width={6} height={6} />}
-          description="From StarkNet token faucet"
+          description="From Starknet token faucet"
         />
       </Link>
     )

@@ -2,7 +2,7 @@ import { TokenWithBalance } from "@argent/shared"
 import { NavigationContainer } from "@argent/ui"
 import { FC, ReactNode } from "react"
 import { PageWrapper } from "../../../../components/Page"
-import { Grid, Text } from "@chakra-ui/react"
+import { Grid } from "@chakra-ui/react"
 import { TokenOption } from "../../../../components/TokenOption"
 import { getTokenIconUrl } from "../../../accountTokens/TokenIcon"
 import { formatTokenBalance } from "../../../../services/tokens/utils"
@@ -58,14 +58,7 @@ export const TokenPickerScreen: FC<TokenPickerScreenProps> = ({
                 name={tokenView.name}
                 symbol={tokenView.symbol}
                 balance={tokenView.balance}
-                ccyBalance={
-                  disabled ? (
-                    <Text color={"red.50"}>Insufficient funds</Text>
-                  ) : (
-                    tokenView.balance
-                  )
-                }
-                onClick={() => onSelect(token)}
+                onTokenSelect={() => onSelect(token)}
               />
             )
           })}

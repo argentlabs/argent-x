@@ -80,7 +80,10 @@ export class InMemoryRepository<T> implements IRepository<T> {
     return selector ? this._data.filter(selector) : this._data
   }
 
-  async upsert(value: AllowArray<T> | SetterFn<T>): Promise<UpsertResult> {
+  async upsert(
+    value: AllowArray<T> | SetterFn<T>,
+    insertMode: "push" | "unshift" = "push",
+  ): Promise<UpsertResult> {
     const oldValue = [...this._data]
     const items = isFunction(value)
       ? value(oldValue)
@@ -100,7 +103,7 @@ export class InMemoryRepository<T> implements IRepository<T> {
         this._data[index] = item
         updated++
       } else {
-        this._data.push(item)
+        this._data[insertMode](item)
         created++
       }
     }

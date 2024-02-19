@@ -1,14 +1,11 @@
 import { Mocked, describe, expect, it, vi } from "vitest"
 import { addressSchema } from "@argent/shared"
-import { noop } from "lodash-es"
 
 import { getMockWalletAccount } from "../../../../../../test/walletAccount.mock"
 import { IAccountService } from "../../../../../shared/account/service/interface"
-import { IDebounceService } from "../../../../../shared/debounce"
-import { STANDARD_ACCOUNT_CLASS_HASH } from "../../../../../shared/network/constants"
+import { TXV1_ACCOUNT_CLASS_HASH } from "../../../../../shared/network/constants"
 import { IScheduleService } from "../../../../../shared/schedule/interface"
 import { IActivityService } from "../../activity/interface"
-import { IBackgroundUIService } from "../../ui/interface"
 import { AccountWorker } from "./implementation"
 
 vi.mock("../../../../../shared/account/details/getAccountCairoVersionFromChain")
@@ -43,16 +40,10 @@ describe("AccountWorker", () => {
       },
     } as unknown as Mocked<IActivityService>
 
-    const backgroundUIService = {} as unknown as Mocked<IBackgroundUIService>
-
-    const debounceService = {} as unknown as Mocked<IDebounceService>
-
     const accountWorker = new AccountWorker(
       accountService,
       activityService,
       scheduleService,
-      backgroundUIService,
-      debounceService,
     )
 
     return {
@@ -60,8 +51,6 @@ describe("AccountWorker", () => {
       accountService,
       activityService,
       scheduleService,
-      backgroundUIService,
-      debounceService,
     }
   }
 
@@ -133,16 +122,12 @@ describe("AccountWorker", () => {
 
     accountService.get = vi.fn().mockResolvedValueOnce([mockAccount])
 
-    worker.updateAccountClassHashImmediately = vi
-      .fn()
-      .mockImplementationOnce(noop)
-
     await worker.updateAccountClassHash()
 
     expect(accountService.upsert).toHaveBeenCalledWith([
       {
         ...mockAccount,
-        classHash: addressSchema.parse(STANDARD_ACCOUNT_CLASS_HASH),
+        classHash: addressSchema.parse(TXV1_ACCOUNT_CLASS_HASH),
       },
     ])
   })
@@ -165,10 +150,6 @@ describe("AccountWorker", () => {
         cairoVersion: "1",
       },
     ])
-
-    worker.updateAccountClassHashImmediately = vi
-      .fn()
-      .mockImplementationOnce(noop)
 
     await worker.updateAccountCairoVersion()
 

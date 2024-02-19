@@ -12,26 +12,6 @@ test.describe("Welcome screen", () => {
     ])
   })
 
-  test("Disclaimer - Continue button should only be enabled if both options are accepted", async ({
-    extension,
-  }) => {
-    await extension.wallet.createNewWallet.click()
-    await Promise.all([
-      expect(extension.wallet.banner2).toBeVisible(),
-      expect(extension.wallet.disclaimerLostOfFunds).not.toBeChecked(),
-      expect(extension.wallet.disclaimerAlphaVersion).not.toBeChecked(),
-      expect(extension.wallet.continue).toBeDisabled(),
-    ])
-    await extension.wallet.disclaimerLostOfFunds.check()
-    await expect(extension.wallet.continue).toBeDisabled()
-
-    await extension.wallet.disclaimerAlphaVersion.check()
-    await expect(extension.wallet.continue).toBeEnabled()
-
-    await extension.wallet.disclaimerLostOfFunds.uncheck()
-    await expect(extension.wallet.continue).toBeDisabled()
-  })
-
   test("create new account with success", async ({ extension }) => {
     await extension.wallet.newWalletOnboarding()
     await extension.open()

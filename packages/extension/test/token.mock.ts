@@ -1,9 +1,8 @@
+import { BaseToken, Token } from "../src/shared/token/__new/types/token.model"
 import {
-  ApiTokenDataResponse,
-  ApiTokenDetails,
-  BaseToken,
-  Token,
-} from "../src/shared/token/__new/types/token.model"
+  ApiTokensInfoResponse,
+  ApiTokenInfo,
+} from "../src/shared/token/__new/types/tokenInfo.model"
 import {
   TokenWithBalance,
   TokenWithOptionalBigIntBalance,
@@ -26,7 +25,7 @@ const defaultToken: Token = {
   decimals: 18,
 }
 
-const defaultApiTokenDetails: ApiTokenDetails = {
+const defaultApiTokenDetails: ApiTokenInfo = {
   id: 1,
   address: "0x123",
   name: "Token",
@@ -42,7 +41,7 @@ const defaultApiTokenDetails: ApiTokenDetails = {
   pricingId: 1,
 }
 
-const defaultApiTokenData: ApiTokenDataResponse = {
+const defaultApiTokenData: ApiTokensInfoResponse = {
   tokens: [defaultApiTokenDetails],
 }
 
@@ -82,15 +81,13 @@ export const getMockToken = (overrides?: Partial<Token>) => ({
   ...(overrides ?? {}),
 })
 
-export const getMockApiTokenDetails = (
-  overrides?: Partial<ApiTokenDetails>,
-) => ({
+export const getMockApiTokenDetails = (overrides?: Partial<ApiTokenInfo>) => ({
   ...defaultApiTokenDetails,
   ...(overrides ?? {}),
 })
 
 export const getMockApiTokenData = (
-  overrides?: Partial<ApiTokenDataResponse>,
+  overrides?: Partial<ApiTokensInfoResponse>,
 ) => ({
   ...defaultApiTokenData,
   ...(overrides ?? {}),

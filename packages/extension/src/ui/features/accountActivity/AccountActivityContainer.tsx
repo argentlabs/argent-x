@@ -183,7 +183,9 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
       }
       if (isVoyagerTransaction(transaction)) {
         const { hash, meta } = transaction
-        const failureReason = getTransactionFailureReason(transaction.status)
+        const failureReason = getTransactionFailureReason(
+          getTransactionStatus(transaction),
+        )
 
         const activityTransaction: ActivityTransaction = {
           hash,

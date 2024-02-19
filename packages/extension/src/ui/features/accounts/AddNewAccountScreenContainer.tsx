@@ -1,5 +1,5 @@
-import { icons, useNavigateBack } from "@argent/ui"
-import { FC, useCallback, useMemo } from "react"
+import { useNavigateBack } from "@argent/ui"
+import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useAction } from "../../hooks/useAction"
@@ -7,39 +7,12 @@ import { routes, useReturnTo } from "../../routes"
 import { assertNever } from "../../../shared/utils/assertNever"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import {
-  AccountType,
+  type AccountType,
   AccountTypeId,
   AddNewAccountScreen,
 } from "./AddNewAccountScreen"
 import { clientAccountService } from "../../services/account"
-
-const { WalletIcon, MultisigIcon } = icons
-
-const accountTypes: AccountType[] = [
-  {
-    id: AccountTypeId.STANDARD,
-    type: "standard",
-    title: "Standard Account",
-    subtitle: "Create a new Argent X account",
-    icon: <WalletIcon />,
-    enabled: true, // always enabled
-  },
-  {
-    id: AccountTypeId.MULTISIG,
-    type: "multisig",
-    title: "Multisig Account",
-    subtitle: "For multiple owners",
-    icon: <MultisigIcon />,
-    enabled: true,
-  },
-
-  //   {
-  //     title: "Connect Ledger",
-  //     subtitle: "Use a Ledger hardware wallet",
-  //     icon: <Ledger />,
-  //     enabled: booleanifyEnv("FEATURE_LEDGER", false),
-  //   },
-]
+import { useAccountTypesForNetwork } from "./useAccountTypesForNetwork"
 
 export const AddNewAccountScreenContainer: FC = () => {
   const navigate = useNavigate()
@@ -47,16 +20,18 @@ export const AddNewAccountScreenContainer: FC = () => {
     clientAccountService.create.bind(clientAccountService),
   )
   // TODO: should be view after networks was refactored
-  const { id: networkId } = useCurrentNetwork()
+  const network = useCurrentNetwork()
   const returnTo = useReturnTo()
+  const accountTypes = useAccountTypesForNetwork(network)
 
   const onAccountTypeClick = useCallback(
     async (accountTypeId: AccountTypeId) => {
-      const isDevnet = networkId === "localhost"
-
       switch (accountTypeId) {
         case AccountTypeId.STANDARD:
-          await addAccount(isDevnet ? "standardCairo0" : "standard", networkId) // default
+          await addAccount("standard", network.id) // default
+          return navigate(routes.accounts(returnTo))
+        case AccountTypeId.STANDARD_CAIRO_0:
+          await addAccount("standardCairo0", network.id) // default
           return navigate(routes.accounts(returnTo))
 
         case AccountTypeId.MULTISIG:
@@ -70,7 +45,7 @@ export const AddNewAccountScreenContainer: FC = () => {
           assertNever(accountTypeId) // Should always be handled
       }
     },
-    [addAccount, navigate, networkId, returnTo],
+    [addAccount, navigate, network.id, returnTo],
   )
 
   const isAccountTypeLoading = useCallback(
@@ -86,16 +61,12 @@ export const AddNewAccountScreenContainer: FC = () => {
     [isAdding],
   )
 
-  const enabledAccountTypes = useMemo(() => {
-    return accountTypes.filter(({ enabled }) => enabled)
-  }, [])
-
   const onClose = useNavigateBack()
 
   return (
     <AddNewAccountScreen
       onClose={onClose}
-      accountTypes={enabledAccountTypes}
+      accountTypes={accountTypes}
       isAccountTypeLoading={isAccountTypeLoading}
       onAccountTypeClick={onAccountTypeClick}
     />

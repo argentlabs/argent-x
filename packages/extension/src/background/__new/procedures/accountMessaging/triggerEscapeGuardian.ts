@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { Account } from "starknet"
 
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
@@ -20,8 +19,8 @@ export const triggerEscapeGuardianProcedure = extensionOnlyProcedure
       },
     }) => {
       try {
-        const starknetAccount =
-          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+        const starknetAccount = await wallet.getSelectedStarknetAccount()
+
         await actionService.add(
           {
             type: "TRANSACTION",

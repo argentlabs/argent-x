@@ -3,6 +3,7 @@ import { formatUnits } from "./formatUnits"
 import { BigDecimal } from "./types"
 import { abs } from "./lib"
 import { BigNumberish } from "starknet"
+import { DEFAULT_TOKEN_DECIMALS } from "../tokens/constants"
 
 /**
  * Formats a BigInt representing wei into a string representing ether,
@@ -17,7 +18,7 @@ import { BigNumberish } from "starknet"
  * @returns {string} The amount in ether.
  */
 export function formatEther(wei: bigint): string {
-  return formatUnits({ value: wei, decimals: 18 })
+  return formatUnits({ value: wei, decimals: DEFAULT_TOKEN_DECIMALS })
 }
 
 /**
@@ -27,23 +28,23 @@ export function formatEther(wei: bigint): string {
  * @returns {bigint} The amount in wei.
  */
 export function parseEther(ether: string): BigDecimal {
-  return parseUnits(ether, 18)
+  return parseUnits(ether, DEFAULT_TOKEN_DECIMALS)
 }
 
 /**
  * Formats a BigInt representing a currency amount into a string,
- * with a precision of 6 decimal places.
+ * with a precision of 18 decimal places.
  *
  * {
  *    amount: bigint,
- *    decimals: 6
+ *    decimals: 18
  * }
  *
  * @param {bigint} value - The amount to be formatted.
  * @returns {string} The formatted amount.
  */
 export function formatCurrency(value: bigint): string {
-  return formatUnits({ value, decimals: 6 })
+  return formatUnits({ value, decimals: DEFAULT_TOKEN_DECIMALS })
 }
 
 /**
@@ -53,7 +54,7 @@ export function formatCurrency(value: bigint): string {
  * @returns {bigint} The parsed amount.
  */
 export function parseCurrency(amount: string): BigDecimal {
-  return parseUnits(amount, 6)
+  return parseUnits(amount, DEFAULT_TOKEN_DECIMALS)
 }
 
 /**

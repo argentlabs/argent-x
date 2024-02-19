@@ -13,6 +13,7 @@ const AddNetwork = () => {
         chainId: "SN_DAPP_TEST",
         chainName: "Test chain name",
         baseUrl: "http://localhost:5050",
+        rpcUrls: ["http://localhost:5050/rpc"],
       })
       setAddNetworkError("")
     } catch (error) {

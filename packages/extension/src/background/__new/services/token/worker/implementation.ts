@@ -1,3 +1,8 @@
+import {
+  isArgentNetworkId,
+  includesAddress,
+  isEqualAddress,
+} from "@argent/shared"
 import { RefreshInterval } from "../../../../../shared/config"
 import type { IDebounceService } from "../../../../../shared/debounce"
 import { defaultNetwork } from "../../../../../shared/network"
@@ -18,21 +23,22 @@ import { BaseWalletAccount } from "../../../../../shared/wallet.model"
 import type { WalletStorageProps } from "../../../../../shared/wallet/walletStore"
 import { Recovered } from "../../../../wallet/recovery/interface"
 import { WalletRecoverySharedService } from "../../../../wallet/recovery/shared.service"
+import { WalletSessionService } from "../../../../wallet/session/session.service"
 import {
   TokenActivity,
   type IActivityService,
   type TokenActivityPayload,
+  ProvisionActivity,
 } from "../../activity/interface"
 import type { IBackgroundUIService } from "../../ui/interface"
 import {
   every,
   everyWhenOpen,
   onInstallAndUpgrade,
-  onStartup,
 } from "../../worker/schedule/decorators"
 import { pipe } from "../../worker/schedule/pipe"
-
-const NETWORKS_WITH_BACKEND_SUPPORT = ["goerli-alpha", "mainnet-alpha"]
+import { mergeTokensWithDefaults } from "../../../../../shared/token/__new/repository/mergeTokens"
+import { ProvisionActivityPayload } from "../../../../../shared/activity/types"
 
 /**
  * This class is responsible for managing token updates, including token balances and prices.
@@ -49,6 +55,7 @@ export class TokenWorker {
     private readonly scheduleService: IScheduleService,
     private readonly debounceService: IDebounceService,
     private readonly activityService: IActivityService,
+    private readonly sessionService: WalletSessionService,
   ) {
     // Listen for account changes
     this.walletStore.subscribe(
@@ -73,6 +80,12 @@ export class TokenWorker {
       TokenActivity,
       this.onTokenActivity.bind(this),
     )
+
+    // Listen to provision
+    this.activityService.emitter.on(
+      ProvisionActivity,
+      this.onProvisionActivity.bind(this),
+    )
   }
 
   async getSelectedAccount() {
@@ -84,15 +97,15 @@ export class TokenWorker {
    * Update tokens
    * Fetches tokens for all networks and updates the token service
    */
-  runFetchAndUpdateTokensFromBackend = pipe(
+  runRefreshTokenRepoWithTokensInfoFromBackend = pipe(
     onInstallAndUpgrade(this.scheduleService), // This will run the function on update
     every(
       this.scheduleService,
-      RefreshInterval.VERY_SLOW,
-      "TokenWorker.updateTokens",
-    ), // This will run the function every 24 hours
+      RefreshInterval.SLOW,
+      "TokenWorker.refreshTokenRepoWithTokensInfoFromBackend",
+    ), // This will run the function every 5 mins
   )(async (): Promise<void> => {
-    await this.fetchAndUpdateTokensFromBackend()
+    await this.refreshTokenRepoWithTokensInfoFromBackend()
   })
 
   /**
@@ -119,19 +132,40 @@ export class TokenWorker {
       this.backgroundUIService,
       this.scheduleService,
       this.debounceService,
-      RefreshInterval.MEDIUM,
+      RefreshInterval.FAST,
       "TokenWorker.fetchAndUpdateTokenPricesFromBackend",
     ), // This will run the function every minute when the UI is open
   )(async (): Promise<void> => {
     await this.fetchAndUpdateTokenPricesFromBackend()
   })
 
+  runOnOpenAndUnlocked = pipe(
+    everyWhenOpen(
+      this.backgroundUIService,
+      this.scheduleService,
+      this.debounceService,
+      RefreshInterval.MEDIUM,
+      "TokenWorker.onOpenAndUnlocked",
+    ), // This will run the function when the wallet is opened and unlocked, debounced to one minute
+  )(async () => {
+    const selectedAccount = await this.getSelectedAccount()
+    if (!selectedAccount) {
+      return
+    }
+    await this.runUpdatesForAccount(selectedAccount)
+  })
+
   async onSelectedAccountChange(account?: BaseWalletAccount | null) {
     if (!account) {
       return
     }
+    await this.runUpdatesForAccount(account)
+  }
+
+  async runUpdatesForAccount(account: BaseWalletAccount) {
     void this.maybeUpdateTokensFromBackendForAccount(account)
     void this.updateTokenBalancesFromOnChain(account)
+    void this.discoverTokensFromBackendForAccount(account)
   }
 
   async onTransactionRepoChange(changeSet: StorageChange<Transaction[]>) {
@@ -171,20 +205,43 @@ export class TokenWorker {
     void this.fetchAndUpdateTokenPricesFromBackend()
   }
 
-  async fetchAndUpdateTokensFromBackend() {
+  async refreshTokenRepoWithTokensInfoFromBackend() {
     const networks = await this.networkService.get()
-    // Fetch tokens for all networks in parallel
-    const tokensFromAllNetworks = await Promise.allSettled(
+    await Promise.allSettled(
       networks.map((network) =>
-        this.tokenService.fetchTokensFromBackend(network.id),
+        this.refreshTokenRepoWithTokensInfoFromBackendForNetwork(network.id),
       ),
     )
-    const tokens = tokensFromAllNetworks
-      .map((result) => result.status === "fulfilled" && result.value)
-      .filter((t): t is Token[] => Boolean(t))
-      .flat()
+  }
 
-    await this.tokenService.updateTokens(tokens)
+  async refreshTokenRepoWithTokensInfoFromBackendForNetwork(networkId: string) {
+    const tokensInfoOnNetwork =
+      await this.tokenService.getTokensInfoFromBackendForNetwork(networkId)
+    if (!tokensInfoOnNetwork) {
+      return
+    }
+    const tokensOnNetwork = await this.tokenService.getTokens(
+      (token) => token.networkId === networkId,
+    )
+    // refresh the local tokens with tokens info
+    const updatedTokens = tokensOnNetwork.map((tokenOnNetwork) => {
+      const tokenInfoOnNetwork = tokensInfoOnNetwork.find(
+        (tokenInfoOnNetwork) =>
+          isEqualAddress(tokenInfoOnNetwork.address, tokenOnNetwork.address),
+      )
+      return tokenInfoOnNetwork
+        ? { ...tokenOnNetwork, ...tokenInfoOnNetwork }
+        : tokenOnNetwork
+    })
+
+    // explicitly filter out tokens that are not tradable
+    const tradableTokens = tokensInfoOnNetwork
+      .filter((token) => token.tradable)
+      .map((t) => ({ ...t, networkId }))
+
+    await this.tokenService.updateTokens(
+      mergeTokensWithDefaults(tradableTokens, updatedTokens),
+    )
   }
 
   async updateTokenBalancesFromOnChain(
@@ -201,7 +258,7 @@ export class TokenWorker {
     const tokensWithBalance =
       await this.tokenService.fetchTokenBalancesFromOnChain(accounts)
 
-    return await this.tokenService.updateTokenBalances(tokensWithBalance)
+    return await this.tokenService.updateTokenBalances(tokensWithBalance) // Update token balances in the token service
   }
 
   async maybeUpdateTokensFromBackendForAccount(account: BaseWalletAccount) {
@@ -210,7 +267,7 @@ export class TokenWorker {
     )
 
     if (!tokens.length) {
-      await this.fetchAndUpdateTokensFromBackend()
+      await this.refreshTokenRepoWithTokensInfoFromBackend()
     }
   }
 
@@ -228,7 +285,7 @@ export class TokenWorker {
     if (!selectedAccount) {
       return
     }
-    if (NETWORKS_WITH_BACKEND_SUPPORT.includes(selectedAccount.networkId)) {
+    if (isArgentNetworkId(selectedAccount.networkId)) {
       return
     }
     await this.fetchAndUpdateTokenBalancesFromOnChain(selectedAccount)
@@ -254,7 +311,7 @@ export class TokenWorker {
    */
   async onRecovered(recoveredAccounts: BaseWalletAccount[]) {
     if (recoveredAccounts.length > 0) {
-      await this.fetchAndUpdateTokensFromBackend()
+      await this.refreshTokenRepoWithTokensInfoFromBackend()
       await this.fetchAndUpdateTokenPricesFromBackend()
       await this.fetchAndUpdateTokenBalancesFromOnChain(recoveredAccounts)
     }
@@ -266,5 +323,55 @@ export class TokenWorker {
    */
   async onTokenActivity({ accounts, tokens }: TokenActivityPayload) {
     await this.fetchAndUpdateTokenBalancesFromOnChain(accounts, tokens)
+  }
+
+  async discoverTokensFromBackendForAccount(account: BaseWalletAccount) {
+    const accountTokenBalancesFromBackend =
+      await this.tokenService.fetchAccountTokenBalancesFromBackend(account)
+
+    const tokensOnNetwork = await this.tokenService.getTokens(
+      (token) => account.networkId === token.networkId,
+    )
+
+    const knownTokenAddresses = tokensOnNetwork.map((token) => token.address)
+
+    const discoveredTokens = accountTokenBalancesFromBackend.filter(
+      (accountTokenBalance) => {
+        return !includesAddress(
+          accountTokenBalance.address,
+          knownTokenAddresses,
+        )
+      },
+    )
+    if (!discoveredTokens.length) {
+      return
+    }
+
+    const tokensInfoOnNetwork =
+      await this.tokenService.getTokensInfoFromBackendForNetwork(
+        account.networkId,
+      )
+    if (!tokensInfoOnNetwork) {
+      return
+    }
+    /** both sets of tokens are already on the same network */
+    const discoveredTokensInfo: Token[] = []
+    discoveredTokens.forEach((discoveredToken) => {
+      const tokenInfo = tokensInfoOnNetwork.find((tokenInfo) =>
+        isEqualAddress(discoveredToken.address, tokenInfo.address),
+      )
+      if (tokenInfo) {
+        discoveredTokensInfo.push({
+          ...tokenInfo,
+          networkId: account.networkId,
+        })
+      }
+    })
+    await this.tokenService.addToken(discoveredTokensInfo)
+  }
+
+  async onProvisionActivity(payload: ProvisionActivityPayload) {
+    await this.tokenService.handleProvisionTokens(payload)
+    await this.refreshTokenRepoWithTokensInfoFromBackend()
   }
 }

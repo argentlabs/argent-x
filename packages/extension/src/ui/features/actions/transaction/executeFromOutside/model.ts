@@ -20,7 +20,7 @@ export const outsideCallSchema = z.object({
  * See https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-9.md#1-build-the-outsideexecution-struct
  */
 export const outsideExecutionMessageSchema = z.object({
-  caller: addressSchema, // The StarkNet address of the caller
+  caller: addressSchema, // The Starknet address of the caller
   nonce: bigNumberishSchema, // Nonce for replay protection
   execute_after: bigNumberishSchema, // Timestamp after which the execution is valid
   execute_before: bigNumberishSchema, // Timestamp before which the execution must occur

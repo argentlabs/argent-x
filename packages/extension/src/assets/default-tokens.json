@@ -19,6 +19,17 @@
     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
     "showAlways": true
   },
+
+  {
+    "id": 1,
+    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+    "name": "Ether",
+    "symbol": "ETH",
+    "decimals": "18",
+    "network": "sepolia-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+    "showAlways": true
+  },
   {
     "id": 1,
     "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
@@ -42,10 +53,41 @@
   {
     "id": 2,
     "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
-    "name": "Stark",
+    "name": "Starknet",
+    "symbol": "STRK",
+    "decimals": "18",
+    "network": "mainnet-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+    "showAlways": true
+  },
+  {
+    "id": 2,
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "name": "Starknet",
     "symbol": "STRK",
     "decimals": "18",
     "network": "integration",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+    "showAlways": true
+  },
+  {
+    "id": 2,
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "name": "Starknet",
+    "symbol": "STRK",
+    "decimals": "18",
+    "network": "goerli-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+    "showAlways": true
+  },
+  {
+    "id": 2,
+    "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+    "name": "Starknet",
+    "symbol": "STRK",
+    "decimals": "18",
+    "network": "sepolia-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
     "showAlways": true
   },
   {
@@ -67,6 +109,15 @@
     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
   },
   {
+    "id": 6,
+    "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
+    "name": "DAI",
+    "symbol": "DAI",
+    "decimals": "18",
+    "network": "sepolia-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png"
+  },
+  {
     "id": 4,
     "address": "0x03fe2b97c1fd336e750087d68b9b867997fd64a2661ff3ca5a7c771641e8e7ac",
     "name": "Wrapped BTC",
@@ -82,6 +133,15 @@
     "symbol": "WBTC",
     "decimals": "8",
     "network": "goerli-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png"
+  },
+  {
+    "id": 4,
+    "address": "0x12d537dc323c439dc65c976fad242d5610d27cfb5f31689a0a319b8be7f3d56",
+    "name": "Wrapped BTC",
+    "symbol": "WBTC",
+    "decimals": "8",
+    "network": "sepolia-alpha",
     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png"
   },
   {
@@ -103,6 +163,15 @@
     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png"
   },
   {
+    "id": 2,
+    "address": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
+    "name": "USD Coin",
+    "symbol": "USDC",
+    "decimals": "6",
+    "network": "sepolia-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png"
+  },
+  {
     "id": 3,
     "address": "0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8",
     "name": "Tether USD",
@@ -118,6 +187,15 @@
     "symbol": "USDT",
     "decimals": "6",
     "network": "goerli-alpha",
+    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
+  },
+  {
+    "id": 3,
+    "address": "0x386e8d061177f19b3b485c20e31137e6f6bc497cc635ccdfcab96fadf5add6a",
+    "name": "Tether USD",
+    "symbol": "USDT",
+    "decimals": "6",
+    "network": "sepolia-alpha",
     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png"
   }
 ]

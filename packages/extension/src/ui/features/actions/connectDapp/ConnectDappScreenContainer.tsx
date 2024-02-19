@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 
 import { useIsPreauthorized } from "../../preAuthorizations/hooks"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
@@ -10,10 +10,12 @@ import { useActionScreen } from "../hooks/useActionScreen"
 import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { ConnectDappScreen } from "./ConnectDappScreen"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
-import { NavigationBar } from "@argent/ui"
-import { NetworkSwitcherContainer } from "../../networks/NetworkSwitcher/NetworkSwitcherContainer"
 import { clientAccountService } from "../../../services/account"
 import { preAuthorizationService } from "../../../../shared/preAuthorization/service"
+import { useRiskAssessment } from "./useRiskAssessment"
+import { AccountNavigationBarContainer } from "../../accounts/AccountNavigationBarContainer"
+import { WarningBanner } from "../warning/WarningBanner"
+import { ReviewFooter } from "../warning/ReviewFooter"
 
 export const ConnectDappScreenContainer: FC = () => {
   const {
@@ -28,6 +30,32 @@ export const ConnectDappScreenContainer: FC = () => {
     )
   }
   const host = action.payload.host
+  const riskAssessment = useRiskAssessment({
+    host,
+  })
+  const [isHighRisk, setIsHighRisk] = useState(false)
+  const [hasAcceptedRisk, setHasAcceptedRisk] = useState(false)
+  useEffect(() => {
+    const isRiskyTransaction =
+      riskAssessment?.warning?.severity === "critical" ||
+      riskAssessment?.warning?.severity === "high"
+    if (isRiskyTransaction) {
+      setIsHighRisk(true)
+    }
+  }, [riskAssessment?.warning?.severity])
+  const transactionReviewWarnings = useMemo(() => {
+    if (!riskAssessment?.warning) {
+      return null
+    }
+
+    return (
+      <WarningBanner
+        warnings={[riskAssessment.warning]}
+        onReject={() => void reject()}
+        onConfirm={() => setHasAcceptedRisk(true)}
+      />
+    )
+  }, [riskAssessment?.warning, reject])
 
   const { switcherNetworkId } = useAppState()
   const visibleAccounts = useView(
@@ -72,18 +100,9 @@ export const ConnectDappScreenContainer: FC = () => {
   }, [action.payload.host, reject, selectedAccount])
 
   const networkNavigationBar = (
-    <NavigationBar
-      rightButton={
-        <NetworkSwitcherContainer
-          disabled
-          _disabled={{ opacity: 1 }}
-          cursor="auto"
-          _hover={{}}
-          _active={{}}
-        />
-      }
-      py="3"
-      px="4"
+    <AccountNavigationBarContainer
+      showSettingsButton={false}
+      showAccountButton={false}
     />
   )
 
@@ -100,7 +119,16 @@ export const ConnectDappScreenContainer: FC = () => {
       onSelectedAccountChange={onSelectedAccountChange}
       actionIsApproving={Boolean(action.meta.startedApproving)}
       navigationBar={networkNavigationBar}
-      footer={<WithActionScreenErrorFooter />}
-    />
+      isHighRisk={isHighRisk}
+      hasAcceptedRisk={hasAcceptedRisk}
+      footer={
+        <>
+          {isHighRisk && <ReviewFooter />}
+          <WithActionScreenErrorFooter />
+        </>
+      }
+    >
+      {transactionReviewWarnings}
+    </ConnectDappScreen>
   )
 }

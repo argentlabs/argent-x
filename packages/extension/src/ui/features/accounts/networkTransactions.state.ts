@@ -4,6 +4,7 @@ import { Transaction } from "../../../shared/transactions"
 import { transactionsStore } from "../../../shared/transactions/store"
 import { useMemo } from "react"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
+import { isSafeUpgradeTransaction } from "../../../shared/utils/isUpgradeTransaction"
 
 type UseTransactionsOnNetwork = (networkId?: string) => {
   transactions: Transaction[]
@@ -31,7 +32,9 @@ export const useUpgradeTransactionsOnNetwork: UseTransactionsOnNetwork = (
 
   const pendingTransactions = sortedTransactions.filter((transaction) => {
     const { finality_status } = getTransactionStatus(transaction)
-    return finality_status === "RECEIVED" && transaction.meta?.isUpgrade
+    return (
+      finality_status === "RECEIVED" && isSafeUpgradeTransaction(transaction)
+    )
   })
 
   return { transactions, pendingTransactions }

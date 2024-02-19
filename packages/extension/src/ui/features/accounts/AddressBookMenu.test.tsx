@@ -5,6 +5,13 @@ import { describe, expect, it } from "vitest"
 import { AddressBook } from "../../hooks/useAddressBook"
 import { AddressBookMenu } from "./AddressBookMenu"
 
+vi.mock("./accounts.state", () => {
+  return { useAccount: vi.fn() }
+})
+vi.mock("./useOnSettingsNavigate", () => {
+  return { useOnSettingsNavigate: vi.fn() }
+})
+
 describe("AddressBookMenu", () => {
   describe("When there are contacts", () => {
     it("Calls expected methods when buttons are clicked", async () => {

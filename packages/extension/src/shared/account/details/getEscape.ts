@@ -9,6 +9,7 @@ import {
   ESCAPE_TYPE_SIGNER,
   Escape,
 } from "./escape.model"
+import { multicallWithCairo0Fallback } from "./multicallWithCairo0Fallback"
 
 /**
  * Get escape state from account
@@ -17,20 +18,12 @@ import {
 export const getEscapeForAccount = async (account: BaseWalletAccount) => {
   const network = await networkService.getById(account.networkId)
 
-  // Prioritize Cairo 1 get_escape over cairo 0 getEscape
   const call: Call = {
     contractAddress: account.address,
     entrypoint: "get_escape",
   }
   const multicall = getMulticallForNetwork(network)
-  let response: { result: string[] } = { result: [] }
-
-  try {
-    response = await multicall.callContract(call)
-  } catch {
-    call.entrypoint = "getEscape"
-    response = await multicall.callContract(call)
-  }
+  const response = await multicallWithCairo0Fallback(call, multicall)
 
   return shapeResponse(response.result)
 }

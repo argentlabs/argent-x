@@ -20,8 +20,8 @@ export const OnboardingFinishScreen: FC<OnboardingFinishScreenProps> = ({
   useOnboardingToastMessage()
   return (
     <OnboardingScreen
-      length={4}
-      currentIndex={3}
+      length={3}
+      currentIndex={2}
       title="Your wallet is ready!"
       subtitle="Follow us for product updates or if you have any questions"
       icon={<TickCircleIcon data-testid={"TickCircleIcon"} />}

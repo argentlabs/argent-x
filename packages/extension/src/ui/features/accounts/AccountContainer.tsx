@@ -8,7 +8,7 @@ import {
   useScrollRestoration,
 } from "@argent/ui"
 import { Center, Flex } from "@chakra-ui/react"
-import { ComponentProps, FC, PropsWithChildren, Suspense } from "react"
+import { ComponentProps, FC, PropsWithChildren, Suspense, useMemo } from "react"
 import { NavLink } from "react-router-dom"
 
 import { routes } from "../../routes"
@@ -20,8 +20,10 @@ import { useMultisigPendingTransactionsAwaitingConfirmation } from "../multisig/
 import { WithEscapeWarning } from "../shield/escape/WithEscapeWarning"
 import { AccountNavigationBarContainer } from "./AccountNavigationBarContainer"
 import { useAccountTransactions } from "./accountTransactions.state"
+import { LegalAgreementsBannerContainer } from "../legal/LegalAgreementsBannerContainer"
+import { discoverDataView, discoverViewedAtView } from "../../views/discover"
 
-const { WalletIcon, NftIcon, ActivityIcon, SwapIcon } = icons
+const { WalletIcon, NftIcon, ActivityIcon, SwapIcon, FlameIcon } = icons
 
 /** TODO: refactor: rename 'RootTabsContainer' or similar and extract 'RootTabs' component */
 
@@ -51,10 +53,25 @@ export const AccountContainer: FC<AccountContainerProps> = (props) => {
   const totalPendingTransactions =
     pendingTransactions.length + pendingMultisigTransactions.length
 
+  const discoverViewedAt = useView(discoverViewedAtView)
+  const discoverData = useView(discoverDataView)
+
+  const discoverBadgeLabel = useMemo(() => {
+    if (!discoverData) {
+      return 0
+    }
+    const lastModifiedAt = new Date(discoverData.lastModified).getTime()
+    if (discoverViewedAt > lastModifiedAt) {
+      return 0
+    }
+    return discoverData.news.length
+  }, [discoverData, discoverViewedAt])
+
   return (
     <RootTabs
       showTabs={showTabs}
       activityBadgeLabel={totalPendingTransactions}
+      discoverBadgeLabel={discoverBadgeLabel}
       showMultisigBanner={showMultisigBanner}
       showActivateBanner={showActivateBanner}
       {...props}
@@ -65,6 +82,7 @@ export const AccountContainer: FC<AccountContainerProps> = (props) => {
 export interface RootTabsProps extends PropsWithChildren {
   scrollKey: string
   activityBadgeLabel: ComponentProps<typeof Tab>["badgeLabel"]
+  discoverBadgeLabel?: ComponentProps<typeof Tab>["badgeLabel"]
   showMultisigBanner?: boolean
   showActivateBanner: boolean
   showTabs: boolean
@@ -72,6 +90,7 @@ export interface RootTabsProps extends PropsWithChildren {
 
 export const RootTabs: FC<RootTabsProps> = ({
   activityBadgeLabel,
+  discoverBadgeLabel,
   scrollKey,
   showMultisigBanner,
   showActivateBanner,
@@ -99,38 +118,50 @@ export const RootTabs: FC<RootTabsProps> = ({
           </L1>
         </Center>
       ) : showTabs ? (
-        <TabBar>
-          <Tab
-            as={NavLink}
-            to={routes.accountTokens()}
-            replace
-            icon={<WalletIcon />}
-            label="Tokens"
-          />
-          <Tab
-            as={NavLink}
-            to={routes.accountCollections()}
-            replace
-            icon={<NftIcon />}
-            label="NFTs"
-          />
-          <Tab
-            as={NavLink}
-            to={routes.swap()}
-            replace
-            icon={<SwapIcon />}
-            label="Swap"
-          />
-          <Tab
-            as={NavLink}
-            to={routes.accountActivity()}
-            replace
-            icon={<ActivityIcon />}
-            badgeLabel={activityBadgeLabel}
-            badgeDescription={"Pending transactions"}
-            label="Activity"
-          />
-        </TabBar>
+        <>
+          <LegalAgreementsBannerContainer />
+          <TabBar>
+            <Tab
+              as={NavLink}
+              to={routes.accountTokens()}
+              replace
+              icon={<WalletIcon />}
+              label="Tokens"
+            />
+            <Tab
+              as={NavLink}
+              to={routes.accountCollections()}
+              replace
+              icon={<NftIcon />}
+              label="NFTs"
+            />
+            <Tab
+              as={NavLink}
+              to={routes.swap()}
+              replace
+              icon={<SwapIcon />}
+              label="Swap"
+            />
+            <Tab
+              as={NavLink}
+              to={routes.accountActivity()}
+              replace
+              icon={<ActivityIcon />}
+              badgeLabel={activityBadgeLabel}
+              badgeDescription={"Pending transactions"}
+              label="Activity"
+            />
+            <Tab
+              as={NavLink}
+              to={routes.accountDiscover()}
+              replace
+              icon={<FlameIcon />}
+              badgeLabel={discoverBadgeLabel}
+              badgeDescription={"New items"}
+              label="Discover"
+            />
+          </TabBar>
+        </>
       ) : null}
     </WithEscapeWarning>
   )

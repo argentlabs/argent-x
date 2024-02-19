@@ -17,6 +17,7 @@ import { SendQuery, isSendQuery } from "../send/schema"
 import { useTokensWithBalance } from "./tokens.state"
 import { useAccountIsDeployed } from "./useAccountStatus"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
+import { useBestFeeToken } from "../actions/useBestFeeToken"
 
 interface AddFundsDialogContextProps {
   onSend: (queryOrTo?: SendQuery | To) => void
@@ -44,6 +45,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
   const returnTo = useCurrentPathnameWithQuery()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const tokenDetails = useTokensWithBalance(account)
+  const bestFeeToken = useBestFeeToken(account)
 
   const hasNonZeroBalance = useMemo(() => {
     return tokenDetails.some(({ balance }) => balance && balance > 0n)
@@ -69,7 +71,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
           navigate(
             routes.sendRecipientScreen({
               returnTo,
-              tokenAddress: ETH_TOKEN_ADDRESS,
+              tokenAddress: bestFeeToken?.address ?? ETH_TOKEN_ADDRESS,
             }),
           )
         }
@@ -77,7 +79,14 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
         onOpen()
       }
     },
-    [accountIsDeployed, hasNonZeroBalance, navigate, onOpen, returnTo],
+    [
+      accountIsDeployed,
+      bestFeeToken?.address,
+      hasNonZeroBalance,
+      navigate,
+      onOpen,
+      returnTo,
+    ],
   )
 
   const { title, message, cancelTitle, onConfirm } = useMemo(() => {

@@ -1,6 +1,7 @@
-import { addressSchemaArgentBackend } from "@argent/shared"
+import { addressSchema, addressSchemaArgentBackend } from "@argent/shared"
 import { z } from "zod"
 import { estimatedFeesSchema } from "../transactionSimulation/fees/fees.model"
+import { reasonsSchema, severitySchema } from "../warning/schema"
 
 const linkSchema = z.object({
   name: z.string(),
@@ -64,31 +65,6 @@ export const actionSchema = z.object({
   defaultProperties: z.array(propertySchema).optional(),
 })
 
-export const reasonsSchema = z.union([
-  z.literal("account_upgrade_to_unknown_implementation"),
-  z.literal("account_state_change"),
-  z.literal("contract_is_black_listed"),
-  z.literal("amount_mismatch_too_low"),
-  z.literal("amount_mismatch_too_high"),
-  z.literal("dst_token_black_listed"),
-  z.literal("internal_service_issue"),
-  z.literal("recipient_is_not_current_account"),
-  z.literal("recipient_is_token_address"),
-  z.literal("recipient_is_black_listed"),
-  z.literal("spender_is_black_listed"),
-  z.literal("operator_is_black_listed"),
-  z.literal("src_token_black_listed"),
-  z.literal("unknown_token"),
-  z.literal("undeployed_account"),
-  z.literal("contract_is_not_verified"),
-  z.literal("token_a_black_listed"),
-  z.literal("token_b_black_listed"),
-  z.literal("approval_too_high"),
-  // these exist in the backend but should never occur
-  // z.literal("multi_calls_on_account"),
-  // z.literal("unknown_selector"),
-])
-
 export const assessmentSchema = z.union([
   z.literal("verified"),
   z.literal("neutral"),
@@ -96,16 +72,17 @@ export const assessmentSchema = z.union([
   z.literal("warn"),
 ])
 
-export const severitySchema = z.union([
-  z.literal("critical"),
-  z.literal("high"),
-  z.literal("caution"),
-  z.literal("info"),
-])
+export const warningDetailsSchema = z.object({
+  unknown_token: z.unknown().optional(),
+  date_of_addition: z.string().optional(),
+  contract_address: addressSchema.optional(),
+  reason: z.string().optional(),
+  value: z.string().or(z.number()).optional(),
+})
 
 export const warningSchema = z.object({
   reason: reasonsSchema,
-  details: z.record(z.string().or(z.number())).optional(),
+  details: warningDetailsSchema.optional(),
   severity: severitySchema,
 })
 
@@ -193,14 +170,38 @@ const transferSchema = z.object({
   value: z.string().optional(),
   details: tokenDetailsSchema.optional(),
 })
+// Not great but this is to deal with backend inconsistencies
+const stringOrNumberAsNumberSchema = z
+  .union([z.string(), z.number()])
+  .transform((val) => parseInt(val.toString(), 10))
+const feeEstimationCommonFields = {
+  overallFee: stringOrNumberAsNumberSchema,
+  gasPrice: stringOrNumberAsNumberSchema,
+  gasUsage: stringOrNumberAsNumberSchema,
+}
 
-export const feeEstimationSchema = z.object({
-  overallFee: z.string(),
-  gasPrice: z.string(),
-  gasUsage: z.string(),
-  unit: z.string(),
-  maxFee: z.string(),
-})
+export const feeEstimationSchema = z
+  .object({
+    ...feeEstimationCommonFields,
+    unit: z
+      .string()
+      .transform((t) => t.toUpperCase())
+      .pipe(z.literal("WEI")),
+
+    maxFee: stringOrNumberAsNumberSchema,
+  })
+  .or(
+    z.object({
+      ...feeEstimationCommonFields,
+      unit: z
+        .string()
+        .transform((t) => t.toUpperCase())
+        .pipe(z.literal("FRI")),
+
+      maxAmount: stringOrNumberAsNumberSchema,
+      maxPricePerUnit: stringOrNumberAsNumberSchema,
+    }),
+  )
 
 const summarySchema = z.object({
   type: z.string(),
@@ -265,8 +266,7 @@ export type EnrichedSimulateAndReview = z.infer<
 >
 
 export type SimulateAndReview = z.infer<typeof simulateAndReviewSchema>
-export type AssessmentReason = z.infer<typeof reasonsSchema>
-export type AssessmentSeverity = z.infer<typeof severitySchema>
+
 export type Assessment = z.infer<typeof assessmentSchema>
 export type FeeEstimation = z.infer<typeof feeEstimationSchema>
 export type ReviewOfTransaction = z.infer<typeof reviewOfTransactionSchema>

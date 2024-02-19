@@ -1,7 +1,8 @@
 import { H6, P4, icons } from "@argent/ui"
-import { Circle, Flex, Button } from "@chakra-ui/react"
+import { Button, Center, Circle } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
+
 import { routes } from "../../routes"
 
 const { PasswordIcon } = icons
@@ -12,40 +13,34 @@ export const SaveRecoverySeedphraseBanner: FC = () => {
     navigate(routes.setupSeedRecovery())
   }
   return (
-    <Flex
-      py={4}
+    <Center
+      py={6}
       px={4}
-      direction={"column"}
+      flexDirection={"column"}
       backgroundColor="accentExtraDark"
       justifyContent={"center"}
       alignContent={"center"}
+      textAlign="center"
       borderRadius="2xl"
     >
-      <Circle
-        size={10}
-        bg={"accentLight"}
-        color={"neutrals.900"}
-        my={2}
-        mx="auto"
-      >
-        <PasswordIcon fontSize={24} />
+      <Circle bg={"accentLight"} color={"neutrals.900"} size={12} mb={4}>
+        <PasswordIcon fontSize={"3xl"} />
       </Circle>
-      <Flex my={2} alignItems="center" mb={4} direction="column">
-        <H6 color={"white"}>Save your recovery phrase</H6>
-
-        <P4 color={"neutrals.100"} textAlign="center">
-          It is very important you save this as it’s the only way you can
-          recover your account{" "}
-        </P4>
-      </Flex>
+      <H6>Save your recovery phrase</H6>
+      <P4 color="white50" mb={6} fontWeight="semibold">
+        It is very important you save this as it’s the only way you can recover
+        your account
+      </P4>
       <Button
         onClick={navigateToRecoveryPhrase}
         backgroundColor="accent.500"
         _hover={{ bg: "accent.600" }}
         px={2}
+        w={"full"}
+        size={"sm"}
       >
         Show recovery phrase
       </Button>
-    </Flex>
+    </Center>
   )
 }

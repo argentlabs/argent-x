@@ -1,22 +1,16 @@
 import { Call, Provider, ProviderInterface } from "starknet4"
 import { Network } from "../shared/network"
-import {
-  getRandomPublicRPCNode,
-  isArgentNetwork,
-} from "../shared/network/utils"
+import { getRandomPublicRPCNode } from "../shared/network/utils"
 import { getProviderv4 } from "../shared/network/provider"
+import { argentApiNetworkForNetwork } from "../shared/api/headers"
 
 export class ArgentXProviderV4 extends Provider implements ProviderInterface {
   constructor(network: Network) {
     // Only expose sequencer provider for argent networks
-    if (isArgentNetwork(network)) {
+    const key = argentApiNetworkForNetwork(network.id)
+    if (key) {
       const publicRpcNode = getRandomPublicRPCNode(network)
-
-      const nodeUrl =
-        network.id === "mainnet-alpha"
-          ? publicRpcNode.mainnet
-          : publicRpcNode.testnet
-
+      const nodeUrl = publicRpcNode[key]
       super({ rpc: { nodeUrl } })
     } else {
       // Otherwise, it's a custom network, so we expose the custom provider

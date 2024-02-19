@@ -6,11 +6,13 @@ import {
   NFTService,
   CollectionSpec,
   PaginatedItems,
+  PaginatedCollections,
 } from "./interface"
-import { BackendResponsePage } from "../argent/interface"
-import { HTTPService, IHttpService } from "../http"
+import type { BackendResponsePage } from "../argent/interface"
+import { HTTPService, type IHttpService } from "../http"
 import { BackendPaginationError } from "../argent/errors"
 import urlJoin from "url-join"
+import type { ArgentBackendNetworkId } from "../argent/type"
 
 export type BackendCollectionType =
   | "erc721"
@@ -61,6 +63,10 @@ interface NftsItem {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface NftsResponse extends BackendResponsePage<NftsItem> {}
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface PaginatedCollectionsResponse
+  extends BackendResponsePage<CollectionResponse> {}
+
 // GET /{chain}/{network}/profile/{accountAddress}/nfts
 // It has the same structure as NftsResponse
 // So no need to define a new interface, use NftsResponse instead
@@ -77,6 +83,12 @@ interface NftResponse {
   spec: BackendCollectionType
 }
 
+interface CollectionMetricsResponse {
+  numberOfItems: number
+  uniqueOwners: number
+  floorPrice?: string
+}
+
 const PAGE_SIZE = 32
 
 export class ArgentBackendNftService implements NFTService {
@@ -91,7 +103,7 @@ export class ArgentBackendNftService implements NFTService {
 
   async getNfts(
     chain: string,
-    network: "mainnet" | "goerli",
+    network: ArgentBackendNetworkId,
     _address: string,
     page = 1,
   ): Promise<PaginatedItems> {
@@ -120,17 +132,15 @@ export class ArgentBackendNftService implements NFTService {
 
   async getCollection(
     chain: string,
-    network: "mainnet" | "goerli",
+    network: ArgentBackendNetworkId,
     _collectionAddress: string,
-    page = 1,
   ): Promise<Collection> {
     const beSafeAddress = this.normalizeAddress(_collectionAddress)
     const baseUrl = urlJoin(this.apiBase, "pandora", chain, network)
     const endpoint = urlJoin(baseUrl, "collection", beSafeAddress)
 
     // get the items
-    const pageParam = this.pageToPageIndex(page)
-    const itemsEndpoint = `${baseUrl}/collection/${beSafeAddress}/nfts?page=${pageParam}&size=${PAGE_SIZE}`
+    const itemsEndpoint = `${baseUrl}/collection/${beSafeAddress}`
     const [data, itemsData] = await Promise.all([
       this.httpService.get<CollectionResponse>(endpoint),
       this.httpService.get<NftsResponse>(itemsEndpoint),
@@ -154,23 +164,76 @@ export class ArgentBackendNftService implements NFTService {
 
   async getNft(
     chain: string,
-    network: "mainnet" | "goerli",
+    network: ArgentBackendNetworkId,
     _collectionAddress: string,
     itemId: string,
   ): Promise<NftItem> {
     const beSafeAddress = this.normalizeAddress(_collectionAddress)
     const baseUrl = urlJoin(this.apiBase, "pandora", chain, network)
     const endpoint = urlJoin(baseUrl, "nft", beSafeAddress, itemId)
-    const [data, collection] = await Promise.all([
-      this.httpService.get<NftResponse>(endpoint),
-      this.getCollection(chain, network, beSafeAddress),
-    ])
+
+    const data = await this.httpService.get<NftResponse>(endpoint)
     const item = mapItem(data)
 
-    return {
-      ...item,
-      collection,
+    return item
+  }
+
+  async getProfileCollections(
+    chain: string,
+    network: ArgentBackendNetworkId,
+    address: string,
+    page = 1,
+    withMetrics = false,
+  ): Promise<PaginatedCollections> {
+    const pageParam = this.pageToPageIndex(page)
+    const beSafeAddress = this.normalizeAddress(address)
+    const baseUrl = urlJoin(this.apiBase, "pandora", chain, network)
+    const endpoint = urlJoin(
+      baseUrl,
+      "profile",
+      beSafeAddress,
+      "collections",
+      `?page=${pageParam}&size=${PAGE_SIZE}`,
+    )
+
+    const data = await this.httpService.get<PaginatedCollectionsResponse>(
+      endpoint,
+    )
+
+    const collections: Omit<Collection, "nfts" | "totalItems">[] = []
+
+    for (const collection of data.content) {
+      if (withMetrics) {
+        const metrics = await this.getCollectionMetrics(
+          chain,
+          network,
+          collection.contractAddress,
+        )
+
+        collections.push(mapCollection(collection, metrics))
+      } else {
+        collections.push(mapCollection(collection))
+      }
     }
+
+    return {
+      totalPages: data.totalPages,
+      page: data.number + 1,
+      count: collections.length,
+      collections,
+    }
+  }
+
+  private async getCollectionMetrics(
+    chain: string,
+    network: ArgentBackendNetworkId,
+    address: string,
+  ): Promise<CollectionMetricsResponse | undefined> {
+    const beSafeAddress = this.normalizeAddress(address)
+    const baseUrl = urlJoin(this.apiBase, "pandora", chain, network)
+    const endpoint = urlJoin(baseUrl, "collection", beSafeAddress, "metrics")
+
+    return this.httpService.get<CollectionMetricsResponse>(endpoint)
   }
 
   protected normalizeAddress(address: string): Address {
@@ -241,6 +304,7 @@ function mapItem(input: NftsItem | NftResponse, address?: string): NftItem {
 
 function mapCollection(
   input: CollectionResponse,
+  metrics?: CollectionMetricsResponse | undefined,
 ): Omit<Collection, "nfts" | "totalItems"> {
   const contractAddress = addressSchema.parse(input.contractAddress)
 
@@ -257,5 +321,15 @@ function mapCollection(
           color: "#ffffff",
         },
       ),
+    ...(metrics && {
+      owners: {
+        total: metrics.numberOfItems,
+        unique: metrics.uniqueOwners,
+      },
+      ...(metrics.floorPrice && {
+        //floorPrice: getEthTokenPrice(BigInt(metrics.floorPrice)),
+        floorPrice: BigInt(metrics.floorPrice),
+      }),
+    }),
   }
 }

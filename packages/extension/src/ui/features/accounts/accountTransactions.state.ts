@@ -8,6 +8,7 @@ import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { getAccountIdentifier } from "@argent/shared"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
+import { isSafeUpgradeTransaction } from "../../../shared/utils/isUpgradeTransaction"
 
 type UseAccountTransactions = (account?: BaseWalletAccount) => {
   transactions: Transaction[]
@@ -75,7 +76,9 @@ export const useUpgradeAccountTransactions: UseAccountTransactions = (
 
   const pendingTransactions = sortedTransactions.filter((transaction) => {
     const { finality_status } = getTransactionStatus(transaction)
-    return finality_status === "RECEIVED" && transaction.meta?.isUpgrade
+    return (
+      finality_status === "RECEIVED" && isSafeUpgradeTransaction(transaction)
+    )
   })
 
   return { transactions, pendingTransactions }

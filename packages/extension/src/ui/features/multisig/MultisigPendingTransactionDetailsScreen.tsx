@@ -12,7 +12,7 @@ import {
   useMultisigPendingTransaction,
   useMultisigPendingTransactionsByAccount,
 } from "./multisigTransactions.state"
-import { num } from "starknet"
+import { TransactionType, num } from "starknet"
 import { multisigService } from "../../services/multisig"
 import { useView } from "../../views/implementation/react"
 import { selectedAccountView } from "../../views/account"
@@ -132,7 +132,10 @@ export const MultisigPendingTransactionDetailsScreen = () => {
       onSubmit={onConfirm}
       onConfirmAnyway={() => void onSubmit()}
       onReject={onReject}
-      transactions={transactions}
+      transactionAction={{
+        type: TransactionType.INVOKE,
+        payload: transactions,
+      }}
       approveScreenType={ApproveScreenType.TRANSACTION}
       multisigBannerProps={multisigBannerProps}
       multisigModalDisclosure={multisigModalDisclosure}

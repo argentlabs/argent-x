@@ -52,7 +52,7 @@ describe("StarknetChainService", () => {
         getTransactionStatus: () => ({
           finality_status: status,
         }),
-        getTransactionReceipt,
+        getTransactionReceipt: () => ({ finality_status: status }),
       })
 
       const txWithStatus = await starknetChainService.getTransactionStatus(

@@ -1,4 +1,4 @@
-import { Account } from "starknet"
+import { Account } from "starknet6"
 import { Account as AccountV4__deprecated } from "starknet4-deprecated"
 
 export function isAccountV5(account: any): account is Account {

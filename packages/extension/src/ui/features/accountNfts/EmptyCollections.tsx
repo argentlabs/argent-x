@@ -57,7 +57,7 @@ const EmptyCollections: FC<{ networkId: string }> = () => (
     </Flex>
     <Flex direction="column" flex={1} bg="black" p="-4">
       <P3 color="neutrals.400" mb="3" mt="12">
-        Discover NFTs on StarkNet
+        Discover NFTs on Starknet
       </P3>
 
       <SimpleGrid columns={3} gap="2" mx="8">

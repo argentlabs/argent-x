@@ -19,7 +19,20 @@ const txFixture: ActionItem = {
   },
 }
 
+const txFixture2: ActionItem = {
+  type: "TRANSACTION",
+  payload: {
+    transactions: {
+      contractAddress: "0x456",
+      entrypoint: "fooBar",
+      calldata: [],
+    },
+    createdAt: 456,
+  },
+}
+
 const txFixtureHash = objectHash(txFixture)
+const txFixtureHash2 = objectHash(txFixture2)
 
 describe("actionQueue", () => {
   const actionQueueRepo = new InMemoryRepository<ExtensionActionItem>({
@@ -41,6 +54,19 @@ describe("actionQueue", () => {
     await actionQueue.add(txFixture)
     const [item] = await actionQueue.getAll()
     expect(item.meta).toHaveProperty("expires")
+    expect(item.meta.hash).toEqual(txFixtureHash)
+  })
+
+  it("automatically adds an item to the front of the queue", async () => {
+    await actionQueue.add(txFixture)
+    await actionQueue.addFront(txFixture2)
+    const [item] = await actionQueue.getAll()
+    expect(item.meta.hash).toEqual(txFixtureHash2)
+  })
+
+  it("automatically adds an item to the front even the queue is empty", async () => {
+    await actionQueue.addFront(txFixture)
+    const [item] = await actionQueue.getAll()
     expect(item.meta.hash).toEqual(txFixtureHash)
   })
 
@@ -66,6 +92,10 @@ describe("actionQueue", () => {
     await actionQueue.add(txFixture)
     const items = await actionQueue.getAll()
     expect(items.length).toEqual(1)
+
+    await actionQueue.addFront(txFixture)
+    const itemsFront = await actionQueue.getAll()
+    expect(itemsFront.length).toEqual(1)
   })
 
   it("updates meta", async () => {

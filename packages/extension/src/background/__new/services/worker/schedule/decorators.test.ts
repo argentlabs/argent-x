@@ -8,9 +8,13 @@ import {
   onlyIfOpen,
   debounce,
   everyWhenOpen,
+  onUnlocked,
+  onlyIfUnlocked,
+  everyWhenOpenAndUnlocked,
 } from "./decorators"
 import { getMockBackgroundUIService } from "./mockBackgroundUIService"
 import { getMockDebounceService } from "../../../../../shared/debounce/mock"
+import { getMockSessionService } from "./mockSessionService"
 
 describe("decorators", () => {
   describe("onStartup", () => {
@@ -90,6 +94,42 @@ describe("decorators", () => {
     })
   })
 
+  describe("onUnlock", async () => {
+    test("should call the function when the session service is unlocked", async () => {
+      const [mockSessionServiceManager, mockSessionService] =
+        getMockSessionService()
+      const fn = vi.fn()
+      onUnlocked(mockSessionService)(fn)
+      expect(fn).toHaveBeenCalledTimes(0)
+      await mockSessionServiceManager.setLocked(false)
+      expect(fn).toHaveBeenCalledTimes(1)
+      await mockSessionServiceManager.setLocked(true)
+      expect(fn).toHaveBeenCalledTimes(1)
+      await mockSessionServiceManager.setLocked(false)
+      expect(fn).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe("onlyIfUnlocked", async () => {
+    test("should call the function when the session service is unlocked", async () => {
+      const [mockSessionServiceManager, mockSessionService] =
+        getMockSessionService()
+      const fn = vi.fn()
+      const oiuFn = onlyIfUnlocked(mockSessionService)(fn)
+      await oiuFn()
+      expect(fn).toHaveBeenCalledTimes(1)
+      await mockSessionServiceManager.setLocked(true)
+      await oiuFn()
+      expect(fn).toHaveBeenCalledTimes(1)
+      await mockSessionServiceManager.setLocked(false)
+      await oiuFn()
+      expect(fn).toHaveBeenCalledTimes(2)
+      await mockSessionServiceManager.setLocked(true)
+      await oiuFn()
+      expect(fn).toHaveBeenCalledTimes(2)
+    })
+  })
+
   describe("debounce", () => {
     test("should call the function when not in debounce interval", async () => {
       const debounceService = getMockDebounceService()
@@ -161,6 +201,77 @@ describe("decorators", () => {
       await fnExec()
       expect(debounceService.debounce).toHaveBeenCalledTimes(4)
       expect(fn).toHaveBeenCalledTimes(4)
+    })
+  })
+
+  describe("everyWhenOpenAndUnlocked", () => {
+    test("should call the function when the background ui service is opened and the session service is unlocked", async () => {
+      const [mockBackgroundUIServiceManager, mockBackgroundUIService] =
+        getMockBackgroundUIService()
+      const [scheduleServiceManager, scheduleService] =
+        createScheduleServiceMock()
+      const [mockSessionServiceManager, mockSessionService] =
+        getMockSessionService()
+
+      const debounceService = getMockDebounceService()
+      const fn = vi.fn()
+      const fnExec = everyWhenOpenAndUnlocked(
+        mockBackgroundUIService,
+        scheduleService,
+        mockSessionService,
+        debounceService,
+        1,
+        "test",
+      )(fn)
+
+      // wait 1 loop
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      // test scheduleService
+      expect(scheduleService.registerImplementation).toHaveBeenCalledWith({
+        id: expect.stringContaining("every@1s:"),
+        callback: expect.any(Function),
+      })
+      expect(scheduleService.every).toBeCalledTimes(1)
+
+      // test onLocked and onOpen
+      await mockSessionServiceManager.setLocked(true)
+      expect(fn).toHaveBeenCalledTimes(0)
+      await mockBackgroundUIServiceManager.setOpened(true)
+      expect(fn).toHaveBeenCalledTimes(0)
+      await mockSessionServiceManager.setLocked(false)
+      expect(fn).toHaveBeenCalledTimes(1)
+      await mockBackgroundUIServiceManager.setOpened(false)
+      expect(fn).toHaveBeenCalledTimes(1)
+      await mockBackgroundUIServiceManager.setOpened(true)
+      expect(fn).toHaveBeenCalledTimes(2)
+      await mockBackgroundUIServiceManager.setOpened(false)
+      await mockSessionServiceManager.setLocked(true)
+      await mockBackgroundUIServiceManager.setOpened(true)
+      expect(fn).toHaveBeenCalledTimes(2)
+      await mockSessionServiceManager.setLocked(false)
+      expect(fn).toHaveBeenCalledTimes(3)
+
+      // test scheduleService
+      await scheduleServiceManager.fireAll("every")
+      expect(fn).toHaveBeenCalledTimes(4)
+
+      // test debounce
+      expect(debounceService.debounce).toHaveBeenCalledTimes(4)
+      await fnExec()
+      expect(debounceService.debounce).toHaveBeenCalledTimes(5)
+      expect(debounceService.debounce).toHaveBeenCalledWith({
+        id: expect.stringContaining("debounce@1s:"),
+        debounce: 1,
+        callback: expect.any(Function),
+      })
+      expect(fn).toHaveBeenCalledTimes(5)
+
+      // does not call debounce when not open
+      await mockBackgroundUIServiceManager.setOpened(false)
+      await fnExec()
+      expect(debounceService.debounce).toHaveBeenCalledTimes(5)
+      expect(fn).toHaveBeenCalledTimes(5)
     })
   })
 })

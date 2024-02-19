@@ -1,8 +1,8 @@
 import { getProvider } from "../../../shared/network"
 import {
-  ExtendedFinalityStatus,
   Transaction,
   getInFlightTransactions,
+  SUCCESS_STATUSES,
 } from "../../../shared/transactions"
 import { getTransactionsStatusUpdate } from "../determineUpdates"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
@@ -18,14 +18,30 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
       const { finality_status, execution_status } =
         await provider.getTransactionStatus(transaction.hash)
 
+      // getTransactionStatus goes straight to the sequencer, hence it's much faster than the RPC nodes
+      // because of that we need to wait for the RPC nodes to have a receipt as well
       try {
-        if (execution_status === "REVERTED") {
-          const tx = await provider.getTransactionReceipt(transaction.hash)
+        if (
+          execution_status === "REVERTED" ||
+          SUCCESS_STATUSES.includes(finality_status)
+        ) {
+          const receipt = await provider.getTransactionReceipt(transaction.hash)
+          const {
+            finality_status: receiptFinalityStatus,
+            execution_status: receiptExecutionStatus,
+          } = receipt
 
-          if ("revert_reason" in tx) {
+          if (
+            finality_status !== receiptFinalityStatus ||
+            execution_status !== receiptExecutionStatus
+          ) {
+            return transaction
+          }
+
+          if ("revert_reason" in receipt) {
             return {
               ...transaction,
-              revertReason: tx.revert_reason,
+              revertReason: receipt.revert_reason,
               status: {
                 finality_status,
                 execution_status,

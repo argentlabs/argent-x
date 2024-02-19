@@ -17,6 +17,7 @@ import {
 import { TransactionReviewActions } from "./transactionV2/action/TransactionReviewActions"
 import { ReviewOfTransaction } from "../../../shared/transactionReview/schema"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
+import { useBestFeeToken } from "./useBestFeeToken"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit">,
@@ -39,6 +40,7 @@ export const ApproveDeployAccountScreen: FC<
   ...rest
 }) => {
   const [disableConfirm, setDisableConfirm] = useState(false)
+  const bestFeeToken = useBestFeeToken(selectedAccount)
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
@@ -93,7 +95,7 @@ export const ApproveDeployAccountScreen: FC<
       footer={
         <WithActionScreenErrorFooter isTransaction>
           <DeployAccountFeeEstimation
-            feeTokenAddress={ETH_TOKEN_ADDRESS}
+            feeToken={bestFeeToken}
             onErrorChange={setDisableConfirm}
             accountAddress={selectedAccount.address}
             networkId={selectedAccount.networkId}

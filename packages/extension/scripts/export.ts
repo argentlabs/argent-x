@@ -36,8 +36,6 @@ const exclude = [
   "**.log**",
   "**/node_modules**",
   "packages/dapp**",
-  "packages/get-starknet**",
-  "packages/starknet-react-webwallet-connector**",
   "packages/web**",
 ]
 

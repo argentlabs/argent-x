@@ -124,7 +124,7 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = ({
               autoComplete="off"
               control={control}
               placeholder="Fee Token Address"
-              name="feeTokenAddress"
+              name="possibleFeeTokenAddresses[0]"
               type="text"
               disabled={defaultNetwork.readonly}
             />

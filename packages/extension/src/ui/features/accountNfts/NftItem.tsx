@@ -40,6 +40,7 @@ const NftItem: FC<NftItemProps> = ({ logoSrc, name, thumbnailSrc, total }) => (
     </Box>
 
     <Box
+      data-testid="nft-item-name"
       as="figcaption"
       display="flex"
       justifyContent="space-between"

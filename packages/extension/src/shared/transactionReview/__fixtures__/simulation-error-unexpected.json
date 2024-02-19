@@ -1,0 +1,44 @@
+{
+  "transactions": [
+    {
+      "reviewOfTransaction": {
+        "assessment": "neutral",
+        "warnings": [],
+        "reviews": [
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "initiate_withdraw",
+              "properties": [],
+              "defaultProperties": [
+                {
+                  "type": "address",
+                  "label": "default_contract",
+                  "address": "0x073314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82",
+                  "addressName": "StarkGate: ETH Bridge",
+                  "verified": false
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "initiate_withdraw",
+                  "calldata": [
+                    "672615209863731673604883528732489532497378066027",
+                    "1000000000000000",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "simulationError": {
+        "label": "transaction_unknown_error",
+        "code": -1,
+        "message": "Encountered an unknown key 'order'.\nUse 'ignoreUnknownKeys = true' in 'Json {}' builder to ignore unknown keys.\nCurrent input: .....],\"to_address\":\"0xae0ee0a63a2ce6baeeffe56e7714fb4efe48d419\"}"
+      }
+    }
+  ]
+}

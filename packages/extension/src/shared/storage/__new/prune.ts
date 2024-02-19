@@ -28,6 +28,7 @@ const localStoragePatterns: Pattern[] = [
   /"feeTokenBalance"/,
   [/^core:transactions$/, pruneTransactions],
   /^dev:storage/,
+  /^core:tokenInfo$/,
 ]
 
 /** keep in-flight transactions as they can't be retreived from backend or on-chain */

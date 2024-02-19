@@ -71,6 +71,7 @@ export const NetworkSettingsScreen: FC<NetworkSettingsScreenProps> = ({
                 <SettingsMenuItemRemove
                   key={network.id}
                   title={network.name}
+                  onClick={() => onViewNetwork(network)}
                   onRemoveClick={() => {
                     onRemoveNetwork(network)
                   }}

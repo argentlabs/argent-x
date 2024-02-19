@@ -80,7 +80,6 @@ export const qs = (query?: Record<string, string>) => {
 export const routes = {
   onboardingStart: route("/onboarding/start"),
   onboardingDisclaimer: route("/onboarding/disclaimer"),
-  onboardingPrivacyStatement: route("/onboarding/privacy"),
   onboardingPassword: route("/onboarding/password"),
   onboardingFinish: route("/onboarding/finish"),
   onboardingRestoreBackup: route("/onboarding/restore/backup"),
@@ -93,6 +92,7 @@ export const routes = {
   accountTokens: route("/account/tokens"),
   accountCollections: route("/account/collections"),
   accountActivity: route("/account/activity"),
+  accountDiscover: route("/account/discover"),
   beforeYouContinue: route("/before-you-continue"),
   collectionNfts: route(
     (contractAddress: string) => `/account/collection/${contractAddress}`,
@@ -144,13 +144,6 @@ export const routes = {
   ),
   accounts: routeWithReturnTo("/accounts"),
   newAccount: routeWithReturnTo("/accounts/new"),
-  editAccount: route(
-    (accountAddress, returnTo?: string) =>
-      returnTo
-        ? `/accounts/${accountAddress}?returnTo=${encodeURIComponent(returnTo)}`
-        : `/accounts/${accountAddress}`,
-    "/accounts/:accountAddress",
-  ),
   changeAccountImplementations: route(
     (accountAddress) => `/accounts/${accountAddress}/change-implementation`,
     "/accounts/:accountAddress/change-implementation",
@@ -217,6 +210,15 @@ export const routes = {
   reset: route("/reset"),
   legacy: route("/legacy"),
   settings: routeWithReturnTo("/settings"),
+  settingsAccount: route(
+    (accountAddress, returnTo?: string) =>
+      returnTo
+        ? `/settings/account/${accountAddress}?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/settings/account/${accountAddress}`,
+    "/settings/account/:accountAddress",
+  ),
   settingsPreferences: routeWithReturnTo("/settings/preferences"),
   settingsBlockExplorer: routeWithReturnTo(
     "/settings/preferences/block-explorer",
@@ -253,10 +255,11 @@ export const routes = {
       `/settings/addressbook/add-or-edit?${qs(contact)}`,
     "/settings/addressbook/add-or-edit",
   ),
-  settingsPrivacyStatement: route("/settings/privacy-policy"),
   settingsSmartContractDevelopment: route(
     "/settings/smart-contract-development",
   ),
+  settingsClearLocalStorage: route("/settings/clear-local-storage"),
+  deploymentData: route("/settings/deployment-data"),
   settingsSmartContractDeclare: route(
     "/settings/smart-contract-development/declare",
   ),
@@ -345,4 +348,8 @@ export const routes = {
   ),
 
   swap: route("/swap"),
+  provisionAnnouncement: route(
+    (accountName, starkAmount) => `/provision/${accountName}/${starkAmount}`,
+    "/provision/:accountName/:starkAmount",
+  ),
 }

@@ -1,0 +1,81 @@
+{
+  "transactions": [
+    {
+      "reviewOfTransaction": {
+        "assessment": "neutral",
+        "warnings": [],
+        "reviews": [
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "type": "amount",
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  },
+                  "amount": "1882970796924913",
+                  "usd": "4.21",
+                  "editable": false
+                },
+                {
+                  "type": "address",
+                  "label": "ERC20_transfer_recipient",
+                  "address": "0x00575b2948cbaa8ef2d24c62c5e5c3848a5950c0bbac4d260801b159d7806633",
+                  "verified": false
+                }
+              ],
+              "defaultProperties": [
+                {
+                  "type": "token_address",
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "type": "ERC20"
+                  }
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "transfer",
+                  "calldata": [
+                    "154344866577359164344739446380090869279696317484211928595226592103047915059",
+                    "1882970796924913",
+                    "0"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "simulation": {
+        "approvals": [],
+        "transfers": [],
+        "summary": [],
+        "calculatedNonce": "0x12",
+        "feeEstimation": {
+          "overallFee": "1674000015066",
+          "gasPrice": "1000000009",
+          "gasUsage": "1674",
+          "unit": "WEI",
+          "maxFee": "3348008526928"
+        }
+      }
+    }
+  ]
+}

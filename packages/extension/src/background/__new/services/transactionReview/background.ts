@@ -1,6 +1,6 @@
 import urlJoin from "url-join"
 
-import { type IHttpService, ensureArray } from "@argent/shared"
+import { type IHttpService, ensureArray, Address } from "@argent/shared"
 import {
   Account,
   CairoVersion,
@@ -8,9 +8,8 @@ import {
   Calldata,
   Invocations,
   TransactionType,
-  hash,
   num,
-} from "starknet"
+} from "starknet6"
 
 import type {
   ITransactionReviewLabelsStore,
@@ -31,8 +30,10 @@ import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fee
 import { KeyValueStorage } from "../../../../shared/storage"
 import { ITransactionReviewWorker } from "./worker/interface"
 import { ARGENT_TRANSACTION_REVIEW_API_BASE_URL } from "../../../../shared/api/constants"
-import { ETH_TOKEN_ADDRESS } from "../../../../shared/network/constants"
 import { getEstimatedFeeFromSimulationAndRespectWatermarkFee } from "../../../../shared/transactionSimulation/utils"
+import { getTxVersionFromFeeToken } from "../../../../shared/utils/getTransactionVersion"
+import { isArgentNetwork } from "../../../../shared/network/utils"
+import { getNonce } from "../../../nonce"
 
 interface ApiTransactionReviewV2RequestBody {
   transactions: Array<{
@@ -66,10 +67,12 @@ export default class BackgroundTransactionReviewService
     starknetAccount,
     calls,
     isDeployed,
+    feeTokenAddress,
   }: {
     starknetAccount: Account
     calls: Call[]
     isDeployed: boolean
+    feeTokenAddress: Address
   }) {
     try {
       const selectedAccount = await this.wallet.getSelectedAccount()
@@ -78,9 +81,11 @@ export default class BackgroundTransactionReviewService
         throw new AccountError({ code: "NOT_FOUND" })
       }
 
+      const version = getTxVersionFromFeeToken(feeTokenAddress)
+
       const fees: EstimatedFees = {
         transactions: {
-          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          feeTokenAddress,
           amount: 0n,
           pricePerUnit: 0n,
         },
@@ -100,11 +105,14 @@ export default class BackgroundTransactionReviewService
               payload: calls,
             },
           ]
-          const [deployEstimate, txEstimate] =
-            await starknetAccount.estimateFeeBulk(bulkTransactions, {
-              skipValidate: true,
+          const [deployEstimate, txEstimate] = await starknetAccount
+            .estimateFeeBulk(bulkTransactions, {
+              version,
             })
-
+            .catch((error) => {
+              console.error(error)
+              throw error
+            })
           if (
             !deployEstimate.gas_consumed ||
             !deployEstimate.gas_price ||
@@ -118,12 +126,12 @@ export default class BackgroundTransactionReviewService
           }
 
           fees.deployment = {
-            feeTokenAddress: ETH_TOKEN_ADDRESS,
+            feeTokenAddress,
             amount: deployEstimate.gas_consumed,
             pricePerUnit: deployEstimate.gas_price,
           }
           fees.transactions = {
-            feeTokenAddress: ETH_TOKEN_ADDRESS,
+            feeTokenAddress,
             amount: txEstimate.gas_consumed,
             pricePerUnit: txEstimate.gas_price,
           }
@@ -133,6 +141,7 @@ export default class BackgroundTransactionReviewService
           calls,
           {
             skipValidate: true,
+            version,
           },
         )
 
@@ -144,13 +153,16 @@ export default class BackgroundTransactionReviewService
         }
 
         fees.transactions = {
-          feeTokenAddress: ETH_TOKEN_ADDRESS,
+          feeTokenAddress,
           amount: gas_consumed,
           pricePerUnit: gas_price,
         }
       }
 
-      await addEstimatedFee(fees, calls)
+      await addEstimatedFee(fees, {
+        type: TransactionType.INVOKE,
+        payload: calls,
+      })
 
       return fees
     } catch (error) {
@@ -216,26 +228,50 @@ export default class BackgroundTransactionReviewService
       simulateAndReviewResult,
     )
 
-    await addEstimatedFee(
-      fee,
-      initialTransactions[isDeploymentTransaction ? 1 : 0].calls ?? [],
-    )
+    await addEstimatedFee(fee, {
+      type: TransactionType.INVOKE,
+      payload: initialTransactions[isDeploymentTransaction ? 1 : 0].calls ?? [],
+    })
 
     return fee
   }
 
   async simulateAndReview({
     transactions,
+    feeTokenAddress,
   }: {
     transactions: TransactionReviewTransactions[]
+    feeTokenAddress: Address
   }) {
+    const selectedAccount = await this.wallet.getSelectedAccount()
     const account = await this.wallet.getSelectedStarknetAccount()
-    const isDeploymentTransaction = Boolean(
-      transactions.find((tx) => tx.type === "DEPLOY_ACCOUNT"),
+    const isDeploymentTransaction = transactions.some(
+      (tx) => tx.type === "DEPLOY_ACCOUNT",
     )
+
+    if (!selectedAccount) {
+      throw new AccountError({ code: "NOT_SELECTED" })
+    }
+
     try {
-      const nonce = isDeploymentTransaction ? "0x0" : await account.getNonce()
-      const version = num.toHex(hash.feeTransactionVersion)
+      if (!isArgentNetwork(selectedAccount?.network)) {
+        // If it's not an argent network we fallback to onchain fee estimation
+        console.warn(
+          `Falling back to onchain fee estimation as ${selectedAccount?.network.id} is not an argent network`,
+        )
+        return this.fallbackToOnchainFeeEstimation({
+          account,
+          transactions,
+          isDeploymentTransaction,
+          feeTokenAddress,
+        })
+      }
+
+      const version = getTxVersionFromFeeToken(feeTokenAddress)
+
+      const nonce = isDeploymentTransaction
+        ? "0x0"
+        : await getNonce(selectedAccount, account)
 
       if (!("getChainId" in account)) {
         throw new AccountError({
@@ -263,10 +299,10 @@ export default class BackgroundTransactionReviewService
           }),
         ),
       }
+
       const result = await this.httpService.post<SimulateAndReview>(
         simulateAndReviewEndpoint,
         {
-          method: "POST",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -276,14 +312,18 @@ export default class BackgroundTransactionReviewService
         simulateAndReviewSchema,
       )
 
-      // if there is a simulation error then there is also no actual simulation
-      // or fee information, and no way to proceed with fee estimation
-      // returning the result will surface the error to the user in the ui
+      // if there is any simulation error then we should fall-back to on-chain so the user is not blocked
       const hasSimulationError = result.transactions.some((transaction) =>
         isTransactionSimulationError(transaction),
       )
       if (hasSimulationError) {
-        return result
+        console.warn(
+          `Falling back to onchain fee estimation as there was an error in the backend simulation response:`,
+          result,
+        )
+        throw new ReviewError({
+          code: "BACKEND_SIMULATION_ERROR",
+        })
       }
 
       const enrichedFeeEstimation = await this.getEnrichedFeeEstimation(
@@ -297,34 +337,54 @@ export default class BackgroundTransactionReviewService
       }
     } catch (e) {
       console.error(e)
-      try {
-        const invokeCalls = isDeploymentTransaction
-          ? this.getCallsFromTx(transactions[1])
-          : this.getCallsFromTx(transactions[0])
+      return this.fallbackToOnchainFeeEstimation({
+        transactions,
+        account,
+        isDeploymentTransaction,
+        feeTokenAddress,
+      })
+    }
+  }
 
-        if (!invokeCalls) {
-          throw new ReviewError({
-            code: "NO_CALLS_FOUND",
-          })
-        }
-        // Backend is failing we use the fallback method to estimate fees
-        const enrichedFeeEstimation = await this.fetchFeesOnchain({
-          starknetAccount: account,
-          calls: invokeCalls,
-          isDeployed: !isDeploymentTransaction,
-        })
-        return {
-          transactions: [],
-          enrichedFeeEstimation,
-          isBackendDown: true,
-        }
-      } catch (error) {
-        console.error(error)
+  async fallbackToOnchainFeeEstimation({
+    transactions,
+    account,
+    isDeploymentTransaction,
+    feeTokenAddress,
+  }: {
+    transactions: TransactionReviewTransactions[]
+    account: Account
+    isDeploymentTransaction: boolean
+    feeTokenAddress: Address
+  }) {
+    try {
+      const invokeCalls = isDeploymentTransaction
+        ? this.getCallsFromTx(transactions[1])
+        : this.getCallsFromTx(transactions[0])
+
+      if (!invokeCalls) {
         throw new ReviewError({
-          message: `${error}`,
-          code: "SIMULATE_AND_REVIEW_FAILED",
+          code: "NO_CALLS_FOUND",
         })
       }
+      // Backend is failing we use the fallback method to estimate fees
+      const enrichedFeeEstimation = await this.fetchFeesOnchain({
+        starknetAccount: account,
+        calls: invokeCalls,
+        isDeployed: !isDeploymentTransaction,
+        feeTokenAddress,
+      })
+      return {
+        transactions: [],
+        enrichedFeeEstimation,
+        isBackendDown: true,
+      }
+    } catch (error) {
+      console.error(error)
+      throw new ReviewError({
+        message: `${error}`,
+        code: "SIMULATE_AND_REVIEW_FAILED",
+      })
     }
   }
 

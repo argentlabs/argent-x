@@ -44,13 +44,13 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
     >
       <path
         d="M12 22.6789V1.04587L23.508 18.044C23.7544 18.4078 23.5834 18.9063 23.1656 19.0424L12 22.6789Z"
-        fill="white"
+        fill="currentColor"
       />
     </mask>
     <g mask="url(#mask1_1162_20)">
       <path
         d="M23.1656 19.0424L12 22.6789L0.875638 18.8854C0.462764 18.7446 0.297323 18.2493 0.542676 17.8886L11.5437 1.71654C11.7625 1.39498 12.2367 1.3955 12.4547 1.71755L23.508 18.044C23.7544 18.4079 23.5834 18.9063 23.1656 19.0424Z"
-        fill="white"
+        fill="currentColor"
       />
     </g>
     <defs>
@@ -62,7 +62,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
         y2={22.6789}
         gradientUnits="userSpaceOnUse"
       >
-        <stop stopColor="white" />
+        <stop stopColor="currentColor" />
         <stop offset={1} stopColor="#D9D9D9" stopOpacity={0.63} />
       </linearGradient>
     </defs>

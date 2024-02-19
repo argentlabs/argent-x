@@ -1,10 +1,10 @@
-import { Address } from "@argent/shared"
+import { Address, ensureDecimals } from "@argent/shared"
 
 import { TokenView } from "../../features/accountTokens/tokens.service"
 import { messageClient } from "../messaging/trpc"
 import { ITokensService } from "./interface"
 import { formatTokenBalance } from "./utils"
-import { Call, CallData, RawArgs } from "starknet"
+import { CallData, RawArgs } from "starknet"
 import { BalancesMap, PricesMap } from "./types"
 import {
   BaseTokenWithBalance,
@@ -65,7 +65,7 @@ export class TokenService implements ITokensService {
     balance,
     ...rest
   }: TokenWithOptionalBigIntBalance): TokenView {
-    const decimalsNumber = decimals ?? 18
+    const decimalsNumber = ensureDecimals(decimals)
     return {
       name,
       symbol,
@@ -125,12 +125,14 @@ export class TokenService implements ITokensService {
     calldata,
     title,
     subtitle,
+    isMaxSend,
   }: {
     to: Address
     method: string
     calldata: RawArgs
     title: string
     subtitle: string
+    isMaxSend?: boolean
   }) {
     await this.trpcMessageClient.transfer.send.mutate({
       transactions: {
@@ -140,6 +142,7 @@ export class TokenService implements ITokensService {
       },
       title,
       subtitle,
+      isMaxSend,
     })
   }
 }

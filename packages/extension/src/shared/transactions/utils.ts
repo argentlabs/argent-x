@@ -9,8 +9,10 @@ import {
   ExtendedTransactionStatus,
   Transaction,
   ExecutionStatus,
+  SUCCESS_STATUSES,
 } from "../transactions"
 import { z } from "zod"
+import { isSafeUpgradeTransaction } from "../utils/isUpgradeTransaction"
 
 export function getTransactionIdentifier(transaction: BaseTransaction): string {
   return `${transaction.networkId}::${hexSchema.parse(transaction.hash)}`
@@ -94,4 +96,24 @@ export function getTransactionStatus(
   }
 
   return { finality_status, execution_status }
+}
+
+export function getPendingTransactions(
+  transactions: Transaction[],
+): Transaction[] {
+  return transactions.filter((transaction) => {
+    const { finality_status } = getTransactionStatus(transaction)
+    return finality_status === "RECEIVED"
+  })
+}
+
+export function getPendingUpgradeTransactions(
+  transactions: Transaction[],
+): Transaction[] {
+  return getPendingTransactions(transactions).filter(isSafeUpgradeTransaction)
+}
+
+export const isSuccessfulTransaction = (tx: Transaction) => {
+  const { finality_status } = getTransactionStatus(tx)
+  return finality_status && SUCCESS_STATUSES.includes(finality_status)
 }

@@ -28,6 +28,7 @@ const ICONS_CONFIG: IconsConfig[] = [
     additionalSvgConfig: {
       replaceAttrValues: {
         "#fff": "currentColor",
+        white: "currentColor",
       } /** allows icons to be coloured using current css color */,
     },
     additionalPlugins: [
@@ -42,6 +43,7 @@ const ICONS_CONFIG: IconsConfig[] = [
     additionalSvgConfig: {
       replaceAttrValues: {
         "#fff": "currentColor",
+        white: "currentColor",
       } /** allows logos to be coloured using current css color */,
     },
     componentSuffix: "logo",

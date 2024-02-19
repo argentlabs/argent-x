@@ -26,6 +26,14 @@ import { backgroundStarknetAddressService } from "./services/address"
 import { networkService } from "../../shared/network/service"
 import { sharedSwapService } from "../../shared/swap/service"
 import { transactionEstimateRouter } from "./procedures/transactionEstimate"
+import { tokenService } from "../../shared/token/__new/service"
+import { riskAssessmentRouter } from "./procedures/riskAssessment"
+import { riskAssessmentService } from "./services/riskAssessment"
+import { feeTokenService } from "../../shared/feeToken/service"
+import { feeTokenRouter } from "./procedures/feeToken"
+import { provisionRouter } from "./procedures/provision"
+import { provisionService } from "./services/provision"
+import { discoverRouter } from "./procedures/discover"
 
 const appRouter = router({
   account: accountRouter,
@@ -43,6 +51,10 @@ const appRouter = router({
   transactionReview: transactionReviewRouter,
   transfer: transferRouter,
   udc: udcRouter,
+  riskAssessment: riskAssessmentRouter,
+  feeToken: feeTokenRouter,
+  provision: provisionRouter,
+  discover: discoverRouter,
 })
 
 export type AppRouter = typeof appRouter
@@ -62,7 +74,11 @@ createChromeHandler({
       transactionReviewService: backgroundTransactionReviewService,
       swapService: sharedSwapService,
       starknetAddressService: backgroundStarknetAddressService,
+      tokenService,
+      feeTokenService,
       networkService,
+      riskAssessmentService,
+      provisionService,
     },
   }),
 })

@@ -2,8 +2,12 @@ import { Page, expect } from "@playwright/test"
 
 import { lang } from "../languages"
 import Activity from "./Activity"
+import {
+  FeeTokens,
+  TokenSymbol,
+  getTokenInfo,
+} from "../../../shared/src/assets"
 
-type TokenName = "Ethereum"
 export interface IAsset {
   name: string
   balance: number
@@ -46,24 +50,28 @@ export default class Account extends Activity {
   }
 
   get send() {
-    return this.page.locator(`button:text-is("${lang.account.send}")`)
+    return this.page.locator(`button:has-text("${lang.account.send}")`)
   }
 
   get deployAccount() {
     return this.page.locator(
-      `button :text-is("${lang.settings.deployAccount}")`,
+      `button :text-is("${lang.settings.account.deployAccount}")`,
     )
   }
 
-  token(tkn: TokenName) {
-    return this.page.locator(`button :text-is('${tkn}')`)
+  token(tkn: TokenSymbol) {
+    const tokenInfo = getTokenInfo(tkn)
+    if (!tokenInfo) {
+      throw new Error(`Invalid token: ${tkn}`)
+    }
+    return this.page.locator(`button :text-is('${tokenInfo.name}')`)
   }
 
   get accountListSelector() {
     return this.page.locator(`[aria-label="Show account list"]`)
   }
 
-  get addANewccountFromAccountList() {
+  get addANewAccountFromAccountList() {
     return this.page.locator('[aria-label="Create new wallet"]')
   }
 
@@ -107,10 +115,8 @@ export default class Account extends Activity {
     return this.page.locator('[data-testid="tokenBalance"]')
   }
 
-  currentBalance(tkn: "Ethereum") {
-    return this.page.locator(
-      ` //button//h6[contains(text(), '${tkn}')]/following::p`,
-    )
+  currentBalance(tkn: TokenSymbol) {
+    return this.page.locator(`[data-testid="${tkn}-balance"]`)
   }
 
   currentBalanceDevNet(tkn: "ETH") {
@@ -150,7 +156,7 @@ export default class Account extends Activity {
       await this.createAccount.click()
     } else {
       await this.accountListSelector.click()
-      await this.addANewccountFromAccountList.click()
+      await this.addANewAccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
 
@@ -163,7 +169,7 @@ export default class Account extends Activity {
       await this.createAccount.click()
     } else {
       await this.accountListSelector.click()
-      await this.addANewccountFromAccountList.click()
+      await this.addANewAccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
 
@@ -174,7 +180,7 @@ export default class Account extends Activity {
     const accountAddress = await this.accountAddress
       .textContent()
       .then((v) => v?.replaceAll(" ", ""))
-    await this.close.last().click()
+    await this.closeLocator.last().click()
     const accountName = await this.accountListSelector.textContent()
     return [accountName, accountAddress]
   }
@@ -207,13 +213,13 @@ export default class Account extends Activity {
     return assetsList
   }
 
-  async ensureAsset(accountName: string, name: "Ethereum", value: string) {
+  async ensureAsset(
+    accountName: string,
+    name: TokenSymbol = "ETH",
+    value: string,
+  ) {
     await this.ensureSelectedAccount(accountName)
-    await expect(
-      this.page.locator(
-        `//*[text() = '${name}']/following-sibling::div/p[text() = '${value}']`,
-      ),
-    ).toBeVisible({ timeout: 1000 * 60 * 4 })
+    await expect(this.currentBalance(name)).toContainText(value)
   }
 
   async getTotalFeeValue() {
@@ -227,27 +233,27 @@ export default class Account extends Activity {
 
     return parseFloat(fee.split(" ")[0])
   }
-  async txValidations(txAmount: string) {
+  async txValidations(feAmount: string) {
     const trxAmountHeader = await this.page
       .locator(`//*[starts-with(text(),'Send ')]`)
       .textContent()
       .then((v) => v?.split(" ")[1])
 
-    const amountLocator = this.page.locator(
-      `//div//label[text()='Send']/following-sibling::div[1]//*[@data-testid]`,
-    )
-    const sendAmount = await amountLocator
-      .textContent()
-      .then((v) => v?.split(" ")[0])
+    const sendAmountFEText = await this.page
+      .locator("[data-fe-value]")
+      .getAttribute("data-fe-value")
+    const sendAmountTXText = await this.page
+      .locator("[data-tx-value]")
+      .getAttribute("data-tx-value")
+    const sendAmountFE = sendAmountFEText!.split(" ")[0]
+    const sendAmountTX = parseInt(sendAmountTXText!)
+    console.log({ sendAmountFE, sendAmountTX })
+    expect(sendAmountFE).toBe(`${trxAmountHeader}`)
 
-    expect(sendAmount!.substring(1)).toBe(`${trxAmountHeader}`)
-    if (txAmount != "MAX") {
-      expect(txAmount.toString()).toBe(trxAmountHeader)
+    if (feAmount != "MAX") {
+      expect(feAmount).toBe(trxAmountHeader)
     }
-    const amount = await amountLocator
-      .getAttribute("data-testid")
-      .then((value) => parseInt(value!) / Math.pow(10, 18))
-    return amount
+    return { sendAmountTX, sendAmountFE }
   }
 
   async fillRecipientAddress({
@@ -271,23 +277,34 @@ export default class Account extends Activity {
       }
     }
   }
+
+  async confirmTransaction() {
+    const failPredict = this.page.getByText("Transaction fail")
+    await expect(failPredict)
+      .toBeVisible({ timeout: 1000 * 5 })
+      .then(async (_) => await failPredict.click())
+      .catch(async (_) => await this.confirmLocator.click())
+  }
+
   async transfer({
     originAccountName,
     recipientAddress,
-    tokenName,
+    token,
     amount,
     fillRecipientAddress = "paste",
     submit = true,
+    feeToken = "ETH",
   }: {
     originAccountName: string
     recipientAddress: string
-    tokenName: TokenName
+    token: TokenSymbol
     amount: number | "MAX"
     fillRecipientAddress?: "typing" | "paste"
     submit?: boolean
+    feeToken?: FeeTokens
   }) {
     await this.ensureSelectedAccount(originAccountName)
-    await this.token(tokenName).click()
+    await this.token(token).click()
     await this.fillRecipientAddress({ recipientAddress, fillRecipientAddress })
     if (amount === "MAX") {
       await expect(this.balance).toBeVisible()
@@ -297,12 +314,17 @@ export default class Account extends Activity {
       await this.amount.fill(amount.toString())
     }
 
-    await this.reviewSend.click()
-    const trxAmount = await this.txValidations(amount.toString())
+    await this.reviewSendLocator.click()
     if (submit) {
-      await this.confirm.click()
+      if (feeToken) {
+        await this.selectFeeToken(feeToken)
+      }
+      await this.confirmTransaction()
     }
-    return trxAmount
+    const { sendAmountFE, sendAmountTX } = await this.txValidations(
+      amount.toString(),
+    )
+    return { sendAmountTX, sendAmountFE }
   }
 
   async ensureTokenBalance({
@@ -311,7 +333,7 @@ export default class Account extends Activity {
     balance,
   }: {
     accountName: string
-    token: TokenName
+    token: TokenSymbol
     balance: number
   }) {
     await this.ensureSelectedAccount(accountName)
@@ -319,7 +341,7 @@ export default class Account extends Activity {
     await expect(this.page.locator('[data-testid="tokenBalance"]')).toHaveText(
       balance.toString(),
     )
-    await this.back.click()
+    await this.backLocator.click()
   }
 
   get password() {
@@ -356,9 +378,7 @@ export default class Account extends Activity {
   }
 
   get recipientAddress() {
-    return this.page.locator(
-      `//textarea[@placeholder="${lang.account.recipientAddress}"]/following::button[1]`,
-    )
+    return this.page.locator('[data-testid="recipient-input"]')
   }
 
   get saveAddress() {
@@ -386,22 +406,20 @@ export default class Account extends Activity {
   }
 
   async saveRecoveryPhrase() {
-    const nextModal = await this.next.isVisible({ timeout: 60 })
+    const nextModal = await this.nextLocator.isVisible({ timeout: 60 })
     if (nextModal) {
       await Promise.all([
         expect(
-          this.page.locator(
-            `h3:has-text("${lang.settings.beforeYouContinue}")`,
-          ),
+          this.page.locator(`h3:has-text("${lang.common.beforeYouContinue}")`),
         ).toBeVisible(),
         expect(
-          this.page.locator(`p:has-text("${lang.settings.seedWarning}")`),
+          this.page.locator(`p:has-text("${lang.common.seedWarning}")`),
         ).toBeVisible(),
       ])
-      await this.next.click()
+      await this.nextLocator.click()
     }
     await this.page
-      .locator(`span:has-text("${lang.settings.revealSeedPhrase}")`)
+      .locator(`span:has-text("${lang.common.revealSeedPhrase}")`)
       .click()
     const pos = Array.from({ length: 12 }, (_, i) => i + 1)
     const seed = await Promise.all(
@@ -414,15 +432,15 @@ export default class Account extends Activity {
     ).then((result) => result.join(" "))
 
     await Promise.all([
-      this.page.locator(`button:has-text("${lang.settings.copy}")`).click(),
+      this.page.locator(`button:has-text("${lang.common.copy}")`).click(),
       expect(
-        this.page.locator(`button:has-text("${lang.settings.copied}")`),
+        this.page.locator(`button:has-text("${lang.common.copied}")`),
       ).toBeVisible(),
     ])
     await this.page
-      .locator(`p:has-text("${lang.settings.confirmRecovery}")`)
+      .locator(`p:has-text("${lang.common.confirmRecovery}")`)
       .click()
-    await this.done.click()
+    await this.doneLocator.click()
     const seedPhraseCopied = await this.page.evaluate(
       `navigator.clipboard.readText();`,
     )
@@ -449,6 +467,18 @@ export default class Account extends Activity {
     return this.saveRecoveryPhrase().then((adr) => String(adr))
   }
 
+  get addedArgentShieldLocator() {
+    return this.page.getByRole("heading", {
+      name: lang.common.argentShieldAdded,
+    })
+  }
+
+  get removedArgentShieldLocator() {
+    return this.page.getByRole("heading", {
+      name: lang.common.argentShieldRemoved,
+    })
+  }
+
   // Multisig
   get deployNeededWarning() {
     return this.page.locator(`p:has-text("${lang.account.deployFirst}")`)
@@ -460,10 +490,6 @@ export default class Account extends Activity {
 
   get decreaseThreshold() {
     return this.page.locator(`[data-testid="decrease-threshold"]`)
-  }
-
-  get manageOwners() {
-    return this.page.locator(`button:text-is("Manage owners")`)
   }
 
   get setConfirmationsLocator() {
@@ -478,7 +504,7 @@ export default class Account extends Activity {
     confirmations?: number
   }) {
     await this.accountListSelector.click()
-    await this.addANewccountFromAccountList.click()
+    await this.addANewAccountFromAccountList.click()
     await this.addMultisigAccountFromNewAccountScreen.click()
 
     const [pages] = await Promise.all([
@@ -488,6 +514,7 @@ export default class Account extends Activity {
     const tabs = pages.context().pages()
     await tabs[1].waitForLoadState("load")
     await expect(tabs[1].locator('[name^="signerKeys.0.key"]')).toHaveCount(1)
+
     if (signers.length > 0) {
       for (let index = 0; index < signers.length; index++) {
         await tabs[1]
@@ -515,14 +542,14 @@ export default class Account extends Activity {
     }
 
     await tabs[1].locator('button:text-is("Next")').click()
-    const currentTheshold = await tabs[1]
+    const currentThreshold = await tabs[1]
       .locator('[data-testid="threshold"]')
       .innerText()
       .then((v) => parseInt(v!))
 
     //set confirmations
-    if (confirmations > currentTheshold) {
-      for (let i = currentTheshold; i < confirmations; i++) {
+    if (confirmations > currentThreshold) {
+      for (let i = currentThreshold; i < confirmations; i++) {
         await tabs[1].locator('[data-testid="increase-threshold"]').click()
       }
     }
@@ -535,7 +562,7 @@ export default class Account extends Activity {
 
   async joinMultisig() {
     await this.accountListSelector.click()
-    await this.addANewccountFromAccountList.click()
+    await this.addANewAccountFromAccountList.click()
     await this.addMultisigAccountFromNewAccountScreen.click()
 
     await this.joinExistingMultisig.click()
@@ -544,14 +571,48 @@ export default class Account extends Activity {
     return String(await this.page.evaluate(`navigator.clipboard.readText()`))
   }
 
+  async addOwnerToMultisig({
+    accountName,
+    pubKey,
+    confirmations = 1,
+  }: {
+    accountName: string
+    pubKey: string
+    confirmations?: number
+  }) {
+    await this.showSettingsLocator.click()
+    await this.account(accountName).click()
+    await this.manageOwners.click()
+    await this.page.locator('[data-testid="add-owners"]').click()
+    //hydrogen build will always have 2 inputs
+    const locs = await this.page.locator('[data-testid^="closeButton."]').all()
+    for (let index = 0; locs.length - 1 > index; index++) {
+      await this.page.locator(`[data-testid^="closeButton.${index}"]`).click()
+    }
+    await this.page.locator('[name^="signerKeys.0.key"]').fill(pubKey)
+
+    await this.nextLocator.click()
+
+    const currentThreshold = await this.page
+      .locator('[data-testid="threshold"]')
+      .innerText()
+      .then((v) => parseInt(v!))
+    //set confirmations
+    if (confirmations > currentThreshold) {
+      for (let i = currentThreshold; i < confirmations; i++) {
+        await this.page.locator('[data-testid="increase-threshold"]').click()
+      }
+    }
+    await this.nextLocator.click()
+    await this.confirmLocator.click()
+  }
+
   ensureMultisigActivated() {
     return Promise.all([
-      expect(this.page.locator("label:has-text('Not activated')")).toBeHidden({
-        timeout: 60000,
-      }),
+      expect(this.page.locator("label:has-text('Not activated')")).toBeHidden(),
       expect(
         this.page.locator('[data-testid="activating-multisig"]'),
-      ).toBeHidden({ timeout: 60000 }),
+      ).toBeHidden(),
     ])
   }
 
@@ -566,35 +627,121 @@ export default class Account extends Activity {
   }
 
   async acceptTx(tx: string) {
-    await this.menuActivity.click()
+    await this.menuActivityLocator.click()
     await this.page.locator(`[data-tx-hash="${tx}"]`).click()
-    await this.confirm.click()
+    await this.confirmTransaction()
   }
 
   async setConfirmations(accountName: string, confirmations: number) {
     await this.ensureSelectedAccount(accountName)
-    await this.showSettings.click()
+    await this.showSettingsLocator.click()
     await this.account(accountName).click()
     await this.setConfirmationsLocator.click()
 
-    const currentTheshold = await this.page
+    const currentThreshold = await this.page
       .locator('[data-testid="threshold"]')
       .innerText()
       .then((v) => parseInt(v!))
-    if (confirmations > currentTheshold) {
-      for (let i = currentTheshold; i < confirmations; i++) {
+    if (confirmations > currentThreshold) {
+      for (let i = currentThreshold; i < confirmations; i++) {
         await this.increaseThreshold.click()
       }
-    } else if (confirmations < currentTheshold) {
-      for (let i = currentTheshold; i > confirmations; i--) {
+    } else if (confirmations < currentThreshold) {
+      for (let i = currentThreshold; i > confirmations; i--) {
         await this.decreaseThreshold.click()
       }
     }
     await this.page.locator('[data-testid="update-confirmations"]').click()
-    await this.confirm.click()
+    await this.confirmTransaction()
     await Promise.all([
-      expect(this.confirm).toBeHidden(),
-      expect(this.menuActivity).toBeVisible(),
+      expect(this.confirmLocator).toBeHidden(),
+      expect(this.menuActivityLocator).toBeVisible(),
     ])
+  }
+
+  async ensure2FANotEnabled(accountName: string) {
+    await this.selectAccount(accountName)
+    await Promise.all([
+      expect(this.menuPendingTransactionsIndicatorLocator).toBeHidden(),
+      expect(
+        this.page.locator('[data-testid="shield-on-account-view"]'),
+      ).toBeHidden(),
+    ])
+    await this.showSettingsLocator.click()
+    await Promise.all([
+      expect(
+        this.page.locator('[data-testid="shield-on-settings"]'),
+      ).toBeHidden(),
+      expect(
+        this.page.locator('[data-testid="shield-not-activated"]'),
+      ).toBeVisible(),
+    ])
+    await this.account(accountName).click()
+    await expect(
+      this.page.locator('[data-testid="shield-switch"]'),
+    ).not.toBeChecked()
+  }
+
+  editOwnerLocator(owner: string) {
+    return this.page.locator(`[data-testid="edit-${owner}"]`)
+  }
+  get manageOwners() {
+    return this.page.locator(
+      `//button//*[text()="${lang.settings.account.manageOwners.manageOwners}"]`,
+    )
+  }
+
+  get removeOwnerLocator() {
+    return this.page.locator(
+      `//button[text()="${lang.settings.account.manageOwners.removeOwner}"]`,
+    )
+  }
+
+  get removedFromMultisigLocator() {
+    return this.page.getByText(lang.account.removedFromMultisig)
+  }
+
+  async removeMultiSigOwner(accountName: string, owner: string) {
+    await this.showSettingsLocator.click()
+    await this.account(accountName).click()
+    await this.manageOwners.click()
+    await this.editOwnerLocator(owner).click()
+    await this.removeOwnerLocator.click()
+    await this.removeLocator.click()
+    await this.nextLocator.click()
+    await this.confirmTransaction()
+  }
+
+  //TX v3
+  get feeTokenPickerLoc() {
+    return this.page.locator('[data-testid="fee-token-picker"]')
+  }
+
+  feeTokenLoc(token: FeeTokens) {
+    return this.page.locator(`[data-testid="fee-token-${token}"]`)
+  }
+
+  feeTokenBalanceLoc(token: FeeTokens) {
+    return this.page.locator(`[data-testid="fee-token-${token}-balance"]`)
+  }
+
+  selectedFeeTokenLoc(token: FeeTokens) {
+    return this.feeTokenPickerLoc.locator(`img[alt=${token}]`)
+  }
+
+  async selectFeeToken(token: FeeTokens) {
+    //wait for locator to be visible
+    await Promise.race([
+      expect(this.selectedFeeTokenLoc("ETH")).toBeVisible(),
+      expect(this.selectedFeeTokenLoc("STRK")).toBeVisible(),
+    ])
+    const tokenAlreadySelected = await this.selectedFeeTokenLoc(
+      token,
+    ).isVisible()
+    if (!tokenAlreadySelected) {
+      await this.feeTokenPickerLoc.click()
+      await this.feeTokenLoc(token).click()
+      await expect(this.selectedFeeTokenLoc(token)).toBeVisible()
+    }
   }
 }

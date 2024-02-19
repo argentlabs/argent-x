@@ -25,7 +25,7 @@ export const Default = {
   ),
   args: {
     activity: activity as DailyActivity,
-    account: account as Account,
+    account: account as unknown as Account,
     tokensByNetwork,
   },
 }

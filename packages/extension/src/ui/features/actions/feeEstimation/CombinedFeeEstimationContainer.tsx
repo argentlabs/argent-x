@@ -1,4 +1,4 @@
-import { isFunction, isUndefined } from "lodash-es"
+import { isFunction } from "lodash-es"
 import { FC, useEffect, useMemo } from "react"
 
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
@@ -8,14 +8,13 @@ import { CombinedFeeEstimation } from "./CombinedFeeEstimation"
 import { ParsedFeeError, getParsedFeeError } from "./feeError"
 import { TransactionsFeeEstimationProps } from "./types"
 import { useMaxFeeEstimation } from "./utils"
-import { useTokenBalance } from "../../accountTokens/tokens.state"
 
 export const CombinedFeeEstimationContainer: FC<
   TransactionsFeeEstimationProps
 > = ({
-  feeTokenAddress,
+  feeToken,
   accountAddress,
-  transactions,
+  transactionAction,
   actionHash,
   onErrorChange,
   onFeeErrorChange,
@@ -24,18 +23,18 @@ export const CombinedFeeEstimationContainer: FC<
   transactionSimulation,
   transactionSimulationFeeError,
   transactionSimulationLoading,
+  allowFeeTokenSelection,
 }) => {
   const account = useAccount({ address: accountAddress, networkId })
   if (!account) {
     throw new Error("Account not found")
   }
 
-  const feeToken = useTokenBalance(feeTokenAddress, account)
-
   const { fee: feeSequencer, error } = useMaxFeeEstimation(
     actionHash,
     account,
-    transactions,
+    transactionAction,
+    feeToken.address,
     transactionSimulation,
     transactionSimulationLoading,
   )
@@ -92,12 +91,6 @@ export const CombinedFeeEstimationContainer: FC<
     totalMaxFee,
   )
 
-  const hasTransactions = !isUndefined(transactions)
-
-  if (!hasTransactions) {
-    return null
-  }
-
   return (
     <CombinedFeeEstimation
       amountCurrencyValue={amountCurrencyValue}
@@ -111,6 +104,7 @@ export const CombinedFeeEstimationContainer: FC<
       totalMaxFee={totalMaxFee}
       userClickedAddFunds={userClickedAddFunds}
       totalMaxFeeCurrencyValue={totalMaxFeeCurrencyValue}
+      allowFeeTokenSelection={allowFeeTokenSelection}
     />
   )
 }

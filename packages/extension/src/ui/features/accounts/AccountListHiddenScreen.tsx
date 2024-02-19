@@ -38,6 +38,7 @@ export const AccountListHiddenScreen: FC<AccountListHiddenScreenProps> = ({
             networkId={account.networkId}
             hidden={account.hidden ?? false}
             onClick={() => onToggleHiddenAccount(account, !account.hidden)}
+            showRightElements={true}
           />
         ))}
         {pendingMultisigAccounts.map((pendingMultisig) => (

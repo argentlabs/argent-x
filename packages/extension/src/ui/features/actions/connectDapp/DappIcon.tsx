@@ -2,6 +2,7 @@ import { Box, BoxProps } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { DappDisplayAttributes } from "./useDappDisplayAttributes"
+import { UnknownDappIcon } from "../transactionV2/TransactionHeader/TransactionIcon/UnknownDappIcon"
 
 interface DappIconProps extends BoxProps {
   dappDisplayAttributes?: DappDisplayAttributes
@@ -13,7 +14,7 @@ export const DappIcon: FC<DappIconProps> = ({
 }) => {
   return (
     <Box
-      borderRadius="xl"
+      borderRadius={16}
       size="full"
       backgroundSize="cover"
       h="14"
@@ -27,6 +28,10 @@ export const DappIcon: FC<DappIconProps> = ({
         dappDisplayAttributes?.iconUrl ? "white" : "rgba(255, 255, 255, 0.15)"
       }
       {...rest}
-    />
+    >
+      {!dappDisplayAttributes?.iconUrl && (
+        <UnknownDappIcon borderRadius={16} padding={1} />
+      )}
+    </Box>
   )
 }

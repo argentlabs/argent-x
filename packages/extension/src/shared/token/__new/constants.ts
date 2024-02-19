@@ -12,6 +12,11 @@ export const ETH: Record<string, BaseToken> = {
       "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
     networkId: "goerli-alpha",
   },
+  [constants.StarknetChainId.SN_SEPOLIA]: {
+    address:
+      "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+    networkId: "sepolia-alpha",
+  },
 }
 
 export const USDC: Record<string, BaseToken> = {
@@ -24,5 +29,10 @@ export const USDC: Record<string, BaseToken> = {
     address:
       "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
     networkId: "goerli-alpha",
+  },
+  [constants.StarknetChainId.SN_SEPOLIA]: {
+    address:
+      "0x03a909c1f2d1900d0c96626fac1bedf1e82b92110e5c529b05f9138951b93535",
+    networkId: "sepolia-alpha",
   },
 }

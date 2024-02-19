@@ -30,13 +30,16 @@ jobs:
       SAFE_ENV_VARS: true
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
       ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
+      ARGENT_HEALTHCHECK_BASE_URL: ${{ vars.ARGENT_HEALTHCHECK_BASE_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
       ARGENT_X_ENVIRONMENT: "prod"
       MULTICALL_MAX_BATCH_SIZE: 20
       FAST: 20 # 20s
       MEDIUM: 60 # 60s
       SLOW: 60 * 5 # 5m
       VERY_SLOW: 24 * 60 * 60 # 1d
+      NEW_CAIRO_0_ENABLED: false
 
     if: ${{ !startsWith(github.ref, 'refs/tags/') || startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'extension') }}
     runs-on: ubuntu-latest
@@ -82,7 +85,7 @@ jobs:
         run: pnpm bundlewatch
 
       - name: Upload artifacts for chrome
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: chrome
           path: "*-chrome.zip"
@@ -90,7 +93,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload artifacts for firefox
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: firefox
           path: "*-firefox.zip"
@@ -132,10 +135,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           npm config set "//registry.npmjs.org/:_authToken" "$NPM_ACCESS_TOKEN"
-          cp Readme.md ./packages/get-starknet/README.md
-          pnpm --filter @argent/get-starknet publish --no-git-checks --access public || exit 0
-          pnpm --filter @argent/web-sdk publish --no-git-checks --access public || exit 0
-          pnpm --filter @argent/starknet-react-webwallet-connector publish --no-git-checks --access public || exit 0
           pnpm --filter @argent/x-sessions publish --no-git-checks --access public || exit 0
 
       - name: Get product version

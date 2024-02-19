@@ -29,7 +29,7 @@ export const estimateAccountDeployProcedure = extensionOnlyProcedure
         : await wallet.getSelectedAccount()
 
       if (!account) {
-        throw Error("no accounts")
+        throw new AccountError({ code: "NOT_FOUND" })
       }
 
       try {

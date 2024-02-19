@@ -7,7 +7,6 @@ import styled, {
   css,
 } from "styled-components"
 
-import { statusMessageStore } from "../../../shared/statusMessage/storage"
 import {
   IStatusMessage,
   IStatusMessageLevel,
@@ -16,8 +15,6 @@ import { Button } from "../../components/Button"
 import { CloseRoundedIcon } from "../../components/Icons/MuiIcons"
 import { getColorForLevel } from "./getColorForLevel"
 import { StatusMessageIcon } from "./StatusMessageIcon"
-import { useShouldShowStatusMessage } from "./useShouldShowStatusMessage"
-import { useStatusMessage } from "./useStatusMessage"
 
 export interface IStatusMessageBanner
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -35,20 +32,6 @@ export interface IStatusMessageBanner
     | undefined
   onDismiss: () => void
   extendable?: boolean
-}
-
-export const StatusMessageBannerContainer: FC = () => {
-  const shouldShowStatusMessage = useShouldShowStatusMessage()
-  const statusMessage = useStatusMessage()
-  const onDismiss = useCallback(async () => {
-    await statusMessageStore.set("lastDismissedMessageId", statusMessage?.id)
-  }, [statusMessage?.id])
-  if (!shouldShowStatusMessage) {
-    return null
-  }
-  return (
-    <StatusMessageBanner statusMessage={statusMessage} onDismiss={onDismiss} />
-  )
 }
 
 const ToggleButton = styled.div`

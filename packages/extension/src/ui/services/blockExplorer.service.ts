@@ -9,6 +9,7 @@ import {
 } from "../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../hooks/useStorage"
 import { getNetworkIdFromChainId } from "../../shared/network/utils"
+import { isArgentNetworkId } from "@argent/shared"
 
 export const useBlockExplorerTitle = () => {
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
@@ -19,11 +20,7 @@ export const useBlockExplorerTitle = () => {
 export const getBlockExplorerUrlForNetwork = async (network: Network) => {
   const blockExplorerKey = await settingsStore.get("blockExplorerKey")
   const settingsBlockExplorer = defaultBlockExplorers[blockExplorerKey]
-  if (
-    network.id === "mainnet-alpha" ||
-    network.id === "goerli-alpha" ||
-    network.id === "localhost"
-  ) {
+  if (isArgentNetworkId(network.id) || network.id === "localhost") {
     return settingsBlockExplorer.url[network.id]
   }
 

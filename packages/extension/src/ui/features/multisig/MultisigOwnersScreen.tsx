@@ -109,7 +109,9 @@ const MultisigOwners = ({ account }: { account: Account }) => {
             color="neutrals.400"
             onClick={handleAddOwnerClick}
           >
-            <B2 color="neutrals.400">Add owners</B2>
+            <B2 data-testid="add-owners" color="neutrals.400">
+              Add owners
+            </B2>
           </Button>
         )}
       </Flex>

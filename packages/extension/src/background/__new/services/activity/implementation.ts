@@ -8,7 +8,10 @@ import {
 import type Emittery from "emittery"
 
 import type { IAccountService } from "../../../../shared/account/service/interface"
-import type { IActivityStorage } from "../../../../shared/activity/types"
+import type {
+  ActivitiesPayload,
+  IActivityStorage,
+} from "../../../../shared/activity/types"
 import { ARGENT_API_BASE_URL } from "../../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/headers"
 import { RefreshInterval } from "../../../../shared/config"
@@ -22,7 +25,7 @@ import { urlWithQuery } from "../../../../shared/utils/url"
 import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 import type { Wallet } from "../../../wallet"
 import type { IBackgroundUIService } from "../ui/interface"
-import { everyWhenOpen } from "../worker/schedule/decorators"
+import { everyWhenOpen, onAccountChanged } from "../worker/schedule/decorators"
 import { pipe } from "../worker/schedule/pipe"
 import {
   AccountUpgradedActivity,
@@ -38,18 +41,22 @@ import {
   TokenActivity,
   TriggerEscapeGuardianActivity,
   TriggerEscapeSignerActivity,
-  type ActivitiesPayload,
   type Events,
   type IActivityService,
+  AccountDeployActivity,
+  ProvisionActivity,
 } from "./interface"
 import {
   isActivityDetailsAction,
   type ActivityDetailsAction,
   type ActivityResponse,
-} from "./schema"
-import { getOverallLastModified } from "./utils/getOverallLastModified"
-import { parseFinanceActivities } from "./utils/parseFinanceActivities"
-import { parseSecurityActivities } from "./utils/parseSecurityActivities"
+} from "../../../../shared/activity/schema"
+import { getOverallLastModified } from "../../../../shared/activity/utils/getOverallLastModified"
+import { parseFinanceActivities } from "../../../../shared/activity/utils/parseFinanceActivities"
+import { parseAccountActivities } from "../../../../shared/activity/utils/parseAccountActivities"
+import { IKeyValueStorage } from "../../../../shared/storage"
+import { WalletStorageProps } from "../../../wallet/backup/backup.service"
+import { parseProvisionActivity } from "../../../../shared/activity/utils/parseProvisionActivity"
 
 /** maps activity details action to an equivalent Event to emit */
 
@@ -81,9 +88,11 @@ export class ActivityService implements IActivityService {
     private readonly scheduleService: IScheduleService,
     private readonly backgroundUIService: IBackgroundUIService,
     private readonly debounceService: IDebounceService,
+    private readonly old_walletStore: IKeyValueStorage<WalletStorageProps>,
   ) {}
 
   runUpdateSelectedAccountActivities = pipe(
+    onAccountChanged(this.old_walletStore),
     everyWhenOpen(
       this.backgroundUIService,
       this.scheduleService,
@@ -248,7 +257,7 @@ export class ActivityService implements IActivityService {
 
     /** security */
 
-    const accountAddressesByAction = parseSecurityActivities({
+    const accountAddressesByAction = parseAccountActivities({
       activities: filteredActivities,
       accountAddressesOnNetwork,
     })
@@ -262,8 +271,23 @@ export class ActivityService implements IActivityService {
         if (accounts.length) {
           void this.emitter.emit(event, accounts)
         }
+      } else if (action === "deploy") {
+        const accounts = accountsOnNetwork.filter((account) =>
+          includesAddress(account.address, addresses),
+        )
+        if (accounts.length) {
+          void this.emitter.emit(AccountDeployActivity, accounts)
+        }
       }
     })
+    /** Provision */
+    const provisionActivity = parseProvisionActivity(filteredActivities)
+    if (provisionActivity !== undefined) {
+      void this.emitter.emit(ProvisionActivity, {
+        account: activityAccount,
+        activity: provisionActivity,
+      })
+    }
   }
 
   async getModifiedAfter(

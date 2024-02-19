@@ -9,7 +9,6 @@ const { ChevronRightIcon } = icons
 interface AccountListScreenItemProps extends AccountListItemProps {
   clickNavigateSettings?: boolean
   onClick: ReactEventHandler
-  shouldDisplayGuardianBanner?: boolean
 }
 
 export const AccountListScreenItem: FC<AccountListScreenItemProps> = ({

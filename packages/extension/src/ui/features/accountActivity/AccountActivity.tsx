@@ -66,6 +66,7 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
   transaction,
 }) => {
   const navigate = useNavigate()
+
   if (isActivityTransaction(transaction)) {
     const { hash, failureReason } = transaction
     const transactionTransformed = transformTransaction({
@@ -85,7 +86,7 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
         >
           {failureReason ? (
             <div style={{ display: "flex" }}>
-              <TransactionStatusIndicator color={"red"} />
+              <TransactionStatusIndicator status={"red"} />
             </div>
           ) : null}
         </TransactionListItem>

@@ -1,10 +1,10 @@
 import { H4 } from "@argent/ui"
 import { Code, Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { FC, ReactNode } from "react"
 
 const InfoRow: FC<{
   title: string
-  content?: string
+  content?: ReactNode
   copyContent?: string
 }> = ({ title, content, copyContent }) => {
   return (

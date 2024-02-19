@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
+import { pluralise } from "@argent/shared"
 import useSWR from "swr"
 
 import { Escape } from "../../../../shared/account/details/escape.model"
@@ -20,10 +21,6 @@ import {
   getEscapeWarningStoreKey,
 } from "./escapeWarningStore"
 import { clientAccountService } from "../../../services/account"
-
-const pluralise = (value: number, unit: string) => {
-  return `${value} ${unit}${value === 1 ? "" : "s"}`
-}
 
 export const getActiveFromNow = (activeAt: number, now = new Date()) => {
   if (!isNumeric(activeAt)) {

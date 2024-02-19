@@ -1,7 +1,9 @@
+import { ProvisionActivityPayload } from "../../../activity/types"
 import { AllowArray, SelectorFn } from "../../../storage/__new/interface"
-import { BaseWalletAccount, WalletAccount } from "../../../wallet.model"
+import { BaseWalletAccount } from "../../../wallet.model"
 import { BaseToken, Token } from "../types/token.model"
 import { BaseTokenWithBalance } from "../types/tokenBalance.model"
+import { ApiTokenInfo } from "../types/tokenInfo.model"
 import {
   TokenPriceDetails,
   TokenWithBalanceAndPrice,
@@ -26,15 +28,15 @@ export interface ITokenService {
     tokensWithBalance: AllowArray<BaseTokenWithBalance>,
   ): Promise<void>
   updateTokenPrices(tokenPrices: AllowArray<TokenPriceDetails>): Promise<void>
-
+  handleProvisionTokens: (payload: ProvisionActivityPayload) => Promise<void>
   /**
    * Fetch methods - These methods fetch data from backend or chain
-   * fetchTokensFromBackend: Fetch a list of tokens from the backend using networkId
    * fetchTokenBalancesFromOnChain: Fetch balances of specified tokens from on-chain for given accounts
    * fetchTokenPricesFromBackend: Fetch prices of specified tokens from the backend
    * fetchTokenDetails: Fetch details of specified tokens from on-chain
+   * fetchAccountTokenBalancesFromBackend: Fetch list of tokens and balances for given account from backend
+   * getTokensInfoFromBackendForNetwork: Lazy fetch tokens info from local storage or backend max RefreshInterval.VERY_SLOW
    */
-  fetchTokensFromBackend: (networkId: string) => Promise<Token[]>
   fetchTokenBalancesFromOnChain: (
     accounts: AllowArray<BaseWalletAccount>,
     tokens?: AllowArray<Token>,
@@ -44,6 +46,12 @@ export interface ITokenService {
     networkId: string,
   ) => Promise<TokenPriceDetails[]>
   fetchTokenDetails: (baseToken: BaseToken) => Promise<Token>
+  fetchAccountTokenBalancesFromBackend: (
+    account: BaseWalletAccount,
+  ) => Promise<BaseTokenWithBalance[]>
+  getTokensInfoFromBackendForNetwork(
+    networkId: string,
+  ): Promise<ApiTokenInfo[] | undefined>
 
   /**
    * Get methods - These methods retrieve data from local storage or perform calculations
@@ -66,11 +74,4 @@ export interface ITokenService {
   getTotalCurrencyBalanceForAccounts: (
     accounts: BaseWalletAccount[],
   ) => Promise<{ [key: string]: string }>
-
-  getFeeTokens: (
-    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
-  ) => Promise<Token[]>
-  getBestFeeToken: (
-    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
-  ) => Promise<Token>
 }

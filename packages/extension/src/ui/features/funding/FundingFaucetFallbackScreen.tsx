@@ -39,7 +39,7 @@ export const FundingFaucetFallbackScreen: FC = () => {
           variant="info"
           size="sm"
           backgroundColor="black"
-          title="There is no token faucet available yet on Testnet 2"
+          title={`There is no token faucet available yet on ${network.name}`}
           mb={3}
         />
         <Grid templateColumns="1fr" gap={4}>

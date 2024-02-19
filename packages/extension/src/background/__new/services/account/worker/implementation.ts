@@ -4,22 +4,22 @@ import { WalletAccount } from "../../../../../shared/wallet.model"
 import { getAccountClassHashFromChain } from "../../../../../shared/account/details/getAccountClassHashFromChain"
 import { getAccountCairoVersionFromChain } from "../../../../../shared/account/details/getAccountCairoVersionFromChain"
 import { IAccountService } from "../../../../../shared/account/service/interface"
-import { isUndefined, keyBy } from "lodash-es"
-import {
-  onInstallAndUpgrade,
-  onStartup,
-} from "../../worker/schedule/decorators"
+import { keyBy } from "lodash-es"
+import { onInstallAndUpgrade } from "../../worker/schedule/decorators"
 
 import { AllowArray } from "../../../../../shared/storage/__new/interface"
 import { pipe } from "../../worker/schedule/pipe"
-import { IBackgroundUIService } from "../../ui/interface"
-import { IDebounceService } from "../../../../../shared/debounce"
 import { getOwnerForAccount } from "../../../../../shared/account/details/getOwner"
 import {
+  GuardianChangedActivity,
   IActivityService,
-  SecurityActivityPayload,
+  AccountActivityPayload,
   SignerChangedActivity,
+  AccountDeployActivity,
+  ProvisionActivity,
 } from "../../activity/interface"
+import { getGuardianForAccount } from "../../../../../shared/account/details/getGuardian"
+import { ProvisionActivityPayload } from "../../../../../shared/activity/types"
 
 export enum AccountUpdaterTaskId {
   UPDATE_DEPLOYED = "accountUpdateDeployed",
@@ -38,12 +38,22 @@ export class AccountWorker {
     private readonly accountService: IAccountService,
     private readonly activityService: IActivityService,
     private readonly scheduleService: IScheduleService<AccountUpdaterTaskId>,
-    private readonly backgroundUIService: IBackgroundUIService,
-    private readonly debounceService: IDebounceService,
   ) {
     this.activityService.emitter.on(
       SignerChangedActivity,
       this.onSignerChanged.bind(this),
+    )
+    this.activityService.emitter.on(
+      AccountDeployActivity,
+      this.updateDeployed.bind(this),
+    )
+    this.activityService.emitter.on(
+      GuardianChangedActivity,
+      this.onGuardianChanged.bind(this),
+    )
+    this.activityService.emitter.on(
+      ProvisionActivity,
+      this.onProvisionActivity.bind(this),
     )
   }
 
@@ -57,6 +67,7 @@ export class AccountWorker {
     ])
   })
 
+  /** @internal just exposed for testing */
   async runUpdaterTask(tasks: AllowArray<AccountUpdaterTask>): Promise<void> {
     const updaterTasks = Array.isArray(tasks) ? tasks : [tasks]
     for (const task of updaterTasks) {
@@ -74,6 +85,7 @@ export class AccountWorker {
     }
   }
 
+  /** @internal just exposed for testing */
   async updateDeployed(): Promise<void> {
     const accounts = await this.accountService.get(
       (account) => account.needsDeploy !== false,
@@ -101,6 +113,7 @@ export class AccountWorker {
     await this.accountService.upsert(newlyDeployedAccounts)
   }
 
+  /** @internal just exposed for testing */
   async updateAccountClassHash(): Promise<void> {
     const accounts = await this.accountService.get()
 
@@ -122,6 +135,7 @@ export class AccountWorker {
     await this.accountService.upsert(updated)
   }
 
+  /** @internal just exposed for testing */
   async updateAccountCairoVersion(): Promise<void> {
     const accounts = await this.accountService.get()
 
@@ -145,38 +159,7 @@ export class AccountWorker {
     await this.accountService.upsert(updated)
   }
 
-  async updateAccountClassHashImmediately(): Promise<void> {
-    const accounts = await this.accountService.get()
-    const needsImmediateUpdate = accounts.some((account) =>
-      isUndefined(account.classHash),
-    )
-    if (needsImmediateUpdate) {
-      // Let's keep console.log here for now, as it's a critical path.
-      // It will be removed in Prod.
-      console.log("Updating account class hash immediately")
-      await this.updateAccountClassHash()
-    } else {
-      console.log("Account class hash up to date")
-    }
-  }
-
-  async updateAccountCairoVersionImmediately(): Promise<void> {
-    const accounts = await this.accountService.get()
-    // Using every here, because we don't want to fetch the cairo version for undeployed accounts
-    const needsImmediateUpdate = accounts.every((account) =>
-      isUndefined(account.cairoVersion),
-    )
-    if (needsImmediateUpdate) {
-      // Let's keep console.log here for now, as it's a critical path.
-      // It will be removed in Prod.
-      console.log("Updating account cairo version immediately")
-      await this.updateAccountCairoVersion()
-    } else {
-      console.log("Account cairo version up to date")
-    }
-  }
-
-  async onSignerChanged(payload: SecurityActivityPayload) {
+  async onSignerChanged(payload: AccountActivityPayload) {
     const accounts = await this.accountService.getFromBaseWalletAccounts(
       payload,
     )
@@ -194,5 +177,29 @@ export class AccountWorker {
       }
     })
     await this.accountService.upsert(updated)
+  }
+
+  async onGuardianChanged(payload: AccountActivityPayload) {
+    const accounts = await this.accountService.getFromBaseWalletAccounts(
+      payload,
+    )
+    const results = await Promise.allSettled(
+      accounts.map((account) => {
+        return getGuardianForAccount(account)
+      }),
+    )
+    const updated = accounts.map((account, index) => {
+      const result = results[index]
+      const guardian = result.status === "fulfilled" ? result.value : undefined
+      return {
+        ...account,
+        guardian,
+      }
+    })
+    await this.accountService.upsert(updated)
+  }
+
+  async onProvisionActivity(payload: ProvisionActivityPayload) {
+    await this.accountService.handleProvisionedAccount(payload)
   }
 }

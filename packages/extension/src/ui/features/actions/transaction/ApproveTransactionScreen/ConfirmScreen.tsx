@@ -154,11 +154,6 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                           type="submit"
                           isLoading={confirmButtonIsLoading}
                           loadingText={confirmButtonLoadingText}
-                          leftIcon={
-                            destructive ? (
-                              <AlertFillIcon color="white" />
-                            ) : undefined
-                          }
                           sx={{
                             pointerEvents: "auto !important",
                           }}

@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { useTransactionReviewV2 } from "./useTransactionReviewV2"
 import { useActionScreen } from "../hooks/useActionScreen"
@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react"
 import { isArray } from "lodash-es"
 import { TransactionHeader } from "./TransactionHeader"
-import { WarningBanner } from "./warning/WarningBanner"
+import { WarningBanner } from "../warning/WarningBanner"
 import { FeeEstimationContainerV2 } from "./FeeEstimationContainerV2"
 import { isEmpty, isObject } from "lodash-es"
 import { routes } from "../../../routes"
@@ -45,11 +45,35 @@ import {
 import { TransactionReviewLabel } from "./TransactionReviewLabel"
 
 const { AlertIcon } = icons
-import { ETH_TOKEN_ADDRESS } from "../../../../shared/network/constants"
 import { warningSchema } from "../../../../shared/transactionReview/schema"
 import { z } from "zod"
-import { ConfirmationModal } from "./warning/ConfirmationModal"
-import { getHighestSeverity } from "./warning/helper"
+import { useBestFeeToken } from "../useBestFeeToken"
+import { ConfirmationModal } from "../warning/ConfirmationModal"
+import { getHighestSeverity } from "../warning/helper"
+import { ReviewFooter } from "../warning/ReviewFooter"
+import { useRejectDeployIfPresent } from "../hooks/useRejectDeployAction"
+import { FeeTokenPickerModal } from "../feeEstimation/ui/FeeTokenPickerModal"
+import { useFeeTokenBalances } from "../../accountTokens/useFeeTokenBalance"
+import { useUpgradeAccountTransactions } from "../../accounts/accountTransactions.state"
+import { useTxnsHasV3UpgradeCallback } from "./useTxnsHasV3Upgrade"
+import { BaseToken } from "../../../../shared/token/__new/types/token.model"
+import { feeTokenService } from "../../../services/feeToken"
+import { isTransactionActionItem } from "../../../../shared/actionQueue/types"
+import { useNetworkFeeTokens } from "../../accountTokens/tokens.state"
+import {
+  Address,
+  formatAddress,
+  getUint256CalldataFromBN,
+  isEqualAddress,
+  nonNullable,
+  transferCalldataSchema,
+} from "@argent/shared"
+import { maxFeeEstimateForTransfer } from "../../accountTokens/useMaxFeeForTransfer"
+import { tokenService } from "../../../services/tokens"
+import { formatUnits } from "ethers"
+import { parseTransferTokenCall } from "./utils"
+import { prettifyTokenNumber } from "../../../../shared/utils/number"
+import { isSafeUpgradeTransaction } from "../../../../shared/utils/isUpgradeTransaction"
 
 export interface TransactionActionScreenContainerV2Props
   extends ConfirmScreenProps {
@@ -85,18 +109,28 @@ export const TransactionActionScreenContainerV2: FC<
     userClickedAddFundsAtom,
   )
   const [askForConfirmation, setAskForConfirmation] = useState(false)
+  const [isHighRisk, setIsHighRisk] = useState(false)
+  const [hasAcceptedRisk, setHasAcceptedRisk] = useState(false)
+  const [isFeeTokenPickerOpen, setIsFeeTokenPickerOpen] = useState(false)
+  const rejectDeployIfPresent = useRejectDeployIfPresent()
+  const feeTokePickerRef = useRef<HTMLDivElement>(null)
+
+  const feeTokens = useFeeTokenBalances(selectedAccount)
 
   const onSubmit = useCallback(async () => {
     const result = await approve()
     if (isObject(result) && "error" in result) {
       // stay on error screen
     } else {
+      await rejectDeployIfPresent()
       closePopupIfLastAction()
       if (location.pathname === routes.swap()) {
         navigate(routes.accountActivity())
       }
     }
-  }, [closePopupIfLastAction, navigate, approve])
+  }, [approve, rejectDeployIfPresent, closePopupIfLastAction, navigate])
+
+  const feeToken = useBestFeeToken(selectedAccount)
 
   const {
     data: transactionReview,
@@ -105,6 +139,8 @@ export const TransactionActionScreenContainerV2: FC<
   } = useTransactionReviewV2({
     calls: action.payload.transactions,
     actionHash: action.meta.hash,
+    feeTokenAddress: feeToken?.address,
+    selectedAccount,
   })
 
   const loadingOrErrorState = useMemo(() => {
@@ -224,6 +260,18 @@ export const TransactionActionScreenContainerV2: FC<
     warningsWithoutUndefined.success &&
     getHighestSeverity(warningsWithoutUndefined.data)
 
+  const { pendingTransactions: pendingUpgradeTransactions } =
+    useUpgradeAccountTransactions(selectedAccount)
+
+  const txnsHasV3UpgradeTxn = useTxnsHasV3UpgradeCallback()
+
+  const isUpgradeTransaction = useMemo(
+    () =>
+      isTransactionActionItem(action) &&
+      isSafeUpgradeTransaction(action.payload),
+    [action],
+  )
+
   useEffect(() => {
     if (
       highestSeverityWarning &&
@@ -231,6 +279,7 @@ export const TransactionActionScreenContainerV2: FC<
         highestSeverityWarning.severity === "high")
     ) {
       setAskForConfirmation(true)
+      setIsHighRisk(true)
     }
   }, [highestSeverityWarning])
 
@@ -242,6 +291,7 @@ export const TransactionActionScreenContainerV2: FC<
       <WarningBanner
         warnings={warningsWithoutUndefined.data}
         onReject={() => void reject()}
+        onConfirm={() => setHasAcceptedRisk(true)}
       />
     )
   }, [warningsWithoutUndefined, reject])
@@ -277,6 +327,11 @@ export const TransactionActionScreenContainerV2: FC<
     multisigModalDisclosure,
   } = useMultisigActionScreen({ onSubmit, transactionContext })
 
+  const networkFeeTokens = useNetworkFeeTokens(selectedAccount?.networkId)
+  // Disable fee token selection if the transaction is an upgrade transaction
+  // or if its a multisig account
+  const allowFeeTokenSelection = !isUpgradeTransaction && !multisig
+
   const onShowAddFunds = useCallback(
     (hasInsufficientFunds: boolean) => {
       if (!hasInsufficientFunds) {
@@ -288,6 +343,73 @@ export const TransactionActionScreenContainerV2: FC<
       setHasInsufficientFunds(hasInsufficientFunds)
     },
     [setUserClickedAddFunds, userClickedAddFunds],
+  )
+
+  const setPreferredFeeToken = useCallback(
+    async ({ address }: BaseToken) => {
+      await feeTokenService.preferFeeToken(address)
+
+      const transferTokenCall =
+        action.payload.meta?.isMaxSend &&
+        parseTransferTokenCall(action.payload.transactions)
+      const transferToken =
+        transferTokenCall &&
+        networkFeeTokens?.find((networkFeeToken) =>
+          isEqualAddress(
+            networkFeeToken.address,
+            transferTokenCall.tokenAddress,
+          ),
+        )
+      setIsFeeTokenPickerOpen(false)
+
+      if (transferTokenCall && transferToken && selectedAccount) {
+        // If the user has selected a different fee token, we need to recompute the max amount
+        console.warn(
+          "Max send detected, recreating transaction with new max amount",
+        )
+        const { recipient, tokenAddress } = transferTokenCall
+        const maxFeeForTransfer = await maxFeeEstimateForTransfer(
+          address,
+          tokenAddress,
+          selectedAccount,
+        )
+        const balance = await tokenService.fetchTokenBalance(
+          transferToken.address,
+          selectedAccount.address as Address,
+          selectedAccount.networkId,
+        )
+        const maxAmount = BigInt(balance) - (maxFeeForTransfer ?? 0n)
+        if (!nonNullable(maxAmount)) {
+          throw new Error("maxAmount could not be determined")
+        }
+        const formattedMaxAmount = formatUnits(
+          maxAmount,
+          transferToken.decimals,
+        )
+
+        await tokenService.send({
+          to: tokenAddress,
+          method: "transfer",
+          calldata: transferCalldataSchema.parse({
+            recipient,
+            amount: getUint256CalldataFromBN(maxAmount),
+          }),
+          title: `Send ${prettifyTokenNumber(formattedMaxAmount)} ${
+            transferToken.symbol
+          }`,
+          subtitle: `to ${formatAddress(recipient)}`,
+          isMaxSend: true,
+        })
+        void reject()
+      }
+    },
+    [
+      action.payload.meta?.isMaxSend,
+      action.payload.transactions,
+      networkFeeTokens,
+      reject,
+      selectedAccount,
+    ],
   )
 
   const onConfirm = () => {
@@ -313,21 +435,28 @@ export const TransactionActionScreenContainerV2: FC<
     }
     void onSubmit()
   }
+  const onReject = useCallback(() => {
+    setUserClickedAddFunds(false)
+    void reject()
+  }, [reject, setUserClickedAddFunds])
 
   const footer = userClickedAddFunds ? (
     <WaitingForFunds />
   ) : (
     <WithActionScreenErrorFooter isTransaction>
+      {isHighRisk && <ReviewFooter />}
       {selectedAccount && transactionReview?.enrichedFeeEstimation && (
         <FeeEstimationContainerV2
-          feeTokenAddress={ETH_TOKEN_ADDRESS}
           onErrorChange={setDisableConfirm}
           onFeeErrorChange={onShowAddFunds}
           transactionSimulationLoading={isValidating}
           fee={transactionReview.enrichedFeeEstimation}
+          feeToken={feeToken}
           networkId={selectedAccount.networkId}
           accountAddress={selectedAccount.address}
           needsDeploy={selectedAccount.needsDeploy}
+          onOpenFeeTokenPicker={() => setIsFeeTokenPickerOpen(true)}
+          allowFeeTokenSelection={allowFeeTokenSelection}
           error={error}
         />
       )}
@@ -351,13 +480,15 @@ export const TransactionActionScreenContainerV2: FC<
       <ConfirmScreen
         navigationBar={navigationBar}
         confirmButtonIsLoading={actionIsApproving}
-        confirmButtonDisabled={disableConfirm}
+        confirmButtonDisabled={
+          disableConfirm || (isHighRisk && !hasAcceptedRisk)
+        }
         confirmButtonText={confirmButtonText}
         onSubmit={onSubmitWithChecks}
         showHeader={true}
-        onReject={() => void reject()}
+        onReject={onReject}
         footer={footer}
-        destructive={askForConfirmation}
+        destructive={askForConfirmation || isHighRisk}
         {...rest}
       >
         {multisigModal}
@@ -383,6 +514,15 @@ export const TransactionActionScreenContainerV2: FC<
         isOpen={isConfirmationModalOpen}
         onClose={onConfirmationModalClose}
         onConfirm={onConfirm}
+      />
+      <FeeTokenPickerModal
+        isOpen={allowFeeTokenSelection && isFeeTokenPickerOpen}
+        onClose={() => {
+          setIsFeeTokenPickerOpen(false)
+        }}
+        tokens={feeTokens}
+        initialFocusRef={feeTokePickerRef}
+        onFeeTokenSelect={setPreferredFeeToken}
       />
     </WithArgentShieldVerified>
   )

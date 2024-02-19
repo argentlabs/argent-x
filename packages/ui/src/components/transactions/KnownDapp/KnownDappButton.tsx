@@ -14,6 +14,7 @@ export const KnownDappButton = ({ dapplandUrl }: { dapplandUrl?: string }) => {
   return (
     <>
       <Button
+        data-testid="KnownDappButton"
         p="1px"
         color="success.500"
         fontSize="sm"

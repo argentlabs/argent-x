@@ -1,7 +1,6 @@
 import { Component, cloneElement } from "react"
-import { Location, RouterProps } from "react-router-dom"
+import { RouterProps } from "react-router-dom"
 
-import { routes } from "../routes"
 import { withRouter } from "../services/withRouter"
 
 interface ErrorBoundaryProps {
@@ -25,18 +24,6 @@ class ErrorBoundaryComponent extends Component<
   static getDerivedStateFromError(error: unknown) {
     return {
       error,
-    }
-  }
-
-  componentDidUpdate() {
-    const { router } = this.props
-    if (
-      router &&
-      (router.location as Location).pathname ===
-        routes.settingsPrivacyStatement.path &&
-      this.state.error
-    ) {
-      this.setState({ error: null })
     }
   }
 

@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
-import { constants, num, Account } from "starknet"
+import { constants, num } from "starknet"
 import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 import { AccountError } from "../../../../shared/errors/account"
@@ -34,8 +34,7 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
          */
 
         const selectedAccount = await wallet.getAccount(account)
-        const starknetAccount =
-          (await wallet.getSelectedStarknetAccount()) as Account // Old accounts are not supported
+        const starknetAccount = await wallet.getSelectedStarknetAccount()
 
         if (!selectedAccount) {
           throw new AccountError({

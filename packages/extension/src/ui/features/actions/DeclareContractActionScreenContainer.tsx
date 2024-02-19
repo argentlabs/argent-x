@@ -7,6 +7,7 @@ import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
 import { useActionScreen } from "./hooks/useActionScreen"
 import { ApproveTransactionScreenContainer } from "./transaction/ApproveTransactionScreen/ApproveTransactionScreenContainer"
 import { ApproveScreenType } from "./transaction/types"
+import { TransactionType } from "starknet"
 
 export const DeclareContractActionScreenContainer: FC = () => {
   const {
@@ -44,10 +45,13 @@ export const DeclareContractActionScreenContainer: FC = () => {
         actionHash={action.meta.hash}
         actionIsApproving={Boolean(action.meta.startedApproving)}
         actionErrorApproving={action.meta.errorApproving}
-        transactions={[]}
+        transactionAction={{
+          type: TransactionType.DECLARE,
+          payload: action.payload,
+        }}
         approveScreenType={ApproveScreenType.DECLARE}
-        onSubmit={() => void onSubmit()}
-        onReject={() => void rejectAllActions()}
+        onSubmit={onSubmit}
+        onReject={rejectAllActions}
         selectedAccount={selectedAccount}
       />
     </WithArgentShieldVerified>

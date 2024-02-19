@@ -8,109 +8,123 @@ export default class Navigation {
     this.page = page
   }
 
-  get back() {
+  get backLocator() {
     return this.page.locator(`[aria-label="${lang.common.back}"]`).first()
   }
 
-  get close() {
+  get closeLocator() {
     return this.page.locator(`[aria-label="${lang.common.close}"]`)
   }
-
-  get confirm() {
+  get closeButtonLocator() {
+    return this.page.locator('[data-testid="close-button"]')
+  }
+  get confirmLocator() {
     return this.page.locator(`button:text-is("${lang.common.confirm}")`)
   }
 
-  get next() {
+  get nextLocator() {
     return this.page.locator(`button:text-is("${lang.common.next}")`)
   }
 
-  get reviewSend() {
+  get reviewSendLocator() {
     return this.page.locator(`button:text-is("${lang.common.reviewSend}")`)
   }
 
-  get done() {
+  get doneLocator() {
     return this.page.locator(`button:text-is("${lang.common.done}")`)
   }
 
-  get continue() {
+  get continueLocator() {
     return this.page
       .locator(`button:text-is("${lang.common.continue}")`)
       .first()
   }
 
-  get yes() {
+  get yesLocator() {
     return this.page.locator(`button:text-is("${lang.common.yes}")`)
   }
 
-  get no() {
+  get noLocator() {
     return this.page.locator(`button:text-is("${lang.common.no}")`)
   }
 
-  get unlock() {
+  get unlockLocator() {
     return this.page.locator(`button:text-is("${lang.common.unlock}")`)
   }
 
-  get showSettings() {
+  get showSettingsLocator() {
     return this.page.locator('[aria-label="Show settings"]')
   }
 
-  get lockWallet() {
-    return this.page.locator(`//button//*[text()="${lang.common.lockWallet}"]`)
+  get lockWalletLocator() {
+    return this.page.locator(
+      `//button//*[text()="${lang.settings.lockWallet}"]`,
+    )
   }
 
-  get reset() {
+  get resetLocator() {
     return this.page.locator(`a:text-is("${lang.common.reset}")`)
   }
 
-  get confirmReset() {
+  get confirmResetLocator() {
     return this.page.locator(`button:text-is("${lang.common.confirmReset}")`)
   }
 
-  get menuPendingTransactionsIndicator() {
+  get menuPendingTransactionsIndicatorLocator() {
     return this.page.locator('[aria-label="Pending transactions"]')
   }
 
-  get menuTokens() {
+  get menuTokensLocator() {
     return this.page.locator('[aria-label="Tokens"]')
   }
 
-  get menuNTFs() {
+  get menuNTFsLocator() {
     return this.page.locator('[aria-label="NFTs"]')
   }
 
-  get menuSwaps() {
+  get menuSwapsLocator() {
     return this.page.locator('[aria-label="Swap"]')
   }
 
-  get menuActivity() {
+  get menuActivityLocator() {
     return this.page.locator('[aria-label="Activity"]')
   }
 
-  get menuActivityActive() {
+  get menuActivityActiveLocator() {
     return this.page.locator('[aria-label="Activity"][class*="active"]')
   }
 
-  get save() {
+  get saveLocator() {
     return this.page.locator(`button:text-is("${lang.common.save}")`)
   }
 
-  get create() {
+  get createLocator() {
     return this.page.locator(`button:text-is("${lang.common.create}")`)
   }
 
-  get cancel() {
+  get cancelLocator() {
     return this.page.locator(`button:text-is("${lang.common.cancel}")`)
   }
 
-  get approve() {
+  get approveLocator() {
     return this.page.locator(`button:text-is("${lang.common.approve}")`)
   }
 
-  get addArgentShield() {
+  get addArgentShieldLocator() {
     return this.page.locator(`button:text-is("${lang.common.addArgentShield}")`)
   }
 
-  get dismiss() {
+  get removeArgentShieldLocator() {
+    return this.page.locator(
+      `button:text-is("${lang.common.removeArgentShield}")`,
+    )
+  }
+
+  get dismissLocator() {
     return this.page.locator(`button:text-is("${lang.common.dismiss}")`)
+  }
+
+  get removeLocator() {
+    return this.page.locator(`button:text-is("${lang.common.remove}")`)
   }
 }

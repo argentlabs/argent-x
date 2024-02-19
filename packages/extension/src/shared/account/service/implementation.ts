@@ -5,7 +5,7 @@ import { accountsEqual } from "../../utils/accountsEqual"
 import { withoutHiddenSelector } from "../selectors"
 import type { IAccountRepo } from "../store"
 import type { IAccountService } from "./interface"
-
+import { ProvisionActivityPayload } from "../../activity/types"
 export class AccountService implements IAccountService {
   constructor(
     private readonly chainService: IChainService,
@@ -71,5 +71,16 @@ export class AccountService implements IAccountService {
 
   async getDeployed(baseAccount: BaseWalletAccount): Promise<boolean> {
     return this.chainService.getDeployed(baseAccount)
+  }
+
+  async handleProvisionedAccount(payload: ProvisionActivityPayload) {
+    await this.update(
+      (account) => accountsEqual(account, payload.account),
+      (account) => ({
+        ...account,
+        provisionAmount: payload.activity.transfers[0].asset.amount,
+        provisionDate: payload.activity.lastModified,
+      }),
+    )
   }
 }

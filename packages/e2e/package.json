@@ -6,12 +6,11 @@
   "license": "MIT",
   "devDependencies": {
     "@argent/shared": "workspace:^",
-    "@argent/x-multicall": "^7.0.12",
-    "@playwright/test": "^1.37.1",
+    "@playwright/test": "^1.40.1",
     "@types/node": "^20.5.7",
     "@types/uuid": "^9.0.3",
     "dotenv": "^16.3.1",
-    "starknet": "5.24.3",
+    "starknet": "6.0.0-beta.13",
     "uuid": "^9.0.0"
   },
   "scripts": {

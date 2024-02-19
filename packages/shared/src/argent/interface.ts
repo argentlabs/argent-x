@@ -9,6 +9,7 @@ interface Sort {
   sorted: boolean
   unsorted: boolean
 }
+
 interface Pageable {
   offset: number
   pageNumber: number

@@ -5,7 +5,7 @@ import { Controller, useFormContext } from "react-hook-form"
 
 import { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
 
-const { AddIcon, MinusIcon } = icons
+const { AddIcon, RemoveIcon } = icons
 
 export const SetConfirmationsInput = ({
   existingThreshold,
@@ -47,7 +47,7 @@ export const SetConfirmationsInput = ({
                     }
                     px="1em"
                   >
-                    <MinusIcon />
+                    <RemoveIcon />
                   </Button>
                   <H1 data-testid="threshold" defaultValue={existingThreshold}>
                     {field.value}

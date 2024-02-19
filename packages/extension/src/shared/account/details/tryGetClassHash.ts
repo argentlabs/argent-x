@@ -1,5 +1,5 @@
 import { Call, ProviderInterface } from "starknet"
-import { STANDARD_ACCOUNT_CLASS_HASH } from "../../network/constants"
+import { TXV1_ACCOUNT_CLASS_HASH } from "../../network/constants"
 import { addressSchema } from "@argent/shared"
 
 export async function tryGetClassHash(
@@ -18,7 +18,7 @@ export async function tryGetClassHash(
       if (fallbackClassHash) {
         return fallbackClassHash
       }
-      return STANDARD_ACCOUNT_CLASS_HASH
+      return TXV1_ACCOUNT_CLASS_HASH
     }
   }
 }

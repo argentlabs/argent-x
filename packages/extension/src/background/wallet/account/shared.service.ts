@@ -7,7 +7,7 @@ import {
 } from "../../../shared/wallet.model"
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { PendingMultisig } from "../../../shared/multisig/types"
-import { Network, defaultNetwork } from "../../../shared/network"
+import { defaultNetwork } from "../../../shared/network"
 import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
 import {
   MULTISIG_DERIVATION_PATH,
@@ -26,6 +26,15 @@ import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 export interface WalletSession {
   secret: string
   password: string
+}
+
+interface GetAccountArgs
+  extends Pick<
+    WalletAccount,
+    "address" | "network" | "needsDeploy" | "classHash"
+  > {
+  index: number
+  name?: string
 }
 
 export class WalletAccountSharedService {
@@ -63,14 +72,16 @@ export class WalletAccountSharedService {
     return defaultAccountName
   }
 
-  public getDefaultStandardAccount(
-    index: number,
-    address: string,
-    network: Network,
-    needsDeploy: boolean,
-  ): WalletAccount {
+  public getDefaultStandardAccount({
+    index,
+    address,
+    network,
+    needsDeploy,
+    name,
+    classHash,
+  }: GetAccountArgs): WalletAccount {
     return {
-      name: `Account ${index + 1}`,
+      name: name || `Account ${index + 1}`,
       address,
       network,
       networkId: network.id,
@@ -79,18 +90,20 @@ export class WalletAccountSharedService {
         derivationPath: getPathForIndex(index, STANDARD_DERIVATION_PATH),
         type: "local_secret",
       },
+      classHash,
       needsDeploy,
     }
   }
 
-  public getDefaultMultisigAccount(
-    index: number,
-    address: string,
-    network: Network,
-    needsDeploy: boolean,
-  ): WalletAccount {
+  public getDefaultMultisigAccount({
+    index,
+    address,
+    network,
+    needsDeploy,
+    name,
+  }: GetAccountArgs): WalletAccount {
     return {
-      name: `Multisig ${index + 1}`,
+      name: name || `Multisig ${index + 1}`,
       address,
       networkId: network.id,
       network,

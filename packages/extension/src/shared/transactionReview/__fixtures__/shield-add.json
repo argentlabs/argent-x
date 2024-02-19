@@ -1,0 +1,56 @@
+{
+  "transactions": [
+    {
+      "reviewOfTransaction": {
+        "assessment": "neutral",
+        "warnings": [],
+        "reviews": [
+          {
+            "assessment": "neutral",
+            "warnings": [],
+            "action": {
+              "name": "account_change_guardian_add",
+              "properties": [
+                {
+                  "type": "address",
+                  "label": "account_change_guardian_address",
+                  "address": "0x060fbe775b152a9b671f80ebd6d3245af9e275573fdadeacf6656828266753bb",
+                  "verified": false
+                }
+              ],
+              "defaultProperties": [
+                {
+                  "type": "address",
+                  "label": "default_contract",
+                  "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+                  "verified": false
+                },
+                {
+                  "type": "calldata",
+                  "label": "default_call",
+                  "entrypoint": "change_guardian",
+                  "calldata": [
+                    "2741694347102943600871280873022221851817804225003651186046337463495789335483"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "simulation": {
+        "approvals": [],
+        "transfers": [],
+        "summary": [],
+        "calculatedNonce": "0x34",
+        "feeEstimation": {
+          "overallFee": "2785000025065",
+          "gasPrice": "1000000009",
+          "gasUsage": "2785",
+          "unit": "WEI",
+          "maxFee": "5569996282936"
+        }
+      }
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import {
+  CairoVersion,
   DeployAccountContractPayload as StarknetDeployAccountContractPayload,
   InvocationsDetails as StarknetInvocationDetails,
 } from "starknet"
@@ -13,7 +14,10 @@ import { Address } from "@argent/shared"
 
 // Extend to support multichain
 type InvocationsDetails = StarknetInvocationDetails
-type DeployAccountContractPayload = StarknetDeployAccountContractPayload
+export type DeployAccountContractPayload =
+  StarknetDeployAccountContractPayload & {
+    version: CairoVersion
+  }
 
 export interface IWalletDeploymentService {
   deployAccount(

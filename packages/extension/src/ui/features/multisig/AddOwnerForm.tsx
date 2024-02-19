@@ -8,7 +8,7 @@ import {
   InputGroup,
   InputRightElement,
 } from "@chakra-ui/react"
-import { useCallback, useEffect } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
 import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
@@ -24,6 +24,7 @@ export const AddOwnersForm = ({
   nextOwnerIndex,
   isNewMultisig = true,
 }: AddOwnerFormProps) => {
+  const didAddOwner = useRef(false)
   const {
     control,
     formState: { errors },
@@ -39,10 +40,11 @@ export const AddOwnersForm = ({
     append({ key: "" })
   }, [append])
 
-  // This allows to add an owner when the form is first rendered (will render two in dev mode)
+  // This allows to add an owner when the form is first rendered
   useEffect(() => {
-    if (fields.length === 0) {
+    if (!didAddOwner.current && fields.length === 0) {
       addOwner()
+      didAddOwner.current = true // don't add more than one in dev mode
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addOwner])

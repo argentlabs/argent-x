@@ -8,7 +8,7 @@ import {
   ListItem,
   Text,
 } from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import { FC, PropsWithChildren, ReactNode } from "react"
 
 import {
   BaseWalletAccount,
@@ -18,15 +18,15 @@ import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmSc
 import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
 import { DappIcon } from "./DappIcon"
 import { DappDisplayAttributes } from "./useDappDisplayAttributes"
+import { DappActionHeader } from "./DappActionHeader"
 
-const { LinkIcon, TickIcon } = icons
+const { TickIcon, LinkIcon } = icons
 
-export interface ConnectDappScreenProps {
+export interface ConnectDappScreenProps extends PropsWithChildren {
   isConnected: boolean
   onConnect: () => void
   onDisconnect: () => void
   onReject?: () => void
-
   host: string
   accounts: WalletAccount[]
   selectedAccount?: BaseWalletAccount
@@ -35,6 +35,8 @@ export interface ConnectDappScreenProps {
   footer?: ReactNode
   dappDisplayAttributes?: DappDisplayAttributes
   navigationBar?: ReactNode
+  isHighRisk: boolean
+  hasAcceptedRisk: boolean
 }
 
 export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
@@ -50,9 +52,12 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
   actionIsApproving,
   navigationBar,
   footer,
+  children,
+  isHighRisk,
+  hasAcceptedRisk,
 }) => {
   const confirmButtonText = isConnected ? "Continue" : "Connect"
-  const rejectButtonText = isConnected ? "Disconnect" : "Reject"
+  const rejectButtonText = isConnected ? "Disconnect" : "Cancel"
 
   const hostName = new URL(host).hostname
 
@@ -67,21 +72,16 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
         confirmButtonLoadingText={confirmButtonText}
         navigationBar={navigationBar}
         footer={footer}
+        destructive={isHighRisk}
+        confirmButtonDisabled={isHighRisk && !hasAcceptedRisk}
       >
-        <Center flexDirection={"column"} textAlign={"center"} gap={1}>
-          <DappIcon dappDisplayAttributes={dappDisplayAttributes} />
-          <H5 mt={4}>Connect to {dappDisplayAttributes?.title ?? "dapp"}</H5>
-          <Flex gap="1" align="flex-end">
-            <P4 fontWeight="bold" color={"neutrals.300"}>
-              {hostName}
-            </P4>
-            {dappDisplayAttributes?.isKnown && (
-              <KnownDappButton
-                dapplandUrl={dappDisplayAttributes.dapplandUrl}
-              />
-            )}
-          </Flex>
-        </Center>
+        <DappActionHeader
+          host={host}
+          dappDisplayAttributes={dappDisplayAttributes}
+          title={`Connect to ${dappDisplayAttributes?.title ?? "dapp"}`}
+          mb={3}
+        />
+        {children}
         <Flex mt={4} w={"full"} flexDirection={"column"}>
           <ConnectDappAccountSelect
             accounts={accounts}

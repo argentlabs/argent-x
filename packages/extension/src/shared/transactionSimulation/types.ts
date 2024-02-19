@@ -9,6 +9,9 @@ import {
 import { Fetcher } from "../api/fetcher"
 import { EstimatedFees } from "./fees/fees.model"
 
+export type WEI = "WEI" | "wei"
+export type FRI = "FRI" | "fri"
+
 export interface SimulationError extends Error {
   name: string
   responseJson: { status: string }
@@ -74,13 +77,22 @@ export interface TokenDetails {
   usdValue: string | null
 }
 
-export type TransactionSimulationFeesEstimation = {
-  gasPrice: number
-  gasUsage: number
-  overallFee: number
-  unit: string
-  maxFee: number
-}
+export type TransactionSimulationFeesEstimation =
+  | {
+      gasPrice: number
+      gasUsage: number
+      overallFee: number
+      unit: WEI
+      maxFee: number
+    }
+  | {
+      gasPrice: number
+      gasUsage: number
+      overallFee: number
+      unit: FRI
+      maxAmount: number
+      maxPricePerUnit: number
+    }
 
 export type ApiTransactionSimulationResponse = {
   approvals: TransactionSimulationApproval[]

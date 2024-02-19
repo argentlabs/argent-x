@@ -31,7 +31,7 @@ export const DeployAccountScreen: FC<DeployAccountScreenProps> = ({
     >
       <P3>
         In order to sign this transaction you need to first activate your
-        account on StarkNet
+        account on Starknet
       </P3>
       <P3 fontWeight={"bold"}>
         Activating an account involves a fee. This is not controlled by ArgentX

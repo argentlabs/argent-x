@@ -1,15 +1,16 @@
+import { L2 } from "@argent/ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
 
 export const FeeEstimationBox: FC<PropsWithChildren> = (props) => {
   return (
     <Flex
-      borderRadius="lg"
+      borderRadius="xl"
       backgroundColor="white"
       border="1px"
       borderColor="transparent"
       px={3}
-      py={2.5}
+      py={2}
       _dark={{
         backgroundColor: "neutrals.900",
         borderColor: "neutrals.500",
@@ -20,9 +21,11 @@ export const FeeEstimationBox: FC<PropsWithChildren> = (props) => {
   )
 }
 
-export const FeeEstimationBoxWithDeploy: FC<PropsWithChildren> = (props) => (
+export const FeeEstimationBoxWithDeploy: FC<PropsWithChildren> = ({
+  children,
+}) => (
   <Flex
-    borderRadius="lg"
+    borderRadius="xl"
     backgroundColor="white"
     border="1px"
     borderColor="transparent"
@@ -33,8 +36,8 @@ export const FeeEstimationBoxWithDeploy: FC<PropsWithChildren> = (props) => (
       boxShadow: "menu",
     }}
   >
-    <Flex px={3} py={2.5}>
-      {props.children}
+    <Flex px={3} py={2}>
+      {children}
     </Flex>
     <Flex
       backgroundColor="neutrals.700"
@@ -47,3 +50,43 @@ export const FeeEstimationBoxWithDeploy: FC<PropsWithChildren> = (props) => (
     </Flex>
   </Flex>
 )
+
+interface FeeEstimationBoxWithInsufficientFundsProps extends PropsWithChildren {
+  userClickedAddFunds: boolean
+}
+
+export const FeeEstimationBoxWithInsufficientFunds: FC<
+  FeeEstimationBoxWithInsufficientFundsProps
+> = ({ children, userClickedAddFunds }) => {
+  return (
+    <Flex
+      borderRadius="xl"
+      backgroundColor="white"
+      border="1px"
+      borderColor="error.500"
+      flexDir={"column"}
+      _dark={{
+        backgroundColor: "neutrals.900",
+        borderColor: "redText",
+        boxShadow: "menu",
+      }}
+    >
+      <Flex px={3} py={2}>
+        {children}
+      </Flex>
+      <Flex
+        backgroundColor="errorExtraDark"
+        justifyContent="center"
+        alignItems="center"
+        borderBottomRadius="xl"
+        p="1"
+      >
+        <L2 color="errorText">
+          {userClickedAddFunds
+            ? "Waiting for funds..."
+            : "Insufficient funds to pay fee"}
+        </L2>
+      </Flex>
+    </Flex>
+  )
+}

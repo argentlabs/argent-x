@@ -1,8 +1,11 @@
-import * as fs from "fs"
+import {
+  artifactsDir,
+  isCI,
+  isKeepArtifacts,
+  keepVideos,
+  saveHtml,
+} from "../../shared/cfg/test"
 import path from "path"
-import dotenv from "dotenv"
-
-dotenv.config()
 import {
   ChromiumBrowserContext,
   Page,
@@ -11,23 +14,13 @@ import {
   test as testBase,
 } from "@playwright/test"
 import { v4 as uuid } from "uuid"
-
-import config from "./config"
 import type { TestExtensions } from "./fixtures"
 import ExtensionPage from "./page-objects/ExtensionPage"
 
-const isCI = Boolean(process.env.CI)
 const isExtensionURL = (url: string) => url.startsWith("chrome-extension://")
 let browserCtx: ChromiumBrowserContext
-const outputFolder = (testInfo: TestInfo) =>
-  testInfo.title.replace(/\s+/g, "_").replace(/\W/g, "")
-const artifactFilename = (testInfo: TestInfo) =>
-  `${testInfo.retry}-${testInfo.status}-${pageId++}-${testInfo.workerIndex}`
-const keepArtifacts = (testInfo: TestInfo) =>
-  testInfo.config.preserveOutput === "always" ||
-  (testInfo.config.preserveOutput === "failures-only" &&
-    testInfo.status === "failed") ||
-  testInfo.status === "timedOut"
+const distDir = path.join(__dirname, "../../../extension/dist/")
+
 const closePages = async (browserContext: ChromiumBrowserContext) => {
   const pages = browserContext?.pages() || []
   for (const page of pages) {
@@ -35,31 +28,6 @@ const closePages = async (browserContext: ChromiumBrowserContext) => {
     if (!isExtensionURL(url)) {
       await page.close()
     }
-  }
-}
-
-const keepHtml = async (testInfo: TestInfo, page: Page) => {
-  if (keepArtifacts(testInfo)) {
-    const htmlContent = await page.content()
-    await fs.promises
-      .mkdir(path.resolve(config.artifactsDir, outputFolder(testInfo)), {
-        recursive: true,
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-    await fs.promises
-      .writeFile(
-        path.resolve(
-          config.artifactsDir,
-          outputFolder(testInfo),
-          `${artifactFilename(testInfo)}.html`,
-        ),
-        htmlContent,
-      )
-      .catch((error) => {
-        console.error(error)
-      })
   }
 }
 
@@ -71,57 +39,23 @@ const createBrowserContext = () => {
       `${isCI ? "--headless=new" : ""}`,
       "--disable-dev-shm-usage",
       "--ipc=host",
-      `--disable-extensions-except=${config.distDir}`,
-      `--load-extension=${config.distDir}`,
+      `--disable-extensions-except=${distDir}`,
+      `--load-extension=${distDir}`,
       "--disable-gpu",
     ],
     ignoreDefaultArgs: ["--disable-component-extensions-with-background-pages"],
     recordVideo: {
-      dir: config.artifactsDir,
+      dir: artifactsDir,
       size: {
         width: 800,
-        height: 600,
+        height: 700,
       },
     },
   })
 }
 
-const initBrowserWithExtension = async (testInfo: TestInfo) => {
+const initBrowserWithExtension = async () => {
   const browserContext = await createBrowserContext()
-  // save video
-  browserContext.on("page", async (page) => {
-    page.on("load", async (page) => {
-      try {
-        await page.title()
-      } catch (err) {
-        console.warn(err)
-      }
-    })
-
-    page.on("close", async (page) => {
-      if (keepArtifacts(testInfo)) {
-        await page
-          .video()
-          ?.saveAs(
-            path.resolve(
-              config.artifactsDir,
-              outputFolder(testInfo),
-              `${artifactFilename(testInfo)}.webm`,
-            ),
-          )
-          .catch((error) => {
-            console.error(error)
-          })
-      }
-      await page
-        .video()
-        ?.delete()
-        .catch((error) => {
-          console.error(error)
-        })
-    })
-  })
-
   await browserContext.addInitScript("window.PLAYWRIGHT = true;")
   await browserContext.addInitScript(() => {
     window.localStorage.setItem(
@@ -130,7 +64,7 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
     )
   })
 
-  let page = browserContext.pages()[0]
+  let page: Page = browserContext.pages()[0]
 
   await page.bringToFront()
   await page.goto("chrome://inspect/#extensions")
@@ -145,7 +79,9 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
   await page.waitForTimeout(500)
   const pages = browserContext.pages()
 
-  const extPage = pages.find((x) => x.url() === extensionURL)
+  const extPage = pages.find(
+    (x: { url: () => string }) => x.url() === extensionURL,
+  )
   if (extPage) {
     page = extPage
   }
@@ -154,34 +90,26 @@ const initBrowserWithExtension = async (testInfo: TestInfo) => {
   }
 
   await page.emulateMedia({ reducedMotion: "reduce" })
-
   return { browserContext, extensionURL, page }
 }
 
-//delete videos related with chrome://extensions/ page
-function cleanArtifactDir() {
-  try {
-    fs.readdirSync(config.artifactsDir)
-      .filter((f) => f.endsWith("webm"))
-      .forEach((fileToDelete) =>
-        fs.rmSync(`${config.artifactsDir}/${fileToDelete}`),
-      )
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-function createExtension() {
+function createExtension(label: string) {
   return async ({}, use: any, testInfo: TestInfo) => {
     const { browserContext, page, extensionURL } =
-      await initBrowserWithExtension(testInfo)
+      await initBrowserWithExtension()
+
     const extension = new ExtensionPage(page, extensionURL)
     await closePages(browserContext)
     browserCtx = browserContext
     await use(extension)
-    await keepHtml(testInfo, page)
-    await browserContext.close()
-    cleanArtifactDir()
+    const keepArtifacts = isKeepArtifacts(testInfo)
+    if (keepArtifacts) {
+      await saveHtml(testInfo, page, label)
+      await browserContext.close()
+      await keepVideos(testInfo, page, label)
+    } else {
+      await browserContext.close()
+    }
   }
 }
 
@@ -191,10 +119,9 @@ function getContext() {
   }
 }
 
-let pageId = 0
 const test = testBase.extend<TestExtensions>({
-  extension: createExtension(),
-  secondExtension: createExtension(),
+  extension: createExtension("extension"),
+  secondExtension: createExtension("secondExtension"),
   browserContext: getContext(),
 })
 

@@ -21,7 +21,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
         width={24}
         height={24}
       >
-        <path d="M0.375 0H23.5177V24H0.375V0Z" fill="white" />
+        <path d="M0.375 0H23.5177V24H0.375V0Z" fill="currentColor" />
       </mask>
       <g mask="url(#mask0_1196_29)">
         <path
@@ -76,13 +76,13 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
           fillRule="evenodd"
           clipRule="evenodd"
           d="M7.0245 10.983L0.375 7.36425L7.0245 3.7455V10.983Z"
-          fill="white"
+          fill="currentColor"
         />
         <path
           fillRule="evenodd"
           clipRule="evenodd"
           d="M23.4278 12.8415L16.842 16.494L10.1925 12.8055L11.9025 11.8538L11.889 11.8613L13.548 12.7815L16.8098 10.9665L16.842 9.189L23.4278 12.8415Z"
-          fill="white"
+          fill="currentColor"
         />
         <path
           fillRule="evenodd"
@@ -100,19 +100,19 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
           fillRule="evenodd"
           clipRule="evenodd"
           d="M11.9017 10.0875L5.25225 13.785L1.95975 11.8995L8.556 8.232L11.901 10.0875H11.9017Z"
-          fill="white"
+          fill="currentColor"
         />
         <path
           fillRule="evenodd"
           clipRule="evenodd"
           d="M16.8398 7.34099V3.65249L18.4868 2.71049L21.78 4.59599L16.8398 7.34099Z"
-          fill="white"
+          fill="currentColor"
         />
         <path
           fillRule="evenodd"
           clipRule="evenodd"
           d="M6.89999 1.827L13.5465 5.47875L16.8397 3.65175L10.1925 0L6.89999 1.827Z"
-          fill="white"
+          fill="currentColor"
         />
       </g>
     </g>
@@ -125,7 +125,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
         y2={23.799}
         gradientUnits="userSpaceOnUse"
       >
-        <stop stopColor="white" />
+        <stop stopColor="currentColor" />
         <stop offset={1} stopColor="#CCCCCC" />
       </linearGradient>
       <linearGradient
@@ -137,7 +137,7 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
         gradientUnits="userSpaceOnUse"
       >
         <stop stopColor="#CCCCCC" />
-        <stop offset={1} stopColor="white" />
+        <stop offset={1} stopColor="currentColor" />
       </linearGradient>
       <linearGradient
         id="paint2_linear_1196_29"
@@ -147,11 +147,11 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
         y2={12.843}
         gradientUnits="userSpaceOnUse"
       >
-        <stop stopColor="white" />
+        <stop stopColor="currentColor" />
         <stop offset={1} stopColor="#CCCCCC" />
       </linearGradient>
       <clipPath id="clip0_1196_29">
-        <rect width={24} height={24} fill="white" />
+        <rect width={24} height={24} fill="currentColor" />
       </clipPath>
     </defs>
   </svg>

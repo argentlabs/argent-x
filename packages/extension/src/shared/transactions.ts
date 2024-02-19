@@ -7,6 +7,7 @@ import {
   MultisigTransactionType,
 } from "./multisig/types"
 import { getTransactionStatus } from "./transactions/utils"
+import { Address } from "@argent/shared"
 
 export type FinaliyStatus = RPC.SPEC.TXN_STATUS
 export type ExecutionStatus = RPC.SPEC.TXN_EXECUTION_STATUS
@@ -25,7 +26,6 @@ export type ExtendedTransactionStatus = {
 
 // Global Constants for Transactions
 export const SUCCESS_STATUSES: ExtendedFinalityStatus[] = [
-  "PENDING", // For backward compatibility on mainnet
   "ACCEPTED_ON_L2",
   "ACCEPTED_ON_L1",
 ]
@@ -51,10 +51,11 @@ export type ExtendedTransactionType =
 export interface TransactionMeta {
   title?: string
   subTitle?: string
-  isUpgrade?: boolean
+  newClassHash?: Address
   isChangeGuardian?: boolean
   isDeployAccount?: boolean
   isCancelEscape?: boolean
+  isMaxSend?: boolean
   transactions?: Call | Call[]
   type?: ExtendedTransactionType
 }

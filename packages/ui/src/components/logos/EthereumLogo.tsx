@@ -11,11 +11,11 @@ const SvgComponent = (props: SVGProps<SVGSVGElement>) => (
   >
     <path
       d="M11.998 0L4.49847 12.2225L11.998 16.5764L19.4966 12.2225L11.998 0Z"
-      fill="white"
+      fill="currentColor"
     />
     <path
       d="M19.5016 13.6188L11.998 24L4.49844 13.6188L11.998 17.9707L19.5016 13.6188Z"
-      fill="white"
+      fill="currentColor"
     />
   </svg>
 )

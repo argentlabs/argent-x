@@ -29,19 +29,22 @@ export const withSignerSchema = z.object({
   signer: walletAccountSignerSchema,
 })
 
+export const cairoVersionSchema = z.union([z.literal("0"), z.literal("1")])
 export const walletAccountSchema = z
   .object({
     name: z.string(),
     network: networkSchema,
     type: argentAccountTypeSchema,
     classHash: addressSchema.optional(),
-    cairoVersion: z.union([z.literal("0"), z.literal("1")]).optional(),
+    cairoVersion: cairoVersionSchema.optional(),
     hidden: z.boolean().optional(),
     needsDeploy: z.boolean().optional(),
     showBlockingDeprecated: z.boolean().optional(),
     guardian: z.string().optional(),
     escape: escapeSchema.optional(),
     owner: z.string().optional(),
+    provisionAmount: z.string().optional(),
+    provisionDate: z.number().optional(),
   })
   .merge(withSignerSchema)
   .merge(baseWalletAccountSchema)

@@ -132,6 +132,7 @@ export const MultisigOwner: FC<MultisigOwnerProps> = ({
           {hasUpdate && (
             <Menu>
               <MenuButton
+                data-testid={`edit-${encodedSignerKey}`}
                 backgroundColor="neutrals.900"
                 aria-label="Update owner"
                 h="auto"

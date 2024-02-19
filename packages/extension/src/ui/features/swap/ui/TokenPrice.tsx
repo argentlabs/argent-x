@@ -7,7 +7,7 @@ import {
   useTokenAmountToCurrencyValue,
   useTokenPriceDetails,
 } from "../../accountTokens/tokenPriceHooks"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal, ensureDecimals } from "@argent/shared"
 import { Token } from "../../../../shared/token/__new/types/token.model"
 
 interface TokenPriceProps {
@@ -19,7 +19,7 @@ interface TokenPriceProps {
 const TokenPrice: FC<TokenPriceProps> = ({ token, onClick }) => {
   const currencyValue = useTokenAmountToCurrencyValue(
     token,
-    bigDecimal.parseUnits("1", token?.decimals ?? 18).value,
+    bigDecimal.parseUnits("1", ensureDecimals(token?.decimals)).value,
   )
 
   const priceDetails = useTokenPriceDetails(token)

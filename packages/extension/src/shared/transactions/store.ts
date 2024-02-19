@@ -21,7 +21,9 @@ export const transactionsStore = new ArrayStorage<Transaction>([], {
   compare: compareTransactions,
 })
 
-export const transactionsRepo: IRepository<Transaction> =
+export type ITransactionsRepository = IRepository<Transaction>
+
+export const transactionsRepo: ITransactionsRepository =
   adaptArrayStorage(transactionsStore)
 
 const timestampInSeconds = (): number => Math.floor(Date.now() / 1000)

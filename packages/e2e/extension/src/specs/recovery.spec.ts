@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import config from "../config"
+import config from "../../../shared/config"
 import test from "../test"
 
 test.describe("Recovery Wallet", () => {
@@ -9,10 +9,7 @@ test.describe("Recovery Wallet", () => {
   }) => {
     const { seed } = await extension.setupWallet({
       accountsToSetup: [
-        {
-          initialBalance: 0.0005,
-          deploy: true,
-        },
+        { assets: [{ token: "ETH", balance: 0.0005 }], deploy: true },
       ],
     })
 
@@ -31,7 +28,7 @@ test.describe("Recovery Wallet", () => {
     await expect(extension.account.showAccountRecovery).toBeVisible()
     await extension.account.showAccountRecovery.click()
     await extension.account.confirmTheSeedPhrase.click()
-    await extension.navigation.done.click()
+    await extension.navigation.doneLocator.click()
     await expect(extension.account.setUpAccountRecovery).toBeHidden()
   })
 
@@ -41,9 +38,9 @@ test.describe("Recovery Wallet", () => {
     await extension.open()
     await extension.recoverWallet(config.testNetSeed1!)
     await expect(extension.network.networkSelector).toBeVisible()
-    await extension.network.selectNetwork("Testnet")
+    await extension.network.selectDefaultNetwork()
     await extension.account.selectAccount("Account 33")
-    await expect(extension.account.currentBalance("Ethereum")).toContainText(
+    await expect(extension.account.currentBalance("ETH")).toContainText(
       "0.0000097 ETH",
     )
   })

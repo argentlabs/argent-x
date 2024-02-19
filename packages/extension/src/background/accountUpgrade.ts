@@ -5,7 +5,7 @@ import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
 import { IBackgroundActionService } from "./__new/services/action/interface"
 import { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
-import { isAccountV5 } from "@argent/shared"
+import { addressSchema, isAccountV5 } from "@argent/shared"
 export interface IUpgradeAccount {
   account: BaseWalletAccount
   wallet: Wallet
@@ -40,18 +40,22 @@ export const upgradeAccount = async ({
   const implementationClassHash =
     newImplementation[accountTypeWithCairo0Check] ?? newImplementation.standard
 
+  const parsedImplClassHash = addressSchema.parse(implementationClassHash)
+
   if (!isAccountV5(starknetAccount)) {
     throw new AccountError({ code: "UPGRADE_NOT_SUPPORTED" })
   }
 
   const upgradeCalldata = {
-    implementation: implementationClassHash,
+    implementation: parsedImplClassHash,
     // new starknet accounts have a new upgrade interface to allow for transactions right after upgrade
     calldata: [0],
   }
 
   const calldata = CallData.compile(upgradeCalldata)
-  await actionService.add(
+
+  // Always add upgrade transaction to the front of the queue
+  await actionService.addFront(
     {
       type: "TRANSACTION",
       payload: {
@@ -60,7 +64,10 @@ export const upgradeAccount = async ({
           entrypoint: "upgrade",
           calldata,
         },
-        meta: { isUpgrade: true, title: "Switch account type" },
+        meta: {
+          title: "Switch account type",
+          newClassHash: parsedImplClassHash,
+        },
       },
     },
     {

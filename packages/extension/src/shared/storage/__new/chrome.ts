@@ -81,7 +81,10 @@ export class ChromeRepository<T> implements IRepository<T> {
     return removedValues
   }
 
-  async upsert(value: AllowArray<T> | SetterFn<T>): Promise<UpsertResult> {
+  async upsert(
+    value: AllowArray<T> | SetterFn<T>,
+    insertMode: "push" | "unshift" = "push",
+  ): Promise<UpsertResult> {
     // use mergeArrayStableWith to merge the new values with the existing values
     const items = await this.getStorage()
 
@@ -93,10 +96,10 @@ export class ChromeRepository<T> implements IRepository<T> {
     } else {
       newValues = [value]
     }
-
     const mergedValues = mergeArrayStableWith(items, newValues, {
       compareFn: this.options.compare.bind(this),
       mergeFn: this.options.merge.bind(this),
+      insertMode,
     })
 
     await this.set(mergedValues)

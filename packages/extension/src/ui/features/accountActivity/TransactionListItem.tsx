@@ -12,6 +12,7 @@ import {
   isDeployContractTransaction,
   isNFTTransaction,
   isNFTTransferTransaction,
+  isProvisionTransaction,
   isSwapTransaction,
   isTokenApproveTransaction,
   isTokenMintTransaction,
@@ -56,9 +57,9 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
   const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
   const isDeployContract = isDeployContractTransaction(transactionTransformed)
-
+  const isProvision = isProvisionTransaction(transactionTransformed)
   const subtitle = useMemo(() => {
-    if (isTransfer || isNFTTransfer) {
+    if (isTransfer || isNFTTransfer || isProvision) {
       const titleShowsTo =
         (isTransfer || isNFTTransfer) &&
         (action === "SEND" || action === "TRANSFER")
@@ -124,6 +125,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     dapp,
     isDeclareContract,
     isDeployContract,
+    isProvision,
     action,
     transactionTransformed,
     network.id,
@@ -185,7 +187,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   }, [isNFT, isSwap, transactionTransformed, failureReason, network.id])
 
   const accessory = useMemo(() => {
-    if (isTransfer || isTokenMint || isTokenApprove) {
+    if (isTransfer || isTokenMint || isTokenApprove || isProvision) {
       return (
         <TransferAccessory
           transaction={transactionTransformed}
@@ -209,6 +211,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     isSwap,
     transactionTransformed,
     failureReason,
+    isProvision,
   ])
 
   const isCancelled = failureReason === "CANCELLED"

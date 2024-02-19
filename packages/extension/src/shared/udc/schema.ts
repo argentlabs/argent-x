@@ -1,4 +1,5 @@
 import {
+  Address,
   cairoAssemblySchema,
   compiledContractClassSchema,
 } from "@argent/shared"
@@ -8,6 +9,7 @@ import {
   UniversalDeployerContractPayload,
 } from "starknet"
 import { z } from "zod"
+import { BaseWalletAccount } from "../wallet.model"
 
 export const getConstructorParamsSchema = z.object({
   networkId: z.string(),
@@ -23,15 +25,17 @@ export const basicContractClassSchema = z.object({
 
 export type BasicContractClass = z.infer<typeof basicContractClassSchema>
 
-export type DeclareContract = {
-  address?: string
-  networkId?: string
-} & DeclareContractPayload
+export interface DeclareContract {
+  payload: DeclareContractPayload
+  feeTokenAddress: Address
+  account?: BaseWalletAccount
+}
 
-export type DeployContract = {
-  address: string
-  networkId: string
-} & UniversalDeployerContractPayload
+export interface DeployContract {
+  payload: UniversalDeployerContractPayload
+  feeTokenAddress: Address
+  account?: BaseWalletAccount
+}
 
 export const declareContractSchema = z.object({
   address: z.string().optional(),

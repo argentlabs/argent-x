@@ -58,6 +58,14 @@ export const useActionScreen = () => {
     void uiService.closeFloatingWindow()
   }, [])
 
+  const rejectActionWithHash = useCallback(
+    async (actionHash: string) => {
+      await clientActionService.reject(actionHash)
+      closePopupIfLastAction()
+    },
+    [closePopupIfLastAction],
+  )
+
   /** Focus the extension if it is running in a tab  */
   useEffect(() => {
     const init = async () => {
@@ -75,6 +83,7 @@ export const useActionScreen = () => {
     approveAndClose,
     reject: rejectAndClose,
     rejectWithoutClose: reject,
+    rejectActionWithHash,
     rejectAllActions,
     closePopupIfLastAction,
   }

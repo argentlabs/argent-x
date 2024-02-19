@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: [prod, hydrogen]
+        env: [prod, staging, hydrogen]
         extension_type: [chrome, firefox]
 
     environment: ${{ matrix.env }}
@@ -29,8 +29,9 @@ jobs:
       # API URLs
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
       ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
-
+      ARGENT_HEALTHCHECK_BASE_URL: ${{ vars.ARGENT_HEALTHCHECK_BASE_URL }}
       # API ENVIRONMENT
       ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
 
@@ -44,6 +45,7 @@ jobs:
       RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
       SAFE_ENV_VARS: false
       MULTICALL_MAX_BATCH_SIZE: 20
+      NEW_CAIRO_0_ENABLED: false
 
       # Refresh intervals
       FAST: 20 # 20s
@@ -111,7 +113,7 @@ jobs:
         run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}" .)
 
       - name: Upload ${{ matrix.extension_type }} extension
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}
           path: "*-${{ matrix.extension_type }}.zip"
@@ -125,7 +127,9 @@ jobs:
     env:
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
       ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
+      ARGENT_HEALTHCHECK_BASE_URL: ${{ vars.ARGENT_HEALTHCHECK_BASE_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
       ARGENT_X_ENVIRONMENT: "hydrogen"
 
     services:
@@ -174,7 +178,7 @@ jobs:
         run: pnpm run test:ci
       - name: SonarCloud Scan
         # TODO replace with master as soon as sonarcloud fixes the issue with action https://community.sonarsource.com/t/sonarsource-sonarcloud-github-action-failing-with-node-js-12-error/89664/2
-        uses: SonarSource/sonarcloud-github-action@v1.9
+        uses: SonarSource/sonarcloud-github-action@v2.1.1
         with:
           projectBaseDir: ./packages/extension
         env:
@@ -198,12 +202,20 @@ jobs:
       E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
       E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
       ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
-      E2E_SENDER_ADDRESS: ${{ secrets.E2E_SENDER_ADDRESS }}
-      E2E_SENDER_PRIVATEKEY: ${{ secrets.E2E_SENDER_PRIVATEKEY }}
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
       E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
       STARKNET_TESTNET_URL: ${{ secrets.STARKNET_TESTNET_URL }}
       STARKSCAN_TESTNET_URL: ${{ secrets.STARKSCAN_TESTNET_URL }}
       ARGENT_TESTNET_RPC_URL: ${{ secrets.ARGENT_TESTNET_RPC_URL }}
+      ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
+      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
+      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+      # Refresh intervals
+      REFRESH_INTERVAL_FAST: 1 # 1s
+      REFRESH_INTERVAL_MEDIUM: 5 # 5s
+      REFRESH_INTERVAL_SLOW: 20 # 20s
+      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
     steps:
       - uses: actions/checkout@v4
@@ -241,19 +253,20 @@ jobs:
         run: xvfb-run --auto-servernum pnpm test:e2e:extension --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-artifacts
+          name: test-artifacts-${{ matrix.shardIndex }}
           path: |
             packages/e2e/artifacts/playwright/
+            !packages/e2e/artifacts/playwright/*.webm
           retention-days: 5
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: all-blob-reports
+          name: all-blob-reports-${{ matrix.shardIndex }}
           path: packages/e2e/blob-report/
           retention-days: 5
 
@@ -286,19 +299,20 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: all-blob-reports
           path: all-blob-reports
+          pattern: all-blob-reports-*
+          merge-multiple: true
 
       - name: Merge into HTML Report
-        run: npx playwright merge-reports --reporter html ./all-blob-reports
+        run: npx playwright merge-reports -c ./packages/e2e/merge-reports.config.js ./all-blob-reports
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
-          path: playwright-report
+          path: packages/e2e/playwright-report
           retention-days: 14
 
   add_pr_comments:
@@ -408,6 +422,23 @@ jobs:
       NEXT_PUBLIC_ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
       NEXT_PUBLIC_ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
 
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
+      E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
+      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
+      E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
+      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
+      STARKNET_TESTNET_URL: ${{ secrets.STARKNET_TESTNET_URL }}
+      STARKSCAN_TESTNET_URL: ${{ secrets.STARKSCAN_TESTNET_URL }}
+      ARGENT_TESTNET_RPC_URL: ${{ secrets.ARGENT_TESTNET_RPC_URL }}
+      ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
+      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
+      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -443,19 +474,19 @@ jobs:
           pnpm run test:e2e:webwallet
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-artifacts
+          name: test-artifacts-${{ matrix.shardIndex }}
           path: |
             packages/e2e/artifacts/playwright/
           retention-days: 5
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: all-blob-reports-webwallet
+          name: all-blob-reports-webwallet-${{ matrix.shardIndex }}
           path: packages/e2e/blob-report/
           retention-days: 5
 

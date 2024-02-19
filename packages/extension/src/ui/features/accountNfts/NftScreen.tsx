@@ -35,7 +35,7 @@ export const NftScreen: FC<NftScreenProps> = ({
   onViewNft,
   onSendNft,
 }) => {
-  const description = nft.description ?? nft.collection?.description
+  const description = nft.description
   const hasDescription = description?.length > 0
   return (
     <>
@@ -81,11 +81,7 @@ export const NftScreen: FC<NftScreenProps> = ({
                 <AccordionButton justifyContent="space-between">
                   <P4 color="neutrals.300">Description</P4> <AccordionIcon />
                 </AccordionButton>
-                <AccordionPanel>
-                  {nft.description.length > 0
-                    ? nft.description
-                    : nft.collection?.description}
-                </AccordionPanel>
+                <AccordionPanel>{nft.description}</AccordionPanel>
               </AccordionItem>
             </Accordion>
           </CellStack>

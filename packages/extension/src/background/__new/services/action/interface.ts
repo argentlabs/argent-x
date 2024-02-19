@@ -13,5 +13,9 @@ export interface IBackgroundActionService extends IActionService {
     action: T,
     meta?: Partial<ActionQueueItemMeta>,
   ): Promise<ExtQueueItem<T>>
+  addFront<T extends ActionItem>(
+    action: T,
+    meta?: Partial<ActionQueueItemMeta>,
+  ): Promise<ExtQueueItem<T>>
   remove(actionHash: ActionHash): Promise<ExtQueueItem<ActionItem> | null>
 }

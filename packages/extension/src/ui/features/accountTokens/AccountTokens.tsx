@@ -1,7 +1,5 @@
 import { CellStack, Banner, Empty, icons } from "@argent/ui"
-import avnuBanner from "@argent/ui/assets/avnuBannerBackground.png"
-import ekuboBanner from "@argent/ui/assets/ekuboBannerBackground.png"
-import { Center, Flex, VStack } from "@chakra-ui/react"
+import { Flex, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { routes } from "../../routes"
@@ -9,7 +7,7 @@ import { Account } from "../accounts/Account"
 import { Multisig } from "../multisig/Multisig"
 import { MultisigBanner } from "../multisig/MultisigBanner"
 import { EscapeBanner } from "../shield/escape/EscapeBanner"
-import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBanner"
+import { StatusMessageBannerContainer } from "../statusMessage/StatusMessageBannerContainer"
 import { AccountTokensButtonsContainer } from "./AccountTokensButtonsContainer"
 import { AccountTokensHeader } from "./AccountTokensHeader"
 import { SaveRecoverySeedphraseBanner } from "./SaveRecoverySeedphraseBanner"
@@ -17,16 +15,15 @@ import { TokenList } from "./TokenList"
 import { TokenListItemVariant } from "./TokenListItem"
 import { UpgradeBanner } from "./UpgradeBanner"
 import { AccountDeprecatedBanner } from "./warning/AccountDeprecatedBanner"
-import { classHashSupportsTxV3 } from "../../../shared/network/txv3"
 import { AccountOwnerBanner } from "./warning/AccountOwnerBanner"
+import { ProvisionStatus } from "../../../shared/provision/types"
+import { isEmpty } from "lodash-es"
 
-const { MultisigIcon, WalletIcon } = icons
+const { MultisigIcon } = icons
 
 export interface AccountTokensProps {
   account: Account
   showTokensAndBanners: boolean
-  showEkuboBanner: boolean
-  showAvnuBanner: boolean
   hasEscape: boolean
   accountGuardianIsSelf: boolean | null
   accountOwnerIsSelf?: boolean
@@ -35,21 +32,23 @@ export interface AccountTokensProps {
   onUpgradeBannerClick?: () => void
   upgradeLoading?: boolean
   multisig?: Multisig
-  showAddFundsBackdrop?: boolean
   tokenListVariant?: TokenListItemVariant
   hasFeeTokenBalance?: boolean
   showSaveRecoverySeedphraseBanner: boolean
   isDeprecated?: boolean
-  setEkuboBannerSeen: () => void
-  setAvnuBannerSeen: () => void
   onAvnuClick?: () => void
   returnTo?: string
+  onProvisionBannerClose: () => void
+  shouldShowProvisionBanner: boolean
+  provisionStatus:
+    | (ProvisionStatus & {
+        bannerUrl: string
+      })
+    | undefined
 }
 
 export const AccountTokens: FC<AccountTokensProps> = ({
   account,
-  showEkuboBanner,
-  showAvnuBanner,
   showTokensAndBanners,
   hasEscape,
   accountGuardianIsSelf,
@@ -59,46 +58,45 @@ export const AccountTokens: FC<AccountTokensProps> = ({
   onUpgradeBannerClick,
   upgradeLoading,
   multisig,
-  showAddFundsBackdrop,
   tokenListVariant,
   hasFeeTokenBalance,
   showSaveRecoverySeedphraseBanner,
   isDeprecated = false,
-  setEkuboBannerSeen,
-  setAvnuBannerSeen,
-  onAvnuClick,
   returnTo,
+  onProvisionBannerClose,
+  provisionStatus,
+  shouldShowProvisionBanner,
 }) => {
-  const supportsStrkAsFeeToken = classHashSupportsTxV3(account.classHash)
-  const feeTokenCurrency = supportsStrkAsFeeToken ? "ETH or STRK" : "ETH"
   return (
-    <Flex direction={"column"} data-testid="account-tokens">
+    <Flex direction={"column"} data-testid="account-tokens" flex={1}>
       <VStack spacing={6} mt={4} mb={6}>
         <AccountTokensHeader account={account} accountName={account.name} />
-        <AccountTokensButtonsContainer
-          account={account}
-          hideSend={showAddFundsBackdrop}
-        />
+        <AccountTokensButtonsContainer account={account} />
       </VStack>
       {showTokensAndBanners ? (
-        <CellStack pt={0}>
-          {showEkuboBanner && (
+        <CellStack pt={0} flex={1}>
+          {shouldShowProvisionBanner && provisionStatus && (
             <Banner
-              backgroundImageUrl={ekuboBanner}
-              href="https://ekubo.org/"
-              onClose={setEkuboBannerSeen}
-              title="Provide liquidity on Ekubo"
-              subTitle="Starknet's most powerful AMM"
+              background={`url('${provisionStatus?.bannerUrl}'), linear-gradient(180deg, #1D1D77 0%, #154C7C 100%);`}
               dark
-            />
-          )}
-          {showAvnuBanner && (
-            <Banner
-              backgroundImageUrl={avnuBanner}
-              title="Swap with AVNU"
-              subTitle="Get the best rate on Argent X"
-              onClose={setAvnuBannerSeen}
-              onClick={onAvnuClick}
+              backgroundSize="contain"
+              backgroundRepeat="no-repeat"
+              backgroundPosition="left"
+              _hover={{
+                background: `url('${provisionStatus?.bannerUrl}'), linear-gradient(180deg, #1D1D77 0%, #154C7C 100%);`,
+                backgroundSize: "contain",
+                backgroundPosition: "left",
+                backgroundRepeat: "no-repeat",
+              }}
+              pl={20}
+              title={provisionStatus?.bannerTitle}
+              subTitle={provisionStatus?.bannerDescription}
+              href={
+                !isEmpty(provisionStatus.link)
+                  ? provisionStatus?.link
+                  : undefined
+              }
+              onClose={onProvisionBannerClose}
             />
           )}
           {showSaveRecoverySeedphraseBanner && <SaveRecoverySeedphraseBanner />}
@@ -134,25 +132,12 @@ export const AccountTokens: FC<AccountTokensProps> = ({
               hasFeeTokenBalance={hasFeeTokenBalance}
             />
           )}
-          {showAddFundsBackdrop && (
-            <Empty
-              icon={<WalletIcon color="neutrals.500" />}
-              title={"Add funds"}
-            >
-              <Center textAlign={"center"}>
-                {multisig
-                  ? `You will need some ${feeTokenCurrency} to activate the multisig account`
-                  : `You will need some ${feeTokenCurrency} to use the account`}
-              </Center>
-            </Empty>
-          )}
-          {!showAddFundsBackdrop && (
-            <TokenList
-              variant={tokenListVariant}
-              showNewTokenButton
-              onItemClick={multisig?.needsDeploy ? () => null : undefined}
-            />
-          )}
+
+          <TokenList
+            variant={tokenListVariant}
+            showNewTokenButton
+            onItemClick={multisig?.needsDeploy ? () => null : undefined}
+          />
         </CellStack>
       ) : (
         <Empty

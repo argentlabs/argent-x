@@ -1,9 +1,8 @@
-import { AddNetworkScreen } from "@argent-x/extension/src/ui/features/actions/AddNetworkScreen/AddNetworkScreen"
-import { Network } from "@argent-x/extension/src/shared/network"
+import { AddNetworkScreen } from "@argent-x/extension/src/ui/features/actions/AddNetworkScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 
-const network: Network = {
+const network = {
   id: "networkId",
   name: "Ethereum",
   chainId: "chainId",

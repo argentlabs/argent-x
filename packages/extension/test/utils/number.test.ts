@@ -56,6 +56,10 @@ describe("prettifyNumber()", () => {
         expect(prettifyTokenNumber("1.50005")).toEqual("1.5001")
         expect(prettifyTokenNumber("123456789")).toEqual("123,456,789.0")
         expect(prettifyTokenNumber(123456789n)).toEqual("123,456,789.0")
+        expect(prettifyTokenNumber("9.999990228523712194")).toEqual("10.0")
+        expect(prettifyTokenNumber(9999990228523712194n)).toEqual(
+          "9,999,990,228,523,712,194.0",
+        )
       })
     })
   })

@@ -75,6 +75,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
                   fontWeight={"semibold"}
                   overflow="hidden"
                   textOverflow={"ellipsis"}
+                  data-testid={`${token.symbol}-balance`}
                 >
                   {displayBalance}
                 </P4>

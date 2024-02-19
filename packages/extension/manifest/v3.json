@@ -1,8 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/chrome-manifest.json",
-  "name": "Argent X",
-  "description": "The security of Ethereum with the scale of StarkNet",
-  "version": "5.12.8",
+  "name": "Argent X - Starknet Wallet",
+  "description": "7 out of 10 Starknet users choose Argent X as their Starknet wallet. Join 2m+ Argent users now.",
+  "version": "5.13.4",
   "manifest_version": 3,
   "action": {
     "default_icon": {

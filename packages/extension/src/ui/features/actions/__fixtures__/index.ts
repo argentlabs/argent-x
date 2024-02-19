@@ -1,5 +1,6 @@
 export * from "./jediswap"
 export * from "./aspect"
 export * from "./transfer"
+export * from "./transferV3"
 export * from "./accounts"
 export * from "./dataToSign"

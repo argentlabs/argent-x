@@ -35,8 +35,8 @@ export const OnboardingRestoreBackupScreen: FC<
   return (
     <OnboardingScreen
       onBack={onBack}
-      length={4}
-      currentIndex={2}
+      length={3}
+      currentIndex={1}
       title={"Select backup"}
     >
       <Center

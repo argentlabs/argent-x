@@ -8,6 +8,7 @@ import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { WalletCryptoStarknetService } from "../../wallet/crypto/starknet.service"
 import { WalletStorageProps } from "../../../shared/wallet/walletStore"
+import { getAccountContractAddress } from "../../wallet/findImplementationForAddress"
 
 export async function determineMigrationNeededV581(
   cryptoStarknetService: WalletCryptoStarknetService,
@@ -20,11 +21,11 @@ export async function determineMigrationNeededV581(
       const { pubKey } = await cryptoStarknetService.getKeyPairByDerivationPath(
         account.signer.derivationPath,
       )
-      const falseyAccountAddress =
-        cryptoStarknetService.getCairo1AccountContractAddress(
-          STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
-          pubKey,
-        )
+      const falseyAccountAddress = getAccountContractAddress(
+        "1",
+        STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
+        pubKey,
+      )
 
       return [account, isEqualAddress(falseyAccountAddress, account.address)]
     }),

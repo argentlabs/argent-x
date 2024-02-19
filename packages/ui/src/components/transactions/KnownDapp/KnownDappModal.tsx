@@ -35,6 +35,7 @@ export const KnownDappModal: FC<KnownDappModalProps> = ({
       >
         <ModalHeader p={0}>
           <Button
+            data-testid="close-button"
             position={"absolute"}
             right={3}
             top={3}

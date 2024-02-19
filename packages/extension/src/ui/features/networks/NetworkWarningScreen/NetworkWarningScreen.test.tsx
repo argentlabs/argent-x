@@ -12,7 +12,7 @@ describe("NetworkWarningScreen", () => {
     expect(titleElement).toBeInTheDocument()
 
     const descriptionElement = screen.getByText(
-      /StarkNet is in Alpha and is experiencing degraded network performance./i,
+      /Starknet is in Alpha and is experiencing degraded network performance./i,
     )
     expect(descriptionElement).toBeInTheDocument()
 

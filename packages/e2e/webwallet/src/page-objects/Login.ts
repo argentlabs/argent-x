@@ -1,9 +1,9 @@
 import { Page, expect } from "@playwright/test"
 
-import config from "../config"
+import config from "../../../shared/config"
 import Navigation from "./Navigation"
 
-interface ICredentials {
+export interface ICredentials {
   email: string
   pin: string
   password: string
@@ -25,7 +25,9 @@ export default class Login extends Navigation {
   get password() {
     return this.page.locator("input[name=password]")
   }
-
+  get repeatPassword() {
+    return this.page.locator("input[name=repeatPassword]")
+  }
   get wrongPassword() {
     return this.page.locator(
       '//input[@name="password"][@aria-invalid="true"]/following::label[contains(text(), "Wrong password")]',
@@ -57,6 +59,19 @@ export default class Login extends Navigation {
     await this.password.fill(credentials.password)
     await expect(this.forgetPassword).toBeVisible()
     await expect(this.differentAccount).toBeVisible()
+    await Promise.all([
+      this.page.waitForURL(`${config.url}/dashboard`),
+      this.continue.click(),
+    ])
+    await expect(this.lock).toBeVisible()
+  }
+
+  async createWallet(credentials: ICredentials) {
+    await this.email.fill(credentials.email)
+    //await this.continue.click()
+    await this.fillPin(credentials.pin)
+    await this.password.fill(credentials.password)
+    await this.repeatPassword.fill(credentials.password)
     await Promise.all([
       this.page.waitForURL(`${config.url}/dashboard`),
       this.continue.click(),

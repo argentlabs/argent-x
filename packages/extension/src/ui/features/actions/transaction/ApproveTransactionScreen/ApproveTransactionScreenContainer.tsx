@@ -1,9 +1,9 @@
 import { useDisclosure } from "@chakra-ui/react"
 import { useAtom } from "jotai"
-import { isArray, isEmpty, isFunction } from "lodash-es"
+import { isEmpty, isFunction } from "lodash-es"
 import { FC, useCallback, useMemo, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
-import { Call } from "starknet"
+import { Call, TransactionType, isSierra } from "starknet"
 
 import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
 import { routes } from "../../../../routes"
@@ -21,11 +21,15 @@ import { useAggregatedSimData } from "../useTransactionSimulatedData"
 import { useTransactionSimulation } from "../useTransactionSimulation"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { MultisigBannerProps } from "./MultisigBanner"
-import { useEstimatedFees } from "../../feeEstimation/useEstimatedFees"
 import { WithActionScreenErrorFooter } from "./WithActionScreenErrorFooter"
 import { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
-import { ensureArray } from "@argent/shared"
+import { Address, TransactionAction, ensureArray } from "@argent/shared"
 import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
+import { useBestFeeToken } from "../../useBestFeeToken"
+import { FeeTokenPickerModal } from "../../feeEstimation/ui/FeeTokenPickerModal"
+import { feeTokenService } from "../../../../services/feeToken"
+import { BaseToken } from "../../../../../shared/token/__new/types/token.model"
+import { useFeeTokenBalances } from "../../../accountTokens/useFeeTokenBalance"
 
 export const ApproveTransactionScreenContainer: FC<
   ApproveTransactionScreenContainerProps
@@ -34,7 +38,7 @@ export const ApproveTransactionScreenContainer: FC<
   actionIsApproving,
   actionErrorApproving,
   selectedAccount,
-  transactions,
+  transactionAction,
   onReject,
   onSubmit,
   onConfirmAnyway,
@@ -58,20 +62,39 @@ export const ApproveTransactionScreenContainer: FC<
 
   const { data: transactionReview } = useTransactionReview({
     account: selectedAccount,
-    transactions,
+    transactions:
+      transactionAction.type === "INVOKE_FUNCTION"
+        ? transactionAction.payload
+        : [],
     actionHash,
   })
+
+  // This is required because if STRK is selected as the user preferred fee token
+  // It would throw an error as tx v1 doesn't support STRK
+  const preferFeeToken = useMemo(() => {
+    if (
+      transactionAction.type === TransactionType.DECLARE &&
+      !isSierra(transactionAction.payload.contract)
+    ) {
+      return [ETH_TOKEN_ADDRESS] as Address[]
+    }
+  }, [transactionAction.payload, transactionAction.type])
+
+  const feeToken = useBestFeeToken(selectedAccount, {
+    prefer: preferFeeToken,
+  })
+
+  const feeTokens = useFeeTokenBalances(selectedAccount)
 
   const {
     data: transactionSimulation,
     isValidating: isSimulationValidating,
     error: transactionSimulationError,
   } = useTransactionSimulation({
-    transactions,
+    transactionAction,
+    feeTokenAddress: feeToken.address,
     actionHash,
   })
-
-  const simulationEstimatedFee = useEstimatedFees(transactions)
 
   const multisigModalDisclosure = useDisclosure()
 
@@ -105,14 +128,14 @@ export const ApproveTransactionScreenContainer: FC<
     [setUserClickedAddFunds, userClickedAddFunds],
   )
 
-  const onSubmitAction = (transactions: Call | Call[]) => {
+  const onSubmitAction = (transactionAction: TransactionAction) => {
     if (hasInsufficientFunds) {
       navigate(routes.funding(), { state: { showOnTop: true } })
       setUserClickedAddFunds(true)
       setHasInsufficientFunds(false)
       setDisableConfirm(true)
     } else {
-      onSubmit(transactions)
+      onSubmit(transactionAction)
     }
   }
 
@@ -124,8 +147,11 @@ export const ApproveTransactionScreenContainer: FC<
   }
 
   const transactionsArray: Call[] = useMemo(
-    () => (isArray(transactions) ? transactions : [transactions]),
-    [transactions],
+    () =>
+      transactionAction.type === "INVOKE_FUNCTION"
+        ? ensureArray(transactionAction.payload)
+        : [],
+    [transactionAction.payload, transactionAction.type],
   )
 
   const txnHasTransfers = useMemo(
@@ -202,6 +228,26 @@ export const ApproveTransactionScreenContainer: FC<
 
   const showFraudMonitorBanner = Boolean(warn && !isChangeGuardianTx)
 
+  // Disable fee token selection if the transaction is a Cairo0 declare transaction
+  const declareSupportTokenSelection = useMemo(
+    () =>
+      transactionAction.type !== TransactionType.DECLARE ||
+      isSierra(transactionAction.payload.contract),
+    [transactionAction.payload, transactionAction.type],
+  )
+
+  // Disable fee token selection if the transaction is an upgrade transaction
+  // or if its a multisig account
+  const allowFeeTokenSelection = !multisig && declareSupportTokenSelection
+
+  // Same as TransactionActionsContainerV2
+  const setPreferredFeeToken = useCallback(async ({ address }: BaseToken) => {
+    await feeTokenService.preferFeeToken(address)
+    setIsFeeTokenPickerOpen(false)
+  }, [])
+
+  const [isFeeTokenPickerOpen, setIsFeeTokenPickerOpen] = useState(false)
+
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
@@ -216,73 +262,84 @@ export const ApproveTransactionScreenContainer: FC<
   }
 
   return (
-    <ApproveTransactionScreen
-      actionHash={actionHash}
-      actionIsApproving={actionIsApproving}
-      aggregatedData={aggregatedData}
-      disableConfirm={disableConfirm}
-      isMainnet={isMainnet}
-      isSimulationLoading={isSimulationLoading}
-      selectedAccount={selectedAccount}
-      transactionReview={transactionReview}
-      transactions={transactionsArray}
-      transactionSimulation={transactionSimulation}
-      hasPendingMultisigTransactions={hasPendingMultisigTransactions}
-      multisig={multisig}
-      multisigModalDisclosure={
-        providedMultisigModalDisclosure || multisigModalDisclosure
-      }
-      onReject={onRejectAction}
-      onSubmit={onSubmitAction}
-      onConfirmAnyway={onConfirmAnyway}
-      approveScreenType={approveScreenType}
-      hasBalanceChange={hasBalanceChange}
-      showFraudMonitorBanner={showFraudMonitorBanner}
-      showTransactionActions={showTransactionActions}
-      transactionActionsType={transactionActionsType}
-      showTxDetails={showTxDetails}
-      setShowTxDetails={setShowTxDetails}
-      assessmentReason={reason}
-      multisigBannerProps={bannerProps}
-      confirmButtonText={
-        hasInsufficientFunds && !userClickedAddFunds ? "Add funds" : "Confirm"
-      }
-      footer={
-        <WithActionScreenErrorFooter isTransaction>
-          {selectedAccount.needsDeploy ? (
-            <CombinedFeeEstimationContainer
-              feeTokenAddress={ETH_TOKEN_ADDRESS}
-              onErrorChange={setDisableConfirm}
-              onFeeErrorChange={onShowAddFunds}
-              accountAddress={selectedAccount.address}
-              networkId={selectedAccount.networkId}
-              transactions={transactions}
-              actionHash={actionHash}
-              userClickedAddFunds={userClickedAddFunds}
-              transactionSimulation={transactionSimulation}
-              transactionSimulationFee={simulationEstimatedFee}
-              transactionSimulationFeeError={transactionSimulationError}
-              transactionSimulationLoading={isSimulationLoading}
-            />
-          ) : (
-            <FeeEstimationContainer
-              feeTokenAddress={ETH_TOKEN_ADDRESS}
-              onErrorChange={setDisableConfirm}
-              onFeeErrorChange={onShowAddFunds}
-              accountAddress={selectedAccount.address}
-              networkId={selectedAccount.networkId}
-              transactions={transactions}
-              actionHash={actionHash}
-              userClickedAddFunds={userClickedAddFunds}
-              transactionSimulation={transactionSimulation}
-              transactionSimulationFee={simulationEstimatedFee}
-              transactionSimulationFeeError={transactionSimulationError}
-              transactionSimulationLoading={isSimulationLoading}
-            />
-          )}
-        </WithActionScreenErrorFooter>
-      }
-      {...rest}
-    />
+    <>
+      <ApproveTransactionScreen
+        actionHash={actionHash}
+        actionIsApproving={actionIsApproving}
+        aggregatedData={aggregatedData}
+        disableConfirm={disableConfirm}
+        isMainnet={isMainnet}
+        isSimulationLoading={isSimulationLoading}
+        selectedAccount={selectedAccount}
+        transactionReview={transactionReview}
+        transactions={transactionsArray}
+        transactionAction={transactionAction}
+        transactionSimulation={transactionSimulation}
+        hasPendingMultisigTransactions={hasPendingMultisigTransactions}
+        multisig={multisig}
+        multisigModalDisclosure={
+          providedMultisigModalDisclosure || multisigModalDisclosure
+        }
+        onReject={onRejectAction}
+        onSubmit={onSubmitAction}
+        onConfirmAnyway={onConfirmAnyway}
+        approveScreenType={approveScreenType}
+        hasBalanceChange={hasBalanceChange}
+        showFraudMonitorBanner={showFraudMonitorBanner}
+        showTransactionActions={showTransactionActions}
+        transactionActionsType={transactionActionsType}
+        showTxDetails={showTxDetails}
+        setShowTxDetails={setShowTxDetails}
+        assessmentReason={reason}
+        multisigBannerProps={bannerProps}
+        confirmButtonText={
+          hasInsufficientFunds && !userClickedAddFunds ? "Add funds" : "Confirm"
+        }
+        footer={
+          <WithActionScreenErrorFooter isTransaction>
+            {selectedAccount.needsDeploy ? (
+              <CombinedFeeEstimationContainer
+                feeToken={feeToken}
+                onErrorChange={setDisableConfirm}
+                onFeeErrorChange={onShowAddFunds}
+                accountAddress={selectedAccount.address}
+                networkId={selectedAccount.networkId}
+                transactionAction={transactionAction}
+                actionHash={actionHash}
+                userClickedAddFunds={userClickedAddFunds}
+                transactionSimulation={transactionSimulation}
+                transactionSimulationFeeError={transactionSimulationError}
+                transactionSimulationLoading={isSimulationLoading}
+                allowFeeTokenSelection={allowFeeTokenSelection}
+                onFeeTokenPickerOpen={() => setIsFeeTokenPickerOpen(true)}
+              />
+            ) : (
+              <FeeEstimationContainer
+                feeToken={feeToken}
+                onErrorChange={setDisableConfirm}
+                onFeeErrorChange={onShowAddFunds}
+                accountAddress={selectedAccount.address}
+                networkId={selectedAccount.networkId}
+                transactionAction={transactionAction}
+                actionHash={actionHash}
+                userClickedAddFunds={userClickedAddFunds}
+                transactionSimulation={transactionSimulation}
+                transactionSimulationFeeError={transactionSimulationError}
+                transactionSimulationLoading={isSimulationLoading}
+                allowFeeTokenSelection={allowFeeTokenSelection}
+                onFeeTokenPickerOpen={() => setIsFeeTokenPickerOpen(true)}
+              />
+            )}
+          </WithActionScreenErrorFooter>
+        }
+        {...rest}
+      />
+      <FeeTokenPickerModal
+        isOpen={allowFeeTokenSelection && isFeeTokenPickerOpen}
+        onClose={() => setIsFeeTokenPickerOpen(false)}
+        tokens={feeTokens}
+        onFeeTokenSelect={setPreferredFeeToken}
+      />
+    </>
   )
 }

@@ -67,7 +67,10 @@ export interface IRepository<T> {
    * @param value - An array of items, a single item, or a setter function that operates on an array of items.
    * @returns A Promise that resolves to a boolean indicating whether the operation succeeded.
    */
-  upsert(value: AllowArray<T> | SetterFn<T>): Promise<UpsertResult>
+  upsert(
+    value: AllowArray<T> | SetterFn<T>,
+    insertMode?: "push" | "unshift",
+  ): Promise<UpsertResult>
 
   /**
    * Removes items from the repository based on the provided value or selector function.

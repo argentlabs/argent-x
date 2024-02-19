@@ -6,6 +6,7 @@ import {
   DeployContractTransaction,
   NFTTransaction,
   NFTTransferTransaction,
+  ProvisionTransaction,
   SwapTransaction,
   TokenApproveTransaction,
   TokenMintTransaction,
@@ -91,4 +92,11 @@ export const isExplorerTransaction = (
   transaction: any,
 ): transaction is IExplorerTransaction => {
   return !!(!isVoyagerTransaction(transaction) && transaction.transactionHash)
+}
+
+export const isProvisionTransaction = (
+  transaction: TransformedTransaction,
+): transaction is ProvisionTransaction => {
+  const { entity, action } = transaction
+  return entity === "TOKEN" && action === "PROVISION"
 }

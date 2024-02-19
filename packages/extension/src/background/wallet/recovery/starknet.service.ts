@@ -1,8 +1,5 @@
 import { WalletAccountSharedService } from "./../account/shared.service"
-import {
-  networkIdToStarknetNetwork,
-  networkToDiscoveryNetwork,
-} from "./../../../shared/utils/starknetNetwork"
+import { networkIdToStarknetNetwork } from "./../../../shared/utils/starknetNetwork"
 import { union, partition, memoize } from "lodash-es"
 import { num } from "starknet"
 
@@ -30,7 +27,7 @@ import {
   generatePublicKeys,
 } from "../../keys/keyDerivation"
 import { WalletCryptoStarknetService } from "../crypto/starknet.service"
-import { ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES__NEW } from "../starknet.constants"
+import { ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES } from "../../../shared/account/starknet.constants"
 import { IWalletRecoveryService } from "./interface"
 import { IRepository } from "../../../shared/storage/__new/interface"
 import urlJoin from "url-join"
@@ -44,7 +41,9 @@ import {
   ApiMultisigDataForSignerSchema,
 } from "../../../shared/multisig/multisig.model"
 import { RecoveryError } from "../../../shared/errors/recovery"
-import { isContractDeployed } from "@argent/shared"
+import { Address, isContractDeployed } from "@argent/shared"
+import { getAccountContractAddress } from "../findImplementationForAddress"
+import { argentApiNetworkForNetwork } from "../../../shared/api/headers"
 
 const INITIAL_PUB_KEY_COUNT = 5
 
@@ -62,12 +61,14 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
   ) {}
 
   private getCairo1AccountContractAddressMemoized = memoize(
-    this.cryptoStarknetService.getCairo1AccountContractAddress,
+    (classHash: string, publicKey: string) =>
+      getAccountContractAddress("1", classHash, publicKey),
     (classHash, publicKey) => `${classHash}:${publicKey}`,
   )
 
   private getCairo0AccountContractAddressMemoized = memoize(
-    this.cryptoStarknetService.getCairo0AccountContractAddress,
+    (classHash: string, publicKey: string) =>
+      getAccountContractAddress("0", classHash, publicKey),
     (classHash, publicKey) => `${classHash}:${publicKey}`,
   )
 
@@ -114,7 +115,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
   }
 
   private getStandardAccountDiscoveryUrl(network: Network) {
-    const backendNetwork = networkToDiscoveryNetwork(network)
+    const backendNetwork = argentApiNetworkForNetwork(network.id)
 
     if (
       process.env.NODE_ENV !== "production" && // be more strict in development
@@ -183,7 +184,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
   ) {
     // Discover Cairo1 standard accounts
     const cairo1AccountClassHashes = union(
-      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES__NEW.CAIRO_1,
+      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES.CAIRO_1,
       [...(defaultClassHash ? [defaultClassHash] : [])],
     )
 
@@ -194,10 +195,14 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       )
 
       const account = this.walletAccountSharedService.getDefaultStandardAccount(
-        pubKeyWithIndex.index,
-        address,
-        network,
-        false,
+        {
+          index: pubKeyWithIndex.index,
+          address,
+          network,
+          needsDeploy: false,
+          name: `Account ${pubKeyWithIndex.index + 1}`,
+          classHash: accountClassHash as Address,
+        },
       )
 
       return {
@@ -214,7 +219,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
   ) {
     // Discover Cairo0 standard accounts
     const cairo0AccountClassHashes = union(
-      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES__NEW.CAIRO_0,
+      ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES.CAIRO_0,
       [...(defaultClassHash ? [defaultClassHash] : [])],
     )
 
@@ -225,10 +230,14 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       )
 
       const account = this.walletAccountSharedService.getDefaultStandardAccount(
-        pubKeyWithIndex.index,
-        address,
-        network,
-        false,
+        {
+          index: pubKeyWithIndex.index,
+          address,
+          network,
+          needsDeploy: false,
+          name: `Account ${pubKeyWithIndex.index + 1}`,
+          classHash: accountClassHash as Address,
+        },
       )
 
       return {
@@ -360,12 +369,12 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       })
 
       return {
-        ...this.walletAccountSharedService.getDefaultMultisigAccount(
-          pubKeyWithIndex.index,
-          validMultisig.address,
+        ...this.walletAccountSharedService.getDefaultMultisigAccount({
+          index: pubKeyWithIndex.index,
+          address: validMultisig.address,
           network,
-          false,
-        ),
+          needsDeploy: false,
+        }),
         type: "multisig",
       }
     })

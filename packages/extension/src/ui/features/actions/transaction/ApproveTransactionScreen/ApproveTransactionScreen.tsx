@@ -43,6 +43,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   confirmButtonText = "Confirm",
   multisigBannerProps,
   onConfirmAnyway,
+  transactionAction,
   ...rest
 }) => {
   const showTxActions =
@@ -60,7 +61,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           if (hasPendingMultisigTransactions) {
             multisigModalDisclosure.onOpen()
           } else {
-            onSubmit(transactions)
+            onSubmit(transactionAction)
           }
         }}
         showHeader={true}
@@ -114,8 +115,8 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
             isOpen={multisigModalDisclosure.isOpen}
             onConfirm={() =>
               onConfirmAnyway
-                ? onConfirmAnyway(transactions)
-                : onSubmit(transactions)
+                ? onConfirmAnyway(transactionAction)
+                : onSubmit(transactionAction)
             }
             onClose={multisigModalDisclosure.onClose}
             noOfOwners={multisig.threshold}

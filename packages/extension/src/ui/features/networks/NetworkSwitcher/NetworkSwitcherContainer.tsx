@@ -19,7 +19,7 @@ import {
   NetworkSwitcherListProps,
 } from "./NetworkSwitcherList"
 
-const valuesToShowNetwortWarning: Array<NetworkStatus> = ["degraded", "error"]
+const valuesToShowNetwortWarning: Array<NetworkStatus> = ["red", "amber"]
 
 interface NetworkSwitcherProps extends ButtonProps {
   disabled?: boolean
@@ -34,7 +34,7 @@ export const NetworkSwitcherContainer: FC<NetworkSwitcherProps> = ({
   const allNetworksWithStatuses = useNetworksWithStatuses()
   const currentNetwork = useCurrentNetworkWithStatus()
   const [needsToShowNetworkStatusWarning] = useNeedsToShowNetworkStatusWarning()
-  const currentNetworkStatus = currentNetwork?.status
+  const currentNetworkStatus = currentNetwork?.status ?? "unknown"
 
   useEffect(() => {
     if (
@@ -66,7 +66,7 @@ export const NetworkSwitcherContainer: FC<NetworkSwitcherProps> = ({
 
   return (
     <Menu>
-      {currentNetworkStatus && (
+      {currentNetworkStatus !== null && (
         <NetworkSwitcherButton
           disabled={disabled}
           currentNetwork={currentNetwork}

@@ -12,7 +12,6 @@ import { WalletSessionService } from "../session/session.service"
 import type { WalletSession } from "../session/walletSession.model"
 import { IWalletDeploymentService } from "../deployment/interface"
 import { IObjectStore } from "../../../shared/storage/__new/interface"
-import { WalletError } from "../../../shared/errors/wallet"
 import { walletToKeystore } from "../utils"
 
 export class WalletCryptoSharedService {
@@ -26,10 +25,6 @@ export class WalletCryptoSharedService {
   ) {}
 
   public async restoreSeedPhrase(seedPhrase: string, newPassword: string) {
-    const session = await this.sessionStore.get()
-    if ((await this.backupService.isInitialized()) || session) {
-      throw new WalletError({ code: "ALREADY_INITIALIZED" })
-    }
     const ethersWallet = HDNodeWallet.fromPhrase(seedPhrase)
     const encryptedBackup = await encryptKeystoreJson(
       walletToKeystore(ethersWallet),

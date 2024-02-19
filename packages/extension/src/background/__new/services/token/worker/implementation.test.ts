@@ -12,10 +12,12 @@ import { IScheduleService } from "../../../../../shared/schedule/interface"
 import {
   emitterMock,
   recoverySharedServiceMock,
+  sessionServiceMock,
 } from "../../../../wallet/test.utils"
 import { IBackgroundUIService } from "../../ui/interface"
 import { getMockNetwork } from "../../../../../../test/network.mock"
 import {
+  getMockApiTokenDetails,
   getMockBaseToken,
   getMockToken,
   getMockTokenPriceDetails,
@@ -49,7 +51,6 @@ describe("TokenWorker", () => {
   beforeEach(() => {
     // Initialize mocks
     mockTokenService = {
-      fetchTokensFromBackend: vi.fn(),
       updateTokens: vi.fn(),
       addToken: vi.fn(),
       removeToken: vi.fn(),
@@ -65,6 +66,11 @@ describe("TokenWorker", () => {
       updateTokenPrices: vi.fn(),
       getFeeTokens: vi.fn(),
       getBestFeeToken: vi.fn(),
+      fetchAccountTokenBalancesFromBackend: vi.fn(),
+      getTokensInfoFromBackendForNetwork: vi.fn(),
+      preferFeeToken: vi.fn(),
+      getFeeTokenPreference: vi.fn(),
+      handleProvisionTokens: vi.fn(),
     } as Mocked<ITokenService>
 
     mockNetworkService = {
@@ -110,6 +116,7 @@ describe("TokenWorker", () => {
       mockScheduleService,
       mockDebounceService,
       mockActivityService,
+      sessionServiceMock,
     )
   })
 
@@ -117,33 +124,62 @@ describe("TokenWorker", () => {
     it("should fetch tokens for all networks and update the token service", async () => {
       // Arrange
       const mockNetworks = [
-        getMockNetwork({ id: "1" }),
-        getMockNetwork({ id: "2" }),
+        getMockNetwork({ id: "mainnet-alpha" }),
+        getMockNetwork({ id: "invalid-backend-network" }),
       ]
-      const mockTokens = [
-        [getMockToken({ address: tokenAddress1, networkId: "1" })],
-        [getMockToken({ address: tokenAddress2, networkId: "2" })],
-      ]
-      mockNetworkService.get.mockResolvedValue(mockNetworks)
-      mockTokenService.fetchTokensFromBackend
-        .mockResolvedValueOnce(mockTokens[0])
-        .mockResolvedValueOnce(mockTokens[1])
 
-      await tokenWorker.fetchAndUpdateTokensFromBackend()
+      const mockTokens = [
+        getMockToken({ address: tokenAddress1 }),
+        getMockToken({ address: tokenAddress2 }),
+      ]
+
+      const mockApiTokens = [
+        getMockApiTokenDetails({ address: tokenAddress1 }),
+        getMockApiTokenDetails({ address: tokenAddress2 }),
+      ]
+
+      mockNetworkService.get.mockResolvedValue(mockNetworks)
+
+      mockTokenService.getTokensInfoFromBackendForNetwork
+        .mockResolvedValueOnce([mockApiTokens[0]])
+        .mockResolvedValueOnce([mockApiTokens[1]])
+
+      mockTokenService.getTokens
+        .mockResolvedValueOnce([mockTokens[0]])
+        .mockResolvedValueOnce([mockTokens[1]])
+
+      await tokenWorker.refreshTokenRepoWithTokensInfoFromBackend()
 
       expect(mockNetworkService.get).toHaveBeenCalled()
-      expect(mockTokenService.fetchTokensFromBackend).toHaveBeenCalledTimes(2)
-      expect(mockTokenService.fetchTokensFromBackend).toHaveBeenNthCalledWith(
-        1,
-        mockNetworks[0].id,
-      )
-      expect(mockTokenService.fetchTokensFromBackend).toHaveBeenNthCalledWith(
-        2,
-        mockNetworks[1].id,
-      )
-      expect(mockTokenService.updateTokens).toHaveBeenCalledWith(
-        mockTokens.flat(),
-      )
+
+      expect(
+        mockTokenService.getTokensInfoFromBackendForNetwork,
+      ).toHaveBeenCalledTimes(2)
+      expect(
+        mockTokenService.getTokensInfoFromBackendForNetwork,
+      ).toHaveBeenNthCalledWith(1, mockNetworks[0].id)
+      expect(
+        mockTokenService.getTokensInfoFromBackendForNetwork,
+      ).toHaveBeenNthCalledWith(2, mockNetworks[1].id)
+
+      // merged tokens
+      expect(mockTokenService.updateTokens).toHaveBeenNthCalledWith(1, [
+        {
+          ...mockApiTokens[0],
+          ...mockTokens[0],
+        },
+      ])
+      expect(mockTokenService.updateTokens).toHaveBeenNthCalledWith(2, [
+        {
+          ...mockApiTokens[1], // from api
+          ...mockTokens[1],
+        },
+        {
+          ...mockApiTokens[1], // from tradable
+          ...mockTokens[1],
+          networkId: "invalid-backend-network",
+        },
+      ])
     })
   })
 

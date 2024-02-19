@@ -16,4 +16,5 @@ export interface IAccountMessagingService {
     start: number,
     buffer: number,
   ): Promise<string[]>
+  clearLocalStorageAndRecoverAccounts(password: string): Promise<void>
 }

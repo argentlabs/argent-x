@@ -216,7 +216,7 @@ export const useTxFeesPreprocessor = (
             gasPrice,
             gasUsage,
             overallFee,
-            unit: tx.feeEstimation?.unit ?? "wei",
+            unit: tx.feeEstimation?.unit ?? "WEI",
           },
         }
       },
@@ -225,7 +225,7 @@ export const useTxFeesPreprocessor = (
           gasPrice: num.toBigInt(0),
           gasUsage: num.toBigInt(0),
           overallFee: num.toBigInt(0),
-          unit: "wei",
+          unit: "WEI",
         },
       },
     )

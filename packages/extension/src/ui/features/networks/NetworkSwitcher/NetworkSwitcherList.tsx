@@ -3,10 +3,7 @@ import { Flex, MenuItem, MenuList, MenuListProps } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Network, NetworkStatus } from "../../../../shared/network"
-// import {
-//   StatusIndicator,
-//   mapNetworkStatusToColor,
-// } from "../../../components/StatusIndicator"
+import { StatusIndicator } from "../../../components/StatusIndicator"
 
 export interface NetworkSwitcherListProps extends MenuListProps {
   currentNetwork: Network
@@ -22,7 +19,7 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
 }) => {
   return (
     <MenuList {...rest}>
-      {allNetworks.map(({ id, name, status: _status, rpcUrl, readonly }) => {
+      {allNetworks.map(({ id, name, status, rpcUrl, readonly }) => {
         const isCurrent = id === currentNetwork.id
         return (
           <MenuItem
@@ -38,12 +35,7 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
             }
             data-group
           >
-            <Flex
-              ml={"auto"}
-              justifyContent={"flex-end"}
-              alignItems={"center"}
-              pointerEvents={"none"}
-            >
+            <Flex ml={"auto"} justifyContent={"flex-end"} alignItems={"center"}>
               <Flex
                 direction={"column"}
                 alignItems={"flex-end"}
@@ -69,8 +61,7 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
                   </L2>
                 )}
               </Flex>
-              {/* Temp: This is commented out until we have a final decision on RPC provider */}
-              {/*<StatusIndicator color={mapNetworkStatusToColor(status)} />*/}
+              <StatusIndicator status={status} />
             </Flex>
           </MenuItem>
         )

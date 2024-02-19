@@ -13,9 +13,10 @@ import { AccountScreenEmptyContainer } from "./AccountScreenEmptyContainer"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useIsDefaultNetwork } from "../networks/hooks/useIsDefaultNetwork"
+import { AccountDiscoverScreenContainer } from "../discover/AccountDiscoverScreenContainer"
 
 interface AccountScreenProps {
-  tab: "tokens" | "collections" | "activity" | "swap"
+  tab: "tokens" | "collections" | "activity" | "swap" | "discover"
 }
 
 /** TODO: refactor: rename 'RootContainer' or similar */
@@ -43,6 +44,8 @@ export const AccountScreen: FC<AccountScreenProps> = ({ tab }) => {
     body = <AccountCollectionsContainer account={account} />
   } else if (tab === "activity") {
     body = <AccountActivityContainer account={account} />
+  } else if (tab === "discover") {
+    body = <AccountDiscoverScreenContainer account={account} />
   } else if (tab === "swap") {
     body = isDefaultNetwork ? <Swap /> : <NoSwap /> // Swap is only available on default network
   } else {

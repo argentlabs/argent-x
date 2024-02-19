@@ -1,9 +1,21 @@
 import { IDebounceService } from "../../../../../shared/debounce"
 import { IScheduleService } from "../../../../../shared/schedule/interface"
+import { Locked } from "../../../../wallet/session/interface"
+import { WalletSessionService } from "../../../../wallet/session/session.service"
+import { IKeyValueStorage } from "../../../../../shared/storage"
+import { WalletStorageProps } from "../../../../wallet/backup/backup.service"
 import { IBackgroundUIService, Opened } from "../../ui/interface"
 import { pipe } from "./pipe"
 
 type Fn = (...args: unknown[]) => Promise<void>
+
+export const onAccountChanged =
+  <T extends Fn>(walletStore: IKeyValueStorage<WalletStorageProps>) =>
+  (fn: T): T => {
+    walletStore.subscribe("selected", fn)
+
+    return fn
+  }
 
 /**
  * Function to schedule a task on startup.
@@ -68,6 +80,10 @@ export type MinimalIBackgroundUIService = Pick<
   "opened" | "emitter"
 >
 
+export type MinimalWalletSessionService = Pick<
+  WalletSessionService,
+  "locked" | "emitter"
+>
 /**
  * Function to schedule a task to run when the UI is opened.
  * @param {IBackgroundUIService} backgroundUIService - The background UI service.
@@ -95,6 +111,26 @@ export const onClose =
     })
 
     return fn
+  }
+
+export const onUnlocked =
+  <T extends Fn>(sessionService: MinimalWalletSessionService) =>
+  (fn: T): T => {
+    sessionService.emitter.on(Locked, async (locked) => {
+      if (!locked) {
+        await fn()
+      }
+    })
+
+    return fn
+  }
+
+export const onlyIfUnlocked =
+  <T extends Fn>(sessionService: MinimalWalletSessionService) =>
+  (fn: T): T => {
+    return ((...args: unknown[]) => {
+      return !sessionService.locked ? fn(...args) : noopAs(fn)(...args)
+    }) as T
   }
 
 function noopAs<T extends Fn>(_fn: T): T {
@@ -156,6 +192,49 @@ export const everyWhenOpen = (
     debounce(debounceService, seconds, name),
     onlyIfOpen(backgroundUIService),
     onOpen(backgroundUIService),
+    onInstallAndUpgrade(scheduleService),
+    every(scheduleService, seconds, name),
+  )
+}
+
+/**
+ * Function to run a task when the wallet is opened and unlocked, debounced by specified seconds
+ */
+
+export const whenOpenAndUnlocked = (
+  backgroundUIService: MinimalIBackgroundUIService,
+  sessionService: MinimalWalletSessionService,
+  debounceService: IDebounceService,
+  seconds: number,
+  name: string,
+) => {
+  return pipe(
+    debounce(debounceService, seconds, name),
+    onlyIfOpen(backgroundUIService),
+    onlyIfUnlocked(sessionService),
+    onOpen(backgroundUIService),
+    onUnlocked(sessionService),
+  )
+}
+
+/**
+ * Function to schedule a task to run every specified seconds when the UI is opened and unlocked
+ */
+
+export const everyWhenOpenAndUnlocked = (
+  backgroundUIService: MinimalIBackgroundUIService,
+  scheduleService: IScheduleService,
+  sessionService: MinimalWalletSessionService,
+  debounceService: IDebounceService,
+  seconds: number,
+  name: string,
+) => {
+  return pipe(
+    debounce(debounceService, seconds, name),
+    onlyIfOpen(backgroundUIService),
+    onlyIfUnlocked(sessionService),
+    onOpen(backgroundUIService),
+    onUnlocked(sessionService),
     onInstallAndUpgrade(scheduleService),
     every(scheduleService, seconds, name),
   )

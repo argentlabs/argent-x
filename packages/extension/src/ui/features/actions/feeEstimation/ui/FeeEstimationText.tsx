@@ -1,16 +1,15 @@
-import { L2, P4, icons } from "@argent/ui"
+import { B3, L2, P4, icons } from "@argent/ui"
 import {
-  // Center,
   Flex,
+  Img,
   Spinner,
   Text,
   ThemingProps,
   Tooltip,
 } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
-// import { TokenPicker } from "./TokenPicker"
 
-const { InfoIcon } = icons
+const { InfoIcon, ChevronRightIcon } = icons
 
 export interface FeeEstimationTextProps extends ThemingProps<"Flex"> {
   allowFeeTokenSelection?: boolean
@@ -20,10 +19,13 @@ export interface FeeEstimationTextProps extends ThemingProps<"Flex"> {
   primaryText?: ReactNode
   secondaryText?: ReactNode
   isLoading?: boolean
+  onOpenFeeTokenPicker?: () => void
+  feeTokenIcon?: string
+  feeTokenSymbol?: string
 }
 
 export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
-  // allowFeeTokenSelection = true,
+  allowFeeTokenSelection = true,
   colorScheme = "neutrals",
   tooltipText,
   title = "Estimated fee",
@@ -31,10 +33,17 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
   isLoading = false,
   primaryText,
   secondaryText,
+  feeTokenIcon,
+  feeTokenSymbol,
+  onOpenFeeTokenPicker,
 }) => {
   return (
     <Flex flex={1} flexDirection="column" gap={1}>
-      <Flex flexDirection={"row"} justifyContent="space-between">
+      <Flex
+        flexDirection={"row"}
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Flex flexDirection="column" gap={1}>
           <Flex alignItems="center" gap="5px" mr={2} flexShrink={0}>
             <Flex alignItems="center" justifyContent="center" gap="5px">
@@ -65,25 +74,32 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
         {isLoading ? (
           <Spinner size={"sm"} />
         ) : (
-          <Flex gap="1" alignItems="end" direction="column" flexWrap="wrap">
-            {primaryText && (
-              <Flex gap="2" mr={2} alignItems={"center"}>
-                {/* {!allowFeeTokenSelection && (
-                  <TokenPicker
-                    selected={{
-                      name: "Starknet Network",
-                      symbol: "ETH",
-                      image: "https://argent.xyz/images/eth.svg",
-                    }}
-                    onClick={() => setIsTokenPickerOpen(true)}
+          <Flex
+            data-testid="fee-token-picker"
+            gap="2"
+            alignItems="center"
+            cursor={allowFeeTokenSelection ? "pointer" : "default"}
+            onClick={() => allowFeeTokenSelection && onOpenFeeTokenPicker?.()}
+          >
+            <Flex gap="0.5" alignItems="end" direction="column" flexWrap="wrap">
+              {primaryText && (
+                <Flex gap="1" alignItems="center" justifyContent="center">
+                  <Img
+                    borderRadius="50%"
+                    bg="neutrals.700"
+                    src={feeTokenIcon}
+                    alt={feeTokenSymbol}
+                    height="16px"
+                    width="16px"
                   />
-                )} */}
-                <P4 fontWeight="medium">{primaryText}</P4>
-              </Flex>
-            )}
-            {secondaryText && (
-              <L2 color={`${colorScheme}.300`}>{secondaryText}</L2>
-            )}
+                  <B3>{primaryText}</B3>
+                </Flex>
+              )}
+              {secondaryText && (
+                <L2 color={`${colorScheme}.300`}>{secondaryText}</L2>
+              )}
+            </Flex>
+            {allowFeeTokenSelection && <ChevronRightIcon />}
           </Flex>
         )}
       </Flex>

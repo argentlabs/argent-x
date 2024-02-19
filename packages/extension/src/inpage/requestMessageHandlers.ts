@@ -8,6 +8,7 @@ import type { Network } from "../shared/network/type"
 import { sendMessage, waitForMessage } from "./messageActions"
 import { ETH_TOKEN_ADDRESS } from "../shared/network/constants"
 import { inpageMessageClient } from "./trpcClient"
+import { CairoVersion } from "starknet"
 
 export async function handleAddTokenRequest(
   callParams: WatchAssetParameters,
@@ -179,6 +180,7 @@ interface GetDeploymentDataResult {
   class_hash: string // Represented as 'felt252'
   salt: string // Represented as 'felt252'
   calldata: string[] // Array of 'felt252', length := calldata_len
+  version: CairoVersion
 }
 
 const toHex = (x: bigint) => `0x${x.toString(16)}`
@@ -186,12 +188,21 @@ const toHex = (x: bigint) => `0x${x.toString(16)}`
 const isStringArray = (x: any): x is string[] =>
   x.every((y: any) => typeof y === "string")
 
-export async function handleDeploymentData(): Promise<GetDeploymentDataResult> {
+export async function handleDeploymentData(): Promise<GetDeploymentDataResult | null> {
   const deploymentData =
     await inpageMessageClient.accountMessaging.getAccountDeploymentPayload.query()
 
-  const { classHash, constructorCalldata, addressSalt, contractAddress } =
-    deploymentData
+  if (!deploymentData) {
+    return deploymentData
+  }
+
+  const {
+    version,
+    classHash,
+    constructorCalldata,
+    addressSalt,
+    contractAddress,
+  } = deploymentData
 
   if (!classHash || !constructorCalldata || !addressSalt || !contractAddress) {
     throw new Error("Deployment data not found")
@@ -209,5 +220,6 @@ export async function handleDeploymentData(): Promise<GetDeploymentDataResult> {
     class_hash: classHash,
     salt: _addressSalt,
     calldata: _callData,
+    version,
   }
 }

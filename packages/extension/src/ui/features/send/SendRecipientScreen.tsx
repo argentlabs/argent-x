@@ -5,12 +5,14 @@ import {
   CellStack,
   Empty,
   FieldError,
+  H6,
   HeaderCell,
   NavigationContainer,
   TextareaAutosize,
   icons,
 } from "@argent/ui"
 import {
+  Flex,
   InputGroup,
   InputLeftElement,
   InputRightElement,
@@ -24,24 +26,22 @@ import {
 import { BaseSyntheticEvent, FC, ReactNode } from "react"
 import { FieldErrors, UseFormRegister } from "react-hook-form"
 
+import { addressInputCharactersAndLengthSchema } from "@argent/shared"
+import { isEmpty } from "lodash-es"
 import type { AddressBookContact } from "../../../shared/addressBook/type"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 import { AccountListItem } from "../accounts/AccountListItem"
-import { AccountListItemWithBalance } from "../accounts/AccountListItemWithBalance"
+import { AccountListWithBalance } from "./AccountListWithBalance"
 import { SendModalAddContactScreen } from "./SendModalAddContactScreen"
 import { FormType } from "./sendRecipientScreen.model"
-import {
-  addressInputCharactersAndLengthSchema,
-  getAccountIdentifier,
-} from "@argent/shared"
 
-const { SearchIcon, WalletIcon, AddressBookIcon, CloseIcon } = icons
+const { SearchIcon, WalletIcon, AddressBookIcon, CloseIcon, MultisigIcon } =
+  icons
 
 interface SendRecipientScreenProps {
   errors: FieldErrors<FormType>
   hasAccounts?: boolean
-  filteredAccounts: WalletAccount[]
   filteredContacts: AddressBookContact[]
   hasQueryError: boolean
   isLoading: boolean
@@ -59,12 +59,13 @@ interface SendRecipientScreenProps {
   query: string
   register: UseFormRegister<FormType>
   switcherNetworkId: string
+  multisigAccounts: WalletAccount[]
+  standardAccounts: WalletAccount[]
 }
 
 export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
   errors,
   hasAccounts,
-  filteredAccounts,
   filteredContacts,
   hasQueryError,
   isLoading,
@@ -82,12 +83,19 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
   query,
   register,
   switcherNetworkId,
+  multisigAccounts,
+  standardAccounts,
 }) => {
   const { ref, onChange, ...rest } = register("query")
   const inputRef = useAutoFocusInputRef<HTMLTextAreaElement>()
 
-  const hasFilteredAccounts = filteredAccounts.length > 0
   const hasFilteredContacts = filteredContacts.length > 0
+
+  const hasMultisigAccounts = !isEmpty(multisigAccounts)
+  const hasStandardAccounts = !isEmpty(standardAccounts)
+  const hasMultipleAccountTypes = hasStandardAccounts && hasMultisigAccounts
+  const hasOnlyMultisigAccounts = hasMultisigAccounts && !hasStandardAccounts
+
   const hasQuery = Boolean(query)
 
   const defaultTabIndex = hasAccounts ? 0 : 1
@@ -107,6 +115,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                 <SearchIcon />
               </InputLeftElement>
               <TextareaAutosize
+                data-testid="recipient-input"
                 {...rest}
                 ref={(e) => {
                   ref(e)
@@ -184,20 +193,42 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
               </TabList>
               <TabPanels flex={1} display={"flex"} flexDirection={"column"}>
                 <TabPanel flex={1} display={"flex"} flexDirection={"column"}>
-                  {hasFilteredAccounts ? (
-                    <CellStack px={0} pt={4}>
-                      {filteredAccounts.map((account) => (
-                        <AccountListItemWithBalance
-                          key={getAccountIdentifier(account)}
-                          account={account}
-                          avatarSize={9}
-                          accountAddress={account.address}
-                          networkId={account.networkId}
-                          accountName={account.name}
-                          onClick={() => onAccountClick(account)}
-                        />
-                      ))}
-                    </CellStack>
+                  {hasMultipleAccountTypes ? (
+                    <>
+                      <Flex
+                        gap={2}
+                        align="center"
+                        color="neutrals.300"
+                        px={2}
+                        pt={4}
+                      >
+                        <WalletIcon w={4} h={4} />
+                        <H6>Standard Accounts</H6>
+                      </Flex>
+                      <AccountListWithBalance
+                        accounts={standardAccounts}
+                        onAccountClick={onAccountClick}
+                      />
+
+                      <Flex gap={2} align="center" color="neutrals.300" px={2}>
+                        <MultisigIcon w={4} h={4} />
+                        <H6>Multisig Accounts</H6>
+                      </Flex>
+                      <AccountListWithBalance
+                        accounts={multisigAccounts}
+                        onAccountClick={onAccountClick}
+                      />
+                    </>
+                  ) : hasOnlyMultisigAccounts ? (
+                    <AccountListWithBalance
+                      accounts={multisigAccounts}
+                      onAccountClick={onAccountClick}
+                    />
+                  ) : hasStandardAccounts ? (
+                    <AccountListWithBalance
+                      accounts={standardAccounts}
+                      onAccountClick={onAccountClick}
+                    />
                   ) : (
                     <Empty
                       icon={hasQuery ? <SearchIcon /> : <WalletIcon />}

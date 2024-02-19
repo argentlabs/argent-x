@@ -19,6 +19,7 @@ import { Wallet } from "./wallet"
 import { preAuthorizationService } from "../shared/preAuthorization/service"
 import { networkSchema } from "../shared/network"
 import { encodeChainId } from "../shared/utils/encodeChainId"
+import { IFeeTokenService } from "../shared/feeToken/service/interface"
 
 const handleTransactionAction = async ({
   action,
@@ -66,6 +67,7 @@ const handleTransactionAction = async ({
 export const handleActionApproval = async (
   action: ExtensionActionItem,
   wallet: Wallet,
+  feeTokenService: IFeeTokenService,
 ): Promise<MessageType | undefined> => {
   const actionHash = action.meta.hash
   const selectedAccount = await wallet.getSelectedAccount()
@@ -94,7 +96,11 @@ export const handleActionApproval = async (
     }
 
     case "TRANSACTION": {
-      return handleTransactionAction({ action, networkId, wallet })
+      return handleTransactionAction({
+        action,
+        networkId,
+        wallet,
+      })
     }
 
     case "DEPLOY_ACCOUNT": {
@@ -103,7 +109,11 @@ export const handleActionApproval = async (
         //   networkId,
         // }) // TODO: temporary disabled
 
-        const txHash = await accountDeployAction(action, wallet)
+        const txHash = await accountDeployAction(
+          action,
+          wallet,
+          feeTokenService,
+        )
 
         void analytics.track("deployAccount", {
           status: "success",

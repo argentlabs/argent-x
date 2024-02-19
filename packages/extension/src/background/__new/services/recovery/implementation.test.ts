@@ -35,9 +35,12 @@ describe("BackgroundRecoveryService", () => {
       const { recoveryStore, wallet, backgroundRecoveryService } = makeService()
       await backgroundRecoveryService.byBackup("foo")
       expect(recoveryStore.set).toHaveBeenNthCalledWith(1, {
-        isRecovering: true,
+        errorRecovering: false,
       })
       expect(recoveryStore.set).toHaveBeenNthCalledWith(2, {
+        isRecovering: true,
+      })
+      expect(recoveryStore.set).toHaveBeenNthCalledWith(3, {
         isRecovering: false,
       })
       expect(wallet.importBackup).toHaveBeenCalledWith("foo")
@@ -53,9 +56,12 @@ describe("BackgroundRecoveryService", () => {
       } = makeService()
       await backgroundRecoveryService.bySeedPhrase("foo", "bar")
       expect(recoveryStore.set).toHaveBeenNthCalledWith(1, {
-        isRecovering: true,
+        errorRecovering: false,
       })
       expect(recoveryStore.set).toHaveBeenNthCalledWith(2, {
+        isRecovering: true,
+      })
+      expect(recoveryStore.set).toHaveBeenNthCalledWith(3, {
         isRecovering: false,
       })
       expect(wallet.restoreSeedPhrase).toHaveBeenCalledWith("foo", "bar")

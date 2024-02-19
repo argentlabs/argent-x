@@ -48,10 +48,15 @@ export const connectedDappsProcedure = publicProcedure.use(
       })
     }
 
+    const senderType = isPreauthorized
+      ? ("preauthorized" as const)
+      : ("extension" as const)
+
     return next({
       ctx: {
         ...ctx,
         sender, // by passing it after checking, every method after this middleware will have a mandatory sender
+        senderType,
       },
     })
   },

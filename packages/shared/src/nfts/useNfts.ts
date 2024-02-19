@@ -1,14 +1,15 @@
 import useSWR from "swr"
 
-import { PaginatedItems } from "@argent/shared"
-import { SWRConfigCommon, getAccountIdentifier } from "../http/swr"
+import { type SWRConfigCommon, getAccountIdentifier } from "../http/swr"
 import { ArgentBackendNftService } from "./argent"
-import { Address } from "../chains"
+import type { Address } from "../chains"
+import type { ArgentBackendNetworkId } from "../argent/type"
+import type { PaginatedItems } from "./interface"
 
 const fetchNfts = async (
   nftService: ArgentBackendNftService,
   chain: string,
-  network: "mainnet" | "goerli",
+  network: ArgentBackendNetworkId,
   address: Address,
   page = 1,
 ) => {
@@ -38,7 +39,7 @@ const fetchNfts = async (
 export const useNfts = (
   nftService: ArgentBackendNftService,
   chain: string,
-  network: "mainnet" | "goerli",
+  network: ArgentBackendNetworkId,
   address?: Address,
   config?: SWRConfigCommon,
 ) => {
@@ -57,7 +58,7 @@ export const useNfts = (
 export const useCollection = (
   nftService: ArgentBackendNftService,
   chain: string,
-  network: "mainnet" | "goerli",
+  network: ArgentBackendNetworkId,
   collectionAddress?: Address,
   config?: SWRConfigCommon,
 ) => {
@@ -79,7 +80,7 @@ export const useCollection = (
 export const useNft = (
   nftService: ArgentBackendNftService,
   chain: string,
-  network: "mainnet" | "goerli",
+  network: ArgentBackendNetworkId,
   collectionAddress?: Address,
   tokenId?: string,
   config?: SWRConfigCommon,
@@ -92,6 +93,8 @@ export const useNft = (
         : undefined,
     {
       refreshInterval: 60e3 /* 1 minute */,
+      revalidateOnFocus: false,
+      revalidateOnMount: false,
       ...config,
     },
   )

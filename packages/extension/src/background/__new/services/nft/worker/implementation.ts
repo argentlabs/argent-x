@@ -48,7 +48,10 @@ export class NftsWorker {
         changeSet?.oldValue,
       )
       if (hasSuccessTx) {
-        setTimeout(() => void this.updateNftsCallback(), 5000) // Add a delay so the backend has time to index the nft
+        setTimeout(
+          () => void this.updateNftsCallback(),
+          RefreshInterval.FAST * 1000,
+        ) // Add a delay so the backend has time to index the nft
       }
     })
   }
@@ -83,6 +86,7 @@ export class NftsWorker {
         "starknet",
         account.networkId,
         contractsAddresses,
+        addressSchema.parse(account.address),
       )
     } catch (e) {
       console.error(e)

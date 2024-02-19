@@ -2,6 +2,12 @@ import { constants } from "starknet"
 
 import { Network } from "../network"
 
+/**
+ * NOTE: Sepolia - Currently Multisig only distinguishes between 'testnet' and 'mainnet'
+ *
+ * Sepolia is therefore not added here.
+ */
+
 export const networkToStarknetNetwork = (network: Network) => {
   switch (network.chainId) {
     case "SN_MAIN":
@@ -10,18 +16,6 @@ export const networkToStarknetNetwork = (network: Network) => {
       return "testnet"
     default:
       return "testnet"
-  }
-}
-
-export const networkToDiscoveryNetwork = (network: Network) => {
-  // Prioritize network.id over network.chainId
-  switch (network.id) {
-    case "mainnet-alpha":
-      return "mainnet"
-    case "goerli-alpha":
-      return "goerli"
-    default:
-      return
   }
 }
 

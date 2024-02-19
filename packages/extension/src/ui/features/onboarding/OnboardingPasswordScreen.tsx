@@ -33,7 +33,7 @@ export interface OnboardingPasswordScreenProps {
   submitText?: {
     start: string
     submitting: string
-    retryAfterError: string
+    retryAfterError?: string
   }
   onSubmit: (password: string) => AllowPromise<void>
   onBack?: MouseEventHandler
@@ -81,8 +81,8 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
   return (
     <OnboardingScreen
       onBack={onBack}
-      length={4}
-      currentIndex={2}
+      length={3}
+      currentIndex={1}
       title={title}
       subtitle="Enter a password to protect your wallet"
     >

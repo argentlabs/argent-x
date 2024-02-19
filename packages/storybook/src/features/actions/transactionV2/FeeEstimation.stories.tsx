@@ -4,6 +4,7 @@ import {
   feeEstimationFixture3,
   feeEstimationFixture4,
   feeEstimationFixture5,
+  feeEstimationFixture6,
 } from "@argent-x/extension/src/ui/features/actions/feeEstimation/__fixtures__"
 import { FeeEstimation } from "@argent-x/extension/src/ui/features/actions/feeEstimation/FeeEstimation"
 
@@ -38,5 +39,11 @@ export const Scenario4 = {
 export const Scenario5 = {
   args: {
     ...feeEstimationFixture5,
+  },
+}
+
+export const Scenario6 = {
+  args: {
+    ...feeEstimationFixture6,
   },
 }

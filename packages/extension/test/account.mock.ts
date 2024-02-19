@@ -8,7 +8,10 @@ import {
   WalletAccountSigner,
 } from "../src/shared/wallet.model"
 import { Account } from "../src/ui/features/accounts/Account"
-import { ETH_TOKEN_ADDRESS } from "../src/shared/network/constants"
+import {
+  ETH_TOKEN_ADDRESS,
+  TXV3_ACCOUNT_CLASS_HASH,
+} from "../src/shared/network/constants"
 
 const defaultNetwork: Network = {
   id: "localhost",
@@ -31,6 +34,7 @@ const defaultName = "Account 1"
 const defaultAccount: Account = {
   name: defaultName,
   address: defaultAddress,
+  classHash: TXV3_ACCOUNT_CLASS_HASH,
   network: defaultNetwork,
   networkId: defaultNetwork.id,
   signer: defaultSigner,

@@ -1,13 +1,12 @@
 import {
-  Abi,
   Call,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
   stark,
-} from "starknet"
-import { Signer, typedData } from "starknet"
+} from "starknet6"
+import { Signer, typedData } from "starknet6"
 
 /**
  * Use case: `escapeGuardian` cannot be used to remove or set guardian to ZERO
@@ -34,57 +33,25 @@ export class GuardianSelfSigner extends Signer {
   public async signTransaction(
     transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,
-    abis?: Abi[],
   ): Promise<Signature> {
     const signatures = await super.signTransaction(
       transactions,
       transactionsDetail,
-      abis,
     )
     const formattedSignatures = stark.signatureToDecimalArray(signatures)
     return [...formattedSignatures, ...formattedSignatures]
   }
 
-  public async signDeployAccountTransaction({
-    classHash,
-    contractAddress,
-    constructorCalldata,
-    addressSalt,
-    maxFee,
-    version,
-    chainId,
-    nonce,
-  }: DeployAccountSignerDetails) {
-    const signatures = await super.signDeployAccountTransaction({
-      classHash,
-      contractAddress,
-      constructorCalldata,
-      addressSalt,
-      maxFee,
-      version,
-      chainId,
-      nonce,
-    })
+  public async signDeployAccountTransaction(
+    details: DeployAccountSignerDetails,
+  ) {
+    const signatures = await super.signDeployAccountTransaction(details)
     const formattedSignatures = stark.signatureToDecimalArray(signatures)
     return [...formattedSignatures, ...formattedSignatures]
   }
 
-  public async signDeclareTransaction({
-    classHash,
-    senderAddress,
-    chainId,
-    maxFee,
-    version,
-    nonce,
-  }: DeclareSignerDetails) {
-    const signatures = await super.signDeclareTransaction({
-      classHash,
-      senderAddress,
-      chainId,
-      maxFee,
-      version,
-      nonce,
-    })
+  public async signDeclareTransaction(details: DeclareSignerDetails) {
+    const signatures = await super.signDeclareTransaction(details)
     const formattedSignatures = stark.signatureToDecimalArray(signatures)
     return [...formattedSignatures, ...formattedSignatures]
   }

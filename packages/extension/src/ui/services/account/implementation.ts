@@ -117,6 +117,12 @@ export class ClientAccountService implements IAccountService {
       await messageClient.accountMessaging.getAccountDeploymentPayload.query({
         account,
       })
+
+    if (accountDeployPayload === null) {
+      // This code should be unreachable, as the extension will always get the deployment data back. The method above only returns null if the account is not deployed and the sender is not the extension, aka if it's an external dapp
+      throw new Error("This should never happen")
+    }
+
     return {
       type: "DEPLOY_ACCOUNT" as const,
       calldata: CallData.toCalldata(accountDeployPayload.constructorCalldata),

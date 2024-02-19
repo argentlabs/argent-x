@@ -4,17 +4,15 @@ import { ITokenBalanceRepository } from "../repository/tokenBalance"
 import { ITokenPriceRepository } from "../repository/tokenPrice"
 import { ITokenService } from "./interface"
 import {
-  ApiTokenDataResponseSchema,
+  ApiAccountTokenBalances,
   BaseToken,
   BaseTokenSchema,
   Token,
+  apiAccountTokenBalancesSchema,
 } from "../types/token.model"
 import { convertTokenAmountToCurrencyValue, equalToken } from "../utils"
-import {
-  BaseTokenWithBalance,
-  TokenWithBalance,
-} from "../types/tokenBalance.model"
-import { BaseWalletAccount, WalletAccount } from "../../../wallet.model"
+import { BaseTokenWithBalance } from "../types/tokenBalance.model"
+import { BaseWalletAccount } from "../../../wallet.model"
 import {
   ApiPriceDataResponseSchema,
   TokenPriceDetails,
@@ -22,21 +20,34 @@ import {
 } from "../types/tokenPrice.model"
 import { accountsEqual } from "../../../utils/accountsEqual"
 import { groupBy, uniq } from "lodash-es"
-import { SelectorFn } from "../../../storage/__new/interface"
-import { bigDecimal, ensureArray, isEqualAddress } from "@argent/shared"
+import { IObjectStore, SelectorFn } from "../../../storage/__new/interface"
+import {
+  IHttpService,
+  addressSchema,
+  bigDecimal,
+  ensureArray,
+  stripAddressZeroPadding,
+} from "@argent/shared"
 import { INetworkService } from "../../../network/service/interface"
 import { getMulticallForNetwork } from "../../../multicall"
 import { getProvider } from "../../../network/provider"
 import { Network, defaultNetwork } from "../../../network"
-import { fetcherWithArgentApiHeadersForNetwork } from "../../../api/fetcher"
-import { getAccountIdentifier } from "../../../wallet.service"
 import { TokenError } from "../../../errors/token"
 import {
-  classHashSupportsTxV3,
-  feeTokenNeedsTxV3Support,
-} from "../../../network/txv3"
-
-const FEE_TOKEN_PREFERENCE_BY_SYMBOL = ["STRK", "ETH"]
+  ApiTokenInfo,
+  ApiTokensInfoResponse,
+  TokenInfoByNetwork,
+  apiTokensInfoResponseSchema,
+} from "../types/tokenInfo.model"
+import { RefreshInterval } from "../../../config"
+import retry from "async-retry"
+import { getDefaultNetworkId } from "../../../network/utils"
+import { ARGENT_API_BASE_URL } from "../../../api/constants"
+import { argentApiNetworkForNetwork } from "../../../api/headers"
+import urlJoin from "url-join"
+import { ProvisionActivityPayload } from "../../../activity/types"
+import vSTRK from "../../../../assets/vSTRK.json"
+import { hasDelegationActivity } from "../../../activity/utils/hasDelegationActivity"
 
 /**
  * TokenService class implements ITokenService interface.
@@ -58,6 +69,8 @@ export class TokenService implements ITokenService {
     private readonly tokenRepo: ITokenRepository,
     private readonly tokenBalanceRepo: ITokenBalanceRepository,
     private readonly tokenPriceRepo: ITokenPriceRepository,
+    private readonly tokenInfoStore: IObjectStore<TokenInfoByNetwork>,
+    private readonly httpService: IHttpService,
     TOKENS_INFO_URL: string | undefined,
     TOKENS_PRICES_URL: string | undefined,
   ) {
@@ -120,60 +133,52 @@ export class TokenService implements ITokenService {
   }
 
   /**
-   * Fetch tokens from the backend.
+   * Lazy fetch tokens info from local storage or backend max RefreshInterval.VERY_SLOW
    * @param {string} networkId - The network id.
-   * @returns {Promise<Token[]>} - The fetched tokens.
+   * @returns {Promise<ApiTokenInfo[]>} - The fetched tokens or undefined if there was an error or not default network
    */
-  async fetchTokensFromBackend(networkId: string): Promise<Token[]> {
+  async getTokensInfoFromBackendForNetwork(
+    networkId: string,
+  ): Promise<ApiTokenInfo[] | undefined> {
+    /** the backend currently only returns token info for its specific network */
     const isDefaultNetwork = defaultNetwork.id === networkId
-
-    const tokensOnNetwork = await this.tokenRepo.get(
-      (t) => t.networkId === networkId,
-    )
     if (!isDefaultNetwork) {
-      return tokensOnNetwork
+      return
+    }
+    const tokenInfoByNetwork = await this.tokenInfoStore.get()
+
+    /** if we have data and updatedAt within RefreshInterval.VERY_SLOW, then return that data  */
+    if (
+      tokenInfoByNetwork &&
+      tokenInfoByNetwork[networkId] &&
+      tokenInfoByNetwork[networkId].data
+    ) {
+      if (
+        Date.now() - tokenInfoByNetwork[networkId].updatedAt <
+        RefreshInterval.SLOW * 1000
+      ) {
+        return tokenInfoByNetwork[networkId].data
+      }
     }
 
-    // Prepare a map to avoid find operation
-    const tokenMap = new Map(
-      tokensOnNetwork.map((t) => [getAccountIdentifier(t), t]),
+    /** fetch data and check it's valid format */
+    const response = await this.httpService.get<ApiTokensInfoResponse>(
+      this.TOKENS_INFO_URL,
     )
-
-    const fetcher = fetcherWithArgentApiHeadersForNetwork(networkId)
-    const response = await fetcher(this.TOKENS_INFO_URL)
-    const parsedResponse = ApiTokenDataResponseSchema.safeParse(response)
-
+    const parsedResponse = apiTokensInfoResponseSchema.safeParse(response)
     if (!parsedResponse.success) {
-      throw new TokenError({ code: "TOKEN_PARSING_ERROR" })
+      return
     }
 
-    const tokens = parsedResponse.data.tokens
-      .filter(
-        (t) =>
-          t.popular ||
-          tokensOnNetwork.some((tn) => equalToken(tn, { ...t, networkId })),
-      )
-      .map<Token>((token) => {
-        const cached = tokenMap.get(
-          getAccountIdentifier({ address: token.address, networkId }),
-        )
-        return {
-          id: token.id,
-          address: token.address,
-          decimals: token.decimals || cached?.decimals || 18,
-          name: token.name,
-          symbol: token.symbol,
-          iconUrl: token.iconUrl || cached?.iconUrl,
-          pricingId: token.pricingId || cached?.pricingId,
-          showAlways: cached?.showAlways,
-          networkId,
-          custom: cached?.custom,
-          popular: token.popular || cached?.popular,
-          tradable: token.tradable || cached?.tradable,
-        }
-      })
-
-    return tokens
+    /** store and update the updatedAt timestamp */
+    const data = parsedResponse.data.tokens
+    await this.tokenInfoStore.set({
+      [networkId]: {
+        updatedAt: Date.now(),
+        data,
+      },
+    })
+    return data
   }
 
   /**
@@ -203,22 +208,27 @@ export class TokenService implements ITokenService {
     const tokenBalances: BaseTokenWithBalance[] = []
 
     for (const networkId in accountsGroupedByNetwork) {
-      const tokensOnCurrentNetwork = tokensGroupedByNetwork[networkId] // filter tokens based on networkId
-      const network = await this.networkService.getById(networkId)
-      if (network.multicallAddress) {
-        const balances = await this.fetchTokenBalancesWithMulticall(
-          network,
-          accountsGroupedByNetwork,
-          tokensOnCurrentNetwork,
-        )
-        tokenBalances.push(...balances)
-      } else {
-        const balances = await this.fetchTokenBalancesWithoutMulticall(
-          network,
-          accountsArray,
-          tokensOnCurrentNetwork,
-        )
-        tokenBalances.push(...balances)
+      try {
+        const tokensOnCurrentNetwork = tokensGroupedByNetwork[networkId] // filter tokens based on networkId
+        const network = await this.networkService.getById(networkId)
+        if (network.multicallAddress) {
+          const balances = await this.fetchTokenBalancesWithMulticall(
+            network,
+            accountsGroupedByNetwork,
+            tokensOnCurrentNetwork,
+          )
+          tokenBalances.push(...balances)
+        } else {
+          const balances = await this.fetchTokenBalancesWithoutMulticall(
+            network,
+            accountsArray,
+            tokensOnCurrentNetwork,
+          )
+          tokenBalances.push(...balances)
+        }
+      } catch (e) {
+        /** Catch error to be resilient to individual network failure */
+        console.error(`fetchTokenBalancesFromOnChain error on ${networkId}`, e)
       }
     }
     return tokenBalances
@@ -311,8 +321,7 @@ export class TokenService implements ITokenService {
       return tokenPrices
     }
 
-    const fetcher = fetcherWithArgentApiHeadersForNetwork(defaultNetwork.id)
-    const response = await fetcher(this.TOKENS_PRICES_URL)
+    const response = await this.httpService.get(this.TOKENS_PRICES_URL)
     const parsedResponse = ApiPriceDataResponseSchema.safeParse(response)
 
     if (!parsedResponse.success) {
@@ -548,65 +557,83 @@ export class TokenService implements ITokenService {
     return totalCurrencyBalanceForAccounts
   }
 
-  async getFeeTokens(
-    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
-  ): Promise<TokenWithBalance[]> {
-    const tokens = await this.getTokens()
-    const network = await this.networkService.getById(account.networkId)
-    const networkFeeTokens = tokens.filter((token) =>
-      network.possibleFeeTokenAddresses.some((ft) =>
-        isEqualAddress(ft, token.address),
-      ),
-    )
-    const accountFeeTokens = networkFeeTokens.filter((token) => {
-      if (feeTokenNeedsTxV3Support(token)) {
-        return classHashSupportsTxV3(account.classHash)
-      }
-      return true
-    })
-    const feeTokenBalances = await this.getTokenBalancesForAccount(
-      account,
-      accountFeeTokens,
-    )
-    const feeTokensWithBalances: TokenWithBalance[] = accountFeeTokens.map(
-      (token) => {
-        const tokenBalance = feeTokenBalances.find((tb) =>
-          equalToken(tb, token),
-        ) ?? {
-          balance: "0",
-          account: { address: account.address, networkId: account.networkId },
-        }
-        return {
-          ...token,
-          ...tokenBalance,
-        }
-      },
-    )
-    // sort by fee token preference defined in FEE_TOKEN_PREFERENCE_BY_SYMBOL
-    return feeTokensWithBalances.sort((a, b) => {
-      const [aIndex, bIndex] = [a, b].map((token) =>
-        FEE_TOKEN_PREFERENCE_BY_SYMBOL.indexOf(token.symbol),
-      )
-      return aIndex === -1 ? 1 : bIndex === -1 ? -1 : aIndex - bIndex
-    })
-  }
-
-  async getBestFeeToken(
-    account: BaseWalletAccount & Required<Pick<WalletAccount, "classHash">>,
-  ): Promise<TokenWithBalance> {
-    const possibleFeeTokenWithBalances = await this.getFeeTokens(account)
-
-    if (possibleFeeTokenWithBalances.length === 1) {
-      return possibleFeeTokenWithBalances[0]
+  async fetchAccountTokenBalancesFromBackend(
+    account: BaseWalletAccount,
+    opts?: retry.Options,
+  ): Promise<BaseTokenWithBalance[]> {
+    const defaultNetworkId = getDefaultNetworkId()
+    /** This service only works for the default network */
+    if (account.networkId !== defaultNetworkId) {
+      return []
+    }
+    const apiBaseUrl = ARGENT_API_BASE_URL
+    const argentApiNetwork = argentApiNetworkForNetwork(account.networkId)
+    if (!argentApiNetwork) {
+      return []
     }
 
-    // we expect the fee tokens to be sorted by preference
-    // so we return the first one that has a balance
-    // if none have a balance, we return the first one (prefered one)
-    return (
-      possibleFeeTokenWithBalances.find(
-        (token) => bigDecimal.parseCurrency(token.balance).value > 0n,
-      ) ?? possibleFeeTokenWithBalances[0]
+    const url = urlJoin(
+      apiBaseUrl,
+      "activity",
+      "starknet",
+      argentApiNetwork,
+      "account",
+      stripAddressZeroPadding(account.address),
+      "balance",
     )
+
+    /** retry until status is "initialised" */
+    const accountTokenBalances = await retry(
+      async (bail) => {
+        let response
+        try {
+          response = await this.httpService.get<ApiAccountTokenBalances>(url)
+        } catch (e) {
+          /** bail without retry if there is any fetching error */
+          bail(new Error("Error fetching"))
+          return []
+        }
+        const parsedRespose = apiAccountTokenBalancesSchema.safeParse(response)
+        if (!parsedRespose.success) {
+          bail(new Error("Error parsing response"))
+          return []
+        }
+        if (parsedRespose.data.status !== "initialised") {
+          /** causes a retry */
+          throw new Error("Not initialised yet")
+        }
+        return parsedRespose.data.balances
+      },
+      {
+        /** seems to take 5-10 sec for initialised state */
+        retries: 5,
+        minTimeout: 5000,
+        ...opts,
+      },
+    )
+
+    const baseTokenWithBalances: BaseTokenWithBalance[] =
+      accountTokenBalances.map((accountTokenBalance) => {
+        return {
+          address: accountTokenBalance.tokenAddress,
+          balance: accountTokenBalance.tokenBalance,
+          networkId: account.networkId,
+          account,
+        }
+      })
+
+    return baseTokenWithBalances
+  }
+
+  async handleProvisionTokens(payload: ProvisionActivityPayload) {
+    const hasDelegation = hasDelegationActivity(payload.activity)
+
+    if (hasDelegation) {
+      void this.addToken({
+        ...vSTRK,
+        networkId: payload.account.networkId,
+        address: addressSchema.parse(vSTRK.address),
+      })
+    }
   }
 }

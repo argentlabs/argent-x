@@ -54,7 +54,7 @@ export function getStarkPair<T extends number | string>(
 }
 
 /**
- * Grinds a private key to a valid StarkNet private key
+ * Grinds a private key to a valid Starknet private key
  * @param privateKey
  * @returns Unsantized hex string
  */

@@ -7,6 +7,7 @@ import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
 import { useActionScreen } from "./hooks/useActionScreen"
 import { ApproveTransactionScreenContainer } from "./transaction/ApproveTransactionScreen/ApproveTransactionScreenContainer"
 import { getApproveScreenTypeFromAction } from "./utils"
+import { TransactionType } from "starknet"
 
 export const TransactionActionScreenContainer: FC = () => {
   const {
@@ -38,7 +39,10 @@ export const TransactionActionScreenContainer: FC = () => {
   return (
     <WithArgentShieldVerified transactions={action.payload.transactions}>
       <ApproveTransactionScreenContainer
-        transactions={action.payload.transactions}
+        transactionAction={{
+          type: TransactionType.INVOKE,
+          payload: action.payload.transactions,
+        }}
         actionHash={action.meta.hash}
         actionIsApproving={Boolean(action.meta.startedApproving)}
         actionErrorApproving={action.meta.errorApproving}

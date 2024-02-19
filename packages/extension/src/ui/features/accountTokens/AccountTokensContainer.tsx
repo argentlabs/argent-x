@@ -19,13 +19,12 @@ import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import { accountHasEscape } from "../shield/escape/accountHasEscape"
 import { useAccountGuardianIsSelf } from "../shield/useAccountGuardian"
 import { AccountTokens } from "./AccountTokens"
-import { hasSeenAvnuAtom, hasSeenEkuboAtom } from "./banner/banner.state"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { AddFundsDialogProvider } from "./useAddFundsDialog"
 import { useHasFeeTokenBalance } from "./useFeeTokenBalance"
 import { clientAccountService } from "../../services/account"
-import { useAtom } from "jotai"
 import { useAccountOwnerIsSelf } from "../accounts/useAccountOwner"
+import { useProvisionBanner } from "./banner/useAirdropBanner"
 
 interface AccountTokensContainerProps {
   account: Account
@@ -37,8 +36,6 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   const navigate = useNavigate()
   const returnTo = useCurrentPathnameWithQuery()
   const { pendingTransactions } = useAccountTransactions(account)
-  const [hasSeenEkuboBanner, setHasSeenEkuboBanner] = useAtom(hasSeenEkuboAtom)
-  const [hasSeenAvnuBanner, setHasSeenAvnuBanner] = useAtom(hasSeenAvnuAtom)
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const transactionsBeforeReview = useKeyValueStorage(
     userReviewStore,
@@ -48,7 +45,8 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   const isMainnet = useIsMainnet()
   const [upgradeLoading, setUpgradeLoading] = useState(false)
   const userHasReviewed = useKeyValueStorage(userReviewStore, "hasReviewed")
-
+  const { provisionStatus, onProvisionBannerClose, shouldShowProvisionBanner } =
+    useProvisionBanner()
   const hasPendingTransactions = pendingTransactions.length > 0
 
   useEffect(() => {
@@ -77,10 +75,11 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   )
 
   const showNoBalanceForUpgrade = Boolean(
-    needsUpgrade &&
-      !hasPendingTransactions &&
-      !hasFeeTokenBalance &&
-      !account.needsDeploy,
+    showUpgradeBanner && !hasFeeTokenBalance,
+  )
+
+  const showWithBalanceForUpgrade = Boolean(
+    showUpgradeBanner && hasFeeTokenBalance,
   )
 
   const hasEscape = accountHasEscape(account)
@@ -103,28 +102,15 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
     return !hasSavedRecoverySeedPhrase && isMainnet
   }, [hasSavedRecoverySeedPhrase, isMainnet])
 
-  const showAddFundsBackdrop = useMemo(() => {
-    return !showSaveRecoverySeedphraseBanner && !hasFeeTokenBalance
-  }, [hasFeeTokenBalance, showSaveRecoverySeedphraseBanner])
-
-  const shouldShowDappBanner =
-    !showAddFundsBackdrop &&
+  // If important banners are displayed we dont want to display secondary banners
+  const canShowSecondaryBanner =
     !showSaveRecoverySeedphraseBanner &&
     !needsUpgrade &&
-    !hasPendingTransactions &&
     !hasEscape &&
     !multisig?.needsDeploy
 
-  const showAvnuBanner = !hasSeenAvnuBanner && shouldShowDappBanner
-  // Show Ekubo banner only after Avnu banner has been dismissed
-  const showEkuboBanner =
-    !hasSeenEkuboBanner && shouldShowDappBanner && hasSeenAvnuBanner
-  const setAvnuBannerSeen = useCallback(() => {
-    setHasSeenAvnuBanner(true)
-  }, [setHasSeenAvnuBanner])
-  const setEkuboBannerSeen = useCallback(() => {
-    setHasSeenEkuboBanner(true)
-  }, [setHasSeenEkuboBanner])
+  const showProvisionBanner =
+    shouldShowProvisionBanner && canShowSecondaryBanner
 
   const hadPendingTransactions = useRef(false)
 
@@ -149,31 +135,26 @@ export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
     setUpgradeLoading(false)
   }, [account, navigate, showNoBalanceForUpgrade])
 
-  const onAvnuClick = () => navigate(routes.swap())
-
   return (
     <AddFundsDialogProvider account={account}>
       <AccountTokens
+        onProvisionBannerClose={onProvisionBannerClose}
+        provisionStatus={provisionStatus}
+        shouldShowProvisionBanner={Boolean(showProvisionBanner)}
         account={account}
         showTokensAndBanners={showTokensAndBanners}
         hasEscape={hasEscape}
         accountGuardianIsSelf={accountGuardianIsSelf}
         accountOwnerIsSelf={accountOwnerIsSelf}
-        showUpgradeBanner={showUpgradeBanner}
+        showUpgradeBanner={showWithBalanceForUpgrade}
         showNoBalanceForUpgrade={showNoBalanceForUpgrade}
         onUpgradeBannerClick={() => void onUpgradeBannerClick()}
         upgradeLoading={upgradeLoading}
         multisig={multisig}
-        showAddFundsBackdrop={showAddFundsBackdrop}
         tokenListVariant={tokenListVariant}
         hasFeeTokenBalance={hasFeeTokenBalance}
         showSaveRecoverySeedphraseBanner={showSaveRecoverySeedphraseBanner}
         isDeprecated={isDeprecated}
-        showEkuboBanner={showEkuboBanner}
-        showAvnuBanner={showAvnuBanner}
-        setAvnuBannerSeen={setAvnuBannerSeen}
-        setEkuboBannerSeen={setEkuboBannerSeen}
-        onAvnuClick={onAvnuClick}
         returnTo={returnTo}
       />
     </AddFundsDialogProvider>

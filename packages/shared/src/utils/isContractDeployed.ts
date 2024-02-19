@@ -1,7 +1,7 @@
 import { ProviderInterface } from "starknet"
 
 export const isContractDeployed = async (
-  provider: ProviderInterface,
+  provider: Pick<ProviderInterface, "getClassHashAt">,
   contractAddress: string,
 ): Promise<boolean> => {
   try {

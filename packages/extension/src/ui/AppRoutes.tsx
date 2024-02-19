@@ -7,7 +7,7 @@ import { Location, Outlet, useLocation } from "react-router-dom"
 import { useAppState, useMessageStreamHandler } from "./app.state"
 import { ResponsiveBox } from "./components/Responsive"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
-import { AccountEditScreen } from "./features/accountEdit/AccountEditScreen"
+import { AccountSettingsScreen } from "./features/settings/account/AccountSettingsScreen"
 import { CollectionNftsContainer } from "./features/accountNfts/CollectionNftsContainer"
 import { NftScreenContainer } from "./features/accountNfts/NftScreenContainer"
 import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
@@ -17,7 +17,6 @@ import { AccountListScreenContainer } from "./features/accounts/AccountListScree
 import { AccountScreen } from "./features/accounts/AccountScreen"
 import { AddNewAccountScreenContainer } from "./features/accounts/AddNewAccountScreenContainer"
 import { HideOrDeleteAccountConfirmScreenContainer } from "./features/accounts/HideOrDeleteAccountConfirmScreenContainer"
-import { ExportPrivateKeyScreen } from "./features/accountTokens/ExportPrivateKeyScreen"
 import { HideTokenScreenContainer } from "./features/accountTokens/HideTokenScreenContainer"
 import { ActionScreenContainer } from "./features/actions/ActionScreen"
 import { AddTokenScreenContainer } from "./features/actions/AddTokenScreenContainer"
@@ -40,10 +39,8 @@ import { MultisigTransactionConfirmationsScreen } from "./features/multisig/Mult
 import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
 import { RemovedMultisigSettingsScreenContainer } from "./features/multisig/RemovedMultisigSettingsScreenContainer"
 import { NetworkWarningScreenContainer } from "./features/networks/NetworkWarningScreen/NetworkWarningScreenContainer"
-import { OnboardingDisclaimerScreenContainer } from "./features/onboarding/OnboardingDisclaimerScreenContainer"
 import { OnboardingFinishScreenContainer } from "./features/onboarding/OnboardingFinishScreenContainer"
 import { OnboardingPasswordScreenContainer } from "./features/onboarding/OnboardingPasswordScreenContainer"
-import { OnboardingPrivacyStatementScreenContainer } from "./features/onboarding/OnboardingPrivacyStatementScreenContainer"
 import { OnboardingRestoreBackupScreenContainer } from "./features/onboarding/OnboardingRestoreBackupScreenContainer"
 import { OnboardingRestorePasswordScreenContainer } from "./features/onboarding/OnboardingRestorePasswordScreenContainer"
 import { OnboardingRestoreSeedScreenContainer } from "./features/onboarding/OnboardingRestoreSeedScreenContainer"
@@ -64,7 +61,6 @@ import { DeploySmartContractScreen } from "./features/settings/developerSettings
 import { NetworkSettingsEditScreen } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsEditScreen"
 import { NetworkSettingsFormScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsFormScreenContainer"
 import { SeedSettingsScreenContainer } from "./features/settings/securityAndPrivacy/SeedSettingsScreenContainer"
-import { SettingsPrivacyStatementScreen } from "./features/settings/SettingsPrivacyStatementScreen"
 import { SmartContractDevelopmentScreen } from "./features/settings/developerSettings/smartContractDevelopment/SmartContractDevelopmentScreen"
 import { EscapeWarningScreen } from "./features/shield/escape/EscapeWarningScreen"
 import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
@@ -85,11 +81,11 @@ import { EmailNotificationsSettingsScreenContainer } from "./features/settings/p
 import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
 import { SuspenseScreen } from "./components/SuspenseScreen"
 import { BetaFeaturesSettingsScreenContainer } from "./features/settings/developerSettings/betaFeatures/BetaFeaturesSettingsScreenContainer"
-import { ChangeAccountImplementationScreen } from "./features/accountEdit/ChangeAccountImplementationScreen"
+import { ChangeAccountImplementationScreen } from "./features/settings/account/ChangeAccountImplementationScreen"
 import { MultisigReplaceOwnerScreen } from "./features/multisig/MultisigReplaceOwnerScreen"
 import { FundingQrCodeScreenContainer } from "./features/funding/FundingQrCodeScreenContainer"
 import { AppBackgroundError } from "./AppBackgroundError"
-import { isRecoveringView } from "./views/recovery"
+import { isClearingStorageView, isRecoveringView } from "./views/recovery"
 import { SettingsScreenContainer } from "./features/settings/SettingsScreenContainer"
 import { PreferencesSettingsContainer } from "./features/settings/preferences/PreferencesSettingsContainer"
 import { BlockExplorerSettingsScreenContainer } from "./features/settings/preferences/BlockExplorerSettingsScreenContainer"
@@ -101,6 +97,11 @@ import { DeveloperSettingsScreenContainer } from "./features/settings/developerS
 import { ExperimentalSettingsScreenContainer } from "./features/settings/developerSettings/experimental/ExperimentalSettingsScreenContainer"
 import { NetworkSettingsScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsScreenContainer"
 import { AccountOwnerWarningScreen } from "./features/accountTokens/warning/AccountOwnerWarningScreen"
+import { ExportPrivateKeyScreenContainer } from "./features/settings/account/ExportPrivateKeyScreenContainer"
+import { ClearLocalStorageScreen } from "./features/settings/developerSettings/clearLocalStorage/ClearLocalStorageScreen"
+import { useProvisionAnnouncement } from "./services/provision/useProvisionAnnouncement"
+import { ProvisionAnnouncement } from "./features/provision/ProvisionAnnouncement"
+import { DeploymentDataScreen } from "./features/settings/developerSettings/deploymentData/DeploymentDataScreen"
 
 interface LocationWithState extends Location {
   state: {
@@ -193,6 +194,11 @@ const walletRoutes = (
       element={<AccountScreen tab="activity" />}
     />
     <Route
+      presentation="push"
+      path={routes.accountDiscover.path}
+      element={<AccountScreen tab="discover" />}
+    />
+    <Route
       presentation="modal"
       path={routes.accounts.path}
       element={
@@ -205,11 +211,6 @@ const walletRoutes = (
       presentation="modal"
       path={routes.newAccount.path}
       element={<AddNewAccountScreenContainer />}
-    />
-    <Route
-      presentation="push"
-      path={routes.editAccount.path}
-      element={<AccountEditScreen />}
     />
     <Route
       presentation="push"
@@ -270,6 +271,15 @@ const walletRoutes = (
       element={
         <SuspenseScreen>
           <SettingsScreenContainer />
+        </SuspenseScreen>
+      }
+    />
+    <Route
+      presentation="push"
+      path={routes.settingsAccount.path}
+      element={
+        <SuspenseScreen>
+          <AccountSettingsScreen />
         </SuspenseScreen>
       }
     />
@@ -351,6 +361,7 @@ const walletRoutes = (
         </SuspenseScreen>
       }
     />
+
     <Route
       presentation="push"
       path={routes.settingsDeveloper.path}
@@ -360,6 +371,16 @@ const walletRoutes = (
       presentation="push"
       path={routes.settingsSmartContractDevelopment.path}
       element={<SmartContractDevelopmentScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.settingsClearLocalStorage.path}
+      element={<ClearLocalStorageScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.deploymentData.path}
+      element={<DeploymentDataScreen />}
     />
     <Route
       presentation="push"
@@ -390,11 +411,6 @@ const walletRoutes = (
       presentation="push"
       path={routes.settingsNetworks.path}
       element={<NetworkSettingsScreenContainer />}
-    />
-    <Route
-      presentation="push"
-      path={routes.settingsPrivacyStatement.path}
-      element={<SettingsPrivacyStatementScreen />}
     />
     <Route
       presentation="modal"
@@ -514,8 +530,9 @@ const walletRoutes = (
       element={<AddPluginScreen />}
     />
     <Route
+      presentation="push"
       path={routes.exportPrivateKey.path}
-      element={<ExportPrivateKeyScreen />}
+      element={<ExportPrivateKeyScreenContainer />}
     />
     {/* Multisig */}
     <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
@@ -584,14 +601,6 @@ const fullscreenRoutes = (
       element={<OnboardingStartScreenContainer />}
     />
     <Route
-      path={routes.onboardingDisclaimer.path}
-      element={<OnboardingDisclaimerScreenContainer />}
-    />
-    <Route
-      path={routes.onboardingPrivacyStatement.path}
-      element={<OnboardingPrivacyStatementScreenContainer />}
-    />
-    <Route
       path={routes.onboardingPassword.path}
       element={<OnboardingPasswordScreenContainer />}
     />
@@ -640,6 +649,8 @@ export const AppRoutes: FC = () => {
   const { isLoading } = useAppState()
   const hasActions = useView(hasActionsView)
   const isRecovering = useView(isRecoveringView)
+  const isClearingStorage = useView(isClearingStorageView)
+  const provisionAnnouncement = useProvisionAnnouncement()
 
   /** TODO: refactor: this should maybe be invoked by service + worker pattern */
   const showActions = useMemo(() => {
@@ -648,7 +659,10 @@ export const AppRoutes: FC = () => {
     return hasActions && !isNonWalletRoute
   }, [hasActions, pathname, state])
 
-  if (isRecovering) {
+  if (isClearingStorage) {
+    return <LoadingScreenContainer loadingTexts={["Clearing storage..."]} />
+  }
+  if (isRecovering && !isClearingStorage) {
     return <LoadingScreenContainer loadingTexts={["Recovering accounts..."]} />
   }
   if (isLoading) {
@@ -660,6 +674,14 @@ export const AppRoutes: FC = () => {
       <ResponsiveContainer>
         <ActionScreenContainer />
       </ResponsiveContainer>
+    )
+  }
+
+  if (provisionAnnouncement) {
+    return (
+      <ProvisionAnnouncement
+        account={provisionAnnouncement.provisionedAccount}
+      />
     )
   }
 

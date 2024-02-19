@@ -15,50 +15,67 @@ export const tokenBalancesView = atom(async (get) => {
   return tokenBalances
 })
 
-export const tokenBalanceForAccountView = atomFamily(
+export const tokenBalancesForAccountView = atomFamily(
   (account?: BaseWalletAccount) => {
     return atom(async (get) => {
       const tokenBalances = await get(tokenBalancesView)
-      if (!account) {
-        return
-      }
       return tokenBalances.filter((tokenBalance) =>
         accountsEqual(tokenBalance.account, account),
       )
     })
   },
-  (a, b) => !!a && !!b && accountsEqual(a, b),
+  (a, b) => accountsEqual(a, b),
+)
+
+export const tokenBalanceForAccountAndTokenView = atomFamily(
+  ({ account, token }: { account?: BaseWalletAccount; token?: BaseToken }) => {
+    return atom(async (get) => {
+      const tokenBalances = await get(tokenBalancesView)
+      return tokenBalances.find(
+        (tokenBalance) =>
+          accountsEqual(tokenBalance.account, account) &&
+          equalToken(tokenBalance, token),
+      )
+    })
+  },
+  (a, b) => accountsEqual(a.account, b.account) && equalToken(a.token, b.token),
 )
 
 export const tokenBalanceForTokenView = atomFamily(
   (token?: BaseToken) => {
     return atom(async (get) => {
       const tokenBalances = await get(tokenBalancesView)
-      if (!token) {
-        return
-      }
-      return tokenBalances.filter((tokenBalance) =>
+      return tokenBalances.find((tokenBalance) =>
         equalToken(tokenBalance, token),
       )
     })
   },
-  (a, b) => !!a && !!b && equalToken(a, b),
+  (a, b) => equalToken(a, b),
 )
 
 export const feeTokenBalancesView = atomFamily(
   (account?: BaseWalletAccount) => {
     return atom(async (get) => {
-      const tokenBalances = await get(tokenBalanceForAccountView(account))
+      const tokenBalances = await get(tokenBalancesForAccountView(account))
       if (!account || !tokenBalances) {
         return
       }
       const feeTokens = await get(
         networkFeeTokensOnNetworkFamily(account.networkId),
       )
-      return tokenBalances.filter((tokenBalance) =>
-        feeTokens?.some((token) => equalToken(token, tokenBalance)),
-      )
+      if (!feeTokens) {
+        return
+      }
+      return feeTokens.map((feeToken) => {
+        const tokenBalance = tokenBalances.find((tokenBalance) =>
+          equalToken(tokenBalance, feeToken),
+        )
+        return {
+          ...feeToken,
+          balance: tokenBalance?.balance ?? "0",
+        }
+      })
     })
   },
-  (a, b) => !!a && !!b && accountsEqual(a, b),
+  (a, b) => accountsEqual(a, b),
 )

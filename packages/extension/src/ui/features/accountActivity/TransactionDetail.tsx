@@ -53,8 +53,8 @@ import { useTransactionFees } from "./useTransactionFees"
 import { useTransactionNonce } from "./useTransactionNonce"
 import { Token } from "../../../shared/token/__new/types/token.model"
 import { formatTruncatedAddress } from "@argent/shared"
-import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
+import { unitToFeeTokenAddress } from "../../../shared/transactionSimulation/utils"
 
 const { ActivityIcon } = icons
 
@@ -428,8 +428,8 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         {additionalFields}
         {txFee && (
           <FeeField
-            feeTokenAddress={ETH_TOKEN_ADDRESS}
-            fee={txFee}
+            feeTokenAddress={unitToFeeTokenAddress(txFee.unit)}
+            fee={txFee.amount}
             networkId={network.id}
           />
         )}

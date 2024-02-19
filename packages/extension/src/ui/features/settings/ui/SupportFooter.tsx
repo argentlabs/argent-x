@@ -1,9 +1,11 @@
-import { Button, L2, P3, icons, logos } from "@argent/ui"
-import { SimpleGrid, VStack, StackProps } from "@chakra-ui/react"
+import { Button, L2, P3, P4, icons, logos } from "@argent/ui"
+import { SimpleGrid, VStack, StackProps, Link, Flex } from "@chakra-ui/react"
 import { FC } from "react"
-import { Link } from "react-router-dom"
 
-import { routes } from "../../../routes"
+import {
+  ARGENT_X_LEGAL_PRIVACY_POLICY_URL,
+  ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL,
+} from "../../../../shared/api/constants"
 
 const { SupportIcon } = icons
 const { DiscordLogo, GithubLogo, TwitterLogo } = logos
@@ -73,11 +75,18 @@ const SupportFooter: FC<SupportFooterProps> = ({
       </Button>
     </SimpleGrid>
     {privacyStatement && (
-      <Link to={routes.settingsPrivacyStatement()}>
-        <L2 color="neutrals.400" cursor="inherit" textDecoration="underline">
-          Privacy statement
-        </L2>
-      </Link>
+      <Flex color="text.secondary" gap={2}>
+        <P4
+          as={Link}
+          href={ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL}
+          target="_blank"
+        >
+          Terms of Service
+        </P4>
+        <P4 as={Link} href={ARGENT_X_LEGAL_PRIVACY_POLICY_URL} target="_blank">
+          Privacy Policy
+        </P4>
+      </Flex>
     )}
     <L2 color="neutrals.500">Version: v{process.env.VERSION}</L2>
   </VStack>

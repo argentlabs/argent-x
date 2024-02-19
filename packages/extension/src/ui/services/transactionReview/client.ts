@@ -1,3 +1,4 @@
+import { Address } from "@argent/shared"
 import {
   ITransactionReviewService,
   TransactionReviewTransactions,
@@ -11,12 +12,15 @@ export class ClientTransactionReviewService
 
   async simulateAndReview({
     transactions,
+    feeTokenAddress,
   }: {
     transactions: TransactionReviewTransactions[]
+    feeTokenAddress: Address
   }) {
-    return this.trpcClient.transactionReview.simulateAndReview.query(
+    return this.trpcClient.transactionReview.simulateAndReview.query({
       transactions,
-    )
+      feeTokenAddress,
+    })
   }
 
   async getLabels() {

@@ -16,6 +16,7 @@ import { AccountTokensButtons } from "./AccountTokensButtons"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
 import { useToken } from "./tokens.state"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
+import { useBestFeeToken } from "../actions/useBestFeeToken"
 
 interface AccountTokensButtonsContainerProps {
   account: Account
@@ -30,8 +31,9 @@ export const AccountTokensButtonsContainer: FC<
   const multisig = useMultisig(account)
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
   const isMainnet = useIsMainnet()
+  const bestFeeToken = useBestFeeToken(account)
   const sendToken = useToken({
-    address: ETH_TOKEN_ADDRESS,
+    address: bestFeeToken?.address ?? ETH_TOKEN_ADDRESS,
     networkId: switcherNetworkId,
   })
 

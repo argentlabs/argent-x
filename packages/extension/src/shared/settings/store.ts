@@ -8,7 +8,7 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
     privacyUseArgentServices: true,
     privacyShareAnalyticsData: true,
     privacyErrorReporting: Boolean(process.env.SENTRY_DSN), // use SENRY_DSN to enable error reporting
-    privacyAutomaticErrorReporting: false,
+    privacyAutomaticErrorReporting: true,
     experimentalAllowChooseAccount: false,
     blockExplorerKey: defaultBlockExplorerKey,
     nftMarketplaceKey: "unframed",

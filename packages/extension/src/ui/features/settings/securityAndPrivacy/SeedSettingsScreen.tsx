@@ -6,13 +6,12 @@ import {
   NavigationContainer,
 } from "@argent/ui"
 import { FC, ReactEventHandler } from "react"
+import { Flex } from "@chakra-ui/react"
 
 import { PasswordForm, PasswordFormProps } from "../../lock/PasswordForm"
-import { CopySeedPhrase } from "../../recovery/CopySeedPhrase"
+import { SeedPhraseWithCopyButton } from "../../recovery/SeedPhraseWithCopyButton"
 import { useSeedPhrase } from "../../recovery/hooks/useSeedPhrase"
-import { SeedPhrase } from "../../recovery/SeedPhrase"
-import { Divider, Flex, Text } from "@chakra-ui/react"
-import { WarningRecoverySeedphraseBanner } from "../../accountTokens/WarningRecoverySeedphraseBanner"
+import { WarningRecoveryBanner } from "../ui/WarningRecoveryBanner"
 
 export interface SeedSettingsScreenProps
   extends Pick<PasswordFormProps, "verifyPassword"> {
@@ -31,7 +30,9 @@ export const SeedSettingsScreen: FC<SeedSettingsScreenProps> = ({
       title={"Recovery phrase"}
     >
       {passwordIsValid ? (
-        <CopySeedScreen />
+        <Flex px={4}>
+          <SeedPhraseWithCopyButtonContainer />
+        </Flex>
       ) : (
         <UnlockCopySeed verifyPassword={verifyPassword} />
       )}
@@ -39,19 +40,9 @@ export const SeedSettingsScreen: FC<SeedSettingsScreenProps> = ({
   )
 }
 
-function CopySeedScreen() {
+function SeedPhraseWithCopyButtonContainer() {
   const seedPhrase = useSeedPhrase()
-  return (
-    <CellStack>
-      <Text fontSize="sm" color="neutrals.300" mb={2}>
-        Write these words down on paper. It is unsafe to save them on your
-        computer.
-      </Text>
-      <Divider mb={2} color="neutrals.800" />
-      <SeedPhrase seedPhrase={seedPhrase} />
-      <CopySeedPhrase seedPhrase={seedPhrase} />
-    </CellStack>
-  )
+  return <SeedPhraseWithCopyButton seedPhrase={seedPhrase} />
 }
 
 function UnlockCopySeed({
@@ -59,7 +50,14 @@ function UnlockCopySeed({
 }: Pick<PasswordFormProps, "verifyPassword">) {
   return (
     <CellStack flex={1}>
-      <WarningRecoverySeedphraseBanner />
+      <WarningRecoveryBanner
+        title="Never share your recovery phrase!"
+        reasons={[
+          "It’s the only way to recover your wallet",
+          "If someone else has access to your recovery phrase they can control your wallet",
+        ]}
+        mb={4}
+      />
       <HeaderCell color={"text.primary"}>Enter your password</HeaderCell>
       <PasswordForm flex={1} verifyPassword={verifyPassword}>
         {(isDirty) => (

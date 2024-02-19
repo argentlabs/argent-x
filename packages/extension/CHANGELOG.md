@@ -1,5 +1,35 @@
 # @argent-x/extension
 
+## 6.13.4
+
+### Patch Changes
+
+- e871c0954: Release
+
+## 6.13.3
+
+### Patch Changes
+
+- 6b1326d64: Release
+
+## 6.13.2
+
+### Patch Changes
+
+- 0e774f90f: Release
+
+## 6.13.1
+
+### Patch Changes
+
+- d89a36f73: Release
+
+## 6.13.0
+
+### Minor Changes
+
+- 914e376fb: Release
+
 ## 6.12.8
 
 ### Patch Changes

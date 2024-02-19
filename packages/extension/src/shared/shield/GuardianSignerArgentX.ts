@@ -1,6 +1,6 @@
-import { CosignerOffchainMessage, GuardianSigner } from "@argent/guardian"
-import type { CosignerMessage } from "@argent/guardian"
-import { Signature, hash, num } from "starknet"
+import { GuardianSigner } from "@argent/guardian"
+import type { CosignerMessage, CosignerOffchainMessage } from "@argent/guardian"
+import { Signature, hash, num } from "starknet6"
 import { isEqualAddress } from "@argent/shared"
 
 import { isTokenExpired } from "./backend/account"
@@ -25,11 +25,15 @@ export class GuardianSignerArgentX extends GuardianSigner {
     isOffchainMessage = false,
   ): Promise<Signature> {
     /** special case - check guardianSignerNotRequired */
-    const selector = cosignerMessage.message?.calldata?.[2]
-
     if (
+      "type" in cosignerMessage &&
+      (cosignerMessage.type === "starknet" ||
+        cosignerMessage.type === "starknetV3") &&
       guardianSignerNotRequiredSelectors.find((notRequiredSelector) =>
-        isEqualAddress(notRequiredSelector, selector),
+        isEqualAddress(
+          notRequiredSelector,
+          cosignerMessage.message.calldata[2], // calldata[2] is the selector
+        ),
       )
     ) {
       return []

@@ -13,4 +13,6 @@ export interface FeeEstimationProps {
   suggestedMaxFeeCurrencyValue?: string
   userClickedAddFunds?: boolean
   needsDeploy?: boolean
+  onOpenFeeTokenPicker?: () => void
+  allowFeeTokenSelection?: boolean
 }

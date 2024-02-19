@@ -18,6 +18,8 @@ describe("ConnectDappScreen", () => {
     selectedAccount: accounts[0],
     host: "http://localhost:3000",
     onSelectedAccountChange,
+    isHighRisk: false,
+    hasAcceptedRisk: false,
   }
 
   beforeEach(async () => {

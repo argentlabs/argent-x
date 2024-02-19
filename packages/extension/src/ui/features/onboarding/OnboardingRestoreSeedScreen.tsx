@@ -47,7 +47,7 @@ export const OnboardingRestoreSeedScreen: FC<
   return (
     <OnboardingScreen
       onBack={onBack}
-      length={4}
+      length={3}
       currentIndex={1}
       title={"Restore accounts"}
       subtitle="Enter each of the 12 words from your recovery phrase separated by a
