@@ -1,4 +1,4 @@
-import { H5, KnownDappButton, P4 } from "@argent/ui"
+import { H5, KnownDappButton, P4 } from "@argent/x-ui"
 import { Center, CenterProps, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 

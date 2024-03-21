@@ -1,24 +1,36 @@
 import { Box, Center, Image, SystemStyleObject } from "@chakra-ui/react"
 
+import { AggregatedSimData } from "@argent/x-shared"
+import { isEmpty } from "lodash-es"
+import { useMemo } from "react"
 import { Network } from "../../../../../../../shared/network"
-import { ApiTransactionReview } from "../../../../../../../shared/transactionReview.service"
 import { useToken } from "../../../../../accountTokens/tokens.state"
 import { UnknownTokenIcon } from "./UnknownTokenIcon"
 
 export const SwapTransactionIcon = ({
-  transaction,
+  aggregatedData,
   network,
 }: {
-  transaction: ApiTransactionReview
+  aggregatedData?: AggregatedSimData[]
   network: Network
 }) => {
+  const srcAddress = useMemo(
+    () => aggregatedData?.find((ag) => ag.recipients.length > 0)?.token.address,
+    [aggregatedData],
+  )
+
+  const dstAddress = useMemo(
+    () => aggregatedData?.find((ag) => isEmpty(ag.recipients))?.token.address,
+    [aggregatedData],
+  )
+
   const srcToken = useToken({
-    address: transaction.activity?.src?.token.address || "0x0",
+    address: srcAddress || "0x0",
     networkId: network.id,
   })
 
   const dstToken = useToken({
-    address: transaction.activity?.dst?.token.address || "0x0",
+    address: dstAddress || "0x0",
     networkId: network.id,
   })
   const token1Styling: SystemStyleObject = {

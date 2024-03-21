@@ -1,4 +1,4 @@
-import { FieldError, Input, icons } from "@argent/ui"
+import { FieldError, Input, icons } from "@argent/x-ui"
 import { Box, Flex, FlexProps, Text } from "@chakra-ui/react"
 import { isEmpty, isString } from "lodash-es"
 import { FC, ReactNode, useEffect } from "react"

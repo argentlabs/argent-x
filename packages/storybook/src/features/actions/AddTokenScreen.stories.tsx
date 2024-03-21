@@ -8,9 +8,6 @@ const token = parsedDefaultTokens[0]
 export default {
   component: AddTokenScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

@@ -1,4 +1,4 @@
-import { addressSchema, isEqualAddress } from "@argent/shared"
+import { addressSchema, isEqualAddress } from "@argent/x-shared"
 
 import defaultTokens from "../../../assets/default-tokens.json"
 import { BaseToken, Token } from "./type"

@@ -1,4 +1,4 @@
-import { bigDecimal, BigDecimal } from "@argent/shared"
+import { bigDecimal, BigDecimal } from "@argent/x-shared"
 import { BaseToken } from "../../../../shared/token/__new/types/token.model"
 import { BaseTokenAmount } from "../../../../shared/token/__new/types/tokenAmount.model"
 import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"

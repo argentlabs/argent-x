@@ -1,4 +1,4 @@
-import { addressOrDomainInputSchema } from "@argent/shared"
+import { addressOrDomainInputSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 export const addressBookContactSchema = z.object({

@@ -1,11 +1,10 @@
 import { FC, useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
-import { Button, H2, P3, P4, logos } from "@argent/ui"
+import { Button, H2, P3, P4, logos } from "@argent/x-ui"
 import { Box, Flex, Text } from "@chakra-ui/react"
 
 import { routes } from "../../routes"
-import { unlockedExtensionTracking } from "../../services/analytics"
 import { sessionService } from "../../services/session"
 import { recover } from "../recovery/recovery.service"
 import { PasswordForm } from "./PasswordForm"
@@ -20,7 +19,6 @@ export const LockScreen: FC = () => {
     setIsLoading(true)
     try {
       await sessionService.startSession(password)
-      await unlockedExtensionTracking()
       const target = await recover()
       navigate(target, { replace: true })
       return true

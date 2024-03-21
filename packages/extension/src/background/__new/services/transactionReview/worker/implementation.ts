@@ -1,4 +1,4 @@
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 
 import urlJoin from "url-join"
 import { RefreshInterval } from "../../../../../shared/config"
@@ -51,9 +51,8 @@ export class TransactionReviewWorker implements ITransactionReviewWorker {
 
   async updateLabels() {
     try {
-      const labels = await this.httpService.get<ITransactionReviewLabel[]>(
-        labelsEndpoint,
-      )
+      const labels =
+        await this.httpService.get<ITransactionReviewLabel[]>(labelsEndpoint)
       const updatedAt = Date.now()
       await this.labelsStore.set("labels", labels)
       await this.labelsStore.set("updatedAt", updatedAt)

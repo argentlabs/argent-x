@@ -45,7 +45,7 @@ async function createContext({
   return context
 }
 
-function createPage() {
+function createPage(pageType: "WebWallet" | "DApp" = "WebWallet") {
   return async (
     { browser }: { browser: Browser },
     use: any,
@@ -56,20 +56,24 @@ function createPage() {
     const context = await createContext({
       browser,
       testInfo,
-      name: "WebWallet",
+      name: pageType,
       baseURL: url,
     })
     const page = await context.newPage()
-
-    const webWalletPage = new WebWalletPage(page)
-    await webWalletPage.open()
     browserCtx = context
-    await use(webWalletPage)
+    if (pageType === "WebWallet") {
+      const webWalletPage = new WebWalletPage(page)
+      await webWalletPage.open()
+      await use(webWalletPage)
+    } else {
+      await use(page)
+    }
+
     const keepArtifacts = isKeepArtifacts(testInfo)
     if (keepArtifacts) {
-      await saveHtml(testInfo, page, "WebWallet")
+      await saveHtml(testInfo, page, pageType)
       await context.close()
-      await keepVideos(testInfo, page, "WebWallet")
+      await keepVideos(testInfo, page, pageType)
     } else {
       await context.close()
     }
@@ -84,6 +88,7 @@ function getContext() {
 const test = testBase.extend<TestPages>({
   webWallet: createPage(),
   browserContext: getContext(),
+  dApp: createPage("DApp"),
 })
 
 export default test

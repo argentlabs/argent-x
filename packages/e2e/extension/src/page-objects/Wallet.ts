@@ -82,6 +82,9 @@ export default class Wallet extends Navigation {
     return this.page.locator(`button:text-is("${lang.wallet.finish}")`)
   }
 
+  get agreeLoc() {
+    return this.page.locator('[data-testid="agree-button"]')
+  }
   async newWalletOnboarding() {
     await Promise.all([
       expect(this.banner).toBeVisible(),
@@ -89,7 +92,7 @@ export default class Wallet extends Navigation {
       expect(this.restoreExistingWallet).toBeVisible(),
     ])
     await this.createNewWallet.click()
-
+    await this.agreeLoc.click()
     await Promise.all([
       expect(this.banner3).toBeVisible(),
       expect(this.description3).toBeVisible(),

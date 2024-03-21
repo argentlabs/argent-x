@@ -4,7 +4,7 @@ import {
   CellStack,
   NavigationContainer,
   Switch,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 interface EmailNotificationsSettingsScreenProps {

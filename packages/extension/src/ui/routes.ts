@@ -80,6 +80,10 @@ export const qs = (query?: Record<string, string>) => {
 export const routes = {
   onboardingStart: route("/onboarding/start"),
   onboardingDisclaimer: route("/onboarding/disclaimer"),
+  onboardingPrivacy: route(
+    (path: "password" | "seedphrase") => `/onboarding/privacy/${path}`,
+    `/onboarding/privacy/:path`,
+  ),
   onboardingPassword: route("/onboarding/password"),
   onboardingFinish: route("/onboarding/finish"),
   onboardingRestoreBackup: route("/onboarding/restore/backup"),
@@ -348,8 +352,4 @@ export const routes = {
   ),
 
   swap: route("/swap"),
-  provisionAnnouncement: route(
-    (accountName, starkAmount) => `/provision/${accountName}/${starkAmount}`,
-    "/provision/:accountName/:starkAmount",
-  ),
 }

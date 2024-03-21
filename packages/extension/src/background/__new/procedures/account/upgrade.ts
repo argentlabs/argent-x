@@ -9,7 +9,7 @@ import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
 import { getAccountClassHashFromChain } from "../../../../shared/account/details"
 import { networkService } from "../../../../shared/network/service"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 
 const upgradeAccountSchema = z.object({
   account: walletAccountSchema,

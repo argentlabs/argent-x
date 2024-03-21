@@ -2,15 +2,8 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { BrowserRouter } from "react-router-dom"
 import { describe, expect, it } from "vitest"
-import copy from "copy-to-clipboard"
 
 import { FundingQrCodeScreen } from "./FundingQrCodeScreen"
-import { normalizeAddress } from "@argent/shared"
-
-vi.mock("copy-to-clipboard", () => ({
-  __esModule: true,
-  default: vi.fn(),
-}))
 
 const accountAddress =
   "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
@@ -49,11 +42,19 @@ describe("FundingQrCodeScreen", () => {
     /** in production app, this address will be formatted */
     await user.click(formattedAddress)
 
-    // Need to change the test a bit to make it work with happy-dom
-    // See issue: https://github.com/capricorn86/happy-dom/issues/1153
-    const normalizedAddress = normalizeAddress(accountAddress)
     const copyButton = screen.getByRole("button", { name: /copy address/i })
+
+    vi.spyOn(window, "prompt").mockImplementation(vi.fn())
+
+    // the CopyTooltip component uses document.execCommand to copy the address
+    document.execCommand = vi.fn()
+    const spy = vi.spyOn(document, "execCommand")
+
     await user.click(copyButton)
-    expect(copy).toHaveBeenCalledWith(normalizedAddress)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith("copy")
+
+    // Clean up the mock
+    spy.mockRestore()
   })
 })

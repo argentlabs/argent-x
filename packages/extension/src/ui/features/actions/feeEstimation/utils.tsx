@@ -3,7 +3,7 @@ import {
   TransactionAction,
   bigDecimal,
   useConditionallyEnabledSWR,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { TransactionType, UniversalDeployerContractPayload } from "starknet"
 import useSWR from "swr"
 
@@ -22,6 +22,7 @@ import {
 } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
 import { RefreshInterval } from "../../../../shared/config"
+import { isString } from "lodash-es"
 
 interface UseMaxFeeEstimationReturnProps {
   fee: EstimatedFees | undefined
@@ -169,9 +170,7 @@ export function getCombinedFeeTooltipText(
   }
   return {
     status: "error",
-    message: `Insufficient balance to pay network fees. You need at least ${bigDecimal.formatEther(
-      maxFee - feeTokenBalance,
-    )} ETH more.`,
+    message: `Insufficient balance to pay network fees. You need to add more funds to be able to execute the transaction.`,
   }
 }
 
@@ -179,10 +178,12 @@ export function getTooltipText(maxFee?: bigint, feeTokenBalance?: bigint) {
   if (!maxFee || !feeTokenBalance) {
     return "Network fee is still loading."
   }
+  if (isString(feeTokenBalance)) {
+    // FIXME: this is string '0' if the fee token is not deployed?
+    feeTokenBalance = BigInt(feeTokenBalance)
+  }
   if (feeTokenBalance >= maxFee) {
     return "Network fees are paid to the network to include transactions in blocks"
   }
-  return `Insufficient balance to pay network fees. You need at least ${bigDecimal.formatEther(
-    maxFee - feeTokenBalance,
-  )} ETH more.`
+  return `Insufficient balance to pay network fees. You need to add more funds to be able to execute the transaction.`
 }

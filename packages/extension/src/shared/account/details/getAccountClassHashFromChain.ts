@@ -7,7 +7,7 @@ import { networkService } from "../../network/service"
 import { mapImplementationToArgentAccountType } from "../../network/utils"
 import { ArgentAccountType, WalletAccount } from "../../wallet.model"
 import { accountsEqual } from "../../utils/accountsEqual"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import { tryGetClassHash } from "./tryGetClassHash"
 import {
   MULTISIG_ACCOUNT_CLASS_HASH,

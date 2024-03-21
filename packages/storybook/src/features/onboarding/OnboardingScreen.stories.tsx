@@ -1,16 +1,10 @@
 import { OnboardingScreen } from "@argent-x/extension/src/ui/features/onboarding/ui/OnboardingScreen"
-import { logos } from "@argent/ui"
+import { logos } from "@argent/x-ui"
 
 const { ArgentXLogo } = logos
 
 export default {
   component: OnboardingScreen,
-  parameters: {
-    layout: "fullscreen",
-    viewport: {
-      defaultViewport: "reset",
-    },
-  },
 }
 
 export const Default = {

@@ -14,7 +14,7 @@ export default class Dapps extends Navigation {
   }
 
   account(accountName: string) {
-    return this.page.locator(`[data-testid="${accountName}"]`)
+    return this.page.locator(`[data-testid="${accountName}"]`).first()
   }
 
   connectedDapps(accountName: string, nbrConnectedDapps: number) {
@@ -93,6 +93,16 @@ export default class Dapps extends Navigation {
       await expect(dapp.locator("text=Argent X")).toBeVisible()
       await dapp.locator("text=Argent X").click()
     } else {
+      // assert that if the connect button is visible click on it
+      const connectButton = dapp.getByRole("button", { name: "connect" })
+      await expect(connectButton)
+        .toBeVisible({ timeout: 5 * 1000 })
+        .then(async () => {
+          await connectButton.click()
+        })
+        .catch(async () => {
+          null
+        })
       await expect(dapp.getByRole("button", { name: "Argent X" })).toBeVisible()
       await dapp.getByRole("button", { name: "Argent X" }).click()
     }

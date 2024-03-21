@@ -5,7 +5,7 @@ import { useView } from "../../../views/implementation/react"
 import { useTokenOnCurrentNetworkByAddress } from "../../accountTokens/tokens.state"
 import { useTokenBalanceForAccount } from "../../accountTokens/useTokenBalanceForAccount"
 import { Field, useSwapState } from "../state/fields"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal } from "@argent/x-shared"
 import { useSwapQuoteForPay } from "./useSwapQuoteForPay"
 import { useTradeFromSwapQuote } from "./useTradeFromSwapQuote"
 import { Trade } from "../../../../shared/swap/model/trade.model"
@@ -97,7 +97,7 @@ export function useSwapInfo(): SwapInfo {
 
   const slippageAdjustedAmounts =
     trade &&
-    userSlippageTolerance &&
+    userSlippageTolerance !== undefined &&
     computeSlippageAdjustedAmounts(trade, userSlippageTolerance)
 
   // compare input balance to max input based on version

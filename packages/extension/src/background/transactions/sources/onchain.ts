@@ -1,11 +1,13 @@
 import { getProvider } from "../../../shared/network"
 import {
+  SUCCESS_STATUSES,
   Transaction,
   getInFlightTransactions,
-  SUCCESS_STATUSES,
 } from "../../../shared/transactions"
-import { getTransactionsStatusUpdate } from "../determineUpdates"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
+import { getTransactionsStatusUpdate } from "../determineUpdates"
+
+const TXN_HASH_NOT_FOUND_MSG = "Transaction hash not found"
 
 export async function getTransactionsUpdate(transactions: Transaction[]) {
   const transactionsToCheck = getInFlightTransactions(transactions)
@@ -15,8 +17,20 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
   const fetchedTransactions = await Promise.allSettled(
     transactionsToCheck.map(async (transaction) => {
       const provider = getProvider(transaction.account.network)
-      const { finality_status, execution_status } =
-        await provider.getTransactionStatus(transaction.hash)
+
+      const txStatus = await provider.getTransactionStatus(transaction.hash)
+
+      const { finality_status, execution_status } = txStatus
+
+      // we do not want to return the transaction if it's rejected just yet,
+      // as in some cases it is temporary, and don't want to show the user a false positive
+      if (
+        finality_status === "REJECTED" &&
+        "revert_reason" in txStatus &&
+        txStatus.revert_reason === TXN_HASH_NOT_FOUND_MSG
+      ) {
+        return transaction
+      }
 
       // getTransactionStatus goes straight to the sequencer, hence it's much faster than the RPC nodes
       // because of that we need to wait for the RPC nodes to have a receipt as well
@@ -43,8 +57,8 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
               ...transaction,
               revertReason: receipt.revert_reason,
               status: {
-                finality_status,
-                execution_status,
+                finality_status: finality_status,
+                execution_status: execution_status,
               },
             }
           }
@@ -59,8 +73,8 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
       return {
         ...transaction,
         status: {
-          finality_status,
-          execution_status,
+          finality_status: finality_status,
+          execution_status: execution_status,
         },
       }
     }),
@@ -84,6 +98,5 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
     },
     [],
   )
-
   return getTransactionsStatusUpdate(transactions, updatedTransactions) // filter out transactions that have not changed
 }

@@ -7,9 +7,6 @@ import { account } from "../../account"
 export default {
   component: MultisigSignatureScreenWarning,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

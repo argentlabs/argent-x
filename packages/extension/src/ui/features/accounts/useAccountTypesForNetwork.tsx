@@ -1,7 +1,7 @@
-import { isFeatureEnabled } from "@argent/shared"
+import { isFeatureEnabled } from "@argent/x-shared"
 import { isFunction } from "lodash-es"
 import { useMemo } from "react"
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 
 import { type Network } from "../../../shared/network"
 import { AccountTypeId, type AccountType } from "./AddNewAccountScreen"

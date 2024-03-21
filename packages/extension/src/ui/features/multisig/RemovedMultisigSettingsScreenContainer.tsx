@@ -1,4 +1,4 @@
-import { BarBackButton, NavigationContainer } from "@argent/ui"
+import { BarBackButton, NavigationContainer } from "@argent/x-ui"
 import { useDisclosure } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"

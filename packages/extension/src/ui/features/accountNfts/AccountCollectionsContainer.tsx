@@ -1,5 +1,5 @@
-import { Collection, addressSchema } from "@argent/shared"
-import { Empty, H4, icons } from "@argent/ui"
+import { Collection, addressSchema } from "@argent/x-shared"
+import { Empty, H4, icons } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
 

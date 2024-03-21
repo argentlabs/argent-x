@@ -1,4 +1,4 @@
-import { useNavigateBack } from "@argent/ui"
+import { useNavigateBack } from "@argent/x-ui"
 import { FC } from "react"
 
 import { coerceErrorToString } from "../../../shared/utils/error"

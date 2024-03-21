@@ -4,7 +4,7 @@ import {
   isStarknetDomainName,
   isValidAddress,
   useDebouncedValue,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import useSWR from "swr"
 
 import { clientStarknetAddressService } from "../../services/address"

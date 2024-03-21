@@ -1,4 +1,4 @@
-import { Button, L2, P3, P4, icons, logos } from "@argent/ui"
+import { Button, L2, P3, P4, icons, logos } from "@argent/x-ui"
 import { SimpleGrid, VStack, StackProps, Link, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -35,7 +35,7 @@ const SupportFooter: FC<SupportFooterProps> = ({
         rounded={"lg"}
         leftIcon={<SupportIcon />}
         href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
-        title="Get ArgentX Support"
+        title="Get Argent X Support"
         target="_blank"
       >
         Help
@@ -75,7 +75,7 @@ const SupportFooter: FC<SupportFooterProps> = ({
       </Button>
     </SimpleGrid>
     {privacyStatement && (
-      <Flex color="text.secondary" gap={2}>
+      <Flex color="text-secondary" gap={2}>
         <P4
           as={Link}
           href={ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL}

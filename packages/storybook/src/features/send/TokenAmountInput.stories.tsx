@@ -1,5 +1,5 @@
 import { TokenAmountInput } from "@argent-x/extension/src/ui/features/send/TokenAmountInput"
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { ComponentProps, FC, useState } from "react"
 
 import { tokenWithBalance } from "../../tokens"
@@ -19,9 +19,6 @@ const Story: FC<ComponentProps<typeof TokenAmountInput>> = (props) => {
 
 export default {
   component: Story,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

@@ -1,4 +1,4 @@
-import { H6, icons } from "@argent/ui"
+import { H6, icons } from "@argent/x-ui"
 import { ArgentAccountType } from "../../../../shared/wallet.model"
 import { FC, ReactNode } from "react"
 import { AutoColumn } from "../../../components/Column"

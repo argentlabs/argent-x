@@ -3,12 +3,10 @@ import { useCallback, useEffect } from "react"
 
 import { uiService } from "../../../../shared/__new/services/ui"
 import { clientActionService } from "../../../services/action"
-import { analytics } from "../../../services/analytics"
 import { selectedAccountView } from "../../../views/account"
 import { currentActionView, isLastActionView } from "../../../views/actions"
 import { useView } from "../../../views/implementation/react"
 import { focusExtensionTab, useExtensionIsInTab } from "../../browser/tabs"
-import { getOriginatingHost } from "../../browser/useOriginatingHost"
 
 export const useActionScreen = () => {
   const selectedAccount = useView(selectedAccountView)
@@ -40,13 +38,8 @@ export const useActionScreen = () => {
   }, [closePopupIfLastAction, approve])
 
   const reject = useCallback(async () => {
-    /** TODO: refactor: move tracking into service or action handler */
-    void analytics.track("rejectedTransaction", {
-      networkId: selectedAccount?.networkId || "unknown",
-      host: await getOriginatingHost(),
-    })
     action && void clientActionService.reject(action.meta.hash)
-  }, [action, selectedAccount?.networkId])
+  }, [action])
 
   const rejectAndClose = useCallback(async () => {
     await reject()

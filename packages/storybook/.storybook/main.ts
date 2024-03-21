@@ -1,39 +1,34 @@
 import type { Configuration } from "webpack"
 import DotenvWebPack from "dotenv-webpack"
 import path from "path"
+import type { StorybookConfig } from "@storybook/nextjs"
 
-export default {
+export const isCI = Boolean(process.env.CI)
+
+const config: StorybookConfig = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
-
   addons: [
     "@storybook/addon-links",
-    "@storybook/addon-actions",
-    {
-      name: "@storybook/addon-essentials",
-      options: {
-        actions:
-          false /** disable mock functions in props, which break component checks for undefined */,
-      },
-    },
+    "@storybook/addon-essentials",
     "@storybook/addon-interactions",
-    // "@chakra-ui/storybook-addon", /** TODO: Color mode toggle currently broken - reinstate when fixed https://github.com/chakra-ui/chakra-ui/issues/6855 */
     "storybook-addon-swc",
-    "@storybook/addon-mdx-gfm",
   ],
-
-  features: {
-    emotionAlias: false,
-  },
-
   framework: {
     name: "@storybook/nextjs",
     options: {},
   },
-
-  core: {
-    disableTelemetry: true,
+  docs: {
+    autodocs: false,
   },
-
+  refs: {
+    "@chakra-ui/react": {
+      disable: true,
+    },
+    "@argent/x-ui": {
+      title: "Argent Design System",
+      url: "https://develop--65d8cb036305ac44c7a097eb.chromatic.com/",
+    },
+  },
   webpackFinal: async (config: Configuration) => {
     /**
      * Use Mui with styled-components
@@ -44,6 +39,10 @@ export default {
       alias: {
         ...(config.resolve?.alias || {}),
         "@mui/styled-engine": "@mui/styled-engine-sc",
+        "webextension-polyfill": path.resolve(
+          __dirname,
+          "./webextension-polyfill-mock.ts",
+        ),
       },
     }
 
@@ -69,23 +68,24 @@ export default {
         },
       ],
     }
-
-    /**
-     * Use .env file from extension package
-     */
     config.plugins = [
       ...(config.plugins || []),
-      new DotenvWebPack({
-        path: path.resolve(__dirname, "../../extension/.env"),
-      }),
+      new DotenvWebPack(
+        isCI
+          ? {
+              /** Use env vars defined in CI */
+              systemvars: true,
+            }
+          : {
+              /** Use .env file from extension package */
+              path: path.resolve(__dirname, "../../extension/.env"),
+            },
+      ),
     ]
 
     return config
   },
-
-  staticDirs: ["../../extension/src", "../../ui/assets"],
-
-  docs: {
-    autodocs: false,
-  },
+  staticDirs: ["../../extension/src"],
 }
+
+export default config

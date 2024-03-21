@@ -1,12 +1,13 @@
-import { TokenWithBalance, bigDecimal } from "@argent/shared"
-import { L1, P4, TextWithAmount } from "@argent/ui"
+import {
+  TokenWithBalance,
+  bigDecimal,
+  prettifyCurrencyValue,
+  prettifyTokenAmount,
+} from "@argent/x-shared"
+import { L1, P4, TextWithAmount } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 
-import {
-  prettifyCurrencyValue,
-  prettifyTokenAmount,
-} from "../../../../shared/token/price"
 import { ParsedFeeError } from "./feeError"
 import { FeeEstimationBox } from "./ui/FeeEstimationBox"
 import { FeeEstimationText } from "./ui/FeeEstimationText"
@@ -213,8 +214,8 @@ const TooltipText: FC<FeeEstimationTooltipProps> = ({
   }
   return (
     <P4 color="neutrals.500">
-      Insufficient balance to pay network fees. You need at least $
-      {bigDecimal.formatEther(BigInt(totalMaxFee) - feeToken.balance)} ETH more.
+      Insufficient balance to pay network fees. You need to add more funds to be
+      able to execute the transaction.
     </P4>
   )
 }

@@ -1,4 +1,4 @@
-import { L2 } from "@argent/ui"
+import { L2 } from "@argent/x-ui"
 import { FC } from "react"
 
 import { ArgentAccountType } from "../../../shared/wallet.model"

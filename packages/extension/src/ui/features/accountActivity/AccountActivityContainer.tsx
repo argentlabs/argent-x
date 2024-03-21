@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo } from "react"
 import { get, uniqBy } from "lodash-es"
-import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/ui"
+import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/x-ui"
 import { Center, Skeleton } from "@chakra-ui/react"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
@@ -21,7 +21,7 @@ import { PendingTransactions } from "./PendingTransactions"
 import { isVoyagerTransaction } from "./transform/is"
 import { ActivityTransaction } from "./useActivity"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
-import { isEqualAddress, normalizeAddress } from "@argent/shared"
+import { isEqualAddress, normalizeAddress } from "@argent/x-shared"
 import { getTransactionFailureReason } from "./getTransactionFailureReason"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
 

@@ -5,16 +5,18 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@argent/shared": "workspace:^",
+    "@argent/x-shared": "1.1.7",
     "@playwright/test": "^1.40.1",
     "@types/node": "^20.5.7",
     "@types/uuid": "^9.0.3",
     "dotenv": "^16.3.1",
     "starknet": "6.0.0-beta.13",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "@slack/web-api": "^7.0.0"
   },
   "scripts": {
     "test:extension": "pnpm playwright test --config=./extension",
-    "test:webwallet": "pnpm playwright test --config=./webwallet"
+    "test:webwallet": "pnpm playwright test --config=./webwallet",
+    "test:slack-notifications": "pnpm playwright test shared/src/slack.spec.ts "
   }
 }

@@ -1,8 +1,8 @@
 import useSWR from "swr"
 import { provisionService } from "../../../services/provision"
 
-import airdropBanner from "@argent/ui/assets/airdrop.png"
-import airdropHalted from "@argent/ui/assets/airdropHalted.png"
+import airdropBanner from "./assets/airdrop@3x.png"
+import airdropHalted from "./assets/airdropHalted@3x.png"
 import {
   provisionBannerAtom,
   provisionBannerStore,

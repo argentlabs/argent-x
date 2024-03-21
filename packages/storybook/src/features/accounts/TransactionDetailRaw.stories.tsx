@@ -38,9 +38,6 @@ const makeTransaction = (transactions?: Call | Call[]): Transaction => {
 export default {
   component: TransactionDetail,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const Default = {

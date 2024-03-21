@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import { escapeSchema } from "./account/details/escape.model"
 import { networkSchema } from "./network"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 export const argentAccountTypeSchema = z.enum([
   "standard",
@@ -45,6 +45,7 @@ export const walletAccountSchema = z
     owner: z.string().optional(),
     provisionAmount: z.string().optional(),
     provisionDate: z.number().optional(),
+    index: z.number().optional(),
   })
   .merge(withSignerSchema)
   .merge(baseWalletAccountSchema)
@@ -59,6 +60,7 @@ export const multisigDataSchema = z.object({
   threshold: z.number(),
   creator: z.string().optional(), // Creator is the public key of the account that created the multisig account
   updatedAt: z.number(),
+  index: z.number().optional(),
 })
 
 export const baseMultisigWalletAccountSchema =

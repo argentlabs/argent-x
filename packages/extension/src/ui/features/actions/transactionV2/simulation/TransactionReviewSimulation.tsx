@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { B3, L1 } from "@argent/ui"
+import { B3, L1 } from "@argent/x-ui"
 import { groupBy, isEmpty } from "lodash-es"
 import type { Simulation } from "../../../../../shared/transactionReview/schema"
 import { TransactionReviewSummary } from "./summary/TransactionReviewSummary"
@@ -16,7 +16,7 @@ export const TransactionReviewSimulation: FC<
   if (isEmpty(simulation?.summary)) {
     return (
       <TransactionReviewSummaryStack>
-        <B3 color="text.secondary" textAlign="center" py={1}>
+        <B3 color="text-secondary" textAlign="center" py={1}>
           No balance change
         </B3>
       </TransactionReviewSummaryStack>
@@ -29,7 +29,7 @@ export const TransactionReviewSimulation: FC<
     <TransactionReviewSummaryStack>
       {send && (
         <>
-          <L1 color="text.secondary">Send</L1>
+          <L1 color="text-secondary">Send</L1>
           {send.map((summary, index) => (
             <TransactionReviewSummary
               key={`send-${index}-${summary.type}`}
@@ -40,7 +40,7 @@ export const TransactionReviewSimulation: FC<
       )}
       {receive && (
         <>
-          <L1 color="text.secondary">Receive</L1>
+          <L1 color="text-secondary">Receive</L1>
           {receive.map((summary, index) => (
             <TransactionReviewSummary
               key={`send-${index}-${summary.type}`}

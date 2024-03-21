@@ -1,5 +1,5 @@
-import { TokenWithBalance } from "@argent/shared"
-import { NavigationContainer } from "@argent/ui"
+import { TokenWithBalance } from "@argent/x-shared"
+import { NavigationContainer } from "@argent/x-ui"
 import { FC, ReactNode } from "react"
 import { PageWrapper } from "../../../../components/Page"
 import { Grid } from "@chakra-ui/react"

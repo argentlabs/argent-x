@@ -1,23 +1,27 @@
 import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens/TokenListItem"
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
+import type { Meta, StoryObj } from "@storybook/react"
 import { ComponentProps } from "react"
 import { tokenWithBalance, tokenWithSymbol } from "../../tokens"
 
-export default {
+const meta = {
   component: TokenListItem,
-  parameters: {
-    layout: "fullscreen",
-  },
   render: (props: ComponentProps<typeof TokenListItem>) => (
     <CellStack>
       <TokenListItem {...props}></TokenListItem>
     </CellStack>
   ),
+} satisfies Meta<typeof TokenListItem>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+const longNameToken = {
+  ...tokenWithSymbol("STRK"),
+  name: "Lorem ipsum dolor sit amet",
 }
 
-const longNameToken = tokenWithSymbol("wstETH")
-
-export const Default = {
+export const Default: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("1000000000000000000"),
@@ -25,7 +29,7 @@ export const Default = {
   },
 }
 
-export const Thousands = {
+export const Thousands: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("1234000000000000000000"),
@@ -33,7 +37,7 @@ export const Thousands = {
   },
 }
 
-export const HighLongBalance = {
+export const HighLongBalance: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("12345678000000000000000000"),
@@ -41,7 +45,7 @@ export const HighLongBalance = {
   },
 }
 
-export const LowLongBalance = {
+export const LowLongBalance: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("100000000000000"),
@@ -49,7 +53,7 @@ export const LowLongBalance = {
   },
 }
 
-export const DustLongBalance = {
+export const DustLongBalance: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("892308777860895"),
@@ -57,7 +61,7 @@ export const DustLongBalance = {
   },
 }
 
-export const MissingCurrencyValue = {
+export const MissingCurrencyValue: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("100000000000000"),
@@ -65,17 +69,19 @@ export const MissingCurrencyValue = {
   },
 }
 
-export const MissingBalance = {
+export const MissingBalance: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance(),
+    currencyValue: undefined,
   },
 }
 
-export const MissingBalanceAndError = {
+export const MissingBalanceAndError: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance(),
+    currencyValue: undefined,
     errorMessage: {
       message: "Token not found",
       description:
@@ -84,7 +90,7 @@ export const MissingBalanceAndError = {
   },
 }
 
-export const NoCurrencyVariant = {
+export const NoCurrencyVariant: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("12345678000000000000000000"),
@@ -93,7 +99,7 @@ export const NoCurrencyVariant = {
   },
 }
 
-export const MissingCurrencyValueNoCurrencyVariant = {
+export const MissingCurrencyValueNoCurrencyVariant: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("100000000000000"),
@@ -102,7 +108,7 @@ export const MissingCurrencyValueNoCurrencyVariant = {
   },
 }
 
-export const LongTokenNameAndBalance = {
+export const LongTokenNameAndBalance: Story = {
   args: {
     isLoading: false,
     token: tokenWithBalance("400", longNameToken),

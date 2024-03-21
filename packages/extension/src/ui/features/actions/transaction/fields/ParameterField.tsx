@@ -1,4 +1,4 @@
-import { formatTruncatedAddress, isValidAddress } from "@argent/shared"
+import { formatTruncatedAddress, isValidAddress } from "@argent/x-shared"
 import { chakra } from "@chakra-ui/react"
 import { FC } from "react"
 

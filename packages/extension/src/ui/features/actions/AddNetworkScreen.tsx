@@ -4,7 +4,7 @@ import {
   FieldError,
   HeaderCell,
   NavigationContainer,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex, FormControl, Input } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 

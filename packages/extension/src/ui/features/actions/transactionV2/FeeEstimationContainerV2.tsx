@@ -1,6 +1,6 @@
 import { isFunction } from "lodash-es"
 import { FC, useEffect, useMemo } from "react"
-import { TokenWithBalance } from "@argent/shared"
+import { TokenWithBalance } from "@argent/x-shared"
 import { useAccount } from "../../accounts/accounts.state"
 import {
   useCurrencyDisplayEnabled,

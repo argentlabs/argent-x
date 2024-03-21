@@ -3,7 +3,7 @@ import {
   addressOrDomainInputSchema,
   isStarknetDomainName,
   normalizeAddressOrDomain,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { useDisclosure } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FC, useCallback, useEffect, useMemo } from "react"
@@ -199,13 +199,13 @@ export const SendRecipientScreenContainer: FC = () => {
       if (query !== "") {
         return
       }
-      /** ignore starknet id or invalid address */
       if (!addressInputSchema.safeParse(queryPaste).success) {
-        return
+        /** submit and validate so the user will see error in the UI */
+        return onQuerySubmit()
       }
       selectAddress(queryPaste)
     },
-    [query, selectAddress],
+    [onQuerySubmit, query, selectAddress],
   )
 
   if (!account) {

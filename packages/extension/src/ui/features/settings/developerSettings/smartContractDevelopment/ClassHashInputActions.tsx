@@ -1,4 +1,4 @@
-import { Button, H6, icons } from "@argent/ui"
+import { Button, H6, icons } from "@argent/x-ui"
 import { Box, ScaleFade } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 

@@ -1,19 +1,17 @@
 import { FC, Suspense, useMemo } from "react"
 
-import { useAppState } from "../../app.state"
+import { Token } from "../../../shared/token/__new/types/token.model"
+import { equalToken } from "../../../shared/token/__new/utils"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
 import { useCurrentPathnameWithQuery } from "../../routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
+import { sortedTokensWithBalances } from "../../views/tokenPrices"
 import { NewTokenButton } from "./NewTokenButton"
 import { TokenListItemVariant } from "./TokenListItem"
 import { TokenListItemContainer } from "./TokenListItemContainer"
-import { useTokensInNetwork } from "./tokens.state"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
-import { Token } from "../../../shared/token/__new/types/token.model"
-import { sortBy } from "lodash-es"
-import { num } from "starknet"
 
 interface TokenListProps {
   tokenList?: Token[]
@@ -31,8 +29,6 @@ export const TokenList: FC<TokenListProps> = ({
   onItemClick,
 }) => {
   const account = useView(selectedAccountView)
-  const { switcherNetworkId } = useAppState()
-  const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
   const returnTo = useCurrentPathnameWithQuery()
   const addFundsDialogSend = useAddFundsDialogSend()
 
@@ -46,13 +42,16 @@ export const TokenList: FC<TokenListProps> = ({
       returnTo,
     })
   }
+  const sortedTokensWithBalance = useView(sortedTokensWithBalances(account))
 
   const tokens = useMemo(
     () =>
-      sortBy(tokenList ?? tokensInNetwork, (token) =>
-        token.id ? BigInt(token.id) : num.toBigInt(token.address),
-      ),
-    [tokenList, tokensInNetwork],
+      tokenList
+        ? sortedTokensWithBalance.filter((token) =>
+            tokenList.some((t) => equalToken(t, token)),
+          )
+        : sortedTokensWithBalance,
+    [tokenList, sortedTokensWithBalance],
   )
 
   if (!account) {

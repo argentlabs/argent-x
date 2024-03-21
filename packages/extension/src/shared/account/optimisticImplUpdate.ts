@@ -1,4 +1,4 @@
-import { Address, isEqualAddress } from "@argent/shared"
+import { Address, isEqualAddress } from "@argent/x-shared"
 import { WalletAccount } from "../wallet.model"
 import { ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES } from "./starknet.constants"
 
@@ -15,8 +15,8 @@ export const optimisticImplUpdate = (
   const cairoVersion = CAIRO_1.some((c1) => isEqualAddress(c1, newClassHash))
     ? "1"
     : CAIRO_0.some((c0) => isEqualAddress(c0, newClassHash))
-    ? "0"
-    : account.cairoVersion // fallback to the current account's cairo version
+      ? "0"
+      : account.cairoVersion // fallback to the current account's cairo version
 
   return { ...account, classHash: newClassHash, cairoVersion }
 }

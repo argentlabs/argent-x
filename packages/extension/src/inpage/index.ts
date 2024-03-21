@@ -4,8 +4,10 @@ import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
 import { sendMessage, waitForMessage } from "./messageActions"
-import { getIsPreauthorized } from "./messaging"
 import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
+import { BackwardsCompatibleStarknetWindowObject } from "@argent/x-window"
+import { shortString } from "starknet"
+import { isArgentNetwork } from "../shared/network/utils"
 
 const INJECT_NAMES = ["starknet", "starknet_argentX"]
 
@@ -46,14 +48,16 @@ document.addEventListener("readystatechange", () => attachHandler())
 
 window.addEventListener(
   "message",
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   async ({ data }: MessageEvent<WindowMessageType>) => {
-    const { starknet } = window
-    if (!starknet) {
+    if (!window.starknet) {
       return
     }
 
+    const starknet = window.starknet as BackwardsCompatibleStarknetWindowObject
+
     if (
-      (starknet.account && data.type === "CONNECT_ACCOUNT_RES") ||
+      data.type === "CONNECT_ACCOUNT_RES" ||
       data.type === "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK"
     ) {
       const account =
@@ -61,44 +65,43 @@ window.addEventListener(
           ? data.data
           : data.data.selectedAccount
 
-      const isPreauthorized = await getIsPreauthorized()
-      if (!isPreauthorized) {
-        // disconnect so the user can see they are no longer connected
-        // TODO: better UX would be to also re-connect when user selects pre-authorized account
-        await disconnectAccount()
-      } else {
-        const walletAccountP = waitForMessage(
-          "CONNECT_DAPP_RES",
-          10 * 60 * 1000,
-        )
+      if (
+        account &&
+        (account.address !== starknet.selectedAddress ||
+          account.network.chainId !== starknet.chainId)
+      ) {
         sendMessage({
           type: "CONNECT_DAPP",
         })
+        const walletAccountP = Promise.race([
+          waitForMessage("CONNECT_DAPP_RES", 10 * 60 * 1000),
+          waitForMessage("REJECT_PREAUTHORIZATION", 10 * 60 * 1000).then(
+            () => "USER_ABORTED" as const,
+          ),
+        ])
         const walletAccount = await walletAccountP
 
-        if (!walletAccount) {
+        if (!walletAccount || walletAccount === "USER_ABORTED") {
           return disconnectAccount()
         }
 
-        if (
-          account &&
-          (account.address !== starknet.selectedAddress ||
-            account.network.chainId !== starknet.chainId)
-        ) {
-          const { address, network } = account
+        const { address, network } = account
+        const provider = getProvider(network)
 
-          starknet.selectedAddress = address
-          starknet.chainId = network.chainId
-          starknet.provider = getProvider(network)
-          starknet.account = new ArgentXAccount(address, starknet.provider)
-          for (const userEvent of userEventHandlers) {
-            if (userEvent.type === "accountsChanged") {
-              userEvent.handler([address])
-            } else if (userEvent.type === "networkChanged") {
-              userEvent.handler(network.chainId)
-            } else {
-              assertNever(userEvent)
-            }
+        starknet.selectedAddress = address
+        starknet.chainId = network.chainId
+        starknet.provider = provider
+        starknet.account = new ArgentXAccount(address, provider)
+        for (const userEvent of userEventHandlers) {
+          if (userEvent.type === "accountsChanged") {
+            userEvent.handler([address])
+          } else if (userEvent.type === "networkChanged") {
+            const chainId = isArgentNetwork(network)
+              ? shortString.encodeShortString(network.chainId)
+              : network.chainId
+            userEvent.handler(chainId as any)
+          } else {
+            assertNever(userEvent)
           }
         }
       }

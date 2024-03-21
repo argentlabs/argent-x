@@ -1,4 +1,8 @@
-import { KnownDapp, KnownDapps, KnownDappsBackendService } from "@argent/shared"
+import {
+  KnownDapp,
+  KnownDapps,
+  KnownDappsBackendService,
+} from "@argent/x-shared"
 import { IKnownDappsRepository } from "../storage/__new/repositories/knownDapp"
 import { IKnownDappService } from "./interface"
 

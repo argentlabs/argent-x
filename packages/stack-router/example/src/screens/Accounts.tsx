@@ -3,7 +3,7 @@ import {
   ButtonCell,
   CellStack,
   NavigationContainer,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Link } from "react-router-dom"
 
 const ids = Array.from({ length: 10 }).map((_, index) => index + 1)

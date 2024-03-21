@@ -17,7 +17,7 @@ import { AccountError } from "../../shared/errors/account"
 import { fetchTransactionBulkSimulation } from "../../shared/transactionSimulation/transactionSimulation.service"
 import { TransactionError } from "../../shared/errors/transaction"
 import { getEstimatedFeeFromBulkSimulation } from "../../shared/transactionSimulation/utils"
-import { isAccountV4, isAccountV5 } from "@argent/shared"
+import { isAccountV4, isAccountV5 } from "@argent/x-shared"
 import { EstimatedFees } from "../../shared/transactionSimulation/fees/fees.model"
 import { addEstimatedFee } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import {
@@ -214,9 +214,8 @@ export const handleTransactionMessage: HandleMessage<
             const bulkTransactions: Invocations = [
               {
                 type: TransactionType.DEPLOY_ACCOUNT,
-                payload: await wallet.getAccountDeploymentPayload(
-                  selectedAccount,
-                ),
+                payload:
+                  await wallet.getAccountDeploymentPayload(selectedAccount),
               },
               {
                 type: TransactionType.DEPLOY,
@@ -321,9 +320,8 @@ export const handleTransactionMessage: HandleMessage<
 
         const chainId = await starknetAccount.getChainId()
 
-        const bestFeeToken = await feeTokenService.getBestFeeToken(
-          selectedAccount,
-        )
+        const bestFeeToken =
+          await feeTokenService.getBestFeeToken(selectedAccount)
         const version = getSimulationTxVersionFromFeeToken(bestFeeToken.address)
 
         const calldata = transaction.getExecuteCalldata(
@@ -348,9 +346,8 @@ export const handleTransactionMessage: HandleMessage<
         }
 
         if (!isDeployed) {
-          const accountDeployPayload = await wallet.getAccountDeploymentPayload(
-            selectedAccount,
-          )
+          const accountDeployPayload =
+            await wallet.getAccountDeploymentPayload(selectedAccount)
 
           accountDeployTransaction = {
             type: TransactionType.DEPLOY_ACCOUNT,
@@ -441,9 +438,8 @@ export const handleTransactionMessage: HandleMessage<
         }
 
         if (!isDeployed) {
-          const accountDeployPayload = await wallet.getAccountDeploymentPayload(
-            selectedAccount,
-          )
+          const accountDeployPayload =
+            await wallet.getAccountDeploymentPayload(selectedAccount)
 
           accountDeployTransaction = {
             type: TransactionType.DEPLOY_ACCOUNT,
@@ -464,6 +460,7 @@ export const handleTransactionMessage: HandleMessage<
 
         const result = await fetchTransactionBulkSimulation({
           invocations,
+          networkId: selectedAccount.networkId,
           chainId: chainId as any, // TODO: migrate to snjsv6 completely
         })
 

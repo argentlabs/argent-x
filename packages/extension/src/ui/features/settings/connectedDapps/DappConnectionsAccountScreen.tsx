@@ -6,7 +6,7 @@ import {
   NavigationContainer,
   P4,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { Flex } from "@chakra-ui/react"
@@ -35,7 +35,7 @@ export const DappConnectionsAccountScreen: FC<
       ) : (
         <CellStack width={"full"}>
           <Flex w="full" alignItems={"center"}>
-            <H6 color="text.secondary">Connected dapps</H6>
+            <H6 color="text-secondary">Connected dapps</H6>
             <P4
               ml="auto"
               fontWeight="semibold"

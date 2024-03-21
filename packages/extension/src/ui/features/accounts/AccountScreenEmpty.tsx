@@ -1,4 +1,4 @@
-import { Empty, EmptyButton, icons } from "@argent/ui"
+import { Empty, EmptyButton, icons } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { HiddenAccountsBarContainer } from "./HiddenAccountsBar"

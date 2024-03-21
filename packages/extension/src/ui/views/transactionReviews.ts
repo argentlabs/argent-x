@@ -3,7 +3,7 @@ import { atomFamily } from "jotai/utils"
 import { transactionReviewLabelsStore } from "../../shared/transactionReview/store"
 import { atomFromKeyValueStore } from "./implementation/atomFromKeyValueStore"
 import { isArray, isEqual, lowerCase, upperFirst } from "lodash-es"
-import { ensureArray } from "@argent/shared"
+import { ensureArray } from "@argent/x-shared"
 
 const allLabelsView = atomFromKeyValueStore(
   transactionReviewLabelsStore,

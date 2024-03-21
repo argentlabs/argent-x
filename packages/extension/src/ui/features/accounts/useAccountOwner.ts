@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { useRef } from "react"
 import useSWR from "swr"
 

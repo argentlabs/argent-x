@@ -1,7 +1,6 @@
-import { useToast, icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 import { Collapse } from "@mui/material"
-import * as Sentry from "@sentry/react"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { FC, useMemo, useState } from "react"
 import styled from "styled-components"
 
 import { settingsStore } from "../../shared/settings"
@@ -147,7 +146,6 @@ const ErrorBoundaryFallbackWithCopyError: FC<
 }) => {
   const [viewLogs, setViewLogs] = useState(false)
 
-  const toast = useToast()
   const {
     isOpen: isClearStorageModalOpen,
     onOpen: onClearStorageModalOpen,
@@ -176,30 +174,6 @@ ${displayStack}
     return fallbackErrorPayload
   }, [error, errorInfo])
 
-  const reportToSentry = useCallback(
-    (manuallySubmitted = true) => {
-      Sentry.withScope((scope) => {
-        try {
-          Object.keys(errorInfo).forEach((key) => {
-            scope.setExtra(key, errorInfo[key])
-          })
-        } catch {
-          // noop
-        }
-        scope.setExtra("submittedManually", manuallySubmitted)
-        Sentry.captureException(error)
-      })
-      if (manuallySubmitted) {
-        toast({
-          title: "The error was reported successfully",
-          status: "success",
-          duration: 3000,
-        })
-      }
-    },
-    [error, errorInfo, toast],
-  )
-
   const privacyErrorReportingSetting = useKeyValueStorage(
     settingsStore,
     "privacyErrorReporting",
@@ -214,12 +188,6 @@ ${displayStack}
     settingsStore,
     "privacyAutomaticErrorReporting",
   )
-
-  useEffect(() => {
-    if (privacyErrorReporting && privacyAutomaticErrorReporting) {
-      reportToSentry(false)
-    }
-  }, [privacyErrorReporting, privacyAutomaticErrorReporting, reportToSentry])
 
   return (
     <MessageContainer>
@@ -272,12 +240,13 @@ ${displayStack}
           <RefreshIcon />
           <span>Retry</span>
         </ActionContainer>
-        {privacyErrorReporting && (
+        {/* TODO decide what to do with this */}
+        {/* {privacyErrorReporting && (
           <ActionContainer {...makeClickable(reportToSentry)}>
             <WarningIcon />
             <span>Report error</span>
           </ActionContainer>
-        )}
+        )} */}
         <ActionContainer {...makeClickable(onClearStorageModalOpen)}>
           <BroomIcon />
           <span>Clear storage</span>

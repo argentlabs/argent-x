@@ -1,4 +1,4 @@
-import { Hex, isEqualAddress } from "@argent/shared"
+import { Hex, isEqualAddress } from "@argent/x-shared"
 import { CairoVersion, CallData, hash } from "starknet"
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { MultisigSigner } from "../../../shared/multisig/signer"
@@ -18,7 +18,7 @@ import {
   getPathForIndex,
 } from "../../../shared/utils/derivationPath"
 
-import { WalletAccountSharedService } from "../account/shared.service"
+import { WalletAccountSharedService } from "../../../shared/account/service/shared.service"
 import { getMultisigAccountFromBaseWallet } from "../../../shared/multisig/utils/baseMultisig"
 import type { WalletSession } from "../session/walletSession.model"
 import { Network } from "../../../shared/network"
@@ -31,7 +31,7 @@ import {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import { decodeBase58Array } from "@argent/shared"
+import { decodeBase58Array } from "@argent/x-shared"
 import { MULTISIG_DERIVATION_PATH } from "../../../shared/wallet.service"
 import { sortMultisigByDerivationPath } from "../../../shared/utils/accountsMultisigSort"
 import { SessionError } from "../../../shared/errors/session"
@@ -116,9 +116,8 @@ export class WalletCryptoStarknetService {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
 
-    const account = await this.accountSharedService.getAccount(
-      baseWalletAccount,
-    )
+    const account =
+      await this.accountSharedService.getAccount(baseWalletAccount)
 
     if (!account) {
       throw new AccountError({ code: "NOT_SELECTED" })
@@ -297,9 +296,8 @@ export class WalletCryptoStarknetService {
   public async getCalculatedMultisigAddress(
     baseMultisigAccount: BaseMultisigWalletAccount,
   ): Promise<string> {
-    const multisigAccount = await getMultisigAccountFromBaseWallet(
-      baseMultisigAccount,
-    )
+    const multisigAccount =
+      await getMultisigAccountFromBaseWallet(baseMultisigAccount)
 
     if (!multisigAccount) {
       throw new AccountError({ code: "MULTISIG_NOT_FOUND" })

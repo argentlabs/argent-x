@@ -4,7 +4,7 @@ import {
   Empty,
   NavigationBar,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC } from "react"
 
 import { routes } from "../../../../routes"

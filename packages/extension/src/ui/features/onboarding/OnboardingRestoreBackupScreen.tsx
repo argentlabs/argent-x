@@ -1,4 +1,4 @@
-import { H6 } from "@argent/ui"
+import { H6 } from "@argent/x-ui"
 import { Center, chakra } from "@chakra-ui/react"
 import { FC, MouseEventHandler, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
@@ -45,7 +45,7 @@ export const OnboardingRestoreBackupScreen: FC<
         p={8}
         bg={"black"}
         border={"2px dashed"}
-        borderColor={"white50"}
+        borderColor={"white.50"}
         rounded={"lg"}
         w={"full"}
         h={"256px"}

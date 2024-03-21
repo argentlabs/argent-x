@@ -1,4 +1,4 @@
-import { B2, H4, P3, icons } from "@argent/ui"
+import { B2, H4, P3, icons } from "@argent/x-ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
@@ -11,9 +11,9 @@ import { useMultisig } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { num } from "starknet"
 import { MultisigOwner } from "./MultisigOwner"
-import { creatorMultisigMetadataView } from "../../views/multisig"
+import { publicKeyMultisigMetadataView } from "../../views/multisig"
 import { useView } from "../../views/implementation/react"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { multisigService } from "../../services/multisig"
 
 const { MultisigJoinIcon } = icons
@@ -34,18 +34,18 @@ const MultisigOwners = ({ account }: { account: Account }) => {
   const ownerPublicKey = usePublicKey()
   const navigate = useNavigate()
 
-  const multisigMetadata = useView(creatorMultisigMetadataView(multisig))
+  const multisigMetadata = useView(publicKeyMultisigMetadataView(multisig))
 
   const handleAddOwnerClick = () => {
     navigate(routes.multisigAddOwners(account.address))
   }
 
   const onUpdateAccountName = (key: string | undefined, name: string) => {
-    if (!multisig?.creator || !key) {
+    if (!multisig?.publicKey || !key) {
       return
     }
 
-    void multisigService.updateSignerMetadata(multisig?.creator, {
+    void multisigService.updateSignerMetadata(multisig?.publicKey, {
       key,
       name,
     })

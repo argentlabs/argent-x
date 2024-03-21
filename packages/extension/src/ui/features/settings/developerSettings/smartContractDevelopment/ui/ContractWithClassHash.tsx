@@ -1,4 +1,4 @@
-import { CopyTooltip, P3, P4, icons } from "@argent/ui"
+import { CopyTooltip, P3, P4, icons } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 

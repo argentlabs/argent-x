@@ -1,4 +1,4 @@
-import { BarBackButton, NavigationContainer } from "@argent/ui"
+import { BarBackButton, NavigationContainer } from "@argent/x-ui"
 import { FC, PropsWithChildren, ReactNode, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 

@@ -40,9 +40,6 @@ const baseAccount = {
 export default {
   component: AccountListScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

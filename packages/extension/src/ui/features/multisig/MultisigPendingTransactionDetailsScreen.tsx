@@ -1,4 +1,4 @@
-import { BarBackButton, H6, NavigationBar, P3 } from "@argent/ui"
+import { BarBackButton, H6, NavigationBar, P3 } from "@argent/x-ui"
 import { Box, Flex, useDisclosure } from "@chakra-ui/react"
 import { useEffect, useMemo } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
@@ -18,7 +18,7 @@ import { useView } from "../../views/implementation/react"
 import { selectedAccountView } from "../../views/account"
 import { ApproveScreenType } from "../actions/transaction/types"
 import { ApproveTransactionScreenContainer } from "../actions/transaction/ApproveTransactionScreen/ApproveTransactionScreenContainer"
-import { formatTruncatedAddress } from "@argent/shared"
+import { formatTruncatedAddress } from "@argent/x-shared"
 
 export const MultisigPendingTransactionDetailsScreen = () => {
   const selectedAccount = useView(selectedAccountView)
@@ -112,10 +112,7 @@ export const MultisigPendingTransactionDetailsScreen = () => {
 
   const navigationBar = (
     <Box pb="2">
-      <NavigationBar
-        leftButton={<BarBackButton onClick={() => navigate(-1)} />}
-        title={title}
-      />
+      <NavigationBar leftButton={<BarBackButton />} title={title} />
     </Box>
   )
 

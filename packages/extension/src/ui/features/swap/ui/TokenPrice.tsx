@@ -1,13 +1,16 @@
-import { P4, TokenButton } from "@argent/ui"
+import { P4, TokenButton } from "@argent/x-ui"
 import { FC } from "react"
 
-import { prettifyCurrencyValue } from "../../../../shared/token/price"
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import {
   useTokenAmountToCurrencyValue,
   useTokenPriceDetails,
 } from "../../accountTokens/tokenPriceHooks"
-import { bigDecimal, ensureDecimals } from "@argent/shared"
+import {
+  bigDecimal,
+  ensureDecimals,
+  prettifyCurrencyValue,
+} from "@argent/x-shared"
 import { Token } from "../../../../shared/token/__new/types/token.model"
 
 interface TokenPriceProps {

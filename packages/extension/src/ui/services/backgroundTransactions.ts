@@ -5,7 +5,7 @@ import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMess
 import { BaseWalletAccount } from "../../shared/wallet.model"
 import { messageClient } from "./messaging/trpc"
 import { DeclareContract, DeployContract } from "../../shared/udc/schema"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 export const executeTransaction = (data: ExecuteTransactionRequest) => {
   return sendMessage({ type: "EXECUTE_TRANSACTION", data })

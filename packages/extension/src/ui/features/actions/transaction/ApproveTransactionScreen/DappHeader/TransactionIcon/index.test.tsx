@@ -45,12 +45,18 @@ describe("TransactionIcon", () => {
   it("should render SendTransactionIcon if type is apiTransactionReviewActivityType.transfer", async () => {
     vi.spyOn(
       transactionReviewService,
-      "getTransactionReviewWithType",
+      "transactionReviewHasTransfer",
     ).mockImplementation(() =>
-      vi.fn(() => {
-        return {
-          type: "transfer",
-        } as transactionReviewService.TransactionReviewWithType
+      vi.fn((): boolean => {
+        return true
+      })(),
+    )
+    vi.spyOn(
+      transactionReviewService,
+      "transactionReviewHasSwap",
+    ).mockImplementation(() =>
+      vi.fn((): boolean => {
+        return false
       })(),
     )
     const props: TransactionIconProps = {
@@ -68,10 +74,19 @@ describe("TransactionIcon", () => {
 
     vi.spyOn(
       transactionReviewService,
-      "getTransactionReviewSwap",
+      "transactionReviewHasTransfer",
     ).mockImplementation(() =>
-      vi.fn(() => {
-        return mockSwapTransactionReview as transactionReviewService.ApiTransactionReview
+      vi.fn((): boolean => {
+        return false
+      })(),
+    )
+
+    vi.spyOn(
+      transactionReviewService,
+      "transactionReviewHasSwap",
+    ).mockImplementation(() =>
+      vi.fn((): boolean => {
+        return true
       })(),
     )
 

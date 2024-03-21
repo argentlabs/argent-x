@@ -1,4 +1,4 @@
-import { P3, icons } from "@argent/ui"
+import { P3, icons } from "@argent/x-ui"
 import {
   Flex,
   FormLabel,

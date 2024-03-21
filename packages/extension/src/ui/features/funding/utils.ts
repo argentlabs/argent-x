@@ -1,4 +1,4 @@
-import { normalizeAddress } from "@argent/shared"
+import { normalizeAddress } from "@argent/x-shared"
 
 export const getLayerSwapUrl = (accountAddress: string) => {
   return `https://www.layerswap.io/?destNetwork=STARKNET_MAINNET&destAddress=${normalizeAddress(

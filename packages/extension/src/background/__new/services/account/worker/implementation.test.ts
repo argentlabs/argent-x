@@ -1,5 +1,5 @@
 import { Mocked, describe, expect, it, vi } from "vitest"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 import { getMockWalletAccount } from "../../../../../../test/walletAccount.mock"
 import { IAccountService } from "../../../../../shared/account/service/interface"

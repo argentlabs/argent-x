@@ -1,16 +1,13 @@
-export type {
-  AddStarknetChainParameters,
-  WatchAssetParameters,
-  AccountChangeEventHandler,
-  NetworkChangeEventHandler,
-  StarknetWindowObject,
-  WalletEvents,
-} from "get-starknet-core"
+export * from "get-starknet-core"
+
+export type { StarknetWindowObject as OldStarknetWindowObject } from "get-starknet-coreV3"
 
 export type {
   GetArgentStarknetWindowObject,
   Variant,
   WebWalletStarknetWindowObject,
+  BackwardsCompatibleConnectedStarknetWindowObject,
+  BackwardsCompatibleStarknetWindowObject,
 } from "./starknet"
 export type {
   StarknetMethods,
@@ -35,5 +32,10 @@ export { getArgentStarknetWindowObject } from "./starknet"
 export { WindowMessenger } from "./messages/messenger/window"
 export { Sender, Receiver } from "./messages/exchange/bidirectional"
 export { Relayer } from "./messages/exchange/relayer"
-export { StarknetMethodArgumentsSchemas, CallSchema } from "./types"
+export {
+  StarknetMethodArgumentsSchemas,
+  CallSchema,
+  CallsArraySchema,
+  BigNumberishSchema,
+} from "./types"
 export * from "./utils/mittx"

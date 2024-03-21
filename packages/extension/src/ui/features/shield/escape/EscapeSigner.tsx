@@ -1,10 +1,10 @@
-import { Button, FlowHeader, P4, icons } from "@argent/ui"
+import { Button, FlowHeader, P4, icons } from "@argent/x-ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/escape.model"
-import { analytics } from "../../../services/analytics"
-import { ZENDESK_LINK } from "../../userReview/ReviewFeedbackScreen"
+
+import { ZENDESK_LINK } from "../../userReview/constants"
 import {
   ESCAPE_GUARDIAN_LINK,
   ShieldExternalLinkButton,
@@ -45,13 +45,7 @@ export const EscapeSigner: FC<EscapeSignerProps> = ({
         {ESCAPE_SECURITY_PERIOD_DAYS} days. Check detailed instructions here:
       </P4>
       <ShieldExternalLinkButton
-        onClick={() => {
-          analytics.track("argentShieldEscapeScreenAction", {
-            escapeId: "escapeSigner",
-            remainingTime: liveAccountEscape.activeFromNowMs,
-            action: "detailedInstructions",
-          })
-        }}
+        onClick={() => undefined}
         href={ESCAPE_GUARDIAN_LINK}
         my={3}
       >
@@ -60,13 +54,7 @@ export const EscapeSigner: FC<EscapeSignerProps> = ({
       <Flex flex={1} />
       <VStack spacing={1} alignItems={"stretch"}>
         <Button
-          onClick={() => {
-            analytics.track("argentShieldEscapeScreenAction", {
-              escapeId: "escapeSigner",
-              remainingTime: liveAccountEscape.activeFromNowMs,
-              action: "contactArgentSupport",
-            })
-          }}
+          onClick={() => undefined}
           as={"a"}
           colorScheme={"primary"}
           href={ZENDESK_LINK}

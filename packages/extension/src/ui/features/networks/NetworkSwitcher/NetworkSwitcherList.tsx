@@ -1,13 +1,13 @@
-import { B3, L2 } from "@argent/ui"
+import { B3, L2 } from "@argent/x-ui"
 import { Flex, MenuItem, MenuList, MenuListProps } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { Network, NetworkStatus } from "../../../../shared/network"
+import { Network, ColorStatus } from "../../../../shared/network"
 import { StatusIndicator } from "../../../components/StatusIndicator"
 
 export interface NetworkSwitcherListProps extends MenuListProps {
   currentNetwork: Network
-  allNetworks: (Network & { status: NetworkStatus })[]
+  allNetworks: (Network & { status: ColorStatus })[]
   onChangeNetwork: (id: string) => void
 }
 

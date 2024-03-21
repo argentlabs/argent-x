@@ -1,3 +1,4 @@
+import { analyticsService } from "../../../../shared/analytics"
 import { IRecoveryService } from "../../../../shared/recovery/service/interface"
 import { recoveredAtKeyValueStore } from "../../../../shared/recovery/storage"
 import { IRecoveryStorage } from "../../../../shared/recovery/types"
@@ -32,6 +33,7 @@ export class BackgroundRecoveryService implements IRecoveryService {
     } finally {
       await this.updateLastRecoveredAt()
       await this.setIsRecovering(false)
+      analyticsService.walletRestored()
     }
   }
 
@@ -57,6 +59,7 @@ export class BackgroundRecoveryService implements IRecoveryService {
     } finally {
       await this.updateLastRecoveredAt()
       await this.setIsRecovering(false)
+      analyticsService.walletRestored()
     }
   }
 

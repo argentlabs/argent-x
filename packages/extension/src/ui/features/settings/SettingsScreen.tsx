@@ -6,7 +6,7 @@ import {
   NavigationContainerProps,
   SpacerCell,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
 import { FC, ReactEventHandler } from "react"
 
@@ -22,7 +22,7 @@ import {
   SettingsMenuItemLink,
 } from "./ui/SettingsMenuItem"
 import { SupportFooter } from "./ui/SupportFooter"
-import { formatTruncatedString } from "@argent/shared"
+import { formatTruncatedString } from "@argent/x-shared"
 
 const {
   LockIcon,

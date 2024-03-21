@@ -1,4 +1,4 @@
-import { addressOrDomainSchema, addressSchema } from "@argent/shared"
+import { addressOrDomainSchema, addressSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 import { useQuery } from "../../hooks/useQuery"

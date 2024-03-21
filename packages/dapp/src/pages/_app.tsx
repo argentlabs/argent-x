@@ -1,5 +1,5 @@
 import type { AppProps } from "next/app"
-import { ThemeProvider } from "@argent/ui"
+import { ThemeProvider } from "@argent/x-ui"
 import { FC } from "react"
 
 const GlobalStyle: FC = () => {

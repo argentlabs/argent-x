@@ -2,7 +2,7 @@ import {
   isArgentNetworkId,
   includesAddress,
   isEqualAddress,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { RefreshInterval } from "../../../../../shared/config"
 import type { IDebounceService } from "../../../../../shared/debounce"
 import { defaultNetwork } from "../../../../../shared/network"
@@ -31,11 +31,7 @@ import {
   ProvisionActivity,
 } from "../../activity/interface"
 import type { IBackgroundUIService } from "../../ui/interface"
-import {
-  every,
-  everyWhenOpen,
-  onInstallAndUpgrade,
-} from "../../worker/schedule/decorators"
+import { everyWhenOpen } from "../../worker/schedule/decorators"
 import { pipe } from "../../worker/schedule/pipe"
 import { mergeTokensWithDefaults } from "../../../../../shared/token/__new/repository/mergeTokens"
 import { ProvisionActivityPayload } from "../../../../../shared/activity/types"
@@ -94,21 +90,6 @@ export class TokenWorker {
   }
 
   /**
-   * Update tokens
-   * Fetches tokens for all networks and updates the token service
-   */
-  runRefreshTokenRepoWithTokensInfoFromBackend = pipe(
-    onInstallAndUpgrade(this.scheduleService), // This will run the function on update
-    every(
-      this.scheduleService,
-      RefreshInterval.SLOW,
-      "TokenWorker.refreshTokenRepoWithTokensInfoFromBackend",
-    ), // This will run the function every 5 mins
-  )(async (): Promise<void> => {
-    await this.refreshTokenRepoWithTokensInfoFromBackend()
-  })
-
-  /**
    * Update token balances for custom networks
    */
   runUpdateTokenBalancesForCustomNetworks = pipe(
@@ -125,9 +106,10 @@ export class TokenWorker {
 
   /**
    * Update token prices
+   * Fetches tokens for all networks and updates the token service
    * Fetches token prices for the default network and updates the token service
    */
-  runFetchAndUpdateTokenPricesFromBackend = pipe(
+  runFetchAndUpdateTokensAndTokenPricesFromBackend = pipe(
     everyWhenOpen(
       this.backgroundUIService,
       this.scheduleService,
@@ -136,6 +118,7 @@ export class TokenWorker {
       "TokenWorker.fetchAndUpdateTokenPricesFromBackend",
     ), // This will run the function every minute when the UI is open
   )(async (): Promise<void> => {
+    await this.refreshTokenRepoWithTokensInfoFromBackend()
     await this.fetchAndUpdateTokenPricesFromBackend()
   })
 

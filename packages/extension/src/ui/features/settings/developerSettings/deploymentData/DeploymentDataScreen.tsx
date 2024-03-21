@@ -9,7 +9,7 @@ import {
   scrollbarStyle,
   BarBackButton,
   NavigationContainer,
-} from "@argent/ui"
+} from "@argent/x-ui"
 
 const { CopyIcon } = icons
 
@@ -31,7 +31,7 @@ export const DeploymentDataScreen: FC = () => {
         <Flex
           w="80%"
           p={4}
-          backgroundColor="surface.default"
+          backgroundColor="surface-default"
           rounded="lg"
           border="1px solid"
           borderColor="neutrals.500"

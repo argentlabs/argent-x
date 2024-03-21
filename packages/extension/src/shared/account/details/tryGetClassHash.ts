@@ -1,6 +1,6 @@
 import { Call, ProviderInterface } from "starknet"
 import { TXV1_ACCOUNT_CLASS_HASH } from "../../network/constants"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 export async function tryGetClassHash(
   call: Call,

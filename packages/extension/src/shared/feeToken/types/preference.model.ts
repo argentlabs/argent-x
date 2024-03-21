@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 export const FeeTokenPreferenceSchema = z.object({
   prefer: addressSchema,

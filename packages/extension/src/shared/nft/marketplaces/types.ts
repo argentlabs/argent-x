@@ -1,5 +1,8 @@
-import type { Address } from "@argent/shared"
-import { logos } from "@argent/ui"
+import type { Address } from "@argent/x-shared"
+// just using types here
+// eslint-disable-next-line @argent/local/code-import-patterns
+import { logos } from "@argent/x-ui"
+
 import { defaultNftMarketplaces } from "./defaultNftMarketplaces"
 
 export type NftMarketplaceKey = keyof typeof defaultNftMarketplaces

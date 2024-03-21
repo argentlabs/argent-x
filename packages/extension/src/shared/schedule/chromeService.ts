@@ -1,4 +1,5 @@
 import { DeepPick } from "../types/deepPick"
+import { ALARM_VERSION } from "./constants"
 import {
   BaseScheduledTask,
   IScheduleService,
@@ -20,9 +21,6 @@ const wait: WaitFn = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-function isEqualAlarmId(a: string, b?: string) {
-  return a === b || (b && a.startsWith(`${b}::`))
-}
 function getFrequency(id: string) {
   const match = id.match(/::run(\d+)$/)
   return match ? parseInt(match[1]) : 1
@@ -34,6 +32,7 @@ async function runWithTimer(fn: () => Promise<void>): Promise<number> {
   const duration = Date.now() - start
   return duration
 }
+
 async function runXTimesPerMinute(
   timesPerMinute: number,
   fn: () => Promise<void>,
@@ -52,8 +51,13 @@ export class ChromeScheduleService implements IScheduleService {
 
   constructor(
     private readonly browser: MinimalBrowser,
+    private readonly alarmVersion = ALARM_VERSION,
     private readonly waitFn: (ms: number) => Promise<void> = wait,
   ) {}
+
+  isEqualAlarmId(a: string, b?: string) {
+    return a === b || (b && a.startsWith(`${this.alarmVersion}::${b}::`))
+  }
 
   async every(seconds: number, task: BaseScheduledTask): Promise<void> {
     const isSubMinute = seconds < 60
@@ -61,9 +65,12 @@ export class ChromeScheduleService implements IScheduleService {
       ? Math.max(Math.floor(60 / seconds - 1), 1)
       : 1
     const periodInMinutes = Math.max(Math.round(seconds / 60), 1)
-    await this.browser.alarms.create(`${task.id}::run${timesPerMinute}`, {
-      periodInMinutes,
-    })
+    await this.browser.alarms.create(
+      `${this.alarmVersion}::${task.id}::run${timesPerMinute}`,
+      {
+        periodInMinutes,
+      },
+    )
     if (isSubMinute) {
       const taskImpl = this.taskImplementationById[task.id]
       void runXTimesPerMinute(timesPerMinute, taskImpl.callback, this.waitFn)
@@ -72,7 +79,7 @@ export class ChromeScheduleService implements IScheduleService {
 
   async in(seconds: number, task: BaseScheduledTask): Promise<void> {
     const delayInMinutes = Math.max(Math.round(seconds / 60), 1)
-    await this.browser.alarms.create(`${task.id}::run1`, {
+    await this.browser.alarms.create(`${this.alarmVersion}::${task.id}::run1`, {
       delayInMinutes,
     })
   }
@@ -81,7 +88,7 @@ export class ChromeScheduleService implements IScheduleService {
     delete this.taskImplementationById[task.id]
     const allAlarms = await this.browser.alarms.getAll()
     const alarmsToDelete = allAlarms
-      .filter((alarm) => isEqualAlarmId(alarm.name, task.id))
+      .filter((alarm) => this.isEqualAlarmId(alarm.name, task.id))
       .map((alarm) => alarm.name)
 
     await Promise.allSettled(
@@ -92,7 +99,7 @@ export class ChromeScheduleService implements IScheduleService {
   async registerImplementation(task: ImplementedScheduledTask): Promise<void> {
     this.taskImplementationById[task.id] = task
     this.browser.alarms.onAlarm.addListener((alarm) => {
-      if (isEqualAlarmId(alarm.name, task.id)) {
+      if (this.isEqualAlarmId(alarm.name, task.id)) {
         const frequency = getFrequency(alarm.name)
         void runXTimesPerMinute(frequency, task.callback, this.waitFn)
       }

@@ -1,4 +1,4 @@
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 import {
   DappContext,
   IRiskAssessmentService,

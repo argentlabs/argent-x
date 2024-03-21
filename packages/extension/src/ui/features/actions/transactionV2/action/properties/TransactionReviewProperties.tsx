@@ -2,7 +2,7 @@ import { FC } from "react"
 
 import { Property } from "../../../../../../shared/transactionReview/schema"
 import { TransactionReviewProperty } from "./TransactionReviewProperty"
-import { LabelValueStack } from "@argent/ui"
+import { LabelValueStack } from "@argent/x-ui"
 
 interface TransactionReviewPropertiesProps {
   properties: Property[]

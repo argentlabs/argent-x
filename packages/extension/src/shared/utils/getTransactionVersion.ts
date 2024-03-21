@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import { feeTokenNeedsTxV3Support } from "../network/txv3"
 import {
   TransactionInvokeVersion,

@@ -1,4 +1,4 @@
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import ReactSelect, {

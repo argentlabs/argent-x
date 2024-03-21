@@ -5,7 +5,7 @@ import {
   P3,
   StickyGroup,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Box, Center, Circle, Flex } from "@chakra-ui/react"
 import { FC, isValidElement, useCallback, useState } from "react"
 import Measure, { ContentRect } from "react-measure"

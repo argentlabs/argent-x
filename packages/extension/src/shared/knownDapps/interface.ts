@@ -1,4 +1,4 @@
-import { KnownDapp, KnownDapps } from "@argent/shared"
+import { KnownDapp, KnownDapps } from "@argent/x-shared"
 
 export interface IKnownDappService {
   getDapps: () => Promise<KnownDapps>

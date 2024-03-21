@@ -20,7 +20,7 @@ import {
 } from "../../../../../test/network.mock"
 import { INetworkRepo } from "../../../network/store"
 import { GatewayError, shortString, stark } from "starknet"
-import { IHttpService, addressSchema } from "@argent/shared"
+import { IHttpService, addressSchema } from "@argent/x-shared"
 import { TokenError } from "../../../errors/token"
 import { IObjectStore } from "../../../storage/__new/interface"
 import { TokenInfoByNetwork } from "../types/tokenInfo.model"
@@ -148,9 +148,8 @@ describe("TokenService", () => {
       it("should fetch tokens from backend", async () => {
         mockTokenInfoStore.get.mockResolvedValueOnce({})
         mockHttpService.get.mockResolvedValueOnce({ tokens: mockTokens })
-        const result = await tokenService.getTokensInfoFromBackendForNetwork(
-          mockNetworkId,
-        )
+        const result =
+          await tokenService.getTokensInfoFromBackendForNetwork(mockNetworkId)
         expect(mockTokenInfoStore.get).toHaveBeenCalledOnce()
         expect(mockHttpService.get).toHaveBeenCalledOnce()
         expect(mockTokenInfoStore.set).toHaveBeenCalledOnce()
@@ -167,9 +166,8 @@ describe("TokenService", () => {
           },
         })
         mockHttpService.get.mockResolvedValueOnce({ tokens: mockTokens })
-        const result = await tokenService.getTokensInfoFromBackendForNetwork(
-          mockNetworkId,
-        )
+        const result =
+          await tokenService.getTokensInfoFromBackendForNetwork(mockNetworkId)
         expect(mockTokenInfoStore.get).toHaveBeenCalledOnce()
         expect(mockHttpService.get).not.toHaveBeenCalled()
         expect(mockTokenInfoStore.set).not.toHaveBeenCalled()
@@ -186,9 +184,8 @@ describe("TokenService", () => {
           },
         })
         mockHttpService.get.mockResolvedValueOnce({ tokens: mockTokens })
-        const result = await tokenService.getTokensInfoFromBackendForNetwork(
-          mockNetworkId,
-        )
+        const result =
+          await tokenService.getTokensInfoFromBackendForNetwork(mockNetworkId)
         expect(mockTokenInfoStore.get).toHaveBeenCalledOnce()
         expect(mockHttpService.get).toHaveBeenCalledOnce()
         expect(mockTokenInfoStore.set).toHaveBeenCalledOnce()
@@ -304,9 +301,8 @@ describe("TokenService", () => {
   describe("fetch tokens from backend", () => {
     it("should return without fetching tokens if it is not a default network", async () => {
       const mockNetworkId = "mockNetworkId"
-      const result = await tokenService.getTokensInfoFromBackendForNetwork(
-        mockNetworkId,
-      )
+      const result =
+        await tokenService.getTokensInfoFromBackendForNetwork(mockNetworkId)
       expect(mockTokenInfoStore.get).not.toHaveBeenCalled()
       expect(result).toBeUndefined()
     })
@@ -392,9 +388,8 @@ describe("TokenService", () => {
           },
         ])
 
-      const result = await tokenService.fetchTokenBalancesFromOnChain(
-        mockAccount,
-      )
+      const result =
+        await tokenService.fetchTokenBalancesFromOnChain(mockAccount)
       expect(result).toEqual(mockTokenBalances)
     })
 
@@ -459,9 +454,8 @@ describe("TokenService", () => {
           },
         ])
 
-      const result = await tokenService.fetchTokenBalancesFromOnChain(
-        mockAccounts,
-      )
+      const result =
+        await tokenService.fetchTokenBalancesFromOnChain(mockAccounts)
       expect(result).toEqual(mockTokenBalances)
     })
   })
@@ -801,9 +795,8 @@ describe("TokenService", () => {
       mockTokenBalanceRepo.get.mockResolvedValueOnce(mockTokensWithBalances)
       mockTokenPriceRepo.get.mockResolvedValueOnce(mockTokenPrices)
       mockTokenRepo.get.mockResolvedValueOnce(mockTokensWithBalances)
-      const result = await tokenService.getTotalCurrencyBalanceForAccounts(
-        mockAccounts,
-      )
+      const result =
+        await tokenService.getTotalCurrencyBalanceForAccounts(mockAccounts)
       expect(result).toEqual({
         [`${randomAddress1}:${defaultNetwork.id}`]: "2000",
         [`${randomAddress2}:${defaultNetwork.id}`]: "200",

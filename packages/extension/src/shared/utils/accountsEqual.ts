@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import type { BaseWalletAccount, WalletAccount } from "../wallet.model"
 
 export const accountsEqual = (a?: BaseWalletAccount, b?: BaseWalletAccount) => {

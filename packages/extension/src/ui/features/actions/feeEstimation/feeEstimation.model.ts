@@ -1,4 +1,4 @@
-import { TokenWithBalance } from "@argent/shared"
+import { TokenWithBalance } from "@argent/x-shared"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { ParsedFeeError } from "./feeError"
 

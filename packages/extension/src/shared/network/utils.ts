@@ -3,10 +3,10 @@ import {
   isEqualAddress,
   type ArgentNetworkId,
   isArgentNetworkId,
-} from "@argent/shared"
+} from "@argent/x-shared"
 
 import type { ArgentAccountType } from "../wallet.model"
-import type { DefaultNetworkId, Network, PublicRpcNode } from "./type"
+import type { DefaultNetworkId, Network } from "./type"
 import { PUBLIC_RPC_NODES } from "./constants"
 import { argentApiNetworkForNetwork } from "../api/headers"
 

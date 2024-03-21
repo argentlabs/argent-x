@@ -1,4 +1,4 @@
-import { Button, icons } from "@argent/ui"
+import { Button, icons } from "@argent/x-ui"
 import { ComponentProps, FC } from "react"
 import { Link } from "react-router-dom"
 

@@ -1,19 +1,11 @@
-import { FieldError, P3, RoundButton, icons } from "@argent/ui"
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Input,
-  InputGroup,
-  InputRightElement,
-} from "@chakra-ui/react"
+import { FieldError, P3, icons } from "@argent/x-ui"
+import { Box, Button, Center, Flex, Input, InputGroup } from "@chakra-ui/react"
 import { useCallback, useEffect, useRef } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
 import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 
-const { CloseIcon, AddIcon } = icons
+const { AddIcon, RemoveIcon } = icons
 
 interface AddOwnerFormProps {
   nextOwnerIndex: number
@@ -48,14 +40,47 @@ export const AddOwnersForm = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addOwner])
-
   return (
     <Flex direction="column" justifyContent="space-between" w="100%">
       <Box maxHeight={300} overflowY="auto">
         {fields.map((field, index) => {
           return (
-            <Box key={field.id} my="2" width="100%">
-              <P3 mb="1">Owner {nextOwnerIndex + index}</P3>
+            <Box
+              key={field.id}
+              my="2"
+              width="100%"
+              data-testid={`signerContainer.${index}`}
+            >
+              <Flex justify="space-between" align="center">
+                <P3 mb="1">Owner {nextOwnerIndex + index}</P3>
+                <Button
+                  data-testid={`closeButton.${index}`}
+                  onClick={() => {
+                    if (!isNewMultisig && fields.length === 1) {
+                      addOwner()
+                    }
+                    remove(index)
+                  }}
+                  height="5"
+                  size="xs"
+                  mr="2"
+                  my="0"
+                  pb="0"
+                  variant="link"
+                >
+                  <RemoveIcon />
+                </Button>
+              </Flex>
+              <InputGroup display="flex" alignItems="center">
+                <Input
+                  isInvalid={Boolean(errors?.signerKeys?.[index]?.name)}
+                  placeholder="Name"
+                  {...register(`signerKeys.${index}.name` as const, {
+                    required: false,
+                  })}
+                  mb={2}
+                />
+              </InputGroup>
               <InputGroup display="flex" alignItems="center">
                 <Input
                   isInvalid={Boolean(errors?.signerKeys?.[index]?.key)}
@@ -64,25 +89,6 @@ export const AddOwnersForm = ({
                     required: true,
                   })}
                 />
-                <InputRightElement my="auto">
-                  <RoundButton
-                    data-testid={`closeButton.${index}`}
-                    onClick={() => {
-                      if (!isNewMultisig && fields.length === 1) {
-                        addOwner()
-                      }
-                      remove(index)
-                    }}
-                    height="5"
-                    size="xs"
-                    mr="2"
-                    my="0"
-                    pb="0"
-                    variant="link"
-                  >
-                    <CloseIcon />
-                  </RoundButton>
-                </InputRightElement>
               </InputGroup>
               {errors.signerKeys && (
                 <FieldError>

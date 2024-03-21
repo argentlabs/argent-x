@@ -4,7 +4,7 @@ import {
   BarCloseButton,
   Input,
   H6,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC } from "react"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { ArgentAccountFeaturesList } from "./ArgentAccountFeaturesList"

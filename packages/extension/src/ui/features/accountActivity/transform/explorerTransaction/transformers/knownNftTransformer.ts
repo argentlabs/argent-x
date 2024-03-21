@@ -1,4 +1,4 @@
-import { isEqualAddress, includesAddress } from "@argent/shared"
+import { isEqualAddress, includesAddress } from "@argent/x-shared"
 
 import { NFTTransferTransaction } from "../../type"
 import { IExplorerTransactionTransformer } from "./type"

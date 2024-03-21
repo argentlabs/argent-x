@@ -1,4 +1,4 @@
-import { Address, addressSchema } from "@argent/shared"
+import { Address, addressSchema } from "@argent/x-shared"
 
 // Contracts to be whitelisted for execute_from_outside
 const OUTSIDE_EXEC_WHITELIST = [

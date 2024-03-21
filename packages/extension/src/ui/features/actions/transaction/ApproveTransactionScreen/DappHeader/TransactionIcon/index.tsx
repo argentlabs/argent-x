@@ -1,15 +1,14 @@
-import { useERC721Transactions } from "@argent/shared"
+import { useERC721Transactions } from "@argent/x-shared"
 import { FC } from "react"
 
 import {
-  ApiTransactionReviewResponse,
   ApiTransactionReviewTargettedDapp,
-  getTransactionReviewSwap,
-  getTransactionReviewWithType,
+  transactionReviewHasSwap,
+  transactionReviewHasTransfer,
 } from "../../../../../../../shared/transactionReview.service"
 import { useCurrentNetwork } from "../../../../../networks/hooks/useCurrentNetwork"
 import { ApproveScreenType } from "../../../types"
-import { AggregatedSimData } from "@argent/shared"
+import { AggregatedSimData } from "@argent/x-shared"
 import { ActivateAccountIcon } from "./ActivateAccountIcon"
 import { ActivateMultisigIcon } from "./ActivateMultisigIcon"
 import { AddArgentShieldIcon } from "./AddArgentShieldIcon"
@@ -24,9 +23,10 @@ import { UnknownDappIcon } from "./UnknownDappIcon"
 import { UpdateThresholdIcon } from "./UpdateThresholdIcon"
 import { VerifiedDappIcon } from "./VerifiedDappIcon"
 import { ReplaceOwnerIcon } from "./ReplaceOwnerIcon"
+import { ReviewOfTransaction } from "../../../../../../../shared/transactionReview/schema"
 
 export interface TransactionIconProps {
-  transactionReview?: ApiTransactionReviewResponse
+  transactionReview?: ReviewOfTransaction
   aggregatedData?: AggregatedSimData[]
   verifiedDapp?: ApiTransactionReviewTargettedDapp
   approveScreenType: ApproveScreenType
@@ -41,9 +41,8 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   const network = useCurrentNetwork()
 
   const nftTransfers = useERC721Transactions(aggregatedData)
-  const swapTxnReview = getTransactionReviewSwap(transactionReview)
-  const transactionReviewWithType =
-    getTransactionReviewWithType(transactionReview)
+  const isSwap = transactionReviewHasSwap(transactionReview)
+  const isTransfer = transactionReviewHasTransfer(transactionReview)
 
   // Check approve screen type and return appropriate icon
   switch (approveScreenType) {
@@ -69,9 +68,12 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       return <RemoveArgentShieldIcon />
     default:
       // Check if swap transaction review is available
-      if (swapTxnReview) {
+      if (isSwap) {
         return (
-          <SwapTransactionIcon network={network} transaction={swapTxnReview} />
+          <SwapTransactionIcon
+            network={network}
+            aggregatedData={aggregatedData}
+          />
         )
       }
 
@@ -80,11 +82,11 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       // Here the assumption is that if the transaction is a transfer, it is a send transaction
       // and that it will be done in-app without approval
       // If there is approval, this will not render
-      if (transactionReviewWithType?.type === "transfer") {
+      if (isTransfer) {
         return (
           <SendTransactionIcon
             network={network}
-            transaction={transactionReviewWithType}
+            aggregatedData={aggregatedData}
           />
         )
       }

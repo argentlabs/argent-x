@@ -1,10 +1,9 @@
-import { B3, P4, icons } from "@argent/ui"
+import { B3, P4, icons } from "@argent/x-ui"
 import { Flex, Image, Square } from "@chakra-ui/react"
-import { ensureDecimals } from "@argent/shared"
+import { ensureDecimals, prettifyTokenAmount } from "@argent/x-shared"
 
 import { SimulationSummary } from "../../../../../../shared/transactionReview/schema"
 import { TokenIcon } from "../../../../accountTokens/TokenIcon"
-import { prettifyTokenAmount } from "../../../../../../shared/token/price"
 
 const { ImageIcon } = icons
 
@@ -32,7 +31,7 @@ function NftSummary(summary: SimulationSummary) {
           size={7}
           rounded={"md"}
           bg={"neutrals.600"}
-          color={"text.secondary"}
+          color={"text-secondary"}
           position={"relative"}
         >
           <ImageIcon fontSize={"xl"} />
@@ -77,7 +76,7 @@ function TokenSummary(summary: SimulationSummary) {
           {prefix}
           {displayAmount}
         </B3>
-        {usdValue && <P4 color="text.secondary">${usdValue}</P4>}
+        {usdValue && <P4 color="text-secondary">${usdValue}</P4>}
       </Flex>
     </Flex>
   )

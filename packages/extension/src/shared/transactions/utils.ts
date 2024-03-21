@@ -1,4 +1,4 @@
-import { hexSchema } from "@argent/shared"
+import { hexSchema } from "@argent/x-shared"
 import { constants, num } from "starknet"
 
 import { TransactionError } from "../errors/transaction"

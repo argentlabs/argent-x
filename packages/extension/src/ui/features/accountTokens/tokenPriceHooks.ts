@@ -1,4 +1,9 @@
-import { isAddress } from "@argent/shared"
+import {
+  isAddress,
+  isNumeric,
+  convertTokenAmountToCurrencyValue,
+  convertTokenUnitAmountWithDecimals,
+} from "@argent/x-shared"
 import { useMemo } from "react"
 
 import {
@@ -9,12 +14,9 @@ import {
 import {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
-  convertTokenAmountToCurrencyValue,
-  convertTokenUnitAmountWithDecimals,
-  lookupTokenPriceDetails,
-  sumTokenBalancesToCurrencyValue,
-} from "../../../shared/token/price"
-import { isNumeric } from "../../../shared/utils/number"
+} from "../../../shared/token/types"
+import { lookupTokenPriceDetails } from "../../../shared/token/lookupTokenPriceDetails"
+import { sumTokenBalancesToCurrencyValue } from "../../../shared/token/sumTokenBalancesToCurrencyValue"
 import { argentApiFetcher } from "../../services/argentApiFetcher"
 import {
   useConditionallyEnabledSWR,

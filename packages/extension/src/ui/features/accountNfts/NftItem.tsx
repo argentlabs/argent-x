@@ -1,4 +1,4 @@
-import { H6 } from "@argent/ui"
+import { H6 } from "@argent/x-ui"
 import { Box, Image } from "@chakra-ui/react"
 import { FC } from "react"
 

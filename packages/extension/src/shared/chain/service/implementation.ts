@@ -6,7 +6,7 @@ import {
   TransactionWithStatus,
 } from "../../transactions/interface"
 import { BaseContract, IChainService } from "./interface"
-import { isContractDeployed } from "@argent/shared"
+import { isContractDeployed } from "@argent/x-shared"
 import { SUCCESS_STATUSES } from "../../transactions"
 
 export class StarknetChainService implements IChainService {
@@ -65,8 +65,8 @@ export class StarknetChainService implements IChainService {
           reason: new Error(error_reason),
         }
       : isSuccessful
-      ? { status: "confirmed" }
-      : { status: "pending" }
+        ? { status: "confirmed" }
+        : { status: "pending" }
 
     return {
       ...transaction,

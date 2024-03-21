@@ -1,4 +1,4 @@
-import { useEmitEvent } from "@argent/shared"
+import { useEmitEvent } from "@argent/x-shared"
 import { useCallback } from "react"
 
 export const AppRoutesAnimationComplete = Symbol("AppRoutesAnimationComplete")

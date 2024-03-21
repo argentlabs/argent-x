@@ -5,6 +5,7 @@ import { pubkeySchema } from "../../../../shared/multisig/multisig.model"
 
 const FormSchema = z.object({
   signerKey: pubkeySchema,
+  name: z.string().optional(),
 })
 
 export type FieldValuesReplaceOwnerForm = z.infer<typeof FormSchema>

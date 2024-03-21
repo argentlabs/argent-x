@@ -1,4 +1,4 @@
-import { ArgentKnownDappsBackendService } from "@argent/shared"
+import { ArgentKnownDappsBackendService } from "@argent/x-shared"
 import { ARGENT_API_BASE_URL } from "../api/constants"
 import { KnownDappService } from "./implementation"
 import { knownDappsRepository } from "../storage/__new/repositories/knownDapp"

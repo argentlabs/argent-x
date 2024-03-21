@@ -2,7 +2,7 @@ import {
   Address,
   cairoAssemblySchema,
   compiledContractClassSchema,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import {
   CairoVersion,
   DeclareContractPayload,

@@ -2,7 +2,7 @@ import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useView } from "../../views/implementation/react"
 import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useAccount } from "../accounts/accounts.state"
-import { TokenWithBalance, isEqualAddress } from "@argent/shared"
+import { TokenWithBalance, isEqualAddress } from "@argent/x-shared"
 import {
   classHashSupportsTxV3,
   feeTokenNeedsTxV3Support,

@@ -1,4 +1,4 @@
-import { type IHttpService } from "@argent/shared"
+import { type IHttpService } from "@argent/x-shared"
 
 import { RefreshInterval } from "../../../../shared/config"
 import type { IDebounceService } from "../../../../shared/debounce"
@@ -39,18 +39,31 @@ export class DiscoverService implements IDiscoverService {
     if (!ARGENT_X_NEWS_URL) {
       return this.resetData()
     }
-    /** FIXME: cacheBust param is a temporary fix to force fresh content from static server */
-    const cacheBust = Date.now()
-    const result = await this.httpService.get(
-      `${ARGENT_X_NEWS_URL}?v=${cacheBust}`,
-    )
+
+    const result = await this.httpService.get(ARGENT_X_NEWS_URL)
     const parsedResult = newsApiReponseSchema.safeParse(result)
     if (!parsedResult.success) {
       // on failure, ensure we don't show stale data to end user
       return this.resetData()
     }
+
+    const { news, lastModified } = parsedResult.data
+
+    const sortedNews = news.sort((a, b) => {
+      if (!a.created || !b.created) {
+        return 0
+      }
+      const dateA = new Date(a.created)
+      const dateB = new Date(b.created)
+
+      return dateB.getTime() - dateA.getTime()
+    })
+
     await this.discoverStore.set({
-      data: parsedResult.data,
+      data: {
+        lastModified,
+        news: sortedNews,
+      },
     })
   }
 

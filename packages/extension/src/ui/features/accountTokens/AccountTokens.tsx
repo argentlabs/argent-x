@@ -1,4 +1,4 @@
-import { CellStack, Banner, Empty, icons } from "@argent/ui"
+import { CellStack, Banner, Empty, icons } from "@argent/x-ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 

@@ -1,4 +1,4 @@
-import { L2, icons } from "@argent/ui"
+import { L2, icons } from "@argent/x-ui"
 
 import { Button, Flex, Text } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"

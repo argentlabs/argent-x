@@ -5,9 +5,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: SettingsScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const account = {

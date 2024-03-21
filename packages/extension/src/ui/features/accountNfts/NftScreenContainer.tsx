@@ -1,5 +1,5 @@
-import { isAddress } from "@argent/shared"
-import { AlertDialog, BarBackButton, NavigationContainer } from "@argent/ui"
+import { isAddress } from "@argent/x-shared"
+import { AlertDialog, BarBackButton, NavigationContainer } from "@argent/x-ui"
 import { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 

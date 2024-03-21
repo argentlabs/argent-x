@@ -1,6 +1,6 @@
 import urlJoin from "url-join"
 
-import { type IHttpService, ensureArray, Address } from "@argent/shared"
+import { type IHttpService, ensureArray, Address } from "@argent/x-shared"
 import {
   Account,
   CairoVersion,
@@ -22,6 +22,7 @@ import {
   SimulateAndReview,
   isTransactionSimulationError,
   simulateAndReviewSchema,
+  EnrichedSimulateAndReview,
 } from "../../../../shared/transactionReview/schema"
 import { ReviewError } from "../../../../shared/errors/review"
 import { addEstimatedFee } from "../../../../shared/transactionSimulation/fees/estimatedFeesRepository"
@@ -96,9 +97,8 @@ export default class BackgroundTransactionReviewService
           const bulkTransactions: Invocations = [
             {
               type: TransactionType.DEPLOY_ACCOUNT,
-              payload: await this.wallet.getAccountDeploymentPayload(
-                selectedAccount,
-              ),
+              payload:
+                await this.wallet.getAccountDeploymentPayload(selectedAccount),
             },
             {
               type: TransactionType.INVOKE,
@@ -242,7 +242,7 @@ export default class BackgroundTransactionReviewService
   }: {
     transactions: TransactionReviewTransactions[]
     feeTokenAddress: Address
-  }) {
+  }): Promise<EnrichedSimulateAndReview> {
     const selectedAccount = await this.wallet.getSelectedAccount()
     const account = await this.wallet.getSelectedStarknetAccount()
     const isDeploymentTransaction = transactions.some(
@@ -312,18 +312,14 @@ export default class BackgroundTransactionReviewService
         simulateAndReviewSchema,
       )
 
-      // if there is any simulation error then we should fall-back to on-chain so the user is not blocked
+      // if there is a simulation error then there is also no actual simulation
+      // or fee information, and no way to proceed with fee estimation
+      // returning the result will surface the error to the user in the ui
       const hasSimulationError = result.transactions.some((transaction) =>
         isTransactionSimulationError(transaction),
       )
       if (hasSimulationError) {
-        console.warn(
-          `Falling back to onchain fee estimation as there was an error in the backend simulation response:`,
-          result,
-        )
-        throw new ReviewError({
-          code: "BACKEND_SIMULATION_ERROR",
-        })
+        return result
       }
 
       const enrichedFeeEstimation = await this.getEnrichedFeeEstimation(

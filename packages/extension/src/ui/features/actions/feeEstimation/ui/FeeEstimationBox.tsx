@@ -1,4 +1,4 @@
-import { L2 } from "@argent/ui"
+import { L2 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
 
@@ -9,7 +9,8 @@ export const FeeEstimationBox: FC<PropsWithChildren> = (props) => {
       backgroundColor="white"
       border="1px"
       borderColor="transparent"
-      px={3}
+      pl={3}
+      pr={2}
       py={2}
       _dark={{
         backgroundColor: "neutrals.900",
@@ -67,7 +68,7 @@ export const FeeEstimationBoxWithInsufficientFunds: FC<
       flexDir={"column"}
       _dark={{
         backgroundColor: "neutrals.900",
-        borderColor: "redText",
+        borderColor: "primary.red.600",
         boxShadow: "menu",
       }}
     >
@@ -75,13 +76,13 @@ export const FeeEstimationBoxWithInsufficientFunds: FC<
         {children}
       </Flex>
       <Flex
-        backgroundColor="errorExtraDark"
+        backgroundColor="surface-danger-default"
         justifyContent="center"
         alignItems="center"
         borderBottomRadius="xl"
         p="1"
       >
-        <L2 color="errorText">
+        <L2 color="text-danger">
           {userClickedAddFunds
             ? "Waiting for funds..."
             : "Insufficient funds to pay fee"}

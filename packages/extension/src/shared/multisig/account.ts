@@ -15,7 +15,7 @@ import {
 import { MultisigPendingTransaction } from "./pendingTransactionsStore"
 import { MultisigSigner } from "./signer"
 import { IMultisigBackendService } from "./service/backend/interface"
-import { isAccountV5 } from "@argent/shared"
+import { isAccountV5 } from "@argent/x-shared"
 import {
   txVersionSchema,
   TransactionVersion,

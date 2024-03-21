@@ -1,5 +1,5 @@
 import { FC, lazy } from "react"
-import { NftItem, getNftPicture } from "@argent/shared"
+import { NftItem, getNftPicture } from "@argent/x-shared"
 import { Image } from "@chakra-ui/react"
 
 const LazyNftModelViewer = lazy(() => import("./NftModelViewer"))

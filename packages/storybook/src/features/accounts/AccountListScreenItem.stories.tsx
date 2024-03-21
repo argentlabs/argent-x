@@ -1,12 +1,9 @@
 import { AccountListScreenItem } from "@argent-x/extension/src/ui/features/accounts/AccountListScreenItem"
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { ComponentProps } from "react"
 
 export default {
   component: AccountListScreenItem,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const account = {

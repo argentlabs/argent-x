@@ -1,7 +1,7 @@
 import { AspectRatio, Button, ButtonProps, Flex, Image } from "@chakra-ui/react"
 import { NewsItem } from "../../../../shared/discover/schema"
 import { FC } from "react"
-import { H6, L2, P4 } from "@argent/ui"
+import { H6, L2, P4 } from "@argent/x-ui"
 import { isEmpty } from "lodash-es"
 
 interface NewsItemCardProps extends ButtonProps {

@@ -1,4 +1,4 @@
-import { HeaderCell, L2, icons } from "@argent/ui"
+import { HeaderCell, L2, icons } from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
 import { memoize, partition } from "lodash-es"
 import { FC } from "react"
@@ -141,6 +141,7 @@ export const PendingMultisigTransactionContainer: FC<
                 borderBottomRadius={0}
               />
               <Flex
+                alignItems="center"
                 justifyContent="space-between"
                 px={4}
                 py={1}

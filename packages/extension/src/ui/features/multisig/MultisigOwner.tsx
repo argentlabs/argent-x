@@ -1,4 +1,4 @@
-import { CopyTooltip, H6, icons, P4 } from "@argent/ui"
+import { CopyTooltip, H6, icons, P4 } from "@argent/x-ui"
 import {
   Flex,
   IconButton,
@@ -13,7 +13,7 @@ import { MultisigOwnerNameModal } from "./MultisigOwnerNameModal"
 import { FC, PropsWithChildren, useMemo } from "react"
 import { Account } from "../accounts/Account"
 import { noop } from "lodash-es"
-import { encodeBase58, formatTruncatedSignerKey } from "@argent/shared"
+import { encodeBase58, formatTruncatedSignerKey } from "@argent/x-shared"
 import { SignerMetadata } from "../../../shared/multisig/types"
 import { MultisigRemoveOwnerModal } from "./MultisigRemoveOwnerModal"
 import { useNavigate } from "react-router-dom"

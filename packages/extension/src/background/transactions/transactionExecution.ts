@@ -10,8 +10,7 @@ import {
 } from "../../shared/transactions"
 import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { isAccountDeployed } from "../accountDeploy"
-import { analytics } from "../analytics"
-import { getNonce, increaseStoredNonce, resetStoredNonce } from "../nonce"
+import { getNonce, increaseStoredNonce } from "../nonce"
 import { Wallet } from "../wallet"
 import { getEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import {
@@ -23,7 +22,7 @@ import {
   checkTransactionHash,
   getTransactionStatus,
 } from "../../shared/transactions/utils"
-import { isAccountV5 } from "@argent/shared"
+import { isAccountV5 } from "@argent/x-shared"
 import { estimatedFeeToMaxResourceBounds } from "../../shared/transactionSimulation/utils"
 import { SessionError } from "../../shared/errors/session"
 import { AccountError } from "../../shared/errors/account"
@@ -50,10 +49,6 @@ export const executeTransactionAction = async (
   if (!preComputedFees) {
     throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
   }
-
-  // void analytics.track("executeTransaction", {
-  //   usesCachedFees: Boolean(preComputedFees),
-  // }) // TODO: temporary disabled
 
   if (!(await wallet.isSessionOpen())) {
     throw new SessionError({ code: "NO_OPEN_SESSION" })
@@ -96,8 +91,8 @@ export const executeTransactionAction = async (
   const nonce = accountNeedsDeploy
     ? num.toHex(1)
     : nonceWasProvidedByUI
-    ? num.toHex(transactionsDetail?.nonce || 0)
-    : await getNonce(selectedAccount, starknetAccount)
+      ? num.toHex(transactionsDetail?.nonce || 0)
+      : await getNonce(selectedAccount, starknetAccount)
 
   const version = getTxVersionFromFeeToken(
     preComputedFees.transactions.feeTokenAddress,
@@ -113,12 +108,6 @@ export const executeTransactionAction = async (
         "Deploy Account Transaction could not get added to the sequencer",
       )
     }
-
-    void analytics.track("deployAccount", {
-      status: "success",
-      trigger: "transaction",
-      networkId: account.networkId,
-    })
 
     await addTransaction({
       hash: txHash,

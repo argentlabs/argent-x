@@ -1,5 +1,5 @@
-import { Address, addressSchema, getNftPicture } from "@argent/shared"
-import { H6, P4, icons } from "@argent/ui"
+import { Address, addressSchema, getNftPicture } from "@argent/x-shared"
+import { H6, P4, icons } from "@argent/x-ui"
 import { Circle, Flex, Image } from "@chakra-ui/react"
 import { FC } from "react"
 

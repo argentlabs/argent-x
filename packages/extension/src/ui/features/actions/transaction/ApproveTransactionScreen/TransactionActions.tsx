@@ -5,7 +5,7 @@ import {
   DetailAccordionItem,
   DetailAccordionPanel,
   DetailAccordionRow,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Box } from "@chakra-ui/react"
 import { FC } from "react"
 import { CallData, num } from "starknet"
@@ -13,7 +13,8 @@ import { CallData, num } from "starknet"
 import { entryPointToHumanReadable } from "../../../../../shared/transactions"
 import { TransactionActionsType } from "../types"
 import { formatCalldataSafe } from "../../utils"
-import { formatTruncatedAddress } from "@argent/shared"
+import { formatTruncatedAddress } from "@argent/x-shared"
+import { TransactionReviewProperty } from "../../transactionV2/action/properties/TransactionReviewProperty"
 
 export interface TransactionActionsProps {
   action: TransactionActionsType
@@ -86,10 +87,14 @@ export const TransactionActions: FC<TransactionActionsProps> = ({ action }) => {
                   !transaction.calldata || transaction.calldata?.length === 0
                 }
               >
-                <DetailAccordionButton
-                  label={entryPointToHumanReadable(transaction.entrypoint)}
-                  value={formatTruncatedAddress(transaction.contractAddress)}
-                />
+                <DetailAccordionButton>
+                  <TransactionReviewProperty
+                    type="address"
+                    address={transaction.contractAddress}
+                    label={entryPointToHumanReadable(transaction.entrypoint)}
+                    verified={false}
+                  />
+                </DetailAccordionButton>
                 <DetailAccordionPanel>
                   {CallData.toCalldata(
                     formatCalldataSafe(transaction.calldata),

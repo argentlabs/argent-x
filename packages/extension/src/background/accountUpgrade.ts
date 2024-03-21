@@ -5,7 +5,7 @@ import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
 import { IBackgroundActionService } from "./__new/services/action/interface"
 import { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
-import { addressSchema, isAccountV5 } from "@argent/shared"
+import { addressSchema, isAccountV5 } from "@argent/x-shared"
 export interface IUpgradeAccount {
   account: BaseWalletAccount
   wallet: Wallet

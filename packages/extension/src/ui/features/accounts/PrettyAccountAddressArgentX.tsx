@@ -1,11 +1,11 @@
-import { PrettyAccountAddress, PrettyAccountAddressProps } from "@argent/ui"
+import { PrettyAccountAddress, PrettyAccountAddressProps } from "@argent/x-ui"
 import { FC, useMemo } from "react"
 
 import type { AddressBookContact } from "../../../shared/addressBook/type"
 import { useAddressBook } from "../../hooks/useAddressBook"
 import { accountFindFamily } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 
 const getContactNameForAddress = (
   accountAddress: string,

@@ -4,7 +4,7 @@ import {
   FlowHeader,
   FlowHeaderProps,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { To, useNavigate } from "react-router-dom"
@@ -13,7 +13,6 @@ import {
   ChangeGuardian,
   LiveAccountGuardianState,
 } from "./usePendingChangingGuardian"
-import { useShieldOnboardingTracking } from "./useShieldTracking"
 
 const { ArgentShieldIcon, ArgentShieldDeactivateIcon, TickIcon, AlertIcon } =
   icons
@@ -101,17 +100,9 @@ export const ShieldBaseFinishScreen: FC<ShieldBaseFinishScreenProps> = ({
     liveAccountGuardianState,
   })
 
-  const { trackSuccess } = useShieldOnboardingTracking({
-    stepId:
-      liveAccountGuardianState?.type === ChangeGuardian.ADDING
-        ? "addArgentShieldFinish"
-        : "removeArgentShieldFinish",
-  })
-
   const onFinish = useCallback(() => {
-    void trackSuccess()
     navigate(returnRoute)
-  }, [navigate, returnRoute, trackSuccess])
+  }, [navigate, returnRoute])
   return (
     <CellStack flex={1}>
       <Center flex={1} flexDirection={"column"}>

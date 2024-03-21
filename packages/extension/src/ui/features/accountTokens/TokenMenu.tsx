@@ -1,4 +1,4 @@
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
 import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
@@ -11,7 +11,7 @@ import {
   useBlockExplorerTitle,
 } from "../../services/blockExplorer.service"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { normalizeAddress } from "@argent/shared"
+import { normalizeAddress } from "@argent/x-shared"
 
 const { MoreIcon } = icons
 

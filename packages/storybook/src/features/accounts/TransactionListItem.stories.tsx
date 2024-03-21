@@ -23,7 +23,7 @@ import {
   erc721MintAspect,
   erc721Transfer,
 } from "@argent-x/extension/src/ui/features/accountActivity/transform/explorerTransaction/__test__/__fixtures__/explorer-transactions/goerli-alpha"
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { ComponentProps, FC } from "react"
 
 import { decorators } from "../../decorators/routerDecorators"
@@ -61,9 +61,6 @@ const TransactionListItemWrapped: FC<ITransactionListItemWrapped> = ({
 export default {
   component: TransactionListItem,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const Default = {

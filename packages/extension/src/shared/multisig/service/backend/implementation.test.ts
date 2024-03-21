@@ -78,6 +78,8 @@ describe("MultisigBackendService", () => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            "argent-client": "argent-x",
+            "argent-version": "Unknown version",
           },
           method: "GET",
           body: undefined,
@@ -142,6 +144,8 @@ describe("MultisigBackendService", () => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            "argent-client": "argent-x",
+            "argent-version": "Unknown version",
           },
           method: "GET",
           body: undefined,
@@ -216,6 +220,8 @@ describe("MultisigBackendService", () => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            "argent-client": "argent-x",
+            "argent-version": "Unknown version",
           },
           method: "GET",
           body: undefined,
@@ -330,6 +336,8 @@ describe("MultisigBackendService", () => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            "argent-client": "argent-x",
+            "argent-version": "Unknown version",
           },
           method: "POST",
           body: JSON.stringify(payload),
@@ -429,6 +437,8 @@ describe("MultisigBackendService", () => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            "argent-client": "argent-x",
+            "argent-version": "Unknown version",
           },
           method: "POST",
           body: JSON.stringify(payload),
@@ -557,6 +567,8 @@ describe("MultisigBackendService", () => {
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            "argent-client": "argent-x",
+            "argent-version": "Unknown version",
           },
           method: "POST",
         },

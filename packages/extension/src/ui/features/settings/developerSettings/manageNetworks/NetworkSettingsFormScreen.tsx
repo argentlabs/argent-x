@@ -1,4 +1,4 @@
-import { BarBackButton, NavigationContainer } from "@argent/ui"
+import { BarBackButton, NavigationContainer } from "@argent/x-ui"
 import { Collapse } from "@mui/material"
 import { FC } from "react"
 import { Control, FieldErrors } from "react-hook-form"

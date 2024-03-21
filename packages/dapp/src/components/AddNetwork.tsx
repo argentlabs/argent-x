@@ -1,4 +1,4 @@
-import { H2 } from "@argent/ui"
+import { H2 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { addNetwork } from "../services/wallet.service"
 import { useState } from "react"

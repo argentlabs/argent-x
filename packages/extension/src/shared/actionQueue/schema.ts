@@ -1,5 +1,7 @@
 import { z } from "zod"
-import { icons } from "@argent/ui"
+// just using types here
+// eslint-disable-next-line @argent/local/code-import-patterns
+import { icons } from "@argent/x-ui"
 
 export const actionHashSchema = z.string()
 export type ActionHash = z.infer<typeof actionHashSchema>

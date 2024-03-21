@@ -1,4 +1,4 @@
-import { Button, H2, Input } from "@argent/ui"
+import { Button, H2, Input } from "@argent/x-ui"
 import {
   CompiledSierraCasm,
   DeclareContractPayload,
@@ -6,7 +6,7 @@ import {
   isSierra,
 } from "starknet"
 
-import { readFileAsString } from "@argent/shared"
+import { readFileAsString } from "@argent/x-shared"
 import { Flex } from "@chakra-ui/react"
 import { FC, useMemo, useState } from "react"
 import { declare, declareAndDeploy } from "../services/wallet.service"

@@ -1,4 +1,4 @@
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 export const SwapDataSchema = z.object({

@@ -12,7 +12,7 @@ import {
   isEqualAddress,
   swrRefetchDisabledConfig,
   transferCalldataSchema,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { estimatedFeesToMaxFeeTotal } from "../../../shared/transactionSimulation/utils"
 
 export const maxFeeEstimateForTransfer = async (

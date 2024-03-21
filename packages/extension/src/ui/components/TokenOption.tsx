@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react"
 
-import { Button, H6, L2, P4 } from "@argent/ui"
+import { Button, H6, L2, P4 } from "@argent/x-ui"
 import { Flex, Img, Spinner } from "@chakra-ui/react"
 
 interface TokenOptionProps {

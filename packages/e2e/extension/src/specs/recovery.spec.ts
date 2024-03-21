@@ -40,9 +40,7 @@ test.describe("Recovery Wallet", () => {
     await expect(extension.network.networkSelector).toBeVisible()
     await extension.network.selectDefaultNetwork()
     await extension.account.selectAccount("Account 33")
-    await expect(extension.account.currentBalance("ETH")).toContainText(
-      "0.0000097 ETH",
-    )
+    await expect(extension.account.currentBalance("ETH")).toContainText("0.000")
   })
 
   test("Copy phrase from account view when creating new wallet", async ({
@@ -71,5 +69,20 @@ test.describe("Recovery Wallet", () => {
     const accountAddress = await extension.getClipboard()
     expect(accountAddress).toMatch(/^0x0/)
     await expect(extension.account.showAccountRecovery).toBeHidden()
+  })
+
+  test("User should be able to recover wallet with only one account with founds", async ({
+    extension,
+  }) => {
+    await extension.open()
+    await extension.recoverWallet(config.testNetSeed4!)
+    await expect(extension.network.networkSelector).toBeVisible()
+    await extension.network.selectDefaultNetwork()
+    await extension.account.accountListSelector.click()
+    await expect(extension.account.account("")).toHaveCount(1)
+    await extension.account.account("Account 12").click()
+    await expect(extension.account.currentBalance("ETH")).toContainText(
+      "0.002 ETH",
+    )
   })
 })

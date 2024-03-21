@@ -1,7 +1,6 @@
 import { bipsToPercent } from "."
 import { Trade, TradeType } from "../../../../shared/swap/model/trade.model"
-import { prettifyTokenAmount } from "../../../../shared/token/price"
-import { BigDecimal, bigDecimal } from "@argent/shared"
+import { BigDecimal, bigDecimal, prettifyTokenAmount } from "@argent/x-shared"
 import { Field } from "../state/fields"
 
 /**

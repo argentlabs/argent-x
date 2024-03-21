@@ -1,4 +1,4 @@
-import { H6, P4, icons, typographyStyles } from "@argent/ui"
+import { H6, P4, icons, typographyStyles } from "@argent/x-ui"
 import { Circle, Flex, Text, chakra } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -8,7 +8,7 @@ import {
 } from "../../components/CustomButtonCell"
 import { AccountAvatar } from "../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import { formatTruncatedAddress } from "@argent/shared"
+import { formatTruncatedAddress } from "@argent/x-shared"
 
 const { ViewIcon } = icons
 

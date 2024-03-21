@@ -4,7 +4,7 @@ import {
   NavigationContainer,
   BarCloseButton,
   Warning,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { routes, useCurrentPathnameWithQuery } from "../../../routes"
@@ -35,7 +35,7 @@ export const AccountDeprecatedModal = () => {
             as={"a"}
             size={"sm"}
             colorScheme={"transparent"}
-            color="text.secondary"
+            color="text-secondary"
             rightIcon={<ExpandIcon />}
             href="https://starknet.io/discord/"
             target="_blank"

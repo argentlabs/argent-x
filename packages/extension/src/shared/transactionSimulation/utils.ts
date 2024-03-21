@@ -2,7 +2,7 @@ import { num } from "starknet"
 import { EstimatedFee, EstimatedFees } from "./fees/fees.model"
 import { ApiTransactionSimulationResponse, FRI, WEI } from "./types"
 import { ETH_TOKEN_ADDRESS, STRK_TOKEN_ADDRESS } from "../network/constants"
-import { Address, isEqualAddress } from "@argent/shared"
+import { Address, isEqualAddress } from "@argent/x-shared"
 import {
   SimulateAndReview,
   feeEstimationSchema,

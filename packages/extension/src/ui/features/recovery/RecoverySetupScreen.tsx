@@ -1,4 +1,4 @@
-import { BarCloseButton, NavigationContainer, icons } from "@argent/ui"
+import { BarCloseButton, NavigationContainer, icons } from "@argent/x-ui"
 import { FC } from "react"
 import { Link, useNavigate } from "react-router-dom"
 

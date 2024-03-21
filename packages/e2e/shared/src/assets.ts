@@ -6,12 +6,20 @@ import {
   constants,
   TransactionFinalityStatus,
 } from "starknet"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import config from "../config"
 import { expect } from "@playwright/test"
 import { sleep } from "./common"
+import { sendSlackMessage } from "./slack"
 
-export type TokenSymbol = "ETH" | "WBTC" | "STRK" | "AST"
+export type TokenSymbol = "ETH" | "WBTC" | "STRK" | "AST" | "USDC" | "DAI"
+export type TokenName =
+  | "Ethereum"
+  | "Wrapped BTC"
+  | "Starknet"
+  | "Astraly"
+  | "USD Coin"
+  | "DAI"
 export type FeeTokens = "ETH" | "STRK"
 export interface AccountsToSetup {
   assets: {
@@ -285,4 +293,20 @@ export function isScientific(num: number) {
 export function convertScientificToDecimal(num: number) {
   const exponent = String(num).split("e")[1]
   return Number(num).toFixed(Math.abs(Number(exponent)))
+}
+
+export async function notifyLowBalance() {
+  let msg: string = ""
+  for (const acc of config.senderAddrs!) {
+    for (const token of ["ETH", "STRK"]) {
+      const balance = await getBalance(acc, token as TokenSymbol)
+      if (parseFloat(balance) < 0.1) {
+        console.log(`###### Low balance for ${acc} ${balance}`)
+        msg += "`" + acc + "`  *" + balance + " " + token + "*\n"
+      }
+    }
+  }
+  if (msg) {
+    await sendSlackMessage(`*Low balance for:*\n\n ${msg}\n`)
+  }
 }

@@ -36,7 +36,7 @@ export interface SignerMetadata {
   name: string
 }
 export interface MultisigMetadata {
-  creator: string
+  multisigPublicKey: string
   signers: SignerMetadata[]
 }
 

@@ -1,4 +1,4 @@
-import { BarBackButton, H3, NavigationContainer } from "@argent/ui"
+import { BarBackButton, H3, NavigationContainer } from "@argent/x-ui"
 import { FC } from "react"
 
 interface ErrorScreen {

@@ -4,7 +4,7 @@ import {
   Empty,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import {
   Input,
   InputGroup,

@@ -7,7 +7,7 @@ import {
   Input,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { InputGroup, InputLeftElement } from "@chakra-ui/react"
 import { FC, useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"

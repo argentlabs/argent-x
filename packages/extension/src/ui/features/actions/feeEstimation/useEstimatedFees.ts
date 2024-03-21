@@ -1,4 +1,4 @@
-import { TransactionAction } from "@argent/shared"
+import { TransactionAction } from "@argent/x-shared"
 import { estimatedFeesAtom } from "../../../views/estimatedFees"
 import { useView } from "../../../views/implementation/react"
 

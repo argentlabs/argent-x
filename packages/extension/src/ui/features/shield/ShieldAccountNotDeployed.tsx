@@ -1,4 +1,4 @@
-import { FlowHeader, icons } from "@argent/ui"
+import { FlowHeader, icons } from "@argent/x-ui"
 import { FC } from "react"
 const { ArgentShieldIcon } = icons
 interface ShieldAccountNotReadyProps {

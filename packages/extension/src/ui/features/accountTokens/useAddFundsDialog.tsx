@@ -1,4 +1,4 @@
-import { AlertDialog } from "@argent/ui"
+import { AlertDialog } from "@argent/x-ui"
 import { useDisclosure } from "@chakra-ui/react"
 import { noop } from "lodash-es"
 import {

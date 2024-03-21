@@ -1,4 +1,4 @@
-import { normalizeAddress } from "@argent/shared"
+import { normalizeAddress } from "@argent/x-shared"
 import { Call, constants, validateAndParseAddress } from "starknet"
 import { num, uint256 } from "starknet"
 

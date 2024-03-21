@@ -1,6 +1,6 @@
 import { Circle, Square, SquareProps } from "@chakra-ui/react"
 import { FC } from "react"
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { isSwapTransaction } from "../transform/is"

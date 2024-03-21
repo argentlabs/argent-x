@@ -1,11 +1,18 @@
-import { Collection, addressSchema, getNftPicture } from "@argent/shared"
+import {
+  Address,
+  Collection,
+  addressSchema,
+  getNftPicture,
+} from "@argent/x-shared"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../routes"
 import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
-import { useCollectionNfts } from "./nfts.state"
+import { useCollectionNftsByAccountAndNetwork } from "./nfts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 
 interface AccountCollectionProps {
   collection: Collection
@@ -19,8 +26,12 @@ const AccountCollection: FC<AccountCollectionProps> = ({
   onClick: onClickProp,
 }) => {
   const navigate = useNavigate()
-  const nfts = useCollectionNfts(
-    addressSchema.parse(collection.contractAddress),
+  const selectedAccount = useView(selectedAccountView)
+
+  const nfts = useCollectionNftsByAccountAndNetwork(
+    addressSchema.parse(collection?.contractAddress),
+    (selectedAccount?.address as Address) ?? "0x0",
+    selectedAccount?.networkId,
   )
   const onClick = useCallback(() => {
     if (onClickProp) {

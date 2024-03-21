@@ -1,4 +1,5 @@
 import { accountRepo } from "../../../shared/account/store"
+import { settingsStore } from "../../../shared/settings"
 import { multisigService } from "../multisig"
 import { ClientAccountService } from "./implementation"
 
@@ -9,4 +10,5 @@ export type { IAccountService } from "./interface"
 export const clientAccountService = new ClientAccountService(
   accountRepo,
   multisigService,
+  settingsStore,
 )

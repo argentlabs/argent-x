@@ -12,7 +12,7 @@ import {
   IRepository,
 } from "../../../shared/storage/__new/interface"
 import { WalletAccount } from "../../../shared/wallet.model"
-import { WalletSession } from "../account/shared.service"
+import { WalletSession } from "../../../shared/account/service/shared.service"
 import {
   emitterMock,
   getSessionStoreMock,

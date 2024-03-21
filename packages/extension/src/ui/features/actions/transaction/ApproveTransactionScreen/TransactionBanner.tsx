@@ -1,4 +1,4 @@
-import { L1 } from "@argent/ui"
+import { L1 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 

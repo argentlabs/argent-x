@@ -38,14 +38,9 @@ export type SimulateTransactionsRequest = (
   | SimulateInvokeRequest
 )[]
 
-export interface IFetchTransactionSimulation {
-  invocation: SimulateInvokeRequest
-  chainId: constants.StarknetChainId
-  fetcher?: Fetcher
-}
-
 export interface IFetchTransactionSimulationBulk {
   invocations: SimulateTransactionsRequest
+  networkId: string
   chainId: constants.StarknetChainId
   fetcher?: Fetcher
 }

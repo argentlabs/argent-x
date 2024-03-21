@@ -1,4 +1,4 @@
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { ComponentProps } from "react"
 import { uint256 } from "starknet"
 import { cloneDeep } from "lodash-es"
@@ -32,9 +32,6 @@ export default {
       ></TransactionReviewActions>
     </CellStack>
   ),
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const MultisigAdd = {

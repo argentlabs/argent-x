@@ -1,11 +1,11 @@
-import { Button, icons } from "@argent/ui"
+import { Button, icons } from "@argent/x-ui"
 import { Flex, SimpleGrid } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Account } from "../accounts/Account"
-import { MultisigHideModal } from "../multisig/MultisigDeleteModal"
+import { MultisigHideModal } from "../multisig/MultisigHideModal"
 
-const { AddIcon, SendIcon, PluginIcon, HideIcon } = icons
+const { AddIcon, SendIcon, PluginIcon, HideIcon, PieChartIcon } = icons
 
 export interface AccountTokensButtonsProps {
   account: Account
@@ -19,6 +19,8 @@ export interface AccountTokensButtonsProps {
   isHideMultisigModalOpen: boolean
   onHideMultisigModalClose: () => void
   onHideConfirm: () => Promise<void>
+  portfolioUrl: string | null
+  buttonColumnCount: number
 }
 
 export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
@@ -33,10 +35,12 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
   isHideMultisigModalOpen,
   onHideMultisigModalClose,
   onHideConfirm,
+  portfolioUrl,
+  buttonColumnCount,
 }) => {
   return (
     <Flex gap={2} mx={"auto"}>
-      <SimpleGrid columns={showSendButton ? 2 : 1} spacing={2}>
+      <SimpleGrid columns={buttonColumnCount} spacing={2} mx={4}>
         {showAddFundsButton && (
           <Button
             onClick={onAddFunds}
@@ -44,7 +48,7 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
             size="sm"
             leftIcon={<AddIcon />}
           >
-            Add funds
+            Fund
           </Button>
         )}
         {showSendButton && (
@@ -55,6 +59,18 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
             leftIcon={<SendIcon />}
           >
             Send
+          </Button>
+        )}
+        {portfolioUrl && showSendButton && (
+          <Button
+            as={"a"}
+            href={portfolioUrl}
+            target="_blank"
+            colorScheme={"tertiary"}
+            size="sm"
+            leftIcon={<PieChartIcon />}
+          >
+            Portfolio
           </Button>
         )}
       </SimpleGrid>

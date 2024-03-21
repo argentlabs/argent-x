@@ -1,4 +1,4 @@
-import { NftItem, getNftPicture } from "@argent/shared"
+import { NftItem, getNftPicture } from "@argent/x-shared"
 import {
   BarCloseButton,
   Button,
@@ -7,7 +7,7 @@ import {
   NavigationContainer,
   P4,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import {
   Accordion,
   AccordionButton,

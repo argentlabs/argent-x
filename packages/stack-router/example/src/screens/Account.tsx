@@ -7,7 +7,7 @@ import {
   NavigationContainer,
   SpacerCell,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
 const { MoreIcon } = icons

@@ -3,7 +3,7 @@ import styled from "styled-components"
 
 import { CopyTooltip } from "./CopyTooltip"
 import { ContentCopyIcon } from "./Icons/MuiIcons"
-import { normalizeAddress, formatTruncatedAddress } from "@argent/shared"
+import { normalizeAddress, formatTruncatedAddress } from "@argent/x-shared"
 
 export const AccountAddressWrapper = styled.span`
   display: flex;

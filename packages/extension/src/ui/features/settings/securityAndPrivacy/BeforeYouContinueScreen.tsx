@@ -1,4 +1,4 @@
-import { Button, Warning } from "@argent/ui"
+import { Button, Warning } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../routes"

@@ -24,6 +24,8 @@ const mockProps = {
   isHideMultisigModalOpen: true,
   onHideMultisigModalClose: vi.fn(),
   onHideConfirm: vi.fn(),
+  portfolioUrl: "https://example.com",
+  buttonColumnCount: 3,
 } as AccountTokensButtonsProps
 
 describe("AccountTokensButtons", async () => {
@@ -31,7 +33,7 @@ describe("AccountTokensButtons", async () => {
     render(<AccountTokensButtons {...mockProps} />)
 
     // Add funds button
-    const addFundsButton = await screen.findAllByText(/Add funds/, {
+    const addFundsButton = await screen.findAllByText(/Fund/, {
       selector: "button",
     })
     expect(addFundsButton[0]).toBeInTheDocument()

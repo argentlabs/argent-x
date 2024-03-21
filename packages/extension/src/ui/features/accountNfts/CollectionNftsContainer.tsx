@@ -1,17 +1,24 @@
 import { FC } from "react"
 import { useParams } from "react-router-dom"
 
-import { addressSchema } from "@argent/shared"
+import { Address, addressSchema } from "@argent/x-shared"
 import { CollectionNfts } from "./CollectionNfts"
 import { CollectionNftsGenericError } from "./CollectionNftsGenericError"
-import { useCollection, useCollectionNfts } from "./nfts.state"
+import {
+  useCollection,
+  useCollectionNftsByAccountAndNetwork,
+} from "./nfts.state"
+import { selectedAccountView } from "../../views/account"
+import { useView } from "../../views/implementation/react"
 
 export const CollectionNftsContainer: FC = () => {
   const { contractAddress } = useParams<"contractAddress">()
-
   const collection = useCollection(addressSchema.parse(contractAddress))
-  const nfts = useCollectionNfts(
+  const selectedAccount = useView(selectedAccountView)
+  const nfts = useCollectionNftsByAccountAndNetwork(
     addressSchema.parse(collection?.contractAddress),
+    (selectedAccount?.address as Address) ?? "0x0",
+    selectedAccount?.networkId,
   )
 
   // if no collectibles or no contract address, display generic error

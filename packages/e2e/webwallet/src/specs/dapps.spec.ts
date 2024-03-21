@@ -2,7 +2,7 @@ import test from "../test"
 import config from "../../../shared/config"
 
 test.describe(`Dapps`, () => {
-  test("Create wallet from Dapp", async ({ webWallet, browserContext }) => {
+  test("Create wallet from Dapp", async ({ webWallet, dApp }) => {
     const email = webWallet.generateEmail()
     const credentials = {
       email,
@@ -11,7 +11,7 @@ test.describe(`Dapps`, () => {
     }
 
     await webWallet.dapps.requestConnectionFromDapp({
-      browserContext,
+      dApp,
       dappUrl: "https://dapp-argentlabs.vercel.app",
       credentials,
       newAccount: true,
@@ -19,9 +19,9 @@ test.describe(`Dapps`, () => {
     await webWallet.login.success(credentials)
   })
 
-  test("Connect from Dapp", async ({ webWallet, browserContext }) => {
+  test("Connect from Dapp", async ({ webWallet, dApp }) => {
     await webWallet.dapps.requestConnectionFromDapp({
-      browserContext,
+      dApp,
       dappUrl: "https://dapp-argentlabs.vercel.app",
       credentials: config.validLogin,
       newAccount: false,

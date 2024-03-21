@@ -12,6 +12,7 @@ const config = {
   testNetSeed1: process.env.E2E_TESTNET_SEED1, //wallet with 32 deployed accounts
   testNetSeed2: process.env.E2E_TESTNET_SEED2, //wallet with 1 deployed account
   testNetSeed3: process.env.E2E_TESTNET_SEED3, //wallet with 1 deployed account
+  testNetSeed4: process.env.E2E_TESTNET_SEED4, //wallet with non deployed account but with funds
   senderSeed: process.env.E2E_SENDER_SEED,
   account1Seed2: process.env.E2E_ACCOUNT_1_SEED2,
   account1Seed3: process.env.E2E_ACCOUNT_1_SEED3,
@@ -26,11 +27,14 @@ const config = {
 
   //webwallet
   validLogin: {
-    email: "testuser@mail.com",
-    pin: "1111111",
-    password: "myNewPass12!",
+    email: process.env.WW_EMAIL!,
+    pin: process.env.WW_PIN!,
+    password: process.env.WW_LOGIN_PASSWORD!,
   },
   url: "http://localhost:3005",
+  //slack
+  slackToken: process.env.SLACK_TOKEN,
+  slackChannelId: process.env.SLACK_CHANNEL_ID,
 }
 
 // check that no value of config is undefined, otherwise throw error

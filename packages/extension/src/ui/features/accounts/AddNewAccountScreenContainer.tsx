@@ -1,4 +1,4 @@
-import { useNavigateBack } from "@argent/ui"
+import { useNavigateBack } from "@argent/x-ui"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 

@@ -1,6 +1,6 @@
 import { BoxProps } from "@chakra-ui/react"
 import { IconWrapper } from "./IconWrapper"
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 
 export const KnownIcon = ({
   iconKey,

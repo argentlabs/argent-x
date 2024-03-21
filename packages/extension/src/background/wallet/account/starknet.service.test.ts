@@ -1,6 +1,6 @@
 import { WalletAccountStarknetService } from "./starknet.service"
 import { WalletSessionService } from "../session/session.service"
-import { WalletAccountSharedService } from "./shared.service"
+import { WalletAccountSharedService } from "../../../shared/account/service/shared.service"
 import { WalletCryptoStarknetService } from "../crypto/starknet.service"
 import { MultisigAccount } from "../../../shared/multisig/account"
 import {

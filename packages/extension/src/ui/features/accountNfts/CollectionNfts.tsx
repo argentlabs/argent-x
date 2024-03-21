@@ -1,4 +1,9 @@
-import { Collection, NftItem, bigDecimal, getNftPicture } from "@argent/shared"
+import {
+  Collection,
+  NftItem,
+  bigDecimal,
+  getNftPicture,
+} from "@argent/x-shared"
 import {
   BarBackButton,
   H4,
@@ -6,7 +11,7 @@ import {
   NavigationContainer,
   NavigationContainerProps,
   P4,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex, Image, SimpleGrid } from "@chakra-ui/react"
 import React, { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"

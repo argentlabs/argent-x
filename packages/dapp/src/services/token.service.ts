@@ -1,4 +1,4 @@
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal } from "@argent/x-shared"
 import { Abi, Contract, num, uint256 } from "starknet"
 
 import Erc20Abi from "../../abi/ERC20.json"

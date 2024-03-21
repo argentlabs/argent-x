@@ -8,7 +8,7 @@ import {
   generateAvatarImage,
   id,
   stripAddressZeroPadding,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { withPolling } from "../../services/swr.service"
@@ -28,7 +28,7 @@ const argentColorsArray = [
   "FF5C72",
 ]
 
-export const getColor = (name: string) => {
+export const getColor = (name: string = "") => {
   const hash = id(name).slice(-2)
   const index = parseInt(hash, 16) % argentColorsArray.length
   return argentColorsArray[index]

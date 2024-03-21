@@ -7,7 +7,7 @@ import {
   ModalContent,
   ModalHeader,
 } from "@chakra-ui/react"
-import { H6 } from "@argent/ui"
+import { H6 } from "@argent/x-ui"
 
 import { TokenWithBalance } from "../../../../../shared/token/__new/types/tokenBalance.model"
 import { MinBalances, TokenOptionContainer } from "./TokenOptionContainer"

@@ -1,4 +1,4 @@
-import { Button, H5, L2, P3, icons, logos } from "@argent/ui"
+import { Button, H5, L2, P3, icons, logos } from "@argent/x-ui"
 import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
@@ -69,7 +69,7 @@ const EmptyCollections: FC<{ networkId: string }> = () => (
         <ButtonLink
           title="Flex"
           icon={<FlexLogo />}
-          href="https://flexing.gg/"
+          href="https://hyperflex.market/"
         />
         <ButtonLink
           title="Briq"

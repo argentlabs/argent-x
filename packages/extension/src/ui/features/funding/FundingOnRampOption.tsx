@@ -1,6 +1,6 @@
 import { FC } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { icons, logos } from "@argent/ui"
+import { icons, logos } from "@argent/x-ui"
 import { Option } from "../../components/Options"
 import { routes } from "../../routes"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"

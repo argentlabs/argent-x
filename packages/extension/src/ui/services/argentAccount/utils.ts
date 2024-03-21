@@ -1,4 +1,4 @@
-import { stringToBooleanSchema } from "@argent/shared"
+import { stringToBooleanSchema } from "@argent/x-shared"
 import { z } from "zod"
 import {
   preferencesEndpointPayload,

@@ -5,9 +5,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: ErrorScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

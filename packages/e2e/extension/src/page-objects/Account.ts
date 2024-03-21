@@ -530,13 +530,12 @@ export default class Account extends Activity {
           .fill(signers[index])
       }
     }
-
     //remove empty inputs
-    const locs = await tabs[1].locator('[name^="signerKeys"]').all()
+    const locs = await tabs[1].locator('[data-testid^="signerContainer"]').all()
     if (locs.length > signers.length) {
-      for (let index = locs.length; index > signers.length + 1; index--) {
+      for (let index = locs.length; index > signers.length; index--) {
         await tabs[1]
-          .locator(`[data-testid="closeButton.${index - 2}"]`)
+          .locator(`[data-testid="closeButton.${index - 1}"]`)
           .click()
       }
     }
@@ -735,9 +734,8 @@ export default class Account extends Activity {
       expect(this.selectedFeeTokenLoc("ETH")).toBeVisible(),
       expect(this.selectedFeeTokenLoc("STRK")).toBeVisible(),
     ])
-    const tokenAlreadySelected = await this.selectedFeeTokenLoc(
-      token,
-    ).isVisible()
+    const tokenAlreadySelected =
+      await this.selectedFeeTokenLoc(token).isVisible()
     if (!tokenAlreadySelected) {
       await this.feeTokenPickerLoc.click()
       await this.feeTokenLoc(token).click()

@@ -12,7 +12,7 @@ import {
 import { useAccount } from "../accounts/accounts.state"
 import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
 import { tokenBalancesForAccountView } from "../../views/tokenBalances"
-import { Address, isEqualAddress } from "@argent/shared"
+import { Address, isEqualAddress } from "@argent/x-shared"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { useAppState } from "../../app.state"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"

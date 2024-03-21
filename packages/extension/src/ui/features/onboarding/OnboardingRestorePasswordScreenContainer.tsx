@@ -1,4 +1,4 @@
-import { useNavigateBack, useToast } from "@argent/ui"
+import { useNavigateBack, useToast } from "@argent/x-ui"
 import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -98,6 +98,8 @@ export const OnboardingRestorePasswordScreenContainer: FC = () => {
       }}
       onSubmit={handleSubmit}
       onBack={onBack}
+      length={5}
+      currentIndex={3}
     />
   )
 }

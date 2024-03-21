@@ -1,17 +1,16 @@
 import { TransactionActionFixture } from "./types"
 
 export const aspect: TransactionActionFixture = {
-  actionHash: "a16b5b24e79859e094a31a6c30aa8202b74bb2a0",
   aggregatedData: [
     {
       token: {
         address:
-          "0x4a3621276a83251b557a8140e915599ae8e7b6207b067ea701635c0d509801e",
-        name: "Mint Square Storefront",
-        symbol: "MINTSQ",
+          "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+        name: "Xplorer",
+        symbol: "XPLORER",
         decimals: 0,
-        networkId: "mainnet-alpha",
-        tokenId: "47458",
+        networkId: "goerli-alpha",
+        tokenId: "1002606",
         type: "erc721",
       },
       approvals: [],
@@ -20,7 +19,7 @@ export const aspect: TransactionActionFixture = {
       recipients: [
         {
           address:
-            "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
+            "0x325c46cdbf81d35020f95a82a4dc4d043599f58cfb979b03e2efffdeab20477",
           amount: BigInt("1"),
         },
       ],
@@ -59,153 +58,106 @@ export const aspect: TransactionActionFixture = {
     },
   ],
   transactionReview: {
-    assessment: "neutral",
-    reviews: [
+    transactions: [
       {
-        assessment: "neutral",
-        assessmentDetails: {
-          contract_address:
-            "0x02a92f0f860bf7c63fb9ef42cff4137006b309e0e6e1484e42d0b5511959414d",
+        reviewOfTransaction: {
+          assessment: "neutral",
+          warnings: [],
+          reviews: [
+            {
+              assessment: "neutral",
+              warnings: [],
+              action: {
+                name: "mint",
+                properties: [],
+                defaultProperties: [
+                  {
+                    type: "address",
+                    label: "default_contract",
+                    address:
+                      "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+                    verified: false,
+                  },
+                  {
+                    type: "calldata",
+                    label: "default_call",
+                    entrypoint: "mint",
+                    calldata: [
+                      "0x0325c46cdbf81d35020f95a82a4dc4d043599f58cfb979b03e2efffdeab20477",
+                      "0x00000000000000000000000000000000000000000000000000000000000f4c6e",
+                      "0x0000000000000000000000000000000000000000000000000000000000000004",
+                      "0x00000000000000000000000000000000000000000000000000000000000f4240",
+                      "0x00000000000000000000000000000000000000000000000000000000688c50d8",
+                      "0x03dc421f118edcd7c0a3b9913b4b40d40d8309dde29953210ec85ba365eb2d99",
+                      "0x0132188b9576cf7eea5e25dc9aabee55cf131d4867b70880a20eceaed5358b76",
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        simulation: {
+          approvals: [],
+          transfers: [
+            {
+              tokenAddress:
+                "0x31f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+              from: "0x0",
+              to: "0x325c46cdbf81d35020f95a82a4dc4d043599f58cfb979b03e2efffdeab20477",
+              tokenId: "1002606",
+              details: {
+                address:
+                  "0x31f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+                name: "Xplorer",
+                symbol: "XPLORER",
+                unknown: false,
+                type: "ERC721",
+              },
+            },
+          ],
+          summary: [
+            {
+              type: "transfer",
+              label: "simulation_summary_receive",
+              tokenId: "1002606",
+              token: {
+                address:
+                  "0x31f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+                name: "Xplorer",
+                symbol: "XPLORER",
+                unknown: false,
+                type: "ERC721",
+              },
+              sent: false,
+            },
+          ],
+          calculatedNonce: "0x1",
+          feeEstimation: {
+            overallFee: 5786000040502,
+            gasPrice: 1000000007,
+            gasUsage: 5786,
+            unit: "WEI",
+            maxFee: 17358006159710,
+          },
         },
       },
     ],
-    targetedDapp: {
-      name: "Lorem Ipsum",
-      description: "Lorem ipsum dolor sit amet",
-      logoUrl: "https://www.dappland.com/dapps/jediswap/dapp-icon-jediswap.png",
-      links: [
-        {
-          name: "website",
-          url: "https://jediswap.xyz",
-          position: 1,
-        },
-        {
-          name: "twitter",
-          url: "https://twitter.com/jediswap",
-          position: 2,
-        },
-        {
-          name: "discord",
-          url: "https://discord.gg/jediswap",
-          position: 3,
-        },
-      ],
-    },
   },
   transactions: [
     {
       calldata: [
-        "1203547651708349271448768365881041305352887755542740175005943917204658012493",
-        "2997881207313980570241347267220574957273773683696432153748258537092592926903",
-        "0",
-        "1681661074",
-        "257877205755718",
-        "1",
-        "1",
-        "2097924334809010151269254159849064348527709275410586009206231441117935140894",
-        "47458",
-        "0",
-        "1",
-        "0",
-        "2",
-        "0",
-        "2087021424722619777119509474943472645767659996348769578120564519014510906823",
-        "0",
-        "0",
-        "97000000000000",
-        "0",
-        "2997881207313980570241347267220574957273773683696432153748258537092592926903",
-        "0",
-        "2087021424722619777119509474943472645767659996348769578120564519014510906823",
-        "0",
-        "0",
-        "3000000000000",
-        "0",
-        "2163043529925802864713042203646866750762128402292550239405067396543711442586",
-        "193537044949007465058234585984543106941963984792689474213073467382301419967",
-        "3123624182172242132799495490982949304040176803825006418688666371482845520789",
+        "0x0325c46cdbf81d35020f95a82a4dc4d043599f58cfb979b03e2efffdeab20477",
+        "0x00000000000000000000000000000000000000000000000000000000000f4c6e",
+        "0x0000000000000000000000000000000000000000000000000000000000000004",
+        "0x00000000000000000000000000000000000000000000000000000000000f4240",
+        "0x00000000000000000000000000000000000000000000000000000000688c50d8",
+        "0x03dc421f118edcd7c0a3b9913b4b40d40d8309dde29953210ec85ba365eb2d99",
+        "0x0132188b9576cf7eea5e25dc9aabee55cf131d4867b70880a20eceaed5358b76",
       ],
       contractAddress:
-        "0x02a92f0f860bf7c63fb9ef42cff4137006b309e0e6e1484e42d0b5511959414d",
-      entrypoint: "fillOrder",
-    },
-  ],
-  transactionSimulation: [
-    {
-      approvals: [
-        {
-          tokenAddress:
-            "0x4a3621276a83251b557a8140e915599ae8e7b6207b067ea701635c0d509801e",
-          owner:
-            "0x6a0bd9a21ca429395565127efca751660b503c3966b964bdda5029e031380b7",
-          spender: "0x0",
-          tokenId: "47458",
-          details: {
-            symbol: "MINTSQ",
-            name: "Mint Square Storefront",
-            tokenURI:
-              "ipfs://QmNrLm3JL7DtryfwWjC9vdZm2mbGSwnkS4o4GSWZwqyFCt\u0000",
-            tokenType: "erc721",
-            decimals: "0",
-            usdValue: "0",
-          },
-        },
-      ],
-      transfers: [
-        {
-          tokenAddress:
-            "0x4a3621276a83251b557a8140e915599ae8e7b6207b067ea701635c0d509801e",
-          from: "0x6a0bd9a21ca429395565127efca751660b503c3966b964bdda5029e031380b7",
-          to: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-          tokenId: "47458",
-          details: {
-            symbol: "MINTSQ",
-            name: "Mint Square Storefront",
-            tokenURI:
-              "ipfs://QmNrLm3JL7DtryfwWjC9vdZm2mbGSwnkS4o4GSWZwqyFCt\u0000",
-            tokenType: "erc721",
-            decimals: "0",
-            usdValue: "0",
-          },
-        },
-        {
-          tokenAddress:
-            "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-          from: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-          to: "0x6a0bd9a21ca429395565127efca751660b503c3966b964bdda5029e031380b7",
-          value: "97000000000000",
-          details: {
-            decimals: "18",
-            symbol: "ETH",
-            name: "Ether",
-            tokenType: "erc20",
-            usdValue: "0.161117",
-            tokenURI: "",
-          },
-        },
-        {
-          tokenAddress:
-            "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-          from: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-          to: "0x4c83d3fa770187d7b0a23b3aa7132c7c8273fb4ec3db416f86e4a385596769a",
-          value: "3000000000000",
-          details: {
-            decimals: "18",
-            symbol: "ETH",
-            name: "Ether",
-            tokenType: "erc20",
-            usdValue: "0.004983",
-            tokenURI: "",
-          },
-        },
-      ],
-      feeEstimation: {
-        overallFee: 3744000037440,
-        gasPrice: 1000000010,
-        gasUsage: 3744,
-        unit: "WEI",
-        maxFee: 6744000037440,
-      },
+        "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
+      entrypoint: "mint",
     },
   ],
 }

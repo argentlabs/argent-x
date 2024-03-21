@@ -8,9 +8,7 @@ import {
 import { noop, throttle } from "lodash-es"
 
 import { SessionError } from "../../../shared/errors/session"
-import { ObjectStorage } from "../../../shared/storage"
 import { IObjectStore } from "../../../shared/storage/__new/interface"
-import { adaptObjectStorage } from "../../../shared/storage/__new/object"
 import {
   WalletBackupService,
   WalletStorageProps,
@@ -18,16 +16,6 @@ import {
 import { WalletRecoverySharedService } from "../recovery/shared.service"
 import { walletToKeystore } from "../utils"
 import { Events, Locked } from "./interface"
-
-/**
- * @deprecated use `sessionRepo` instead
- */
-export const sessionStore = new ObjectStorage<WalletSession | null>(null, {
-  namespace: "core:wallet:session",
-  areaName: "session",
-})
-
-export const sessionRepo = adaptObjectStorage(sessionStore)
 
 export interface WalletSession {
   secret: string

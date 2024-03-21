@@ -11,7 +11,7 @@ import {
 import {
   WalletAccountSharedService,
   WalletSession,
-} from "./account/shared.service"
+} from "../../shared/account/service/shared.service"
 import { WalletAccountStarknetService } from "./account/starknet.service"
 import { WalletBackupService } from "./backup/backup.service"
 import { WalletCryptoSharedService } from "./crypto/shared.service"
@@ -23,6 +23,9 @@ import { WalletSessionService } from "./session/session.service"
 import { Wallet } from "."
 import { MultisigBackendService } from "../../shared/multisig/service/backend/implementation"
 import { WalletStorageProps } from "../../shared/wallet/walletStore"
+import { AnalyticsService } from "../../shared/analytics/implementation"
+import { KeyValueStorage } from "../../shared/storage"
+import { ISettingsStorage } from "../../shared/settings/types"
 
 const isDev = true
 const isTest = true
@@ -176,6 +179,11 @@ export const accountStarknetServiceMock = new WalletAccountStarknetService(
   multisigBackendServiceMock,
 )
 
+const analyticsServiceMock = new AnalyticsService(
+  accountSharedServiceMock,
+  getKeyValueStorage() as unknown as KeyValueStorage<ISettingsStorage>,
+)
+
 export const deployStarknetServiceMock = new WalletDeploymentStarknetService(
   getWalletStoreMock(),
   getMultisigStoreMock(),
@@ -187,6 +195,7 @@ export const deployStarknetServiceMock = new WalletDeploymentStarknetService(
   cryptoStarknetServiceMock,
   backupServiceMock,
   networkServiceMock,
+  analyticsServiceMock,
 )
 
 export const cryptoSharedServiceMock = new WalletCryptoSharedService(

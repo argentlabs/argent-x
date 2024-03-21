@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import { BaseTokenWithBalance } from "../token/__new/types/tokenBalance.model"
 import { STRK_TOKEN_ADDRESS } from "../network/constants"
 import { pickBestFeeToken } from "./utils"

@@ -1,4 +1,4 @@
-import { Button, icons } from "@argent/ui"
+import { Button, icons } from "@argent/x-ui"
 import { Circle, Flex } from "@chakra-ui/react"
 import { FC, MouseEvent, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"

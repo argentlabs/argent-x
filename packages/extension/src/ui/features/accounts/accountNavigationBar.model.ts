@@ -1,4 +1,4 @@
-import { NavigationBarProps } from "@argent/ui"
+import { NavigationBarProps } from "@argent/x-ui"
 import { ReactEventHandler } from "react"
 
 export interface AccountNavigationBarProps
@@ -8,6 +8,7 @@ export interface AccountNavigationBarProps
   isMultisig?: boolean
   onAccountList?: ReactEventHandler
   onSettings?: ReactEventHandler
+  envLabel?: string
 }
 
 export interface AccountNavigationBarContainerProps

@@ -9,7 +9,7 @@ import {
   NavigationContainer,
   icons,
   useToast,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC } from "react"
 import { useForm } from "react-hook-form"
 

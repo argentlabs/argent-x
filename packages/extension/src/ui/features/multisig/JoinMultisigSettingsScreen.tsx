@@ -6,17 +6,21 @@ import {
   NavigationContainer,
   P4,
   SpacerCell,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center, Flex, Image, useDisclosure } from "@chakra-ui/react"
 import React, { FC, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
-import { hidePendingMultisig } from "../../../shared/multisig/utils/pendingMultisig"
+import {
+  deletePendingMultisig,
+  hidePendingMultisig,
+} from "../../../shared/multisig/utils/pendingMultisig"
 import { routes, useReturnTo } from "../../routes"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { usePendingMultisig } from "./multisig.state"
-import { MultisigHideModal } from "./MultisigDeleteModal"
+import { MultisigHideModal } from "./MultisigHideModal"
+import { MultisigDeleteModal } from "./MultisigDeleteModal"
 
 export const JoinMultisigSettingsScreen: FC = () => {
   const currentNetwork = useCurrentNetwork()
@@ -45,9 +49,23 @@ export const JoinMultisigSettingsScreen: FC = () => {
     onClose: onDeleteModalClose,
   } = useDisclosure()
 
+  const {
+    isOpen: isHideModalOpen,
+    onOpen: onHideModalOpen,
+    onClose: onHideModalClose,
+  } = useDisclosure()
+
   const onHideConfirm = useCallback(async () => {
     if (pendingMultisig) {
       await hidePendingMultisig(pendingMultisig)
+      onHideModalClose()
+      navigate(routes.accounts())
+    }
+  }, [navigate, onHideModalClose, pendingMultisig])
+
+  const onDeleteConfirm = useCallback(async () => {
+    if (pendingMultisig) {
+      await deletePendingMultisig(pendingMultisig)
       onDeleteModalClose()
       navigate(routes.accounts())
     }
@@ -75,7 +93,7 @@ export const JoinMultisigSettingsScreen: FC = () => {
         <CellStack>
           <Flex direction={"column"} justify="center" align="center">
             <H6>{accountName}</H6>
-            <P4 fontWeight="bold" color={"white50"}>
+            <P4 fontWeight="bold" color={"white.50"}>
               Awaiting owner to finish setup
             </P4>
           </Flex>
@@ -84,15 +102,27 @@ export const JoinMultisigSettingsScreen: FC = () => {
           <ButtonCell
             color={"error.500"}
             _hover={{ color: "error.500" }}
-            onClick={onDeleteModalOpen}
+            onClick={onHideModalOpen}
           >
             Hide account
           </ButtonCell>
+          <ButtonCell
+            color={"error.500"}
+            _hover={{ color: "error.500" }}
+            onClick={onDeleteModalOpen}
+          >
+            Delete account
+          </ButtonCell>
         </CellStack>
       </NavigationContainer>
-      <MultisigHideModal
+      <MultisigDeleteModal
         onClose={onDeleteModalClose}
         isOpen={isDeleteModalOpen}
+        onDelete={onDeleteConfirm}
+      />
+      <MultisigHideModal
+        onClose={onHideModalClose}
+        isOpen={isHideModalOpen}
         onHide={onHideConfirm}
         multisigType="pending"
       />

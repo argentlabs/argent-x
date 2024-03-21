@@ -9,7 +9,7 @@ import { isAccountDeployed } from "../../../accountDeploy"
 import type { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import type { WalletAccount } from "../../../../shared/wallet.model"
 import type { Wallet } from "../../../wallet"
-import type { Address } from "@argent/shared"
+import type { Address } from "@argent/x-shared"
 
 type Invocation = Invocations[number]
 

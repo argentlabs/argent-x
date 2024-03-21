@@ -1,4 +1,4 @@
-import { Button, H2, Input, Textarea } from "@argent/ui"
+import { Button, H2, Input, Textarea } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useSignTypedData } from "@starknet-react/core"
 import { FC, useEffect, useMemo, useState } from "react"

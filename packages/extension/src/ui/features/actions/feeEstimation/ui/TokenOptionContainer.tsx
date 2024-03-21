@@ -7,19 +7,17 @@ import {
   useCurrencyDisplayEnabled,
   useTokenBalanceToCurrencyValue,
 } from "../../../accountTokens/tokenPriceHooks"
-import { Address, prettifyCurrencyValue } from "@argent/shared"
 import {
-  classHashSupportsTxV3,
-  feeTokenNeedsTxV3Support,
-} from "../../../../../shared/network/txv3"
+  Address,
+  prettifyCurrencyValue,
+  prettifyTokenAmount,
+} from "@argent/x-shared"
+import { feeTokenNeedsTxV3Support } from "../../../../../shared/network/txv3"
 import { useAccount } from "../../../accounts/accounts.state"
 import { clientAccountService } from "../../../../services/account"
 import { AccountError } from "../../../../../shared/errors/account"
 import { isEmpty } from "lodash-es"
-import { prettifyTokenAmount } from "../../../../../shared/token/price"
 import { useUpgradeAccountTransactions } from "../../../accounts/accountTransactions.state"
-import { accountService } from "../../../../../shared/account/service"
-import { accountsEqual } from "../../../../../shared/utils/accountsEqual"
 import { useRequiresTxV3Upgrade } from "../useRequiresTxV3Upgrade"
 
 function toTokenView(token: TokenWithBalance): {

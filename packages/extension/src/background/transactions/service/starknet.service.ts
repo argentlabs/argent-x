@@ -84,6 +84,29 @@ export class TransactionTrackerWorker
     await this.transactionsRepo.remove(staleTransactions)
   }
 
+  getStaleTransactions = (transaction: Transaction, now: number) => {
+    const { finality_status, execution_status } =
+      getTransactionStatus(transaction)
+    const isFailed =
+      execution_status === "REVERTED" || finality_status === "REJECTED"
+    const isSuccessful =
+      finality_status === "ACCEPTED_ON_L2" ||
+      finality_status === "ACCEPTED_ON_L1"
+
+    const isCompleted = isFailed || isSuccessful
+    const isStale = now - transaction.timestamp > 60 // we keep the transaction for 1 minute after it's completed, so the subscribers can react to it
+    return isCompleted && isStale
+  }
+
+  async cleanupTransactionStore() {
+    const now = Math.floor(Date.now() / 1000)
+
+    const staleTransactions = await this.transactionsRepo.get((transaction) =>
+      this.getStaleTransactions(transaction, now),
+    )
+    await this.transactionsRepo.remove(staleTransactions)
+  }
+
   async trackTransactionsUpdates() {
     await this.syncTransactionRepo()
   }
@@ -98,6 +121,7 @@ export class TransactionTrackerWorker
     ),
   )(async () => {
     try {
+      await this.cleanupTransactionStore()
       await this.trackTransactionsUpdates()
       await this.update()
     } catch (error) {

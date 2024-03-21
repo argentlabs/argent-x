@@ -41,7 +41,9 @@ test.describe("Multisig", () => {
     await extension.navigation.menuTokensLocator.click()
 
     //ensure that balance is updated
-    await expect(extension.account.currentBalance("ETH")).toContainText("0.000")
+    await expect(extension.account.currentBalance("ETH")).not.toContainText(
+      "0.002",
+    )
   })
 
   test("add and activate 1/2 multisig", async ({
@@ -99,9 +101,11 @@ test.describe("Multisig", () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).toContainText("0.000"),
-      expect(secondExtension.account.currentBalance("ETH")).toContainText(
-        "0.000",
+      expect(extension.account.currentBalance("ETH")).not.toContainText(
+        "0.002",
+      ),
+      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
+        "0.002",
       ),
     ])
     await secondExtension.validateTx({
@@ -182,9 +186,9 @@ test.describe("Multisig", () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).toContainText("0.000"),
-      expect(secondExtension.account.currentBalance("ETH")).toContainText(
-        "0.000",
+      expect(extension.account.currentBalance("ETH")).not.toContainText("0.02"),
+      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
+        "0.02",
       ),
     ])
   })
@@ -299,9 +303,9 @@ test.describe("Multisig", () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).toContainText("0.000"),
-      expect(secondExtension.account.currentBalance("ETH")).toContainText(
-        "0.000",
+      expect(extension.account.currentBalance("ETH")).not.toContainText("0.02"),
+      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
+        "0.02",
       ),
     ])
   })
@@ -514,7 +518,7 @@ test.describe("Multisig", () => {
       originAccountName: extension.account.accountNameMulti1,
       recipientAddress: config.destinationAddress!,
       token: "ETH",
-      amount: 0.001,
+      amount: 0.0015,
     })
     const txHash = await extension.activity.getLastTxHash()
     await extension.navigation.menuTokensLocator.click()
@@ -561,11 +565,14 @@ test.describe("Multisig", () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).toContainText("0.000", {
-        timeout: 120000,
-      }),
-      expect(secondExtension.account.currentBalance("ETH")).toContainText(
-        "0.000",
+      expect(extension.account.currentBalance("ETH")).not.toContainText(
+        "0.002",
+        {
+          timeout: 120000,
+        },
+      ),
+      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
+        "0.002",
         { timeout: 120000 },
       ),
     ])

@@ -1,7 +1,7 @@
 import { Button, Center, Flex, useDisclosure } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { H4, P3 } from "@argent/ui"
+import { H4, P3 } from "@argent/x-ui"
 import { SupportFooter } from "./features/settings/ui/SupportFooter"
 import { useClearLocalStorage } from "./features/settings/developerSettings/clearLocalStorage/useClearLocalStorage"
 import { useHardResetAndReload } from "./services/resetAndReload"

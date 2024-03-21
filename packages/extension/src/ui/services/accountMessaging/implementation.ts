@@ -11,6 +11,7 @@ import { clientRecoveryService } from "../recovery"
 import { IRecoveryStorage } from "../../../shared/recovery/types"
 import { IObjectStore } from "../../../shared/storage/__new/interface"
 import { recoveredAtKeyValueStore } from "../../../shared/recovery/storage"
+import { analyticsService } from "../../../shared/analytics"
 
 export class AccountMessagingService implements IAccountMessagingService {
   constructor(private recoveryStore: IObjectStore<IRecoveryStorage>) {}
@@ -104,6 +105,9 @@ export class AccountMessagingService implements IAccountMessagingService {
   }
 
   async clearLocalStorageAndRecoverAccounts(password: string) {
+    const { promise } = analyticsService.walletLocalStorageCleared()
+    await promise
+
     await this.recoveryStore.set({ isClearingStorage: true })
     const seedPhrase = await this.getSeedPhrase()
     try {

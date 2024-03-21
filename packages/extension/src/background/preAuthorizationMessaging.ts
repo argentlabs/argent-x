@@ -26,6 +26,28 @@ export const handlePreAuthorizationMessage: HandleMessage<
       let selectedAccount = await wallet.getSelectedAccount()
       let didOpenProgramatically = false
 
+      const silent = msg.data?.silent ?? false
+      if (silent) {
+        /** If asked for silent connection, just check if an account is selected and isPreAuthorized
+         * Do not open the UI to unlock the wallet or prompt the user to connect to the dapp
+         */
+        if (
+          selectedAccount &&
+          (await preAuthorizationService.isPreAuthorized({
+            account: selectedAccount,
+            host: origin,
+          }))
+        ) {
+          return respond({
+            type: "CONNECT_DAPP_RES",
+            data: selectedAccount,
+          })
+        }
+        return respond({
+          type: "REJECT_PREAUTHORIZATION",
+        })
+      }
+
       if (!selectedAccount) {
         didOpenProgramatically = true
         const openAndUnlocked = await backgroundUIService.openUiAndUnlock()

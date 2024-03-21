@@ -1,4 +1,4 @@
-import { ArgentBackendNftService } from "@argent/shared"
+import { ArgentBackendNftService } from "@argent/x-shared"
 import { networkService } from "../network/service"
 import {
   nftsCollectionsRepository,

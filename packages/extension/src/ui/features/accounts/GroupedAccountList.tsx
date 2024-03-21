@@ -1,4 +1,4 @@
-import { H6 } from "@argent/ui"
+import { H6 } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC } from "react"

@@ -1,4 +1,4 @@
-import { H6, P4, icons } from "@argent/ui"
+import { H6, P4, icons } from "@argent/x-ui"
 import { Flex, HStack } from "@chakra-ui/react"
 // FIXME: remove when depricated accounts do not longer work
 import { FC } from "react"

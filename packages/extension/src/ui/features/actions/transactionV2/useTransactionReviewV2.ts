@@ -6,7 +6,7 @@ import { clientTransactionReviewService } from "../../../services/transactionRev
 import { Call } from "starknet"
 import { isArray, isEmpty } from "lodash-es"
 import { clientAccountService } from "../../../services/account"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import { accountService } from "../../../../shared/account/service"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"

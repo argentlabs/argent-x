@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { Transaction } from "../../../../shared/transactions"
-import { nonNullable } from "@argent/shared"
+import { nonNullable } from "@argent/x-shared"
 import { getV3UpgradeCall } from "../utils"
 
 export function useV3UpgradeFromTxnsCallback() {

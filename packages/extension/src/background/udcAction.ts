@@ -9,7 +9,6 @@ import {
 
 import { ExtQueueItem } from "../shared/actionQueue/types"
 import { isAccountDeployed } from "./accountDeploy"
-import { analytics } from "./analytics"
 import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "../shared/transactions/store"
 import { Wallet } from "./wallet"
@@ -94,12 +93,6 @@ export const udcDeclareContract = async (
     if (!checkTransactionHash(accountDeployTxHash)) {
       throw new UdcError({ code: "DEPLOY_TX_NOT_ADDED" })
     }
-
-    void analytics.track("deployAccount", {
-      status: "success",
-      trigger: "transaction",
-      networkId: account.networkId,
-    })
 
     await addTransaction({
       hash: accountDeployTxHash,
@@ -197,12 +190,6 @@ export const udcDeployContract = async (
     if (!checkTransactionHash(accountDeployTxHash)) {
       throw new UdcError({ code: "DEPLOY_TX_NOT_ADDED" })
     }
-
-    void analytics.track("deployAccount", {
-      status: "success",
-      trigger: "transaction",
-      networkId: account.networkId,
-    })
 
     await addTransaction({
       hash: accountDeployTxHash,

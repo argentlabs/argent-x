@@ -1,5 +1,5 @@
-import { Token } from "@argent/shared"
-import { icons } from "@argent/ui"
+import { Token } from "@argent/x-shared"
+import { icons } from "@argent/x-ui"
 
 import { Flex, Img } from "@chakra-ui/react"
 import { FC } from "react"

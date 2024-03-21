@@ -18,6 +18,7 @@ export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
           selectedAccount?.networkId ?? msg.data.networkId ?? defaultNetwork.id,
       })
       const exists = Boolean(token)
+      let actionHash: string | undefined
 
       if (!exists) {
         const { meta } = await actionService.add(
@@ -30,17 +31,15 @@ export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
           },
         )
 
-        return respond({
-          type: "REQUEST_TOKEN_RES",
-          data: {
-            actionHash: meta.hash,
-          },
-        })
+        actionHash = meta.hash
       }
 
       return respond({
         type: "REQUEST_TOKEN_RES",
-        data: {},
+        data: {
+          exists,
+          actionHash,
+        },
       })
     }
 

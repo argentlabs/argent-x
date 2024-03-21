@@ -7,7 +7,7 @@ import {
   MultisigTransactionType,
 } from "./multisig/types"
 import { getTransactionStatus } from "./transactions/utils"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 export type FinaliyStatus = RPC.SPEC.TXN_STATUS
 export type ExecutionStatus = RPC.SPEC.TXN_EXECUTION_STATUS

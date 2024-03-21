@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import {
   Alert,
   BarBackButton,
@@ -7,7 +7,7 @@ import {
   HeaderCell,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex, FormControl } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FC, ReactNode, useEffect, useMemo } from "react"

@@ -16,9 +16,6 @@ const network = {
 export default {
   component: AddNetworkScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

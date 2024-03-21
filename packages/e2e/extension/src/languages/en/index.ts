@@ -39,7 +39,7 @@ const texts = {
   account: {
     noAccounts: "You have no accounts on",
     createAccount: "Create account",
-    addFunds: "Add funds",
+    addFunds: "Fund",
     fundsFromStarkNet: "From another Starknet wallet",
     fullAccountAddress: "Full account address",
     send: "Send",

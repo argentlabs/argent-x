@@ -8,7 +8,7 @@ import { withPolling } from "../../services/swr.service"
 import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { accountMessagingService } from "../../services/accountMessaging"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 
 export const useAccountsWithGuardian = () => {
   const allAccounts = useView(allAccountsView)

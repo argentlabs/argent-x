@@ -1,12 +1,12 @@
 import { useMemo } from "react"
 
-import { Account } from "../accounts/Account"
-import { tokenBalancesForAccountView } from "../../views/tokenBalances"
-import { useView } from "../../views/implementation/react"
-import { equalToken } from "../../../shared/token/__new/utils"
 import { Token } from "../../../shared/token/__new/types/token.model"
-import { ethTokenOnNetworkView } from "../../views/token"
 import { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
+import { equalToken } from "../../../shared/token/__new/utils"
+import { useView } from "../../views/implementation/react"
+import { ethTokenOnNetworkView } from "../../views/token"
+import { tokenBalancesForAccountView } from "../../views/tokenBalances"
+import { Account } from "../accounts/Account"
 
 /**
  * Interface for the arguments of useTokenBalanceForAccount function

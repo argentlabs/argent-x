@@ -1,4 +1,4 @@
-import { P3 } from "@argent/ui"
+import { P3 } from "@argent/x-ui"
 import { Box, Button, Divider, Input } from "@chakra-ui/react"
 import { useFormContext } from "react-hook-form"
 

@@ -1,4 +1,5 @@
-import { FC } from "react"
+import { FC, useCallback } from "react"
+import { isObject } from "lodash-es"
 
 import { WithArgentShieldVerified } from "../../shield/WithArgentShieldVerified"
 import { useActionScreen } from "../hooks/useActionScreen"
@@ -18,9 +19,10 @@ export const SignActionScreenContainerV2: FC = () => {
   const {
     action,
     selectedAccount,
-    approveAndClose,
+    approve,
     reject,
     rejectWithoutClose,
+    closePopupIfLastAction,
   } = useActionScreen()
   if (action?.type !== "SIGN") {
     throw new Error(
@@ -37,6 +39,15 @@ export const SignActionScreenContainerV2: FC = () => {
 
   const dataToSign = action.payload.typedData
   const skipDeployWarning = action.payload.options?.skipDeploy
+
+  const onSubmit = useCallback(async () => {
+    const result = await approve()
+    if (isObject(result) && "error" in result) {
+      // stay on error screen
+    } else {
+      closePopupIfLastAction()
+    }
+  }, [closePopupIfLastAction, approve])
 
   if (
     !skipDeployWarning &&
@@ -92,7 +103,7 @@ export const SignActionScreenContainerV2: FC = () => {
         dappLogoUrl={dappDisplayAttributes.iconUrl}
         dappHost={action.meta.origin || ""}
         dataToSign={dataToSign}
-        onSubmit={() => void approveAndClose()}
+        onSubmit={() => void onSubmit()}
         footer={<WithActionScreenErrorFooter />}
         onReject={() => void reject()}
         actionIsApproving={Boolean(action.meta.startedApproving)}

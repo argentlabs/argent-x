@@ -6,4 +6,12 @@ export interface IClientMultisigService extends IMultisigService {
     creator: string,
     signerMetadata: SignerMetadata,
   ): Promise<void>
+  updateSignersMetadata(
+    multisigPublicKey: string,
+    signersMetadata: SignerMetadata[],
+  ): Promise<void>
+  removeSignerMetadata(
+    multisigPublicKey: string,
+    signerKey: string,
+  ): Promise<void>
 }

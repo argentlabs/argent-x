@@ -2,7 +2,7 @@ import { Atom, atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 
 import { atomFromRepo } from "./implementation/atomFromRepo"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import {
   multisigBaseWalletRepo,
   multisigMetadataRepo,
@@ -18,7 +18,7 @@ export const allMultisigMetadataView = atom(async (get) => {
   return multisigMetadataList
 })
 
-export const creatorMultisigMetadataAtomFamily = (
+export const publicKeyMultisigMetadataAtomFamily = (
   view: Atom<Promise<MultisigMetadata[]>>,
 ) =>
   atomFamily(
@@ -26,15 +26,17 @@ export const creatorMultisigMetadataAtomFamily = (
       atom(async (get) => {
         const multisigMetadataList = await get(view)
         return multisigMetadataList.find((multisigMetadata) =>
-          isEqualAddress(multisigMetadata?.creator, multisig?.creator),
+          isEqualAddress(
+            multisigMetadata?.multisigPublicKey,
+            multisig?.publicKey,
+          ),
         )
       }),
     (a, b) => a?.creator === b?.creator,
   )
 
-export const creatorMultisigMetadataView = creatorMultisigMetadataAtomFamily(
-  allMultisigMetadataView,
-)
+export const publicKeyMultisigMetadataView =
+  publicKeyMultisigMetadataAtomFamily(allMultisigMetadataView)
 
 export const pendingMultisigsView = atomFromRepo(pendingMultisigRepo)
 

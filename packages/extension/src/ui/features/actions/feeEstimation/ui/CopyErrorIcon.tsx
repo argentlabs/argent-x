@@ -1,21 +1,21 @@
-import { CopyTooltip, icons } from "@argent/ui"
+import { CopyTooltip, icons } from "@argent/x-ui"
 import { Box, Fade, useAccordionItemState } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { FeeEstimationProps } from "../feeEstimation.model"
-
 const { CopyIcon } = icons
 
-export const CopyErrorIcon: FC<
-  Pick<FeeEstimationProps, "parsedFeeEstimationError">
-> = ({ parsedFeeEstimationError }) => {
+interface CopyErrorIconProps {
+  copyValue?: string
+}
+
+export const CopyErrorIcon: FC<CopyErrorIconProps> = ({ copyValue }) => {
   const { isOpen } = useAccordionItemState()
-  if (!parsedFeeEstimationError || !isOpen) {
+  if (!copyValue || !isOpen) {
     return null
   }
   return (
     <Fade in={isOpen}>
-      <CopyTooltip copyValue={parsedFeeEstimationError.message}>
+      <CopyTooltip copyValue={copyValue}>
         <Box
           onClick={(e) => {
             /** prevent accordion from collapsing */

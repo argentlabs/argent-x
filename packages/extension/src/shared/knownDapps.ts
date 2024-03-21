@@ -1,4 +1,4 @@
-import { includesAddress } from "@argent/shared"
+import { includesAddress } from "@argent/x-shared"
 
 import untypedKnownDapps from "../assets/known-dapps.json"
 

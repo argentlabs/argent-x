@@ -1,7 +1,7 @@
 import { GuardianSigner } from "@argent/guardian"
 import type { CosignerMessage, CosignerOffchainMessage } from "@argent/guardian"
 import { Signature, hash, num } from "starknet6"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 
 import { isTokenExpired } from "./backend/account"
 

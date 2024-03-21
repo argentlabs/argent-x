@@ -1,4 +1,4 @@
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { StoryObj } from "@storybook/react"
 import { ComponentProps } from "react"
 
@@ -11,9 +11,6 @@ import newsFixture from "./__fixtures__/news.json"
 export default {
   component: NewsItemCard,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
   render: (props: ComponentProps<typeof NewsItemCard>) => (
     <CellStack>
       <NewsItemCard {...props}></NewsItemCard>

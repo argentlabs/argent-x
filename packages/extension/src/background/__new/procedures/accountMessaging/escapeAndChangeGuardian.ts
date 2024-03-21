@@ -10,7 +10,7 @@ import {
   changeGuardianCalldataSchema,
   escapeGuardianCalldataSchema,
   isEqualAddress,
-} from "@argent/shared"
+} from "@argent/x-shared"
 
 const escapeAndChangeGuardianSchema = z.object({
   account: baseWalletAccountSchema,

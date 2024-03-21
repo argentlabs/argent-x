@@ -17,6 +17,8 @@ import { useAddFundsDialogSend } from "./useAddFundsDialog"
 import { useToken } from "./tokens.state"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 import { useBestFeeToken } from "../actions/useBestFeeToken"
+import { useHasFeeTokenBalance } from "./useFeeTokenBalance"
+import { usePortfolioUrl } from "../actions/hooks/usePortfolioUrl"
 
 interface AccountTokensButtonsContainerProps {
   account: Account
@@ -25,7 +27,7 @@ interface AccountTokensButtonsContainerProps {
 
 export const AccountTokensButtonsContainer: FC<
   AccountTokensButtonsContainerProps
-> = ({ account, hideSend = false }) => {
+> = ({ account }) => {
   const navigate = useNavigate()
   const { switcherNetworkId } = useAppState()
   const multisig = useMultisig(account)
@@ -36,6 +38,7 @@ export const AccountTokensButtonsContainer: FC<
     address: bestFeeToken?.address ?? ETH_TOKEN_ADDRESS,
     networkId: switcherNetworkId,
   })
+  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
 
   const hasSavedRecoverySeedPhrase = useView(hasSavedRecoverySeedPhraseView)
 
@@ -57,7 +60,7 @@ export const AccountTokensButtonsContainer: FC<
     if (
       showSaveRecoveryPhraseModal ||
       (multisig && (multisig.needsDeploy || !signerIsInMultisig)) ||
-      hideSend
+      !hasFeeTokenBalance
     ) {
       return false
     }
@@ -68,9 +71,9 @@ export const AccountTokensButtonsContainer: FC<
     sendToken,
     signerIsInMultisig,
     showSaveRecoveryPhraseModal,
-    hideSend,
+    hasFeeTokenBalance,
   ])
-
+  const portfolioUrl = usePortfolioUrl(account)
   const showAddFundsButton = useMemo(() => {
     if (showSaveRecoveryPhraseModal || (multisig && !signerIsInMultisig)) {
       return false
@@ -105,6 +108,14 @@ export const AccountTokensButtonsContainer: FC<
 
   const onSend = () => addFundsDialogSend()
 
+  let buttonColumnCount = 1
+  if (showSendButton) {
+    buttonColumnCount++
+  }
+  if (showSendButton && portfolioUrl) {
+    buttonColumnCount++
+  }
+
   return (
     <AccountTokensButtons
       account={account}
@@ -118,6 +129,8 @@ export const AccountTokensButtonsContainer: FC<
       onHideMultisigModalClose={onHideMultisigModalClose}
       isHideMultisigModalOpen={isHideMultisigModalOpen}
       onHideConfirm={onHideConfirm}
+      portfolioUrl={portfolioUrl}
+      buttonColumnCount={buttonColumnCount}
     />
   )
 }

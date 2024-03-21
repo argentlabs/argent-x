@@ -1,4 +1,4 @@
-import { BarBackButton, CellStack, NavigationContainer } from "@argent/ui"
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { SettingsMenuItem } from "../ui/SettingsMenuItem"

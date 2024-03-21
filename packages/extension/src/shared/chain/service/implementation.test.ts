@@ -3,7 +3,7 @@ import { describe, expect, test, vi } from "vitest"
 import { INetworkService } from "../../network/service/interface"
 import { Network } from "../../network"
 import { StarknetChainService } from "./implementation"
-import { Hex } from "@argent/shared"
+import { Hex } from "@argent/x-shared"
 
 const mocks = vi.hoisted(() => {
   return {
@@ -55,9 +55,8 @@ describe("StarknetChainService", () => {
         getTransactionReceipt: () => ({ finality_status: status }),
       })
 
-      const txWithStatus = await starknetChainService.getTransactionStatus(
-        mockTransaction,
-      )
+      const txWithStatus =
+        await starknetChainService.getTransactionStatus(mockTransaction)
 
       expect(txWithStatus.status.status).toEqual("confirmed")
       expect(getTransactionReceipt).not.toHaveBeenCalled()
@@ -84,9 +83,8 @@ describe("StarknetChainService", () => {
       getTransactionReceipt,
     })
 
-    const txWithStatus = await starknetChainService.getTransactionStatus(
-      mockTransaction,
-    )
+    const txWithStatus =
+      await starknetChainService.getTransactionStatus(mockTransaction)
 
     expect(txWithStatus.status.status).toEqual("failed")
     expect(getTransactionReceipt).not.toHaveBeenCalled()
@@ -114,9 +112,8 @@ describe("StarknetChainService", () => {
       getTransactionReceipt,
     })
 
-    const txWithStatus = await starknetChainService.getTransactionStatus(
-      mockTransaction,
-    )
+    const txWithStatus =
+      await starknetChainService.getTransactionStatus(mockTransaction)
 
     expect(txWithStatus.status.status).toEqual("failed")
     expect(getTransactionReceipt).toHaveBeenCalledWith(mockTransaction.hash)
@@ -142,9 +139,8 @@ describe("StarknetChainService", () => {
       getTransactionReceipt,
     })
 
-    const txWithStatus = await starknetChainService.getTransactionStatus(
-      mockTransaction,
-    )
+    const txWithStatus =
+      await starknetChainService.getTransactionStatus(mockTransaction)
 
     expect(txWithStatus.status.status).toEqual("failed")
     expect(getTransactionReceipt).toHaveBeenCalledWith(mockTransaction.hash)

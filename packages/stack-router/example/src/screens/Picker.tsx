@@ -4,7 +4,7 @@ import {
   CellStack,
   NavigationContainer,
   SpacerCell,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Link } from "react-router-dom"
 
 export function Picker() {

@@ -10,7 +10,7 @@ import {
   WalletAccount,
 } from "../../../shared/wallet.model"
 import { EstimatedFee } from "../../../shared/transactionSimulation/fees/fees.model"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 // Extend to support multichain
 type InvocationsDetails = StarknetInvocationDetails

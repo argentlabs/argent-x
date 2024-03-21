@@ -5,9 +5,6 @@ import statusMessages from "./__fixtures__/status-messages.json"
 
 export default {
   component: StatusMessageFullScreen,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Danger = {

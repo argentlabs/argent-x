@@ -1,4 +1,4 @@
-import { getAccountIdentifier } from "@argent/shared"
+import { getAccountIdentifier } from "@argent/x-shared"
 import { IScheduleService } from "../../../../../shared/schedule/interface"
 import { WalletAccount } from "../../../../../shared/wallet.model"
 import { getAccountClassHashFromChain } from "../../../../../shared/account/details/getAccountClassHashFromChain"
@@ -139,9 +139,8 @@ export class AccountWorker {
   async updateAccountCairoVersion(): Promise<void> {
     const accounts = await this.accountService.get()
 
-    const accountsWithCairoVersion = await getAccountCairoVersionFromChain(
-      accounts,
-    )
+    const accountsWithCairoVersion =
+      await getAccountCairoVersionFromChain(accounts)
 
     // Create a map to store accountWithCairoVersion with key as unique account id.
     const accountsWithCairoVersionMap = keyBy(
@@ -160,9 +159,8 @@ export class AccountWorker {
   }
 
   async onSignerChanged(payload: AccountActivityPayload) {
-    const accounts = await this.accountService.getFromBaseWalletAccounts(
-      payload,
-    )
+    const accounts =
+      await this.accountService.getFromBaseWalletAccounts(payload)
     const results = await Promise.allSettled(
       accounts.map((account) => {
         return getOwnerForAccount(account)
@@ -180,9 +178,8 @@ export class AccountWorker {
   }
 
   async onGuardianChanged(payload: AccountActivityPayload) {
-    const accounts = await this.accountService.getFromBaseWalletAccounts(
-      payload,
-    )
+    const accounts =
+      await this.accountService.getFromBaseWalletAccounts(payload)
     const results = await Promise.allSettled(
       accounts.map((account) => {
         return getGuardianForAccount(account)

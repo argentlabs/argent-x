@@ -1,10 +1,9 @@
-import { act, screen } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 
 import { AccountListScreenItem } from "./AccountListScreenItem"
 import { renderWithLegacyProviders } from "../../test/utils"
-import { useAccount } from "./accounts.state"
 
 vi.mock("./accounts.state", () => {
   return { useAccount: vi.fn() }
@@ -26,7 +25,6 @@ describe("AccountListScreenItem", async () => {
         <AccountListScreenItem onClick={onClick} {...account} />,
       )
 
-      screen.getByText(/^Account 1/)
       await userEvent.click(screen.getByText(/^Account 1/))
 
       expect(onClick).toHaveBeenCalled()

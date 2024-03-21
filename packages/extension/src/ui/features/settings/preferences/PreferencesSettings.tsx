@@ -3,7 +3,7 @@ import {
   CellStack,
   NavigationContainer,
   Switch,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { NftMarketplace } from "../../../../shared/nft/marketplaces"
@@ -42,7 +42,7 @@ export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
         <SettingsMenuItem
           onClick={toggleHideTokensWithNoBalance}
           title={"Hide tokens with no balance"}
-          subtitle={"ETH will always be shown"}
+          subtitle={"ETH and STRK will always be shown"}
           rightIcon={<Switch isChecked={hideTokensWithNoBalance} />}
         >
           Change account implementation

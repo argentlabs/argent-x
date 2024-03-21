@@ -18,7 +18,7 @@ import {
   STRK_TOKEN_ADDRESS,
   TXV3_ACCOUNT_CLASS_HASH,
 } from "../../network/constants"
-import { Address, IHttpService, addressSchema } from "@argent/shared"
+import { Address, IHttpService, addressSchema } from "@argent/x-shared"
 import { stark } from "starknet"
 import { defaultNetwork } from "../../network"
 import { getMockNetwork } from "../../../../test/network.mock"

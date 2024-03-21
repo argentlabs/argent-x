@@ -5,7 +5,7 @@ import {
   NavigationContainer,
   P3,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { PreAuthorization } from "../../../../shared/preAuthorization/schema"
@@ -35,7 +35,7 @@ export const DappConnectionsAccountListScreen: FC<
         <Empty icon={<LinkIcon />} title={"No connected dapps"} />
       ) : (
         <CellStack width={"full"}>
-          <P3 color="text.secondary">
+          <P3 color="text-secondary">
             One or more dapps are connected to these accounts:
           </P3>
           <Flex

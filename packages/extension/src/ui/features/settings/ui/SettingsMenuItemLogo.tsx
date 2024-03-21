@@ -1,4 +1,4 @@
-import { logos } from "@argent/ui"
+import { logos } from "@argent/x-ui"
 import { Center, CenterProps } from "@chakra-ui/react"
 import { FC } from "react"
 

@@ -1,4 +1,4 @@
-import { Button, icons, H6, B3, P4, L1 } from "@argent/ui"
+import { Button, icons, H6, B3, P4, L1 } from "@argent/x-ui"
 import {
   Badge,
   Flex,

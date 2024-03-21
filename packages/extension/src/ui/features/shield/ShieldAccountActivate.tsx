@@ -1,4 +1,4 @@
-import { FlowHeader, icons } from "@argent/ui"
+import { FlowHeader, icons } from "@argent/x-ui"
 import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 

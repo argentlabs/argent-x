@@ -5,9 +5,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: AccountNavigationBar,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {
@@ -40,5 +37,13 @@ export const OnlySettings = {
   args: {
     showAccountButton: false,
     showNetworkSwitcher: false,
+  },
+}
+
+export const EnvLabel = {
+  args: {
+    isShield: true,
+    accountName: "Account 1",
+    envLabel: "Hydrogen",
   },
 }

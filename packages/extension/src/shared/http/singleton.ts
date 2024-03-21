@@ -1,4 +1,4 @@
-import { HTTPService } from "@argent/shared"
+import { HTTPService } from "@argent/x-shared"
 
 import { argentXHeaders } from "../api/headers"
 

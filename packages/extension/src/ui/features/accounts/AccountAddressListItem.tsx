@@ -5,8 +5,8 @@ import {
   isValidAddress,
   getAccountIdentifier,
   isStarknetDomainName,
-} from "@argent/shared"
-import { icons } from "@argent/ui"
+} from "@argent/x-shared"
+import { icons } from "@argent/x-ui"
 import { FC, ReactNode, useEffect, useMemo, useState } from "react"
 
 import { useAppState } from "../../app.state"

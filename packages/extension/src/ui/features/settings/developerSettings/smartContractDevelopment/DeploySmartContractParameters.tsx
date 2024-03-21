@@ -1,4 +1,4 @@
-import { H6, Input, L2, Switch, TextareaAutosize, icons } from "@argent/ui"
+import { H6, Input, L2, Switch, TextareaAutosize, icons } from "@argent/x-ui"
 import {
   Flex,
   FormControl,

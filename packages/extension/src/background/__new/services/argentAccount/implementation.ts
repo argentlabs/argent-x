@@ -23,7 +23,7 @@ import {
   PreferencesPayload,
   preferencesEndpointPayload,
 } from "../../../../shared/argentAccount/schema"
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 import urlJoin from "url-join"
 import { ARGENT_ACCOUNT_URL } from "../../../../shared/api/constants"
 import { generateJwt } from "../../../../shared/shield/jwt"
@@ -32,7 +32,10 @@ import { BaseError } from "../../../../shared/errors/baseError"
 export default class BackgroundArgentAccountService
   implements IArgentAccountServiceBackground
 {
-  constructor(private wallet: Wallet, private httpService: IHttpService) {}
+  constructor(
+    private wallet: Wallet,
+    private httpService: IHttpService,
+  ) {}
 
   async addAccount() {
     if (!ARGENT_SHIELD_NETWORK_ID) {
@@ -151,9 +154,8 @@ export default class BackgroundArgentAccountService
     const localAccounts = await accountService.get(
       getNetworkSelector(ARGENT_SHIELD_NETWORK_ID),
     )
-    const localAccountsWithGuardian = await accountService.get(
-      withGuardianSelector,
-    )
+    const localAccountsWithGuardian =
+      await accountService.get(withGuardianSelector)
     const backendAccounts = await getBackendAccounts()
 
     /** Validate email against account state */

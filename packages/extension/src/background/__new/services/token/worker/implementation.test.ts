@@ -22,7 +22,7 @@ import {
   getMockToken,
   getMockTokenPriceDetails,
 } from "../../../../../../test/token.mock"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import { stark } from "starknet"
 import { BaseWalletAccount } from "../../../../../shared/wallet.model"
 import { BaseTokenWithBalance } from "../../../../../shared/token/__new/types/tokenBalance.model"
@@ -275,12 +275,18 @@ describe("TokenWorker", () => {
       const mockTokenPrices: TokenPriceDetails[] = [
         getMockTokenPriceDetails({ pricingId: 1 }),
       ]
+      const mockNetworks = [
+        getMockNetwork({ id: "mainnet-alpha" }),
+        getMockNetwork({ id: "invalid-backend-network" }),
+      ]
+
+      mockNetworkService.get.mockResolvedValue(mockNetworks)
       mockTokenService.getTokens.mockResolvedValue(mockTokens)
       mockTokenService.fetchTokenPricesFromBackend.mockResolvedValue(
         mockTokenPrices,
       )
 
-      await tokenWorker.runFetchAndUpdateTokenPricesFromBackend()
+      await tokenWorker.runFetchAndUpdateTokensAndTokenPricesFromBackend()
 
       // Assert
       expect(mockTokenService.getTokens).toHaveBeenCalledWith(

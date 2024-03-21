@@ -1,5 +1,5 @@
 import { AccountSelect } from "@argent-x/extension/src/ui/features/accounts/AccountSelect"
-import { P3 } from "@argent/ui"
+import { P3 } from "@argent/x-ui"
 import { ComponentProps } from "react"
 
 export default {

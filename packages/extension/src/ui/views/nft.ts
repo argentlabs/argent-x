@@ -14,7 +14,7 @@ import {
   NftItem,
   isEqualAddress,
   ensureArray,
-} from "@argent/shared"
+} from "@argent/x-shared"
 
 const allNftsAtom = atomFromRepo(nftsRepository)
 
@@ -159,11 +159,42 @@ export const collectionNftsAtomFamily = (nftsView: Atom<Promise<NftItem[]>>) =>
     (a, b) => a === b,
   )
 
+export const collectionNftsByAccountAndNetworkAtomFamily = (
+  nftsView: Atom<Promise<NftItem[]>>,
+) =>
+  atomFamily(
+    ({
+      contractAddress,
+      accountAddress,
+      networkId,
+    }: {
+      contractAddress: Address
+      accountAddress: Address
+      networkId?: string
+    }) =>
+      atom(async (get) => {
+        const nfts = await get(nftsView)
+
+        return nfts.filter(
+          (nft) =>
+            isEqualAddress(nft.contract_address, contractAddress) &&
+            isEqualAddress(nft.owner.account_address ?? "", accountAddress) &&
+            nft.networkId === networkId,
+        )
+      }),
+    (a, b) =>
+      a.contractAddress === b.contractAddress &&
+      a.accountAddress === b.accountAddress &&
+      a.networkId === b.networkId,
+  )
+
 export const collectionView = collectionAtomFamily(allCollectionsView)
 export const collectionsByNetworkView =
   collectionsByNetworkAtomFamily(allCollectionsView)
 export const collectionsByAccountAndNetworkView =
   collectionsByAccountAndNetworkAtomFamily(allCollectionsView)
+export const collectionNftsByAccountAndNetworkView =
+  collectionNftsByAccountAndNetworkAtomFamily(allNftsView)
 export const collectionNftsView = collectionNftsAtomFamily(allNftsView)
 
 /* contracts */

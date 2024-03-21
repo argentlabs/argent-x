@@ -1,4 +1,4 @@
-import { generateAvatarImage } from "@argent/shared"
+import { generateAvatarImage } from "@argent/x-shared"
 import { getKnownDappForHost } from "../../../../shared/knownDapps"
 import { getColor } from "../../accounts/accounts.service"
 import { useDappFromKnownDappsByHost } from "../../../services/knownDapps"

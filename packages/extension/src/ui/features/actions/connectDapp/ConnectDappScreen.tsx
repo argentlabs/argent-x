@@ -1,13 +1,5 @@
-import { H5, H6, KnownDappButton, L2, P4, icons } from "@argent/ui"
-import {
-  Box,
-  Center,
-  Flex,
-  List,
-  ListIcon,
-  ListItem,
-  Text,
-} from "@chakra-ui/react"
+import { H6, L2, P4, icons } from "@argent/x-ui"
+import { Box, Flex, List, ListIcon, ListItem, Text } from "@chakra-ui/react"
 import { FC, PropsWithChildren, ReactNode } from "react"
 
 import {
@@ -16,7 +8,6 @@ import {
 } from "../../../../shared/wallet.model"
 import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
 import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
-import { DappIcon } from "./DappIcon"
 import { DappDisplayAttributes } from "./useDappDisplayAttributes"
 import { DappActionHeader } from "./DappActionHeader"
 
@@ -58,8 +49,6 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
 }) => {
   const confirmButtonText = isConnected ? "Continue" : "Connect"
   const rejectButtonText = isConnected ? "Disconnect" : "Cancel"
-
-  const hostName = new URL(host).hostname
 
   return (
     <>

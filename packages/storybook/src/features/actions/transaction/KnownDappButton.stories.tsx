@@ -1,4 +1,4 @@
-import { KnownDappButton } from "@argent/ui"
+import { KnownDappButton } from "@argent/x-ui"
 
 export default {
   component: KnownDappButton,

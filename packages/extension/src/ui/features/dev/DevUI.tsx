@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { TabBarHeight } from "@argent/ui"
+import { TabBarHeight } from "@argent/x-ui"
 import {
   useHardReload,
   useResetCache,

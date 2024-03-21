@@ -2,7 +2,7 @@ import {
   Address,
   TransactionAction,
   swrRefetchDisabledConfig,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { useCallback } from "react"
 import { TransactionType } from "starknet"
 

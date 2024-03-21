@@ -1,4 +1,4 @@
-import { KnownDappButton } from "@argent/ui"
+import { KnownDappButton } from "@argent/x-ui"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 
 export const KnownDappButtonWrapper = ({ dappHost }: { dappHost: string }) => {

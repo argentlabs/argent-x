@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { BaseWalletAccount, WalletAccount } from "./wallet.model"
 
 // from https://community.starknet.io/t/account-keys-and-addresses-derivation-standard/1230
@@ -19,11 +19,16 @@ export const DEPRECATED_TX_V0_ACCOUNT_IMPLEMENTATION_CLASS_HASH = [
 export const hasNewDerivationPath = (derivationPath?: string): boolean =>
   Boolean(derivationPath?.startsWith(STANDARD_DERIVATION_PATH))
 
+export const hasMultisigDerivationPath = (derivationPath?: string): boolean =>
+  Boolean(derivationPath?.startsWith(MULTISIG_DERIVATION_PATH))
 export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
-  return (
+  const isOldPathDeprecated =
     Boolean(network.accountClassHash) &&
     !hasNewDerivationPath(signer.derivationPath)
-  )
+
+  const isNotMultisig = !hasMultisigDerivationPath(signer.derivationPath)
+
+  return isOldPathDeprecated && isNotMultisig
 }
 
 export const isDeprecatedTxV0 = (account: WalletAccount): boolean => {

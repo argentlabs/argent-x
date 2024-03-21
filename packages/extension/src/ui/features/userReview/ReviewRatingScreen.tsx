@@ -11,7 +11,6 @@ import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { StarRounded } from "../../components/Icons/MuiIcons"
 import { routes } from "../../routes"
-import { analytics } from "../../services/analytics"
 import { H2 } from "../../theme/Typography"
 
 const Container = styled(ColumnCenter)`
@@ -41,7 +40,6 @@ export const ReviewRatingScreen: FC = () => {
     value: number | null,
   ) => {
     if (value) {
-      analytics.track("userRating", { rating: value })
       await toggleUserHasReviewed()
       navigate(routes.userReviewFeedback(), {
         state: {
@@ -57,13 +55,10 @@ export const ReviewRatingScreen: FC = () => {
         close
         onClick={async () => {
           await resetTransactionsBeforeReview()
-          analytics.track("userFeedbackAction", {
-            action: "RATING_DISMISSED",
-          })
         }}
       />
       <Container>
-        <H2>Enjoying ArgentX?</H2>
+        <H2>Enjoying Argent X?</H2>
         <RateText>How would you rate your experience</RateText>
         <RatingContainer>
           <StyledRating

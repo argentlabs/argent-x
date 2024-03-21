@@ -11,7 +11,7 @@
   "vitest.enable": true,
   "vitest.commandLine": "npx vitest -r packages/extension/",
   "explorer.fileNesting.patterns": {
-    "*.tsx": "${capture}.ts, ${capture}.typegen.ts, ${capture}Container.tsx, ${capture}.container.tsx, ${capture}.test.tsx, ${capture}.spec.tsx, ${capture}.test.ts, ${capture}.spec.ts",
+    "*.tsx": "${capture}.ts, ${capture}.typegen.ts, ${capture}Container.tsx, ${capture}.container.tsx, ${capture}.stories.tsx, ${capture}.test.tsx, ${capture}.spec.tsx, ${capture}.test.ts, ${capture}.spec.ts",
     "*.ts": "${capture}.ts, ${capture}.typegen.ts, ${capture}Container.tsx, ${capture}.container.tsx, ${capture}.test.tsx, ${capture}.spec.tsx, ${capture}.test.ts, ${capture}.spec.ts"
   }
 }

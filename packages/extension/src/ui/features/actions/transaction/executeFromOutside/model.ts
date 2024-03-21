@@ -2,7 +2,7 @@ import {
   addressSchema,
   bigNumberishSchema,
   isEqualAddress,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { z } from "zod"
 import { getWhitelistedContracts } from "./whitelist"
 

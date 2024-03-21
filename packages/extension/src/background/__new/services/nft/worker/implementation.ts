@@ -1,4 +1,4 @@
-import { addressSchema } from "@argent/shared"
+import { addressSchema, isArgentNetworkId } from "@argent/x-shared"
 import { uniq } from "lodash-es"
 
 import { IBackgroundUIService } from "../../ui/interface"
@@ -59,6 +59,9 @@ export class NftsWorker {
   updateNftsCallback = async () => {
     const account = await this.walletSingleton.getSelectedAccount()
     if (!account) {
+      return
+    }
+    if (!isArgentNetworkId(account.networkId)) {
       return
     }
 

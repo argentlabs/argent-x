@@ -1,4 +1,4 @@
-import { addressSchema, addressOrDomainSchema } from "@argent/shared"
+import { addressSchema, addressOrDomainSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"

@@ -4,7 +4,7 @@ import {
   NavigationContainer,
   P4,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAtom } from "jotai"

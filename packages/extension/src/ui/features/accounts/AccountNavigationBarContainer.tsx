@@ -9,6 +9,8 @@ import { AccountNavigationBar } from "./AccountNavigationBar"
 import { AccountNavigationBarContainerProps } from "./accountNavigationBar.model"
 import { useOnSettingsNavigate } from "./useOnSettingsNavigate"
 
+const argentXEnv = process.env.ARGENT_X_ENVIRONMENT || ""
+
 export const AccountNavigationBarContainer: FC<
   AccountNavigationBarContainerProps
 > = (props) => {
@@ -32,6 +34,8 @@ export const AccountNavigationBarContainer: FC<
 
   const accountName = account && account.name
 
+  const envLabel = argentXEnv === "hydrogen" ? "Hydrogen" : undefined
+
   return (
     <AccountNavigationBar
       showAccountButton={hasAccount}
@@ -40,6 +44,7 @@ export const AccountNavigationBarContainer: FC<
       isMultisig={isMultisig}
       onAccountList={onAccountList}
       onSettings={onSettings}
+      envLabel={envLabel}
       {...props}
     />
   )

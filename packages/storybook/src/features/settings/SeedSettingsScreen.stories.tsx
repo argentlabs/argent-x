@@ -5,9 +5,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: SeedSettingsScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const PasswordIsNotValid = {

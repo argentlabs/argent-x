@@ -1,4 +1,4 @@
-import { Address, ensureDecimals } from "@argent/shared"
+import { Address, ensureDecimals } from "@argent/x-shared"
 
 import { TokenView } from "../../features/accountTokens/tokens.service"
 import { messageClient } from "../messaging/trpc"

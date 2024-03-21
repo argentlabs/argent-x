@@ -1,4 +1,4 @@
-import { addressSchema, isEqualAddress } from "@argent/shared"
+import { addressSchema, isEqualAddress } from "@argent/x-shared"
 import type { Dictionary } from "lodash"
 import {
   flatten,
@@ -24,7 +24,7 @@ import { Account } from "../../accounts/Account"
 import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useTokensRecord } from "../../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal } from "@argent/x-shared"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
 import { Token } from "../../../../shared/token/__new/types/token.model"
 import {

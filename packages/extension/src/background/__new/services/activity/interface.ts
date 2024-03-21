@@ -1,4 +1,4 @@
-import type { Token } from "@argent/shared"
+import type { Token } from "@argent/x-shared"
 import type Emittery from "emittery"
 
 import type { ContractAddress } from "../../../../shared/storage/__new/repositories/nft"

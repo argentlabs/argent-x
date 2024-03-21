@@ -16,7 +16,6 @@ import {
 } from "./transactionV2/TransactionHeader"
 import { TransactionReviewActions } from "./transactionV2/action/TransactionReviewActions"
 import { ReviewOfTransaction } from "../../../shared/transactionReview/schema"
-import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 import { useBestFeeToken } from "./useBestFeeToken"
 
 export interface ApproveDeployAccountScreenProps

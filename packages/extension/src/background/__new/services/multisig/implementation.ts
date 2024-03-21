@@ -3,7 +3,6 @@ import {
   IMultisigService,
 } from "../../../../shared/multisig/service/messaging/interface"
 import { tryToMintFeeToken } from "../../../../shared/devnet/mintFeeToken"
-import { analytics } from "../../../analytics"
 import { getMultisigAccounts } from "../../../../shared/multisig/utils/baseMultisig"
 import {
   AddAccountPayload,
@@ -29,7 +28,7 @@ import {
   decodeBase58Array,
   removeOwnersCalldataSchema,
   replaceSignerCalldataSchema,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { AccountError } from "../../../../shared/errors/account"
 import { getMultisigPendingTransaction } from "../../../../shared/multisig/pendingTransactionsStore"
 import { MultisigError } from "../../../../shared/errors/multisig"
@@ -42,37 +41,21 @@ export default class BackgroundMultisigService implements IMultisigService {
   async addAccount(payload: AddAccountPayload): Promise<AddAccountResponse> {
     const { networkId, signers, threshold, creator, publicKey, updatedAt } =
       payload
-    try {
-      const account = await this.wallet.newAccount(networkId, "multisig", {
-        signers,
-        threshold,
-        creator,
-        publicKey,
-        updatedAt,
-      })
-      await tryToMintFeeToken(account)
 
-      void analytics.track("createAccount", {
-        status: "success",
-        networkId,
-        type: "multisig",
-      })
+    const account = await this.wallet.newAccount(networkId, "multisig", {
+      signers,
+      threshold,
+      creator,
+      publicKey,
+      updatedAt,
+    })
+    await tryToMintFeeToken(account)
 
-      const accounts = await getMultisigAccounts()
+    const accounts = await getMultisigAccounts()
 
-      return {
-        account,
-        accounts,
-      }
-    } catch (error) {
-      void analytics.track("createAccount", {
-        status: "failure",
-        networkId: networkId,
-        type: "multisig",
-        errorMessage: `${error}`,
-      })
-
-      throw error
+    return {
+      account,
+      accounts,
     }
   }
 
@@ -191,9 +174,8 @@ export default class BackgroundMultisigService implements IMultisigService {
       throw new AccountError({ code: "NOT_SELECTED" })
     }
 
-    const multisigStarknetAccount = await this.wallet.getStarknetAccount(
-      selectedAccount,
-    )
+    const multisigStarknetAccount =
+      await this.wallet.getStarknetAccount(selectedAccount)
 
     if (!MultisigAccount.isMultisig(multisigStarknetAccount)) {
       throw new AccountError({ code: "NOT_MULTISIG" })

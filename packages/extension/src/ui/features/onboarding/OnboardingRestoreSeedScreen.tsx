@@ -1,5 +1,5 @@
-import { seedphraseSchema } from "@argent/shared"
-import { Alert, B3, FieldError, SeedInput, icons } from "@argent/ui"
+import { seedphraseSchema } from "@argent/x-shared"
+import { Alert, B3, FieldError, SeedInput, icons } from "@argent/x-ui"
 import { Flex, chakra } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FC, MouseEventHandler } from "react"
@@ -47,8 +47,8 @@ export const OnboardingRestoreSeedScreen: FC<
   return (
     <OnboardingScreen
       onBack={onBack}
-      length={3}
-      currentIndex={1}
+      length={5}
+      currentIndex={2}
       title={"Restore accounts"}
       subtitle="Enter each of the 12 words from your recovery phrase separated by a
       space"

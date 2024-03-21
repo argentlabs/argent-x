@@ -1,22 +1,28 @@
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 import { Box, Center, Image } from "@chakra-ui/react"
 
+import { AggregatedSimData } from "@argent/x-shared"
+import { useMemo } from "react"
 import { Network } from "../../../../../../../shared/network"
-import { TransactionReviewWithType } from "../../../../../../../shared/transactionReview.service"
 import { useToken } from "../../../../../accountTokens/tokens.state"
 import { UnknownTokenIcon } from "./UnknownTokenIcon"
 
 const { SendIcon } = icons
 
 export const SendTransactionIcon = ({
-  transaction,
+  aggregatedData,
   network,
 }: {
-  transaction: TransactionReviewWithType
+  aggregatedData?: AggregatedSimData[]
   network: Network
 }) => {
+  const srcAddress = useMemo(
+    () => aggregatedData?.find((ag) => ag.recipients.length > 0)?.token.address,
+    [aggregatedData],
+  )
+
   const srcToken = useToken({
-    address: transaction?.activity?.value?.token.address || "0x0",
+    address: srcAddress || "0x0",
     networkId: network.id,
   })
   return (

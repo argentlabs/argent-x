@@ -7,7 +7,7 @@ import {
   NavigationContainer,
   P3,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Box, Center, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -52,7 +52,7 @@ export const DeclareOrDeployContractSuccessScreen: FC<
               backgroundColor="neutrals.800"
               borderRadius={8}
               textAlign={"center"}
-              color={"white50"}
+              color={"white.50"}
               p="4.5"
               overflowWrap="break-word"
             >
@@ -70,9 +70,9 @@ export const DeclareOrDeployContractSuccessScreen: FC<
                 mt="6"
                 gap="1"
                 size="3xs"
-                color={"white50"}
+                color={"white.50"}
                 bg={"transparent"}
-                _hover={{ bg: "neutrals.700", color: "text.primary" }}
+                _hover={{ bg: "neutrals.700", color: "text-primary" }}
               >
                 <CopyIcon /> Copy
               </Button>

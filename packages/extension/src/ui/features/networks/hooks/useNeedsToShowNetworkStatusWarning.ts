@@ -19,6 +19,7 @@ const useSeenNetworkStatus = create<SeenNetworkStatusState>()(
   ),
 )
 
+/** Not used anymore. We used to show a banner when the network is slow */
 export const useNeedsToShowNetworkStatusWarning = () => {
   const { lastSeen, updateLastSeen } = useSeenNetworkStatus()
 

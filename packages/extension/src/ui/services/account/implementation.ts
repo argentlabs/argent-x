@@ -6,6 +6,7 @@ import {
   ArgentAccountType,
   BaseWalletAccount,
   CreateAccountType,
+  CreateWalletAccount,
   MultisigData,
   WalletAccount,
   baseWalletAccountSchema,
@@ -14,12 +15,17 @@ import { ZERO_MULTISIG } from "../../features/multisig/constants"
 
 import { messageClient } from "../messaging/trpc"
 import { IAccountService } from "./interface"
-import { hexSchema } from "@argent/shared"
+import { ISettingsStorage } from "../../../shared/settings/types"
+import { KeyValueStorage } from "../../../shared/storage"
+
+import { analyticsService } from "../../../shared/analytics"
+import { hexSchema } from "@argent/x-shared"
 
 export class ClientAccountService implements IAccountService {
   constructor(
     private readonly accountRepo: IAccountRepo,
     private readonly multisigService: IMultisigService,
+    private readonly settingsStore: KeyValueStorage<ISettingsStorage>,
   ) {
     // TBD: Does it make sense to somehow inject the trpc client? I'm not sure, as that service would need to match the expected endpoints 1:1
   }
@@ -43,7 +49,7 @@ export class ClientAccountService implements IAccountService {
       throw new Error("Multisig payload is required")
     }
 
-    let newAccount: BaseWalletAccount
+    let newAccount: CreateWalletAccount | WalletAccount
     if (type === "multisig") {
       const { account } = await this.multisigService.addAccount({
         ...multisigPayload,
@@ -56,7 +62,10 @@ export class ClientAccountService implements IAccountService {
         type,
       })
     }
-
+    analyticsService.accountCreated({
+      "account type": type,
+      "account index": newAccount.index?.toString() || "0",
+    })
     // get WalletAccount format
     const [hit] = await this.accountRepo.get((account) =>
       accountsEqual(account, newAccount),
@@ -130,5 +139,17 @@ export class ClientAccountService implements IAccountService {
       salt: hexSchema.parse(num.toHex(accountDeployPayload.addressSalt || 0)),
       signature: [],
     }
+  }
+
+  async acceptTerms() {
+    analyticsService.onboardingAnalyticsDecided({ "analytics activated": true })
+    void this.settingsStore.set("privacyShareAnalyticsData", true)
+  }
+  async refuseTerms() {
+    analyticsService.onboardingAnalyticsDecided({
+      "analytics activated": false,
+    })
+    void this.settingsStore.set("privacyShareAnalyticsData", false)
+    analyticsService.client.setOptOut(true)
   }
 }

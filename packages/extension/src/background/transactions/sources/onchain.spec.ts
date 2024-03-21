@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 
-import { Hex } from "@argent/shared"
+import { Hex } from "@argent/x-shared"
 import { getTransactionsUpdate } from "./onchain"
 import { WalletAccount } from "../../../shared/wallet.model"
 import { ExtendedFinalityStatus } from "../../../shared/transactions"

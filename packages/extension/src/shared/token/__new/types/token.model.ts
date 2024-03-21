@@ -1,4 +1,4 @@
-import { addressSchema, addressSchemaArgentBackend } from "@argent/shared"
+import { addressSchema, addressSchemaArgentBackend } from "@argent/x-shared"
 import { z } from "zod"
 
 export const BaseTokenSchema = z.object(

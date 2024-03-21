@@ -5,14 +5,12 @@ import {
   P4,
   TextWithAmount,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { ButtonProps, Flex, Skeleton, Tooltip } from "@chakra-ui/react"
 import { FC } from "react"
 
-import {
-  prettifyCurrencyValue,
-  prettifyTokenBalance,
-} from "../../../shared/token/price"
+import { prettifyTokenBalance } from "../../../shared/token/prettifyTokenBalance"
+import { prettifyCurrencyValue } from "@argent/x-shared"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { tokenService } from "../../services/tokens"
 import { TokenIcon } from "./TokenIcon"

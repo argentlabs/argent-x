@@ -1,4 +1,4 @@
-import { ButtonCell, CellStack, NavigationContainer } from "@argent/ui"
+import { ButtonCell, CellStack, NavigationContainer } from "@argent/x-ui"
 import { NavLink } from "react-router-dom"
 
 export function LockScreen() {

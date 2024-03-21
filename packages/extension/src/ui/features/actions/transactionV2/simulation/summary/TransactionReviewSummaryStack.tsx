@@ -8,7 +8,7 @@ export function TransactionReviewSummaryStack(props: FlexProps) {
       gap={3}
       p={3}
       rounded={"lg"}
-      bg="surface.elevated"
+      bg="surface-elevated"
       {...props}
     />
   )

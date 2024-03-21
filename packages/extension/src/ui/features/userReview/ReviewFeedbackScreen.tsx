@@ -1,12 +1,10 @@
 import { FC } from "react"
-import { Location, useLocation } from "react-router-dom"
 import styled from "styled-components"
 
 import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { HeartFilled } from "../../components/Icons/HeartFilled"
-import { analytics } from "../../services/analytics"
 import { H2 } from "../../theme/Typography"
 
 const MainWrapper = styled.div`
@@ -45,53 +43,26 @@ const ActionButton = styled(Button)`
   color: black;
 `
 
-interface LocationWithState extends Location {
-  state: {
-    rating?: number
-  }
+interface ReviewFeedbackScreenProps {
+  onSubmit: () => void
+  onClose: () => void
+  rating?: number
+  browserName?: string
 }
 
-const CHROME_STORE_LINK =
-  "https://chrome.google.com/webstore/detail/argent-x/dlcobpjiigpikoobohmabehhmhfoodbb"
-
-const FIREFOX_STORE_LINK =
-  "https://addons.mozilla.org/en-GB/firefox/addon/argent-x/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search"
-
-export const ZENDESK_LINK = "https://support.argent.xyz/hc/en-us/requests/new"
-
-export const ReviewFeedbackScreen: FC = () => {
-  const { state } = useLocation() as LocationWithState
-
-  const [browserName, storeLink] = useBrowserStore()
-
-  const handleButtonClick = () => {
-    if (state?.rating === 5) {
-      analytics.track("userFeedbackAction", {
-        action: "REVIEWED_ON_CHROME_STORE",
-      })
-      window.open(storeLink, "_blank")?.focus()
-    } else {
-      window.open(ZENDESK_LINK, "_blank")?.focus()
-      analytics.track("userFeedbackAction", {
-        action: "REVIEWED_ON_ZENDESK",
-      })
-    }
-  }
-
+export const ReviewFeedbackScreen: FC<ReviewFeedbackScreenProps> = ({
+  onSubmit,
+  onClose,
+  rating,
+  browserName,
+}) => {
   return (
     <MainWrapper>
-      <IconBar
-        close
-        onClick={() =>
-          analytics.track("userFeedbackAction", {
-            action: "FEEDBACK_DISMISSED",
-          })
-        }
-      />
+      <IconBar close onClick={onClose} />
       <Container>
         <HeartFilled />
         <ThankYouText>Thank You!</ThankYouText>
-        {state?.rating === 5 ? (
+        {rating === 5 ? (
           <RateText>
             We’re thrilled to hear you’re enjoying Argent&nbsp;X. We would
             really appreciate if you could help spread the word by also rating
@@ -106,21 +77,10 @@ export const ReviewFeedbackScreen: FC = () => {
       </Container>
 
       <ButtonsContainer>
-        <ActionButton onClick={handleButtonClick}>
-          {state?.rating === 5
-            ? `Rate on ${browserName} store`
-            : "Give Feedback"}
+        <ActionButton onClick={onSubmit}>
+          {rating === 5 ? `Rate on ${browserName} store` : "Give Feedback"}
         </ActionButton>
       </ButtonsContainer>
     </MainWrapper>
   )
-}
-
-const isFirefox = navigator.userAgent.indexOf("Firefox") !== -1
-
-const useBrowserStore = (): [string, string] => {
-  // This works because we only support 2 browsers for now
-  return isFirefox
-    ? ["Firefox", FIREFOX_STORE_LINK]
-    : ["Chrome", CHROME_STORE_LINK]
 }

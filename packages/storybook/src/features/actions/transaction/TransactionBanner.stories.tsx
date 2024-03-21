@@ -1,5 +1,5 @@
 import { TransactionBanner } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/TransactionBanner"
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 
 const { AlertFillIcon, TickCircleIcon } = icons
 

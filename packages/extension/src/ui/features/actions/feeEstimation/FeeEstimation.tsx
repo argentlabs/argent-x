@@ -1,11 +1,8 @@
-import { TextWithAmount } from "@argent/ui"
+import { TextWithAmount } from "@argent/x-ui"
 import { FC, useMemo } from "react"
 
 import { isUndefined } from "lodash-es"
-import {
-  prettifyCurrencyValue,
-  prettifyTokenAmount,
-} from "../../../../shared/token/price"
+import { prettifyCurrencyValue, prettifyTokenAmount } from "@argent/x-shared"
 import {
   FeeEstimationBox,
   FeeEstimationBoxWithDeploy,
