@@ -9,12 +9,13 @@ for (const feeToken of ["STRK", "ETH"] as const) {
       extension,
       browserContext,
     }) => {
+      test.slow()
       const { accountAddresses } = await extension.setupWallet({
         accountsToSetup: [
           {
             assets: [
               { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.005 },
+              { token: "STRK", balance: 0.8 },
             ],
             deploy: true,
             feeToken,
@@ -40,7 +41,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
       await expect(
         extension.activity.menuPendingTransactionsIndicatorLocator,
       ).toBeHidden()
-
+      await dapp.close()
       await extension.navigation.menuNTFsLocator.click()
       await extension.nfts.collection(spokCampaignName).click()
       await extension.nfts.nftByPosition().click()

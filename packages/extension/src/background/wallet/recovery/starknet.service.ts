@@ -1,7 +1,7 @@
-import { WalletAccountSharedService } from "./../account/shared.service"
+import { WalletAccountSharedService } from "../../../shared/account/service/shared.service"
 import { networkIdToStarknetNetwork } from "./../../../shared/utils/starknetNetwork"
 import { union, partition, memoize } from "lodash-es"
-import { num } from "starknet"
+import { num, RpcProvider } from "starknet"
 
 import { BaseMultisigWalletAccount } from "../../../shared/wallet.model"
 import {
@@ -41,11 +41,14 @@ import {
   ApiMultisigDataForSignerSchema,
 } from "../../../shared/multisig/multisig.model"
 import { RecoveryError } from "../../../shared/errors/recovery"
-import { Address, isContractDeployed } from "@argent/shared"
+import { Address, isContractDeployed } from "@argent/x-shared"
 import { getAccountContractAddress } from "../findImplementationForAddress"
-import { argentApiNetworkForNetwork } from "../../../shared/api/headers"
+import {
+  argentApiNetworkForNetwork,
+  argentXHeaders,
+} from "../../../shared/api/headers"
 
-const INITIAL_PUB_KEY_COUNT = 5
+const INITIAL_PUB_KEY_COUNT = 20
 
 interface TempAccountData {
   account: WalletAccount
@@ -87,7 +90,12 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
         STANDARD_DERIVATION_PATH,
         MULTISIG_DERIVATION_PATH,
       ].map((derivationPath) =>
-        generatePublicKeys(secret, lastCheck, pubKeyCount, derivationPath),
+        generatePublicKeys(
+          secret,
+          lastCheck,
+          initialPubKeyCount,
+          derivationPath,
+        ),
       )
 
       const tempAccountsData = await this.buildTempAccounts(
@@ -104,9 +112,9 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
 
       accounts.push(...validAccounts, ...validMultisigs)
 
-      lastCheck += pubKeyCount
+      lastCheck += initialPubKeyCount
 
-      pubKeyCount = validAccounts.length
+      pubKeyCount = validAccounts.length + validMultisigs.length
     }
 
     const accountsWithDetails = await this.getAccountDetails(accounts)
@@ -267,6 +275,15 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
     )
   }
 
+  private async isNetworkAvailable(provider: RpcProvider) {
+    try {
+      await provider.getSpecVersion()
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   private async fetchValidAccountsFromBackend(
     addresses: string[],
     discoveryUrl: string,
@@ -277,6 +294,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        ...argentXHeaders,
       },
     })
 
@@ -297,6 +315,11 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
     network: Network,
   ): Promise<string[]> {
     const provider = getProvider(network)
+    const isNetworkAvailable = await this.isNetworkAvailable(provider)
+
+    if (!isNetworkAvailable) {
+      return []
+    }
 
     const validAccounts = await Promise.all(
       addresses.map(async (address) =>
@@ -323,6 +346,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        ...argentXHeaders,
       },
     })
 

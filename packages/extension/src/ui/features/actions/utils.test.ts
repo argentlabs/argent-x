@@ -1,6 +1,5 @@
-import { Call, num } from "starknet"
+import { Call } from "starknet"
 import { getV3UpgradeCall } from "./utils"
-import { TXV3_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
 
 describe("getV3UpgradeCall", () => {
   it("should return the first call that matches the condition", () => {

@@ -1,4 +1,4 @@
-import { H5, P3 } from "@argent/ui"
+import { H5, P3 } from "@argent/x-ui"
 import {
   Button,
   Modal,

@@ -35,6 +35,7 @@ function getMockBrowser() {
 }
 
 describe("ChromeScheduleService", () => {
+  const alarmVersion = "v1.2.3"
   let waitFn = vi.fn()
   let service: ChromeScheduleService
   let mockBrowser = getMockBrowser()
@@ -42,7 +43,7 @@ describe("ChromeScheduleService", () => {
   beforeEach(() => {
     waitFn = vi.fn()
     mockBrowser = getMockBrowser()
-    service = new ChromeScheduleService(mockBrowser, waitFn)
+    service = new ChromeScheduleService(mockBrowser, alarmVersion, waitFn)
   })
 
   test("every creates an alarm", async () => {
@@ -58,11 +59,16 @@ describe("ChromeScheduleService", () => {
       id: "test",
     }
     mockBrowser.alarms.getAll.mockResolvedValue([
-      { name: "test::run1" },
-      { name: "other::run1" },
+      { name: `${alarmVersion}::test::run1` },
+      { name: `${alarmVersion}::other::run1` },
     ])
     await service.delete(task)
-    expect(mockBrowser.alarms.clear).toBeCalledWith("test::run1")
+    expect(mockBrowser.alarms.clear).toBeCalledWith(
+      `${alarmVersion}::test::run1`,
+    )
+    expect(mockBrowser.alarms.clear).not.toBeCalledWith(
+      `${alarmVersion}::other::run1`,
+    )
   })
 
   test("registerImplementation adds alarm listener", async () => {
@@ -73,14 +79,14 @@ describe("ChromeScheduleService", () => {
     await service.registerImplementation(task)
     expect(mockBrowser.alarms.onAlarm.addListener).toBeCalled()
     const callback = mockBrowser.alarms.onAlarm.addListener.mock.calls[0][0]
-    callback({ name: "test::run1" })
+    callback({ name: `${alarmVersion}::test::run1` })
     expect(task.callback).toBeCalled()
   })
 
   test("registerImplementation runs callback once per minute", async () => {
     let cb: ((alarm: { name: string }) => void) | undefined = undefined
     const task: ImplementedScheduledTask = {
-      id: "test",
+      id: `test`,
       callback: vi.fn(),
     }
     mockBrowser.alarms.onAlarm.addListener.mockImplementationOnce(
@@ -92,7 +98,7 @@ describe("ChromeScheduleService", () => {
     expect(mockBrowser.alarms.onAlarm.addListener).toBeCalled()
     expect(cb).toBeDefined()
     mockBrowser.alarms.create.mockImplementationOnce((name, options) => {
-      expect(name).toBe("test::run1")
+      expect(name).toBe(`${alarmVersion}::test::run1`)
       expect(options).toEqual({ periodInMinutes: 1 })
       cb?.({ name })
     })
@@ -119,7 +125,7 @@ describe("ChromeScheduleService", () => {
 
     const mockBrowserAlarmFired = vi.fn()
     mockBrowser.alarms.create.mockImplementationOnce((name, options) => {
-      expect(name).toBe("test::run5")
+      expect(name).toBe(`${alarmVersion}::test::run5`)
       expect(options).toEqual({ periodInMinutes: 1 })
       // simulate the 1-minute delay in browser alarms
       setTimeout(() => {

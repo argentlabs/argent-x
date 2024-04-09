@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { NftDetails } from "@argent/ui"
+import { NftDetails } from "@argent/x-ui"
 import {
   useIndexedCollection,
   useIndexedNft,

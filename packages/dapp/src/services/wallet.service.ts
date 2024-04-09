@@ -2,7 +2,7 @@ import { createOffchainSession } from "@argent/x-sessions"
 import type {
   AddStarknetChainParameters,
   StarknetWindowObject,
-} from "get-starknet-core"
+} from "get-starknet-coreV3"
 import {
   AccountInterface,
   DeclareContractPayload,
@@ -15,7 +15,7 @@ import {
 import { connect, disconnect } from "starknetkit"
 import { ETHTokenAddress } from "./token.service"
 import getConfig from "next/config"
-import { Hex, bigDecimal } from "@argent/shared"
+import { Hex, bigDecimal } from "@argent/x-shared"
 
 export type StarknetWindowObjectV5 = StarknetWindowObject & {
   account: AccountInterface

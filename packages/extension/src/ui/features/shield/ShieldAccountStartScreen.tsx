@@ -5,7 +5,7 @@ import {
   NavigationContainer,
   icons,
   useToast,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -21,7 +21,6 @@ import { ShieldAccountActivate } from "./ShieldAccountActivate"
 import { ShieldAccountDeactivate } from "./ShieldAccountDeactivate"
 import { ShieldAccountNotReady } from "./ShieldAccountNotDeployed"
 import { useRouteAccount } from "./useRouteAccount"
-import { useShieldOnboardingTracking } from "./useShieldTracking"
 import { useShieldVerifiedEmail } from "./useShieldVerifiedEmail"
 
 const { ArgentShieldIcon } = icons
@@ -35,12 +34,7 @@ export const ShieldAccountStartScreen: FC = () => {
   const network = useCurrentNetwork()
   const needsUpgrade = useCheckUpgradeAvailable(account)
 
-  const { trackSuccess } = useShieldOnboardingTracking({
-    stepId: "welcome",
-  })
-
   const onActivate = useCallback(async () => {
-    void trackSuccess()
     if (verifiedEmail) {
       try {
         setIsLoading(true)
@@ -74,14 +68,7 @@ export const ShieldAccountStartScreen: FC = () => {
     } else {
       navigate(routes.argentAccountEmail(account?.address, "shield"))
     }
-  }, [
-    account?.address,
-    account?.guardian,
-    navigate,
-    toast,
-    trackSuccess,
-    verifiedEmail,
-  ])
+  }, [account?.address, account?.guardian, navigate, toast, verifiedEmail])
 
   const isAvailable = network.id === ARGENT_SHIELD_NETWORK_ID
 

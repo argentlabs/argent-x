@@ -1,4 +1,4 @@
-import { H2, Input } from "@argent/ui"
+import { H2, Input } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, useState } from "react"
 import { AccountInterface } from "starknet"

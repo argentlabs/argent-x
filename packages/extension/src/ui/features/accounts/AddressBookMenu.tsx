@@ -1,4 +1,4 @@
-import { B3 } from "@argent/ui"
+import { B3 } from "@argent/x-ui"
 import {
   Box,
   Tab,

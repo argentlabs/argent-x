@@ -1,4 +1,4 @@
-import { BarBackButton, H4, NavigationContainer, P3 } from "@argent/ui"
+import { BarBackButton, H4, NavigationContainer, P3 } from "@argent/x-ui"
 import { Box, Divider } from "@chakra-ui/react"
 import { useMemo } from "react"
 
@@ -15,10 +15,10 @@ import { useRouteAccount } from "../shield/useRouteAccount"
 import { useMultisig } from "./multisig.state"
 import { useMultisigPendingTransaction } from "./multisigTransactions.state"
 import { num } from "starknet"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { MultisigOwner } from "./MultisigOwner"
 import { useView } from "../../views/implementation/react"
-import { creatorMultisigMetadataView } from "../../views/multisig"
+import { publicKeyMultisigMetadataView } from "../../views/multisig"
 import { Navigate } from "react-router-dom"
 
 export const MultisigTransactionConfirmationsScreen = () => {
@@ -30,7 +30,7 @@ export const MultisigTransactionConfirmationsScreen = () => {
   const encodedPubKey = useEncodedPublicKey(publicKey)
 
   const multisig = useMultisig(selectedAccount)
-  const multisigMetadata = useView(creatorMultisigMetadataView(multisig))
+  const multisigMetadata = useView(publicKeyMultisigMetadataView(multisig))
 
   const transactionTransformed = useMemo(() => {
     if (!pendingTransaction || !selectedAccount) {

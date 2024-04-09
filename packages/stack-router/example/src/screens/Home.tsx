@@ -5,7 +5,7 @@ import {
   NavigationContainer,
   SpacerCell,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { useCallback } from "react"
 import { Link } from "react-router-dom"
 

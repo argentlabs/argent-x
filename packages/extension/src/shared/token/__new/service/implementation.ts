@@ -10,7 +10,7 @@ import {
   Token,
   apiAccountTokenBalancesSchema,
 } from "../types/token.model"
-import { convertTokenAmountToCurrencyValue, equalToken } from "../utils"
+import { equalToken } from "../utils"
 import { BaseTokenWithBalance } from "../types/tokenBalance.model"
 import { BaseWalletAccount } from "../../../wallet.model"
 import {
@@ -27,7 +27,8 @@ import {
   bigDecimal,
   ensureArray,
   stripAddressZeroPadding,
-} from "@argent/shared"
+  convertTokenAmountToCurrencyValue,
+} from "@argent/x-shared"
 import { INetworkService } from "../../../network/service/interface"
 import { getMulticallForNetwork } from "../../../multicall"
 import { getProvider } from "../../../network/provider"
@@ -260,8 +261,10 @@ export class TokenService implements ITokenService {
       const token = tokensOnCurrentNetwork[Math.floor(i / accounts.length)]
       const account = accounts[i % accounts.length]
       if (result.status === "fulfilled") {
-        const [low, high] = result.value.result
-        const balance = uint256.uint256ToBN({ low, high }).toString()
+        const [low, high] = ensureArray(result.value.result)
+        const balance = uint256
+          .uint256ToBN({ low: low || "0", high: high || "0" })
+          .toString()
         tokenBalances.push({
           account,
           ...token,
@@ -534,9 +537,8 @@ export class TokenService implements ITokenService {
       accounts.some((a) => accountsEqual(a, tb.account)),
     )
 
-    const tokensWithBalanceAndPrice = await this.getCurrencyValueForTokens(
-      tokenBalances,
-    )
+    const tokensWithBalanceAndPrice =
+      await this.getCurrencyValueForTokens(tokenBalances)
 
     const groupedBalances = groupBy(
       tokensWithBalanceAndPrice,

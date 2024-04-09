@@ -28,9 +28,6 @@ import { TransactionDetailWrapped } from "./TransactionDetailWrapped"
 export default {
   component: TransactionDetail,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const network = defaultNetwork

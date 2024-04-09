@@ -14,7 +14,7 @@ import {
 } from "../../../shared/wallet.model"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { clientAccountService } from "../../services/account"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 export interface AccountConstructorProps {
   name: string

@@ -1,5 +1,5 @@
 import browser from "webextension-polyfill"
-import { TransactionAction, ensureArray } from "@argent/shared"
+import { TransactionAction, ensureArray } from "@argent/x-shared"
 import { deserialize, serialize } from "superjson"
 import { TransactionType } from "starknet"
 

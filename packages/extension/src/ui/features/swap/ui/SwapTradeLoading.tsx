@@ -1,4 +1,4 @@
-import { P4 } from "@argent/ui"
+import { P4 } from "@argent/x-ui"
 import { Flex, Spinner, Box } from "@chakra-ui/react"
 
 export function SwapTradeLoading() {

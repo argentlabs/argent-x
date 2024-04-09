@@ -1,4 +1,4 @@
-import { Button, H2, P3, icons, logos } from "@argent/ui"
+import { Button, H2, P3, icons, logos } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import { FC, MouseEventHandler, PropsWithChildren, ReactNode } from "react"

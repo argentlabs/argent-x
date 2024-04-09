@@ -1,4 +1,4 @@
-import { Button, icons } from "@argent/ui"
+import { Button, icons } from "@argent/x-ui"
 import { ButtonProps } from "@chakra-ui/react"
 import { ComponentPropsWithoutRef, FC } from "react"
 

@@ -1,4 +1,4 @@
-import { CellStack, NavigationContainerSkeleton } from "@argent/ui"
+import { CellStack, NavigationContainerSkeleton } from "@argent/x-ui"
 import { FlexProps, Skeleton } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
 

@@ -1,4 +1,4 @@
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { ComponentProps } from "react"
 
 import { TransactionReviewSimulation } from "@argent-x/extension/src/ui/features/actions/transactionV2/simulation/TransactionReviewSimulation"
@@ -17,9 +17,6 @@ export default {
       <TransactionReviewSimulation {...props}></TransactionReviewSimulation>
     </CellStack>
   ),
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const NonNativeJediswap = {

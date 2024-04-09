@@ -1,4 +1,4 @@
-import { useEventListener, useIsEventEmitterEnabled } from "@argent/shared"
+import { useEventListener, useIsEventEmitterEnabled } from "@argent/x-shared"
 import { useIsPresent } from "framer-motion"
 import { useRef } from "react"
 

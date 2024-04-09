@@ -5,7 +5,7 @@ import {
   HeaderCell,
   NavigationContainer,
   SpacerCell,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
 import { ComponentProps, FC, ReactNode } from "react"
 import { Link, NavLink } from "react-router-dom"

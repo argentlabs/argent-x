@@ -1,22 +1,21 @@
 import {
   BarBackButton,
   CellStack,
-  HeaderCell,
   L2,
   NavigationContainer,
   P3,
   icons,
-} from "@argent/ui"
-import { FC, ReactEventHandler, useEffect, useState } from "react"
+} from "@argent/x-ui"
+import { FC, ReactEventHandler, useState } from "react"
 import { Button, Center, Flex } from "@chakra-ui/react"
 import copy from "copy-to-clipboard"
 
 import { useRouteAccountAddress } from "../../../routes"
 import { usePrivateKey } from "../../accountTokens/usePrivateKey"
-import { PasswordForm, PasswordFormProps } from "../../lock/PasswordForm"
+import { PasswordFormProps } from "../../lock/PasswordForm"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
-import { WarningRecoveryBanner } from "../ui/WarningRecoveryBanner"
 import { QrCode } from "../../../components/QrCode"
+import { PasswordWarningForm } from "../ui/PasswordWarningForm"
 
 const { AlertFillIcon } = icons
 
@@ -41,7 +40,14 @@ export const ExportPrivateKeyScreen: FC<ExportPrivateKeyScreenProps> = ({
       {passwordIsValid ? (
         <ExportPrivateKey privateKey={privateKey} />
       ) : (
-        <UnlockExportPrivateKey verifyPassword={verifyPassword} />
+        <PasswordWarningForm
+          verifyPassword={verifyPassword}
+          title="Never share your private key!"
+          reasons={[
+            "It’s the only way to recover your wallet",
+            "If someone else has access to your private key they can control your wallet",
+          ]}
+        />
       )}
     </NavigationContainer>
   )
@@ -102,39 +108,6 @@ function ExportPrivateKey({
           {privateKeyCopied ? "Copied" : "Copy"}
         </Button>
       </Center>
-    </CellStack>
-  )
-}
-
-function UnlockExportPrivateKey({
-  verifyPassword,
-}: Pick<PasswordFormProps, "verifyPassword">) {
-  return (
-    <CellStack flex={1}>
-      <WarningRecoveryBanner
-        title="Never share your private key!"
-        reasons={[
-          "It’s the only way to recover your wallet",
-          "If someone else has access to your private key they can control your wallet",
-        ]}
-        mb={4}
-      />
-      <HeaderCell color={"text.primary"}>Enter your password</HeaderCell>
-      <PasswordForm flex={1} verifyPassword={verifyPassword}>
-        {(isDirty) => (
-          <>
-            <Flex flex={1}></Flex>
-            <Button
-              type="submit"
-              disabled={!isDirty}
-              colorScheme="primary"
-              width="full"
-            >
-              Unlock
-            </Button>
-          </>
-        )}
-      </PasswordForm>
     </CellStack>
   )
 }

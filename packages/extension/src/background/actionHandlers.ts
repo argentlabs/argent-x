@@ -7,7 +7,7 @@ import { networkService } from "../shared/network/service"
 import { isEqualWalletAddress } from "../shared/wallet.service"
 import { assertNever } from "../shared/utils/assertNever"
 import { accountDeployAction } from "./accountDeployAction"
-import { analytics } from "./analytics"
+
 import { addMultisigDeployAction } from "./multisig/multisigDeployAction"
 import { openUi } from "./openUi"
 import {
@@ -20,44 +20,26 @@ import { preAuthorizationService } from "../shared/preAuthorization/service"
 import { networkSchema } from "../shared/network"
 import { encodeChainId } from "../shared/utils/encodeChainId"
 import { IFeeTokenService } from "../shared/feeToken/service/interface"
+import { analyticsService } from "../shared/analytics"
 
 const handleTransactionAction = async ({
   action,
-  networkId,
   wallet,
 }: {
   action: TransactionAction
   networkId: string
   wallet: Wallet
 }): Promise<MessageType> => {
-  const host = action.meta.origin
   const actionHash = action.meta.hash
 
   try {
-    // void analytics.track("signedTransaction", {
-    //   networkId,
-    //   host,
-    // }) // TODO: temporary disabled
-
     const response = await executeTransactionAction(action, wallet)
-
-    void analytics.track("sentTransaction", {
-      success: true,
-      networkId,
-      host,
-    })
 
     return {
       type: "TRANSACTION_SUBMITTED",
       data: { txHash: response.transaction_hash, actionHash },
     }
   } catch (error) {
-    void analytics.track("sentTransaction", {
-      success: false,
-      networkId,
-      host,
-    })
-
     return {
       type: "TRANSACTION_FAILED",
       data: { actionHash, error: `${error}` },
@@ -82,16 +64,13 @@ export const handleActionApproval = async (
         return
       }
 
-      void analytics.track("preauthorizeDapp", {
-        host,
-        networkId,
-      })
-
       await preAuthorizationService.add({
         account: selectedAccount,
         host,
       })
-
+      analyticsService.dappPreauthorized({
+        host,
+      })
       return { type: "CONNECT_DAPP_RES", data: selectedAccount }
     }
 
@@ -105,26 +84,11 @@ export const handleActionApproval = async (
 
     case "DEPLOY_ACCOUNT": {
       try {
-        // void analytics.track("signedTransaction", {
-        //   networkId,
-        // }) // TODO: temporary disabled
-
         const txHash = await accountDeployAction(
           action,
           wallet,
           feeTokenService,
         )
-
-        void analytics.track("deployAccount", {
-          status: "success",
-          trigger: "sign",
-          networkId: action.payload.account.networkId,
-        })
-
-        void analytics.track("sentTransaction", {
-          success: true,
-          networkId,
-        })
 
         return {
           type: "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
@@ -136,17 +100,6 @@ export const handleActionApproval = async (
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
 
-        void analytics.track("sentTransaction", {
-          success: false,
-          networkId,
-        })
-
-        void analytics.track("deployAccount", {
-          status: "failure",
-          networkId: action.payload.account.networkId,
-          errorMessage: `${error}`,
-        })
-
         return {
           type: "DEPLOY_ACCOUNT_ACTION_FAILED",
           data: { actionHash, error: `${error}` },
@@ -156,22 +109,8 @@ export const handleActionApproval = async (
 
     case "DEPLOY_MULTISIG": {
       try {
-        // void analytics.track("signedTransaction", {
-        //   networkId,
-        // }) // TODO: temporary disabled
-
         await addMultisigDeployAction(action, wallet)
 
-        void analytics.track("deployMultisig", {
-          status: "success",
-          trigger: "transaction",
-          networkId: action.payload.account.networkId,
-        })
-
-        void analytics.track("sentTransaction", {
-          success: true,
-          networkId,
-        })
         break
       } catch (exception) {
         let error = `${exception}`
@@ -180,16 +119,6 @@ export const handleActionApproval = async (
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
 
-        void analytics.track("sentTransaction", {
-          success: false,
-          networkId,
-        })
-
-        void analytics.track("deployMultisig", {
-          status: "failure",
-          networkId: action.payload.account.networkId,
-          errorMessage: `${error}`,
-        })
         break
       }
     }
@@ -231,19 +160,26 @@ export const handleActionApproval = async (
         }
       }
 
-      const signature = await starknetAccount.signMessage(typedData)
-      const formattedSignature = stark.signatureToDecimalArray(signature)
+      try {
+        const signature = await starknetAccount.signMessage(typedData)
+        const formattedSignature = stark.signatureToDecimalArray(signature)
 
-      await analytics.track("signedMessage", {
-        networkId: selectedAccount?.networkId || "unknown",
-      })
-
-      return {
-        type: "SIGNATURE_SUCCESS",
-        data: {
-          signature: formattedSignature,
-          actionHash,
-        },
+        return {
+          type: "SIGNATURE_SUCCESS",
+          data: {
+            signature: formattedSignature,
+            actionHash,
+          },
+        }
+      } catch (error) {
+        console.error(error)
+        return {
+          type: "SIGNATURE_FAILURE",
+          data: {
+            error: `${error}`,
+            actionHash,
+          },
+        }
       }
     }
 
@@ -318,17 +254,7 @@ export const handleActionApproval = async (
 
     case "DECLARE_CONTRACT": {
       try {
-        void analytics.track("signedDeclareTransaction", {
-          networkId,
-        })
-
         const { classHash, txHash } = await udcDeclareContract(action, wallet)
-
-        void analytics.track("sentTransaction", {
-          success: true,
-          networkId,
-        })
-
         return {
           type: "DECLARE_CONTRACT_ACTION_SUBMITTED",
           data: { txHash, actionHash, classHash },
@@ -339,11 +265,6 @@ export const handleActionApproval = async (
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
 
-        void analytics.track("sentTransaction", {
-          success: false,
-          networkId,
-        })
-
         return {
           type: "DECLARE_CONTRACT_ACTION_FAILED",
           data: { actionHash, error: `${error}` },
@@ -353,19 +274,10 @@ export const handleActionApproval = async (
 
     case "DEPLOY_CONTRACT": {
       try {
-        void analytics.track("signedDeployTransaction", {
-          networkId,
-        })
-
         const { txHash, contractAddress } = await udcDeployContract(
           action,
           wallet,
         )
-
-        void analytics.track("sentTransaction", {
-          success: true,
-          networkId,
-        })
 
         return {
           type: "DEPLOY_CONTRACT_ACTION_SUBMITTED",
@@ -380,11 +292,6 @@ export const handleActionApproval = async (
         if (error.includes("403")) {
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
-
-        void analytics.track("sentTransaction", {
-          success: false,
-          networkId,
-        })
 
         return {
           type: "DEPLOY_CONTRACT_ACTION_FAILED",

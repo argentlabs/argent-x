@@ -1,20 +1,10 @@
-import { icons } from "@argent/ui"
-import {
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-} from "@chakra-ui/react"
-import React, { FC, PropsWithChildren } from "react"
+import { FC, PropsWithChildren } from "react"
 
 import { useActionScreen } from "../../hooks/useActionScreen"
 import { usePrettyError } from "../../hooks/usePrettyError"
+import { ActionScreenErrorFooter } from "./ActionScreenErrorFooter"
 
-const { AlertIcon } = icons
-
-export interface WithActionScreenErrorFooterProps extends PropsWithChildren {
+interface WithActionScreenErrorFooterProps extends PropsWithChildren {
   isTransaction?: boolean
 }
 
@@ -32,18 +22,7 @@ export const WithActionScreenErrorFooter: FC<
   return (
     <>
       {children}
-      <Accordion size="sm" colorScheme="error" boxShadow={"menu"} allowToggle>
-        <AccordionItem>
-          <AccordionButton>
-            <AlertIcon display={"inline-block"} fontSize={"base"} mr={1} />{" "}
-            <Box as="span" flex="1" textAlign="left">
-              {title}
-            </Box>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel>{errorMessage}</AccordionPanel>
-        </AccordionItem>
-      </Accordion>
+      <ActionScreenErrorFooter title={title} errorMessage={errorMessage} />
     </>
   )
 }

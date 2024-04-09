@@ -4,7 +4,7 @@ import {
   FlowHeader,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 

@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { Alert, SpacerCell, icons } from "@argent/ui"
+import { Alert, SpacerCell, icons } from "@argent/x-ui"
 
 import { useConstructorParams } from "./useConstructorParams"
 import { DeploySmartContractParameters } from "./DeploySmartContractParameters"

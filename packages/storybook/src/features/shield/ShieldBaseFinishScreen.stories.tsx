@@ -1,39 +1,61 @@
 import { ShieldBaseFinishScreen } from "@argent-x/extension/src/ui/features/shield/ShieldBaseFinishScreen"
 import { ChangeGuardian } from "@argent-x/extension/src/ui/features/shield/usePendingChangingGuardian"
 
-import { decorators } from "../../decorators/routerDecorators"
+import type { Meta, StoryObj } from "@storybook/react"
+import { accountAddressDecorators } from "../../decorators/routerDecorators"
 
-export default {
+const meta = {
   component: ShieldBaseFinishScreen,
-  decorators,
-  parameters: {
-    layout: "fullscreen",
+  decorators: accountAddressDecorators,
+} satisfies Meta<typeof ShieldBaseFinishScreen>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Removed: Story = {
+  args: {
+    accountName: "Account 1",
+    returnRoute: "/",
+    liveAccountGuardianState: {
+      type: ChangeGuardian.REMOVING,
+      status: "SUCCESS",
+      hasGuardian: false,
+    },
   },
 }
 
-export const Removed = {
+export const Adding: Story = {
   args: {
     accountName: "Account 1",
+    returnRoute: "/",
+    liveAccountGuardianState: {
+      type: ChangeGuardian.ADDING,
+      status: "PENDING",
+      hasGuardian: false,
+    },
   },
 }
 
-export const Adding = {
+export const Added: Story = {
   args: {
     accountName: "Account 1",
-    pendingChangeGuardian: ChangeGuardian.ADDING,
+    returnRoute: "/",
+    liveAccountGuardianState: {
+      type: ChangeGuardian.ADDING,
+      status: "SUCCESS",
+      hasGuardian: true,
+    },
   },
 }
 
-export const Added = {
+export const Removing: Story = {
   args: {
     accountName: "Account 1",
-    guardian: "0x123",
-  },
-}
-
-export const Removing = {
-  args: {
-    accountName: "Account 1",
-    pendingChangeGuardian: ChangeGuardian.REMOVING,
+    returnRoute: "/",
+    liveAccountGuardianState: {
+      type: ChangeGuardian.REMOVING,
+      status: "PENDING",
+      hasGuardian: true,
+    },
   },
 }

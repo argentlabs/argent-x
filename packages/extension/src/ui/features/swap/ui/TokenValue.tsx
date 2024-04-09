@@ -1,9 +1,8 @@
-import { L2 } from "@argent/ui"
+import { L2 } from "@argent/x-ui"
 import { FC } from "react"
 
-import { prettifyCurrencyValue } from "../../../../shared/token/price"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal, prettifyCurrencyValue } from "@argent/x-shared"
 import { Token } from "../../../../shared/token/__new/types/token.model"
 
 interface TokenValueProps {

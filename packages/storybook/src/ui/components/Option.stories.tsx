@@ -1,5 +1,5 @@
 import { Option } from "@argent-x/extension/src/ui/components/Options"
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 
 const { CardIcon } = icons
 

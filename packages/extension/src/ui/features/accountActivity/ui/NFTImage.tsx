@@ -2,7 +2,7 @@ import { Image, ImageProps } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { useNft } from "../../accountNfts/nfts.state"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import { useRemoteNft } from "../../accountNfts/useRemoteNft"
 
 export interface NFTImageProps extends ImageProps {

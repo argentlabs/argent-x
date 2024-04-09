@@ -1,11 +1,11 @@
-import { Button, CopyTooltip } from "@argent/ui"
+import { Button, CopyTooltip } from "@argent/x-ui"
 import { FC } from "react"
 
 import { useNavigate } from "react-router-dom"
 import { routes } from "../routes"
 import { useView } from "../views/implementation/react"
 import { hasSavedRecoverySeedPhraseView } from "../views/account"
-import { normalizeAddress, formatTruncatedAddress } from "@argent/shared"
+import { normalizeAddress, formatTruncatedAddress } from "@argent/x-shared"
 
 export interface AddressCopyButtonProps {
   address: string
@@ -27,9 +27,9 @@ export const AddressCopyButton: FC<AddressCopyButtonProps> = ({ address }) => {
     >
       <Button
         size="3xs"
-        color={"white50"}
+        color={"white.50"}
         bg={"transparent"}
-        _hover={{ bg: "neutrals.700", color: "text.primary" }}
+        _hover={{ bg: "neutrals.700", color: "text-primary" }}
       >
         {formatTruncatedAddress(address)}
       </Button>

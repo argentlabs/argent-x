@@ -1,4 +1,4 @@
-import { KnownDapp } from "@argent/shared"
+import { KnownDapp } from "@argent/x-shared"
 import browser from "webextension-polyfill"
 
 import { ChromeRepository } from "../chrome"

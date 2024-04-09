@@ -1,4 +1,4 @@
-import { Collection } from "@argent/shared"
+import { Collection } from "@argent/x-shared"
 import { SimpleGrid, SimpleGridProps } from "@chakra-ui/react"
 import { FC } from "react"
 

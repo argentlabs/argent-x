@@ -8,16 +8,12 @@ import {
   useRouteFlow,
 } from "../../routes"
 import { ShieldBaseOTPScreen } from "./ShieldBaseOTPScreen"
-import { useShieldOnboardingTracking } from "./useShieldTracking"
 
 export const ShieldAccountOTPScreen: FC = () => {
   const accountAddress = useRouteAccountAddress()
   const email = useRouteEmailAddress()
   const navigate = useNavigate()
   const flow = useRouteFlow()
-  const { trackSuccess } = useShieldOnboardingTracking({
-    stepId: "enterPasscode",
-  })
 
   const onBack = useCallback(() => {
     navigate(
@@ -33,7 +29,6 @@ export const ShieldAccountOTPScreen: FC = () => {
   }, [accountAddress, navigate, flow])
 
   const onOTPConfirmed = useCallback(() => {
-    void trackSuccess()
     switch (flow) {
       case "shield":
         return navigate(routes.shieldAccountAction(accountAddress), {
@@ -48,7 +43,7 @@ export const ShieldAccountOTPScreen: FC = () => {
           replace: true,
         })
     }
-  }, [accountAddress, navigate, trackSuccess, flow])
+  }, [accountAddress, navigate, flow])
 
   if (!email) {
     return (

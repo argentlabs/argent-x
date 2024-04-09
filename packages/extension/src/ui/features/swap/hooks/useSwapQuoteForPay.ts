@@ -3,7 +3,7 @@ import { Token } from "../../../../shared/token/__new/types/token.model"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { RefreshInterval } from "../../../../shared/config"
 import { swapService } from "../../../services/swap"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 interface IUseSwapQuoteForPay {
   payToken?: Token

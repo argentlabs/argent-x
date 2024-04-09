@@ -1,4 +1,4 @@
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 import { Box, Text } from "@chakra-ui/react"
 
 const { ImageIcon } = icons

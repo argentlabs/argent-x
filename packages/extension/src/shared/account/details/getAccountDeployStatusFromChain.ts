@@ -1,4 +1,4 @@
-import { isContractDeployed } from "@argent/shared"
+import { isContractDeployed } from "@argent/x-shared"
 import { getProvider } from "../../network"
 import { WalletAccount } from "../../wallet.model"
 

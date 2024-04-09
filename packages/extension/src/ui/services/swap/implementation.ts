@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import { messageClient } from "../messaging/trpc"
 import { ISwapService } from "./interface"
 import { SwapQuoteResponse } from "../../../shared/swap/model/quote.model"

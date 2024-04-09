@@ -1,4 +1,4 @@
-import { AlertButton, icons } from "@argent/ui"
+import { AlertButton, icons } from "@argent/x-ui"
 import { Spinner } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"

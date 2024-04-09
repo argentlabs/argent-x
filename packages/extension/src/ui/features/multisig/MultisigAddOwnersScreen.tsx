@@ -1,4 +1,4 @@
-import { H4, P3 } from "@argent/ui"
+import { H4, P3 } from "@argent/x-ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { FC, useState } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
@@ -91,7 +91,7 @@ const MultisigAddOwners = ({
         </Flex>
         <Button
           colorScheme="primary"
-          onClick={handleNavigationToConfirmationScreen}
+          onClick={() => void handleNavigationToConfirmationScreen()}
         >
           Next
         </Button>

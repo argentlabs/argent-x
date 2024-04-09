@@ -5,7 +5,7 @@ import {
   NavigationContainer,
   SpacerCell,
   Switch,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { ISettingsStorage } from "../../../../shared/settings/types"

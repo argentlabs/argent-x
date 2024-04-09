@@ -1,4 +1,4 @@
-import { type Address, ensureArray, includesAddress } from "@argent/shared"
+import { type Address, ensureArray, includesAddress } from "@argent/x-shared"
 
 import type { Activity, ActivityDetailsAction } from "../schema"
 import { isProvisionWithDeploymentActivity } from "./isProvisionWithDeploymentActivity"

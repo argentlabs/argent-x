@@ -1,8 +1,8 @@
-import { H6, P4 } from "@argent/ui"
+import { H6, P4 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { formatTruncatedAddress } from "@argent/shared"
+import { formatTruncatedAddress } from "@argent/x-shared"
 import { Account } from "../../../accounts/Account"
 
 interface SelectOptionAvatarProps {

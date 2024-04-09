@@ -1,11 +1,10 @@
 import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { pluralise } from "@argent/shared"
+import { pluralise, isNumeric } from "@argent/x-shared"
 import useSWR from "swr"
 
 import { Escape } from "../../../../shared/account/details/escape.model"
 import { useArrayStorage } from "../../../hooks/useStorage"
-import { isNumeric } from "../../../../shared/utils/number"
 import {
   BaseWalletAccount,
   WalletAccount,
@@ -37,12 +36,12 @@ export const getActiveFromNow = (activeAt: number, now = new Date()) => {
     days > 0
       ? pluralise(daysCeil, "day")
       : hours > 0
-      ? pluralise(hours, "hour")
-      : minutes > 0
-      ? pluralise(minutes, "minute")
-      : seconds > 0
-      ? pluralise(seconds, "second")
-      : "now"
+        ? pluralise(hours, "hour")
+        : minutes > 0
+          ? pluralise(minutes, "minute")
+          : seconds > 0
+            ? pluralise(seconds, "second")
+            : "now"
   return {
     activeFromNowMs,
     activeFromNowPretty,

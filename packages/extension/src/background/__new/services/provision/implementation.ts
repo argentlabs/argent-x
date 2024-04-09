@@ -1,4 +1,4 @@
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 import { IProvisionService } from "../../../../shared/provision/interface"
 import { ProvisionStatus } from "../../../../shared/provision/types"
 import { PROVISION_STATUS_ENDPOINT } from "../../../../shared/api/constants"

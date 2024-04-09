@@ -3,7 +3,7 @@ import {
   formatAddress,
   getUint256CalldataFromBN,
   isAddress,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { CallData } from "starknet"
 
 import { messageClient } from "../messaging/trpc"

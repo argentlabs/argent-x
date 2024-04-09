@@ -2,8 +2,8 @@ import { Menu } from "@chakra-ui/react"
 import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import { Network, NetworkStatus } from "../../../../shared/network"
-import { statusMapping } from "../../../components/StatusIndicator"
+import { Network, ColorStatus } from "../../../../shared/network"
+import { networkStatusMapping } from "../../../components/StatusIndicator"
 import { NetworkSwitcherList } from "./NetworkSwitcherList"
 
 export const mockNetworks = [
@@ -28,13 +28,13 @@ export const mockNetworks = [
     chainId: "chainId",
     status: "red",
   },
-] as (Network & { status: NetworkStatus })[]
+] as (Network & { status: ColorStatus })[]
 
 const mockNetworkStatuses = {
   "1": "green",
   "2": "amber",
   "3": "red",
-} as Partial<Record<string, NetworkStatus>>
+} as Partial<Record<string, ColorStatus>>
 
 const mockCurrentNetwork = mockNetworks[0]
 
@@ -93,7 +93,7 @@ describe("NetworkSwitcherList", () => {
       const networkStatus = mockNetworkStatuses[id]
       const statusIndicator = screen.getByTestId(
         `status-indicator-${
-          statusMapping[networkStatus as NetworkStatus].color
+          networkStatusMapping[networkStatus as ColorStatus].color
         }`,
       )
 

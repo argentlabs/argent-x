@@ -1,6 +1,6 @@
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
 import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
-import { TokenWithBalance, TransactionAction } from "@argent/shared"
+import { TokenWithBalance, TransactionAction } from "@argent/x-shared"
 export interface TransactionsFeeEstimationProps {
   feeToken: TokenWithBalance
   transactionAction: TransactionAction

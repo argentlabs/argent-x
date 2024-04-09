@@ -1,4 +1,4 @@
-import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/ui"
+import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/x-ui"
 import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
 import { FC, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
@@ -55,7 +55,7 @@ export const JoinMultisigScreen: FC = () => {
           w="full"
         >
           {signerKey ? (
-            <P3 fontWeight="bold" color="white50">
+            <P3 fontWeight="bold" color="white.50">
               {signerKey}
             </P3>
           ) : (

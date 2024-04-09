@@ -1,4 +1,10 @@
-import { BarCloseButton, H6, NavigationContainer, P4, icons } from "@argent/ui"
+import {
+  BarCloseButton,
+  H6,
+  NavigationContainer,
+  P4,
+  icons,
+} from "@argent/x-ui"
 import { Center, Flex, Text } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
@@ -49,7 +55,7 @@ export const NewMultisigScreen: FC = () => {
             goto: "multisig",
             networkId: switcherNetworkId,
           })
-          chrome.tabs.create({
+          void chrome.tabs.create({
             url,
           })
           navigate(routes.accounts())
@@ -85,7 +91,7 @@ export const NewMultisigScreen: FC = () => {
           gap={4}
           alignItems="center"
           border="1px solid"
-          borderColor="white30"
+          borderColor="white.30"
           mb={1}
         >
           <Text fontSize="58px">
@@ -105,7 +111,7 @@ export const NewMultisigScreen: FC = () => {
             alignItems="center"
             justifyContent="space-between"
             gap={3}
-            onClick={() => onClick(option.type)}
+            onClick={() => void onClick(option.type)}
             _hover={{
               backgroundColor: "neutrals.700",
               "& > .icon-wrapper": {

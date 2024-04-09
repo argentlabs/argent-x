@@ -9,7 +9,7 @@ import {
 } from "../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../hooks/useStorage"
 import { getNetworkIdFromChainId } from "../../shared/network/utils"
-import { isArgentNetworkId } from "@argent/shared"
+import { isArgentNetworkId } from "@argent/x-shared"
 
 export const useBlockExplorerTitle = () => {
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")

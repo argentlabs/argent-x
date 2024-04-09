@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import type { Network } from "./type"
 import { ETH_TOKEN_ADDRESS } from "./constants"
 import { networkSchema } from "."

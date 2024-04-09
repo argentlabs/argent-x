@@ -1,6 +1,12 @@
 import { FC, ReactNode } from "react"
 
-import { CellStack, ErrorMessage, Input, Select, SpacerCell } from "@argent/ui"
+import {
+  CellStack,
+  ErrorMessage,
+  Input,
+  Select,
+  SpacerCell,
+} from "@argent/x-ui"
 import { Box, chakra } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import {

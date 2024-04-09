@@ -7,8 +7,10 @@ import TextareaAutosize, {
 import styled, { css } from "styled-components"
 
 import { scrollbarStyle } from "../theme"
-import { isAllowedAddressHexInputValue } from "./utils/isAllowedAddressHexInputValue"
-import { isAllowedNumericInputValue } from "./utils/isAllowedNumericInputValue"
+import {
+  isAllowedAddressHexInputValue,
+  isAllowedNumericInputValue,
+} from "@argent/x-shared"
 
 export const Container = styled.div`
   display: flex;

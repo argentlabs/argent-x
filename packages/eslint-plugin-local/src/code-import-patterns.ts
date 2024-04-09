@@ -72,7 +72,10 @@ function checkImport(
   const rootBasedImportPath = path.relative(REPO_ROOT, fullImportPath)
 
   for (const pattern of option.disallow) {
-    if (minimatch(rootBasedImportPath, pattern)) {
+    if (
+      minimatch(rootBasedImportPath, pattern) ||
+      minimatch(importPath, pattern)
+    ) {
       const defaultMessage = `import ${option.disallow.join(" or ")} from ${
         option.target
       } is disallowed`

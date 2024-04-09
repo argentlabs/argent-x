@@ -23,7 +23,7 @@ import {
   sortMultisigByDerivationPath,
 } from "../../../shared/utils/accountsMultisigSort"
 import { usePartitionDeprecatedAccounts } from "./accountUpgradeCheck"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 
 /** TODO: we should be able to retreive all these account collections using queries from storage */
 export const AccountListScreenContainer: FC = () => {

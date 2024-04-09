@@ -1,4 +1,4 @@
-import type { ArgentBackendNetworkId, ArgentNetworkId } from "@argent/shared"
+import type { ArgentBackendNetworkId, ArgentNetworkId } from "@argent/x-shared"
 
 const makeArgentXHeaders = () => ({
   "argent-version": process.env.VERSION || "Unknown version",

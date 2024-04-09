@@ -2,9 +2,6 @@ import { LoadingScreen } from "@argent-x/extension/src/ui/features/actions/Loadi
 
 export default {
   component: LoadingScreen,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

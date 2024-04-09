@@ -1,4 +1,4 @@
-import { Button } from "@argent/ui"
+import { Button } from "@argent/x-ui"
 import { ComponentProps, FC } from "react"
 
 export const OnboardingRectButton: FC<ComponentProps<typeof Button>> = (

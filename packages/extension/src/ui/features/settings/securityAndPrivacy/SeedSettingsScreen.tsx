@@ -1,17 +1,11 @@
-import {
-  BarBackButton,
-  Button,
-  CellStack,
-  HeaderCell,
-  NavigationContainer,
-} from "@argent/ui"
+import { BarBackButton, NavigationContainer } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 import { Flex } from "@chakra-ui/react"
 
-import { PasswordForm, PasswordFormProps } from "../../lock/PasswordForm"
+import { PasswordFormProps } from "../../lock/PasswordForm"
 import { SeedPhraseWithCopyButton } from "../../recovery/SeedPhraseWithCopyButton"
 import { useSeedPhrase } from "../../recovery/hooks/useSeedPhrase"
-import { WarningRecoveryBanner } from "../ui/WarningRecoveryBanner"
+import { PasswordWarningForm } from "../ui/PasswordWarningForm"
 
 export interface SeedSettingsScreenProps
   extends Pick<PasswordFormProps, "verifyPassword"> {
@@ -34,7 +28,15 @@ export const SeedSettingsScreen: FC<SeedSettingsScreenProps> = ({
           <SeedPhraseWithCopyButtonContainer />
         </Flex>
       ) : (
-        <UnlockCopySeed verifyPassword={verifyPassword} />
+        <PasswordWarningForm
+          verifyPassword={verifyPassword}
+          title="Never share your recovery phrase!"
+          reasons={[
+            "It’s the only way to recover your wallet",
+            "If someone else has access to your recovery phrase they can control your wallet",
+          ]}
+          mb={4}
+        />
       )}
     </NavigationContainer>
   )
@@ -43,37 +45,4 @@ export const SeedSettingsScreen: FC<SeedSettingsScreenProps> = ({
 function SeedPhraseWithCopyButtonContainer() {
   const seedPhrase = useSeedPhrase()
   return <SeedPhraseWithCopyButton seedPhrase={seedPhrase} />
-}
-
-function UnlockCopySeed({
-  verifyPassword,
-}: Pick<PasswordFormProps, "verifyPassword">) {
-  return (
-    <CellStack flex={1}>
-      <WarningRecoveryBanner
-        title="Never share your recovery phrase!"
-        reasons={[
-          "It’s the only way to recover your wallet",
-          "If someone else has access to your recovery phrase they can control your wallet",
-        ]}
-        mb={4}
-      />
-      <HeaderCell color={"text.primary"}>Enter your password</HeaderCell>
-      <PasswordForm flex={1} verifyPassword={verifyPassword}>
-        {(isDirty) => (
-          <>
-            <Flex flex={1}></Flex>
-            <Button
-              type="submit"
-              disabled={!isDirty}
-              colorScheme="primary"
-              width="full"
-            >
-              Unlock
-            </Button>
-          </>
-        )}
-      </PasswordForm>
-    </CellStack>
-  )
 }

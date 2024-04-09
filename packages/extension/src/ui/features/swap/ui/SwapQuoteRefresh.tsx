@@ -1,6 +1,6 @@
 import { Flex, Spinner, Text } from "@chakra-ui/react"
 import { Trade } from "../../../../shared/swap/model/trade.model"
-import { P4, icons } from "@argent/ui"
+import { P4, icons } from "@argent/x-ui"
 import { SwapInputError } from "../hooks/useSwapInfo"
 
 const { ApproveIcon } = icons

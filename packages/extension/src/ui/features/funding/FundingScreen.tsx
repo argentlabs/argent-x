@@ -4,7 +4,7 @@ import {
   useToast,
   logos,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC } from "react"
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom"
 
@@ -13,10 +13,9 @@ import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
-import { trackAddFundsService } from "../../services/analytics"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { isFeatureEnabled } from "@argent/shared"
+import { isFeatureEnabled } from "@argent/x-shared"
 import { getLayerSwapUrl } from "./utils"
 import { FundingOnRampOption } from "./FundingOnRampOption"
 import { Grid } from "@chakra-ui/react"
@@ -94,11 +93,7 @@ export const FundingScreen: FC = () => {
             />
           </Link>
           {allowLayerswap && (
-            <A
-              href={getLayerSwapUrl(account.address)}
-              targetBlank
-              onClick={trackAddFundsService("layerswap", account.networkId)}
-            >
+            <A href={getLayerSwapUrl(account.address)} targetBlank>
               <Option
                 title="From an exchange"
                 description={"Coinbase, Binance, etc"}

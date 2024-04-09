@@ -5,7 +5,7 @@ import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
 import { constants, num } from "starknet"
 import { getEntryPointSafe } from "../../../../shared/utils/transactions"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
-import { changeGuardianCalldataSchema } from "@argent/shared"
+import { changeGuardianCalldataSchema } from "@argent/x-shared"
 
 const changeGuardianSchema = z.object({
   guardian: z.string(),

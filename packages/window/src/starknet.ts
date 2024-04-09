@@ -1,18 +1,33 @@
 import type {
   AccountChangeEventHandler,
   AddStarknetChainParameters,
-  ConnectedStarknetWindowObject,
   NetworkChangeEventHandler,
-  StarknetWindowObject,
-  SwitchStarknetChainParameter,
+  SwitchStarknetChainParameters,
   WatchAssetParameters,
+  RequestAccountsParameters,
+  StarknetWindowObject,
 } from "get-starknet-core"
+import {
+  IStarknetWindowObject as IStarknetWindowObjectV3,
+  ConnectedStarknetWindowObject as ConnectedStarknetWindowObjectV3,
+} from "get-starknet-coreV3"
 import type { ProviderInterface } from "starknet"
 
 import { MessageAccount } from "./account"
 import { userEventHandlers } from "./eventHandlers"
 import { Sender } from "./messages/exchange/bidirectional"
 import { StarknetMethods } from "./types"
+
+type CommonOmittedProperties = "on" | "off" | "request" | "icon"
+
+export type BackwardsCompatibleStarknetWindowObject = StarknetWindowObject &
+  Omit<IStarknetWindowObjectV3, CommonOmittedProperties> & {
+    isConnected?: boolean
+  }
+
+export type BackwardsCompatibleConnectedStarknetWindowObject =
+  StarknetWindowObject &
+    Omit<ConnectedStarknetWindowObjectV3, CommonOmittedProperties>
 
 export type Variant = "argentX" | "argentWebWallet"
 
@@ -25,17 +40,17 @@ export interface GetArgentStarknetWindowObject {
 }
 
 async function updateStarknetWindowObject(
-  windowObject: StarknetWindowObject,
+  windowObject: BackwardsCompatibleStarknetWindowObject,
   provider: ProviderInterface,
   remoteHandle: Sender<StarknetMethods>,
   walletAddress: string,
-): Promise<ConnectedStarknetWindowObject> {
-  if (windowObject.isConnected) {
-    return windowObject
+): Promise<BackwardsCompatibleConnectedStarknetWindowObject> {
+  if (windowObject.isConnected && windowObject.account) {
+    return windowObject as BackwardsCompatibleConnectedStarknetWindowObject
   }
 
   const valuesToAssign: Pick<
-    ConnectedStarknetWindowObject,
+    BackwardsCompatibleConnectedStarknetWindowObject,
     "isConnected" | "chainId" | "selectedAddress" | "account" | "provider"
   > = {
     isConnected: true,
@@ -48,18 +63,19 @@ async function updateStarknetWindowObject(
   return Object.assign(windowObject, valuesToAssign)
 }
 
-export type WebWalletStarknetWindowObject = StarknetWindowObject & {
-  getLoginStatus(): Promise<
-    | {
-        isLoggedIn: false
-      }
-    | {
-        isLoggedIn: true
-        hasSession: boolean
-        isPreauthorized: boolean
-      }
-  >
-}
+export type WebWalletStarknetWindowObject =
+  BackwardsCompatibleStarknetWindowObject & {
+    getLoginStatus(): Promise<
+      | {
+          isLoggedIn: false
+        }
+      | {
+          isLoggedIn: true
+          hasSession: boolean
+          isPreauthorized: boolean
+        }
+    >
+  }
 
 export const getArgentStarknetWindowObject = (
   options: GetArgentStarknetWindowObject,
@@ -68,25 +84,55 @@ export const getArgentStarknetWindowObject = (
 ): WebWalletStarknetWindowObject => {
   const wallet: WebWalletStarknetWindowObject = {
     ...options,
-    isConnected: false,
     provider,
     getLoginStatus: () => remoteHandle.call("getLoginStatus"),
     async request(call) {
-      switch (call.type) {
-        case "wallet_addStarknetChain": {
-          const params = call.params as AddStarknetChainParameters
-          return remoteHandle.call("addStarknetChain", params)
+      if ("params" in call) {
+        switch (call.type) {
+          case "wallet_requestAccounts": {
+            const params = call.params as RequestAccountsParameters
+            return remoteHandle.call("requestAccounts", params)
+          }
+          case "wallet_watchAsset": {
+            const params = call.params as WatchAssetParameters
+            return remoteHandle.call("watchAsset", params)
+          }
+          case "wallet_addStarknetChain": {
+            const params = call.params as AddStarknetChainParameters
+            return remoteHandle.call("addStarknetChain", params)
+          }
+          case "wallet_switchStarknetChain": {
+            const params = call.params as SwitchStarknetChainParameters
+            return remoteHandle.call("switchStarknetChain", params)
+          }
+          case "starknet_addInvokeTransaction": {
+            throw new Error("not implemented")
+          }
+          case "starknet_addDeclareTransaction":
+          case "starknet_addDeployAccountTransaction":
+          case "starknet_signTypedData": {
+            throw new Error("not implemented")
+          }
+          default:
+            throw new Error(`Unknown request type: ${call.type}`)
         }
-        case "wallet_switchStarknetChain": {
-          const params = call.params as SwitchStarknetChainParameter
-          return remoteHandle.call("switchStarknetChain", params)
+      } else {
+        switch (call.type) {
+          case "wallet_getPermissions": {
+            throw new Error("not implemented")
+          }
+          case "wallet_requestChainId": {
+            throw new Error("not implemented")
+          }
+          case "wallet_deploymentData": {
+            throw new Error("not implemented")
+          }
+          case "starknet_supportedSpecs": {
+            throw new Error("not implemented")
+          }
+          default:
+            throw new Error(`Unknown request type: ${call.type}`)
         }
-        case "wallet_watchAsset": {
-          const params = call.params as WatchAssetParameters
-          return remoteHandle.call("watchAsset", params)
-        }
-        default:
-          throw new Error("not implemented")
       }
     },
     async enable(ops) {

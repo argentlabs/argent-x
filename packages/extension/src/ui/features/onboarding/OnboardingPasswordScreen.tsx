@@ -8,7 +8,7 @@ import { AllowPromise } from "../../../shared/storage/types"
 import { ControlledInput } from "../../components/ControlledInput"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
-import { PasswordStrengthIndicator } from "@argent/ui"
+import { PasswordStrengthIndicator } from "@argent/x-ui"
 
 const MIN_PASSWORD_LENGTH = 8
 const setPasswordFormSchema = z
@@ -37,6 +37,8 @@ export interface OnboardingPasswordScreenProps {
   }
   onSubmit: (password: string) => AllowPromise<void>
   onBack?: MouseEventHandler
+  length?: number
+  currentIndex?: number
 }
 
 export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
@@ -44,6 +46,8 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
   submitText,
   onBack,
   onSubmit,
+  length,
+  currentIndex,
 }) => {
   const {
     control,
@@ -65,8 +69,8 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
       errors.root?.message
         ? submitText?.retryAfterError ?? "Retry create wallet"
         : isSubmitting
-        ? submitText?.submitting ?? "Creating wallet…"
-        : submitText?.start ?? "Create wallet",
+          ? submitText?.submitting ?? "Creating wallet…"
+          : submitText?.start ?? "Create wallet",
     [isSubmitting, errors.root?.message, submitText],
   )
 
@@ -81,8 +85,8 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
   return (
     <OnboardingScreen
       onBack={onBack}
-      length={3}
-      currentIndex={1}
+      length={length ?? 4}
+      currentIndex={currentIndex ?? 2}
       title={title}
       subtitle="Enter a password to protect your wallet"
     >

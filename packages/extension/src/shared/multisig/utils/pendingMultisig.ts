@@ -45,7 +45,13 @@ export async function removePendingMultisig(
     throw new Error("Pending multisig to remove not found")
   }
 
-  return pendingMultisigRepo.remove(pendingMultisig)
+  return pendingMultisigRepo.remove(
+    // pendingMultisigEqual(pendingMultisig, basePendingMultisig),
+    (multisig) => pendingMultisigEqual(multisig, basePendingMultisig),
+    // multisig.name === pendingMultisig.name &&
+    // multisig.networkId === pendingMultisig.networkId &&
+    // multisig.publicKey === pendingMultisig.publicKey,
+  )
 }
 
 export async function pendingMultisigToMultisig(
@@ -104,6 +110,12 @@ export async function hidePendingMultisig(base: BasePendingMultisig) {
     ...hit,
     hidden: true,
   })
+}
+
+export async function deletePendingMultisig(base: BasePendingMultisig) {
+  await pendingMultisigRepo.remove((pendingMultisig) =>
+    pendingMultisigEqual(pendingMultisig, base),
+  )
 }
 
 export async function unhidePendingMultisig(

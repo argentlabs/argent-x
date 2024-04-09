@@ -1,10 +1,10 @@
-import { H6, P4, icons } from "@argent/ui"
+import { H6, P4, icons } from "@argent/x-ui"
 import { Box, Flex, FlexProps, HStack, VStack } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
 const { AlertFillIcon } = icons
 
-interface WarningRecoveryBannerProps extends Omit<FlexProps, "title"> {
+export interface WarningRecoveryBannerProps extends Omit<FlexProps, "title"> {
   title: ReactNode
   reasons: ReactNode[]
 }
@@ -25,7 +25,7 @@ export const WarningRecoveryBanner: FC<WarningRecoveryBannerProps> = ({
       borderRadius="xl"
       {...rest}
     >
-      <H6 color="errorText" mb={5} ml={1} textAlign={"center"}>
+      <H6 color="text-danger" mb={5} ml={1} textAlign={"center"}>
         {title}
       </H6>
       <VStack spacing={2} alignItems={"flex-start"}>
@@ -33,7 +33,7 @@ export const WarningRecoveryBanner: FC<WarningRecoveryBannerProps> = ({
           return (
             <HStack alignItems={"flex-start"} key={`${reason}-${index}`}>
               <Box>
-                <AlertFillIcon color="errorText" fontSize="lg" />
+                <AlertFillIcon color="text-danger" fontSize="lg" />
               </Box>
               <P4>{reason}</P4>
             </HStack>

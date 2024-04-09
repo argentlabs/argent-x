@@ -1,4 +1,4 @@
-import { isFunction, partition } from "lodash-es"
+import { isArray, isFunction, partition } from "lodash-es"
 
 import { mergeArrayStableWith, optionsWithDefaults } from "./base"
 import type {
@@ -70,14 +70,18 @@ export class ChromeRepository<T> implements IRepository<T> {
 
   async remove(value: SelectorFn<T> | AllowArray<T>): Promise<T[]> {
     const items = await this.getStorage()
-    const values = Array.isArray(value) ? value : [value]
 
-    const removeSelector = isFunction(value)
-      ? value
-      : (item: T) => values.includes(item)
+    const compareFn = this.options.compare.bind(this)
 
-    const [newValues, removedValues] = partition(items, removeSelector)
-    await this.set(newValues)
+    const selector = isFunction(value)
+      ? (item: T) => !value(item)
+      : isArray(value)
+        ? (item: T) => value.some((v) => !compareFn(v, item))
+        : (item: T) => !compareFn(value, item)
+
+    const [keptValues, removedValues] = partition(items, selector)
+
+    await this.set(keptValues)
     return removedValues
   }
 

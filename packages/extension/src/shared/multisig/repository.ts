@@ -6,7 +6,7 @@ import {
   PendingMultisig,
 } from "./types"
 import { ChromeRepository } from "../storage/__new/chrome"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import browser from "webextension-polyfill"
 import { accountsEqual } from "../utils/accountsEqual"
 import { pendingMultisigEqual } from "./utils/selectors"
@@ -33,6 +33,6 @@ export const multisigMetadataRepo: IMultisigMetadataRepository =
     areaName: "local",
     namespace: "core:multisig:signerNames",
     compare(a: MultisigMetadata, b: MultisigMetadata) {
-      return isEqualAddress(a.creator, b.creator)
+      return isEqualAddress(a.multisigPublicKey, b.multisigPublicKey)
     },
   })

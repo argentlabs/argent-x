@@ -6,14 +6,14 @@ for (const feeToken of ["STRK", "ETH"] as const) {
   test.describe(`Send MAX funds fee ${feeToken}`, () => {
     test.slow()
     //using STRK to pay fee, user should be able to transfer all ETH funds
-    const expectedUpdatedBalance = feeToken === "STRK" ? "0.0 ETH" : "0.00"
+    const expectedUpdatedBalance = feeToken === "STRK" ? "0.0 ETH" : "0.000"
     test("send MAX funds to other self account", async ({ extension }) => {
       const { accountAddresses } = await extension.setupWallet({
         accountsToSetup: [
           {
             assets: [
               { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.005 },
+              { token: "STRK", balance: 0.8 },
             ],
           },
           { assets: [{ token: "ETH", balance: 0 }] },
@@ -46,7 +46,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
         extension.account.accountName2,
       )
       await expect(extension.account.currentBalance("ETH")).toContainText(
-        "0.01",
+        sendAmountFE,
       )
       balance = await extension.account.currentBalance("ETH").innerText()
       expect(parseFloat(balance)).toBeGreaterThan(0.0001)
@@ -58,7 +58,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
           {
             assets: [
               { token: "ETH", balance: 0.002 },
-              { token: "STRK", balance: 0.005 },
+              { token: "STRK", balance: 0.8 },
             ],
           },
         ],
@@ -97,7 +97,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
           {
             assets: [
               { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.005 },
+              { token: "STRK", balance: 0.8 },
             ],
           },
         ],

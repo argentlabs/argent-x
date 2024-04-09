@@ -44,11 +44,15 @@ const createBrowserContext = () => {
       "--disable-gpu",
     ],
     ignoreDefaultArgs: ["--disable-component-extensions-with-background-pages"],
+    screen: {
+      width: 300,
+      height: 600,
+    },
     recordVideo: {
       dir: artifactsDir,
       size: {
         width: 800,
-        height: 700,
+        height: 900,
       },
     },
   })

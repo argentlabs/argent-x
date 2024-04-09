@@ -7,7 +7,7 @@ import { networksEqual } from "../../../../shared/network/store"
 import { InMemoryRepository } from "../../../../shared/storage/__new/__test__/inmemoryImplementations"
 import BackgroundNetworkService from "./background"
 import { NetworkWithStatus } from "../../../../shared/network/type"
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 import { ETH_TOKEN_ADDRESS } from "../../../../shared/network/constants"
 
 describe("BackgroundNetworkService", () => {

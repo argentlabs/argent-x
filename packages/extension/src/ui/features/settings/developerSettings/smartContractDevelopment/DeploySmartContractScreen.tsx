@@ -1,4 +1,4 @@
-import { BarBackButton, Button, NavigationContainer } from "@argent/ui"
+import { BarBackButton, Button, NavigationContainer } from "@argent/x-ui"
 import { FC, useState } from "react"
 
 import { Flex } from "@chakra-ui/react"

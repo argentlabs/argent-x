@@ -1,5 +1,5 @@
 import { Divider, Flex, Text } from "@chakra-ui/react"
-import { Button } from "@argent/ui"
+import { Button } from "@argent/x-ui"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { FC } from "react"

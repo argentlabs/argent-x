@@ -3,7 +3,7 @@ import {
   ButtonCell,
   CellStack,
   NavigationContainer,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Link, useNavigate } from "react-router-dom"
 
 export function PickerNestedPicker() {

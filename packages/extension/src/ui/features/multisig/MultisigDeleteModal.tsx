@@ -1,4 +1,4 @@
-import { Button, H5, P3 } from "@argent/ui"
+import { Button, H5, P3 } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,
@@ -9,18 +9,16 @@ import {
 } from "@chakra-ui/react"
 import { FC, MouseEvent } from "react"
 
-interface MultisigHideModalProps {
+interface MultisigDeleteModalProps {
   isOpen: boolean
-  onHide?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void>
+  onDelete?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void>
   onClose: () => void
-  multisigType: "pending" | "active"
 }
 
-export const MultisigHideModal: FC<MultisigHideModalProps> = ({
+export const MultisigDeleteModal: FC<MultisigDeleteModalProps> = ({
   isOpen,
-  onHide,
+  onDelete,
   onClose,
-  multisigType,
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
@@ -33,24 +31,14 @@ export const MultisigHideModal: FC<MultisigHideModalProps> = ({
         </ModalHeader>
         <ModalBody>
           <P3 fontWeight="400" textAlign="center">
-            {multisigType === "pending" && (
-              <>
-                The multisig owner can still add you to the multisig if you
-                shared your signer pubkey with them
-              </>
-            )}
-            {multisigType === "active" && (
-              <>
-                You can still be added to the multisig in the future. You can
-                always unhide this account from the account list screen.
-              </>
-            )}
+            The multisig owner will not be able to add you to the multisig
+            anymore
           </P3>
         </ModalBody>
 
         <ModalFooter flexDirection="column" gap="3">
-          <Button w="100%" colorScheme="primary" onClick={onHide}>
-            Hide
+          <Button w="100%" colorScheme="primary" onClick={onDelete}>
+            Delete
           </Button>
           <Button w="100%" backgroundColor="neutrals.600" onClick={onClose}>
             Cancel

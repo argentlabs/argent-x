@@ -4,18 +4,17 @@ import {
   nonNullable,
   parseAmount,
   transferCalldataSchema,
-} from "@argent/shared"
-import { FieldError } from "@argent/ui"
+  prettifyTokenNumber,
+  prettifyCurrencyValue,
+} from "@argent/x-shared"
+import { FieldError } from "@argent/x-ui"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FC, useCallback, useMemo } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { z } from "zod"
 
-import {
-  prettifyCurrencyValue,
-  prettifyTokenBalance,
-} from "../../../shared/token/price"
+import { prettifyTokenBalance } from "../../../shared/token/prettifyTokenBalance"
 import type { Token } from "../../../shared/token/__new/types/token.model"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
@@ -38,9 +37,7 @@ import { clientStarknetAddressService } from "../../services/address"
 import { useMaxFeeEstimateForTransfer } from "../accountTokens/useMaxFeeForTransfer"
 import { useBestFeeToken } from "../actions/useBestFeeToken"
 import { formatUnits } from "ethers"
-import { genericErrorSchema } from "../actions/feeEstimation/feeError"
 import { tokenBalanceForAccountAndTokenView } from "../../views/tokenBalances"
-import { prettifyTokenNumber } from "../../../shared/utils/number"
 
 const formSchema = z.object({
   amount: amountInputSchema,
@@ -222,11 +219,6 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
   const leftText = useMemo(() => {
     if (!maxFeeError) {
       return prettifyCurrencyValue(currencyValue)
-    }
-
-    const genericError = genericErrorSchema.safeParse(maxFeeError)
-    if (genericError.success) {
-      return <FieldError>{genericError.data.message}</FieldError>
     }
     return <FieldError>Unable to estimate max</FieldError>
   }, [currencyValue, maxFeeError])

@@ -10,7 +10,7 @@ import {
   P4,
   TextWithAmount,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Box, Divider, Flex, Image, Text, Tooltip } from "@chakra-ui/react"
 import { motion } from "framer-motion"
 import { isEmpty, isString } from "lodash-es"
@@ -19,45 +19,37 @@ import { FC, useMemo } from "react"
 import {
   bigDecimal,
   formatTruncatedAddress,
-  normalizeAddress,
-} from "@argent/shared"
-import {
   isUnlimitedAmount,
+  normalizeAddress,
   prettifyCurrencyValue,
   prettifyTokenAmount,
-} from "../../../../../shared/token/price"
-import {
-  ApiTransactionReviewResponse,
-  getTransactionReviewWithType,
-} from "../../../../../shared/transactionReview.service"
+} from "@argent/x-shared"
+import { transactionReviewHasTransfer } from "../../../../../shared/transactionReview.service"
+import { ReviewOfTransaction } from "../../../../../shared/transactionReview/schema"
 import { useCurrentNetwork } from "../../../networks/hooks/useCurrentNetwork"
 import { useIsDefaultNetwork } from "../../../networks/hooks/useIsDefaultNetwork"
+import { AggregatedSimData } from "../useTransactionSimulatedData"
 import { UnknownTokenIcon } from "./DappHeader/TransactionIcon/UnknownTokenIcon"
 import { NftDetailsArgentXContainer } from "./NftDetailsArgentXContainer"
-import { AggregatedSimData } from "../useTransactionSimulatedData"
 
 const { InfoIcon, AlertIcon } = icons
 
 interface BalanceChangeOverviewArgentXProps {
   aggregatedData: AggregatedSimData[]
-  transactionReview?: ApiTransactionReviewResponse
+  transactionReview?: ReviewOfTransaction
 }
 
 export const BalanceChangeOverviewArgentX: FC<
   BalanceChangeOverviewArgentXProps
 > = ({ aggregatedData, transactionReview }) => {
   const network = useCurrentNetwork()
-  const transactionReviewWithType = useMemo(
-    () => getTransactionReviewWithType(transactionReview),
-    [transactionReview],
-  )
   const allTransferSafe = useMemo(
     () => aggregatedData.every((t) => t.safe),
     [aggregatedData],
   )
 
   const isDefaultNetwork = useIsDefaultNetwork()
-  const isTransfer = transactionReviewWithType?.type === "transfer"
+  const isTransfer = transactionReviewHasTransfer(transactionReview)
 
   if (aggregatedData.length === 0) {
     return null

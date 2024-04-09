@@ -7,18 +7,20 @@ import {
   feeTokenNeedsTxV3Support,
 } from "../../../../shared/network/txv3"
 import { Token } from "../../../../shared/token/__new/types/token.model"
-import { getAccountIdentifier } from "@argent/shared"
+import { getAccountIdentifier } from "@argent/x-shared"
 
 export function useRequiresTxV3Upgrade(
   account: Account | undefined,
   token: Token,
 ) {
   return useSWR(
-    [
-      "requiresTxV3Upgrade",
-      getAccountIdentifier(account),
-      getAccountIdentifier(token),
-    ],
+    account
+      ? [
+          "requiresTxV3Upgrade",
+          getAccountIdentifier(account),
+          getAccountIdentifier(token),
+        ]
+      : null,
     async () => {
       const [selectedAccount] = await accountService.get((acc) =>
         accountsEqual(acc, account),

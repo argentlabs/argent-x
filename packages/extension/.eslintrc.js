@@ -17,22 +17,14 @@ module.exports = {
     "@argent/local/code-import-patterns": [
       "error",
       {
-        target: "packages/extension/src/ui/**",
-        disallow: ["packages/extension/src/background/**"],
-        message: "import background from ui is disallowed",
-      },
-      {
         target: "packages/extension/src/background/**",
-        disallow: ["packages/extension/src/ui/**"],
-        message: "import ui from background is disallowed",
+        disallow: ["@argent/x-ui"],
+        message: "import @argent/x-ui from background is disallowed",
       },
       {
         target: "packages/extension/src/shared/**",
-        disallow: [
-          "packages/extension/src/ui/**",
-          "packages/extension/src/background/**",
-        ],
-        message: "import ui or background from shared is disallowed",
+        disallow: ["@argent/x-ui", "packages/extension/src/background/**"],
+        message: "import @argent/x-ui or background from shared is disallowed",
       },
     ],
   },

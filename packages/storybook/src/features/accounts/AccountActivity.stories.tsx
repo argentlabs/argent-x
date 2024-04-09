@@ -1,7 +1,7 @@
 import { AccountActivity } from "@argent-x/extension/src/ui/features/accountActivity/AccountActivity"
 import { DailyActivity } from "@argent-x/extension/src/ui/features/accountActivity/useActivity"
 import { Account } from "@argent-x/extension/src/ui/features/accounts/Account"
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { ComponentProps } from "react"
 
 import { account } from "../../account"
@@ -12,9 +12,6 @@ import activity from "./__fixtures__/transactions.json"
 export default {
   component: AccountActivity,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

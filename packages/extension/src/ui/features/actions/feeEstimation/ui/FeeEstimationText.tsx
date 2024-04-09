@@ -1,5 +1,6 @@
-import { B3, L2, P4, icons } from "@argent/ui"
+import { B3, L2, P4, icons } from "@argent/x-ui"
 import {
+  Center,
   Flex,
   Img,
   Spinner,
@@ -80,6 +81,7 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
             alignItems="center"
             cursor={allowFeeTokenSelection ? "pointer" : "default"}
             onClick={() => allowFeeTokenSelection && onOpenFeeTokenPicker?.()}
+            role="group"
           >
             <Flex gap="0.5" alignItems="end" direction="column" flexWrap="wrap">
               {primaryText && (
@@ -96,10 +98,26 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
                 </Flex>
               )}
               {secondaryText && (
-                <L2 color={`${colorScheme}.300`}>{secondaryText}</L2>
+                <L2 cursor="inherit" color={`${colorScheme}.300`}>
+                  {secondaryText}
+                </L2>
               )}
             </Flex>
-            {allowFeeTokenSelection && <ChevronRightIcon />}
+            {allowFeeTokenSelection && (
+              <Center
+                rounded={"lg"}
+                bg={`${colorScheme}.700`}
+                p={1.5}
+                alignSelf={"stretch"}
+                _groupHover={{
+                  bg: `${colorScheme}.600`,
+                }}
+                transitionProperty="common"
+                transitionDuration="fast"
+              >
+                <ChevronRightIcon />
+              </Center>
+            )}
           </Flex>
         )}
       </Flex>

@@ -1,4 +1,4 @@
-import { H3, P3, icons } from "@argent/ui"
+import { H3, P3, icons } from "@argent/x-ui"
 import { Button, Center, Circle, Text } from "@chakra-ui/react"
 import { FC } from "react"
 

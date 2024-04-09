@@ -6,7 +6,10 @@ export const getIsPreauthorized = async () => {
     sendMessage({
       type: "IS_PREAUTHORIZED",
     })
-    const isPreauthorized = await waitForMessage("IS_PREAUTHORIZED_RES", 1000)
+    const isPreauthorized = await waitForMessage(
+      "IS_PREAUTHORIZED_RES",
+      10 * 1000, // 10 seconds, temporary
+    )
     return isPreauthorized
   } catch (e) {
     // ignore timeout or other error

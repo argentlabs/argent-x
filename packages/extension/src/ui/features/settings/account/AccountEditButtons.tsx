@@ -1,4 +1,4 @@
-import { ButtonCell, P4, SpacerCell, Switch, icons } from "@argent/ui"
+import { ButtonCell, P4, SpacerCell, Switch, icons } from "@argent/x-ui"
 import { Spinner } from "@chakra-ui/react"
 import { useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"

@@ -1,6 +1,6 @@
 import { messageClient } from "../messaging/trpc"
 import { IArgentAccountServiceUI } from "../../../shared/argentAccount/interface"
-import { booleanToStringSchema } from "@argent/shared"
+import { booleanToStringSchema } from "@argent/x-shared"
 import { EmailPreferences } from "../../../shared/argentAccount/schema"
 
 export class ArgentAccountService implements IArgentAccountServiceUI {

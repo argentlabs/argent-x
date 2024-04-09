@@ -13,6 +13,7 @@ import { useMultisig } from "./multisig.state"
 import { BaseMultisigConfirmations } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { multisigService } from "../../services/multisig"
+import { decodeBase58 } from "@argent/x-shared"
 
 export const MultisigRemoveOwnersScreen: FC = () => {
   const account = useRouteAccount()
@@ -58,6 +59,7 @@ const MultisigRemoveOwnerAccountWrapper = ({
     <FormProvider {...methods}>
       <MultisigRemove
         account={account}
+        multisigPublicKey={multisig?.publicKey}
         signerToRemove={signerToRemove}
         totalSigners={newTotalSigners}
         newThreshold={newThreshold}
@@ -68,11 +70,13 @@ const MultisigRemoveOwnerAccountWrapper = ({
 
 const MultisigRemove = ({
   account,
+  multisigPublicKey,
   signerToRemove,
   totalSigners,
   newThreshold,
 }: {
   account: Account
+  multisigPublicKey?: string
   signerToRemove: string
   totalSigners?: number
   newThreshold?: number
@@ -90,6 +94,13 @@ const MultisigRemove = ({
         newThreshold,
         address: account?.address,
       })
+
+      if (multisigPublicKey) {
+        await multisigService.removeSignerMetadata(
+          multisigPublicKey,
+          decodeBase58(signerToRemove),
+        )
+      }
       navigate(routes.accountActivity())
     }
   }

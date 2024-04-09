@@ -1,9 +1,11 @@
-import { Address, ArgentBackendNetworkId } from "@argent/shared"
+import { Address, ArgentBackendNetworkId } from "@argent/x-shared"
 import { isArray, lowerCase } from "lodash-es"
 import { Call } from "starknet"
 
 import { ARGENT_TRANSACTION_REVIEW_STARKNET_URL } from "./api/constants"
 import { Fetcher, fetcher } from "./api/fetcher"
+import { ReviewOfTransaction, Action } from "./transactionReview/schema"
+import { argentXHeaders } from "./api/headers"
 
 export type ApiTransactionReviewAssessment =
   | "warn"
@@ -153,6 +155,7 @@ export const fetchTransactionReview = ({
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        ...argentXHeaders,
       },
       body: JSON.stringify(body),
     },
@@ -237,6 +240,51 @@ export const getTransactionReviewWithType = (
         ...review,
         type: review.activity?.type,
       }
+    }
+  }
+}
+
+export const transactionReviewHasSwap = (
+  transactionReview?: ReviewOfTransaction,
+) => {
+  if (!transactionReview) {
+    return false
+  }
+  for (const review of transactionReview.reviews) {
+    if (
+      review.action.name === "multi_route_swap" ||
+      review.action.name === "Jediswap_swap"
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+export const transactionReviewHasTransfer = (
+  transactionReview?: ReviewOfTransaction,
+) => {
+  if (!transactionReview) {
+    return false
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.action.name === "ERC20_transfer") {
+      return true
+    }
+  }
+  return false
+}
+
+export const getTransactionActionByType = (
+  actionName?: string,
+  transactionReview?: ReviewOfTransaction,
+): Action | undefined => {
+  if (!transactionReview || !actionName) {
+    return
+  }
+  for (const review of transactionReview.reviews) {
+    if (review.action?.name.includes(actionName)) {
+      return review.action
     }
   }
 }

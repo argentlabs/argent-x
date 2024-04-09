@@ -1,4 +1,4 @@
-import { AlertButton, icons } from "@argent/ui"
+import { AlertButton, icons } from "@argent/x-ui"
 import { FC } from "react"
 
 const { MultisigIcon } = icons

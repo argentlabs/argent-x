@@ -1,5 +1,5 @@
-import { normalizeAddress, formatTruncatedAddress } from "@argent/shared"
-import { Button, CopyTooltip } from "@argent/ui"
+import { normalizeAddress, formatTruncatedAddress } from "@argent/x-shared"
+import { Button, CopyTooltip } from "@argent/x-ui"
 import { ButtonProps } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -21,9 +21,9 @@ export const StarknetIdCopyButton: FC<StarknetIdCopyButtonProps> = ({
       <Button
         size="3xs"
         bg="neutrals.700"
-        _hover={{ bg: "neutrals.700", color: "text.primary" }}
+        _hover={{ bg: "neutrals.700", color: "text-primary" }}
         borderRadius="100px"
-        color="white50"
+        color="white.50"
         textAlign="center"
         pb={1}
         pt={0.5}

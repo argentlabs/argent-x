@@ -1,4 +1,4 @@
-import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/ui"
+import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC } from "react"

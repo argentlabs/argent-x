@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { isEkuboNft } from "./ekuboMarketplace"
-import { NftItem } from "@argent/shared"
+import { NftItem } from "@argent/x-shared"
 
 const mockEkuboNft: Partial<NftItem> = {
   token_id: "231988",

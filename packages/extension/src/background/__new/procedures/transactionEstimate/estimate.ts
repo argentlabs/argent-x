@@ -3,7 +3,7 @@ import { z } from "zod"
 import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
-import { addressSchema, callSchema, ensureArray } from "@argent/shared"
+import { addressSchema, callSchema, ensureArray } from "@argent/x-shared"
 import {
   callsToInvocation,
   extendInvocationsByAccountDeploy,

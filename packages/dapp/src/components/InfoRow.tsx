@@ -1,4 +1,4 @@
-import { H4 } from "@argent/ui"
+import { H4 } from "@argent/x-ui"
 import { Code, Flex } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 

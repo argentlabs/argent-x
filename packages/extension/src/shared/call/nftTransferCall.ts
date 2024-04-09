@@ -1,4 +1,4 @@
-import { normalizeAddress } from "@argent/shared"
+import { normalizeAddress } from "@argent/x-shared"
 import { Call, CallData, num, uint256, validateAndParseAddress } from "starknet"
 
 const { uint256ToBN } = uint256

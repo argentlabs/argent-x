@@ -1,4 +1,4 @@
-import { getAccountIdentifier } from "@argent/shared"
+import { getAccountIdentifier } from "@argent/x-shared"
 import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 import { groupBy } from "lodash-es"

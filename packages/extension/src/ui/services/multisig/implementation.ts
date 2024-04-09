@@ -14,7 +14,11 @@ import {
 import { PendingMultisig, SignerMetadata } from "../../../shared/multisig/types"
 import { IClientMultisigService } from "./interface"
 import { multisigMetadataRepo } from "../../../shared/multisig/repository"
-import { isEqualAddress, decodeBase58Array } from "@argent/shared"
+import {
+  isEqualAddress,
+  decodeBase58Array,
+  ensureArray,
+} from "@argent/x-shared"
 
 export class MultisigService implements IClientMultisigService {
   constructor(private trpcMessageClient: typeof messageClient) {}
@@ -64,11 +68,12 @@ export class MultisigService implements IClientMultisigService {
   }
 
   async updateSignerMetadata(
-    creator: string,
+    multisigPublicKey: string,
     signerMetadata: SignerMetadata,
   ): Promise<void> {
     const [multisigMetadata] = await multisigMetadataRepo.get(
-      (multisigMetadata) => isEqualAddress(multisigMetadata.creator, creator),
+      (multisigMetadata) =>
+        isEqualAddress(multisigMetadata.multisigPublicKey, multisigPublicKey),
     )
 
     const signers = multisigMetadata?.signers.slice() || []
@@ -83,6 +88,71 @@ export class MultisigService implements IClientMultisigService {
       signers[signerIndex] = signerMetadata
     }
 
-    await multisigMetadataRepo.upsert({ creator, signers })
+    await multisigMetadataRepo.upsert({
+      multisigPublicKey,
+      signers,
+    })
+  }
+
+  async updateSignersMetadata(
+    multisigPublicKey: string,
+    signersMetadata: SignerMetadata[],
+  ): Promise<void> {
+    const [multisigMetadata] = await multisigMetadataRepo.get(
+      (multisigMetadata) =>
+        isEqualAddress(multisigMetadata.multisigPublicKey, multisigPublicKey),
+    )
+
+    const signers = ensureArray(multisigMetadata?.signers.slice())
+
+    for (const signerMetadata of signersMetadata) {
+      const signerIndex = ensureArray(signers).findIndex((signer) =>
+        isEqualAddress(signer.key, signerMetadata.key),
+      )
+
+      // Signer is not in signer metadata list, add it
+      if (signerIndex === -1) {
+        signers.push(signerMetadata)
+      } else {
+        signers[signerIndex] = signerMetadata
+      }
+    }
+
+    await multisigMetadataRepo.upsert({
+      multisigPublicKey,
+      signers,
+    })
+  }
+
+  async removeSignerMetadata(
+    multisigPublicKey: string,
+    signerKey: string,
+  ): Promise<void> {
+    const [multisigMetadata] = await multisigMetadataRepo.get(
+      (multisigMetadata) =>
+        isEqualAddress(multisigMetadata.multisigPublicKey, multisigPublicKey),
+    )
+
+    const signers = ensureArray(multisigMetadata?.signers.slice())
+
+    if (signers.length === 0) {
+      return
+    }
+
+    const signerIndex = signers?.findIndex((signer) =>
+      isEqualAddress(signer.key, signerKey),
+    )
+
+    // Signer is not in signer metadata list, do nothing
+    if (signerIndex === -1) {
+      return
+    } else {
+      signers.splice(signerIndex, 1)
+    }
+
+    await multisigMetadataRepo.upsert({
+      multisigPublicKey,
+      signers,
+    })
   }
 }

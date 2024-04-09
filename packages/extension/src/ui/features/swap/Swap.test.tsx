@@ -4,7 +4,6 @@ import * as useSwapInfoModule from "./hooks/useSwapInfo"
 import * as useSwapStateModule from "./state/fields"
 import * as useSwapActionHandlersModule from "./hooks/useSwapActionHandler"
 import * as useSwapCallbackModule from "./hooks/useSwapCallback"
-import * as analyticsModule from "../../services/analytics"
 import * as useAppStateModule from "../../app.state"
 import * as useUserStateModule from "./state/user"
 import {
@@ -18,7 +17,6 @@ vi.mock("./hooks/useSwapInfo")
 vi.mock("./state/fields")
 vi.mock("./hooks/useSwapActionHandler")
 vi.mock("./hooks/useSwapCallback")
-vi.mock("../../services/analytics")
 vi.mock("../../app.state")
 vi.mock("./state/user")
 
@@ -267,37 +265,5 @@ describe("Swap Component Tests", () => {
       `animation: ${spin.name} 0.125s linear`,
     )
     vi.useRealTimers()
-  })
-
-  // Test for checking if the analytics track event is called with the correct parameters on swap
-  it("calls analytics track event with correct parameters on swap", async () => {
-    const swapCallbackMock = vi.fn().mockResolvedValue({})
-    const analyticsTrackMock = vi.spyOn(analyticsModule.analytics, "track")
-    await act(async () => {
-      return setup(
-        {
-          trade: getMockTrade({
-            payAmount: "100",
-            receiveAmount: "200",
-          }),
-        },
-        {
-          typedValue: "100",
-        },
-        {},
-        {},
-        {},
-        swapCallbackMock,
-      )
-    })
-
-    fireEvent.click(screen.getByText("Review swap"))
-    await act(async () => {
-      await swapCallbackMock()
-    })
-    expect(analyticsTrackMock).toHaveBeenCalledWith("swapInitiated", {
-      networkId: expect.any(String),
-      pair: expect.any(String),
-    })
   })
 })

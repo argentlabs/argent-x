@@ -1,4 +1,6 @@
-import { logos } from "@argent/ui"
+// just using types here
+// eslint-disable-next-line @argent/local/code-import-patterns
+import { logos } from "@argent/x-ui"
 
 export interface BlockExplorer {
   title: string

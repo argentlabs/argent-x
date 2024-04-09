@@ -1,4 +1,4 @@
-import { AddressOrDomain, StarknetDomainName } from "@argent/shared"
+import { AddressOrDomain, StarknetDomainName } from "@argent/x-shared"
 import { messageClient } from "../messaging/trpc"
 import { IClientStarknetAddressService } from "./interface"
 

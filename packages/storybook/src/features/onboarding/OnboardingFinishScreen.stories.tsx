@@ -2,12 +2,6 @@ import { OnboardingFinishScreen } from "@argent-x/extension/src/ui/features/onbo
 
 export default {
   component: OnboardingFinishScreen,
-  parameters: {
-    layout: "fullscreen",
-    viewport: {
-      defaultViewport: "reset",
-    },
-  },
 }
 
 export const Default = {

@@ -1,6 +1,5 @@
 import { FC } from "react"
 import { useActionScreen } from "./hooks/useActionScreen"
-import { useAppState } from "../../app.state"
 import { useDappDisplayAttributes } from "./connectDapp/useDappDisplayAttributes"
 import { AccountNavigationBarContainer } from "../accounts/AccountNavigationBarContainer"
 import { SwitchNetworkScreen } from "./SwitchNetworkScreen"
@@ -15,7 +14,6 @@ export const SwitchNetworkScreenContainer: FC = () => {
   }
   const host = action.meta.origin || ""
   const requestedNetwork = action.payload
-  const { switcherNetworkId } = useAppState()
   const dappDisplayAttributes = useDappDisplayAttributes(host)
 
   const fromNetworkTitle = selectedAccount?.network.name

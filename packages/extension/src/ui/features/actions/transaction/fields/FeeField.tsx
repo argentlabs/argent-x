@@ -1,11 +1,11 @@
-import { L1, TextWithAmount } from "@argent/ui"
+import { L1, TextWithAmount } from "@argent/x-ui"
 import { Box } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
 import { useToken } from "../../../accountTokens/tokens.state"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 interface FeeFieldProps {
   title?: string

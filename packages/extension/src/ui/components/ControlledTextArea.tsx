@@ -1,4 +1,4 @@
-import { FieldError } from "@argent/ui"
+import { FieldError } from "@argent/x-ui"
 import { Textarea, TextareaProps } from "@chakra-ui/react"
 import { FC } from "react"
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form"

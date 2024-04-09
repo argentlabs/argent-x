@@ -1,5 +1,5 @@
-import { bigDecimal } from "@argent/shared"
-import { Button, H2, Input } from "@argent/ui"
+import { bigDecimal } from "@argent/x-shared"
+import { Button, H2, Input } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useContractWrite } from "@starknet-react/core"
 import { FC, useMemo, useState } from "react"

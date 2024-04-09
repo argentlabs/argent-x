@@ -1,4 +1,4 @@
-import { Button, P3 } from "@argent/ui"
+import { Button, P3 } from "@argent/x-ui"
 import { SimpleGrid, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 

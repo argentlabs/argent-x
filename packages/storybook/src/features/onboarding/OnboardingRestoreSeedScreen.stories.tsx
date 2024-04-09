@@ -2,12 +2,6 @@ import { OnboardingRestoreSeedScreen } from "@argent-x/extension/src/ui/features
 
 export default {
   component: OnboardingRestoreSeedScreen,
-  parameters: {
-    layout: "fullscreen",
-    viewport: {
-      defaultViewport: "reset",
-    },
-  },
 }
 
 export const Default = {

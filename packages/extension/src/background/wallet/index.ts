@@ -9,7 +9,7 @@ import {
 import { PendingMultisig } from "../../shared/multisig/types"
 import { Network } from "../../shared/network"
 import { BaseWalletAccount, WalletAccount } from "../../shared/wallet.model"
-import { WalletAccountSharedService } from "./account/shared.service"
+import { WalletAccountSharedService } from "../../shared/account/service/shared.service"
 import { WalletAccountStarknetService } from "./account/starknet.service"
 import { WalletBackupService } from "./backup/backup.service"
 import { WalletCryptoSharedService } from "./crypto/shared.service"
@@ -19,7 +19,7 @@ import { WalletRecoverySharedService } from "./recovery/shared.service"
 import { WalletSessionService } from "./session/session.service"
 import { WalletRecoveryStarknetService } from "./recovery/starknet.service"
 import { ProgressCallback } from "ethers"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 export class Wallet {
   constructor(

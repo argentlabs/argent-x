@@ -1,4 +1,4 @@
-import { FieldError, P3 } from "@argent/ui"
+import { FieldError, P3 } from "@argent/x-ui"
 import { Box, Flex, Input, InputGroup } from "@chakra-ui/react"
 import { useFormContext } from "react-hook-form"
 
@@ -30,6 +30,16 @@ export const ReplaceOwnerForm = ({
           <P3 mb="2" ml={2}>
             New owner
           </P3>
+          <InputGroup display="flex" alignItems="center">
+            <Input
+              isInvalid={Boolean(errors?.name)}
+              placeholder="Name"
+              {...register(`name` as const, {
+                required: false,
+              })}
+              mb={2}
+            />
+          </InputGroup>
           <InputGroup display="flex" alignItems="center">
             <Input
               isInvalid={Boolean(errors?.signerKey)}

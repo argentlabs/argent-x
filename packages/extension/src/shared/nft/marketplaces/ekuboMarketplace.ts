@@ -1,4 +1,4 @@
-import { Address, NftItem, isEqualAddress } from "@argent/shared"
+import { Address, NftItem, isEqualAddress } from "@argent/x-shared"
 import { constants } from "starknet"
 import { z } from "zod"
 

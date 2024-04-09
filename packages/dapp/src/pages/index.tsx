@@ -1,5 +1,5 @@
 import { supportsSessions } from "@argent/x-sessions"
-import type { StarknetWindowObject } from "get-starknet-core"
+import type { StarknetWindowObject } from "get-starknet-coreV3"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { AccountInterface } from "starknet"
 import { Header } from "../components/Header"
@@ -85,7 +85,7 @@ const StarknetKitDapp = () => {
       removeWalletAccountsChangedListener(onAccountsChanged)
       removeWalletNetworkChangedListener(onNetworkChanged)
     }
-  }, [])
+  }, [isConnected])
 
   const handleNetworkClick = useCallback(async (chainId: string) => {
     try {
@@ -97,11 +97,11 @@ const StarknetKitDapp = () => {
 
   const handleConnectClick = useCallback(
     (
-        connectWallet: (
-          enableWebWallet: boolean,
-        ) => Promise<StarknetWindowObject | undefined>,
-        enableWebWallet = true,
-      ) =>
+      connectWallet: (
+        enableWebWallet: boolean,
+      ) => Promise<StarknetWindowObject | undefined>,
+      enableWebWallet = true,
+    ) =>
       async () => {
         const wallet = await connectWallet(enableWebWallet)
         const chainId = await getChainId(wallet?.provider as any)

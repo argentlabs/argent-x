@@ -1,8 +1,8 @@
-import { H6, P4, TextWithAmount } from "@argent/ui"
+import { H6, P4, TextWithAmount } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { prettifyTokenAmount } from "../../../../shared/token/price"
+import { prettifyTokenAmount } from "@argent/x-shared"
 import { SwapTransaction } from "../transform/type"
 
 export interface SwapAccessoryProps {

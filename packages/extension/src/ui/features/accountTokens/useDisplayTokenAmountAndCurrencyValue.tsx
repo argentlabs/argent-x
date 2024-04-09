@@ -1,14 +1,14 @@
 import { BigNumberish } from "starknet"
-import {
-  PRETTY_UNLIMITED,
-  isUnlimitedAmount,
-  prettifyCurrencyValue,
-  prettifyTokenAmount,
-} from "../../../shared/token/price"
 import { useAppState } from "../../app.state"
 import { useTokenAmountToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensInNetwork } from "./tokens.state"
-import { isEqualAddress } from "@argent/shared"
+import {
+  isEqualAddress,
+  prettifyCurrencyValue,
+  PRETTY_UNLIMITED,
+  prettifyTokenAmount,
+  isUnlimitedAmount,
+} from "@argent/x-shared"
 
 export interface IUseDisplayTokenAmountAndCurrencyValue {
   amount: BigNumberish

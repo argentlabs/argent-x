@@ -1,4 +1,4 @@
-import { H3, PreBox } from "@argent/ui"
+import { H3, PreBox } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 

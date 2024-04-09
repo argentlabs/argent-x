@@ -1,4 +1,4 @@
-import { hexSchema, isEqualAddress } from "@argent/shared"
+import { hexSchema, isEqualAddress } from "@argent/x-shared"
 import { WalletAccount, cairoVersionSchema } from "../../shared/wallet.model"
 import { z } from "zod"
 import {

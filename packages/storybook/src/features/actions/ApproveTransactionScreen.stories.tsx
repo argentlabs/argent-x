@@ -5,7 +5,7 @@ import {
   transfer,
 } from "@argent-x/extension/src/ui/features/actions/__fixtures__"
 import { ApproveTransactionScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ApproveTransactionScreen"
-import { P4 } from "@argent/ui"
+import { P4 } from "@argent/x-ui"
 import { Center } from "@chakra-ui/layout"
 
 import { account } from "../../account"
@@ -14,9 +14,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: ApproveTransactionScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const footer = (

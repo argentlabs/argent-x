@@ -1,4 +1,4 @@
-import { ArgentBackendNftService } from "@argent/shared"
+import { ArgentBackendNftService } from "@argent/x-shared"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
 import { beforeEach, describe, expect, vi, Mocked } from "vitest"

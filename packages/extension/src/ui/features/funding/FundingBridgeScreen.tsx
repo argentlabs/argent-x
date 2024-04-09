@@ -3,7 +3,7 @@ import {
   BarCloseButton,
   NavigationContainer,
   logos,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
@@ -12,10 +12,9 @@ import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
-import { trackAddFundsService } from "../../services/analytics"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { isFeatureEnabled } from "@argent/shared"
+import { isFeatureEnabled } from "@argent/x-shared"
 import { getLayerSwapUrl } from "./utils"
 import { Grid } from "@chakra-ui/react"
 
@@ -54,11 +53,7 @@ export const FundingBridgeScreen: FC = () => {
       <PageWrapper>
         <Grid templateColumns="1fr" gap={4}>
           {bridgeUrl ? (
-            <A
-              href={bridgeUrl}
-              targetBlank
-              onClick={trackAddFundsService("starkgate", account.networkId)}
-            >
+            <A href={bridgeUrl} targetBlank>
               <Option
                 title="StarkGate"
                 description="Bridge trustlessly from Ethereum"
@@ -74,11 +69,7 @@ export const FundingBridgeScreen: FC = () => {
             />
           )}
           {allowLayerswap && (
-            <A
-              href={getLayerSwapUrl(account.address)}
-              targetBlank
-              onClick={trackAddFundsService("layerswap", account.networkId)}
-            >
+            <A href={getLayerSwapUrl(account.address)} targetBlank>
               <Option
                 title="Layerswap"
                 description="Bridge from other chains"
@@ -90,7 +81,6 @@ export const FundingBridgeScreen: FC = () => {
             <A
               href={`https://www.orbiter.finance/?referer=argent&dest=starknet&fixed=1&source=Mainnet`}
               targetBlank
-              onClick={trackAddFundsService("orbiter", account.networkId)}
             >
               <Option
                 title="Orbiter.finance"

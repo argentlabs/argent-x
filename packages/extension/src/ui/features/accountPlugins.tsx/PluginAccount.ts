@@ -7,7 +7,7 @@ import {
   addPluginCalldataSchema,
   executeOnPluginCalldataSchema,
   removePluginCalldataSchema,
-} from "@argent/shared"
+} from "@argent/x-shared"
 
 export class PluginAccount extends ArgentXAccount {
   constructor(account: ArgentXAccount) {

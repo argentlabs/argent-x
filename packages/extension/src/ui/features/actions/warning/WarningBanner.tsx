@@ -1,7 +1,7 @@
 import { Button, Flex, useDisclosure } from "@chakra-ui/react"
 import { Warning } from "../../../../shared/transactionReview/schema"
 import { riskToColorMap, riskToHeaderMap } from "./warningMap"
-import { B2, L2 } from "@argent/ui"
+import { B2, L2 } from "@argent/x-ui"
 
 import AlertFillIconWithHalo from "./AlertFillIconWithHalo"
 
@@ -44,7 +44,7 @@ export const WarningBanner = ({
     <>
       <Flex
         borderRadius="lg"
-        bgColor="surface.elevated"
+        bgColor="surface-elevated"
         p={2}
         justifyContent="space-between"
       >
@@ -57,7 +57,7 @@ export const WarningBanner = ({
             my={0.5}
           >
             <B2 color={color}>{header}</B2>
-            <L2 color="text.primary">{title}</L2>
+            <L2 color="text-primary">{title}</L2>
           </Flex>
         </Flex>
         {highestSeverityWarning.severity !== "info" && (

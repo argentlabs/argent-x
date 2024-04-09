@@ -3,7 +3,7 @@ import {
   CellStack,
   HeaderCell,
   NavigationContainer,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { useNavigate, useParams } from "react-router-dom"
 
 export function Token() {

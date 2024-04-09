@@ -30,7 +30,13 @@ export const DappIcon: FC<DappIconProps> = ({
       {...rest}
     >
       {!dappDisplayAttributes?.iconUrl && (
-        <UnknownDappIcon borderRadius={16} padding={1} />
+        <UnknownDappIcon
+          padding={1}
+          width="100%"
+          height="100%"
+          borderRadius={8}
+          boxShadow="menu"
+        />
       )}
     </Box>
   )

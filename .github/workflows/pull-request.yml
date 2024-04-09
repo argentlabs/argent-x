@@ -78,7 +78,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -101,7 +101,7 @@ jobs:
         run: pnpm bundlewatch
 
       - name: Use Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./*
           key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
@@ -158,7 +158,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -166,7 +166,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-hydrogen # test-unit is always run against chrome-hydrogen build
@@ -199,6 +199,7 @@ jobs:
       E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
       E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
       E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
       E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
       E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
       ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
@@ -211,12 +212,19 @@ jobs:
       ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
       E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
       E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+      ##slack config
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
       # Refresh intervals
       REFRESH_INTERVAL_FAST: 1 # 1s
       REFRESH_INTERVAL_MEDIUM: 5 # 5s
       REFRESH_INTERVAL_SLOW: 20 # 20s
       REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
+      ##webwallet default account config
+      WW_EMAIL: ${{ secrets.WW_EMAIL }}
+      WW_PIN: ${{ secrets.WW_PIN }}
+      WW_LOGIN_PASSWORD: ${{ secrets.WW_LOGIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -233,7 +241,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -241,7 +249,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }} # test-e2e is always run against chrome-hydrogen build
@@ -270,6 +278,70 @@ jobs:
           path: packages/e2e/blob-report/
           retention-days: 5
 
+  test-notify-low-balance:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [build-all-artifacts, test-e2e]
+    env:
+      ARGENT_X_ENVIRONMENT: "hydrogen"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
+      E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
+      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
+      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
+      E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
+      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
+      STARKNET_TESTNET_URL: ${{ secrets.STARKNET_TESTNET_URL }}
+      STARKSCAN_TESTNET_URL: ${{ secrets.STARKSCAN_TESTNET_URL }}
+      ARGENT_TESTNET_RPC_URL: ${{ secrets.ARGENT_TESTNET_RPC_URL }}
+      ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
+      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
+      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+      ##slack config
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+      # Refresh intervals
+      REFRESH_INTERVAL_FAST: 1 # 1s
+      REFRESH_INTERVAL_MEDIUM: 5 # 5s
+      REFRESH_INTERVAL_SLOW: 20 # 20s
+      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 8
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: "pnpm"
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Restore cached build
+        uses: actions/cache@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }} # test-e2e is always run against chrome-hydrogen build
+
+      - name: Slack notifications
+        run: pnpm run test:e2e:slack-notifications
+
   merge-reports:
     needs: [test-e2e, test-webwallet]
     if: always()
@@ -291,7 +363,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -336,7 +408,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -376,7 +448,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore cached build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-hydrogen
@@ -426,6 +498,7 @@ jobs:
       E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
       E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
       E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
       E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
       E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
       ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
@@ -438,6 +511,14 @@ jobs:
       ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
       E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
       E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+      ##slack config
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+
+      ##webwallet default account config
+      WW_EMAIL: ${{ secrets.WW_EMAIL }}
+      WW_PIN: ${{ secrets.WW_PIN }}
+      WW_LOGIN_PASSWORD: ${{ secrets.WW_LOGIN_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -455,7 +536,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore cached build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./*
           key: ${{ github.sha }}
@@ -477,7 +558,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-artifacts-${{ matrix.shardIndex }}
+          name: test-artifacts-webwallet
           path: |
             packages/e2e/artifacts/playwright/
           retention-days: 5
@@ -486,7 +567,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: all-blob-reports-webwallet-${{ matrix.shardIndex }}
+          name: all-blob-reports-webwallet-webwallet
           path: packages/e2e/blob-report/
           retention-days: 5
 
@@ -497,7 +578,7 @@ jobs:
 
     steps:
       - name: Send notification to Slack
-        uses: 8398a7/action-slack@v3.15.1
+        uses: 8398a7/action-slack@v3.16.2
         with:
           status: custom
           custom_payload: |
@@ -506,7 +587,7 @@ jobs:
               attachments: [{
                 fallback: 'fallback',
                 color: '${{ env.BUILD_STATUS }}',
-                title: 'Artifacts for testing ${{ env.BUILD_TYPE }} <${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}|${{ github.event.number }} ${{ github.event.pull_request.title }}>',
+                title: `Artifacts for testing ${{ env.BUILD_TYPE }} <${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}|${{ github.event.number }} ${{ github.event.pull_request.title }}>`,
                 text: '<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts|Artifacts link>',
                 fields: [{},],
                 actions: [{}]}]

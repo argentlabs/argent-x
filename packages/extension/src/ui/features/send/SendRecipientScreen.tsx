@@ -10,7 +10,7 @@ import {
   NavigationContainer,
   TextareaAutosize,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import {
   Flex,
   InputGroup,
@@ -26,7 +26,7 @@ import {
 import { BaseSyntheticEvent, FC, ReactNode } from "react"
 import { FieldErrors, UseFormRegister } from "react-hook-form"
 
-import { addressInputCharactersAndLengthSchema } from "@argent/shared"
+import { addressInputCharactersAndLengthSchema } from "@argent/x-shared"
 import { isEmpty } from "lodash-es"
 import type { AddressBookContact } from "../../../shared/addressBook/type"
 import type { WalletAccount } from "../../../shared/wallet.model"

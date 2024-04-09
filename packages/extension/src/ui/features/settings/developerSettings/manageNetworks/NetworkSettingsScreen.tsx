@@ -8,7 +8,7 @@ import {
   NavigationContainer,
   StickyGroup,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import type { Network } from "../../../../../shared/network"
@@ -88,7 +88,7 @@ export const NetworkSettingsScreen: FC<NetworkSettingsScreenProps> = ({
               size={"2xs"}
               colorScheme="transparent"
               leftIcon={<RestoreIcon />}
-              color="text.secondary"
+              color="text-secondary"
             >
               Restore default networks
             </Button>

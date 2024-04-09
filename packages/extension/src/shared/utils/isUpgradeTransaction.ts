@@ -1,4 +1,4 @@
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import { Transaction } from "../transactions"
 
 // This function checks if a transaction is a safe upgrade transaction

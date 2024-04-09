@@ -19,6 +19,11 @@ test.describe(`Login page`, () => {
     await webWallet.login.success()
   })
 
+  test("Assets page has loaded", async ({ webWallet }) => {
+    await webWallet.login.success()
+    await webWallet.assets.assetPageHasLoaded()
+  })
+
   test("wrong password", async ({ webWallet }) => {
     await webWallet.login.email.fill(config.validLogin.email)
     await webWallet.login.fillPin(config.validLogin.pin)

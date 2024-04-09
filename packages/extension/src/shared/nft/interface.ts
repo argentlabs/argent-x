@@ -1,4 +1,4 @@
-import { Address, Collection, NftItem } from "@argent/shared"
+import { Address, Collection, NftItem } from "@argent/x-shared"
 import { ContractAddress } from "../storage/__new/repositories/nft"
 import { AllowArray } from "../storage/types"
 import { Network } from "../network"

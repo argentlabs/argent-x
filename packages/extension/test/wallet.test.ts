@@ -4,7 +4,7 @@ import path from "path"
 import { expect, test } from "vitest"
 
 import { Wallet } from "../src/background/wallet"
-import { WalletAccountSharedService } from "../src/background/wallet/account/shared.service"
+import { WalletAccountSharedService } from "../src/shared/account/service/shared.service"
 import { WalletAccountStarknetService } from "../src/background/wallet/account/starknet.service"
 import { WalletBackupService } from "../src/background/wallet/backup/backup.service"
 import { WalletCryptoSharedService } from "../src/background/wallet/crypto/shared.service"
@@ -48,6 +48,11 @@ import {
 import { WalletStorageProps } from "../src/shared/wallet/walletStore"
 import backup from "./backup.mock.json"
 import backupWrong from "./backup_wrong.mock.json"
+import { AnalyticsService } from "../src/shared/analytics/implementation"
+import {
+  ISettingsStorage,
+  SettingsStorageKey,
+} from "../src/shared/settings/types"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
@@ -93,6 +98,9 @@ const getAccountStore = (name: string, defaults: WalletAccount[] = []) => {
 
 const getSessionStore = (name: string) => {
   return new ObjectStorage<WalletSession | null>(null, name)
+}
+const getSettingsStore = (name: string) => {
+  return new KeyValueStorage<ISettingsStorage>({} as ISettingsStorage, name)
 }
 
 const getMultisigStore = (
@@ -143,6 +151,10 @@ const getWallet = ({
     sessionStore,
     baseMultisigStore,
     pendingMultisigStore,
+  )
+  const defaultAnalyticsService = new AnalyticsService(
+    defaultAccountSharedService,
+    getSettingsStore(""),
   )
 
   const defaultCryptoStarknetService = new WalletCryptoStarknetService(
@@ -202,6 +214,7 @@ const getWallet = ({
     defaultCryptoStarknetService,
     defaultBackUpService,
     networkService,
+    defaultAnalyticsService,
   )
 
   const defaultCryptoSharedService = new WalletCryptoSharedService(

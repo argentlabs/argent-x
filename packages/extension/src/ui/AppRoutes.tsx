@@ -68,7 +68,7 @@ import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinish
 import { ShieldAccountOTPScreen } from "./features/shield/ShieldAccountOTPScreen"
 import { ShieldAccountStartScreen } from "./features/shield/ShieldAccountStartScreen"
 import { WithArgentShieldVerified } from "./features/shield/WithArgentShieldVerified"
-import { ReviewFeedbackScreen } from "./features/userReview/ReviewFeedbackScreen"
+import { ReviewFeedbackScreenContainer } from "./features/userReview/ReviewFeedbackScreenContainer"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { useOnAppRoutesAnimationComplete } from "./hooks/useOnAppRoutesAnimationComplete"
 import { routes } from "./routes"
@@ -99,8 +99,7 @@ import { NetworkSettingsScreenContainer } from "./features/settings/developerSet
 import { AccountOwnerWarningScreen } from "./features/accountTokens/warning/AccountOwnerWarningScreen"
 import { ExportPrivateKeyScreenContainer } from "./features/settings/account/ExportPrivateKeyScreenContainer"
 import { ClearLocalStorageScreen } from "./features/settings/developerSettings/clearLocalStorage/ClearLocalStorageScreen"
-import { useProvisionAnnouncement } from "./services/provision/useProvisionAnnouncement"
-import { ProvisionAnnouncement } from "./features/provision/ProvisionAnnouncement"
+import { OnboardingPrivacyScreenContainer } from "./features/onboarding/OnboardingPrivacyScreenContainer"
 import { DeploymentDataScreen } from "./features/settings/developerSettings/deploymentData/DeploymentDataScreen"
 
 interface LocationWithState extends Location {
@@ -301,7 +300,11 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.settingsEditCustomNetwork.path}
-      element={<NetworkSettingsEditScreen />}
+      element={
+        <SuspenseScreen>
+          <NetworkSettingsEditScreen />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
@@ -579,7 +582,11 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.multisigPendingTransactionConfirmations.path}
-      element={<MultisigTransactionConfirmationsScreen />}
+      element={
+        <SuspenseScreen>
+          <MultisigTransactionConfirmationsScreen />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
@@ -599,6 +606,10 @@ const fullscreenRoutes = (
     <Route
       path={routes.onboardingStart.path}
       element={<OnboardingStartScreenContainer />}
+    />
+    <Route
+      path={routes.onboardingPrivacy.path}
+      element={<OnboardingPrivacyScreenContainer />}
     />
     <Route
       path={routes.onboardingPassword.path}
@@ -623,7 +634,7 @@ const fullscreenRoutes = (
     <Route path={routes.userReview.path} element={<ReviewRatingScreen />} />
     <Route
       path={routes.userReviewFeedback.path}
-      element={<ReviewFeedbackScreen />}
+      element={<ReviewFeedbackScreenContainer />}
     />
     <Route
       path={routes.multisigCreate.path}
@@ -650,7 +661,6 @@ export const AppRoutes: FC = () => {
   const hasActions = useView(hasActionsView)
   const isRecovering = useView(isRecoveringView)
   const isClearingStorage = useView(isClearingStorageView)
-  const provisionAnnouncement = useProvisionAnnouncement()
 
   /** TODO: refactor: this should maybe be invoked by service + worker pattern */
   const showActions = useMemo(() => {
@@ -674,14 +684,6 @@ export const AppRoutes: FC = () => {
       <ResponsiveContainer>
         <ActionScreenContainer />
       </ResponsiveContainer>
-    )
-  }
-
-  if (provisionAnnouncement) {
-    return (
-      <ProvisionAnnouncement
-        account={provisionAnnouncement.provisionedAccount}
-      />
     )
   }
 

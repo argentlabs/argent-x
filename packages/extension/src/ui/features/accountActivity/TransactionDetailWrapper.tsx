@@ -1,4 +1,4 @@
-import { BarCloseButton, NavigationContainer } from "@argent/ui"
+import { BarCloseButton, NavigationContainer } from "@argent/x-ui"
 import { ComponentProps, FC, ReactNode } from "react"
 import styled from "styled-components"
 

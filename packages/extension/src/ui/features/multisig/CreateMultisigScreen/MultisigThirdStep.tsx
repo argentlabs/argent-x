@@ -1,5 +1,5 @@
-import { H1 } from "@argent/ui"
-import { icons } from "@argent/ui"
+import { H1 } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import { Button } from "@chakra-ui/react"
 
 import { ScreenLayout } from "./ScreenLayout"

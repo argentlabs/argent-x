@@ -1,4 +1,4 @@
-import { addressSchema, addressSchemaArgentBackend } from "@argent/shared"
+import { addressSchema, addressSchemaArgentBackend } from "@argent/x-shared"
 import { z } from "zod"
 import { estimatedFeesSchema } from "../transactionSimulation/fees/fees.model"
 import { reasonsSchema, severitySchema } from "../warning/schema"
@@ -13,7 +13,7 @@ const tokenSchema = z.object({
   address: z.string(),
   name: z.string(),
   symbol: z.string().optional(),
-  decimals: z.number(),
+  decimals: z.number().optional(),
   unknown: z.boolean(),
   iconUrl: z.string().optional(),
   type: z.string(),
@@ -56,6 +56,11 @@ export const propertySchema = z.union([
     type: z.literal("text"),
     label: z.string(),
     text: z.string(),
+  }),
+  z.object({
+    type: z.literal("nft"),
+    label: z.string(),
+    token: tokenSchema,
   }),
 ])
 
@@ -260,6 +265,8 @@ export const enrichedSimulateAndReviewSchema = z.object({
   enrichedFeeEstimation: estimatedFeesSchema.optional(),
   isBackendDown: z.boolean().default(false).optional(),
 })
+
+export type ReviewItem = z.infer<typeof reviewSchema>
 
 export type EnrichedSimulateAndReview = z.infer<
   typeof enrichedSimulateAndReviewSchema

@@ -1,5 +1,6 @@
-import { addressOrEmptyUndefinedSchema, addressSchema } from "@argent/shared"
+import { addressOrEmptyUndefinedSchema, addressSchema } from "@argent/x-shared"
 import { z } from "zod"
+import { constants } from "starknet"
 
 const REGEX_HEXSTRING = /^0x[a-f0-9]+$/i
 
@@ -7,18 +8,39 @@ export const baseNetworkSchema = z.object({
   id: z.string().min(2).max(31),
 })
 
-export const networkStatusSchema = z.enum(["red", "amber", "green", "unknown"])
+export const colorStatusSchema = z.enum(["red", "amber", "green", "unknown"])
+
+export const mainnetChainIdSchema = z
+  .string()
+  .transform((t) => t.toUpperCase())
+  .pipe(
+    z.enum([
+      constants.NetworkName.SN_MAIN,
+      constants.StarknetChainId.SN_MAIN.toUpperCase(),
+    ]),
+  )
+
+export const chainIdSchema = z
+  .string()
+  .min(2, "ChainId must be at least 2 characters")
+  .max(31, "ChainId cannot be longer than 31 characters") // max 31 characters as required by starknet short strings
+  .regex(/^[a-zA-Z0-9_]+$/, {
+    message:
+      "chain id must be hexadecimal string, uppercase alphanumeric or underscore, like 'SN_ABCXYZ'",
+  })
+
+export const notMainnetChainIdSchema = chainIdSchema.refine(
+  (value) => {
+    return !mainnetChainIdSchema.safeParse(value).success
+  },
+  {
+    message: "Chain ID is reserved",
+  },
+)
 
 export const networkSchema = baseNetworkSchema.extend({
   name: z.string().min(2).max(128),
-  chainId: z
-    .string()
-    .min(2, "ChainId must be at least 2 characters")
-    .max(31, "ChainId cannot be longer than 31 characters") // max 31 characters as required by starknet short strings
-    .regex(/^[a-zA-Z0-9_]+$/, {
-      message:
-        "chain id must be hexadecimal string, uppercase alphanumeric or underscore, like 'SN_GOERLI'",
-    }),
+  chainId: chainIdSchema,
   rpcUrl: z.string().url("RPC url must be a valid URL"),
   possibleFeeTokenAddresses: z.array(addressSchema).nonempty(), // z.array(addressSchema).min(1) but with better type
   accountImplementation: z.optional(
@@ -85,7 +107,11 @@ export const networkSchema = baseNetworkSchema.extend({
   readonly: z.optional(z.boolean()),
 })
 
+export const notMainnetChainIdNetworkSchema = networkSchema.extend({
+  chainId: notMainnetChainIdSchema,
+})
+
 export const networkWithStatusSchema = z.object({
   id: z.string(),
-  status: networkStatusSchema,
+  status: colorStatusSchema,
 })

@@ -1,4 +1,4 @@
-import { B3, icons } from "@argent/ui"
+import { B3, icons } from "@argent/x-ui"
 import { Center, Flex, Text } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
 

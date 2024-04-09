@@ -4,7 +4,7 @@ import {
   stripAddressZeroPadding,
   type Address,
   type IHttpService,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import type Emittery from "emittery"
 
 import type { IAccountService } from "../../../../shared/account/service/interface"

@@ -1,4 +1,4 @@
-import { H5, icons } from "@argent/ui"
+import { H5, icons } from "@argent/x-ui"
 import { Flex, Text } from "@chakra-ui/react"
 const { SwapIcon } = icons
 

@@ -2,8 +2,15 @@ import {
   addressSchema,
   formatTruncatedAddress,
   isStarknetDomainName,
-} from "@argent/shared"
-import { BarIconButton, H6, L2, P4, icons, typographyStyles } from "@argent/ui"
+} from "@argent/x-shared"
+import {
+  BarIconButton,
+  H6,
+  L2,
+  P4,
+  icons,
+  typographyStyles,
+} from "@argent/x-ui"
 import {
   Box,
   Circle,
@@ -28,7 +35,7 @@ import { AccountListItemUpgradeBadge } from "./AccountListItemUpgradeBadge"
 import { AccountListItemProps } from "./accountListItem.model"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useAccount } from "./accounts.state"
-import { useOnSettingsAccountNavigate } from "./useOnSettingsNavigate"
+import { useOnSettingsAccountNavigate } from "./useOnSettingsAccountNavigate"
 
 const { LinkIcon, MoreIcon } = icons
 
@@ -60,9 +67,7 @@ const AccountListRightElements: FC<
   accountAddress,
   networkId,
   deploying,
-  connectedHost,
   prettyAccountBalance,
-  connectedTooltipLabel,
   isHovering,
   hidden,
 }) => {
@@ -83,7 +88,10 @@ const AccountListRightElements: FC<
       </NetworkStatusWrapper>
     )
   }
-  if (connectedHost || prettyAccountBalance) {
+
+  if (typeof hidden === "boolean") {
+    return <Switch size={"lg"} isChecked={hidden} />
+  } else {
     return (
       <Flex alignItems="center" gap={3} data-testid="connected-dapp">
         {isHovering ? (
@@ -95,26 +103,11 @@ const AccountListRightElements: FC<
             <MoreIcon />
           </BarIconButton>
         ) : (
-          <>
-            {prettyAccountBalance && <H6>{prettyAccountBalance}</H6>}
-            {connectedHost && (
-              <Tooltip
-                label={connectedTooltipLabel || `Connected to ${connectedHost}`}
-              >
-                <Circle size={6} bg={"secondary.500"} color={"white"} p={1}>
-                  <LinkIcon />
-                </Circle>
-              </Tooltip>
-            )}
-          </>
+          <>{prettyAccountBalance && <H6>{prettyAccountBalance}</H6>}</>
         )}
       </Flex>
     )
   }
-  if (typeof hidden === "boolean") {
-    return <Switch size={"lg"} isChecked={hidden} />
-  }
-  return null
 }
 
 export const AccountListItem: FC<AccountListItemProps> = ({
@@ -263,17 +256,37 @@ export const AccountListItem: FC<AccountListItemProps> = ({
               </P4>
             </Flex>
           )}
+          {connectedHost && (
+            <Tooltip
+              label={connectedTooltipLabel || `Connected to ${connectedHost}`}
+            >
+              <Flex
+                gap={1}
+                px={1}
+                py={"1px"}
+                color={"accent.green"}
+                bg={"surface-success-default"}
+                alignSelf={"flex-start"}
+                rounded={"base"}
+                alignItems={"center"}
+                mt={0.5}
+                {...typographyStyles.L3}
+              >
+                <LinkIcon display={"inline-block"} /> Connected
+              </Flex>
+            </Tooltip>
+          )}
         </Flex>
         <Flex direction="column" {...rightElementFlexProps}>
-          {showRightElements && (
+          {(showRightElements || deploying) && (
             <AccountListRightElements
               accountAddress={accountAddress}
               accountName={accountName}
               networkId={networkId}
               isHovering={isHovering}
               prettyAccountBalance={prettyAccountBalance}
-              connectedHost={connectedHost}
               hidden={hidden}
+              deploying={deploying}
             />
           )}
           {children}

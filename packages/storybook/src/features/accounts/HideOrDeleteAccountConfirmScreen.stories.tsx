@@ -6,9 +6,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: HideOrDeleteAccountConfirmScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Delete = {

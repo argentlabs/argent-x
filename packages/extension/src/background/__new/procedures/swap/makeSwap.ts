@@ -1,4 +1,4 @@
-import { callSchema } from "@argent/shared"
+import { callSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"

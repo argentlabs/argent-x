@@ -1,4 +1,4 @@
-import { BarBackButton, H3, NavigationContainer, P3, icons } from "@argent/ui"
+import { BarBackButton, H3, NavigationContainer, P3, icons } from "@argent/x-ui"
 import { Box, Button, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { IconWrapper } from "../../../actions/transactionV2/TransactionHeader/TransactionIcon/IconWrapper"

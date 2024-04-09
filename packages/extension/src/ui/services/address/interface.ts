@@ -1,4 +1,4 @@
-import { Address, AddressOrDomain, StarknetDomainName } from "@argent/shared"
+import { Address, AddressOrDomain, StarknetDomainName } from "@argent/x-shared"
 
 export interface IClientStarknetAddressService {
   parseAddressOrDomain(

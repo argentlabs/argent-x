@@ -1,5 +1,5 @@
-import { FieldError, H1 } from "@argent/ui"
-import { icons } from "@argent/ui"
+import { FieldError, H1 } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 

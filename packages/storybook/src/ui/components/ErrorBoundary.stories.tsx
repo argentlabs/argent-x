@@ -3,9 +3,6 @@ import ErrorBoundaryFallbackWithCopyError from "@argent-x/extension/src/ui/compo
 
 export default {
   component: ErrorBoundaryFallbackWithCopyError,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const error = new BaseError({ message: "Lorem ipsum" })

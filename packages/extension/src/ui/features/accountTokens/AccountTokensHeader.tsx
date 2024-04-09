@@ -1,4 +1,4 @@
-import { B3, H2 } from "@argent/ui"
+import { B3, H2 } from "@argent/x-ui"
 import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 

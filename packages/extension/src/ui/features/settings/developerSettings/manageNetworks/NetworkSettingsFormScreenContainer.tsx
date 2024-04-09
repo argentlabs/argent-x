@@ -8,10 +8,11 @@ import { settingsStore } from "../../../../../shared/settings"
 import { defaultBlockExplorers } from "../../../../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../../../../hooks/useStorage"
 import { slugify } from "./slugify"
-import { addressSchema, isArgentNetworkId } from "@argent/shared"
+import { addressSchema, isArgentNetworkId } from "@argent/x-shared"
 import { addAddressPadding } from "starknet"
 import { NetworkSettingsFormScreen } from "./NetworkSettingsFormScreen"
 import {
+  ETH_TOKEN_ADDRESS,
   MULTICALL_CONTRACT_ADDRESS,
   TXV1_ACCOUNT_CLASS_HASH,
 } from "../../../../../shared/network/constants"
@@ -19,7 +20,9 @@ import { networkService } from "../../../../../shared/network/service"
 import { Token } from "../../../../../shared/token/__new/types/token.model"
 import { TokenSchema } from "../../../../../shared/token/__new/types/token.model"
 import { tokenService } from "../../../../services/tokens"
-import { useFeeTokenPreference } from "../../../actions/useFeeTokenPreference"
+import { useDisclosure } from "@chakra-ui/react"
+import { mainnetChainIdSchema } from "../../../../../shared/network/schema"
+import { AlertDialog } from "@argent/x-ui"
 
 type NetworkSettingsFormScreenContainerProps =
   | {
@@ -33,12 +36,12 @@ type NetworkSettingsFormScreenContainerProps =
 export const NetworkSettingsFormScreenContainer: FC<
   NetworkSettingsFormScreenContainerProps
 > = (props) => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
   const settingsBlockExplorer = defaultBlockExplorers[blockExplorerKey]
-
-  const { prefer: preferredFeeToken } = useFeeTokenPreference()
+  const [userAcceptedRisk, setUserAcceptedRisk] = useState(false)
 
   const defaultNetwork = useMemo<Network>(() => {
     if (props.mode === "add") {
@@ -51,7 +54,7 @@ export const NetworkSettingsFormScreenContainer: FC<
         accountClassHash: {
           standard: TXV1_ACCOUNT_CLASS_HASH,
         },
-        possibleFeeTokenAddresses: [preferredFeeToken], // TODO: let the user add feetokens
+        possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS], // Default to ETH. User can change this if they want
         // should we add a default for this or use undefined? For better UX, its a good idea to have a default imo - Dhruv
         multicallAddress: MULTICALL_CONTRACT_ADDRESS,
       }
@@ -79,6 +82,8 @@ export const NetworkSettingsFormScreenContainer: FC<
     resolver: zodResolver(networkSchema),
   })
 
+  const { chainId } = watch()
+
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       if (props.mode === "add" && type === "change" && name === "name") {
@@ -91,6 +96,12 @@ export const NetworkSettingsFormScreenContainer: FC<
 
   const onSubmit = async (network: Network) => {
     try {
+      if (mainnetChainIdSchema.safeParse(network.chainId).success) {
+        if (!userAcceptedRisk) {
+          onOpen()
+          return
+        }
+      }
       await networkService.add(network)
 
       const promises = network.possibleFeeTokenAddresses.map(
@@ -131,15 +142,30 @@ export const NetworkSettingsFormScreenContainer: FC<
     }
   }
 
+  const onAcceptRisk = () => {
+    setUserAcceptedRisk(true)
+    onClose()
+  }
+
   return (
-    <NetworkSettingsFormScreen
-      control={control}
-      defaultNetwork={defaultNetwork}
-      errors={errors}
-      expanded={expanded}
-      mode={props.mode}
-      onSubmit={handleSubmit(onSubmit)}
-      setExpanded={setExpanded}
-    />
+    <>
+      <AlertDialog
+        isOpen={isOpen}
+        title={"Mainnet Chain ID"}
+        message={`${chainId} is a Mainnet Chain ID. Adding such network is a potential security risk.`}
+        onCancel={onClose}
+        onDestroy={onAcceptRisk}
+        destroyTitle={`Accept risk`}
+      />
+      <NetworkSettingsFormScreen
+        control={control}
+        defaultNetwork={defaultNetwork}
+        errors={errors}
+        expanded={expanded}
+        mode={props.mode}
+        onSubmit={handleSubmit(onSubmit)}
+        setExpanded={setExpanded}
+      />
+    </>
   )
 }

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest"
 
 import { parseQuery, sendQuerySchema } from "./schema"
 import { stark } from "starknet"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 const mockTokenAddress = addressSchema.parse(stark.randomAddress())
 

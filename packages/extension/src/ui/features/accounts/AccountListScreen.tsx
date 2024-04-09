@@ -4,7 +4,7 @@ import {
   CellStack,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { isEmpty, some } from "lodash-es"
 import { FC, ReactEventHandler } from "react"

@@ -11,7 +11,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
           {
             assets: [
               { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.005 },
+              { token: "STRK", balance: 0.8 },
             ],
           },
           { assets: [{ token: "ETH", balance: 0 }] },
@@ -56,7 +56,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
           {
             assets: [
               { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.005 },
+              { token: "STRK", balance: 0.8 },
             ],
           },
         ],
@@ -104,7 +104,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
           {
             assets: [
               { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.005 },
+              { token: "STRK", balance: 0.8 },
             ],
           },
         ],

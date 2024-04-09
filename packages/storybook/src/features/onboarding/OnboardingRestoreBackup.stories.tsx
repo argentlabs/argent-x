@@ -2,12 +2,6 @@ import { OnboardingRestoreBackupScreen } from "@argent-x/extension/src/ui/featur
 
 export default {
   component: OnboardingRestoreBackupScreen,
-  parameters: {
-    layout: "fullscreen",
-    viewport: {
-      defaultViewport: "reset",
-    },
-  },
 }
 
 export const Default = {

@@ -1,12 +1,9 @@
 import { AccountAddressListItem } from "@argent-x/extension/src/ui/features/accounts/AccountAddressListItem"
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { ComponentProps } from "react"
 
 export default {
   component: AccountAddressListItem,
-  parameters: {
-    layout: "fullscreen",
-  },
   render: (props: ComponentProps<typeof AccountAddressListItem>) => (
     <CellStack>
       <AccountAddressListItem {...props}></AccountAddressListItem>

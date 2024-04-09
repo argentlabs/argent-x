@@ -1,3 +1,4 @@
+import { isArgentNetworkId } from "@argent/x-shared"
 import { ARGENT_TRANSACTION_BULK_SIMULATION_URL } from "../api/constants"
 import { fetcher } from "../api/fetcher"
 import { TransactionError } from "../errors/transaction"
@@ -6,9 +7,11 @@ import {
   IFetchTransactionSimulationBulk,
   ApiTransactionBulkSimulationResponse,
 } from "./types"
+import { argentXHeaders } from "../api/headers"
 
 export const fetchTransactionBulkSimulation = async ({
   invocations,
+  networkId,
   chainId,
   fetcher: fetcherImpl = fetcher,
 }: IFetchTransactionSimulationBulk): Promise<
@@ -19,6 +22,9 @@ export const fetchTransactionBulkSimulation = async ({
       code: "SIMULATION_DISABLED",
     })
   }
+  if (!isArgentNetworkId(networkId)) {
+    return
+  }
   try {
     const backendSimulation =
       await fetcherImpl<ApiTransactionSimulationResponseUnparsed>(
@@ -28,6 +34,7 @@ export const fetchTransactionBulkSimulation = async ({
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            ...argentXHeaders,
           },
           body: JSON.stringify({
             chainId,

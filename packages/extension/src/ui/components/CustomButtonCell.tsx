@@ -1,4 +1,4 @@
-import { Button } from "@argent/ui"
+import { Button } from "@argent/x-ui"
 import { ButtonProps } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -15,8 +15,8 @@ export const CustomButtonCell: FC<CustomButtonCellProps> = ({
   const colorScheme = transparent
     ? "transparent"
     : highlighted
-    ? "tertiary"
-    : "neutrals"
+      ? "tertiary"
+      : "neutrals"
   return (
     <Button
       gap={3}

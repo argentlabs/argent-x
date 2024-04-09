@@ -4,7 +4,7 @@ import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
 import { transactionReviewTransactionsSchema } from "../../../../shared/transactionReview/interface"
 import { enrichedSimulateAndReviewSchema } from "../../../../shared/transactionReview/schema"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 const simulateAndReviewSchema = z.object({
   feeTokenAddress: addressSchema,

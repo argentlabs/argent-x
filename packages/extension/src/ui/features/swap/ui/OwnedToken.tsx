@@ -1,10 +1,7 @@
-import { addressSchema } from "@argent/shared"
-import { TokenButton } from "@argent/ui"
+import { addressSchema, prettifyCurrencyValue } from "@argent/x-shared"
+import { TokenButton } from "@argent/x-ui"
 import { FC } from "react"
-import {
-  prettifyCurrencyValue,
-  prettifyTokenBalance,
-} from "../../../../shared/token/price"
+import { prettifyTokenBalance } from "../../../../shared/token/prettifyTokenBalance"
 import { selectedAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { getTokenIconUrl } from "../../accountTokens/TokenIcon"

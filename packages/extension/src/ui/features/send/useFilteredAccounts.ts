@@ -1,4 +1,4 @@
-import { isEqualAddress, normalizeAddressOrDomain } from "@argent/shared"
+import { isEqualAddress, normalizeAddressOrDomain } from "@argent/x-shared"
 import { useMemo } from "react"
 
 import { useAppState } from "../../app.state"

@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { Activity } from "../schema"
 
 export const isProvisionWithDeploymentActivity = (activity: Activity) => {

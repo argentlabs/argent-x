@@ -1,6 +1,6 @@
 import { FC, ReactNode } from "react"
 
-import { CopyTooltip, icons, H6, P4 } from "@argent/ui"
+import { CopyTooltip, icons, H6, P4 } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 
 const { CopyIcon } = icons

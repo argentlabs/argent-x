@@ -1,4 +1,4 @@
-import { NavigationContainerProps, SelectOptions } from "@argent/ui"
+import { NavigationContainerProps, SelectOptions } from "@argent/x-ui"
 import { isFunction } from "lodash-es"
 import { FC, useMemo } from "react"
 import { useNavigate } from "react-router-dom"

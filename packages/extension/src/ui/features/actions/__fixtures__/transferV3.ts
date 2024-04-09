@@ -1,7 +1,6 @@
 import { TransactionActionFixture } from "./types"
 
 export const transferV3: TransactionActionFixture = {
-  actionHash: "abc123",
   aggregatedData: [
     {
       token: {
@@ -16,73 +15,142 @@ export const transferV3: TransactionActionFixture = {
         type: "erc20",
       },
       approvals: [],
-      amount: BigInt("-4835920881083088"),
-      usdValue: "0",
+      amount: BigInt("-1000000000000000"),
+      usdValue: "3.438859",
       recipients: [
         {
           address:
-            "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
-          amount: BigInt("-4835920881083088"),
+            "0x624b60bb6e9fa65f5a6879c496d1c6f48e49c53e8bb7ff0218c37988b003673",
+          amount: BigInt("-1000000000000000"),
+          usdValue: "3.438859",
         },
       ],
       safe: true,
     },
   ],
   transactionReview: {
-    assessment: "warn",
-    reviews: [
+    transactions: [
       {
-        assessment: "warn",
-        assessmentDetails: {
-          contract_address:
-            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-        },
-        activity: {
-          value: {
-            token: {
-              address:
-                "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-              name: "Ether",
-              symbol: "ETH",
-              decimals: 18,
-              unknown: false,
-              type: "ERC20",
+        reviewOfTransaction: {
+          assessment: "neutral",
+          warnings: [],
+          reviews: [
+            {
+              assessment: "neutral",
+              warnings: [],
+              action: {
+                name: "ERC20_transfer",
+                properties: [
+                  {
+                    type: "amount",
+                    label: "ERC20_transfer_amount",
+                    token: {
+                      address:
+                        "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      name: "Ether",
+                      symbol: "ETH",
+                      decimals: 18,
+                      unknown: false,
+                      iconUrl:
+                        "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      type: "ERC20",
+                    },
+                    amount: "100000000000000",
+                    usd: "0.34",
+                    editable: false,
+                  },
+                  {
+                    type: "address",
+                    label: "ERC20_transfer_recipient",
+                    address:
+                      "0x00146ab475f565af0277640952c2cf4c9bb05b6932a7bb454b92746bb9715911",
+                    verified: false,
+                  },
+                ],
+                defaultProperties: [
+                  {
+                    type: "token_address",
+                    label: "default_contract",
+                    token: {
+                      address:
+                        "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      name: "Ether",
+                      symbol: "ETH",
+                      decimals: 18,
+                      unknown: false,
+                      iconUrl:
+                        "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      type: "ERC20",
+                    },
+                  },
+                  {
+                    type: "calldata",
+                    label: "default_call",
+                    entrypoint: "transfer",
+                    calldata: [
+                      "0x00146ab475f565af0277640952c2cf4c9bb05b6932a7bb454b92746bb9715911",
+                      "0x00000000000000000000000000000000000000000000000000005af3107a4000",
+                      "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    ],
+                  },
+                ],
+              },
             },
-            amount: "4835920881083088",
-            usd: 8,
-            slippage: "equal",
-          },
-          recipient:
-            "2377291062867794509008003741341082264125447210642161352160499804006396049914",
-          type: "transfer",
+          ],
         },
-        assessmentReason: "contract_is_not_verified",
+        simulation: {
+          approvals: [],
+          transfers: [
+            {
+              tokenAddress:
+                "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              from: "0x325c46cdbf81d35020f95a82a4dc4d043599f58cfb979b03e2efffdeab20477",
+              to: "0x146ab475f565af0277640952c2cf4c9bb05b6932a7bb454b92746bb9715911",
+              value: "100000000000000",
+              details: {
+                address:
+                  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                name: "Ether",
+                symbol: "ETH",
+                decimals: 18,
+                unknown: false,
+                iconUrl:
+                  "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                type: "ERC20",
+              },
+            },
+          ],
+          summary: [
+            {
+              type: "transfer",
+              label: "simulation_summary_send",
+              value: "100000000000000",
+              usdValue: "0.34",
+              token: {
+                address:
+                  "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                name: "Ether",
+                symbol: "ETH",
+                decimals: 18,
+                unknown: false,
+                iconUrl:
+                  "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                type: "ERC20",
+              },
+              sent: true,
+            },
+          ],
+          calculatedNonce: "0x1",
+          feeEstimation: {
+            overallFee: 2788000019516,
+            gasPrice: 1000000007,
+            gasUsage: 2788,
+            unit: "WEI",
+            maxFee: 8363998255470,
+          },
+        },
       },
     ],
-    reason: "contract_is_not_verified",
-    targetedDapp: {
-      name: "JediSwap",
-      description:
-        "A community-led fully permissionless and composable AMM on Starknet.",
-      logoUrl: "https://www.dappland.com/dapps/jediswap/dapp-icon-jediswap.png",
-      links: [
-        {
-          name: "website",
-          url: "https://jediswap.xyz",
-          position: 1,
-        },
-        {
-          name: "twitter",
-          url: "https://twitter.com/jediswap",
-          position: 2,
-        },
-        {
-          name: "discord",
-          url: "https://discord.gg/jediswap",
-          position: 3,
-        },
-      ],
-    },
   },
   transactions: [
     {
@@ -94,36 +162,6 @@ export const transferV3: TransactionActionFixture = {
       contractAddress:
         "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
       entrypoint: "transfer",
-    },
-  ],
-  transactionSimulation: [
-    {
-      approvals: [],
-      transfers: [
-        {
-          tokenAddress:
-            "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-          from: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-          to: "0x5417fc252d9b7b6ea311485a9e946cc814e3aa4d00f740f7e5f6b11ce0db9fa",
-          value: "4835920881083088",
-          details: {
-            decimals: "18",
-            symbol: "ETH",
-            name: "Ether",
-            tokenType: "erc20",
-            usdValue: "0.014761",
-            tokenURI: "",
-          },
-        },
-      ],
-      feeEstimation: {
-        overallFee: 374400003744,
-        gasPrice: 100000001,
-        gasUsage: 3744,
-        unit: "FRI",
-        maxAmount: 7018,
-        maxPricePerUnit: 19999989162,
-      },
     },
   ],
 }

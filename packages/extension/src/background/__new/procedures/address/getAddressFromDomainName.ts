@@ -1,4 +1,4 @@
-import { addressSchema, starknetDomainNameSchema } from "@argent/shared"
+import { addressSchema, starknetDomainNameSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"

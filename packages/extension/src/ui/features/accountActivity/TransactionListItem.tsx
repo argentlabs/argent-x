@@ -1,4 +1,4 @@
-import { H6, P4 } from "@argent/ui"
+import { H6, P4 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode, useMemo } from "react"
 
@@ -58,6 +58,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
   const isDeployContract = isDeployContractTransaction(transactionTransformed)
   const isProvision = isProvisionTransaction(transactionTransformed)
+
   const subtitle = useMemo(() => {
     if (isTransfer || isNFTTransfer || isProvision) {
       const titleShowsTo =
@@ -138,8 +139,12 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
 
     return (
       <Flex alignItems="center">
-        {subtitle}
-        {<> ∙ </>}
+        {subtitle && (
+          <>
+            {subtitle}
+            {<P4 color="neutrals.300"> ∙ </P4>}
+          </>
+        )}
         <P4
           color="error.500"
           fontWeight="semibold"

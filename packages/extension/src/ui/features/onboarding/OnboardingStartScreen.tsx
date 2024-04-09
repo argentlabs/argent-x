@@ -1,4 +1,4 @@
-import { P4, icons } from "@argent/ui"
+import { P4, icons } from "@argent/x-ui"
 import { Circle, Flex, Link, SimpleGrid } from "@chakra-ui/react"
 import { FC, MouseEventHandler } from "react"
 
@@ -24,7 +24,7 @@ export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
 }) => {
   return (
     <OnboardingScreen
-      length={3}
+      length={4}
       currentIndex={0}
       title="Welcome to Argent X"
       subtitle="Enjoy the security of Ethereum with the scale of Starknet"
@@ -33,7 +33,7 @@ export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
         alignItems={"center"}
         px={4}
         py={3}
-        bg={"surface.elevated"}
+        bg={"surface-elevated"}
         rounded={"lg"}
         w={"full"}
       >

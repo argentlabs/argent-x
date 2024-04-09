@@ -1,4 +1,4 @@
-import { Button, icons } from "@argent/ui"
+import { Button, icons } from "@argent/x-ui"
 import {
   Input,
   InputGroup,

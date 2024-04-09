@@ -13,9 +13,6 @@ const activeAt5d = activeAtNow + 24 * 60 * 60 * 5
 export default {
   component: EscapeSigner,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Signer5Days = {

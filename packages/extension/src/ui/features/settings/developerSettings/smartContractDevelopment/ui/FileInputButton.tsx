@@ -1,4 +1,4 @@
-import { Button, icons } from "@argent/ui"
+import { Button, icons } from "@argent/x-ui"
 import { ButtonProps, Spinner } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 

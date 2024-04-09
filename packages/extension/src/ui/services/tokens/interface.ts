@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 import { TokenView } from "../../features/accountTokens/tokens.service"
 import { RawArgs } from "starknet"

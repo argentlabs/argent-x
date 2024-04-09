@@ -1,4 +1,4 @@
-import { AccordionIcon, P4, icons } from "@argent/ui"
+import { AccordionIcon, P4, icons } from "@argent/x-ui"
 import {
   Accordion,
   AccordionButton,
@@ -37,9 +37,7 @@ export const TransactionFailureAccordion: FC<
             {title || "Transaction failure predicted"}
           </Flex>
           <Flex ml={1} gap={3}>
-            <CopyErrorIcon
-              parsedFeeEstimationError={parsedFeeEstimationError}
-            />
+            <CopyErrorIcon copyValue={parsedFeeEstimationError.message} />
             <AccordionIcon />
           </Flex>
         </AccordionButton>
@@ -49,7 +47,7 @@ export const TransactionFailureAccordion: FC<
             overflow: "auto",
           }}
         >
-          <P4 color="errorText" whiteSpace="pre-wrap">
+          <P4 color="text-danger" whiteSpace="pre-wrap">
             {message}
           </P4>
         </AccordionPanel>

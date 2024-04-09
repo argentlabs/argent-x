@@ -1,5 +1,5 @@
-import { Address, addressSchema, isEqualAddress } from "@argent/shared"
-import { useToast } from "@argent/ui"
+import { Address, addressSchema, isEqualAddress } from "@argent/x-shared"
+import { useToast } from "@argent/x-ui"
 import { debounce } from "lodash-es"
 import { FC, Suspense, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"

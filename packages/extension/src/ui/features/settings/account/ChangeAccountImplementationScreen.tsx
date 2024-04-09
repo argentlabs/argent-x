@@ -5,7 +5,7 @@ import {
   NavigationContainer,
   P4,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Box } from "@chakra-ui/react"
 import { filter, partition } from "lodash-es"
 import { FC } from "react"

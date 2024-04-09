@@ -1,18 +1,17 @@
-import { Button, CellStack, L2, icons } from "@argent/ui"
+import { Button, CellStack, L2, icons } from "@argent/x-ui"
 import { Box, Flex, IconButton, chakra, keyframes } from "@chakra-ui/react"
 import { useCallback, useMemo, useState } from "react"
 
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 import { SwapInputError, useSwapInfo } from "./hooks/useSwapInfo"
-import { bigDecimal, ensureDecimals } from "@argent/shared"
+import { bigDecimal, ensureDecimals } from "@argent/x-shared"
 import { Field, useSwapState } from "./state/fields"
 import { useSwapActionHandlers } from "./hooks/useSwapActionHandler"
 import { Token } from "../../../shared/token/__new/types/token.model"
 import { maxAmountSpendFromTokenBalance } from "./utils"
 import { SwapTradeLoading } from "./ui/SwapTradeLoading"
 import { useSwapCallback } from "./hooks/useSwapCallback"
-import { analytics } from "../../services/analytics"
 import { useAppState } from "../../app.state"
 import { useUserState } from "./state/user"
 import { SwapQuoteRefresh } from "./ui/SwapQuoteRefresh"
@@ -79,7 +78,7 @@ const Swap = () => {
   const { switcherNetworkId: networkId } = useAppState()
 
   const [rotate, setRotate] = useState(false)
-  const [swapUnavailable, setSwapUnavailable] = useState<boolean>(false)
+  const [swapUnavailable, setSwapUnavailable] = useState(false)
 
   const payToken = tokens[Field.PAY]
   const receiveToken = tokens[Field.RECEIVE]
@@ -133,7 +132,7 @@ const Swap = () => {
   const hasZeroBalance = !payTokenBalance || payTokenBalance.balance === 0n
 
   const atMaxAmountInput = Boolean(
-    maxAmountInput && payAmount && payAmount === maxAmountInput,
+    maxAmountInput !== undefined && payAmount && payAmount === maxAmountInput,
   )
 
   const handleInputSelect = useCallback(
@@ -145,7 +144,7 @@ const Swap = () => {
   )
 
   const handleMaxInput = useCallback(() => {
-    maxAmountInput &&
+    maxAmountInput !== undefined &&
       payToken?.decimals &&
       onUserInput(
         Field.PAY,
@@ -182,10 +181,6 @@ const Swap = () => {
 
   const handleSwap = useCallback(() => {
     if (swapCallback) {
-      void analytics.track("swapInitiated", {
-        networkId,
-        pair: payToken?.symbol + "-" + receiveToken?.symbol,
-      })
       return swapCallback()
         .then(() => {
           onUserInput(Field.PAY, "")

@@ -1,5 +1,5 @@
 import { ConfirmScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ConfirmScreen"
-import { P4 } from "@argent/ui"
+import { P4 } from "@argent/x-ui"
 import { Center } from "@chakra-ui/layout"
 import { ComponentProps } from "react"
 
@@ -8,9 +8,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: ConfirmScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 const footer = (

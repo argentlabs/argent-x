@@ -4,7 +4,7 @@ import {
   H6,
   NavigationContainer,
   P4,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center, Flex, Spinner } from "@chakra-ui/react"
 import { FC, ReactEventHandler } from "react"
 

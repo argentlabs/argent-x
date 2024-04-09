@@ -1,4 +1,4 @@
-import { Button, L2, icons, typographyStyles } from "@argent/ui"
+import { Button, L2, icons, typographyStyles } from "@argent/x-ui"
 import { Flex, InputProps, Spinner, chakra } from "@chakra-ui/react"
 import { ReactNode, forwardRef, useCallback, useMemo, useState } from "react"
 import Measure, { ContentRect } from "react-measure"
@@ -86,7 +86,7 @@ const TokenAmountInput = forwardRef<HTMLInputElement, TokenAmountInputProps>(
                   w={"full"}
                   bg={"transparent"}
                   placeholder={"0"}
-                  color={isInvalid ? "error.500" : "text.primary"}
+                  color={isInvalid ? "error.500" : "text-primary"}
                   _placeholder={{ color: "neutrals.500" }}
                   _focus={{ outline: "none" }}
                   value={value}

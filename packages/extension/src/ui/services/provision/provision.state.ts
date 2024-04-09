@@ -18,21 +18,3 @@ export const provisionBannerKeyValueStore = new KeyValueStorage<{
 export const provisionBannerStore = adaptKeyValue(provisionBannerKeyValueStore)
 
 export const provisionBannerAtom = atomFromStore(provisionBannerStore)
-
-export const provisionAnnouncementShownKeyValueStore = new KeyValueStorage<{
-  [accountAddress: string]: number
-}>(
-  {},
-  {
-    namespace: "core:provisionAnnouncementShown",
-    areaName: "local",
-  },
-)
-
-export const provisionAnnouncementStore = adaptKeyValue(
-  provisionAnnouncementShownKeyValueStore,
-)
-
-export const provisionAnnouncementShownForAccountAtom = atomFromStore(
-  provisionAnnouncementStore,
-)

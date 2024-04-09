@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountMessagingService } from "../../services/accountMessaging"
-import { encodeBase58 } from "@argent/shared"
+import { encodeBase58 } from "@argent/x-shared"
 
 export const usePublicKey = (account?: BaseWalletAccount) => {
   const [pubKey, setPubKey] = useState<string>()

@@ -1,7 +1,7 @@
 import { feeTokenBalancesView } from "./../../views/tokenBalances"
 import { Account } from "../accounts/Account"
 import { useView } from "../../views/implementation/react"
-import { TokenWithBalance } from "@argent/shared"
+import { TokenWithBalance } from "@argent/x-shared"
 import {
   classHashSupportsTxV3,
   feeTokenNeedsTxV3Support,

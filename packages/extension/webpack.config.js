@@ -85,7 +85,7 @@ module.exports = {
         test: /\.tsx?$/,
         loader: "esbuild-loader",
         options: {
-          pure: isProd ? ["console.log"] : [],
+          pure: isProd ? ["console.log", "console.warn"] : [],
           target: "es2020",
         },
       },

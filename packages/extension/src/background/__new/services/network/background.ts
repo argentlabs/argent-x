@@ -1,10 +1,10 @@
 import { uniqWith } from "lodash-es"
 
-import { Network, NetworkStatus } from "../../../../shared/network"
+import { Network, ColorStatus } from "../../../../shared/network"
 import { INetworkRepo, networksEqual } from "../../../../shared/network/store"
 import { IBackgroundNetworkService } from "./interface"
 import { INetworkWithStatusRepo } from "../../../../shared/network/statusStore"
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 import urlJoin from "url-join"
 import { argentApiNetworkForNetwork } from "../../../../shared/api/headers"
 import { ARGENT_NETWORK_STATUS } from "../../../../shared/api/constants"
@@ -39,14 +39,14 @@ export default class BackgroundNetworkService
         if (!backendNetworkId) {
           return {
             id: network.id,
-            status: "unknown" as NetworkStatus,
+            status: "unknown" as ColorStatus,
           }
         }
 
         const url = urlJoin(ARGENT_NETWORK_STATUS, backendNetworkId)
         try {
           const response = await this.httpService.get<{
-            state: NetworkStatus
+            state: ColorStatus
           }>(url)
 
           return {
@@ -56,7 +56,7 @@ export default class BackgroundNetworkService
         } catch (error) {
           return {
             id: network.id,
-            status: "unknown" as NetworkStatus,
+            status: "unknown" as ColorStatus,
           }
         }
       }),

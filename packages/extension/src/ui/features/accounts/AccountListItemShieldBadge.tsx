@@ -1,4 +1,4 @@
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 import { Circle, Tooltip } from "@chakra-ui/react"
 import { FC } from "react"
 

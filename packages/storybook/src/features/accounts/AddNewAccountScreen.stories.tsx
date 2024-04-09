@@ -3,7 +3,7 @@ import {
   AccountType,
   AccountTypeId,
 } from "@argent-x/extension/src/ui/features/accounts/AddNewAccountScreen"
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 
 import { decorators } from "../../decorators/routerDecorators"
 
@@ -31,9 +31,6 @@ const isAccountTypeLoading = () => false
 export default {
   component: AddNewAccountScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Default = {

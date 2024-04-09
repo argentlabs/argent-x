@@ -8,6 +8,7 @@ import { Locked } from "../../../wallet/session/interface"
 import type { WalletSessionService } from "../../../wallet/session/session.service"
 import type { Events, IBackgroundUIService } from "./interface"
 import { Opened } from "./interface"
+import { analyticsService } from "../../../../shared/analytics"
 
 type MinimalBrowser = DeepPick<
   typeof chrome,

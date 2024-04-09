@@ -1,4 +1,4 @@
-import { L1, P4, icons } from "@argent/ui"
+import { P4, icons } from "@argent/x-ui"
 import { Box, Flex, Text, Tooltip, useDisclosure } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import {
@@ -8,7 +8,7 @@ import {
 import { Token } from "../../../../shared/token/__new/types/token.model"
 import { useUserState } from "../state/user"
 import { getProvidersFromTradeRoute } from "../utils"
-import { prettifyTokenAmount } from "../../../../shared/token/price"
+import { prettifyTokenAmount } from "@argent/x-shared"
 import { SlippageModal } from "./SlippageModal"
 import { Trade } from "../../../../shared/swap/model/trade.model"
 
@@ -55,6 +55,11 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
     [trade, inverted],
   )
 
+  const totalFeePercentage = useMemo(
+    () => trade.totalFeePercentage * 100,
+    [trade],
+  )
+
   return (
     <>
       <Flex
@@ -71,18 +76,12 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
       >
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Min received (incl. fees) </P4>
-            <Tooltip label="The minimum amount of tokens you're guaranteed to receive given the slippage percentage">
+            <P4 color="neutrals.300">Rate</P4>
+            <Tooltip label="AVNU rate Includes swap fee">
               <Text color="neutrals.300" cursor="pointer">
                 <InfoIcon />
               </Text>
             </Tooltip>
-          </Flex>
-          <P4 fontWeight="bold">{prettifiedMinReceived}</P4>
-        </Flex>
-        <Flex justifyContent="space-between">
-          <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Rate</P4>
           </Flex>
           <P4
             fontWeight="bold"
@@ -92,6 +91,28 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
           >
             {executionPrice}
           </P4>
+        </Flex>
+        <Flex justifyContent="space-between">
+          <Flex alignItems="center" gap="1">
+            <P4 color="neutrals.300">Swap fee</P4>
+            <Tooltip label="Service fee of AVNU and Argent">
+              <Text color="neutrals.300" cursor="pointer">
+                <InfoIcon />
+              </Text>
+            </Tooltip>
+          </Flex>
+          <P4 fontWeight="500">{totalFeePercentage}%</P4>
+        </Flex>
+        <Flex justifyContent="space-between">
+          <Flex alignItems="center" gap="1">
+            <P4 color="neutrals.300">Min received (incl. fees) </P4>
+            <Tooltip label="The minimum amount of tokens you're guaranteed to receive given the slippage percentage">
+              <Text color="neutrals.300" cursor="pointer">
+                <InfoIcon />
+              </Text>
+            </Tooltip>
+          </Flex>
+          <P4 fontWeight="bold">{prettifiedMinReceived}</P4>
         </Flex>
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
@@ -128,17 +149,5 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
         onClose={onCloseSlippageModal}
       />
     </>
-  )
-}
-
-const HighPriceImpactLabel = () => {
-  return (
-    <Flex direction="column" gap="4px" width="180px">
-      <L1>High Price Impact</L1>
-      <P4 color="neutrals.100">
-        This trade will result in you receiving significantly less than the
-        amount being sold
-      </P4>
-    </Flex>
   )
 }

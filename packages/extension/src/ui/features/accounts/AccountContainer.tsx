@@ -2,11 +2,11 @@ import {
   L1,
   NavigationBarSkeleton,
   ScrollContainer,
-  Tab,
+  TabBarTab,
   TabBar,
   icons,
   useScrollRestoration,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
 import { ComponentProps, FC, PropsWithChildren, Suspense, useMemo } from "react"
 import { NavLink } from "react-router-dom"
@@ -81,8 +81,8 @@ export const AccountContainer: FC<AccountContainerProps> = (props) => {
 
 export interface RootTabsProps extends PropsWithChildren {
   scrollKey: string
-  activityBadgeLabel: ComponentProps<typeof Tab>["badgeLabel"]
-  discoverBadgeLabel?: ComponentProps<typeof Tab>["badgeLabel"]
+  activityBadgeLabel: ComponentProps<typeof TabBarTab>["badgeLabel"]
+  discoverBadgeLabel?: ComponentProps<typeof TabBarTab>["badgeLabel"]
   showMultisigBanner?: boolean
   showActivateBanner: boolean
   showTabs: boolean
@@ -121,28 +121,28 @@ export const RootTabs: FC<RootTabsProps> = ({
         <>
           <LegalAgreementsBannerContainer />
           <TabBar>
-            <Tab
+            <TabBarTab
               as={NavLink}
               to={routes.accountTokens()}
               replace
               icon={<WalletIcon />}
               label="Tokens"
             />
-            <Tab
+            <TabBarTab
               as={NavLink}
               to={routes.accountCollections()}
               replace
               icon={<NftIcon />}
               label="NFTs"
             />
-            <Tab
+            <TabBarTab
               as={NavLink}
               to={routes.swap()}
               replace
               icon={<SwapIcon />}
               label="Swap"
             />
-            <Tab
+            <TabBarTab
               as={NavLink}
               to={routes.accountActivity()}
               replace
@@ -151,7 +151,7 @@ export const RootTabs: FC<RootTabsProps> = ({
               badgeDescription={"Pending transactions"}
               label="Activity"
             />
-            <Tab
+            <TabBarTab
               as={NavLink}
               to={routes.accountDiscover()}
               replace

@@ -1,4 +1,4 @@
-import { useToast } from "@argent/ui"
+import { useToast } from "@argent/x-ui"
 import { FC, useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { constants } from "starknet"
@@ -9,7 +9,7 @@ import { routes } from "../../routes"
 import { ShieldBaseActionScreen } from "./ShieldBaseActionScreen"
 import { usePendingChangeGuardian } from "./usePendingChangingGuardian"
 import { useRouteAccount } from "./useRouteAccount"
-import { useShieldOnboardingTracking } from "./useShieldTracking"
+
 import { argentAccountService } from "../../services/argentAccount"
 import { accountMessagingService } from "../../services/accountMessaging"
 
@@ -19,19 +19,14 @@ export const ShieldAccountActionScreen: FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const pendingChangeGuardian = usePendingChangeGuardian(account)
   const toast = useToast()
-  const hasGuardian = Boolean(account?.guardian)
-
-  const { trackSuccess } = useShieldOnboardingTracking({
-    stepId: hasGuardian ? "removeArgentShield" : "addArgentShield",
-  })
 
   useEffect(() => {
     if (pendingChangeGuardian && account) {
       /** a guardian transaction for this account is now pending - move to finish */
-      void trackSuccess()
+
       navigate(routes.shieldAccountFinish(account?.address), { replace: true })
     }
-  }, [account, navigate, pendingChangeGuardian, trackSuccess])
+  }, [account, navigate, pendingChangeGuardian])
 
   const onAddOrRemove = useCallback(async () => {
     if (!account) {

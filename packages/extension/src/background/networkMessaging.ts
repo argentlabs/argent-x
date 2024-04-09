@@ -4,35 +4,65 @@ import { NetworkMessage } from "../shared/messages/NetworkMessage"
 import { networkService } from "../shared/network/service"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
+import { networkSchema } from "../shared/network"
 
 export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
   msg,
   origin,
-  background: { actionService },
+  background: { actionService, wallet },
   respond,
 }) => {
   switch (msg.type) {
-    case "REQUEST_ADD_CUSTOM_NETWORK": {
-      const exists = await networkService.getByChainId(msg.data.chainId)
-
-      if (exists) {
+    case "REQUEST_SELECTED_NETWORK": {
+      const account = await wallet.getSelectedAccount()
+      if (!account) {
         return respond({
-          type: "REQUEST_ADD_CUSTOM_NETWORK_REJ",
+          type: "REQUEST_SELECTED_NETWORK_REJ",
           data: {
-            error: `Network with chainId ${msg.data.chainId} already exists`,
+            error: "No account selected",
           },
         })
       }
 
-      const { meta } = await actionService.add({
-        type: "REQUEST_ADD_CUSTOM_NETWORK",
-        payload: msg.data,
+      return respond({
+        type: "REQUEST_SELECTED_NETWORK_RES",
+        data: {
+          network: account.network,
+        },
       })
+    }
+
+    case "REQUEST_ADD_CUSTOM_NETWORK": {
+      const parsedCustomNetwork = networkSchema.safeParse(msg.data)
+      if (!parsedCustomNetwork.success) {
+        return respond({
+          type: "REQUEST_ADD_CUSTOM_NETWORK_REJ",
+          data: {
+            error: parsedCustomNetwork.error.message,
+          },
+        })
+      }
+
+      const network = await networkService.getByChainId(
+        parsedCustomNetwork.data.chainId,
+      )
+
+      const exists = Boolean(network)
+      let actionHash: string | undefined
+      if (!exists) {
+        const { meta } = await actionService.add({
+          type: "REQUEST_ADD_CUSTOM_NETWORK",
+          payload: parsedCustomNetwork.data,
+        })
+
+        actionHash = meta.hash
+      }
 
       return respond({
         type: "REQUEST_ADD_CUSTOM_NETWORK_RES",
         data: {
-          actionHash: meta.hash,
+          exists,
+          actionHash,
         },
       })
     }
@@ -45,29 +75,28 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
         isHexChainId ? shortString.decodeShortString(chainId) : chainId,
       )
 
-      if (!network) {
-        return respond({
-          type: "REQUEST_SWITCH_CUSTOM_NETWORK_REJ",
-          data: {
-            error: `Network with chainId ${chainId} does not exist. Please add the network with wallet_addStarknetChain request`,
+      const exists = Boolean(network)
+      let actionHash: string | undefined
+      if (exists) {
+        // Switch only if network exists
+        const { meta } = await actionService.add(
+          {
+            type: "REQUEST_SWITCH_CUSTOM_NETWORK",
+            payload: network,
           },
-        })
-      }
+          {
+            origin,
+          },
+        )
 
-      const { meta } = await actionService.add(
-        {
-          type: "REQUEST_SWITCH_CUSTOM_NETWORK",
-          payload: network,
-        },
-        {
-          origin,
-        },
-      )
+        actionHash = meta.hash
+      }
 
       return respond({
         type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES",
         data: {
-          actionHash: meta.hash,
+          actionHash,
+          exists,
         },
       })
     }

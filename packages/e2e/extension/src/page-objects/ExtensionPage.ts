@@ -80,6 +80,7 @@ export default class ExtensionPage {
 
   async recoverWallet(seed: string, password?: string) {
     await this.wallet.restoreExistingWallet.click()
+    await this.wallet.agreeLoc.click()
     await this.setClipBoardContent(seed)
     await this.pasteSeed()
     await this.navigation.continueLocator.click()

@@ -1,4 +1,4 @@
-import { P4 } from "@argent/ui"
+import { P4 } from "@argent/x-ui"
 import { ChakraComponent, HStack } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
 

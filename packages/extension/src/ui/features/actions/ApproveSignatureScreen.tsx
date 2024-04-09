@@ -1,4 +1,4 @@
-import { H3, P3, PreBoxJsonStringify } from "@argent/ui"
+import { H3, P3, PreBoxJsonStringify } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 import { typedData } from "starknet"

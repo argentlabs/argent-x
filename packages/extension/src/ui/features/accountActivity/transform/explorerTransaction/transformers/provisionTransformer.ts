@@ -1,7 +1,7 @@
 import { IExplorerTransactionTransformer } from "./type"
 import { ProvisionTransaction } from "../../type"
 import { getParameter } from "../getParameter"
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { STRK_TOKEN_ADDRESS } from "../../../../../../shared/network/constants"
 import { getTokenForContractAddress } from "../../getTokenForContractAddress"
 import { PROVISION_CONTRACT_ADDRESSES } from "../../../../../../shared/api/constants"

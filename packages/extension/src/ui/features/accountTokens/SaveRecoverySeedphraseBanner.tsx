@@ -1,4 +1,4 @@
-import { H6, P4, icons } from "@argent/ui"
+import { H6, P4, icons } from "@argent/x-ui"
 import { Button, Center, Circle } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
@@ -17,17 +17,17 @@ export const SaveRecoverySeedphraseBanner: FC = () => {
       py={6}
       px={4}
       flexDirection={"column"}
-      backgroundColor="accentExtraDark"
+      backgroundColor="surface-info-default"
       justifyContent={"center"}
       alignContent={"center"}
       textAlign="center"
       borderRadius="2xl"
     >
-      <Circle bg={"accentLight"} color={"neutrals.900"} size={12} mb={4}>
+      <Circle bg={"secondary.sky.blue"} color={"neutrals.900"} size={12} mb={4}>
         <PasswordIcon fontSize={"3xl"} />
       </Circle>
       <H6>Save your recovery phrase</H6>
-      <P4 color="white50" mb={6} fontWeight="semibold">
+      <P4 color="white.50" mb={6} fontWeight="semibold">
         It is very important you save this as it’s the only way you can recover
         your account
       </P4>

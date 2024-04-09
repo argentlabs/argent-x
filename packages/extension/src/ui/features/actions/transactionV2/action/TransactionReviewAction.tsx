@@ -6,10 +6,10 @@ import {
   Flex,
 } from "@chakra-ui/react"
 import { FC } from "react"
-import { icons } from "@argent/ui"
+import { icons } from "@argent/x-ui"
 
 const { AlertFillIcon } = icons
-import { AccordionIconDropdown, P4 } from "@argent/ui"
+import { AccordionIconDropdown, P4 } from "@argent/x-ui"
 import type {
   Action,
   Assessment,
@@ -40,7 +40,10 @@ export const TransactionReviewAction: FC<TransactionReviewActionProps> = ({
       defaultIndex={defaultIndex}
     >
       <AccordionItem>
-        <AccordionButton justifyContent="space-between">
+        <AccordionButton
+          justifyContent="space-between"
+          data-testid={`transaction-review-action-${name}`}
+        >
           <Flex alignItems={"center"}>
             <P4 fontWeight="semibold" mr={1}>
               <TransactionReviewLabel label={name} />

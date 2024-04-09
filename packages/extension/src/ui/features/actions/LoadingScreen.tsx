@@ -35,7 +35,7 @@ export const LoadingScreen: FC<LoadingScreenProps> = ({
         max={1}
         value={progress}
         trackColor={"transparent"}
-        color={"text.primary"}
+        color={"text-primary"}
         capIsRound
       />
       <Greetings greetings={loadingTexts} />

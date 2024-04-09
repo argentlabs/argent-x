@@ -1,5 +1,5 @@
 import urlJoin from "url-join"
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 import { INetworkService } from "../../network/service/interface"
 import { ITokenService } from "../../token/__new/service/interface"
 import { urlWithQuery } from "../../utils/url"

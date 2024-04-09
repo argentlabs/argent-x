@@ -3,7 +3,7 @@ import {
   isEqualAddress,
   isEqualStarknetDomainName,
   isStarknetDomainName,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { useMemo } from "react"
 import { useAppState } from "../../app.state"
 import { visibleAccountsOnNetworkFamily } from "../../views/account"

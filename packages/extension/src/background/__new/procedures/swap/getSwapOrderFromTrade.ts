@@ -2,7 +2,7 @@ import { z } from "zod"
 import { extensionOnlyProcedure } from "../permissions"
 import { SwapOrderResponseSchema } from "../../../../shared/swap/model/order.model"
 import { TradeSchema } from "../../../../shared/swap/model/trade.model"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 const SwapOrderFromTradeSchema = z.object({
   trade: TradeSchema,

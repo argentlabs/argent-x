@@ -8,7 +8,7 @@ import {
 import { DeclareContract, DeployContract } from "../udc/schema"
 import { TransactionError } from "../errors/transaction"
 import { EstimatedFees } from "../transactionSimulation/fees/fees.model"
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 export interface ExecuteTransactionRequest {
   transactions: Call | Call[]

@@ -1,4 +1,4 @@
-import { Button, H2 } from "@argent/ui"
+import { Button, H2 } from "@argent/x-ui"
 import { truncateAddress } from "../services/address.service"
 import { DAITokenAddress, ETHTokenAddress } from "../services/token.service"
 import { addToken } from "../services/wallet.service"

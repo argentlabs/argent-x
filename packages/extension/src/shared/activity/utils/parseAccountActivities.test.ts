@@ -1,4 +1,4 @@
-import type { Address } from "@argent/shared"
+import type { Address } from "@argent/x-shared"
 import { describe, expect, test } from "vitest"
 
 import activities from "../__fixtures__/activities.json"

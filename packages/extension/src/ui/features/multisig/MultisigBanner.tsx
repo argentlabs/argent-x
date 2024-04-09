@@ -1,5 +1,5 @@
-import { AlertButton } from "@argent/ui"
-import { icons } from "@argent/ui"
+import { AlertButton } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import { Spinner } from "@chakra-ui/react"
 import { FC, useCallback, useMemo } from "react"
 

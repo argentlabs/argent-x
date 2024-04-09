@@ -2,12 +2,6 @@ import { OnboardingPasswordScreen } from "@argent-x/extension/src/ui/features/on
 
 export default {
   component: OnboardingPasswordScreen,
-  parameters: {
-    layout: "fullscreen",
-    viewport: {
-      defaultViewport: "reset",
-    },
-  },
 }
 
 export const Default = {

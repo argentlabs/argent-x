@@ -1,4 +1,4 @@
-import { P3 } from "@argent/ui"
+import { P3 } from "@argent/x-ui"
 import { Divider, Flex } from "@chakra-ui/react"
 import { CopySeedPhrase } from "./CopySeedPhrase"
 import { SeedPhrase } from "./SeedPhrase"

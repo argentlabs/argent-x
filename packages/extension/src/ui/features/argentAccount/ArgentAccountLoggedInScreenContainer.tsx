@@ -7,7 +7,7 @@ import { ArgentAccountLoggedInScreen } from "./ArgentAccountLoggedInScreen"
 import { allAccountsWithGuardianView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { argentAccountService } from "../../services/argentAccount"
-import { useToast } from "@argent/ui"
+import { useToast } from "@argent/x-ui"
 import { useEmailPreferences } from "./hooks/useEmailPreferences"
 
 export const ArgentAccountLoggedInScreenContainer: FC = () => {

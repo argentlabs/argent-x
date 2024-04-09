@@ -1,7 +1,7 @@
 /**
  * Why is this a container?
  */
-import { Button, icons } from "@argent/ui"
+import { Button, icons } from "@argent/x-ui"
 import { Center, chakra } from "@chakra-ui/react"
 import { FC, ReactEventHandler } from "react"
 
@@ -29,7 +29,7 @@ export const HiddenAccountsBar: FC<HiddenAccountsBarProps> = ({ onClick }) => {
         leftIcon={<HideIcon />}
         size="sm"
         colorScheme="transparent"
-        color="white50"
+        color="white.50"
       >
         Hidden accounts
       </Button>

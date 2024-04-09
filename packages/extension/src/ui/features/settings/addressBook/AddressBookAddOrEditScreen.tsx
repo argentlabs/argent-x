@@ -10,11 +10,11 @@ import {
   Select,
   SelectOptions,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import {
   addressInputCharactersAndLengthSchema,
   isStarknetDomainName,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import {
   Button,
   Center,

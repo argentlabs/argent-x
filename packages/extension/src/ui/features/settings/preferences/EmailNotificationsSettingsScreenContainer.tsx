@@ -6,7 +6,7 @@ import {
   emailPreferencesSchema,
 } from "../../../../shared/argentAccount/schema"
 import { useEmailPreferences } from "../../argentAccount/hooks/useEmailPreferences"
-import { useDebounce } from "@argent/shared"
+import { useDebounce } from "@argent/x-shared"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 
 export const EmailNotificationsSettingsScreenContainer = () => {

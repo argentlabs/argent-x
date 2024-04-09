@@ -2,10 +2,8 @@ import { ApproveTransactionScreenProps } from "../transaction/ApproveTransaction
 
 export type TransactionActionFixture = Pick<
   ApproveTransactionScreenProps,
-  | "actionHash"
   | "aggregatedData"
   | "transactionReview"
   | "transactions"
-  | "transactionSimulation"
   | "transactionActionsType"
 >

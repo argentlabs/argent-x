@@ -17,7 +17,7 @@ const shortStringSchema = z
     "The shortString should not be an integer string",
   )
 
-const bignumberishSchema = z.union([
+export const BigNumberishSchema = z.union([
   z
     .string()
     .regex(
@@ -39,9 +39,11 @@ export const CallSchema = z.object({
   contractAddress: z.string(),
   entrypoint: z.string(),
   calldata: z
-    .array(bignumberishSchema.or(z.array(bignumberishSchema)))
+    .array(BigNumberishSchema.or(z.array(BigNumberishSchema)))
     .optional(),
 })
+
+export const CallsArraySchema = z.array(CallSchema).nonempty()
 
 export const typedDataSchema = z.object({
   types: z.record(
@@ -109,14 +111,19 @@ export const StarknetMethodArgumentsSchemas = {
       }),
     }),
   ]),
+  requestAccounts: z.tuple([
+    z.object({
+      silentMode: z.boolean().optional(),
+    }),
+  ]),
   execute: z.tuple([
-    z.array(CallSchema).nonempty().or(CallSchema),
+    CallsArraySchema.or(CallSchema),
     z.array(z.any()).optional(),
     z
       .object({
-        nonce: bignumberishSchema.optional(),
-        maxFee: bignumberishSchema.optional(),
-        version: bignumberishSchema.optional(),
+        nonce: BigNumberishSchema.optional(),
+        maxFee: BigNumberishSchema.optional(),
+        version: BigNumberishSchema.optional(),
       })
       .optional(),
   ]),
@@ -136,7 +143,9 @@ export type StarknetMethods = {
   watchAsset: (
     ...args: z.infer<typeof StarknetMethodArgumentsSchemas.watchAsset>
   ) => Promise<boolean>
-
+  requestAccounts: (
+    ...args: z.infer<typeof StarknetMethodArgumentsSchemas.requestAccounts>
+  ) => Promise<string[]>
   execute: (
     ...args: z.infer<typeof StarknetMethodArgumentsSchemas.execute>
   ) => Promise<InvokeFunctionResponse>

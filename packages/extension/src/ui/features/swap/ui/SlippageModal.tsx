@@ -1,4 +1,4 @@
-import { B3, H6, icons } from "@argent/ui"
+import { B3, H6, icons } from "@argent/x-ui"
 import {
   Modal,
   ModalContent,
@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react"
 import { useUserState } from "../state/user"
 import { useCallback, useState } from "react"
-import { isAllowedNumericInputValue } from "../../../components/utils/isAllowedNumericInputValue"
+import { isAllowedNumericInputValue } from "@argent/x-shared"
 import { isNumber } from "lodash-es"
 
 const { AddIcon, RemoveIcon, TickIcon } = icons
@@ -142,7 +142,8 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
               aria-label="Increase slippage tolerance"
               disabled={localSlippage >= MAX_SLIPPAGE}
               onClick={() => {
-                const updatedValue = localSlippage + 10
+                const validLocalSlippage = localSlippage || 0
+                const updatedValue = validLocalSlippage + 10
                 localSlippageHandler(Math.min(updatedValue, MAX_SLIPPAGE))
               }}
               icon={<AddIcon />}

@@ -16,7 +16,7 @@ import { InjectedConnector } from "starknetkit/injected"
 import { WebWalletConnector } from "starknetkit/webwallet"
 import { Header } from "../components/Header"
 
-import { H2 } from "@argent/ui"
+import { H2 } from "@argent/x-ui"
 import { Flex, Image } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
 import { useStarknetkitConnectModal } from "starknetkit"

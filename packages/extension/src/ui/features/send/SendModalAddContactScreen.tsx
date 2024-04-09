@@ -1,4 +1,4 @@
-import { BarCloseButton } from "@argent/ui"
+import { BarCloseButton } from "@argent/x-ui"
 import { DrawerProps } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
 

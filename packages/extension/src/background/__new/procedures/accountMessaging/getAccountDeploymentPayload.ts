@@ -12,7 +12,7 @@ import {
   addressSchema,
   bigNumberishSchema,
   rawArgsSchema,
-} from "@argent/shared"
+} from "@argent/x-shared"
 
 const getAccountDeploymentPayloadInputSchema = z
   .object({

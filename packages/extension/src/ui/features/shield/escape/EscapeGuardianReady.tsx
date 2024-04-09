@@ -1,4 +1,4 @@
-import { Button, FlowHeader, P3, icons } from "@argent/ui"
+import { Button, FlowHeader, P3, icons } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 

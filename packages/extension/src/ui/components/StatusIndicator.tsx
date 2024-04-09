@@ -1,8 +1,6 @@
-import { Box, Tooltip } from "@chakra-ui/react"
+import { Box, Tooltip, keyframes } from "@chakra-ui/react"
 
-import styled, { css, keyframes } from "styled-components"
-
-import { NetworkStatus } from "../../shared/network"
+import { ColorStatus } from "../../shared/network"
 
 export type StatusIndicatorColor =
   | "green"
@@ -11,29 +9,45 @@ export type StatusIndicatorColor =
   | "neutral"
   | "hidden"
 
-interface NetworkStatusResponse {
+interface StatusResponse {
   color: StatusIndicatorColor
   label?: string
   hexColor: string
 }
 
-export const statusMapping: { [key in NetworkStatus]: NetworkStatusResponse } =
-  {
-    red: { color: "red", hexColor: "#FF675C", label: "Very busy" },
-    amber: { color: "orange", hexColor: "#FFBF3D", label: "Busy" },
-    green: { color: "green", hexColor: "#08A681", label: "Live" },
-    unknown: { color: "hidden", hexColor: "#BFBFBF" },
-  }
+export const networkStatusMapping: { [key in ColorStatus]: StatusResponse } = {
+  red: { color: "red", hexColor: "#FF675C", label: "Very busy" },
+  amber: { color: "orange", hexColor: "#FFBF3D", label: "Busy" },
+  green: { color: "green", hexColor: "#08A681", label: "Live" },
+  unknown: { color: "hidden", hexColor: "#BFBFBF" },
+}
 
-function mapNetworkStatus(status: NetworkStatus): NetworkStatusResponse {
-  const response = statusMapping[status]
+export const transactionStatusMapping: {
+  [key in ColorStatus]: StatusResponse
+} = {
+  red: { color: "red", hexColor: "#FF675C", label: "Reverted" },
+  amber: { color: "orange", hexColor: "#FFBF3D" },
+  green: { color: "green", hexColor: "#08A681" },
+  unknown: { color: "hidden", hexColor: "#BFBFBF" },
+}
+
+function mapNetworkStatus(status: ColorStatus): StatusResponse {
+  const response = networkStatusMapping[status]
   if (!response) {
     throw new Error(`Unexpected status: ${status}`)
   }
   return response
 }
 
-export const StatusIndicator = ({ status }: { status: NetworkStatus }) => {
+function mapTransactionStatus(status: ColorStatus): StatusResponse {
+  const response = transactionStatusMapping[status]
+  if (!response) {
+    throw new Error(`Unexpected status: ${status}`)
+  }
+  return response
+}
+
+export const StatusIndicator = ({ status }: { status: ColorStatus }) => {
   const { color, label, hexColor } = mapNetworkStatus(status)
 
   return (
@@ -66,14 +80,30 @@ const PulseAnimation = keyframes`
   }
 `
 
-export const TransactionStatusIndicator = styled(StatusIndicator)`
-  margin-right: 8px;
+export const TransactionStatusIndicator = ({
+  status,
+}: {
+  status: ColorStatus
+}) => {
+  const { color, label, hexColor } = mapTransactionStatus(status)
+  const animation =
+    status === "amber" ? `${PulseAnimation} 1.5s infinite` : undefined
 
-  ${({ status }) =>
-    status === "amber" &&
-    css`
-      box-shadow: 0 0 0 0 rgba(255, 168, 92, 1);
-      transform: scale(1);
-      animation: ${PulseAnimation} 1.5s infinite;
-    `}
-`
+  return (
+    <Tooltip label={label} aria-label={label}>
+      <Box
+        height={2}
+        width={2}
+        borderRadius={8}
+        backgroundColor={hexColor}
+        marginRight={2}
+        boxShadow={
+          status === "amber" ? "0 0 0 0 rgba(255, 168, 92, 1)" : undefined
+        }
+        transform={status === "amber" ? "scale(1)" : undefined}
+        animation={animation}
+        data-testid={`transaction-status-indicator-${color}`}
+      />
+    </Tooltip>
+  )
+}

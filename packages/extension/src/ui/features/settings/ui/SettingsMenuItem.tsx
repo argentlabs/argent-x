@@ -1,4 +1,4 @@
-import { ButtonCell, P4, icons } from "@argent/ui"
+import { ButtonCell, P4, icons } from "@argent/x-ui"
 import { Box, Button, ButtonProps, Flex, Text } from "@chakra-ui/react"
 import { FC, PropsWithChildren, ReactEventHandler } from "react"
 import { Link, LinkProps } from "react-router-dom"
@@ -21,7 +21,7 @@ export const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
       <Text overflow={"hidden"} textOverflow={"ellipsis"}>
         {title}
       </Text>
-      {subtitle && <P4 color="text.secondary">{subtitle}</P4>}
+      {subtitle && <P4 color="text-secondary">{subtitle}</P4>}
     </Flex>
   </ButtonCell>
 )

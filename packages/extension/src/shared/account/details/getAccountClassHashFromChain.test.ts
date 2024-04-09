@@ -9,7 +9,7 @@ import {
   MULTISIG_ACCOUNT_CLASS_HASH,
   TXV1_ACCOUNT_CLASS_HASH,
 } from "../../network/constants"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import {
   getMockNetwork,
   getMockNetworkWithoutMulticall,

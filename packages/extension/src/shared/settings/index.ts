@@ -1,4 +1,4 @@
-import { isFeatureEnabled } from "@argent/shared"
+import { isFeatureEnabled } from "@argent/x-shared"
 
 export const isPrivacySettingsEnabled = isFeatureEnabled(
   process.env.FEATURE_PRIVACY_SETTINGS,

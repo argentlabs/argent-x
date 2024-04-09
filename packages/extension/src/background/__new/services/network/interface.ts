@@ -1,4 +1,4 @@
-import { Network, NetworkStatus } from "../../../../shared/network"
+import { Network, ColorStatus } from "../../../../shared/network"
 
 export interface IBackgroundNetworkService {
   updateStatuses(): Promise<void>
@@ -6,4 +6,4 @@ export interface IBackgroundNetworkService {
 
 export type GetNetworkStatusesFn = (
   networks: Network[],
-) => Promise<Record<Network["id"], NetworkStatus>>
+) => Promise<Record<Network["id"], ColorStatus>>

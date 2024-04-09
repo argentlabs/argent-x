@@ -1,8 +1,8 @@
-import { activeStore } from "../../../../shared/analytics"
+import { analyticsService } from "../../../../shared/analytics"
 import { backgroundUIService } from "../ui"
-import { AnalyticsWorker } from "./worker"
+import { AnalyticsWoker } from "./worker"
 
-export const analyticsWorker = new AnalyticsWorker(
-  activeStore,
+export const analyticsWorker = new AnalyticsWoker(
+  analyticsService,
   backgroundUIService,
 )

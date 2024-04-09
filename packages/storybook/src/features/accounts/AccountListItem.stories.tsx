@@ -1,14 +1,14 @@
+import { StoryObj } from "@storybook/react"
 import { AccountListItem } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
-import { Button, CellStack, icons } from "@argent/ui"
+import { Button, CellStack, icons } from "@argent/x-ui"
 import { ComponentProps } from "react"
+import { decorators } from "../../decorators/routerDecorators"
 
 const { AddressBookIcon, WalletIcon } = icons
 
 export default {
   component: AccountListItem,
-  parameters: {
-    layout: "fullscreen",
-  },
+  decorators,
   render: (props: ComponentProps<typeof AccountListItem>) => (
     <CellStack>
       <AccountListItem {...props}></AccountListItem>
@@ -23,13 +23,13 @@ const account = {
   networkId: "goerli-alpha",
 }
 
-export const Default = {
+export const Default: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
   },
 }
 
-export const StarknetID = {
+export const StarknetID: StoryObj<typeof AccountListItem> = {
   args: {
     accountName: "foobar.stark",
     accountAddress: "foobar.stark",
@@ -37,127 +37,124 @@ export const StarknetID = {
   },
 }
 
-export const Outline = {
-  args: {
-    ...account,
-    outlined: true,
-  },
-}
-
-export const Highlight = {
+export const Highlight: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     highlighted: true,
   },
 }
 
-export const Deploying = {
+export const Deploying: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     deploying: true,
   },
 }
 
-export const Upgrade = {
+export const Upgrade: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     upgrade: true,
   },
 }
 
-export const WithAmount = {
+export const WithAmount: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
+    showRightElements: true,
     prettyAccountBalance: "$1.2",
   },
 }
 
-export const WithAccountExtraInfo = {
+export const WithAccountExtraInfo: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     accountExtraInfo: "2/3",
   },
 }
 
-export const Connected = {
+export const Connected: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
+    showRightElements: true,
     connectedHost: "foobar.xyz",
   },
 }
 
-export const ConnectedWithAmount = {
+export const ConnectedWithAmount: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
+    showRightElements: true,
     connectedHost: "foobar.xyz",
     prettyAccountBalance: "$1.2",
   },
 }
 
-export const Hidden = {
+export const Hidden: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
+    showRightElements: true,
     hidden: true,
   },
 }
 
-export const Children = {
+export const Children: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     children: <span>Child in here</span>,
   },
 }
 
-export const AvatarOutlined = {
+export const AvatarOutlined: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     avatarOutlined: true,
   },
 }
 
-export const PluginAccount = {
+export const PluginAccount: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     accountType: "plugin",
   },
 }
 
-export const Disabled = {
+export const Disabled: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     isDisabled: true,
   },
 }
 
-export const AvatarSize = {
+export const AvatarSize: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     avatarSize: 9,
   },
 }
 
-export const NetworkName = {
+export const NetworkName: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     networkName: "Integration",
   },
 }
 
-export const Deprecated = {
+export const Deprecated: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     isDeprecated: true,
   },
 }
 
-export const AvatarIcon = {
+export const AvatarIcon: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     avatarIcon: <WalletIcon />,
   },
 }
 
-export const IsClickableFalse = {
+export const IsClickableFalse: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     avatarSize: 9,

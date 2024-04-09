@@ -3,18 +3,18 @@ import {
   BarCloseButton,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { routes } from "../../routes"
-import { Alert } from "@argent/ui"
+import { Alert } from "@argent/x-ui"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { A } from "../../components/TrackingLink"
 import { Grid } from "@chakra-ui/react"
-import { formatTruncatedAddress } from "@argent/shared"
+import { formatTruncatedAddress } from "@argent/x-shared"
 
 const { DocumentIcon } = icons
 

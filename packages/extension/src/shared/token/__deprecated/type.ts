@@ -1,6 +1,11 @@
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import { z } from "zod"
 
+// NOTE: these deprecated types are currently used by `runV59TokenMigration`
+
+/**
+ * @deprecated use new schema instead
+ */
 export const BaseTokenSchema = z.object(
   {
     address: addressSchema,
@@ -9,9 +14,12 @@ export const BaseTokenSchema = z.object(
   { required_error: "BaseToken is required" },
 )
 
+/**
+ * @deprecated use new schema instead
+ */
 export type BaseToken = z.infer<typeof BaseTokenSchema>
 
-export const RequestTokenSchema = z.object({
+const RequestTokenSchema = z.object({
   address: addressSchema,
   networkId: z.string().optional(),
   name: z.string().optional(),
@@ -19,12 +27,7 @@ export const RequestTokenSchema = z.object({
   decimals: z.coerce.number().optional(),
 })
 
-export type RequestToken = z.infer<typeof RequestTokenSchema>
-
-/**
- * @deprecated use new schema instead
- */
-export const TokenSchema = RequestTokenSchema.required().extend({
+const TokenSchema = RequestTokenSchema.required().extend({
   image: z.string().optional(),
   showAlways: z.boolean().optional(),
 })

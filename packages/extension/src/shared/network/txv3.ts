@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { STRK_TOKEN_ADDRESS, TXV3_ACCOUNT_CLASS_HASH } from "./constants"
 import { BaseToken } from "../token/__new/types/token.model"
 

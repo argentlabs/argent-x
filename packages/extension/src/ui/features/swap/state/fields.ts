@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import { create } from "zustand"
 import { ETH, USDC } from "../../../../shared/token/__new/constants"
 import { constants } from "starknet"

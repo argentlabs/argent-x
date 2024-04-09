@@ -1,4 +1,4 @@
-import { HeaderCell } from "@argent/ui"
+import { HeaderCell } from "@argent/x-ui"
 import { FC, Fragment } from "react"
 import { useNavigate } from "react-router-dom"
 

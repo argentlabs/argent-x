@@ -1,4 +1,4 @@
-import type { Address } from "@argent/shared"
+import type { Address } from "@argent/x-shared"
 import type { NftMarketplaces } from "./types"
 
 export const defaultNftMarketplaces: NftMarketplaces = {
@@ -15,7 +15,7 @@ export const defaultNftMarketplaces: NftMarketplaces = {
     logo: "FlexLogo",
     url: {
       "mainnet-alpha": (contractAddress: Address, tokenId: string) =>
-        `https://flexing.gg/starknet/asset/${contractAddress}/${tokenId}`,
+        `https://hyperflex.market/starknet/asset/${contractAddress}/${tokenId}`,
     },
   },
   pyramid: {

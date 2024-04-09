@@ -1,4 +1,4 @@
-import { prettifyCurrencyValue } from "../../../shared/token/price"
+import { prettifyCurrencyValue } from "@argent/x-shared"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"

@@ -1,4 +1,4 @@
-import { useNavigateBack } from "@argent/ui"
+import { useNavigateBack } from "@argent/x-ui"
 import { FC, useCallback } from "react"
 
 import { routes } from "../../routes"
@@ -8,18 +8,13 @@ import { useSeedRecovery } from "../recovery/seedRecovery.state"
 import { OnboardingRestoreSeedScreen } from "./OnboardingRestoreSeedScreen"
 
 export const OnboardingRestoreSeedScreenContainer: FC = () => {
-  // const { trackSuccess } = useTimeSpentWithSuccessTracking(
-  //   "onboardingStepFinished",
-  //   { stepId: "restoreSeedphrase" },
-  // )
   const customNavigate = useCustomNavigate()
   const onBack = useNavigateBack()
 
   const onRestore = useCallback(
     async (seedPhrase: string) => {
-      // seedPhrase was already validated in the OnboardingRestoreSeedScreen form and will be validated again in the BG
-      useSeedRecovery.setState({ seedPhrase }) // set to temorary state, so we can access it after the next screen
-      // void trackSuccess() // TODO: temporary disabled
+      useSeedRecovery.setState({ seedPhrase })
+
       await customNavigate(routes.onboardingRestorePassword())
     },
     [customNavigate],

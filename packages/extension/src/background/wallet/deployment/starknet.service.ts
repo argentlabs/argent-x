@@ -4,7 +4,7 @@ import {
   isAccountV5,
   isContractDeployed,
   isEqualAddress,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import {
   CallData,
   DeployAccountContractTransaction,
@@ -29,13 +29,13 @@ import {
   WalletAccount,
 } from "../../../shared/wallet.model"
 
-import { WalletAccountSharedService } from "../account/shared.service"
+import { WalletAccountSharedService } from "../../../shared/account/service/shared.service"
 
 import {
   MULTISIG_DERIVATION_PATH,
   STANDARD_DERIVATION_PATH,
 } from "../../../shared/wallet.service"
-import { getStarkPair } from "../../keys/keyDerivation"
+import { getIndexForPath, getStarkPair } from "../../keys/keyDerivation"
 import {
   getNextPathIndex,
   getPathForIndex,
@@ -59,13 +59,14 @@ import {
 import { AccountError } from "../../../shared/errors/account"
 import { EstimatedFee } from "../../../shared/transactionSimulation/fees/fees.model"
 import { estimatedFeeToMaxResourceBounds } from "../../../shared/transactionSimulation/utils"
-import { BigNumberish, num, constants, CairoVersion } from "starknet"
+import { BigNumberish, num, constants } from "starknet"
 import { getTxVersionFromFeeToken } from "../../../shared/utils/getTransactionVersion"
 import {
   Implementation,
   findImplementationForAccount,
   getAccountDeploymentPayload,
 } from "../findImplementationForAddress"
+import { AnalyticsService } from "../../../shared/analytics/implementation"
 
 const { calculateContractAddressFromHash } = hash
 
@@ -103,6 +104,7 @@ export class WalletDeploymentStarknetService
     private readonly cryptoStarknetService: WalletCryptoStarknetService,
     private readonly backupService: WalletBackupService,
     private readonly networkService: Pick<INetworkService, "getById">,
+    private readonly analyticsService: AnalyticsService,
   ) {}
 
   public async deployAccount(
@@ -143,7 +145,17 @@ export class WalletDeploymentStarknetService
         ...maxFeeOrBounds,
       },
     )
-
+    const baseDerivationPath =
+      walletAccount.type === "multisig"
+        ? MULTISIG_DERIVATION_PATH
+        : STANDARD_DERIVATION_PATH
+    this.analyticsService.accountDeployed({
+      "account index": getIndexForPath(
+        walletAccount.signer.derivationPath,
+        baseDerivationPath,
+      ).toString(),
+      "account type": walletAccount.type,
+    })
     await this.accountSharedService.selectAccount(walletAccount)
 
     return { account: walletAccount, txHash: transaction_hash }
@@ -249,7 +261,7 @@ export class WalletDeploymentStarknetService
 
     return {
       ...getAccountDeploymentPayload(cairoVersion, accountClassHash, starkPub),
-      version: cairoVersion as CairoVersion,
+      version: cairoVersion,
       contractAddress: walletAccount.address,
     }
   }
@@ -257,9 +269,8 @@ export class WalletDeploymentStarknetService
   public async getMultisigDeploymentPayload(
     walletAccount: WalletAccount,
   ): Promise<Required<DeployAccountContractPayload>> {
-    const multisigAccount = await getMultisigAccountFromBaseWallet(
-      walletAccount,
-    )
+    const multisigAccount =
+      await getMultisigAccountFromBaseWallet(walletAccount)
 
     if (!multisigAccount) {
       throw new AccountError({ code: "MULTISIG_NOT_FOUND" })
@@ -497,6 +508,7 @@ export class WalletDeploymentStarknetService
       classHash: addressSchema.parse(payload.classHash), // This is only true for new Cairo 1 accounts. For Cairo 0, this is the proxy contract class hash
       cairoVersion: type === "standardCairo0" ? "0" : "1",
       needsDeploy: !isDeployed,
+      index,
     }
 
     await this.walletStore.upsert([account])
@@ -510,6 +522,7 @@ export class WalletDeploymentStarknetService
         creator: multisigPayload.creator,
         publicKey: multisigPayload.publicKey,
         updatedAt: Date.now(),
+        index,
       })
     }
 

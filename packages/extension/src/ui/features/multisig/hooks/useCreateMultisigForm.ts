@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { accountMessagingService } from "../../../services/accountMessaging"
 import { getBaseMultisigAccounts } from "../../../../shared/multisig/utils/baseMultisig"
-import { encodeBase58Array } from "@argent/shared"
+import { encodeBase58Array } from "@argent/x-shared"
 import { pubkeySchema } from "../../../../shared/multisig/multisig.model"
 
 export const confirmationsSchema = z
@@ -18,6 +18,7 @@ const getFormSchema = (accountSignerKey?: string, isNewMultisig = true) =>
       signerKeys: z
         .object({
           key: pubkeySchema,
+          name: z.string().optional(),
         })
         .array()
         .min(isNewMultisig ? 0 : 1, "You need at least one signer")
@@ -33,12 +34,25 @@ const getFormSchema = (accountSignerKey?: string, isNewMultisig = true) =>
           {
             message: "You cannot use the same key twice",
           },
+        )
+        .refine(
+          (arr) => {
+            const nonEmptyNames = arr.map((item) => item.name).filter(Boolean)
+            const uniqueValues = new Set(
+              nonEmptyNames.map((name) => name?.toLowerCase()),
+            )
+            return uniqueValues.size === nonEmptyNames.length
+          },
+          {
+            message: "You cannot use the same name twice",
+          },
         ),
       confirmations: confirmationsSchema,
     })
     .refine(
       async (data) => {
         const baseMultisigs = await getBaseMultisigAccounts()
+
         const bufferedPubKeys =
           await accountMessagingService.getPublicKeysBufferForMultisig(
             0,
@@ -69,6 +83,11 @@ const getFormSchema = (accountSignerKey?: string, isNewMultisig = true) =>
 export type FieldValuesCreateMultisigForm = z.infer<
   ReturnType<typeof getFormSchema>
 >
+
+export const CreateMultisigFormSchema = (
+  accountSignerKey?: string,
+  isNewMultisig = true,
+) => getFormSchema(accountSignerKey, isNewMultisig)
 
 export const useCreateMultisigForm = (accountSignerKey?: string) => {
   return useForm<FieldValuesCreateMultisigForm>({

@@ -3,10 +3,8 @@ import {
   BarCloseButton,
   NavigationContainer,
   logos,
-} from "@argent/ui"
-import { isString } from "@sentry/utils"
+} from "@argent/x-ui"
 import { colord } from "colord"
-// import { colord } from "colord"
 import { FC } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
@@ -16,12 +14,12 @@ import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
 import { routes } from "../../routes"
-import { trackAddFundsService } from "../../services/analytics"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
-import { isFeatureEnabled, normalizeAddress } from "@argent/shared"
+import { isFeatureEnabled, normalizeAddress } from "@argent/x-shared"
 import { Grid } from "@chakra-ui/react"
+import { isString } from "lodash-es"
 
 const { RampLogo, BanxaLogo } = logos
 
@@ -84,11 +82,7 @@ export const FundingProviderScreen: FC = () => {
       <PageWrapper>
         <Grid templateColumns="1fr" gap={4}>
           {RAMP_ENABLED && (
-            <A
-              href={rampUrl}
-              targetBlank
-              onClick={trackAddFundsService("ramp", account.networkId)}
-            >
+            <A href={rampUrl} targetBlank>
               <Option
                 title={
                   <>
@@ -104,11 +98,7 @@ export const FundingProviderScreen: FC = () => {
             </A>
           )}
           {BANXA_ENABLED && (
-            <A
-              href={banxaUrl}
-              targetBlank
-              onClick={trackAddFundsService("banxa", account.networkId)}
-            >
+            <A href={banxaUrl} targetBlank>
               <Option
                 title="Banxa"
                 description="Card or bank transfer"

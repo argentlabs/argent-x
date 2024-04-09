@@ -5,12 +5,12 @@ import {
   FlowHeader,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex, Link } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 
-import { ZENDESK_LINK } from "../userReview/ReviewFeedbackScreen"
-import { useShieldTracking } from "./useShieldTracking"
+import { ZENDESK_LINK } from "../userReview/constants"
+
 import {
   SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
   SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
@@ -28,17 +28,9 @@ export interface ShieldValidationErrorScreenProps {
 export const ShieldValidationErrorScreen: FC<
   ShieldValidationErrorScreenProps
 > = ({ onBack, error, onDone }) => {
-  const { trackSuccess } = useShieldTracking("argentShieldError", {
-    errorId:
-      error === SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2
-        ? "emailNotMatch"
-        : "emailAlreadyInUseForOtherSeedphrase",
-  })
-
   const onDoneClick = useCallback(() => {
-    void trackSuccess()
     onDone()
-  }, [onDone, trackSuccess])
+  }, [onDone])
 
   const subtitle =
     error === SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1 ? (

@@ -1,19 +1,15 @@
 import { UseDisclosureReturn } from "@chakra-ui/react"
-import React from "react"
 import { Call } from "starknet"
 
-import {
-  ApiTransactionReviewResponse,
-  ApiTransactionReviewTargettedDapp,
-} from "../../../../../shared/transactionReview.service"
-import { ApiTransactionBulkSimulationResponse } from "../../../../../shared/transactionSimulation/types"
+import { TransactionAction } from "@argent/x-shared"
+import { ApiTransactionReviewTargettedDapp } from "../../../../../shared/transactionReview.service"
+import { EnrichedSimulateAndReview } from "../../../../../shared/transactionReview/schema"
 import { WalletAccount } from "../../../../../shared/wallet.model"
 import { Multisig } from "../../../multisig/Multisig"
 import { ApproveScreenType, TransactionActionsType } from "../types"
 import { AggregatedSimData } from "../useTransactionSimulatedData"
 import { ConfirmScreenProps } from "./ConfirmScreen"
 import { MultisigBannerProps } from "./MultisigBanner"
-import { TransactionAction } from "@argent/shared"
 
 export interface ApproveTransactionScreenContainerProps
   extends Omit<ConfirmScreenProps, "onSubmit"> {
@@ -39,8 +35,8 @@ export interface ApproveTransactionScreenProps
   aggregatedData: AggregatedSimData[]
   isMainnet: boolean
   isSimulationLoading: boolean
-  transactionReview?: ApiTransactionReviewResponse
-  transactionSimulation?: ApiTransactionBulkSimulationResponse
+  transactionReview?: EnrichedSimulateAndReview
+  transactionActionsType?: TransactionActionsType
   selectedAccount: WalletAccount
   disableConfirm: boolean
   verifiedDapp?: ApiTransactionReviewTargettedDapp
@@ -49,11 +45,8 @@ export interface ApproveTransactionScreenProps
   confirmButtonText?: string
   transactions: Call[]
   multisigModalDisclosure: UseDisclosureReturn
-  showFraudMonitorBanner: boolean
   hasBalanceChange: boolean
   showTransactionActions: boolean
-  transactionActionsType?: TransactionActionsType
-  assessmentReason: React.ReactNode
   showTxDetails: boolean
   setShowTxDetails: (viewMoreDetails: boolean) => void
   multisigBannerProps: MultisigBannerProps

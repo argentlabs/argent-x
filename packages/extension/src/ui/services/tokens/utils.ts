@@ -1,5 +1,5 @@
 import { BigNumberish } from "starknet"
-import { bigDecimal } from "@argent/shared"
+import { bigDecimal } from "@argent/x-shared"
 
 export function formatTokenBalance(
   length: number,

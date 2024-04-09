@@ -1,10 +1,10 @@
-import type { ArgentNetworkId, ArgentBackendNetworkId } from "@argent/shared"
+import type { ArgentNetworkId, ArgentBackendNetworkId } from "@argent/x-shared"
 import { z } from "zod"
 
 import {
   baseNetworkSchema,
   networkSchema,
-  networkStatusSchema,
+  colorStatusSchema,
   networkWithStatusSchema,
 } from "./schema"
 
@@ -14,7 +14,7 @@ export type Network = z.infer<typeof networkSchema>
 
 export type NetworkWithStatus = z.infer<typeof networkWithStatusSchema>
 
-export type NetworkStatus = z.infer<typeof networkStatusSchema>
+export type ColorStatus = z.infer<typeof colorStatusSchema>
 
 export type DefaultNetworkId = ArgentNetworkId | "localhost" | "integration"
 

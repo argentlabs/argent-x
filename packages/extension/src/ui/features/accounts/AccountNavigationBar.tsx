@@ -1,4 +1,4 @@
-import { BarIconButton, NavigationBar, icons } from "@argent/ui"
+import { BarIconButton, L2, NavigationBar, icons } from "@argent/x-ui"
 import { Button, Flex, Text } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -17,6 +17,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   showAccountButton = true,
   showNetworkSwitcher = true,
   showSettingsButton = true,
+  envLabel,
 }) => {
   return (
     <NavigationBar scroll={scroll}>
@@ -45,11 +46,16 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
           </Text>
         </Button>
       )}
-      <Flex ml={"auto"}>
+
+      <Flex ml={"auto"} gap={1} alignItems={"center"}>
+        {envLabel && (
+          <L2 color="text-secondary" pointerEvents={"none"} mr={1}>
+            {envLabel}
+          </L2>
+        )}
         {showNetworkSwitcher && <NetworkSwitcherContainer />}
         {showSettingsButton && (
           <BarIconButton
-            ml={1}
             aria-label="Show settings"
             onClick={onSettings}
             colorScheme={"neutrals"}

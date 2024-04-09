@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { ChromeRepository } from "../../storage/__new/chrome"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 const maxFeeSchema = z
   .object({

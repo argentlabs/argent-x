@@ -1,4 +1,4 @@
-import { Button, H2, Input } from "@argent/ui"
+import { Button, H2, Input } from "@argent/x-ui"
 import { OffchainSessionAccount } from "@argent/x-sessions"
 import { FC, useState } from "react"
 import { AccountInterface, RpcProvider } from "starknet"

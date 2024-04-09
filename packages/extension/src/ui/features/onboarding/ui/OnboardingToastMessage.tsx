@@ -1,4 +1,4 @@
-import { H6, P3, icons, logos } from "@argent/ui"
+import { H6, P3, icons, logos } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 

@@ -1,4 +1,4 @@
-import { ScrollContainer } from "@argent/ui"
+import { ScrollContainer } from "@argent/x-ui"
 import { Box } from "@chakra-ui/react"
 import { FC, ReactNode, useState } from "react"
 import Measure from "react-measure"

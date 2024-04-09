@@ -3,7 +3,7 @@ import {
   H3,
   NavigationContainer,
   typographyStyles,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Box, Circle, Flex, Link } from "@chakra-ui/react"
 import { FC, PropsWithChildren, ReactEventHandler, ReactNode } from "react"
 

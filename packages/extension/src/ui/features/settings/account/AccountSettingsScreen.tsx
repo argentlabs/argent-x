@@ -3,7 +3,7 @@ import {
   CellStack,
   NavigationContainer,
   SpacerCell,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center, Flex, Image } from "@chakra-ui/react"
 import React, { FC, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"

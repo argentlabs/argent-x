@@ -1,5 +1,5 @@
-import { EventEmitterProvider } from "@argent/shared"
-import { ThemeProvider as ArgentTheme } from "@argent/ui"
+import { EventEmitterProvider } from "@argent/x-shared"
+import { ThemeProvider as ArgentTheme } from "@argent/x-ui"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 import { RenderOptions, render } from "@testing-library/react"
 import Emittery from "emittery"

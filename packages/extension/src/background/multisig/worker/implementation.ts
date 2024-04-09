@@ -1,6 +1,6 @@
 import { flatMap, isEmpty, partition } from "lodash-es"
 import { hash, transaction } from "starknet"
-import { getChainIdFromNetworkId } from "@argent/shared"
+import { getChainIdFromNetworkId } from "@argent/x-shared"
 
 import { IBackgroundUIService } from "../../../background/__new/services/ui/interface"
 import { IScheduleService } from "../../../shared/schedule/interface"
@@ -166,9 +166,8 @@ export class MultisigWorker {
         address: multisig.address,
         networkId: multisig.networkId,
       }
-      const data = await this.multisigBackendService.fetchMultisigRequests(
-        account,
-      )
+      const data =
+        await this.multisigBackendService.fetchMultisigRequests(account)
       return {
         ...data,
         account,

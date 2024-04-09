@@ -1,5 +1,5 @@
-import { addressSchema } from "@argent/shared"
-import { BarBackButton, BarCloseButton } from "@argent/ui"
+import { addressSchema } from "@argent/x-shared"
+import { BarBackButton, BarCloseButton } from "@argent/x-ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 

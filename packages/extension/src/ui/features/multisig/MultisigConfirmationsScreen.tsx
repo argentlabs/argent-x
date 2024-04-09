@@ -1,4 +1,4 @@
-import { H1, H4, P3 } from "@argent/ui"
+import { H1, H4, P3 } from "@argent/x-ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC } from "react"
@@ -17,6 +17,8 @@ import { useMultisig } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { SetConfirmationsInput } from "./SetConfirmationsInput"
 import { multisigService } from "../../services/multisig"
+import { SignerMetadata } from "../../../shared/multisig/types"
+import { decodeBase58 } from "@argent/x-shared"
 
 export const MultisigConfirmationsScreen: FC = () => {
   const account = useRouteAccount()
@@ -58,12 +60,31 @@ export const MultisigConfirmationsWithOwners = ({
   const handleNextClick = async () => {
     await trigger()
     if (isEmpty(errors)) {
+      const signerKeys = getValues("signerKeys")
+
       await multisigService.addOwner({
         address: account.address,
         newThreshold: getValues("confirmations"),
-        signersToAdd: getValues("signerKeys").map((signer) => signer.key),
+        signersToAdd: signerKeys.map((signer) => signer.key),
         currentThreshold: multisig?.threshold,
       })
+      if (!multisig?.creator) {
+        return
+      }
+      const signersWithMetadata = signerKeys
+        .filter((signer) => !isEmpty(signer.name))
+        .map(
+          (signer) =>
+            ({
+              key: decodeBase58(signer.key),
+              name: signer.name,
+            }) as SignerMetadata,
+        )
+
+      await multisigService.updateSignersMetadata(
+        multisig?.publicKey,
+        signersWithMetadata,
+      )
 
       navigate(routes.accountActivity())
     }
@@ -178,7 +199,7 @@ export const BaseMultisigConfirmations = ({
           <Button
             data-testid="update-confirmations"
             colorScheme="primary"
-            onClick={handleNextClick}
+            onClick={() => void handleNextClick()}
           >
             {buttonTitle}
           </Button>

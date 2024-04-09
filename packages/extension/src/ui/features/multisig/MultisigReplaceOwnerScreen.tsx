@@ -2,19 +2,21 @@ import { FC } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
+import { decodeBase58 } from "@argent/x-shared"
+import { H4, P3, P4 } from "@argent/x-ui"
+import { Button, Divider, Flex } from "@chakra-ui/react"
 import { routes, useRouteSignerToReplace } from "../../routes"
+import { multisigService } from "../../services/multisig"
 import { Account } from "../accounts/Account"
 import { useRouteAccount } from "../shield/useRouteAccount"
-import { useMultisig } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
-import { multisigService } from "../../services/multisig"
+import { ReplaceOwnerForm } from "./ReplaceOwnerForm"
 import {
   FieldValuesReplaceOwnerForm,
   useReplaceOwnerForm,
 } from "./hooks/useReplaceOwnerForm"
-import { ReplaceOwnerForm } from "./ReplaceOwnerForm"
-import { Button, Divider, Flex } from "@chakra-ui/react"
-import { H4, P3, P4 } from "@argent/ui"
+import { useMultisig } from "./multisig.state"
+import { isEmpty } from "lodash-es"
 
 export const MultisigReplaceOwnerScreen: FC = () => {
   const account = useRouteAccount()
@@ -45,7 +47,11 @@ const MultisigReplaceOwnerAccountWrapper = ({
   return (
     <FormProvider {...methods}>
       {multisig && (
-        <MultisigReplace account={account} signerToRemove={signerToReplace} />
+        <MultisigReplace
+          account={account}
+          signerToRemove={signerToReplace}
+          multisigPublicKey={multisig.publicKey}
+        />
       )}
     </FormProvider>
   )
@@ -53,9 +59,11 @@ const MultisigReplaceOwnerAccountWrapper = ({
 
 const MultisigReplace = ({
   account,
+  multisigPublicKey,
   signerToRemove,
 }: {
   account: Account
+  multisigPublicKey?: string
   signerToRemove: string
 }) => {
   const { trigger, getValues } = useFormContext<FieldValuesReplaceOwnerForm>()
@@ -63,13 +71,31 @@ const MultisigReplace = ({
   const navigate = useNavigate()
 
   const handleSubmit = async () => {
+    const signerToAdd = getValues("signerKey")
     const isValid = await trigger()
+
     if (isValid && signerToRemove && account?.address) {
       await multisigService.replaceOwner({
         signerToRemove,
-        signerToAdd: getValues("signerKey"),
+        signerToAdd,
         address: account.address,
       })
+
+      const name = getValues("name")
+
+      // need to do name && !isEmpty(name) because the compiler doesn't recognize isEmpty as a type guard
+      if (name && !isEmpty(name) && multisigPublicKey) {
+        const signerMetadata = { key: decodeBase58(signerToAdd), name }
+        await multisigService.updateSignerMetadata(
+          multisigPublicKey,
+          signerMetadata,
+        )
+        await multisigService.removeSignerMetadata(
+          multisigPublicKey,
+          decodeBase58(signerToRemove),
+        )
+      }
+
       navigate(routes.accountActivity())
     }
   }
@@ -94,7 +120,7 @@ const MultisigReplace = ({
 
         <ReplaceOwnerForm signerToRemove={signerToRemove} />
       </Flex>
-      <Button colorScheme="primary" onClick={handleSubmit}>
+      <Button colorScheme="primary" onClick={() => void handleSubmit()}>
         Replace owner
       </Button>
     </Flex>

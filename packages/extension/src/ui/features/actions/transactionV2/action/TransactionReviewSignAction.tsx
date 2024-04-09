@@ -16,7 +16,7 @@ import {
   NestedAccordion,
   P4,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { typedData } from "starknet"
 import { JsonObject } from "type-fest"
 
@@ -47,7 +47,7 @@ export const TransactionReviewSignAction: FC<
         isOpen={isOpen}
         onClose={onClose}
       />
-      <Flex alignItems={"center"} w="full" color={"text.secondary"} px={3}>
+      <Flex alignItems={"center"} w="full" color={"text-secondary"} px={3}>
         <L1>Data to be signed</L1>
         <Flex
           onClick={onOpen}
@@ -57,7 +57,7 @@ export const TransactionReviewSignAction: FC<
           transitionProperty="common"
           transitionDuration="fast"
           _hover={{
-            color: "text.primary",
+            color: "text-primary",
             cursor: "pointer",
           }}
         >

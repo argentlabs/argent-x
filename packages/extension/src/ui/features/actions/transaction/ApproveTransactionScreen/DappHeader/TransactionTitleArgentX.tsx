@@ -1,11 +1,22 @@
-import { useERC20Transactions, useERC721Transactions } from "@argent/shared"
-import { TextWithAmount, icons } from "@argent/ui"
+import {
+  prettifyTokenAmount,
+  useERC20Transactions,
+  useERC721Transactions,
+} from "@argent/x-shared"
+import { TextWithAmount, icons } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, PropsWithChildren, useMemo } from "react"
 
-import { prettifyTokenAmount } from "../../../../../../shared/token/price"
-import { getTransactionReviewWithType } from "../../../../../../shared/transactionReview.service"
-import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
+import { isEmpty } from "lodash-es"
+import {
+  getTransactionActionByType,
+  transactionReviewHasSwap,
+  transactionReviewHasTransfer,
+} from "../../../../../../shared/transactionReview.service"
+import {
+  Property,
+  ReviewOfTransaction,
+} from "../../../../../../shared/transactionReview/schema"
 import { useRemoteNft } from "../../../../accountNfts/useRemoteNft"
 import { useCurrentNetwork } from "../../../../networks/hooks/useCurrentNetwork"
 import { ApproveScreenType } from "../../types"
@@ -14,7 +25,7 @@ import { AggregatedSimData } from "../../useTransactionSimulatedData"
 const { ArrowRightIcon } = icons
 
 export interface TransactionTitleArgentXProps {
-  transactionReview?: ApiTransactionReviewResponse
+  transactionReview?: ReviewOfTransaction
   aggregatedData?: AggregatedSimData[]
   fallback?: string
   approveScreenType: ApproveScreenType
@@ -37,10 +48,8 @@ export const TransactionTitleArgentX: FC<TransactionTitleArgentXProps> = ({
   const erc20Transfers = useERC20Transactions(aggregatedData)
   const hasErc20Transfers = Boolean(erc20Transfers.length)
 
-  const transactionReviewWithType = useMemo(
-    () => getTransactionReviewWithType(transactionReview),
-    [transactionReview],
-  )
+  const isSwap = transactionReviewHasSwap(transactionReview)
+  const isTransfer = transactionReviewHasTransfer(transactionReview)
 
   // Check for specific approve screen types
   switch (approveScreenType) {
@@ -67,9 +76,11 @@ export const TransactionTitleArgentX: FC<TransactionTitleArgentXProps> = ({
   }
 
   // Check for specific transaction types
-  if (transactionReviewWithType?.type === "swap") {
-    const srcSymbol = transactionReviewWithType.activity?.src?.token.symbol
-    const dstSymbol = transactionReviewWithType.activity?.dst?.token.symbol
+  if (isSwap) {
+    const srcSymbol = aggregatedData?.find((ag) => ag.recipients.length > 0)
+      ?.token.symbol
+    const dstSymbol = aggregatedData?.find((ag) => isEmpty(ag.recipients))
+      ?.token.symbol
 
     return (
       <Title>
@@ -80,26 +91,39 @@ export const TransactionTitleArgentX: FC<TransactionTitleArgentXProps> = ({
     )
   }
 
-  if (
-    transactionReviewWithType?.type === "transfer" &&
-    transactionReviewWithType?.activity?.value?.amount
-  ) {
-    const amount = transactionReviewWithType.activity.value.amount
-    const decimals = transactionReviewWithType.activity.value.token.decimals
-    const symbol = transactionReviewWithType.activity.value.token.symbol
-
-    return (
-      <TextWithAmount amount={amount} decimals={decimals}>
-        <Title data-testid="send-title">
-          Send{" "}
-          {prettifyTokenAmount({
-            amount,
-            decimals,
-          })}{" "}
-          {symbol}
-        </Title>
-      </TextWithAmount>
+  if (isTransfer) {
+    const action = getTransactionActionByType(
+      "ERC20_transfer",
+      transactionReview,
     )
+    if (action) {
+      const amountProperty = [
+        ...action.properties,
+        ...(action.defaultProperties || []),
+      ].find((p) => p.type === "amount")
+
+      if (amountProperty) {
+        const property = amountProperty as Extract<Property, { type: "amount" }>
+        const amount = property.amount
+        const decimals = property.token.decimals
+        const symbol = property.token.symbol
+
+        if (amount && decimals) {
+          return (
+            <TextWithAmount amount={amount} decimals={decimals}>
+              <Title data-testid="send-title">
+                Send{" "}
+                {prettifyTokenAmount({
+                  amount,
+                  decimals,
+                })}{" "}
+                {symbol}
+              </Title>
+            </TextWithAmount>
+          )
+        }
+      }
+    }
   }
 
   // Display NFT transfers if applicable

@@ -1,4 +1,4 @@
-import { Address, IHttpService } from "@argent/shared"
+import { Address, IHttpService } from "@argent/x-shared"
 import { Account, EstimateFee } from "starknet6"
 import { Mocked, describe, expect, test, vi } from "vitest"
 
@@ -126,7 +126,7 @@ describe("BackgroundTransactionReviewService", () => {
         })
       })
       describe("and there are errors", () => {
-        test("falls back to on-chain simulation", async () => {
+        test("do not fallback to on-chain simulation", async () => {
           const {
             backgroundTransactionReviewService,
             httpService,
@@ -156,20 +156,9 @@ describe("BackgroundTransactionReviewService", () => {
               feeTokenAddress,
             })
 
-          expect(fallbackToOnchainFeeEstimationSpy).toHaveBeenCalledOnce()
+          expect(fallbackToOnchainFeeEstimationSpy).not.toHaveBeenCalledOnce()
 
-          expect(starknetAccount.estimateFee).toHaveBeenCalledOnce()
-
-          expect(result).toMatchObject({
-            isBackendDown: true,
-            enrichedFeeEstimation: {
-              transactions: {
-                amount: 123n,
-                feeTokenAddress,
-                pricePerUnit: 456n,
-              },
-            },
-          })
+          expect(starknetAccount.estimateFee).not.toHaveBeenCalledOnce()
         })
       })
       describe("when backend fails with error", () => {

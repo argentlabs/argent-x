@@ -15,7 +15,7 @@ import {
   useConditionallyEnabledSWR,
   withPolling,
 } from "../../services/swr.service"
-import { stripAddressZeroPadding } from "@argent/shared"
+import { stripAddressZeroPadding } from "@argent/x-shared"
 import { RefreshInterval } from "../../../shared/config"
 
 export const useArgentExplorerEnabled = () => {

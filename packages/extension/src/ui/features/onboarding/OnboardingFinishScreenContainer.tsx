@@ -4,12 +4,12 @@ import { FC, useCallback, useEffect } from "react"
 import { OnboardingFinishScreen } from "./OnboardingFinishScreen"
 import { lastLegalAgreementTimestampAtom } from "../legal/legalStorage"
 import { useAtom } from "jotai"
+import { analyticsService } from "../../../shared/analytics"
 
 export const OnboardingFinishScreenContainer: FC = () => {
-  // const { trackSuccess } = useTimeSpentWithSuccessTracking(
-  //   "onboardingStepFinished",
-  //   { stepId: "finish" },
-  // )
+  useEffect(() => {
+    analyticsService.onboardingCompleted({ "account type": "standard" })
+  }, [])
 
   const [, setLastLegalAgreementTimestamp] = useAtom(
     lastLegalAgreementTimestampAtom,

@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 import { SwapOrderResponse } from "../../../shared/swap/model/order.model"
 import { SwapQuoteResponse } from "../../../shared/swap/model/quote.model"
 import { Trade } from "../../../shared/swap/model/trade.model"

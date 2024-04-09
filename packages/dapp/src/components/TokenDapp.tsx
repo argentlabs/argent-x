@@ -1,4 +1,4 @@
-import { H2, H4, Input, Textarea } from "@argent/ui"
+import { H2, H4, Input, Textarea } from "@argent/x-ui"
 import { SessionAccount, createSession } from "@argent/x-sessions"
 import { FC, useEffect, useState } from "react"
 import { Abi, AccountInterface, Contract, GatewayError } from "starknet"

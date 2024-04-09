@@ -1,4 +1,4 @@
-import { HeaderCell } from "@argent/ui"
+import { HeaderCell } from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 

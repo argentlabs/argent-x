@@ -5,9 +5,13 @@ import { FC, useCallback, useMemo, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import { Call, TransactionType, isSierra } from "starknet"
 
-import { getDisplayWarnAndReasonForTransactionReview } from "../../../../../shared/transactionReview.service"
+import { Address, TransactionAction, ensureArray } from "@argent/x-shared"
+import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
+import { BaseToken } from "../../../../../shared/token/__new/types/token.model"
 import { routes } from "../../../../routes"
+import { feeTokenService } from "../../../../services/feeToken"
 import { userClickedAddFundsAtom } from "../../../../views/actions"
+import { useFeeTokenBalances } from "../../../accountTokens/useFeeTokenBalance"
 import { RemovedMultisigWarningScreen } from "../../../multisig/RemovedMultisigWarningScreen"
 import { useIsSignerInMultisig } from "../../../multisig/hooks/useIsSignerInMultisig"
 import { useMultisig } from "../../../multisig/multisig.state"
@@ -15,21 +19,16 @@ import { useMultisigPendingTransactionsByAccount } from "../../../multisig/multi
 import { useIsMainnet } from "../../../networks/hooks/useIsMainnet"
 import { CombinedFeeEstimationContainer } from "../../feeEstimation/CombinedFeeEstimationContainer"
 import { FeeEstimationContainer } from "../../feeEstimation/FeeEstimationContainer"
-import { ApproveScreenType, TransactionActionsType } from "../types"
-import { useTransactionReview } from "../useTransactionReview"
+import { FeeTokenPickerModal } from "../../feeEstimation/ui/FeeTokenPickerModal"
+import { useTransactionReviewV2 } from "../../transactionV2/useTransactionReviewV2"
+import { useBestFeeToken } from "../../useBestFeeToken"
 import { useAggregatedSimData } from "../useTransactionSimulatedData"
 import { useTransactionSimulation } from "../useTransactionSimulation"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { MultisigBannerProps } from "./MultisigBanner"
 import { WithActionScreenErrorFooter } from "./WithActionScreenErrorFooter"
 import { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
-import { Address, TransactionAction, ensureArray } from "@argent/shared"
-import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
-import { useBestFeeToken } from "../../useBestFeeToken"
-import { FeeTokenPickerModal } from "../../feeEstimation/ui/FeeTokenPickerModal"
-import { feeTokenService } from "../../../../services/feeToken"
-import { BaseToken } from "../../../../../shared/token/__new/types/token.model"
-import { useFeeTokenBalances } from "../../../accountTokens/useFeeTokenBalance"
+import { ApproveScreenType, TransactionActionsType } from "../types"
 
 export const ApproveTransactionScreenContainer: FC<
   ApproveTransactionScreenContainerProps
@@ -59,15 +58,6 @@ export const ApproveTransactionScreenContainer: FC<
   const multisig = useMultisig(selectedAccount)
   const signerIsInMultisig = useIsSignerInMultisig(multisig)
   const navigate = useNavigate()
-
-  const { data: transactionReview } = useTransactionReview({
-    account: selectedAccount,
-    transactions:
-      transactionAction.type === "INVOKE_FUNCTION"
-        ? transactionAction.payload
-        : [],
-    actionHash,
-  })
 
   // This is required because if STRK is selected as the user preferred fee token
   // It would throw an error as tx v1 doesn't support STRK
@@ -154,6 +144,13 @@ export const ApproveTransactionScreenContainer: FC<
     [transactionAction.payload, transactionAction.type],
   )
 
+  const { data: transactionReview } = useTransactionReviewV2({
+    calls: transactionsArray,
+    actionHash,
+    feeTokenAddress: feeToken.address,
+    selectedAccount,
+  })
+
   const txnHasTransfers = useMemo(
     () =>
       ensureArray(transactionSimulation).some((txn) => !isEmpty(txn.transfers)),
@@ -173,45 +170,17 @@ export const ApproveTransactionScreenContainer: FC<
     [approveScreenType],
   )
 
-  const isChangeGuardianTx = useMemo(
-    () =>
-      approveScreenType === ApproveScreenType.ADD_ARGENT_SHIELD ||
-      approveScreenType === ApproveScreenType.REMOVE_ARGENT_SHIELD,
-    [approveScreenType],
-  )
-
   const transactionActionsType: TransactionActionsType | undefined =
     useMemo(() => {
       if (!selectedAccount) {
         return
       }
 
-      if (approveScreenType === ApproveScreenType.ADD_ARGENT_SHIELD) {
-        return {
-          type: "ADD_ARGENT_SHIELD",
-          payload: {
-            accountAddress: selectedAccount.address,
-          },
-        }
-      }
-
-      if (approveScreenType === ApproveScreenType.REMOVE_ARGENT_SHIELD) {
-        return {
-          type: "REMOVE_ARGENT_SHIELD",
-          payload: {
-            accountAddress: selectedAccount.address,
-          },
-        }
-      }
-
       return {
         type: "INVOKE_FUNCTION",
         payload: transactionsArray,
       }
-    }, [approveScreenType, selectedAccount, transactionsArray])
-
-  const { warn, reason } =
-    getDisplayWarnAndReasonForTransactionReview(transactionReview)
+    }, [selectedAccount, transactionsArray])
 
   // Show balance change if there is a transaction simulation and there are approvals or transfers
   const hasBalanceChange = Boolean(
@@ -225,8 +194,6 @@ export const ApproveTransactionScreenContainer: FC<
       (showTxDetails && hasBalanceChange),
     [hasBalanceChange, isUdcAction, showTxDetails],
   )
-
-  const showFraudMonitorBanner = Boolean(warn && !isChangeGuardianTx)
 
   // Disable fee token selection if the transaction is a Cairo0 declare transaction
   const declareSupportTokenSelection = useMemo(
@@ -274,7 +241,6 @@ export const ApproveTransactionScreenContainer: FC<
         transactionReview={transactionReview}
         transactions={transactionsArray}
         transactionAction={transactionAction}
-        transactionSimulation={transactionSimulation}
         hasPendingMultisigTransactions={hasPendingMultisigTransactions}
         multisig={multisig}
         multisigModalDisclosure={
@@ -285,12 +251,10 @@ export const ApproveTransactionScreenContainer: FC<
         onConfirmAnyway={onConfirmAnyway}
         approveScreenType={approveScreenType}
         hasBalanceChange={hasBalanceChange}
-        showFraudMonitorBanner={showFraudMonitorBanner}
         showTransactionActions={showTransactionActions}
         transactionActionsType={transactionActionsType}
         showTxDetails={showTxDetails}
         setShowTxDetails={setShowTxDetails}
-        assessmentReason={reason}
         multisigBannerProps={bannerProps}
         confirmButtonText={
           hasInsufficientFunds && !userClickedAddFunds ? "Add funds" : "Confirm"

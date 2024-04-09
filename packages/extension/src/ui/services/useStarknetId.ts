@@ -1,4 +1,4 @@
-import { getChainIdFromNetworkId } from "@argent/shared"
+import { getChainIdFromNetworkId } from "@argent/x-shared"
 import { Call, starknetId } from "starknet"
 import useSWR from "swr"
 

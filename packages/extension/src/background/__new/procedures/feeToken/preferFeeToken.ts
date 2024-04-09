@@ -1,4 +1,4 @@
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 import { extensionOnlyProcedure } from "../permissions"
 
 export const preferFeeTokenProcedure = extensionOnlyProcedure

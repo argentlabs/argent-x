@@ -4,7 +4,7 @@ import {
   NavigationContainer,
   BarCloseButton,
   Warning,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { routes, useCurrentPathnameWithQuery } from "../../../routes"
@@ -35,7 +35,7 @@ export const AccountOwnerWarningScreen = () => {
             as={"a"}
             size={"sm"}
             colorScheme={"transparent"}
-            color="text.secondary"
+            color="text-secondary"
             rightIcon={<ExpandIcon />}
             href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
             target="_blank"

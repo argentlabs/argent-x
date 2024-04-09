@@ -1,4 +1,4 @@
-import { Button, P3, icons } from "@argent/ui"
+import { Button, P3, icons } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"

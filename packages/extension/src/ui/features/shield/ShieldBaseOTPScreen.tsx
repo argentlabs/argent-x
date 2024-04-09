@@ -6,7 +6,7 @@ import {
   NavigationContainer,
   icons,
   useToast,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Center, HStack, PinInputField } from "@chakra-ui/react"
 import { FC, MouseEvent, useCallback, useRef, useState } from "react"
 import { useForm } from "react-hook-form"

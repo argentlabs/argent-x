@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 
-import { IHttpService } from "@argent/shared"
+import { IHttpService } from "@argent/x-shared"
 import { KeyValueStorage } from "../../../../../shared/storage"
 import { ITransactionReviewLabelsStore } from "../../../../../shared/transactionReview/interface"
 import { TransactionReviewWorker } from "./implementation"

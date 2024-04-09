@@ -1,4 +1,4 @@
-import { Button, H2, Input } from "@argent/ui"
+import { Button, H2, Input } from "@argent/x-ui"
 import { UniversalDeployerContractPayload } from "starknet"
 
 import { Flex } from "@chakra-ui/react"

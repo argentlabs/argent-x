@@ -2,7 +2,7 @@ import { Button, Flex } from "@chakra-ui/react"
 import { FC, useEffect, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
-import { L2, icons } from "@argent/ui"
+import { L2, icons } from "@argent/x-ui"
 
 const { AlertFillIcon } = icons
 

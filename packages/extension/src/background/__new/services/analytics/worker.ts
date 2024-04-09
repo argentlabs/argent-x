@@ -1,15 +1,15 @@
-import type { IActiveStore } from "../../../../shared/analytics"
-import type { IBackgroundUIService } from "../ui/interface"
-import { onClose } from "../worker/schedule/decorators"
+import { AnalyticsService } from "../../../../shared/analytics/implementation"
+import { IBackgroundUIService } from "../ui/interface"
+import { onOpen } from "../worker/schedule/decorators"
 import { pipe } from "../worker/schedule/pipe"
 
-export class AnalyticsWorker {
+export class AnalyticsWoker {
   constructor(
-    private readonly activeStore: IActiveStore,
+    private readonly analyticsService: AnalyticsService,
     private readonly backgroundUIService: IBackgroundUIService,
   ) {}
 
-  onClose = pipe(onClose(this.backgroundUIService))(async () => {
-    await this.activeStore.update("lastClosed")
+  onClose = pipe(onOpen(this.backgroundUIService))(async () => {
+    this.analyticsService.applicationOpened()
   })
 }

@@ -1,4 +1,4 @@
-import { type Address, includesAddress } from "@argent/shared"
+import { type Address, includesAddress } from "@argent/x-shared"
 
 import type { Activity } from "../schema"
 

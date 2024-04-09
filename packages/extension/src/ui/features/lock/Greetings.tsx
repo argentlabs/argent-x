@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, PropsWithChildren } from "react"
 import { Box, keyframes } from "@chakra-ui/react"
-import { P3 } from "@argent/ui"
+import { P3 } from "@argent/x-ui"
 
 const fadeInAndOut = keyframes`
   0% {

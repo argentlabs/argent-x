@@ -49,6 +49,7 @@ import {
   multisigPendingTransactionToTransaction,
 } from "../../pendingTransactionsStore"
 import { MultisigError } from "../../../errors/multisig"
+import { argentXHeaders } from "../../../api/headers"
 
 export class MultisigBackendService implements IMultisigBackendService {
   public readonly baseUrl: string
@@ -106,6 +107,7 @@ export class MultisigBackendService implements IMultisigBackendService {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        ...argentXHeaders,
       },
       body,
     })

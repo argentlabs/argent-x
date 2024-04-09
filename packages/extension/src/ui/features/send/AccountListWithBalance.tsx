@@ -1,8 +1,8 @@
-import { CellStack } from "@argent/ui"
+import { CellStack } from "@argent/x-ui"
 import { FC } from "react"
 import { WalletAccount } from "../../../shared/wallet.model"
 import { AccountListItemWithBalance } from "../accounts/AccountListItemWithBalance"
-import { getAccountIdentifier } from "@argent/shared"
+import { getAccountIdentifier } from "@argent/x-shared"
 
 interface AccountListWithBalanceProps {
   accounts: WalletAccount[]

@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { Call, constants, validateAndParseAddress } from "starknet"
 
 const { UDC } = constants

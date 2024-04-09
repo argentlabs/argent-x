@@ -1,79 +1,67 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
-
-import { useTransactionReviewV2 } from "./useTransactionReviewV2"
-import { useActionScreen } from "../hooks/useActionScreen"
-import { TransactionReviewActions } from "./action/TransactionReviewActions"
-import { AccountDetails } from "./TransactionHeader/AccountDetails"
 import {
-  Accordion,
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-  Divider,
-  useDisclosure,
-} from "@chakra-ui/react"
-import { isArray } from "lodash-es"
-import { TransactionHeader } from "./TransactionHeader"
-import { WarningBanner } from "../warning/WarningBanner"
-import { FeeEstimationContainerV2 } from "./FeeEstimationContainerV2"
+  Address,
+  ensureArray,
+  formatAddress,
+  getUint256CalldataFromBN,
+  isEqualAddress,
+  nonNullable,
+  prettifyTokenNumber,
+  transferCalldataSchema,
+} from "@argent/x-shared"
+import { Divider, useDisclosure } from "@chakra-ui/react"
+import { formatUnits } from "ethers"
+import { useAtom } from "jotai"
 import { isEmpty, isObject } from "lodash-es"
-import { routes } from "../../../routes"
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { ReviewFallback } from "./ReviewFallback"
+import { z } from "zod"
+
+import { isTransactionActionItem } from "../../../../shared/actionQueue/types"
+import { getMessageFromTrpcError } from "../../../../shared/errors/schema"
+import { BaseToken } from "../../../../shared/token/__new/types/token.model"
+import {
+  getMessageFromSimulationError,
+  isNotTransactionSimulationError,
+  isTransactionSimulationError,
+  warningSchema,
+} from "../../../../shared/transactionReview/schema"
+import { isSafeUpgradeTransaction } from "../../../../shared/utils/isUpgradeTransaction"
+import { ListSkeleton } from "../../../components/ScreenSkeleton"
+import { routes } from "../../../routes"
+import { feeTokenService } from "../../../services/feeToken"
+import { tokenService } from "../../../services/tokens"
+import { userClickedAddFundsAtom } from "../../../views/actions"
+import { useNetworkFeeTokens } from "../../accountTokens/tokens.state"
+import { useFeeTokenBalances } from "../../accountTokens/useFeeTokenBalance"
+import { maxFeeEstimateForTransfer } from "../../accountTokens/useMaxFeeForTransfer"
+import { RemovedMultisigWarningScreen } from "../../multisig/RemovedMultisigWarningScreen"
+import { WithArgentShieldVerified } from "../../shield/WithArgentShieldVerified"
+import { FeeTokenPickerModal } from "../feeEstimation/ui/FeeTokenPickerModal"
+import { WaitingForFunds } from "../feeEstimation/ui/WaitingForFunds"
+import { useActionScreen } from "../hooks/useActionScreen"
+import { useRejectDeployIfPresent } from "../hooks/useRejectDeployAction"
 import {
   ConfirmScreen,
   ConfirmScreenProps,
 } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
 import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
-import { RemovedMultisigWarningScreen } from "../../multisig/RemovedMultisigWarningScreen"
-import { WithArgentShieldVerified } from "../../shield/WithArgentShieldVerified"
-import { useAtom } from "jotai"
-import { userClickedAddFundsAtom } from "../../../views/actions"
-import { WaitingForFunds } from "../feeEstimation/ui/WaitingForFunds"
-import { useMultisigActionScreen } from "./useMultisigActionScreen"
-import { TransactionReviewSimulation } from "./simulation/TransactionReviewSimulation"
-import { ListSkeleton } from "../../../components/ScreenSkeleton"
-import { TransactionReviewSummaryStack } from "./simulation/summary/TransactionReviewSummaryStack"
-import { AccordionIcon, B3, P4, icons } from "@argent/ui"
-import { getMessageFromTrpcError } from "../../../../shared/errors/schema"
-import {
-  getMessageFromSimulationError,
-  isNotTransactionSimulationError,
-  isTransactionSimulationError,
-} from "../../../../shared/transactionReview/schema"
-import { TransactionReviewLabel } from "./TransactionReviewLabel"
-
-const { AlertIcon } = icons
-import { warningSchema } from "../../../../shared/transactionReview/schema"
-import { z } from "zod"
 import { useBestFeeToken } from "../useBestFeeToken"
 import { ConfirmationModal } from "../warning/ConfirmationModal"
-import { getHighestSeverity } from "../warning/helper"
 import { ReviewFooter } from "../warning/ReviewFooter"
-import { useRejectDeployIfPresent } from "../hooks/useRejectDeployAction"
-import { FeeTokenPickerModal } from "../feeEstimation/ui/FeeTokenPickerModal"
-import { useFeeTokenBalances } from "../../accountTokens/useFeeTokenBalance"
-import { useUpgradeAccountTransactions } from "../../accounts/accountTransactions.state"
-import { useTxnsHasV3UpgradeCallback } from "./useTxnsHasV3Upgrade"
-import { BaseToken } from "../../../../shared/token/__new/types/token.model"
-import { feeTokenService } from "../../../services/feeToken"
-import { isTransactionActionItem } from "../../../../shared/actionQueue/types"
-import { useNetworkFeeTokens } from "../../accountTokens/tokens.state"
-import {
-  Address,
-  formatAddress,
-  getUint256CalldataFromBN,
-  isEqualAddress,
-  nonNullable,
-  transferCalldataSchema,
-} from "@argent/shared"
-import { maxFeeEstimateForTransfer } from "../../accountTokens/useMaxFeeForTransfer"
-import { tokenService } from "../../../services/tokens"
-import { formatUnits } from "ethers"
-import { parseTransferTokenCall } from "./utils"
-import { prettifyTokenNumber } from "../../../../shared/utils/number"
-import { isSafeUpgradeTransaction } from "../../../../shared/utils/isUpgradeTransaction"
+import { WarningBanner } from "../warning/WarningBanner"
+import { getHighestSeverity } from "../warning/helper"
+import { FeeEstimationContainerV2 } from "./FeeEstimationContainerV2"
+import { ReviewFallback } from "./ReviewFallback"
+import { TransactionHeader } from "./TransactionHeader"
+import { AccountDetails } from "./TransactionHeader/AccountDetails"
+import { TransactionReviewLabel } from "./TransactionReviewLabel"
+import { TransactionReviewActions } from "./action/TransactionReviewActions"
+import { TransactionReviewSimulation } from "./simulation/TransactionReviewSimulation"
+import { useMultisigActionScreen } from "./useMultisigActionScreen"
+import { useTransactionReviewV2 } from "./useTransactionReviewV2"
+import { parseTransferTokenCall } from "./utils/parseTransferTokenCall"
+import { getPrettyRpcError } from "./utils/getPrettyRpcError"
+import { ActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/ActionScreenErrorFooter"
 
 export interface TransactionActionScreenContainerV2Props
   extends ConfirmScreenProps {
@@ -146,25 +134,37 @@ export const TransactionActionScreenContainerV2: FC<
   const loadingOrErrorState = useMemo(() => {
     if (error) {
       console.warn("error", error)
-      const message = getMessageFromTrpcError(error)
       return (
-        <TransactionReviewSummaryStack bg="error.900">
-          <B3 color="text" py={1}>
-            Transaction failure predicted
-          </B3>
-          {message && (
-            <P4 color="errorText" whiteSpace="pre-wrap">
-              {message}
-            </P4>
-          )}
-        </TransactionReviewSummaryStack>
+        <ReviewFallback
+          calls={ensureArray(action.payload.transactions)}
+          message={
+            "Failed to load transaction details and fraud warnings. Transaction not executed."
+          }
+        />
       )
     }
     if (!transactionReview) {
       return <ListSkeleton px={0} />
     }
     return null
-  }, [error, transactionReview])
+  }, [action.payload.transactions, error, transactionReview])
+
+  const customErrorFooter = useMemo(() => {
+    if (!error) {
+      return null
+    }
+    const message = getMessageFromTrpcError(error)
+    if (!message) {
+      return null
+    }
+    const rpcMessage = getPrettyRpcError(message)
+    const title = rpcMessage ? (
+      <TransactionReviewLabel prefix="Tx not executed: " label={rpcMessage} />
+    ) : (
+      "Tx not executed"
+    )
+    return <ActionScreenErrorFooter title={title} errorMessage={message} />
+  }, [error])
 
   /** TODO: come back and refactor all this properly */
 
@@ -179,26 +179,29 @@ export const TransactionActionScreenContainerV2: FC<
           : false,
     )
     // We only keep the last one as if there's more than one the first one is for the deployment of the account
-    const lastSimulation = txSimulationErrors?.[txSimulationErrors.length - 1]
-    if (!lastSimulation) {
+    const lastSimulationError =
+      txSimulationErrors?.[txSimulationErrors.length - 1]
+    if (!lastSimulationError) {
       return null
     }
 
-    const errorMessage = getMessageFromSimulationError(lastSimulation)
+    const errorMessage = getMessageFromSimulationError(lastSimulationError)
+
+    const lastSimulationErrorOrMessage =
+      lastSimulationError.message || lastSimulationError.error
+
+    const rpcError = getPrettyRpcError(lastSimulationErrorOrMessage)
+
+    const label = rpcError ? rpcError : lastSimulationError.label
+    const message = rpcError ? lastSimulationErrorOrMessage : errorMessage
 
     return (
-      <Accordion size="sm" colorScheme="error" boxShadow={"menu"} allowToggle>
-        <AccordionItem>
-          <AccordionButton>
-            <AlertIcon display={"inline-block"} fontSize={"base"} mr={1} />{" "}
-            <Box as="span" flex="1" textAlign="left">
-              <TransactionReviewLabel label={lastSimulation.label} />
-            </Box>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel>{errorMessage}</AccordionPanel>
-        </AccordionItem>
-      </Accordion>
+      <ActionScreenErrorFooter
+        title={
+          <TransactionReviewLabel prefix="Tx not executed:" label={label} />
+        }
+        errorMessage={message}
+      />
     )
   }, [transactionReview])
 
@@ -260,11 +263,6 @@ export const TransactionActionScreenContainerV2: FC<
     warningsWithoutUndefined.success &&
     getHighestSeverity(warningsWithoutUndefined.data)
 
-  const { pendingTransactions: pendingUpgradeTransactions } =
-    useUpgradeAccountTransactions(selectedAccount)
-
-  const txnsHasV3UpgradeTxn = useTxnsHasV3UpgradeCallback()
-
   const isUpgradeTransaction = useMemo(
     () =>
       isTransactionActionItem(action) &&
@@ -299,13 +297,7 @@ export const TransactionActionScreenContainerV2: FC<
   const transactionReviewFallback = useMemo(
     () =>
       transactionReview?.isBackendDown && (
-        <ReviewFallback
-          calls={
-            isArray(action.payload.transactions)
-              ? action.payload.transactions
-              : [action.payload.transactions]
-          }
-        />
+        <ReviewFallback calls={ensureArray(action.payload.transactions)} />
       ),
     [transactionReview, action.payload.transactions],
   )
@@ -442,6 +434,8 @@ export const TransactionActionScreenContainerV2: FC<
 
   const footer = userClickedAddFunds ? (
     <WaitingForFunds />
+  ) : customErrorFooter ? (
+    customErrorFooter
   ) : (
     <WithActionScreenErrorFooter isTransaction>
       {isHighRisk && <ReviewFooter />}

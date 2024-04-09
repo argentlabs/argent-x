@@ -1,4 +1,4 @@
-import { Address } from "@argent/shared"
+import { Address } from "@argent/x-shared"
 
 import { useView } from "../../views/implementation/react"
 import {
@@ -9,6 +9,7 @@ import {
   collectionsByAccountAndNetworkView,
   contractAddressesNfts,
   nftAssetView,
+  collectionNftsByAccountAndNetworkView,
 } from "../../views/nft"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
@@ -36,6 +37,20 @@ export const useCollection = (contractAddress: Address) => {
 
 export const useCollectionNfts = (contractAddress: Address) => {
   return useView(collectionNftsView(contractAddress))
+}
+
+export const useCollectionNftsByAccountAndNetwork = (
+  contractAddress: Address,
+  accountAddress: Address,
+  networkId?: string,
+) => {
+  return useView(
+    collectionNftsByAccountAndNetworkView({
+      accountAddress,
+      contractAddress,
+      networkId,
+    }),
+  )
 }
 
 export const useNft = (contractAddress: Address, tokenId?: string) => {

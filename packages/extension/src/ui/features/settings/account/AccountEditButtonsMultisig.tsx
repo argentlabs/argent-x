@@ -1,4 +1,4 @@
-import { ButtonCell, H6, icons } from "@argent/ui"
+import { ButtonCell, H6, icons } from "@argent/x-ui"
 import { Button, Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 

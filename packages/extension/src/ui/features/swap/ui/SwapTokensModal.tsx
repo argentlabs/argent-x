@@ -1,4 +1,4 @@
-import { CellStack, H5, SearchInput } from "@argent/ui"
+import { CellStack, H5, SearchInput } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,

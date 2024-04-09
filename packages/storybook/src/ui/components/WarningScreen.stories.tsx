@@ -8,9 +8,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: Flex,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const AccountDeprecated = {

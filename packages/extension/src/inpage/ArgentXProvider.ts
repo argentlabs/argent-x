@@ -1,4 +1,4 @@
-import { getChainIdFromNetworkId } from "@argent/shared"
+import { getChainIdFromNetworkId } from "@argent/x-shared"
 import { BlockIdentifier, Call, Provider, ProviderInterface } from "starknet"
 
 import { Network, getProvider } from "../shared/network"

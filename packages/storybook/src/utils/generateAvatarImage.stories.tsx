@@ -1,4 +1,4 @@
-import { generateAvatarImage } from "@argent/shared"
+import { generateAvatarImage } from "@argent/x-shared"
 import { Box, Img, SimpleGrid } from "@chakra-ui/react"
 import { PropsWithChildren } from "react"
 

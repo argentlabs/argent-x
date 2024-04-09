@@ -1,10 +1,10 @@
-import { H5, P3 } from "@argent/ui"
+import { H5, P3 } from "@argent/x-ui"
 import { Center, VStack } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { HideOrDeleteAccountConfirmScreenProps } from "./hideOrDeleteAccountConfirmScreen.model"
-import { formatFullAddress } from "@argent/shared"
+import { formatFullAddress } from "@argent/x-shared"
 
 export const HideOrDeleteAccountConfirmScreen: FC<
   HideOrDeleteAccountConfirmScreenProps

@@ -1,6 +1,6 @@
 import { Mocked, describe, expect, test, vi } from "vitest"
 
-import { IHttpService, Token } from "@argent/shared"
+import { IHttpService, Token } from "@argent/x-shared"
 import Emittery from "emittery"
 
 import type { IAccountService } from "../../../../shared/account/service/interface"
@@ -128,7 +128,7 @@ describe("ActivityService", () => {
           ({
             address,
             networkId,
-          } as WalletAccount),
+          }) as WalletAccount,
       ),
     )
 
@@ -138,7 +138,7 @@ describe("ActivityService", () => {
           ({
             address,
             networkId,
-          } as Token),
+          }) as Token,
       ),
     )
 
@@ -148,7 +148,7 @@ describe("ActivityService", () => {
           ({
             contractAddress,
             networkId,
-          } as ContractAddress),
+          }) as ContractAddress,
       ),
     )
 

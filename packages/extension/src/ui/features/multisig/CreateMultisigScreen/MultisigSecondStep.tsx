@@ -1,4 +1,4 @@
-import { FieldError } from "@argent/ui"
+import { FieldError } from "@argent/x-ui"
 import { Box, Button } from "@chakra-ui/react"
 import { useFormContext } from "react-hook-form"
 
@@ -10,6 +10,10 @@ import { SetConfirmationsInput } from "../SetConfirmationsInput"
 import { ScreenLayout } from "./ScreenLayout"
 import { getErrorData } from "../../../../shared/errors/errorData"
 import { clientAccountService } from "../../../services/account"
+import { multisigService } from "../../../services/multisig"
+import { decodeBase58 } from "@argent/x-shared"
+import { SignerMetadata } from "../../../../shared/multisig/types"
+import { isEmpty } from "lodash-es"
 
 export const MultisigSecondStep = ({
   index,
@@ -27,6 +31,7 @@ export const MultisigSecondStep = ({
   const { action: createAccount, error } = useAction(
     clientAccountService.create.bind(clientAccountService),
   )
+
   const {
     formState: { errors },
     getValues,
@@ -36,9 +41,8 @@ export const MultisigSecondStep = ({
   const handleCreateMultisig = async () => {
     await trigger()
     if (isEmptyValue(errors) && creatorPubKey && creatorSignerKey) {
-      const signers = [creatorSignerKey].concat(
-        getValues("signerKeys").map((i) => i.key),
-      )
+      const signerKeys = getValues("signerKeys")
+      const signers = [creatorSignerKey].concat(signerKeys.map((i) => i.key))
 
       const threshold = getValues("confirmations")
 
@@ -49,6 +53,22 @@ export const MultisigSecondStep = ({
         publicKey: creatorPubKey,
         updatedAt: Date.now(),
       })
+
+      const signersWithMetadata = signerKeys
+        .filter((signer) => !isEmpty(signer.name))
+        .map(
+          (signer) =>
+            ({
+              key: decodeBase58(signer.key),
+              name: signer.name,
+            }) as SignerMetadata,
+        )
+
+      await multisigService.updateSignersMetadata(
+        creatorPubKey,
+        signersWithMetadata,
+      )
+
       if (result) {
         goNext()
       }

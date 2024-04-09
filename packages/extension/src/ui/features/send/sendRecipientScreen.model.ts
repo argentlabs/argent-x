@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { addressOrDomainInputSchema } from "@argent/shared"
+import { addressOrDomainInputSchema } from "@argent/x-shared"
 
 export const formSchema = z.object({
   query: addressOrDomainInputSchema,

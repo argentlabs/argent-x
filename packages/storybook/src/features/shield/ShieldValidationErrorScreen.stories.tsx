@@ -10,9 +10,6 @@ import { decorators } from "../../decorators/routerDecorators"
 export default {
   component: ShieldValidationErrorScreen,
   decorators,
-  parameters: {
-    layout: "fullscreen",
-  },
 }
 
 export const Scenario1 = {

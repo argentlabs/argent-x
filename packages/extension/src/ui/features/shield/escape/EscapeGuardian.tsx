@@ -1,8 +1,7 @@
-import { Button, FlowHeader, P4, icons } from "@argent/ui"
+import { Button, FlowHeader, P4, icons } from "@argent/x-ui"
 import { Center, Flex, ListItem, OrderedList } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { analytics } from "../../../services/analytics"
 import {
   ESCAPE_GUARDIAN_LINK,
   ShieldExternalLinkButton,
@@ -45,13 +44,7 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
       </OrderedList>
       <Center>
         <ShieldExternalLinkButton
-          onClick={() => {
-            analytics.track("argentShieldEscapeScreenAction", {
-              escapeId: "escapeGuardian",
-              remainingTime: liveAccountEscape.activeFromNowMs,
-              action: "detailedInstructions",
-            })
-          }}
+          onClick={() => undefined}
           href={ESCAPE_GUARDIAN_LINK}
           my={3}
         >

@@ -6,7 +6,7 @@ import { useArrayStorage } from "../../hooks/useStorage"
 import { Transaction } from "../../../shared/transactions"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { getAccountIdentifier } from "@argent/shared"
+import { getAccountIdentifier } from "@argent/x-shared"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
 import { isSafeUpgradeTransaction } from "../../../shared/utils/isUpgradeTransaction"
 
@@ -21,7 +21,7 @@ const byAccountSelector = memoize(
   (account) => (account ? getAccountIdentifier(account) : "unknown-account"),
 )
 
-export const useAccountTransactions: UseAccountTransactions = (account) => {
+const useSortedTransactions = (account?: BaseWalletAccount) => {
   const transactions = useArrayStorage(
     transactionsStore,
     byAccountSelector(account),
@@ -31,6 +31,12 @@ export const useAccountTransactions: UseAccountTransactions = (account) => {
     () => transactions.sort((a, b) => b.timestamp - a.timestamp),
     [transactions],
   )
+
+  return { transactions, sortedTransactions }
+}
+
+export const useAccountTransactions: UseAccountTransactions = (account) => {
+  const { transactions, sortedTransactions } = useSortedTransactions(account)
 
   const pendingTransactions = sortedTransactions.filter((transaction) => {
     const { finality_status } = getTransactionStatus(transaction)
@@ -43,15 +49,7 @@ export const useAccountTransactions: UseAccountTransactions = (account) => {
 export const useDeployAccountTransactions: UseAccountTransactions = (
   account,
 ) => {
-  const transactions = useArrayStorage(
-    transactionsStore,
-    byAccountSelector(account),
-  )
-
-  const sortedTransactions = useMemo(
-    () => transactions.sort((a, b) => b.timestamp - a.timestamp),
-    [transactions],
-  )
+  const { transactions, sortedTransactions } = useSortedTransactions(account)
 
   const pendingTransactions = sortedTransactions.filter((transaction) => {
     const { finality_status } = getTransactionStatus(transaction)
@@ -64,15 +62,7 @@ export const useDeployAccountTransactions: UseAccountTransactions = (
 export const useUpgradeAccountTransactions: UseAccountTransactions = (
   account,
 ) => {
-  const transactions = useArrayStorage(
-    transactionsStore,
-    byAccountSelector(account),
-  )
-
-  const sortedTransactions = useMemo(
-    () => transactions.sort((a, b) => b.timestamp - a.timestamp),
-    [transactions],
-  )
+  const { transactions, sortedTransactions } = useSortedTransactions(account)
 
   const pendingTransactions = sortedTransactions.filter((transaction) => {
     const { finality_status } = getTransactionStatus(transaction)

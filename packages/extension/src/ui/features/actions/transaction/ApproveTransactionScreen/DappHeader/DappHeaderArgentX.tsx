@@ -1,18 +1,18 @@
-import { H5, P4 } from "@argent/ui"
+import { H5, P4 } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 import { Call } from "starknet"
 
-import { ApiTransactionReviewResponse } from "../../../../../../shared/transactionReview.service"
+import { ReviewOfTransaction } from "../../../../../../shared/transactionReview/schema"
+import { KnownDappButtonWrapper } from "../../../connectDapp/KnownDappButtonWrapper"
 import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 import { TransactionIcon } from "./TransactionIcon"
 import { TransactionTitleArgentX } from "./TransactionTitleArgentX"
-import { KnownDappButtonWrapper } from "../../../connectDapp/KnownDappButtonWrapper"
 
 export interface DappHeaderArgentXProps {
   transactions?: Call[]
-  transactionReview?: ApiTransactionReviewResponse
+  transactionReview?: ReviewOfTransaction
   aggregatedData?: AggregatedSimData[]
   approveScreenType: ApproveScreenType
 }

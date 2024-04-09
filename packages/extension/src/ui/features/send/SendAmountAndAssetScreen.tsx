@@ -6,7 +6,7 @@ import {
   HeaderCell,
   NavigationContainer,
   icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 

@@ -4,7 +4,7 @@ import {
   CellStack,
   NavigationContainer,
   Switch,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { FC } from "react"
 
 interface BetaFeaturesSettingsScreenProps {}
@@ -17,7 +17,7 @@ export const BetaFeaturesSettingsScreen: FC<
       <CellStack>
         <ButtonCell
           rightIcon={<Switch isChecked={false} pointerEvents="none" />}
-          extendedDescription="ArgentX will use an RPC Provider (instead of the feeder gateway) to
+          extendedDescription="Argent X will use an RPC Provider (instead of the feeder gateway) to
             interact with Starknet."
         >
           Use RPC Provider

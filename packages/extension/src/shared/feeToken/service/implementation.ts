@@ -5,7 +5,7 @@ import { TokenWithBalance } from "../../token/__new/types/tokenBalance.model"
 import { BaseWalletAccount, WalletAccount } from "../../wallet.model"
 import { IFeeTokenService } from "./interface"
 import { INetworkService } from "../../network/service/interface"
-import { Address, isEqualAddress } from "@argent/shared"
+import { Address, isEqualAddress } from "@argent/x-shared"
 import {
   classHashSupportsTxV3,
   feeTokenNeedsTxV3Support,

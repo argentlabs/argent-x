@@ -5,8 +5,7 @@ import {
   ScrollContainer,
   StickyGroup,
   useNavigateBack,
-  icons,
-} from "@argent/ui"
+} from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import {
   FC,
@@ -19,9 +18,7 @@ import {
 import Measure, { ContentRect } from "react-measure"
 
 import { WalletAccount } from "../../../../../shared/wallet.model"
-import { formatTruncatedAddress } from "@argent/shared"
-
-const { AlertFillIcon } = icons
+import { formatTruncatedAddress } from "@argent/x-shared"
 
 export interface ConfirmPageProps {
   onSubmit?: (e: FormEvent<HTMLFormElement>) => void

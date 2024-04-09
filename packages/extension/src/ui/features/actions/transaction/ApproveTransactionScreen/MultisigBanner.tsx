@@ -1,4 +1,4 @@
-import { P4, SplitProgress, icons } from "@argent/ui"
+import { P4, SplitProgress, icons } from "@argent/x-ui"
 import { Box, Flex, Progress } from "@chakra-ui/react"
 
 import { WalletAccount } from "../../../../../shared/wallet.model"
@@ -21,14 +21,14 @@ export const MultisigBanner = ({
 
   return (
     <Box
-      backgroundColor="surface.elevated"
+      backgroundColor="surface-elevated"
       p={3}
       borderRadius="lg"
       _hover={
         onClick
           ? {
               cursor: "pointer",
-              backgroundColor: "surface.elevated.hover",
+              backgroundColor: "surface-elevated-hover",
             }
           : {}
       }

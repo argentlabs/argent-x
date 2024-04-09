@@ -1,7 +1,10 @@
 import { debounce } from "lodash-es"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
 
-import { isAllowedNumericInputValue } from "../../../components/utils/isAllowedNumericInputValue"
+import {
+  isAllowedNumericInputValue,
+  prettifyTokenAmount,
+} from "@argent/x-shared"
 import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { TokenValue } from "./TokenValue"
 import { MaxEthModal } from "./MaxEthModal"
@@ -10,8 +13,7 @@ import { Token } from "../../../../shared/token/__new/types/token.model"
 import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
 import { isETH } from "../utils"
 import { useDisclosure, Flex, Input, Button } from "@chakra-ui/react"
-import { H6, L2, LoadingPulse, P4, icons } from "@argent/ui"
-import { prettifyTokenAmount } from "../../../../shared/token/price"
+import { H6, L2, LoadingPulse, P4, icons } from "@argent/x-ui"
 
 const { ChevronDownIcon } = icons
 

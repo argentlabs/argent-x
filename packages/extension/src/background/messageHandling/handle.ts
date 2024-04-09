@@ -26,6 +26,7 @@ import { walletSingleton } from "../walletSingleton"
 import { safeMessages, safeIfPreauthorizedMessages } from "./messages"
 import browser from "webextension-polyfill"
 import { feeTokenService } from "../../shared/feeToken/service"
+import { z } from "zod"
 
 const handlers = [
   handleAccountMessage,
@@ -38,10 +39,21 @@ const handlers = [
   handleUdcMessaging,
 ] as Array<HandleMessage<MessageType>>
 
+const argentXMessageSchema = z.object({
+  type: z.string(),
+  payload: z.unknown().optional(),
+})
+
 export const handleMessage = async (
   [msg, sender]: [MessageType, browser.runtime.MessageSender],
   port?: browser.runtime.Port,
 ) => {
+  const { success } = argentXMessageSchema.safeParse(msg)
+  if (!success) {
+    console.warn("Invalid message schema received. Ignoring.")
+    return
+  }
+
   await Promise.all([migrateWallet()]) // do migrations before handling messages
 
   const messagingKeys = await getMessagingKeys()

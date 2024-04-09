@@ -1,5 +1,5 @@
 import { FC, ReactEventHandler } from "react"
-import { P4 } from "@argent/ui"
+import { P4 } from "@argent/x-ui"
 import { Button, Flex, FlexProps, Link } from "@chakra-ui/react"
 
 import {
@@ -17,7 +17,7 @@ export const LegalAgreementsBanner: FC<LegalAgreementsBannerProps> = ({
 }) => {
   return (
     <Flex
-      bg={"surface.default"}
+      bg={"surface-default"}
       p={4}
       gap={2}
       alignItems={"center"}
@@ -25,7 +25,7 @@ export const LegalAgreementsBanner: FC<LegalAgreementsBannerProps> = ({
       borderTopColor="border"
       {...rest}
     >
-      <P4 color="text.secondary">
+      <P4 color="text-secondary">
         We’ve updated our terms, please accept the new{" "}
         <Link
           href={ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL}

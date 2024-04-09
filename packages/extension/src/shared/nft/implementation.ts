@@ -6,8 +6,9 @@ import {
   type NftItem,
   type PaginatedItems,
   isEqualAddress,
+  isArgentNetworkId,
   PaginatedCollections,
-} from "@argent/shared"
+} from "@argent/x-shared"
 import { differenceWith, groupBy, isEqual } from "lodash-es"
 import { AllowArray, constants, num, shortString } from "starknet"
 import type { INFTService } from "./interface"
@@ -56,6 +57,9 @@ export class NFTService implements INFTService {
 
   isSupported(network: Network) {
     try {
+      if (!isArgentNetworkId(network.id)) {
+        return false
+      }
       chainIdToPandoraNetwork(network.chainId) // throws if not supported
       return true
     } catch {
@@ -252,9 +256,8 @@ export class NFTService implements INFTService {
     if (isEkuboNft(nft)) {
       nftMarketplace = ekuboMarketplace
     } else {
-      const nftMarketplaceKey = await this.settingsStore.get(
-        "nftMarketplaceKey",
-      )
+      const nftMarketplaceKey =
+        await this.settingsStore.get("nftMarketplaceKey")
       nftMarketplace = defaultNftMarketplaces[nftMarketplaceKey]
     }
     if (!nftMarketplace.url[networkId]) {

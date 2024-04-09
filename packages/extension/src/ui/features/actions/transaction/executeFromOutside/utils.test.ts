@@ -2,7 +2,7 @@ import { validateOutsideExecution } from "./utils"
 import { stark, typedData } from "starknet"
 import * as whitelist from "./whitelist"
 import { getMockNetwork } from "../../../../../../test/network.mock"
-import { addressSchema } from "@argent/shared"
+import { addressSchema } from "@argent/x-shared"
 
 vi.mock("./whitelist")
 

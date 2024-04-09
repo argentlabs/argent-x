@@ -1,4 +1,4 @@
-import { Collection, NftItem, addressSchema } from "@argent/shared"
+import { Collection, NftItem, addressSchema } from "@argent/x-shared"
 import useSWR, { SWRConfiguration } from "swr"
 
 import { useCollection, useNft } from "./nfts.state"
