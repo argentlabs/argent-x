@@ -141,6 +141,7 @@ module.exports = {
           new EsbuildPlugin({
             loader: "tsx",
             target: "es2020",
+            drop: ["console"],
           }),
         ],
         splitChunks: {
