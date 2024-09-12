@@ -1,4 +1,4 @@
-import { Button, icons } from "@argent/x-ui"
+import { Button, iconsDeprecated } from "@argent/x-ui"
 import {
   Input,
   InputGroup,
@@ -10,7 +10,7 @@ import { FC, FormEvent, useCallback, useRef, useState } from "react"
 
 import { useOnClickOutside } from "../../../services/useOnClickOutside"
 
-const { EditIcon, TickIcon } = icons
+const { EditIcon, TickIcon } = iconsDeprecated
 
 interface AccountNameProps extends InputProps {
   onSubmit: () => void

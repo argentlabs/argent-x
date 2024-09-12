@@ -1,30 +1,34 @@
 import { FC, Suspense, useEffect, useMemo, useState } from "react"
 
-import { normalizeAddress } from "@argent/x-shared"
+import {
+  ReviewOfTransaction,
+  getHighestSeverity,
+  isNotTransactionSimulationError,
+  warningSchema,
+} from "@argent/x-shared/simulation"
+import { IconDeprecatedKeys, P4 } from "@argent/x-ui"
+import {
+  TransactionReviewActions,
+  TransactionReviewSimulation,
+} from "@argent/x-ui/simulation"
+import { Center, Collapse } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { z } from "zod"
-import { getTransactionActionByType } from "../../../../../shared/transactionReview.service"
-import {
-  Property,
-  ReviewOfTransaction,
-  warningSchema,
-} from "../../../../../shared/transactionReview/schema"
-import { MultisigPendingTxModal } from "../../../multisig/MultisigPendingTxModal"
-import { TransactionReviewActions } from "../../transactionV2/action/TransactionReviewActions"
+import { useCurrentNetwork } from "../../../networks/hooks/useCurrentNetwork"
+import { useActionScreen } from "../../hooks/useActionScreen"
+import { TransactionHeader } from "../../transactionV2/header"
 import { WarningBanner } from "../../warning/WarningBanner"
-import { AccountNetworkInfoArgentX } from "./AccountNetworkInfoArgentX"
-import { BalanceChangeOverviewArgentX } from "./BalanceChangeOverviewArgentX"
+
+import { MultisigConfirmationsBanner } from "../MultisigConfirmationsBanner"
+import { AirGapReviewButtonContainer } from "../airgap/AirGapReviewButton"
 import { ConfirmScreen } from "./ConfirmScreen"
 import { DappHeaderArgentX } from "./DappHeader/DappHeaderArgentX"
-import { MultisigBanner } from "./MultisigBanner"
-import { SimulationLoadingBanner } from "./SimulationLoadingBanner"
-import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
-import { getHighestSeverity } from "../../warning/helper"
-import { Center, Collapse } from "@chakra-ui/react"
 import { TransactionActions } from "./TransactionActions"
-import { P4 } from "@argent/x-ui"
+import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
+import { LedgerActionModal } from "./ledger/LedgerActionModal"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
+  actionHash,
   actionIsApproving,
   aggregatedData,
   disableConfirm,
@@ -38,7 +42,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   approveScreenType,
   hasPendingMultisigTransactions,
   onReject,
-  multisigModalDisclosure,
   hasBalanceChange,
   showTransactionActions,
   transactionActionsType,
@@ -48,50 +51,51 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   multisigBannerProps,
   onConfirmAnyway,
   transactionAction,
+  ledgerActionModalDisclosure,
+  ledgerErrorMessage,
+  isRejectOnChain,
+  isUpgradeAccount,
+  nonce,
+  txNeedsRetry,
   ...rest
 }) => {
+  const { action } = useActionScreen()
   const [hasAcceptedRisk, setHasAcceptedRisk] = useState(false)
   const [isHighRisk, setIsHighRisk] = useState(false)
+  const networkId = useCurrentNetwork().id
 
   const reviewOfTransaction: ReviewOfTransaction = useMemo(() => {
-    if (transactionReview) {
+    if (transactionReview && transactionReview.transactions[0]) {
       return transactionReview.transactions[0].reviewOfTransaction
     }
   }, [transactionReview])
 
-  const recipientAddress = useMemo(() => {
-    const action = getTransactionActionByType(
-      "ERC20_transfer",
-      reviewOfTransaction,
-    )
-    if (action) {
-      const recipientProperty = [
-        ...action.properties,
-        ...(action.defaultProperties || []),
-      ].find((p) => p.type === "address")
-      if (recipientProperty) {
-        const recipient = recipientProperty as Extract<
-          Property,
-          { type: "address" }
-        >
-        return normalizeAddress(recipient.address)
-      }
-    }
-
-    return undefined
-  }, [reviewOfTransaction])
-
   const transactionReviewActions = useMemo(() => {
+    if (isRejectOnChain) {
+      return (
+        <P4
+          background={"neutrals.800"}
+          borderRadius={"md"}
+          fontWeight={"semibold"}
+          display={"flex"}
+          justifyContent={"space-between"}
+          p={3}
+        >
+          On-chain rejection
+        </P4>
+      )
+    }
     return transactionReview?.transactions.map((transaction, index) => {
       return (
         <TransactionReviewActions
           key={`review-${index}`}
           reviewOfTransaction={transaction.reviewOfTransaction}
           initiallyExpanded={false}
+          networkId={networkId}
         />
       )
     })
-  }, [transactionReview])
+  }, [isRejectOnChain, transactionReview?.transactions, networkId])
 
   const warnings = useMemo(
     () =>
@@ -100,6 +104,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       }),
     [transactionReview],
   )
+  const confirmButtonLabel = txNeedsRetry ? "Retry" : confirmButtonText
 
   const warningsWithoutUndefined = useMemo(
     () =>
@@ -143,68 +148,176 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     )
   }, [warningsWithoutUndefined, onReject])
 
+  const rejectOnChainBanner = useMemo(() => {
+    if (!isRejectOnChain) {
+      return null
+    }
+    return (
+      <P4
+        background={"black"}
+        border={"1px solid"}
+        borderColor={"neutrals.600"}
+        borderRadius={"xl"}
+        color={"neutrals.300"}
+        p={3}
+      >
+        On-chain rejections don’t send any funds. Executing this on-chain
+        rejection will allow the next queued transaction to move to the front of
+        the queue
+      </P4>
+    )
+  }, [isRejectOnChain])
+
+  const onConfirm = () => {
+    return onConfirmAnyway
+      ? onConfirmAnyway(transactionAction)
+      : onSubmit(transactionAction)
+  }
+
+  const transactionReviewSimulation = useMemo(() => {
+    if (!transactionReview) {
+      return null
+    }
+    const txSimulations = transactionReview.transactions.flatMap(
+      (transaction) =>
+        isNotTransactionSimulationError(transaction)
+          ? transaction.simulation
+          : false,
+    )
+    // We only keep the last one as if there's more than one the first one is for the deployment of the account
+    const lastSimulation = txSimulations?.[txSimulations.length - 1]
+    if (!lastSimulation) {
+      return null
+    }
+
+    // don't show 'no balance change' when there is a critical warning as the two messages conflict from a user perspective
+    const hasNoBalanceChange = isEmpty(lastSimulation.summary)
+    const hasCriticalWarning = transactionReview.transactions.some(
+      (transaction) =>
+        transaction.reviewOfTransaction?.warnings?.some(
+          (warning) => warning.severity === "critical",
+        ),
+    )
+
+    if (hasCriticalWarning && hasNoBalanceChange) {
+      return null
+    }
+
+    return (
+      <TransactionReviewSimulation
+        simulation={lastSimulation}
+        networkId={networkId}
+      />
+    )
+  }, [transactionReview, networkId])
+
+  const { title, subtitle, dappLogoUrl, dappHost, iconKey } = useMemo(() => {
+    if (isRejectOnChain) {
+      return {
+        title: "On-chain rejection",
+        iconKey: "CloseIcon" as IconDeprecatedKeys,
+      }
+    }
+    if (isUpgradeAccount) {
+      return {
+        title: "Upgrade account",
+        iconKey: "UpgradeIcon" as IconDeprecatedKeys,
+      }
+    }
+    if (action) {
+      return {
+        title: action.meta?.title,
+        subtitle: action.meta?.subtitle ?? action.meta.origin,
+        dappLogoUrl:
+          transactionReview?.transactions[0]?.reviewOfTransaction?.targetedDapp
+            ?.logoUrl,
+        dappHost: action.meta.origin,
+        iconKey: action.meta?.icon as IconDeprecatedKeys,
+      }
+    }
+    return {}
+  }, [
+    action,
+    isRejectOnChain,
+    isUpgradeAccount,
+    transactionReview?.transactions,
+  ])
+
   return (
     <Suspense fallback={null}>
       <ConfirmScreen
-        confirmButtonText={confirmButtonText}
+        confirmButtonText={confirmButtonLabel}
         confirmButtonIsLoading={actionIsApproving}
         confirmButtonLoadingText={confirmButtonText}
-        rejectButtonText="Cancel"
+        rejectButtonText={"Cancel"}
         confirmButtonDisabled={
           disableConfirm || (isHighRisk && !hasAcceptedRisk)
         }
         selectedAccount={selectedAccount}
         onSubmit={() => {
-          if (hasPendingMultisigTransactions) {
-            multisigModalDisclosure.onOpen()
-          } else {
-            onSubmit(transactionAction)
-          }
+          onSubmit(transactionAction)
         }}
         showHeader={true}
         onReject={onReject}
         {...rest}
       >
         {/** Use Transaction Review to get DappHeader */}
-        <DappHeaderArgentX
-          transactions={transactions}
-          transactionReview={reviewOfTransaction}
-          aggregatedData={aggregatedData}
-          approveScreenType={approveScreenType}
-        />
-        {multisig && <MultisigBanner {...multisigBannerProps} />}
-        {transactionReviewWarnings}
-        {hasBalanceChange ? (
-          <BalanceChangeOverviewArgentX
-            aggregatedData={aggregatedData}
+        {!isRejectOnChain && !isUpgradeAccount && (
+          <DappHeaderArgentX
+            transactions={transactions}
             transactionReview={reviewOfTransaction}
+            aggregatedData={aggregatedData}
+            approveScreenType={approveScreenType}
           />
-        ) : (
-          isSimulationLoading && <SimulationLoadingBanner />
         )}
-        <Collapse
-          in={showTransactionActions && !transactionReview}
-          animateOpacity
-        >
-          {transactionActionsType && (
-            <TransactionActions action={transactionActionsType} />
-          )}
-        </Collapse>
+        {(action || isRejectOnChain || isUpgradeAccount) && (
+          <TransactionHeader
+            px={0}
+            title={title}
+            dappLogoUrl={dappLogoUrl}
+            subtitle={subtitle}
+            dappHost={dappHost}
+            iconKey={iconKey}
+          />
+        )}
+        {rejectOnChainBanner}
+        {multisigBannerProps && (
+          <MultisigConfirmationsBanner {...multisigBannerProps} />
+        )}
+        {transactionReviewWarnings}
+        {!isRejectOnChain && (
+          <>
+            {transactionReviewSimulation}
+            <Collapse
+              in={showTransactionActions && !transactionReview}
+              animateOpacity
+            >
+              {transactionActionsType && (
+                <TransactionActions
+                  action={transactionActionsType}
+                  networkId={networkId}
+                />
+              )}
+            </Collapse>
+          </>
+        )}
         {transactionReviewActions}
-        <AccountNetworkInfoArgentX
-          account={selectedAccount}
-          to={recipientAddress}
+        <AirGapReviewButtonContainer
+          transactions={transactions}
+          estimatedFees={transactionReview?.enrichedFeeEstimation}
+          selectedAccount={selectedAccount}
+          nonce={nonce}
         />
-        {multisig && multisigModalDisclosure.isOpen && (
-          <MultisigPendingTxModal
-            isOpen={multisigModalDisclosure.isOpen}
-            onConfirm={() =>
-              onConfirmAnyway
-                ? onConfirmAnyway(transactionAction)
-                : onSubmit(transactionAction)
-            }
-            onClose={multisigModalDisclosure.onClose}
-            noOfOwners={multisig.threshold}
+        {ledgerActionModalDisclosure?.isOpen && (
+          <LedgerActionModal
+            isOpen={ledgerActionModalDisclosure.isOpen}
+            transactions={transactions}
+            estimatedFees={transactionReview?.enrichedFeeEstimation}
+            nonce={nonce}
+            onClose={ledgerActionModalDisclosure.onClose}
+            onSubmit={onConfirm}
+            errorMessage={ledgerErrorMessage}
+            account={selectedAccount}
           />
         )}
         {hasBalanceChange && !transactionReview && (

@@ -1,13 +1,13 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { Box, Center, Image } from "@chakra-ui/react"
 
 import { AggregatedSimData } from "@argent/x-shared"
 import { useMemo } from "react"
 import { Network } from "../../../../../../../shared/network"
-import { useToken } from "../../../../../accountTokens/tokens.state"
 import { UnknownTokenIcon } from "./UnknownTokenIcon"
+import { useToken } from "../../../../../accountTokens/tokens.state"
 
-const { SendIcon } = icons
+const { SendIcon } = iconsDeprecated
 
 export const SendTransactionIcon = ({
   aggregatedData,
@@ -25,6 +25,7 @@ export const SendTransactionIcon = ({
     address: srcAddress || "0x0",
     networkId: network.id,
   })
+
   return (
     <Center data-testid="send-transaction-icon">
       <Box height="14" width="14" position="relative">

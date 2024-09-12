@@ -1,5 +1,5 @@
 import { Address, addressSchema, getNftPicture } from "@argent/x-shared"
-import { H6, P4, icons } from "@argent/x-ui"
+import { H6, P4, iconsDeprecated } from "@argent/x-ui"
 import { Circle, Flex, Image } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -10,7 +10,7 @@ import {
 import { useNft } from "../accountNfts/nfts.state"
 import { useRemoteNft } from "../accountNfts/useRemoteNft"
 
-const { ChevronDownIcon } = icons
+const { ChevronDownIcon } = iconsDeprecated
 
 interface NftInputProps extends CustomButtonCellProps {
   contractAddress?: Address
@@ -50,7 +50,7 @@ export const NftInput: FC<NftInputProps> = ({
         <H6 whiteSpace="initial">{title}</H6>
         <P4 color={"neutrals.400"}>{subtitle}</P4>
       </Flex>
-      <Circle size={7} bg={"neutrals.900"}>
+      <Circle size={7} bg="surface-default">
         <ChevronDownIcon fontSize={"2xs"} />
       </Circle>
     </CustomButtonCell>

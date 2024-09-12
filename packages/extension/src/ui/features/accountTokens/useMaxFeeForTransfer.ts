@@ -1,19 +1,17 @@
 import { Call, CallData, uint256 } from "starknet"
 import useSWR from "swr"
 
-import { getAccountIdentifier } from "../../../shared/wallet.service"
-import {
-  getEstimatedFee,
-  getSimulationEstimatedFee,
-} from "../../services/backgroundTransactions"
-import { Account } from "../accounts/Account"
 import {
   Address,
-  isEqualAddress,
+  estimatedFeesToMaxFeeTotal,
+  multiplyBigIntByFloat,
   swrRefetchDisabledConfig,
   transferCalldataSchema,
 } from "@argent/x-shared"
-import { estimatedFeesToMaxFeeTotal } from "../../../shared/transactionSimulation/utils"
+import { getAccountIdentifier } from "../../../shared/wallet.service"
+import { getEstimatedFee } from "../../services/backgroundTransactions"
+import { Account } from "../accounts/Account"
+import { getReviewForTransactions } from "../actions/transactionV2/useTransactionReviewV2"
 
 export const maxFeeEstimateForTransfer = async (
   feeTokenAddress?: Address,
@@ -25,9 +23,6 @@ export const maxFeeEstimateForTransfer = async (
 ) => {
   if (!account || !tokenAddress || !feeTokenAddress) {
     return
-  }
-  if (!isEqualAddress(tokenAddress, feeTokenAddress)) {
-    return 0n
   }
 
   const calls: Call[] = [
@@ -46,9 +41,17 @@ export const maxFeeEstimateForTransfer = async (
   ]
 
   const estimatedFee =
-    (await getSimulationEstimatedFee(calls, feeTokenAddress)) ??
+    (
+      await getReviewForTransactions({
+        calls,
+        feeTokenAddress,
+        selectedAccount: account,
+      })
+    )?.result.enrichedFeeEstimation ??
     (await getEstimatedFee(calls, account, feeTokenAddress))
-  return estimatedFeesToMaxFeeTotal(estimatedFee)
+
+  // We add 10% overhead to make sure the estimate is still valid in the simulation
+  return multiplyBigIntByFloat(estimatedFeesToMaxFeeTotal(estimatedFee), 1.1)
 }
 
 export const useMaxFeeEstimateForTransfer = (
@@ -59,9 +62,10 @@ export const useMaxFeeEstimateForTransfer = (
     "address" | "networkId" | "needsDeploy" | "classHash" | "type"
   >,
   balance = 0n,
+  fetch: boolean = false,
 ) => {
   const key =
-    account && tokenAddress
+    fetch && account && tokenAddress
       ? [
           getAccountIdentifier(account),
           "maxFeeEstimateForTransferV2",

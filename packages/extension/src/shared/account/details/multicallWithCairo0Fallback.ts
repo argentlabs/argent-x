@@ -14,7 +14,7 @@ export async function multicallWithCairo0Fallback(
       entrypoint: getEntryPointSafe(call.entrypoint, "1"),
     }
     const response = await multicall.callContract(callCairo1)
-    if (response.result !== undefined) {
+    if (response !== undefined) {
       return response
     }
   } catch {

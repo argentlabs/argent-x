@@ -4,30 +4,38 @@ import path from "path"
 import { expect, test } from "vitest"
 
 import { Wallet } from "../src/background/wallet"
-import { WalletAccountSharedService } from "../src/shared/account/service/shared.service"
-import { WalletAccountStarknetService } from "../src/background/wallet/account/starknet.service"
-import { WalletBackupService } from "../src/background/wallet/backup/backup.service"
-import { WalletCryptoSharedService } from "../src/background/wallet/crypto/shared.service"
-import { WalletCryptoStarknetService } from "../src/background/wallet/crypto/starknet.service"
-import { WalletDeploymentStarknetService } from "../src/background/wallet/deployment/starknet.service"
+import { WalletAccountStarknetService } from "../src/background/wallet/account/WalletAccountStarknetService"
+import { WalletBackupService } from "../src/background/wallet/backup/WalletBackupService"
+import { WalletCryptoSharedService } from "../src/background/wallet/crypto/WalletCryptoSharedService"
+import { WalletCryptoStarknetService } from "../src/background/wallet/crypto/WalletCryptoStarknetService"
+import { WalletDeploymentStarknetService } from "../src/background/wallet/deployment/WalletDeploymentStarknetService"
 import { LoadContracts } from "../src/background/wallet/loadContracts"
-import { WalletRecoverySharedService } from "../src/background/wallet/recovery/shared.service"
-import { WalletRecoveryStarknetService } from "../src/background/wallet/recovery/starknet.service"
+import { WalletRecoverySharedService } from "../src/background/wallet/recovery/WalletRecoverySharedService"
+import { WalletRecoveryStarknetService } from "../src/background/wallet/recovery/WalletRecoveryStarknetService"
 import { Locked } from "../src/background/wallet/session/interface"
-import { WalletSessionService } from "../src/background/wallet/session/session.service"
+import { WalletSessionService } from "../src/background/wallet/session/WalletSessionService"
 import { WalletSession } from "../src/background/wallet/session/walletSession.model"
-import { emitterMock } from "../src/background/wallet/test.utils"
+import {
+  accountServiceMock,
+  emitterMock,
+  httpServiceMock,
+  ledgerServiceMock,
+  multisigBackendServiceMock,
+} from "../src/background/wallet/test.utils"
+import { WalletAccountSharedService } from "../src/shared/account/service/accountSharedService/WalletAccountSharedService"
 import {
   deserializeFactory,
   serialize,
 } from "../src/shared/account/store/serialize"
-import { tryToMintFeeToken } from "../src/shared/devnet/mintFeeToken"
+import { AnalyticsService } from "../src/shared/analytics/AnalyticsService"
+import { tryToMintAllFeeTokens } from "../src/shared/devnet/mintFeeToken"
 import { WalletError } from "../src/shared/errors/wallet"
-import { MultisigBackendService } from "../src/shared/multisig/service/backend/implementation"
+import { MultisigBackendService } from "../src/shared/multisig/service/backend/MultisigBackendService"
 import { PendingMultisig } from "../src/shared/multisig/types"
 import { pendingMultisigEqual } from "../src/shared/multisig/utils/selectors"
 import { Network } from "../src/shared/network"
-import { INetworkService } from "../src/shared/network/service/interface"
+import { INetworkService } from "../src/shared/network/service/INetworkService"
+import { ISettingsStorage } from "../src/shared/settings/types"
 import {
   ArrayStorage,
   KeyValueStorage,
@@ -43,16 +51,15 @@ import { adaptArrayStorage } from "../src/shared/storage/__new/repository"
 import { accountsEqual } from "../src/shared/utils/accountsEqual"
 import {
   BaseMultisigWalletAccount,
+  SignerType,
   WalletAccount,
 } from "../src/shared/wallet.model"
 import { WalletStorageProps } from "../src/shared/wallet/walletStore"
 import backup from "./backup.mock.json"
 import backupWrong from "./backup_wrong.mock.json"
-import { AnalyticsService } from "../src/shared/analytics/implementation"
-import {
-  ISettingsStorage,
-  SettingsStorageKey,
-} from "../src/shared/settings/types"
+
+import { IReferralService } from "../src/background/services/referral/IReferralService"
+import { LedgerSharedService } from "../src/shared/ledger/service/LedgerSharedService"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
@@ -62,14 +69,14 @@ const argentAccountCompiledContract = fs.readFileSync(
   "utf8",
 )
 
-const proxyCompiledContract = fs.readFileSync(
-  path.join(__dirname, "../src/contracts/Proxy.txt"),
+const argentAccountCasm = fs.readFileSync(
+  path.join(__dirname, "../src/contracts/ArgentAccount.casm.txt"),
   "utf8",
 )
 
 const loadContracts: LoadContracts = async () => [
-  proxyCompiledContract,
   argentAccountCompiledContract,
+  argentAccountCasm,
 ]
 
 const NETWORK = "testnetwork"
@@ -78,8 +85,8 @@ const networkService: Pick<INetworkService, "getById"> = {
   getById: async (networkId) => {
     return (networkId === NETWORK && {
       id: NETWORK,
-      chainId: "SN_GOERLI",
-      rpcUrl: "http://127.0.0.1:5050/",
+      chainId: "SN_SEPOLIA",
+      rpcUrl: "http://127.0.0.1:5050",
       name: "Test Network",
     }) as Network
   },
@@ -151,10 +158,18 @@ const getWallet = ({
     sessionStore,
     baseMultisigStore,
     pendingMultisigStore,
+    httpServiceMock,
+    accountServiceMock,
   )
+
   const defaultAnalyticsService = new AnalyticsService(
     defaultAccountSharedService,
     getSettingsStore(""),
+  )
+
+  const defaultLedgerService = new LedgerSharedService(
+    networkService,
+    multisigBackendServiceMock,
   )
 
   const defaultCryptoStarknetService = new WalletCryptoStarknetService(
@@ -162,12 +177,14 @@ const getWallet = ({
     sessionStore,
     pendingMultisigStore,
     defaultAccountSharedService,
+    defaultLedgerService,
     loadContracts,
   )
 
   const defaultRecoveryStarknetService = new WalletRecoveryStarknetService(
-    accountStore,
     baseMultisigStore,
+    multisigBackendServiceMock,
+    ledgerServiceMock,
     defaultCryptoStarknetService,
     defaultAccountSharedService,
   )
@@ -201,7 +218,12 @@ const getWallet = ({
     defaultAccountSharedService,
     defaultCryptoStarknetService,
     defaultMultisigBackendService,
+    defaultLedgerService,
   )
+
+  const defaultReferralService = (): IReferralService => {
+    return { trackReferral: () => Promise.resolve() }
+  }
 
   const defaultDeployStarknetService = new WalletDeploymentStarknetService(
     accountStore,
@@ -215,6 +237,7 @@ const getWallet = ({
     defaultBackUpService,
     networkService,
     defaultAnalyticsService,
+    defaultReferralService(),
   )
 
   const defaultCryptoSharedService = new WalletCryptoSharedService(
@@ -241,6 +264,7 @@ const getWallet = ({
 }
 
 describe("Wallet", () => {
+  // Skipped for now until devnet supports SN_SEPOLIA chain id
   test("create a new wallet", async () => {
     const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet1")
     const accountStore = getAccountStore("test:accounts1")
@@ -272,8 +296,8 @@ describe("Wallet", () => {
       WalletBackupService.validateBackup(backupWithoutAccount as string),
     ).toBe(true)
 
-    const account = await wallet.newAccount(NETWORK, "standardCairo0") // devnet only supports cairo 0 for now
-    void tryToMintFeeToken(account, networkService)
+    const account = await wallet.newAccount(NETWORK, "standard")
+    void tryToMintAllFeeTokens(account, networkService)
     const { txHash } = await wallet.deployAccount(account)
 
     expect(txHash).toMatch(REGEX_HEXSTRING)
@@ -305,7 +329,7 @@ describe("Wallet", () => {
         address: backup.argent.accounts[0].address,
         networkId: backup.argent.accounts[0].network,
         signer: {
-          type: "local_secret",
+          type: SignerType.LOCAL_SECRET,
           derivationPath: backup.argent.accounts[0].signer.derivationPath,
         },
         network: await networkService.getById(

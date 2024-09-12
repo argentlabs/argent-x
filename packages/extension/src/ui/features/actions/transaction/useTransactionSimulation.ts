@@ -13,7 +13,7 @@ import { ARGENT_TRANSACTION_SIMULATION_API_ENABLED } from "./../../../../shared/
 
 export interface IUseTransactionSimulation {
   transactionAction: TransactionAction
-  feeTokenAddress: Address
+  feeTokenAddress?: Address
   actionHash?: string
 }
 
@@ -28,6 +28,10 @@ export const useTransactionSimulation = ({
 }: IUseTransactionSimulation) => {
   const transactionSimulationEnabled = useTransactionSimulationEnabled()
   const transactionSimulationFetcher = useCallback(async () => {
+    // this will never happen, just to make typescript happy
+    if (!feeTokenAddress) {
+      return undefined
+    }
     if (transactionAction.type !== TransactionType.INVOKE) {
       // Backend Tx simulation only supports INVOKE transactions
       return undefined
@@ -59,7 +63,9 @@ export const useTransactionSimulation = ({
   return useConditionallyEnabledSWR<
     ApiTransactionBulkSimulationResponse | undefined
   >(
-    Boolean(actionHash) && transactionSimulationEnabled,
+    Boolean(actionHash) &&
+      Boolean(feeTokenAddress) &&
+      transactionSimulationEnabled,
     [actionHash, "transactionSimulation"],
     transactionSimulationFetcher,
     swrRefetchDisabledConfig,

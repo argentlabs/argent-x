@@ -1,8 +1,7 @@
 import { FC, useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useAppState } from "../../app.state"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import {
   hiddenAccountsOnNetworkFamily,
   visibleAccountsOnNetworkFamily,
@@ -11,15 +10,16 @@ import { useView } from "../../views/implementation/react"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { AccountScreenEmpty } from "./AccountScreenEmpty"
 import { autoSelectAccountOnNetwork } from "./switchAccount"
+import { selectedNetworkIdView } from "../../views/network"
 
 export const AccountScreenEmptyContainer: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const visibleAccounts = useView(
-    visibleAccountsOnNetworkFamily(switcherNetworkId),
+    visibleAccountsOnNetworkFamily(selectedNetworkId),
   )
   const hiddenAccounts = useView(
-    hiddenAccountsOnNetworkFamily(switcherNetworkId),
+    hiddenAccountsOnNetworkFamily(selectedNetworkId),
   )
   const hasVisibleAccounts = visibleAccounts.length > 0
   const hasHiddenAccounts = hiddenAccounts.length > 0

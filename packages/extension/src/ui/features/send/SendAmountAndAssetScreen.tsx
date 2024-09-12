@@ -5,17 +5,17 @@ import {
   CellStack,
   HeaderCell,
   NavigationContainer,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
 import { AccountAddressListItem } from "../accounts/AccountAddressListItem"
-import { SendQuery } from "./schema"
+import { SendQuery } from "../../../shared/send/schema"
 import { SendModalAddContactScreen } from "./SendModalAddContactScreen"
 import { AddressBookContact } from "../../../shared/addressBook/type"
 
-const { AddressBookIcon } = icons
+const { AddressBookIcon } = iconsDeprecated
 
 export interface SendAmountAndAssetScreenProps extends SendQuery {
   input?: ReactNode
@@ -28,7 +28,7 @@ export interface SendAmountAndAssetScreenProps extends SendQuery {
   onSaveContact: (contact: AddressBookContact) => void
   onSubmit?: () => void
   submitButtonError?: string
-  switcherNetworkId: string
+  selectedNetworkId: string
   showSaveAddressButton: boolean
 }
 
@@ -44,7 +44,7 @@ export const SendAmountAndAssetScreen: FC<SendAmountAndAssetScreenProps> = ({
   onSubmit,
   recipientAddress,
   submitButtonError,
-  switcherNetworkId,
+  selectedNetworkId,
   showSaveAddressButton,
 }) => {
   return (
@@ -87,7 +87,7 @@ export const SendAmountAndAssetScreen: FC<SendAmountAndAssetScreenProps> = ({
         </CellStack>
       </NavigationContainer>
       <SendModalAddContactScreen
-        contact={{ address: recipientAddress, networkId: switcherNetworkId }}
+        contact={{ address: recipientAddress, networkId: selectedNetworkId }}
         isOpen={isAddContactOpen}
         onClose={onCloseAddContact}
         onSave={onSaveContact}

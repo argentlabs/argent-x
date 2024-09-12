@@ -11,10 +11,14 @@ import {
 import {
   BaseMultisigWalletAccount,
   BaseWalletAccount,
+  isNetworkOnlyPlaceholderAccount,
   MultisigWalletAccount,
 } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { allAccountsView } from "../../views/account"
+import {
+  accountsEqual,
+  atomFamilyAccountsEqual,
+} from "../../../shared/utils/accountsEqual"
+import { allAccountsView, selectedBaseAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { Multisig } from "./Multisig"
@@ -22,6 +26,10 @@ import {
   multisigBaseWalletView,
   pendingMultisigsView,
 } from "../../views/multisig"
+import { getAccountIdentifier } from "@argent/x-shared"
+import { atomFamily } from "jotai/utils"
+import { atom } from "jotai"
+import { num } from "starknet"
 
 export const mapMultisigWalletAccountsToMultisig = (
   walletAccounts: MultisigWalletAccount[],
@@ -87,31 +95,53 @@ export function useMultisigWalletAccount(base?: BaseWalletAccount) {
   }, [base, multisigAccounts])
 }
 
-export function useMultisig(base?: BaseWalletAccount) {
-  const multisigWalletAccount = useMultisigWalletAccount(base)
+export const selectedMultisigView = atom(async (get) => {
+  const account = await get(selectedBaseAccountView)
+  if (!account || isNetworkOnlyPlaceholderAccount(account)) {
+    return
+  }
+  return get(multisigView(account))
+})
 
-  return useMemo(() => {
-    if (!multisigWalletAccount) {
-      return
-    }
+export const multisigView = atomFamily(
+  (account?: BaseWalletAccount) =>
+    atom(async (get) => {
+      const accounts = await get(allAccountsView)
+      const baseMultisigAccounts = await get(multisigBaseWalletView)
 
-    return new Multisig({
-      name: multisigWalletAccount.name,
-      address: multisigWalletAccount.address,
-      network: multisigWalletAccount.network,
-      signer: multisigWalletAccount.signer,
-      hidden: multisigWalletAccount.hidden,
-      type: multisigWalletAccount.type,
-      guardian: multisigWalletAccount.guardian,
-      escape: multisigWalletAccount.escape,
-      needsDeploy: multisigWalletAccount.needsDeploy,
-      signers: multisigWalletAccount.signers,
-      threshold: multisigWalletAccount.threshold,
-      creator: multisigWalletAccount.creator,
-      publicKey: multisigWalletAccount.publicKey,
-    })
-  }, [multisigWalletAccount])
-}
+      const baseMultisigAccount = baseMultisigAccounts.find((multisigAccount) =>
+        accountsEqual(multisigAccount, account),
+      )
+
+      const walletAccount = accounts.find((walletAccount) =>
+        accountsEqual(walletAccount, account),
+      )
+
+      if (!walletAccount || !baseMultisigAccount) {
+        return
+      }
+
+      return new Multisig({
+        ...walletAccount,
+        ...baseMultisigAccount,
+      })
+    }),
+  atomFamilyAccountsEqual,
+)
+
+export const isSignerInMultisigView = atomFamily(
+  (account?: BaseWalletAccount) =>
+    atom(async (get) => {
+      const multisig = await get(multisigView(account))
+      if (!multisig) {
+        return null
+      }
+      return multisig.signers.some(
+        (signer) => num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
+      )
+    }),
+  atomFamilyAccountsEqual,
+)
 
 export function isZeroMultisigAccount(account: BaseMultisigWalletAccount) {
   return account.signers.length === 0 && account.threshold === 0

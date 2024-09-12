@@ -1,4 +1,4 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated, formatDateTime } from "@argent/x-ui"
 import { isString, upperCase } from "lodash-es"
 import { FC, useMemo, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
@@ -25,7 +25,6 @@ import {
   openBlockExplorerAddress,
   openBlockExplorerTransaction,
 } from "../../services/blockExplorer.service"
-import { formatDateTime } from "../../services/dates"
 import { PrettyAccountAddressArgentX } from "../accounts/PrettyAccountAddressArgentX"
 import { AccountAddressField } from "../actions/transaction/fields/AccountAddressField"
 import { DappContractField } from "../actions/transaction/fields/DappContractField"
@@ -42,21 +41,20 @@ import {
   isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
-} from "./transform/is"
-import { TransformedTransaction } from "./transform/type"
+} from "../../../shared/activity/utils/transform/is"
+import { TransformedTransaction } from "../../../shared/activity/utils/transform/type"
 import { ExpandableFieldGroup } from "./ui/ExpandableFieldGroup"
 import { NFTTitle } from "./ui/NFTTitle"
 import { TransactionCallDataBottomSheet } from "./ui/TransactionCallDataBottomSheet"
-import { TransactionIcon } from "./ui/TransactionIcon"
+import { TransactionIconContainer } from "./ui/TransactionIcon"
 import { TransferTitle } from "./ui/TransferTitle"
 import { useTransactionFees } from "./useTransactionFees"
 import { useTransactionNonce } from "./useTransactionNonce"
 import { Token } from "../../../shared/token/__new/types/token.model"
-import { formatTruncatedAddress } from "@argent/x-shared"
+import { formatTruncatedAddress, unitToFeeTokenAddress } from "@argent/x-shared"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
-import { unitToFeeTokenAddress } from "../../../shared/transactionSimulation/utils"
 
-const { ActivityIcon } = icons
+const { ActivityIcon } = iconsDeprecated
 
 function getErrorMessageFromErrorDump(errorDump?: string) {
   try {
@@ -104,7 +102,7 @@ const StyledCopyIconButton = styled(CopyIconButton)`
   left: 12px;
 `
 
-const TransactionIconContainer = styled.div`
+const TransactionIconContainerStyled = styled.div`
   font-size: 16px;
   color: ${({ theme }) => theme.text2};
   line-height: 1;
@@ -300,7 +298,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         <>
           {!isNFT && (
             <MainTransactionIconContainer>
-              <TransactionIcon
+              <TransactionIconContainer
                 transaction={transactionTransformed}
                 size={18}
                 outline
@@ -340,7 +338,12 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         />
       )}
       <ExpandableFieldGroup
-        icon={<TransactionIcon transaction={transactionTransformed} size={9} />}
+        icon={
+          <TransactionIconContainer
+            transaction={transactionTransformed}
+            size={9}
+          />
+        }
         title="Action"
         subtitle={displayName}
       >
@@ -377,9 +380,9 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
           return (
             <ExpandableFieldGroup
               icon={
-                <TransactionIconContainer>
+                <TransactionIconContainerStyled>
                   <ActivityIcon />
-                </TransactionIconContainer>
+                </TransactionIconContainerStyled>
               }
               title={displayName}
               key={index}
@@ -469,7 +472,7 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
         <FieldGroup>
           <Field
             clickable
-            onClick={() => openBlockExplorerTransaction(hash, network)}
+            onClick={() => void openBlockExplorerTransaction(hash, network)}
           >
             <FieldKey>Transaction ID</FieldKey>
             <FieldValue>
@@ -484,7 +487,10 @@ export const TransactionDetail: FC<TransactionDetailProps> = ({
             clickable={!!transaction.meta?.subTitle}
             onClick={() => {
               if (transaction.meta?.subTitle) {
-                openBlockExplorerAddress(network, transaction.meta?.subTitle)
+                void openBlockExplorerAddress(
+                  network,
+                  transaction.meta?.subTitle,
+                )
               }
             }}
           >

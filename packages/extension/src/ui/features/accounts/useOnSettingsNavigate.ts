@@ -1,8 +1,11 @@
 import { useCallback } from "react"
 import { WalletAccount } from "../../../shared/wallet.model"
-import { routes, useCurrentPathnameWithQuery } from "../../routes"
-import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
-import { useMultisig } from "../multisig/multisig.state"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
+import {
+  isSignerInMultisigView,
+  multisigView,
+} from "../multisig/multisig.state"
 import { useNavigate } from "react-router-dom"
 import { selectedAccountView } from "../../views/account"
 import { clientAccountService } from "../../services/account"
@@ -13,8 +16,8 @@ export const useOnSettingsNavigate = (
   settingsAccount = false,
 ) => {
   const selectedAccount = useView(selectedAccountView)
-  const multisig = useMultisig(account)
-  const signerIsInMultisig = useIsSignerInMultisig(multisig)
+  const multisig = useView(multisigView(account))
+  const signerIsInMultisig = useView(isSignerInMultisigView(account))
   const navigate = useNavigate()
   const returnTo = useCurrentPathnameWithQuery()
 

@@ -1,18 +1,22 @@
-import { B3, Button, H5, NavigationContainer, P3, icons } from "@argent/x-ui"
+import {
+  Button,
+  H5,
+  NavigationContainer,
+  P3,
+  iconsDeprecated,
+} from "@argent/x-ui"
 import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
 import { FC, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 import { useEncodedPublicKey } from "../accounts/usePublicKey"
 import { IconWrapper } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
-import { recover } from "../recovery/recovery.service"
-import { useAppState } from "../../app.state"
+import { routes } from "../../../shared/ui/routes"
 
-const { CopyIcon, ShareIcon } = icons
+const { CopyIcon, ShareIcon } = iconsDeprecated
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId: networkId } = useAppState()
 
   const { publicKey } = useParams()
 
@@ -20,8 +24,8 @@ export const JoinMultisigScreen: FC = () => {
 
   const { onCopy, hasCopied, setValue } = useClipboard("", 2000)
 
-  const onDone = async () => {
-    navigate(await recover({ networkId, showAccountList: true }))
+  const onDone = () => {
+    navigate(routes.accounts())
   }
 
   useEffect(() => {
@@ -38,9 +42,9 @@ export const JoinMultisigScreen: FC = () => {
         direction="column"
         textAlign="center"
         pt="44px"
-        pb={6}
+        pb={4}
         px={4}
-        gap={6}
+        gap={4}
       >
         <IconWrapper borderRadius="90">
           <ShareIcon height="7" width="7" />
@@ -49,8 +53,8 @@ export const JoinMultisigScreen: FC = () => {
         <Box
           borderRadius="xl"
           bg="neutrals.800"
+          mt={2}
           p={4}
-          mb={4.5}
           boxSizing="border-box"
           w="full"
         >
@@ -67,11 +71,12 @@ export const JoinMultisigScreen: FC = () => {
           <Button
             data-testid="copy-pubkey"
             onClick={onCopy}
-            variant="link"
-            gap={1}
+            colorScheme="transparent"
+            size="sm"
+            color="text-secondary"
+            leftIcon={<CopyIcon />}
           >
-            <CopyIcon />
-            <B3 color="neutrals.400">{hasCopied ? "Copied" : "Copy"}</B3>
+            {hasCopied ? "Copied" : "Copy"}
           </Button>
         )}
       </Flex>

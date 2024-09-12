@@ -1,4 +1,4 @@
-import { P3, icons } from "@argent/x-ui"
+import { P3, iconsDeprecated } from "@argent/x-ui"
 import {
   Flex,
   FormLabel,
@@ -7,7 +7,7 @@ import {
 } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
 
-const { CheckboxDefaultIcon, CheckboxActiveIcon } = icons
+const { CheckboxDefaultIcon, CheckboxActiveIcon } = iconsDeprecated
 
 export const OnboardingCheckbox: FC<PropsWithChildren & UseCheckboxProps> = ({
   children,

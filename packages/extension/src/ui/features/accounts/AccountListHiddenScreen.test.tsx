@@ -7,7 +7,7 @@ import { Account } from "./Account"
 import { AccountListHiddenScreen } from "./AccountListHiddenScreen"
 
 vi.mock("./accounts.state", () => {
-  return { useAccount: vi.fn() }
+  return { useWalletAccount: vi.fn() }
 })
 vi.mock("./useOnSettingsNavigate", () => {
   return {
@@ -26,13 +26,13 @@ describe("AccountListHiddenScreen", () => {
       {
         name: "Account 1 Lorem Ipsum Dolor Sit Amet",
         address: "0x123",
-        networkId: "goerli-alpha",
+        networkId: "sepolia-alpha",
         hidden: false,
       },
       {
         name: "Account 2 Lorem Ipsum Dolor Sit Amet",
         address: "0x124",
-        networkId: "goerli-alpha",
+        networkId: "sepolia-alpha",
         hidden: true,
       },
     ] as Account[]

@@ -4,7 +4,7 @@ import {
   H6,
   NavigationContainer,
   P4,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Box } from "@chakra-ui/react"
 import { filter, partition } from "lodash-es"
@@ -13,10 +13,10 @@ import { useNavigate } from "react-router-dom"
 
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { AutoColumn } from "../../../components/Column"
-import { routes } from "../../../routes"
+import { routes } from "../../../../shared/ui/routes"
 import { selectedAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
-import { useRouteAccount } from "../../shield/useRouteAccount"
+import { useRouteWalletAccount } from "../../smartAccount/useRouteWalletAccount"
 import {
   CurrentImplementation,
   Implementation,
@@ -25,7 +25,7 @@ import {
 } from "./Implementation"
 import { clientAccountService } from "../../../services/account"
 
-const { TickIcon } = icons
+const { TickIcon } = iconsDeprecated
 
 const ImplementationItem: FC<ImplementationItemProps> = ({
   title,
@@ -54,7 +54,7 @@ const ImplementationItem: FC<ImplementationItemProps> = ({
 
 export const ChangeAccountImplementationScreen: FC = () => {
   const selectedAccount = useView(selectedAccountView)
-  const account = useRouteAccount()
+  const account = useRouteWalletAccount()
   const navigate = useNavigate()
 
   if (!account || !selectedAccount) {

@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 export enum ACTIVITY_ERROR_MESSAGES {
   FETCH_FAILED = "Failed to fetch activities",

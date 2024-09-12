@@ -4,11 +4,11 @@ import {
   isStarknetDomainName,
   isValidAddress,
   useDebouncedValue,
+  trpcErrorSchema,
 } from "@argent/x-shared"
 import useSWR from "swr"
 
 import { clientStarknetAddressService } from "../../services/address"
-import { trpcErrorSchema } from "../../../shared/errors/schema"
 
 type AddressFromDomainNameResult = {
   /** the normalized address, or undefined if not found */

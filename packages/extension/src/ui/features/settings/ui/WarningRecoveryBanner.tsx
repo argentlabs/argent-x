@@ -1,8 +1,8 @@
-import { H6, P4, icons } from "@argent/x-ui"
+import { H6, P4, iconsDeprecated } from "@argent/x-ui"
 import { Box, Flex, FlexProps, HStack, VStack } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
-const { AlertFillIcon } = icons
+const { AlertFillIcon } = iconsDeprecated
 
 export interface WarningRecoveryBannerProps extends Omit<FlexProps, "title"> {
   title: ReactNode

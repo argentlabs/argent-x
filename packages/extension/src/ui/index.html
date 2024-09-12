@@ -1,14 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" style="min-width: 360px; min-height: 600px">
   <head>
+    <%= htmlWebpackPlugin.options.head %>
     <meta charset="utf-8" />
-    <title>Argent X</title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
     <base href="/" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
-  <body>
+  <body style="color: white; background-color: #0f0f0f">
     <div id="root"></div>
   </body>
 </html>

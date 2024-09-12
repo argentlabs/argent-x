@@ -1,36 +1,58 @@
 import browser from "webextension-polyfill"
-import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import { StarknetMethodArgumentsSchemas } from "starknetkit/window"
 import { MessageType } from "../../shared/messages"
 import { handleMessage } from "./handle"
+import {
+  isSessionKeyTypedData,
+  sessionKeyMessageSchema,
+} from "../../shared/sessionKeys/schema"
+import { isSessionKeysWhitelistedDomain } from "../../shared/sessionKeys/whitelist"
+import { getOriginFromSender } from "../../shared/messages/getOriginFromSender"
 
 export const addMessageListeners = () => {
+  const initialUrls = new Map<number, string>() // tabId -> url
+
   browser.runtime.onConnect.addListener((port) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     port.onMessage.addListener(async (msg: MessageType, port) => {
       const sender = port.sender
+
       if (sender) {
+        if (sender.tab?.id) {
+          // Replace sender.origin with the initial URL from the map to handle redirects
+          sender.origin = initialUrls.get(sender.tab?.id) || sender.origin
+        }
+
         switch (msg.type) {
           case "EXECUTE_TRANSACTION": {
-            const [transactions, abis, transactionsDetail] =
+            const [transactions, transactionsDetail] =
               await StarknetMethodArgumentsSchemas.execute.parseAsync([
                 msg.data.transactions,
-                msg.data.abis,
                 msg.data.transactionsDetail,
               ])
             return handleMessage(
-              [
-                { ...msg, data: { transactions, abis, transactionsDetail } },
-                sender,
-              ],
+              [{ ...msg, data: { transactions, transactionsDetail } }, sender],
               port,
             )
           }
 
           case "SIGN_MESSAGE": {
+            /** validate the message to ensure it is a valid StarknetTypedData */
             const [typedData] =
               await StarknetMethodArgumentsSchemas.signMessage.parseAsync([
                 msg.data.typedData,
               ])
+            /** if it is potentially session key then further validate the message payload and domain */
+            if (isSessionKeyTypedData(typedData)) {
+              if (
+                !isSessionKeysWhitelistedDomain(getOriginFromSender(sender))
+              ) {
+                throw new Error(
+                  `The origin is not whitelisted for session keys`,
+                )
+              }
+              await sessionKeyMessageSchema.parseAsync(typedData.message)
+            }
             return handleMessage(
               [
                 { ...msg, data: { typedData, options: msg.data.options } },
@@ -46,4 +68,25 @@ export const addMessageListeners = () => {
       }
     })
   })
+
+  // Store the initial URL of the tab, to detect redirects
+  const onBeforeNavigateListener = (details: any) => {
+    // We are saving the URL only if the navigation is happening in the top-level frame of a tab. There can only be navigation within a nested frame inside the webpage, such as an iframe
+    if (details.frameType === "outermost_frame") {
+      initialUrls.set(details.tabId, details.url)
+    }
+  }
+
+  if (
+    !browser.webNavigation.onBeforeNavigate.hasListener(
+      onBeforeNavigateListener,
+    )
+  ) {
+    browser.webNavigation.onBeforeNavigate.addListener(
+      onBeforeNavigateListener,
+      {
+        url: [{ urlMatches: ".*" }],
+      },
+    )
+  }
 }

@@ -1,5 +1,5 @@
 import { Collection, addressSchema } from "@argent/x-shared"
-import { Empty, H4, icons } from "@argent/x-ui"
+import { Empty, H4, iconsDeprecated } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Suspense } from "react"
 
@@ -10,7 +10,7 @@ import { AccountCollections } from "./AccountCollections"
 import { useCollectionsByAccountAndNetwork } from "./nfts.state"
 import { nftService } from "../../../shared/nft"
 
-const { NftIcon } = icons
+const { NftIcon } = iconsDeprecated
 
 interface AccountCollectionsContainerProps {
   account: BaseWalletAccount

@@ -5,36 +5,46 @@ import {
   isStarknetDomainName,
 } from "@argent/x-shared"
 import { useMemo } from "react"
-import { useAppState } from "../../app.state"
 import { visibleAccountsOnNetworkFamily } from "../../views/account"
 import { addressBookContactsOnNetworkView } from "../../views/addressBook"
 import { useView } from "../../views/implementation/react"
+import { selectedNetworkIdView } from "../../views/network"
 
 /**
  * return account and contact matching the provided accountAddress or starknet id
  */
 
 export const useAccountOrContact = (accountAddress?: AddressOrDomain) => {
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  return useAccountOrContactOnNetworkId({
+    address: accountAddress,
+    networkId: selectedNetworkId,
+  })
+}
 
-  const isStarknetDomainNameAddress = isStarknetDomainName(accountAddress)
+export const useAccountOrContactOnNetworkId = ({
+  address,
+  networkId,
+}: {
+  address?: AddressOrDomain
+  networkId: string
+}) => {
+  const isStarknetDomainNameAddress = isStarknetDomainName(address)
 
-  const contacts = useView(addressBookContactsOnNetworkView(switcherNetworkId))
+  const contacts = useView(addressBookContactsOnNetworkView(networkId))
   const contact = useMemo(() => {
     return contacts.find((contact) => {
       if (isStarknetDomainNameAddress) {
-        return isEqualStarknetDomainName(accountAddress, contact.address)
+        return isEqualStarknetDomainName(address, contact.address)
       }
-      return isEqualAddress(contact.address, accountAddress)
+      return isEqualAddress(contact.address, address)
     })
-  }, [accountAddress, contacts, isStarknetDomainNameAddress])
+  }, [address, contacts, isStarknetDomainNameAddress])
 
-  const accounts = useView(visibleAccountsOnNetworkFamily(switcherNetworkId))
+  const accounts = useView(visibleAccountsOnNetworkFamily(networkId))
   const account = useMemo(() => {
-    return accounts.find((account) =>
-      isEqualAddress(account.address, accountAddress),
-    )
-  }, [accountAddress, accounts])
+    return accounts.find((account) => isEqualAddress(account.address, address))
+  }, [address, accounts])
 
   return {
     contact,

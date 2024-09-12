@@ -1,10 +1,16 @@
 import { expect } from "@playwright/test"
 
-import config from "../../../shared/config"
+import config from "../config"
 import test from "../test"
 const spokCampaignName = `${config.spokCampaignName!}`
 for (const feeToken of ["STRK", "ETH"] as const) {
-  test.describe(`Nfts ${feeToken}`, () => {
+  test.describe(`Nfts ${feeToken}`, { tag: "@tx" }, () => {
+    test.skip(
+      (feeToken === "STRK" && config.useStrkAsFeeToken === "false") ||
+        config.skipTXTests === "true",
+    )
+    const STRKBalance = feeToken === "STRK" ? 2.0 : 0.001
+
     test(`User should be able to claim and send a NFT`, async ({
       extension,
       browserContext,
@@ -15,7 +21,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
           {
             assets: [
               { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.8 },
+              { token: "STRK", balance: STRKBalance },
             ],
             deploy: true,
             feeToken,
@@ -29,7 +35,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
       const dapp = await extension.dapps.claimSpok(browserContext)
       await extension.dapps.knownDappButton.click()
       await extension.dapps.ensureKnowDappText()
-      await extension.dapps.closeButtonLocator.click()
+      await extension.dapps.closeButtonDappInfoLocator.click()
       await extension.dapps.accept.click()
       await dapp.getByRole("button", { name: "Claim now" }).click()
       await Promise.all([
@@ -57,9 +63,15 @@ for (const feeToken of ["STRK", "ETH"] as const) {
           extension.activity.menuPendingTransactionsIndicatorLocator,
         ).toBeVisible(),
       ])
+      const txHash = await extension.activity.getLastTxHash()
       await expect(
         extension.activity.menuPendingTransactionsIndicatorLocator,
       ).toBeHidden()
+      await extension.validateTx({
+        txHash: txHash!,
+        receiver: accountAddresses[1],
+        txType: "nft",
+      })
       await extension.navigation.menuNTFsLocator.click()
       await expect(extension.nfts.collection(spokCampaignName)).toBeHidden()
 

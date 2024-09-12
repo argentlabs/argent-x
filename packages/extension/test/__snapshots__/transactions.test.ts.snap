@@ -29,7 +29,7 @@ exports[`transactions > should get a transaction by hash 1`] = `
     "networkId": "goerli-alpha",
     "signer": {
       "derivationPath": "0",
-      "type": "local_secret",
+      "type": SignerType.LOCAL_SECRET,
     },
   },
   "hash": "0x16d38d961a659b7565b596060ca812b863a39766accab5a8fd93ace56e6001a",

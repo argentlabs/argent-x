@@ -24,6 +24,7 @@ export function useSwapCallback(trade?: Trade, userSlippageTolerance?: number) {
     return swapService.makeSwap(
       calls,
       `Swap ${trade.payToken.symbol} to ${trade.receiveToken.symbol}`,
+      [trade.payToken.address, trade.receiveToken.address],
     )
   }
 

@@ -10,7 +10,7 @@ import {
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { StarRounded } from "../../components/Icons/MuiIcons"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { H2 } from "../../theme/Typography"
 
 const Container = styled(ColumnCenter)`

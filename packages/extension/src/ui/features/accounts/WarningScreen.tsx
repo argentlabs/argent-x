@@ -4,13 +4,13 @@ import {
   NavigationContainer,
   P3,
   StickyGroup,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Box, Center, Circle, Flex } from "@chakra-ui/react"
 import { FC, isValidElement, useCallback, useState } from "react"
 import Measure, { ContentRect } from "react-measure"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 export interface WarningScreenProps {
   title: React.ReactNode

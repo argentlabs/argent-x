@@ -1,150 +1,121 @@
-import { BarBackButton, H4, NavigationContainer, P3 } from "@argent/x-ui"
-import { Box, Divider } from "@chakra-ui/react"
-import { useMemo } from "react"
+import { H5, P3, logosDeprecated } from "@argent/x-ui"
+import { FC, useMemo } from "react"
 
-import { routes, useRouteRequestId } from "../../routes"
-import { transformTransaction } from "../accountActivity/transform"
-import { getTransactionFromPendingMultisigTransaction } from "../accountActivity/transform/transaction/transformers/pendingMultisigTransactionAdapter"
-import { Account } from "../accounts/Account"
+import { ensureArray, isEqualAddress } from "@argent/x-shared"
+import { Box, Center, Circle, VStack } from "@chakra-ui/react"
+import { num } from "starknet"
+import { useView } from "../../views/implementation/react"
+import { publicKeyMultisigMetadataView } from "../../views/multisig"
 import {
   useEncodedPublicKey,
   useEncodedPublicKeys,
   usePublicKey,
 } from "../accounts/usePublicKey"
-import { useRouteAccount } from "../shield/useRouteAccount"
-import { useMultisig } from "./multisig.state"
-import { useMultisigPendingTransaction } from "./multisigTransactions.state"
-import { num } from "starknet"
-import { isEqualAddress } from "@argent/x-shared"
+import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
+import { multisigView } from "./multisig.state"
 import { MultisigOwner } from "./MultisigOwner"
-import { useView } from "../../views/implementation/react"
-import { publicKeyMultisigMetadataView } from "../../views/multisig"
-import { Navigate } from "react-router-dom"
+import { WalletAccount } from "../../../shared/wallet.model"
 
-export const MultisigTransactionConfirmationsScreen = () => {
-  const selectedAccount = useRouteAccount()
+const { LedgerLogo } = logosDeprecated
 
-  const requestId = useRouteRequestId()
-  const pendingTransaction = useMultisigPendingTransaction(requestId)
-  const publicKey = usePublicKey()
+interface MultisigTransactionConfirmationsScreenProps {
+  account?: WalletAccount
+  approvedSigners: string[]
+  nonApprovedSigners: string[]
+}
+export const MultisigTransactionConfirmationsScreen: FC<
+  MultisigTransactionConfirmationsScreenProps
+> = (props) => {
+  const { account, approvedSigners, nonApprovedSigners } = props
+
+  const publicKey = usePublicKey(account)
+  const approvedSignersPublicKey = useEncodedPublicKeys(
+    ensureArray(approvedSigners),
+  )
   const encodedPubKey = useEncodedPublicKey(publicKey)
 
-  const multisig = useMultisig(selectedAccount)
+  const multisig = useView(multisigView(account))
   const multisigMetadata = useView(publicKeyMultisigMetadataView(multisig))
+  const isLedgerSigner = useIsLedgerSigner(multisig)
 
-  const transactionTransformed = useMemo(() => {
-    if (!pendingTransaction || !selectedAccount) {
-      return
-    }
-
-    return transformTransaction({
-      transaction: getTransactionFromPendingMultisigTransaction(
-        pendingTransaction,
-        selectedAccount,
-      ),
-      accountAddress: selectedAccount.address,
-    })
-  }, [pendingTransaction, selectedAccount])
-  const approvedSignersPublicKey = useEncodedPublicKeys(
-    pendingTransaction?.approvedSigners ?? [],
+  const noLedgerPublicKey = useMemo(
+    () => isLedgerSigner && !publicKey,
+    [isLedgerSigner, publicKey],
   )
 
-  if (!selectedAccount || !requestId) {
-    return <Navigate to={routes.accounts()} />
-  }
-
-  if (!pendingTransaction) {
-    // This means that there was a requestId with pendingTransaction in the past, but now it's submitted.
-    // In this case, we should redirect to the account activity screen.
-    return <Navigate to={routes.accountActivity()} />
+  if (noLedgerPublicKey) {
+    return <ConnectLedgerMessage />
   }
 
   return (
-    <NavigationContainer
-      leftButton={<BarBackButton />}
-      title={transactionTransformed?.displayName}
-    >
-      <Box p={4}>
-        <H4>Waiting for confirmations...</H4>
-        {selectedAccount && pendingTransaction && (
-          <TransactionConfirmationsScreenSubtitle
-            account={selectedAccount}
-            approvedSignersLength={pendingTransaction.approvedSigners.length}
-          />
-        )}
-        <Divider my={4} color="neutrals.800" />
-
-        <P3 color="neutrals.300" mb={3}>
-          Me
-        </P3>
-        {publicKey && (
+    <>
+      <P3 color="neutrals.300" mb={3}>
+        Me
+      </P3>
+      {publicKey && (
+        <MultisigOwner
+          owner={publicKey}
+          signerMetadata={multisigMetadata?.signers?.find((signerMetadata) =>
+            isEqualAddress(publicKey, signerMetadata.key),
+          )}
+          approved={approvedSignersPublicKey.some(
+            (key) => key === encodedPubKey,
+          )}
+        />
+      )}
+      <P3 color="neutrals.300" mb={3}>
+        Other owners
+      </P3>
+      {approvedSigners
+        .filter((signer) => {
+          if (!publicKey) {
+            return false
+          }
+          return num.toBigInt(signer) !== num.toBigInt(publicKey)
+        })
+        .map((signer) => (
           <MultisigOwner
-            owner={publicKey}
+            owner={signer}
+            key={signer}
             signerMetadata={multisigMetadata?.signers?.find((signerMetadata) =>
-              isEqualAddress(publicKey, signerMetadata.key),
+              isEqualAddress(signer, signerMetadata.key),
             )}
-            approved={approvedSignersPublicKey.some(
-              (key) => key === encodedPubKey,
+            approved
+          />
+        ))}
+      {nonApprovedSigners
+        .filter((signer) => {
+          if (!publicKey) {
+            return false
+          }
+          return num.toBigInt(signer) !== num.toBigInt(publicKey)
+        })
+        .map((signer) => (
+          <MultisigOwner
+            owner={signer}
+            key={signer}
+            signerMetadata={multisigMetadata?.signers?.find((signerMetadata) =>
+              isEqualAddress(signer, signerMetadata.key),
             )}
           />
-        )}
-        <P3 color="neutrals.300" mb={3}>
-          Other owners
-        </P3>
-        {pendingTransaction?.approvedSigners
-          .filter((signer) => {
-            if (!publicKey) {
-              return false
-            }
-            return num.toBigInt(signer) !== num.toBigInt(publicKey)
-          })
-          .map((signer) => (
-            <MultisigOwner
-              owner={signer}
-              key={signer}
-              signerMetadata={multisigMetadata?.signers?.find(
-                (signerMetadata) => isEqualAddress(signer, signerMetadata.key),
-              )}
-              approved
-            />
-          ))}
-        {pendingTransaction?.nonApprovedSigners
-          .filter((signer) => {
-            if (!publicKey) {
-              return false
-            }
-            return num.toBigInt(signer) !== num.toBigInt(publicKey)
-          })
-          .map((signer) => (
-            <MultisigOwner
-              owner={signer}
-              key={signer}
-              signerMetadata={multisigMetadata?.signers?.find(
-                (signerMetadata) => isEqualAddress(signer, signerMetadata.key),
-              )}
-            />
-          ))}
-      </Box>
-    </NavigationContainer>
+        ))}
+    </>
   )
 }
 
-const TransactionConfirmationsScreenSubtitle = ({
-  account,
-  approvedSignersLength,
-}: {
-  account: Account
-  approvedSignersLength: number
-}) => {
-  const multisig = useMultisig(account)
-
-  const missingConfirmationsMessage = useMemo(() => {
-    if (multisig?.threshold) {
-      const missingConfirmations = multisig?.threshold - approvedSignersLength
-      return `${missingConfirmations} more confirmation${
-        missingConfirmations > 1 ? "s" : ""
-      } required`
-    }
-  }, [approvedSignersLength, multisig?.threshold])
-  return <P3>{missingConfirmationsMessage}</P3>
+const ConnectLedgerMessage: FC = () => {
+  return (
+    <Box mt={20}>
+      <VStack spacing={4.5} justify="center" align="center">
+        <Circle bg="surface-elevated" p={4.5}>
+          <Center>
+            <LedgerLogo w={10} h={10} />
+          </Center>
+        </Circle>
+        <Box maxW={{ base: 62 }} textAlign="center">
+          <H5 color="text-subtle">Connect your Ledger to view details</H5>
+        </Box>
+      </VStack>
+    </Box>
+  )
 }

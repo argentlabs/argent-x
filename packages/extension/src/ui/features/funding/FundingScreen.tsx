@@ -2,17 +2,17 @@ import {
   BarCloseButton,
   NavigationContainer,
   useToast,
-  logos,
-  icons,
+  logosDeprecated,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { FC } from "react"
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom"
 
-import { tryToMintFeeToken } from "../../../shared/devnet/mintFeeToken"
+import { tryToMintAllFeeTokens } from "../../../shared/devnet/mintFeeToken"
 import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { isFeatureEnabled } from "@argent/x-shared"
@@ -20,8 +20,8 @@ import { getLayerSwapUrl } from "./utils"
 import { FundingOnRampOption } from "./FundingOnRampOption"
 import { Grid } from "@chakra-ui/react"
 
-const { EthereumLogo, CoinbaseLogo } = logos
-const { QrIcon } = icons
+const { EthereumLogo, CoinbaseLogo } = logosDeprecated
+const { QrIcon } = iconsDeprecated
 
 export const FundingScreen: FC = () => {
   const { state } = useLocation()
@@ -34,6 +34,7 @@ export const FundingScreen: FC = () => {
   }
 
   const isMainnet = account.networkId === "mainnet-alpha"
+  const isSepolia = account.networkId === "sepolia-alpha"
   const isBanxaEnabled = isFeatureEnabled(process.env.FEATURE_BANXA)
   const isLayerswapEnabled = isFeatureEnabled(process.env.FEATURE_LAYERSWAP)
   const isDeprecatedAccount = false // isDeprecated(account) // Allow purchases on deprecated accounts as some people may want to buy some eth to transfer funds out of their wallet
@@ -52,11 +53,11 @@ export const FundingScreen: FC = () => {
         <Grid templateColumns="1fr" gap={4}>
           {isDevnet && (
             <Option
-              title="Mint Ethereum"
+              title="Mint Ethereum and Stark"
               description="Only possible on devnets"
               icon={<EthereumLogo width={6} height={6} />}
               onClick={async () => {
-                const success = await tryToMintFeeToken(account)
+                const success = await tryToMintAllFeeTokens(account)
 
                 if (success) {
                   toast({
@@ -84,6 +85,7 @@ export const FundingScreen: FC = () => {
             allowFiatPurchase={allowFiatPurchase}
             isBanxaEnabled={isBanxaEnabled}
             isMainnet={isMainnet}
+            isSepolia={isSepolia}
           />
           <Link to={routes.fundingQrCode()} state={state}>
             <Option

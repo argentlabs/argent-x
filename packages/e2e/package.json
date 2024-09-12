@@ -4,19 +4,30 @@
   "version": "6.3.2",
   "main": "index.js",
   "license": "MIT",
+  "peerDependencies": {
+    "@scure/base": "^1.1.1",
+    "@scure/bip39": "^1.2.1",
+    "lodash-es": "^4.17.21",
+    "object-hash": "^3.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.1",
+    "swr": "^1.3.0",
+    "zod": "^3.23.8"
+  },
   "devDependencies": {
-    "@argent/x-shared": "1.1.7",
-    "@playwright/test": "^1.40.1",
+    "@playwright/test": "^1.46.0",
+    "@slack/web-api": "^7.0.0",
     "@types/node": "^20.5.7",
-    "@types/uuid": "^9.0.3",
+    "@types/uuid": "^10.0.0",
     "dotenv": "^16.3.1",
-    "starknet": "6.0.0-beta.13",
-    "uuid": "^9.0.0",
-    "@slack/web-api": "^7.0.0"
+    "starknet": "6.11.0",
+    "uuid": "^10.0.0"
   },
   "scripts": {
-    "test:extension": "pnpm playwright test --config=./extension",
-    "test:webwallet": "pnpm playwright test --config=./webwallet",
-    "test:slack-notifications": "pnpm playwright test shared/src/slack.spec.ts "
+    "test:extension:prod": "pnpm playwright test --config=./extension --grep '@prodOnly|@all'",
+    "test:extension:tx": "pnpm playwright test --config=./extension --grep '@tx'",
+    "test:extension": "pnpm playwright test --config=./extension --grep-invert '@prodOnly|@tx'",
+    "test:slack-notifications": "pnpm playwright test shared/src/slack.spec.ts"
   }
 }

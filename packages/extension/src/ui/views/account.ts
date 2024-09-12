@@ -1,12 +1,20 @@
+import { ensureArray } from "@argent/x-shared"
 import { Atom, atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 
 import { accountRepo } from "../../shared/account/store"
-import { BaseWalletAccount, WalletAccount } from "../../shared/wallet.model"
+import {
+  BaseWalletAccount,
+  isNetworkOnlyPlaceholderAccount,
+  WalletAccount,
+} from "../../shared/wallet.model"
 import { isAccountHidden } from "../../shared/wallet.service"
-import { accountsEqual } from "./../../shared/utils/accountsEqual"
+import {
+  accountsEqual,
+  atomFamilyAccountsEqual,
+} from "./../../shared/utils/accountsEqual"
 import { walletStore } from "../../shared/wallet/walletStore"
-import { accountHasEscape } from "../features/shield/escape/accountHasEscape"
+import { accountHasEscape } from "../features/smartAccount/escape/accountHasEscape"
 import { atomFromRepo } from "./implementation/atomFromRepo"
 import { atomFromStore } from "./implementation/atomFromStore"
 import { hasSavedRecoverySeedphraseAtom } from "../features/recovery/hasSavedRecoverySeedphraseAtom"
@@ -45,10 +53,26 @@ export const allAccountsWithGuardianView = atom(async (get) => {
 
 const accountsOnNetworkFamilyFactory = (view: Atom<Promise<WalletAccount[]>>) =>
   atomFamily(
+    (networkId?: string) => {
+      return atom(async (get) => {
+        const accounts = await get(view)
+        return accounts.filter((account) => account.networkId === networkId)
+      })
+    },
+    (a, b) => a === b,
+  )
+
+const accountsWithEscapeOnNetworkFamilyFactory = (
+  view: Atom<Promise<WalletAccount[]>>,
+) =>
+  atomFamily(
     (networkId?: string) =>
       atom(async (get) => {
         const accounts = await get(view)
-        return accounts.filter((account) => account.networkId === networkId)
+        return accounts.filter(
+          (account) =>
+            account.networkId === networkId && accountHasEscape(account),
+        )
       }),
     (a, b) => a === b,
   )
@@ -59,6 +83,9 @@ export const visibleAccountsOnNetworkFamily =
 export const allAccountsOnNetworkFamily =
   accountsOnNetworkFamilyFactory(allAccountsView)
 
+export const allAccountsWithEscapeOnNetworkFamily =
+  accountsWithEscapeOnNetworkFamilyFactory(allAccountsWithEscapeView)
+
 export const hiddenAccountsOnNetworkFamily =
   accountsOnNetworkFamilyFactory(hiddenAccountsView)
 
@@ -68,7 +95,7 @@ export const accountFindFamily = atomFamily(
       const accounts = await get(allAccountsView)
       return accounts.find((account) => accountsEqual(account, baseAccount))
     }),
-  (a, b) => accountsEqual(a, b),
+  atomFamilyAccountsEqual,
 )
 
 // Account store views (selected etc)
@@ -86,6 +113,12 @@ export const selectedBaseAccountView = atom(async (get) => {
 // Combined views, eg the full selected account
 export const selectedAccountView = atom(async (get) => {
   const selectedBaseAccount = await get(selectedBaseAccountView)
+  if (
+    !selectedBaseAccount ||
+    isNetworkOnlyPlaceholderAccount(selectedBaseAccount)
+  ) {
+    return
+  }
   const accounts = await get(visibleAccountsView)
 
   return accounts.find(
@@ -97,4 +130,9 @@ export const selectedAccountView = atom(async (get) => {
 export const hasSavedRecoverySeedPhraseView = atom(async (get) => {
   const hasSavedRecoverySeedphrase = get(hasSavedRecoverySeedphraseAtom)
   return hasSavedRecoverySeedphrase
+})
+
+export const noUpgradeBannerAccountsView = atom(async (get) => {
+  const walletStore = await get(walletStoreAtom)
+  return ensureArray(walletStore.noUpgradeBannerAccounts)
 })

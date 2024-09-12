@@ -1,4 +1,6 @@
-import { messageClient } from "../messaging/trpc"
-import { ArgentAccountService } from "./implementation"
+import { messageClient } from "../trpc"
+import { ClientArgentAccountService } from "./ClientArgentAccountService"
 
-export const argentAccountService = new ArgentAccountService(messageClient)
+export const clientArgentAccountService = new ClientArgentAccountService(
+  messageClient,
+)

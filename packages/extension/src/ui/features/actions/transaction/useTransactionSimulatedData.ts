@@ -20,19 +20,20 @@ import {
   TransactionSimulationTransfer,
 } from "../../../../shared/transactionSimulation/types"
 import { useContractAddresses } from "../../accountNfts/nfts.state"
-import { Account } from "../../accounts/Account"
-import { useSelectedAccount } from "../../accounts/accounts.state"
 import { useTokensRecord } from "../../accountTokens/tokens.state"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
-import { bigDecimal } from "@argent/x-shared"
-import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
-import { Token } from "../../../../shared/token/__new/types/token.model"
 import {
-  estimatedFeesToMaxFeeTotal,
-  estimatedFeesToTotal,
+  bigDecimal,
   getEstimatedFeeFromBulkSimulation,
-} from "../../../../shared/transactionSimulation/utils"
+  estimatedFeesToTotal,
+  estimatedFeesToMaxFeeTotal,
+} from "@argent/x-shared"
+import { EstimatedFees } from "@argent/x-shared/simulation"
+import { Token } from "../../../../shared/token/__new/types/token.model"
 import { num } from "starknet"
+import { selectedAccountView } from "../../../views/account"
+import { useView } from "../../../views/implementation/react"
+import { BaseWalletAccount } from "../../../../shared/wallet.model"
 
 interface CommonSimulationData {
   token: Token
@@ -153,6 +154,7 @@ export const useAggregatedTxFeesData = (
     : providedFee
 
   const totalFee = fee ? num.toHex(estimatedFeesToTotal(fee)) : undefined
+
   const totalMaxFee = fee
     ? num.toHex(estimatedFeesToMaxFeeTotal(fee))
     : undefined
@@ -182,7 +184,7 @@ export const useAggregatedSimData = (
   transactionSimulations: ApiTransactionBulkSimulationResponse = DEFAULT_TRANSACTION_SIMULATION,
 ) => {
   const network = useCurrentNetwork()
-  const account = useSelectedAccount()
+  const account = useView(selectedAccountView)
 
   // Need to clean hex because the API returns addresses with unpadded 0s
   const erc20TokensRecord = useTokensRecord({ cleanHex: true })
@@ -471,7 +473,7 @@ export function apiTokenDetailsToToken({
 
 export const transferAffectsBalance = (
   t: TransactionSimulationTransfer,
-  account: Account,
+  account: BaseWalletAccount,
 ): boolean => {
   return (
     isEqualAddress(t.from, account.address) ||

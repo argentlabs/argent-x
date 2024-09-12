@@ -5,7 +5,7 @@ import {
   nftsCollectionsRepository,
   nftsContractsRepository,
   ContractAddress,
-} from "../../shared/storage/__new/repositories/nft"
+} from "../../shared/nft/store"
 
 import { atomFromRepo } from "./implementation/atomFromRepo"
 import {

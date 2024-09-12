@@ -17,7 +17,7 @@ import React, { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { Spinner } from "../../components/Spinner"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { UnknownDappIcon } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/UnknownDappIcon"
 import { NftFigure } from "./NftFigure"
 import { NftItem as NftItemComponent } from "./NftItem"

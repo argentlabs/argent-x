@@ -1,34 +1,49 @@
-import { useDisclosure } from "@chakra-ui/react"
 import { useAtom } from "jotai"
 import { isEmpty, isFunction } from "lodash-es"
-import { FC, useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
-import { Call, TransactionType, isSierra } from "starknet"
+import { Call, TransactionType, isSierra, num } from "starknet"
 
-import { Address, TransactionAction, ensureArray } from "@argent/x-shared"
+import {
+  Address,
+  TokenWithBalance,
+  TransactionAction,
+  classHashSupportsTxV3,
+  ensureArray,
+} from "@argent/x-shared"
 import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
 import { BaseToken } from "../../../../../shared/token/__new/types/token.model"
-import { routes } from "../../../../routes"
+import { equalToken } from "../../../../../shared/token/__new/utils"
+import { routes } from "../../../../../shared/ui/routes"
+import { clientActionService } from "../../../../services/action"
 import { feeTokenService } from "../../../../services/feeToken"
 import { userClickedAddFundsAtom } from "../../../../views/actions"
+import { useView } from "../../../../views/implementation/react"
 import { useFeeTokenBalances } from "../../../accountTokens/useFeeTokenBalance"
+import { useIsLedgerSigner } from "../../../ledger/hooks/useIsLedgerSigner"
 import { RemovedMultisigWarningScreen } from "../../../multisig/RemovedMultisigWarningScreen"
-import { useIsSignerInMultisig } from "../../../multisig/hooks/useIsSignerInMultisig"
-import { useMultisig } from "../../../multisig/multisig.state"
+import {
+  isSignerInMultisigView,
+  multisigView,
+} from "../../../multisig/multisig.state"
 import { useMultisigPendingTransactionsByAccount } from "../../../multisig/multisigTransactions.state"
 import { useIsMainnet } from "../../../networks/hooks/useIsMainnet"
-import { CombinedFeeEstimationContainer } from "../../feeEstimation/CombinedFeeEstimationContainer"
-import { FeeEstimationContainer } from "../../feeEstimation/FeeEstimationContainer"
 import { FeeTokenPickerModal } from "../../feeEstimation/ui/FeeTokenPickerModal"
+import { useMaxFeeEstimation } from "../../feeEstimation/utils"
+import { useActionScreen } from "../../hooks/useActionScreen"
+import { FeeEstimationContainerV2 } from "../../transactionV2/FeeEstimationContainerV2"
+import { useFeeTokenSelection } from "../../transactionV2/useFeeTokenSelection"
 import { useTransactionReviewV2 } from "../../transactionV2/useTransactionReviewV2"
-import { useBestFeeToken } from "../../useBestFeeToken"
-import { useAggregatedSimData } from "../useTransactionSimulatedData"
+import { useDefaultFeeToken } from "../../useDefaultFeeToken"
+import { ApproveScreenType, TransactionActionsType } from "../types"
+import {
+  useAggregatedSimData,
+  useAggregatedTxFeesData,
+} from "../useTransactionSimulatedData"
 import { useTransactionSimulation } from "../useTransactionSimulation"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
-import { MultisigBannerProps } from "./MultisigBanner"
 import { WithActionScreenErrorFooter } from "./WithActionScreenErrorFooter"
 import { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
-import { ApproveScreenType, TransactionActionsType } from "../types"
 
 export const ApproveTransactionScreenContainer: FC<
   ApproveTransactionScreenContainerProps
@@ -44,10 +59,15 @@ export const ApproveTransactionScreenContainer: FC<
   onRejectWithoutClose,
   approveScreenType,
   multisigBannerProps,
-  multisigModalDisclosure: providedMultisigModalDisclosure,
+  ledgerActionModalDisclosure,
+  ledgerErrorMessage,
+  nonce,
   transactionContext = "STANDARD_EXECUTE",
+  txNeedsRetry,
+  showConfirmButton,
   ...rest
 }) => {
+  const { action } = useActionScreen()
   const [disableConfirm, setDisableConfirm] = useState(true)
   const [hasInsufficientFunds, setHasInsufficientFunds] = useState(false)
   const [showTxDetails, setShowTxDetails] = useState(false)
@@ -55,8 +75,8 @@ export const ApproveTransactionScreenContainer: FC<
     userClickedAddFundsAtom,
   )
   const isMainnet = useIsMainnet()
-  const multisig = useMultisig(selectedAccount)
-  const signerIsInMultisig = useIsSignerInMultisig(multisig)
+  const multisig = useView(multisigView(selectedAccount))
+  const signerIsInMultisig = useView(isSignerInMultisigView(selectedAccount))
   const navigate = useNavigate()
 
   // This is required because if STRK is selected as the user preferred fee token
@@ -70,11 +90,14 @@ export const ApproveTransactionScreenContainer: FC<
     }
   }, [transactionAction.payload, transactionAction.type])
 
-  const feeToken = useBestFeeToken(selectedAccount, {
+  const defaultFeeToken = useDefaultFeeToken(selectedAccount, {
     prefer: preferFeeToken,
   })
-
   const feeTokens = useFeeTokenBalances(selectedAccount)
+
+  const [feeToken, setFeeToken] = useState<TokenWithBalance>(defaultFeeToken)
+  const [isFeeTokenSelectionReady, setIsFeeTokenSelectionReady] =
+    useState(false)
 
   const {
     data: transactionSimulation,
@@ -82,13 +105,32 @@ export const ApproveTransactionScreenContainer: FC<
     error: transactionSimulationError,
   } = useTransactionSimulation({
     transactionAction,
-    feeTokenAddress: feeToken.address,
+    feeTokenAddress: feeToken?.address,
     actionHash,
   })
-
-  const multisigModalDisclosure = useDisclosure()
-
   const isSimulationLoading = isSimulationValidating && !transactionSimulation
+
+  const { fee: feeSequencer, error: feeEstimationError } = useMaxFeeEstimation(
+    actionHash,
+    selectedAccount,
+    transactionAction,
+    feeToken?.address,
+    transactionSimulation,
+    isSimulationLoading,
+  )
+
+  const { fee } = useAggregatedTxFeesData(transactionSimulation, feeSequencer)
+
+  useFeeTokenSelection({
+    isFeeTokenSelectionReady,
+    setIsFeeTokenSelectionReady,
+    feeToken,
+    setFeeToken,
+    account: selectedAccount,
+    fee,
+    defaultFeeToken,
+    feeTokens,
+  })
 
   const aggregatedData = useAggregatedSimData(transactionSimulation)
 
@@ -149,7 +191,20 @@ export const ApproveTransactionScreenContainer: FC<
     actionHash,
     feeTokenAddress: feeToken.address,
     selectedAccount,
+    appDomain: action?.meta.origin,
   })
+
+  const usesLedgerSigner = useIsLedgerSigner(selectedAccount)
+
+  useEffect(() => {
+    if (!actionHash || !transactionReview) {
+      return
+    }
+    void clientActionService.updateTransactionReview({
+      actionHash,
+      transactionReview,
+    })
+  }, [actionHash, transactionReview])
 
   const txnHasTransfers = useMemo(
     () =>
@@ -205,13 +260,24 @@ export const ApproveTransactionScreenContainer: FC<
 
   // Disable fee token selection if the transaction is an upgrade transaction
   // or if its a multisig account
-  const allowFeeTokenSelection = !multisig && declareSupportTokenSelection
+  const allowFeeTokenSelection =
+    classHashSupportsTxV3(selectedAccount?.classHash) &&
+    declareSupportTokenSelection
 
-  // Same as TransactionActionsContainerV2
-  const setPreferredFeeToken = useCallback(async ({ address }: BaseToken) => {
-    await feeTokenService.preferFeeToken(address)
-    setIsFeeTokenPickerOpen(false)
-  }, [])
+  const setPreferredFeeToken = useCallback(
+    async (token: BaseToken) => {
+      await feeTokenService.preferFeeToken(token.address)
+      const newFeeToken = feeTokens.find((t) => equalToken(token, t))
+      if (newFeeToken) {
+        setFeeToken({
+          ...newFeeToken,
+          balance: num.toBigInt(newFeeToken.balance ?? 0),
+        })
+      }
+      setIsFeeTokenPickerOpen(false)
+    },
+    [feeTokens],
+  )
 
   const [isFeeTokenPickerOpen, setIsFeeTokenPickerOpen] = useState(false)
 
@@ -221,11 +287,6 @@ export const ApproveTransactionScreenContainer: FC<
 
   if (multisig && !signerIsInMultisig) {
     return <RemovedMultisigWarningScreen onReject={onRejectWithoutClose} />
-  }
-
-  const bannerProps: MultisigBannerProps = multisigBannerProps || {
-    account: selectedAccount,
-    confirmations: 0,
   }
 
   return (
@@ -243,9 +304,8 @@ export const ApproveTransactionScreenContainer: FC<
         transactionAction={transactionAction}
         hasPendingMultisigTransactions={hasPendingMultisigTransactions}
         multisig={multisig}
-        multisigModalDisclosure={
-          providedMultisigModalDisclosure || multisigModalDisclosure
-        }
+        ledgerActionModalDisclosure={ledgerActionModalDisclosure}
+        ledgerErrorMessage={ledgerErrorMessage}
         onReject={onRejectAction}
         onSubmit={onSubmitAction}
         onConfirmAnyway={onConfirmAnyway}
@@ -255,43 +315,36 @@ export const ApproveTransactionScreenContainer: FC<
         transactionActionsType={transactionActionsType}
         showTxDetails={showTxDetails}
         setShowTxDetails={setShowTxDetails}
-        multisigBannerProps={bannerProps}
+        multisigBannerProps={multisigBannerProps}
+        nonce={nonce}
+        isLedger={usesLedgerSigner}
+        txNeedsRetry={txNeedsRetry}
         confirmButtonText={
           hasInsufficientFunds && !userClickedAddFunds ? "Add funds" : "Confirm"
         }
+        showConfirmButton={showConfirmButton}
         footer={
-          <WithActionScreenErrorFooter isTransaction>
-            {selectedAccount.needsDeploy ? (
-              <CombinedFeeEstimationContainer
+          <WithActionScreenErrorFooter
+            customError={actionErrorApproving}
+            isTransaction
+          >
+            {showConfirmButton && (
+              <FeeEstimationContainerV2
+                fee={fee}
                 feeToken={feeToken}
                 onErrorChange={setDisableConfirm}
                 onFeeErrorChange={onShowAddFunds}
                 accountAddress={selectedAccount.address}
                 networkId={selectedAccount.networkId}
-                transactionAction={transactionAction}
-                actionHash={actionHash}
-                userClickedAddFunds={userClickedAddFunds}
-                transactionSimulation={transactionSimulation}
                 transactionSimulationFeeError={transactionSimulationError}
                 transactionSimulationLoading={isSimulationLoading}
                 allowFeeTokenSelection={allowFeeTokenSelection}
-                onFeeTokenPickerOpen={() => setIsFeeTokenPickerOpen(true)}
-              />
-            ) : (
-              <FeeEstimationContainer
-                feeToken={feeToken}
-                onErrorChange={setDisableConfirm}
-                onFeeErrorChange={onShowAddFunds}
-                accountAddress={selectedAccount.address}
-                networkId={selectedAccount.networkId}
-                transactionAction={transactionAction}
-                actionHash={actionHash}
-                userClickedAddFunds={userClickedAddFunds}
-                transactionSimulation={transactionSimulation}
-                transactionSimulationFeeError={transactionSimulationError}
-                transactionSimulationLoading={isSimulationLoading}
-                allowFeeTokenSelection={allowFeeTokenSelection}
-                onFeeTokenPickerOpen={() => setIsFeeTokenPickerOpen(true)}
+                onOpenFeeTokenPicker={() => setIsFeeTokenPickerOpen(true)}
+                needsDeploy={selectedAccount.needsDeploy}
+                error={feeEstimationError}
+                isSendingMoreThanBalanceAndGas={
+                  transactionReview?.isSendingMoreThanBalanceAndGas
+                }
               />
             )}
           </WithActionScreenErrorFooter>

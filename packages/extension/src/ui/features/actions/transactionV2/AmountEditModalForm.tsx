@@ -1,12 +1,18 @@
 import { BigDecimal, bigDecimal } from "@argent/x-shared"
-import { ModalDialog, icons, Input, FieldError, P3 } from "@argent/x-ui"
+import {
+  ModalDialog,
+  iconsDeprecated,
+  Input,
+  FieldError,
+  P3,
+} from "@argent/x-ui"
 import { Button, Flex, InputGroup, InputRightElement } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FC } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-const { TickIcon } = icons
+const { TickIcon } = iconsDeprecated
 const { createUnitsSchema } = bigDecimal
 
 interface AmountEditModalFormProps {

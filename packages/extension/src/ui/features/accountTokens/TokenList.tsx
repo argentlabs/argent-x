@@ -1,17 +1,15 @@
-import { FC, Suspense, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 
 import { Token } from "../../../shared/token/__new/types/token.model"
 import { equalToken } from "../../../shared/token/__new/utils"
-import { ErrorBoundary } from "../../components/ErrorBoundary"
-import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
-import { useCurrentPathnameWithQuery } from "../../routes"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { sortedTokensWithBalances } from "../../views/tokenPrices"
 import { NewTokenButton } from "./NewTokenButton"
 import { TokenListItemVariant } from "./TokenListItem"
 import { TokenListItemContainer } from "./TokenListItemContainer"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
+import { useSortedTokensWithBalances } from "../../views/tokenPrices"
 
 interface TokenListProps {
   tokenList?: Token[]
@@ -31,18 +29,21 @@ export const TokenList: FC<TokenListProps> = ({
   const account = useView(selectedAccountView)
   const returnTo = useCurrentPathnameWithQuery()
   const addFundsDialogSend = useAddFundsDialogSend()
+  const onClick = useCallback(
+    (token: Token) => {
+      if (onItemClick) {
+        return onItemClick(token)
+      }
 
-  const onClick = (token: Token) => {
-    if (onItemClick) {
-      return onItemClick(token)
-    }
+      addFundsDialogSend({
+        tokenAddress: token.address,
+        returnTo,
+      })
+    },
+    [addFundsDialogSend, onItemClick, returnTo],
+  )
 
-    addFundsDialogSend({
-      tokenAddress: token.address,
-      returnTo,
-    })
-  }
-  const sortedTokensWithBalance = useView(sortedTokensWithBalances(account))
+  const sortedTokensWithBalance = useSortedTokensWithBalances(account)
 
   const tokens = useMemo(
     () =>
@@ -59,26 +60,18 @@ export const TokenList: FC<TokenListProps> = ({
   }
 
   return (
-    <ErrorBoundary
-      fallback={
-        <ErrorBoundaryFallbackWithCopyError
-          message={"Sorry, an error occurred fetching tokens"}
+    <>
+      {tokens.map((token) => (
+        <TokenListItemContainer
+          key={token.address}
+          account={account}
+          token={token}
+          variant={variant}
+          showTokenSymbol={showTokenSymbol}
+          onClick={() => onClick(token)}
         />
-      }
-    >
-      <Suspense fallback={<NewTokenButton isLoading />}>
-        {tokens.map((token) => (
-          <TokenListItemContainer
-            key={token.address}
-            account={account}
-            token={token}
-            variant={variant}
-            showTokenSymbol={showTokenSymbol}
-            onClick={() => onClick(token)}
-          />
-        ))}
-        {showNewTokenButton && <NewTokenButton />}
-      </Suspense>
-    </ErrorBoundary>
+      ))}
+      {showNewTokenButton && <NewTokenButton />}
+    </>
   )
 }

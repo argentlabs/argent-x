@@ -2,21 +2,21 @@ import {
   BarBackButton,
   BarCloseButton,
   NavigationContainer,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { Alert } from "@argent/x-ui"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { A } from "../../components/TrackingLink"
 import { Grid } from "@chakra-ui/react"
 import { formatTruncatedAddress } from "@argent/x-shared"
 
-const { DocumentIcon } = icons
+const { DocumentIcon } = iconsDeprecated
 
 const L1_BRIDGE_CONTRACT_ADDRESS = "0xaea4513378eb6023cf9ce730a26255d0e3f075b9"
 

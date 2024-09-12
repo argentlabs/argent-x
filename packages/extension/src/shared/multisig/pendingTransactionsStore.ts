@@ -1,15 +1,35 @@
 import { memoize } from "lodash-es"
-import { AllowArray } from "starknet"
+import { AllowArray, BigNumberish } from "starknet"
 
-import { addTransaction } from "../transactions/store"
+import { isEqualAddress } from "@argent/x-shared"
+import { atom } from "jotai"
+import { atomFamily } from "jotai/utils"
+import { atomFromRepo } from "../../ui/views/implementation/atomFromRepo"
+import { accountService } from "../account/service"
+import { ActionQueueItemMeta } from "../actionQueue/schema"
+import { transformTransaction } from "../activity/utils/transform"
+import { isOnChainRejectTransaction } from "../activity/utils/transform/is"
+import { getTransactionFromPendingMultisigTransaction } from "../activity/utils/transform/transaction/transformers/pendingMultisigTransactionAdapter"
 import { ArrayStorage } from "../storage"
+import { adaptArrayStorage } from "../storage/__new/repository"
 import { SelectorFn } from "../storage/types"
-import { ExtendedTransactionType } from "../transactions"
-import { BaseWalletAccount } from "../wallet.model"
+import {
+  ExtendedFinalityStatus,
+  ExtendedTransactionType,
+} from "../transactions"
+import { addTransaction } from "../transactions/store"
+import { accountsEqual, atomFamilyAccountsEqual } from "../utils/accountsEqual"
+import { BaseWalletAccount, WalletAccount } from "../wallet.model"
 import { getAccountIdentifier } from "../wallet.service"
-import { ApiMultisigState, ApiMultisigTransaction } from "./multisig.model"
+import {
+  TransactionCreatedForMultisigPendingTransaction,
+  multisigEmitter,
+} from "./emitter"
+import {
+  ApiMultisigTransaction,
+  ApiMultisigTransactionState,
+} from "./multisig.model"
 import { getMultisigAccountFromBaseWallet } from "./utils/baseMultisig"
-import { accountsEqual } from "../utils/accountsEqual"
 
 export type MultisigPendingTransaction = {
   requestId: string
@@ -19,17 +39,55 @@ export type MultisigPendingTransaction = {
   type?: ExtendedTransactionType
   approvedSigners: string[]
   nonApprovedSigners: string[]
-  state: ApiMultisigState
+  state: ApiMultisigTransactionState
   creator: string
   nonce: number
   transactionHash: string
   notify: boolean
+  meta?: Pick<
+    ActionQueueItemMeta,
+    "title" | "subtitle" | "icon" | "transactionReview"
+  >
 }
+
 export const multisigPendingTransactionsStore =
   new ArrayStorage<MultisigPendingTransaction>([], {
     namespace: "core:multisig:pendingTransactions",
     compare: (a, b) => a.requestId === b.requestId,
   })
+
+export const multisigPendingTransactionsRepo = adaptArrayStorage(
+  multisigPendingTransactionsStore,
+)
+
+export const allMultisigPendingTransactionsView = atom(async (get) => {
+  const multisigPendingTransactions = await get(
+    atomFromRepo(multisigPendingTransactionsRepo),
+  )
+  return multisigPendingTransactions.sort((a, b) => a.timestamp - b.timestamp)
+})
+
+export const multisigPendingTransactionsAccountView = atomFamily(
+  (account?: BaseWalletAccount) =>
+    atom(async (get) => {
+      const multisigPendingTransactions = await get(
+        allMultisigPendingTransactionsView,
+      )
+      return multisigPendingTransactions.filter((tx) =>
+        accountsEqual(tx.account, account),
+      )
+    }),
+  atomFamilyAccountsEqual,
+)
+
+export const multisigPendingTransactionView = atomFamily((requestId?: string) =>
+  atom(async (get) => {
+    const multisigPendingTransactions = await get(
+      allMultisigPendingTransactionsView,
+    )
+    return multisigPendingTransactions.find((tx) => tx.requestId === requestId)
+  }),
+)
 
 export const byAccountSelector = memoize(
   (account?: BaseWalletAccount) =>
@@ -71,9 +129,176 @@ export async function removeFromMultisigPendingTransactions(
   return multisigPendingTransactionsStore.remove(pendingTransactions)
 }
 
+// the reject on chain transaction replaces the original transaction
+export async function removeMultisigPendingTransactionOnRejectOnChain(
+  nonce?: BigNumberish,
+  account?: WalletAccount,
+): Promise<void> {
+  if (!nonce || !account) {
+    return
+  }
+  const transactionsWithNonce = await getMultisigPendingTransactions(
+    (transaction) => transaction.nonce === nonce,
+  )
+
+  const txToBeRemoved = transactionsWithNonce.filter((multisigTransaction) => {
+    const transaction = getTransactionFromPendingMultisigTransaction(
+      multisigTransaction,
+      account,
+    )
+    const transactionTransformed = transformTransaction({
+      transaction,
+      accountAddress: account.address,
+    })
+    if (
+      transactionTransformed &&
+      !isOnChainRejectTransaction(transactionTransformed)
+    ) {
+      return true
+    }
+  })
+  void multisigPendingTransactionsStore.remove(txToBeRemoved)
+}
+
+export async function removeRejectedOnChainPendingTransactions(
+  allTransactions: MultisigPendingTransaction[],
+): Promise<MultisigPendingTransaction[]> {
+  const groupedTransactionsByAccount =
+    groupTransactionsByAccount(allTransactions)
+  const accountsTransactionLists = Object.values(groupedTransactionsByAccount)
+
+  // account with type WalletAccount is needed later
+  const accounts: WalletAccount[] =
+    await accountService.getFromBaseWalletAccounts(
+      Object.keys(groupedTransactionsByAccount).map((accountKey) => {
+        const [address, networkId] = accountKey.split("/")
+        return {
+          address,
+          networkId,
+        }
+      }),
+    )
+
+  const txToBeRemoved = accountsTransactionLists
+    .flatMap((accountTransactions) => {
+      const walletAccount = accounts.find((account) => {
+        return accountsEqual(account, accountTransactions[0]?.account)
+      })
+      return extractRejectedTransactions(accountTransactions, walletAccount)
+    })
+    .filter((tx) => !!tx) as MultisigPendingTransaction[]
+
+  return multisigPendingTransactionsStore.remove(txToBeRemoved)
+}
+
+const groupTransactionsByAccount = (
+  allTransactions: MultisigPendingTransaction[],
+) => {
+  return allTransactions.reduce(
+    (groups: { [key: string]: MultisigPendingTransaction[] }, transaction) => {
+      // Serialize the account object to a string key
+      const accountKey = `${transaction.account.address}/${transaction.account.networkId}`
+      // Check if a group for this account already exists
+      for (const key in groups) {
+        const accountAddress = key.split("/")[0]
+        if (isEqualAddress(transaction.account.address, accountAddress)) {
+          groups[key].push(transaction)
+          return groups
+        }
+      }
+      groups[accountKey] = [transaction]
+      return groups
+    },
+    {},
+  )
+}
+
+export const multisigPendingTxToTransformedTx = (
+  multisigTransaction: MultisigPendingTransaction,
+  account: WalletAccount,
+) => {
+  const transaction = getTransactionFromPendingMultisigTransaction(
+    multisigTransaction,
+    account,
+  )
+  return transformTransaction({
+    transaction,
+    accountAddress: multisigTransaction.account.address,
+  })
+}
+
+const extractRejectedTransactions = (
+  accountPendingTransactions: MultisigPendingTransaction[],
+  account?: WalletAccount,
+): MultisigPendingTransaction[] => {
+  if (!account) {
+    return []
+  }
+  const nonces = new Set(
+    accountPendingTransactions.map((transaction) => transaction.nonce),
+  )
+
+  return Array.from(nonces).flatMap((nonce) => {
+    const transactionsByNonce = accountPendingTransactions.filter(
+      (transaction) => transaction.nonce === nonce,
+    )
+
+    if (transactionsByNonce.length > 1) {
+      /** this is for backwards compatibility, before multisig queing, to support existing multiple pending transactions with the same nonce
+       *  the hasOnChainReject condition can be removed once all accounts have upgraded to 5.17.0 */
+      const hasOnChainReject = transactionsByNonce.some(
+        (multisigTransaction) => {
+          const transformedTx = multisigPendingTxToTransformedTx(
+            multisigTransaction,
+            account,
+          )
+          return transformedTx && isOnChainRejectTransaction(transformedTx)
+        },
+      )
+      if (hasOnChainReject) {
+        return transactionsByNonce.filter((multisigTransaction) => {
+          const transformedTx = multisigPendingTxToTransformedTx(
+            multisigTransaction,
+            account,
+          )
+          return transformedTx && !isOnChainRejectTransaction(transformedTx)
+        })
+      }
+    }
+
+    return []
+  })
+}
+
+export function getInitialFinalityStatus(
+  state: ApiMultisigTransactionState,
+): ExtendedFinalityStatus {
+  switch (state) {
+    case "CANCELLED":
+      return "CANCELLED"
+    case "TX_ACCEPTED_L2":
+      return "ACCEPTED_ON_L2"
+    case "COMPLETE":
+      return "ACCEPTED_ON_L1"
+    case "REJECTED":
+    case "ERROR":
+      return "REJECTED"
+    case "AWAITING_SIGNATURES":
+      return "NOT_RECEIVED"
+    case "SUBMITTED":
+    case "SUBMITTING":
+    case "TX_PENDING":
+      return "RECEIVED" /** equivalent to 'pending' */
+    case "REVERTED":
+      return "REVERTED"
+  }
+  /** ensures all cases are handled */
+  state satisfies never
+}
+
 export async function multisigPendingTransactionToTransaction(
   requestId: string,
-  state: ApiMultisigState,
+  state: ApiMultisigTransactionState,
 ): Promise<void> {
   const pendingTxn = await getMultisigPendingTransaction(requestId)
 
@@ -93,7 +318,7 @@ export async function multisigPendingTransactionToTransaction(
     throw new Error("Transaction is still awaiting signatures")
   }
 
-  const finalityStatus = state === "CANCELLED" ? "CANCELLED" : "RECEIVED"
+  const finalityStatus = getInitialFinalityStatus(state)
 
   await addTransaction(
     {
@@ -104,8 +329,15 @@ export async function multisigPendingTransactionToTransaction(
         transactions: transaction.calls,
       },
     },
-    { finality_status: finalityStatus },
+    {
+      finality_status: finalityStatus,
+    },
   )
+
+  await multisigEmitter.emit(TransactionCreatedForMultisigPendingTransaction, {
+    requestId,
+    transactionHash,
+  })
 
   await removeFromMultisigPendingTransactions(pendingTxn)
 }
@@ -123,17 +355,21 @@ export async function setHasSeenTransaction(requestId: string) {
   })
 }
 
-export const cancelPendingMultisigTransactions = async (
-  account: BaseWalletAccount,
-) => {
-  const pendingTransactions = await getMultisigPendingTransactions(
-    byAccountSelector(account),
-  )
+export async function addPendingMultisigApproval(
+  requestId: string,
+  pubKey?: string,
+): Promise<void> {
+  const pendingMultisig = await getMultisigPendingTransaction(requestId)
 
-  for (const pendingTransaction of pendingTransactions) {
-    await multisigPendingTransactionToTransaction(
-      pendingTransaction.requestId,
-      "CANCELLED",
-    )
+  if (pendingMultisig && pubKey) {
+    if (!pendingMultisig.approvedSigners.includes(pubKey)) {
+      pendingMultisig.approvedSigners.push(pubKey)
+    }
+    pendingMultisig.nonApprovedSigners =
+      pendingMultisig.nonApprovedSigners.filter(
+        (signer) => !isEqualAddress(signer, pubKey),
+      )
+
+    await multisigPendingTransactionsStore.push(pendingMultisig)
   }
 }

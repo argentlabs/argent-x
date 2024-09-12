@@ -5,20 +5,24 @@ import {
   ScrollContainer,
   StickyGroup,
   useNavigateBack,
+  iconsDeprecated,
 } from "@argent/x-ui"
-import { Box, Flex } from "@chakra-ui/react"
+import { Box, Flex, Tooltip } from "@chakra-ui/react"
 import {
   FC,
   FormEvent,
   PropsWithChildren,
   ReactNode,
   useCallback,
+  useMemo,
   useState,
 } from "react"
 import Measure, { ContentRect } from "react-measure"
 
 import { WalletAccount } from "../../../../../shared/wallet.model"
 import { formatTruncatedAddress } from "@argent/x-shared"
+
+const { LockIcon } = iconsDeprecated
 
 export interface ConfirmPageProps {
   onSubmit?: (e: FormEvent<HTMLFormElement>) => void
@@ -36,6 +40,7 @@ export interface ConfirmScreenProps
   confirmButtonLoadingText?: string
   confirmButtonDisabled?: boolean
   rejectButtonDisabled?: boolean
+  useRejectButtonColorFallback?: boolean
   singleButton?: boolean
   switchButtonOrder?: boolean
   showHeader?: boolean
@@ -45,6 +50,8 @@ export interface ConfirmScreenProps
   destructive?: boolean
   navigationBar?: ReactNode
   hideFooter?: boolean
+  isLedger?: boolean
+  header?: ReactNode
 }
 
 export const ConfirmScreen: FC<ConfirmScreenProps> = ({
@@ -55,6 +62,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   confirmButtonLoadingText = "Confirm",
   rejectButtonText = "Reject",
   rejectButtonDisabled,
+  useRejectButtonColorFallback = true,
   onSubmit,
   onReject,
   selectedAccount,
@@ -67,6 +75,8 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
   children,
   destructive,
   navigationBar,
+  isLedger,
+  header,
   ...props
 }) => {
   const navigateBack = useNavigateBack()
@@ -80,6 +90,32 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
     setPlaceholderHeight(height)
   }, [])
 
+  const confirmLeftIcon = useMemo(() => {
+    if (!isLedger) {
+      return
+    }
+
+    return <LockIcon />
+  }, [isLedger])
+
+  const ConfirmButtonContainer = useCallback(
+    ({ children }: { children: ReactNode }) => {
+      if (isLedger) {
+        return (
+          <Tooltip
+            label="Sign on your Ledger"
+            maxW={{ base: "156px", md: "auto" }}
+          >
+            {children}
+          </Tooltip>
+        )
+      }
+
+      return <>{children}</>
+    },
+    [isLedger],
+  )
+
   return (
     <>
       {navigationBar}
@@ -91,6 +127,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           }}
           {...props}
         >
+          {header}
           <Flex
             pt={accountHeader || navigationBar ? "0" : "18px"}
             px="16px"
@@ -133,7 +170,11 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                           w="full"
                           isDisabled={rejectButtonDisabled}
                           colorScheme={
-                            !showConfirmButton ? "primary" : undefined
+                            useRejectButtonColorFallback
+                              ? !showConfirmButton
+                                ? "primary"
+                                : undefined
+                              : undefined
                           }
                           sx={{
                             pointerEvents: "auto !important",
@@ -143,20 +184,23 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                         </Button>
                       )}
                       {showConfirmButton && (
-                        <Button
-                          id={confirmButtonText}
-                          isDisabled={confirmButtonDisabled}
-                          colorScheme={destructive ? "danger" : "primary"}
-                          w="full"
-                          type="submit"
-                          isLoading={confirmButtonIsLoading}
-                          loadingText={confirmButtonLoadingText}
-                          sx={{
-                            pointerEvents: "auto !important",
-                          }}
-                        >
-                          {confirmButtonText}
-                        </Button>
+                        <ConfirmButtonContainer>
+                          <Button
+                            id={confirmButtonText}
+                            isDisabled={confirmButtonDisabled}
+                            colorScheme={destructive ? "danger" : "primary"}
+                            w="full"
+                            type="submit"
+                            isLoading={confirmButtonIsLoading}
+                            loadingText={confirmButtonLoadingText}
+                            sx={{
+                              pointerEvents: "auto !important",
+                            }}
+                            leftIcon={confirmLeftIcon}
+                          >
+                            {confirmButtonText}
+                          </Button>
+                        </ConfirmButtonContainer>
                       )}
                     </Flex>
                   </StickyGroup>

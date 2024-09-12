@@ -1,4 +1,5 @@
-import type { ArraySignatureType, typedData } from "starknet"
+import type { ArraySignatureType } from "starknet"
+import { TypedData } from "@starknet-io/types-js"
 
 export interface SignMessageOptions {
   skipDeploy: boolean
@@ -7,11 +8,15 @@ export interface SignMessageOptions {
 export type ActionMessage =
   | {
       type: "SIGN_MESSAGE"
-      data: { typedData: typedData.TypedData; options: SignMessageOptions }
+      data: { typedData: TypedData; options: SignMessageOptions }
     }
   | { type: "SIGN_MESSAGE_RES"; data: { actionHash: string } }
   | { type: "SIGNATURE_FAILURE"; data: { actionHash: string; error: string } }
   | {
       type: "SIGNATURE_SUCCESS"
       data: { signature: ArraySignatureType; actionHash: string }
+    }
+  | {
+      type: "SIGNATURES_PENDING"
+      data: { requestId: string; actionHash: string }
     }

@@ -2,10 +2,10 @@ import { parsedDefaultTokens } from "@argent-x/extension/src/shared/token/__new/
 import { getFeeToken } from "@argent-x/extension/src/ui/features/actions/feeEstimation/__fixtures__/feeToken"
 
 export const tokensByNetwork = parsedDefaultTokens.filter(
-  ({ networkId }) => networkId === "goerli-alpha",
+  ({ networkId }) => networkId === "sepolia-alpha",
 )
 
-export const feeToken = getFeeToken("goerli-alpha")
+export const feeToken = getFeeToken("sepolia-alpha")
 
 export const tokenWithSymbol = (symbol: string) => {
   const token = parsedDefaultTokens.find((token) => token.symbol === symbol)

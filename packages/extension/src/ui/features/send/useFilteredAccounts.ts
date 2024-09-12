@@ -1,13 +1,13 @@
 import { isEqualAddress, normalizeAddressOrDomain } from "@argent/x-shared"
 import { useMemo } from "react"
 
-import { useAppState } from "../../app.state"
 import { visibleAccountsOnNetworkFamily } from "../../views/account"
 import { useView } from "../../views/implementation/react"
+import { selectedNetworkIdView } from "../../views/network"
 
 export const useFilteredAccounts = (query?: string) => {
-  const { switcherNetworkId } = useAppState()
-  const accounts = useView(visibleAccountsOnNetworkFamily(switcherNetworkId))
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const accounts = useView(visibleAccountsOnNetworkFamily(selectedNetworkId))
   const filteredAccounts = useMemo(() => {
     if (!query) {
       return accounts

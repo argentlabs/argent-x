@@ -2,13 +2,13 @@ import {
   ARGENT_PORTFOLIO_GOERLI_BASE_URL,
   ARGENT_PORTFOLIO_MAINNET_BASE_URL,
 } from "../../../../shared/api/constants"
-import { Account } from "../../accounts/Account"
+import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { useIsDefaultNetwork } from "../../networks/hooks/useIsDefaultNetwork"
 
-export const usePortfolioUrl = (account: Account) => {
+export const usePortfolioUrl = (account?: BaseWalletAccount) => {
   const isDefaultNetwork = useIsDefaultNetwork()
 
-  if (!isDefaultNetwork) {
+  if (!account || !isDefaultNetwork) {
     return null
   }
 
@@ -17,7 +17,7 @@ export const usePortfolioUrl = (account: Account) => {
     case "mainnet-alpha":
       portfolioBaseUrl = ARGENT_PORTFOLIO_MAINNET_BASE_URL
       break
-    case "goerli-alpha":
+    case "sepolia-alpha":
       portfolioBaseUrl = ARGENT_PORTFOLIO_GOERLI_BASE_URL
       break
     default:

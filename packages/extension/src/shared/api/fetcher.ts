@@ -1,5 +1,7 @@
 /** generic json fetcher */
 
+import { selectedNetworkIdView } from "../../ui/views/network"
+import { useView } from "../../ui/views/implementation/react"
 import { defaultNetwork } from "../network"
 import { walletStore } from "../wallet/walletStore"
 import { argentApiHeadersForNetwork } from "./headers"
@@ -91,7 +93,19 @@ export const fetcherWithArgentApiHeaders = async (
   fetcherImpl: Fetcher = fetcher,
 ) => {
   const { selected } = await walletStore.get()
-  const networkId = selected?.networkId ?? defaultNetwork.id
-  const fetcher = fetcherWithArgentApiHeadersForNetwork(networkId, fetcherImpl)
+  const selectedNetworkId = selected?.networkId ?? defaultNetwork.id
+  const fetcher = fetcherWithArgentApiHeadersForNetwork(
+    selectedNetworkId,
+    fetcherImpl,
+  )
+  return fetcher
+}
+
+export const useArgentApiFetcher = (fetcherImpl: Fetcher = fetcher) => {
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const fetcher = fetcherWithArgentApiHeadersForNetwork(
+    selectedNetworkId,
+    fetcherImpl,
+  )
   return fetcher
 }

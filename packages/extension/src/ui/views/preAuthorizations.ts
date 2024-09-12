@@ -8,7 +8,10 @@ import {
   isEqualPreAuthorization,
 } from "../../shared/preAuthorization/schema"
 import { preAuthorizationRepo } from "../../shared/preAuthorization/store"
-import { accountsEqual } from "../../shared/utils/accountsEqual"
+import {
+  accountsEqual,
+  atomFamilyAccountsEqual,
+} from "../../shared/utils/accountsEqual"
 import type { BaseWalletAccount } from "../../shared/wallet.model"
 import { atomFromRepo } from "./implementation/atomFromRepo"
 
@@ -53,7 +56,7 @@ export const preAuthorizationsForAccount = atomFamily(
       return filtered
     })
   },
-  (a, b) => accountsEqual(a, b),
+  atomFamilyAccountsEqual,
 )
 
 export const isPreauthorized = atomFamily(

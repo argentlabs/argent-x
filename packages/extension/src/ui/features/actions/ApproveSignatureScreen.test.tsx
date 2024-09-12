@@ -27,10 +27,10 @@ describe("ApproveSignatureScreen", () => {
       ),
     ).toBeInTheDocument()
 
-    fireEvent.click(screen.getByText("Reject"))
+    screen.getByText("Reject").click()
     expect(onReject).toHaveBeenCalled()
 
-    fireEvent.click(screen.getByText("Sign"))
+    screen.getByText("Sign").click()
     expect(onSubmit).toHaveBeenCalled()
   })
 })

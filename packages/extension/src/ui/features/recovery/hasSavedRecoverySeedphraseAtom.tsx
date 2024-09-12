@@ -5,6 +5,6 @@ export const hasSavedRecoverySeedphraseAtom = atomWithStorage(
   false,
   undefined,
   {
-    unstable_getOnInit: true,
+    getOnInit: true,
   },
 )

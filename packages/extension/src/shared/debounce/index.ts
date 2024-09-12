@@ -1,5 +1,5 @@
 import { KeyValueStorage } from "../storage"
-import { DebounceService } from "./chrome"
+import { DebounceService } from "./DebounceService"
 
 const debounceStorage = new KeyValueStorage(
   {},
@@ -11,4 +11,4 @@ const debounceStorage = new KeyValueStorage(
 
 export const debounceService = new DebounceService(debounceStorage)
 
-export { IDebounceService } from "./interface"
+export { IDebounceService } from "./IDebounceService"

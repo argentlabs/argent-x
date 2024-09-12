@@ -3,7 +3,7 @@ import { FC } from "react"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 
-import { routes } from "../routes"
+import { routes } from "../../shared/ui/routes"
 import { BackLink } from "./BackLink"
 import { BackIcon } from "./Icons/BackIcon"
 import { CloseIcon } from "./Icons/CloseIcon"

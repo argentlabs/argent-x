@@ -1,7 +1,7 @@
 import { H6 } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
-import { FC } from "react"
+import { FC, Suspense } from "react"
 
 import { PendingMultisig } from "../../../shared/multisig/types"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
@@ -17,6 +17,7 @@ export interface GroupedAccountListProps {
   returnTo?: string
   type: "standard" | "multisig"
   pendingMultisigs?: PendingMultisig[]
+  showTitle?: boolean
 }
 
 export const GroupedAccountList: FC<GroupedAccountListProps> = ({
@@ -27,15 +28,18 @@ export const GroupedAccountList: FC<GroupedAccountListProps> = ({
   returnTo,
   type,
   pendingMultisigs,
+  showTitle = true,
 }) => {
   const groupedAccounts = [...accounts, ...(pendingMultisigs || [])]
 
   return !isEmpty(groupedAccounts) ? (
     <Flex direction="column" gap={3} alignItems="flex-start">
-      <Flex gap={2} align="center" color="neutrals.300" px={2}>
-        {icon}
-        <H6>{title}</H6>
-      </Flex>
+      {showTitle && (
+        <Flex gap={2} align="center" color="neutrals.300" px={2}>
+          {icon}
+          <H6>{title}</H6>
+        </Flex>
+      )}
       {/** Render standard account list items for standard accounts */}
       {type === "standard" &&
         accounts.map((account) => (

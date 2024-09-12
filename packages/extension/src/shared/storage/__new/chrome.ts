@@ -76,7 +76,7 @@ export class ChromeRepository<T> implements IRepository<T> {
     const selector = isFunction(value)
       ? (item: T) => !value(item)
       : isArray(value)
-        ? (item: T) => value.some((v) => !compareFn(v, item))
+        ? (item: T) => !value.some((v) => compareFn(v, item))
         : (item: T) => !compareFn(value, item)
 
     const [keptValues, removedValues] = partition(items, selector)

@@ -1,11 +1,11 @@
-import { P4, icons } from "@argent/x-ui"
+import { P4, iconsDeprecated } from "@argent/x-ui"
 import { Button, Flex, Link } from "@chakra-ui/react"
 import { FC, MouseEventHandler } from "react"
 
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import { ARGENT_X_LEGAL_PRIVACY_POLICY_URL } from "../../../shared/api/constants"
 
-const { TickIcon } = icons
+const { TickIcon } = iconsDeprecated
 
 interface OnboardingStartScreenProps {
   onAccept: MouseEventHandler
@@ -22,8 +22,8 @@ export const PrivacyScreen: FC<OnboardingStartScreenProps> = ({
 }) => {
   return (
     <OnboardingScreen
-      length={length ?? 4}
-      currentIndex={1}
+      length={length ?? 5} // there are 5 steps in the onboarding process
+      currentIndex={1} // this is the second step
       title="Help us improve Argent X"
       subtitle="Argent would like to track anonymous usage data to help identify issues, prioritise features and build a better product without compromising your privacy"
       onBack={onBack}

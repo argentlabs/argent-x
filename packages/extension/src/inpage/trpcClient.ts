@@ -1,7 +1,7 @@
 import { createTRPCProxyClient } from "@trpc/client"
 import { windowLink } from "trpc-browser/link"
 
-import { AppRouter } from "../background/__new/router"
+import { AppRouter } from "../background/trpc/router"
 import superjson from "superjson"
 
 export const inpageMessageClient = createTRPCProxyClient<AppRouter>({

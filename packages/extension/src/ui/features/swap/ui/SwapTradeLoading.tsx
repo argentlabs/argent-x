@@ -4,7 +4,7 @@ import { Flex, Spinner, Box } from "@chakra-ui/react"
 export function SwapTradeLoading() {
   return (
     <Box
-      bg="neutrals.900"
+      bg="surface-default"
       border="solid 1px"
       borderColor="neutrals.700"
       borderRadius="lg"

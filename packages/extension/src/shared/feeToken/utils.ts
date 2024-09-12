@@ -9,6 +9,7 @@ export const pickBestFeeToken = <
   BS extends { address: Address; balance: string | bigint },
 >(
   balances: BS[],
+  networkId: string,
   { avoid = [], prefer = [] }: FeeTokenPreferenceOption = {},
 ): BS => {
   // sort by prefered tokens, neutral tokens, then avoid tokens
@@ -77,7 +78,7 @@ export const pickBestFeeToken = <
   )
 
   const result: BS = filteredBalances[0] ??
-    sortedBalances[0] ?? { address: ETH_TOKEN_ADDRESS, balance: "0" } // fallback to ETH to prevent errors
+    sortedBalances[0] ?? { address: ETH_TOKEN_ADDRESS, balance: "0", networkId } // fallback to ETH to prevent errors
 
   // return the first token with a balance or the first token if all balances are 0, or a default object if no tokens are found
   return result

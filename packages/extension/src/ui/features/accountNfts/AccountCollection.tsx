@@ -7,7 +7,7 @@ import {
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
 import { useCollectionNftsByAccountAndNetwork } from "./nfts.state"

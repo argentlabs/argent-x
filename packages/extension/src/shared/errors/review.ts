@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 export enum REVIEW_ERROR_MESSAGE {
   SIMULATE_AND_REVIEW_FAILED = "Something went wrong fetching review",

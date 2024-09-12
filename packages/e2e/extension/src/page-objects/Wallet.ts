@@ -3,6 +3,7 @@ import { Page, expect } from "@playwright/test"
 import config from "../../../shared/config"
 import { lang } from "../languages"
 import Navigation from "./Navigation"
+import { sleep } from "../../../shared/src/common"
 
 export default class Wallet extends Navigation {
   constructor(page: Page) {
@@ -85,7 +86,35 @@ export default class Wallet extends Navigation {
   get agreeLoc() {
     return this.page.locator('[data-testid="agree-button"]')
   }
-  async newWalletOnboarding() {
+
+  get addStandardAccountFromNewAccountScreen() {
+    return this.page.locator('[aria-label="Standard Account"]')
+  }
+
+  get addSmartAccountFromNewAccountScreen() {
+    return this.page.locator('[aria-label="Smart Account"]')
+  }
+
+  get pinLocator() {
+    return this.page.locator('[aria-label="Please enter your pin code"]')
+  }
+
+  fillEmail(email: string) {
+    return this.page.locator('[data-testid="email-input"]').fill(email)
+  }
+
+  async fillPin(pin: string) {
+    //avoid BE error PIN not requested
+    await sleep(2000)
+    await expect(this.pinLocator).toHaveCount(6)
+    await this.pinLocator.first().click()
+    await this.pinLocator.first().fill(pin)
+  }
+  async newWalletOnboarding(
+    email?: string,
+    pin: string = "111111",
+    success: boolean = true,
+  ) {
     await Promise.all([
       expect(this.banner).toBeVisible(),
       expect(this.description).toBeVisible(),
@@ -99,14 +128,30 @@ export default class Wallet extends Navigation {
     ])
     await this.password.fill(config.password)
     await this.repeatPassword.fill(config.password)
-    await this.createWallet.click()
-
-    await Promise.all([
-      expect(this.banner4).toBeVisible(),
-      expect(this.description4).toBeVisible(),
-      expect(this.twitter).toBeVisible(),
-      expect(this.discord).toBeVisible(),
-      expect(this.finish).toBeEnabled(),
-    ])
+    await this.continueLocator.click()
+    if (!email) {
+      await this.addStandardAccountFromNewAccountScreen.click()
+      await this.continueLocator.click()
+    } else {
+      await this.addSmartAccountFromNewAccountScreen.click()
+      await this.continueLocator.click()
+      await this.fillEmail(email)
+      await this.continueLocator.click()
+      await this.fillPin(pin)
+      if (!success) {
+        await expect(
+          this.page.getByText(lang.account.argentShield.emailInUse),
+        ).toBeVisible()
+      }
+    }
+    if (success) {
+      await Promise.all([
+        expect(this.banner4).toBeVisible(),
+        expect(this.description4).toBeVisible(),
+        expect(this.twitter).toBeVisible(),
+        expect(this.discord).toBeVisible(),
+        expect(this.finish).toBeEnabled(),
+      ])
+    }
   }
 }

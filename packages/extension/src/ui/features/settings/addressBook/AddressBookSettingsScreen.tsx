@@ -6,7 +6,7 @@ import {
   EmptyButton,
   Input,
   NavigationContainer,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { InputGroup, InputLeftElement } from "@chakra-ui/react"
 import { FC, useCallback, useMemo } from "react"
@@ -17,7 +17,7 @@ import { Network } from "../../../../shared/network"
 import { useAutoFocusInputRef } from "../../../hooks/useAutoFocusInputRef"
 import { AccountListItem } from "../../accounts/AccountListItem"
 
-const { SearchIcon, AddressBookIcon, AddIcon } = icons
+const { SearchIcon, AddressBookIcon, AddIcon } = iconsDeprecated
 
 interface AddressBookSettingsScreenProps {
   contacts: AddressBookContact[]

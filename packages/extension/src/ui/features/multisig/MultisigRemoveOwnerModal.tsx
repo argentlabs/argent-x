@@ -47,7 +47,7 @@ export const MultisigRemoveOwnerModal: FC<MultisigRemoveOwnerProps> = ({
           >
             Remove
           </Button>
-          <Button w="100%" colorScheme="neutrals" onClick={onClose}>
+          <Button w="100%" onClick={onClose}>
             Cancel
           </Button>
         </ModalFooter>

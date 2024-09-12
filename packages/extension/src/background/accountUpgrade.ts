@@ -2,10 +2,12 @@ import { CallData } from "starknet"
 
 import { networkService } from "../shared/network/service"
 import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
-import { IBackgroundActionService } from "./__new/services/action/interface"
+import { IBackgroundActionService } from "./services/action/IBackgroundActionService"
 import { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
 import { addressSchema, isAccountV5 } from "@argent/x-shared"
+import { sanitizeAccountType } from "../shared/utils/sanitizeAccountType"
+
 export interface IUpgradeAccount {
   account: BaseWalletAccount
   wallet: Wallet
@@ -49,7 +51,7 @@ export const upgradeAccount = async ({
   const upgradeCalldata = {
     implementation: parsedImplClassHash,
     // new starknet accounts have a new upgrade interface to allow for transactions right after upgrade
-    calldata: [0],
+    calldata: accountType === "multisig" ? [] : [0],
   }
 
   const calldata = CallData.compile(upgradeCalldata)
@@ -67,6 +69,13 @@ export const upgradeAccount = async ({
         meta: {
           title: "Switch account type",
           newClassHash: parsedImplClassHash,
+          ampliProperties: {
+            "is deployment": false,
+            "transaction type": "upgrade contract",
+            "account index": fullAccount.index,
+            "account type": sanitizeAccountType(fullAccount.type),
+            "wallet platform": "browser extension",
+          },
         },
       },
     },

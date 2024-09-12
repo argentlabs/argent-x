@@ -1,4 +1,11 @@
-import { H6, Input, L2, Switch, TextareaAutosize, icons } from "@argent/x-ui"
+import {
+  H6,
+  Input,
+  L2,
+  Switch,
+  TextareaAutosize,
+  iconsDeprecated,
+} from "@argent/x-ui"
 import {
   Flex,
   FormControl,
@@ -16,7 +23,7 @@ import { z } from "zod"
 
 const { randomAddress } = stark
 
-const { InfoIcon } = icons
+const { InfoIcon } = iconsDeprecated
 
 const DeploySmartContractParameters: FC<{
   isLoading: boolean

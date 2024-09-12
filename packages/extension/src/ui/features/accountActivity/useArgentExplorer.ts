@@ -10,13 +10,13 @@ import {
 import { argentApiNetworkForNetwork } from "../../../shared/api/headers"
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { urlWithQuery } from "../../../shared/utils/url"
-import { argentApiFetcher } from "../../services/argentApiFetcher"
 import {
   useConditionallyEnabledSWR,
   withPolling,
 } from "../../services/swr.service"
 import { stripAddressZeroPadding } from "@argent/x-shared"
-import { RefreshInterval } from "../../../shared/config"
+import { RefreshIntervalInSeconds } from "../../../shared/config"
+import { useArgentApiFetcher } from "../../../shared/api/fetcher"
 
 export const useArgentExplorerEnabled = () => {
   return ARGENT_EXPLORER_ENABLED
@@ -29,6 +29,7 @@ export const useArgentExplorerTransaction = ({
   hash?: string
   network: string
 }) => {
+  const argentApiFetcher = useArgentApiFetcher()
   const argentExplorerEnabled = useArgentExplorerEnabled()
   const apiNetwork = argentApiNetworkForNetwork(network)
   return useConditionallyEnabledSWR<IExplorerTransaction>(
@@ -58,6 +59,7 @@ export const useArgentExplorerAccountTransactions = ({
   direction = "DESC",
   withTransfers = true,
 }: IUseArgentExplorerAccountTransactions) => {
+  const argentApiFetcher = useArgentApiFetcher()
   const argentExplorerEnabled = useArgentExplorerEnabled()
   const apiNetwork = argentApiNetworkForNetwork(network)
   const key = useMemo(() => {
@@ -86,7 +88,7 @@ export const useArgentExplorerAccountTransactions = ({
     Boolean(apiNetwork && argentExplorerEnabled),
     key,
     argentApiFetcher,
-    withPolling(RefreshInterval.FAST * 1000) /** 20 seconds */,
+    withPolling(RefreshIntervalInSeconds.FAST * 1000) /** 20 seconds */,
   )
 }
 
@@ -100,6 +102,7 @@ export const useArgentExplorerAccountTransactionsInfinite = (
   }: IUseArgentExplorerAccountTransactions,
   config?: SWRConfiguration,
 ) => {
+  const argentApiFetcher = useArgentApiFetcher()
   const argentExplorerEnabled = useArgentExplorerEnabled()
   const apiNetwork = argentApiNetworkForNetwork(network)
   const key = useCallback(
@@ -138,7 +141,7 @@ export const useArgentExplorerAccountTransactionsInfinite = (
   return useSWRInfinite<IExplorerTransaction[]>(key, argentApiFetcher, {
     revalidateAll: true,
     shouldRetryOnError: false /** expect errors on unsupported networks */,
-    ...withPolling(RefreshInterval.FAST * 1000) /** 20 seconds */,
+    ...withPolling(RefreshIntervalInSeconds.FAST * 1000) /** 20 seconds */,
     ...config,
   })
 }

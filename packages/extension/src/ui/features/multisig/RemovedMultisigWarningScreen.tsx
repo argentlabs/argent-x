@@ -2,7 +2,7 @@ import { FC } from "react"
 
 import { WarningScreen } from "../accounts/WarningScreen"
 import { useNavigate } from "react-router-dom"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { isFunction } from "lodash-es"
 
 export const RemovedMultisigWarningScreen: FC<{

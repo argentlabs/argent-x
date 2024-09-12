@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { FundingQrCodeScreen } from "./FundingQrCodeScreen"

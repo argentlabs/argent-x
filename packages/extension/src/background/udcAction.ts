@@ -17,12 +17,13 @@ import { WalletError } from "../shared/errors/wallet"
 import { UdcError } from "../shared/errors/udc"
 import { checkTransactionHash } from "../shared/transactions/utils"
 import { getEstimatedFees } from "../shared/transactionSimulation/fees/estimatedFeesRepository"
+import { TransactionError } from "../shared/errors/transaction"
 import {
   getTxVersionFromFeeToken,
   getTxVersionFromFeeTokenForDeclareContract,
-} from "../shared/utils/getTransactionVersion"
-import { estimatedFeeToMaxResourceBounds } from "../shared/transactionSimulation/utils"
-import { TransactionError } from "../shared/errors/transaction"
+  estimatedFeeToMaxResourceBounds,
+} from "@argent/x-shared"
+import { sanitizeAccountType } from "../shared/utils/sanitizeAccountType"
 
 const { UDC } = constants
 
@@ -101,6 +102,13 @@ export const udcDeclareContract = async (
         title: "Activate Account",
         isDeployAccount: true,
         type: TransactionType.DEPLOY_ACCOUNT,
+        ampliProperties: {
+          "is deployment": true,
+          "transaction type": "deploy contract",
+          "account index": account.index,
+          "account type": sanitizeAccountType(account.type),
+          "wallet platform": "browser extension",
+        },
       },
     })
   }
@@ -129,6 +137,13 @@ export const udcDeclareContract = async (
         transactions: {
           contractAddress: UDC.ADDRESS,
           entrypoint: "declareContract",
+        },
+        ampliProperties: {
+          "is deployment": false,
+          "transaction type": "declare contract",
+          "account index": selectedAccount.index,
+          "account type": sanitizeAccountType(selectedAccount.type),
+          "wallet platform": "browser extension",
         },
       },
     })
@@ -198,6 +213,13 @@ export const udcDeployContract = async (
         title: "Activate Account",
         isDeployAccount: true,
         type: "DEPLOY_ACCOUNT",
+        ampliProperties: {
+          "is deployment": true,
+          "transaction type": "deploy contract",
+          "account index": account.index,
+          "account type": sanitizeAccountType(account.type),
+          "wallet platform": "browser extension",
+        },
       },
     })
   }
@@ -240,6 +262,13 @@ export const udcDeployContract = async (
           contractAddress: UDC.ADDRESS,
           entrypoint: "deployContract",
           calldata: compiledConstructorCallData,
+        },
+        ampliProperties: {
+          "is deployment": false,
+          "transaction type": "deploy contract",
+          "account index": selectedAccount.index,
+          "account type": sanitizeAccountType(selectedAccount.type),
+          "wallet platform": "browser extension",
         },
       },
     })

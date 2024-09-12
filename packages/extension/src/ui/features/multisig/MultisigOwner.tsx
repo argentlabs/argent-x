@@ -1,4 +1,4 @@
-import { CopyTooltip, H6, icons, P4 } from "@argent/x-ui"
+import { CopyTooltip, H6, iconsDeprecated, P4 } from "@argent/x-ui"
 import {
   Flex,
   IconButton,
@@ -11,19 +11,19 @@ import {
 
 import { MultisigOwnerNameModal } from "./MultisigOwnerNameModal"
 import { FC, PropsWithChildren, useMemo } from "react"
-import { Account } from "../accounts/Account"
 import { noop } from "lodash-es"
 import { encodeBase58, formatTruncatedSignerKey } from "@argent/x-shared"
 import { SignerMetadata } from "../../../shared/multisig/types"
 import { MultisigRemoveOwnerModal } from "./MultisigRemoveOwnerModal"
 import { useNavigate } from "react-router-dom"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
+import { WalletAccount } from "../../../shared/wallet.model"
 
-const { SettingsIcon, EditIcon, TickIcon } = icons
+const { SettingsIcon, EditIcon, TickIcon } = iconsDeprecated
 
 interface MultisigOwnerProps {
   owner: string
-  account?: Account
+  account?: WalletAccount
   signerMetadata: SignerMetadata | undefined
   hasUpdate?: boolean
   hasEdit?: boolean
@@ -111,7 +111,7 @@ export const MultisigOwner: FC<MultisigOwnerProps> = ({
       )}
       {approved && (
         <Flex alignItems="center" marginLeft="auto">
-          <TickIcon color="primary.500" />
+          <TickIcon color="primary.500" h={4} w={4} />
         </Flex>
       )}
       {!readOnly && (

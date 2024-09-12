@@ -2,7 +2,10 @@ import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import type { WalletAccount } from "../../../shared/wallet.model"
+import {
+  defaultNetworkOnlyPlaceholderAccount,
+  type WalletAccount,
+} from "../../../shared/wallet.model"
 import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 export async function getTestnet2Accounts(
@@ -33,7 +36,7 @@ export async function migrateTestnet2Accounts(
             address: firstValidAccount.address,
             networkId: firstValidAccount.networkId,
           }
-        : null,
+        : defaultNetworkOnlyPlaceholderAccount,
     })
   }
 }

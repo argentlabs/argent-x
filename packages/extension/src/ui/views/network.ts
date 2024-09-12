@@ -5,6 +5,8 @@ import { defaultNetwork } from "../../shared/network"
 import { networkRepo } from "../../shared/network/store"
 import { atomFromRepo } from "./implementation/atomFromRepo"
 import { networkStatusRepo } from "../../shared/network/statusStore"
+import { selectedBaseAccountView } from "./account"
+import { useView } from "./implementation/react"
 
 export const allNetworksView = atomFromRepo(networkRepo)
 const networkStatusesView = atomFromRepo(networkStatusRepo)
@@ -36,3 +38,14 @@ export const networkOrDefaultView = atomFamily((networkId: string) =>
     return network || defaultNetwork
   }),
 )
+
+export const selectedNetworkIdView = atom(async (get) => {
+  const selectedBaseAccount = await get(selectedBaseAccountView)
+  return selectedBaseAccount?.networkId ?? defaultNetwork.id
+})
+
+export const selectedNetworkView = atom(async (get) => {
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const selectedNetwork = await get(networkView(selectedNetworkId))
+  return selectedNetwork ?? defaultNetwork
+})

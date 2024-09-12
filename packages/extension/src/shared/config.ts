@@ -5,7 +5,7 @@ const fallbackIntervals = {
   VERY_SLOW: "86400",
 }
 
-export const RefreshInterval = Object.freeze({
+export const RefreshIntervalInSeconds = Object.freeze({
   FAST: parseInt(process.env.REFRESH_INTERVAL_FAST || fallbackIntervals.FAST), // 20s
   MEDIUM: parseInt(
     process.env.REFRESH_INTERVAL_MEDIUM || fallbackIntervals.MEDIUM,
@@ -15,3 +15,6 @@ export const RefreshInterval = Object.freeze({
     process.env.REFRESH_INTERVAL_VERY_SLOW || fallbackIntervals.VERY_SLOW,
   ), // 1d
 })
+
+const isDev = process.env.NODE_ENV === "development"
+isDev && console.log("Refresh intervals in seconds", RefreshIntervalInSeconds)

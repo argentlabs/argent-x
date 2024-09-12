@@ -6,12 +6,12 @@ import {
   FlowHeader,
   NavigationContainer,
   P3,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Box, Center, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
-const { CopyIcon } = icons
+const { CopyIcon } = iconsDeprecated
 
 interface DeclareOrDeployContractSuccessScreenProps {
   type?: string

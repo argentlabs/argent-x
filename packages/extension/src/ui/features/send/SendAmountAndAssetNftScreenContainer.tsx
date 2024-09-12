@@ -2,7 +2,7 @@ import { addressSchema } from "@argent/x-shared"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useNft } from "../accountNfts/nfts.state"
@@ -13,6 +13,7 @@ import {
   SendAmountAndAssetScreenProps,
 } from "./SendAmountAndAssetScreen"
 import { clientNftService } from "../../services/nfts"
+import { delay } from "../../../shared/utils/delay"
 
 export const SendAmountAndAssetNftScreenContainer: FC<
   SendAmountAndAssetScreenProps
@@ -30,6 +31,11 @@ export const SendAmountAndAssetNftScreenContainer: FC<
         account.address,
         recipientAddress,
       )
+      /**
+       * wait for store state to propagate into the ui and show the action screen
+       * otherwise the user will see a flash of the token screen here
+       */
+      await delay(0)
     }
     onCancel()
   }, [account, network, nft, onCancel, recipientAddress, tokenAddress, tokenId])

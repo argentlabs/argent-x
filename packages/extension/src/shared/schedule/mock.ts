@@ -1,4 +1,4 @@
-import { IScheduleService, ImplementedScheduledTask } from "./interface"
+import { IScheduleService, ImplementedScheduledTask } from "./IScheduleService"
 
 interface ScheduleServiceManager {
   fireAll: (

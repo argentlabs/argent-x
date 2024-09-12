@@ -1,4 +1,4 @@
-import { H6, P4, icons, typographyStyles } from "@argent/x-ui"
+import { H6, P4, iconsDeprecated, typographyStyles } from "@argent/x-ui"
 import { Circle, Flex, Text, chakra } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -9,8 +9,9 @@ import {
 import { AccountAvatar } from "../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { formatTruncatedAddress } from "@argent/x-shared"
+import { AccountListItemLedgerBadge } from "../accounts/AccountListItemLedgerBadge"
 
-const { ViewIcon } = icons
+const { ViewIcon } = iconsDeprecated
 
 export interface PendingMultisigListItemProps extends CustomButtonCellProps {
   accountName: string
@@ -19,6 +20,7 @@ export interface PendingMultisigListItemProps extends CustomButtonCellProps {
   networkName?: string
   hidden?: boolean
   avatarOutlined?: boolean
+  isLedger?: boolean
 }
 
 export const NetworkStatusWrapper = chakra(Flex, {
@@ -39,9 +41,16 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
   networkName,
   hidden,
   avatarOutlined,
+  isLedger,
   children,
   ...rest
 }) => {
+  const getAvatarBadge = () => {
+    if (isLedger) {
+      return <AccountListItemLedgerBadge />
+    }
+  }
+
   return (
     <CustomButtonCell {...rest}>
       <AccountAvatar
@@ -52,7 +61,9 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
           networkId,
           backgroundColor: hidden ? "#333332" : undefined,
         })}
-      />
+      >
+        {getAvatarBadge()}
+      </AccountAvatar>
       <Flex
         flex={1}
         overflow={"hidden"}

@@ -7,7 +7,7 @@ export const getFeeToken = (networkId: string) =>
       symbol === "ETH" && network === networkId,
   )
 
-export const feeToken = getFeeToken("goerli-alpha") as Token
+export const feeToken = getFeeToken("sepolia-alpha") as Token
 
 export const feeTokenWithBalance = {
   ...feeToken,

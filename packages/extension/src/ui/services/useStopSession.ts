@@ -1,6 +1,7 @@
 import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-import { routes } from "../routes"
+
+import { routes } from "../../shared/ui/routes"
 import { sessionService } from "./session"
 
 export const useStopSession = () => {
@@ -10,7 +11,7 @@ export const useStopSession = () => {
       if (initiatedByUI) {
         await sessionService.stopSession()
       }
-      navigate(routes.lockScreen(), { replace: true })
+      navigate(routes.accountTokens(), { replace: true })
     },
     [navigate],
   )

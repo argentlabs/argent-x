@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 export enum SESSION_ERROR_MESSAGES {
   NO_OPEN_SESSION = "There is no open session",

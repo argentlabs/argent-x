@@ -1,4 +1,4 @@
-import { WildcardHandler, mittx } from "@argent/x-window"
+import { WildcardHandler, mittx } from "starknetkit/window"
 import { isFunction } from "lodash-es"
 
 import {
@@ -101,10 +101,13 @@ export class MockStorage implements StorageArea, chrome.storage.StorageArea {
   set(items: { [key: string]: any }, callback?: (() => void) | undefined): void
   set(items: { [key: string]: any }, callback?: unknown): void | Promise<void> {
     const entries = Object.entries(items)
-    const changeMap = entries.reduce((acc, [key, value]) => {
-      acc[key] = getChangeMap(this.store.get(key), value)
-      return acc
-    }, {} as Record<string, StorageChange>)
+    const changeMap = entries.reduce(
+      (acc, [key, value]) => {
+        acc[key] = getChangeMap(this.store.get(key), value)
+        return acc
+      },
+      {} as Record<string, StorageChange>,
+    )
     for (const [key, value] of entries) {
       this.store.set(key, value)
     }

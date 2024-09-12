@@ -7,27 +7,51 @@ import type {
   RequestAccountsParameters,
   StarknetWindowObject,
 } from "get-starknet-core"
+
 import {
   IStarknetWindowObject as IStarknetWindowObjectV3,
   ConnectedStarknetWindowObject as ConnectedStarknetWindowObjectV3,
 } from "get-starknet-coreV3"
 import type { ProviderInterface } from "starknet"
+import type { ProviderInterface as ProviderInterface5 } from "starknet5"
+import type { ProviderInterface as ProviderInterface4 } from "starknet4"
+
+import type { AccountInterface } from "starknet"
+import type { AccountInterface as AccountInterface5 } from "starknet5"
+import type { AccountInterface as AccountInterface4 } from "starknet4"
 
 import { MessageAccount } from "./account"
 import { userEventHandlers } from "./eventHandlers"
 import { Sender } from "./messages/exchange/bidirectional"
 import { StarknetMethods } from "./types"
 
-type CommonOmittedProperties = "on" | "off" | "request" | "icon"
+type CommonOmittedProperties =
+  | "on"
+  | "off"
+  | "request"
+  | "icon"
+  | "provider"
+  | "account"
 
-export type BackwardsCompatibleStarknetWindowObject = StarknetWindowObject &
+export type BackwardsCompatibleStarknetWindowObject = Omit<
+  StarknetWindowObject,
+  "provider" | "account"
+> &
   Omit<IStarknetWindowObjectV3, CommonOmittedProperties> & {
     isConnected?: boolean
+  } & {
+    provider?: ProviderInterface | ProviderInterface5 | ProviderInterface4
+    account?: AccountInterface | AccountInterface5 | AccountInterface4
   }
 
-export type BackwardsCompatibleConnectedStarknetWindowObject =
-  StarknetWindowObject &
-    Omit<ConnectedStarknetWindowObjectV3, CommonOmittedProperties>
+export type BackwardsCompatibleConnectedStarknetWindowObject = Omit<
+  StarknetWindowObject,
+  "provider" | "account"
+> &
+  Omit<ConnectedStarknetWindowObjectV3, CommonOmittedProperties> & {
+    provider?: ProviderInterface | ProviderInterface5 | ProviderInterface4
+    account?: AccountInterface | AccountInterface5 | AccountInterface4
+  }
 
 export type Variant = "argentX" | "argentWebWallet"
 
@@ -105,12 +129,11 @@ export const getArgentStarknetWindowObject = (
             const params = call.params as SwitchStarknetChainParameters
             return remoteHandle.call("switchStarknetChain", params)
           }
-          case "starknet_addInvokeTransaction": {
+          case "wallet_addInvokeTransaction": {
             throw new Error("not implemented")
           }
-          case "starknet_addDeclareTransaction":
-          case "starknet_addDeployAccountTransaction":
-          case "starknet_signTypedData": {
+          case "wallet_addDeclareTransaction":
+          case "wallet_signTypedData": {
             throw new Error("not implemented")
           }
           default:
@@ -127,7 +150,7 @@ export const getArgentStarknetWindowObject = (
           case "wallet_deploymentData": {
             throw new Error("not implemented")
           }
-          case "starknet_supportedSpecs": {
+          case "wallet_supportedSpecs": {
             throw new Error("not implemented")
           }
           default:

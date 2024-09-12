@@ -1,14 +1,14 @@
-import { Button, icons } from "@argent/x-ui"
+import { Button, iconsDeprecated } from "@argent/x-ui"
 import { Circle, Flex } from "@chakra-ui/react"
 import { FC, MouseEvent, useCallback, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { PendingMultisig } from "../../../shared/multisig/types"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { AccountListScreenItemAccessory } from "../accounts/AccountListScreenItemAccessory"
 import { PendingMultisigListItem } from "./PendingMultisigListItem"
 
-const { ChevronRightIcon, MoreIcon } = icons
+const { ChevronRightIcon, MoreIcon } = iconsDeprecated
 
 /** TODO: refactor - this should use AccoutListScreenItem */
 
@@ -49,6 +49,7 @@ export const PendingMultisigListScreenItem: FC<
         accountName={pendingMultisig.name}
         publicKey={pendingMultisig.publicKey}
         networkId={pendingMultisig.networkId}
+        isLedger={pendingMultisig.signer.type === "ledger"}
         pr={14}
       >
         {clickNavigateSettings && (

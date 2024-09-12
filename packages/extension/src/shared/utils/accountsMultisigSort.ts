@@ -1,14 +1,18 @@
 import { getIndexForPath } from "./derivationPath"
 import { PendingMultisig } from "../multisig/types"
-import {
-  STANDARD_DERIVATION_PATH,
-  MULTISIG_DERIVATION_PATH,
-} from "../wallet.service"
+import { SignerType } from "../wallet.model"
+import { getBaseDerivationPath } from "../signer/utils"
 
 interface SortableAccount {
   signer: {
+    type: SignerType
     derivationPath: string
   }
+}
+
+const signerPriority: { [key in SignerType]: number } = {
+  [SignerType.LOCAL_SECRET]: 0,
+  [SignerType.LEDGER]: 1,
 }
 
 export const sortAccountsByDerivationPath = (
@@ -17,13 +21,21 @@ export const sortAccountsByDerivationPath = (
 ) => {
   const aIndex = getIndexForPath(
     a.signer.derivationPath,
-    STANDARD_DERIVATION_PATH,
+    getBaseDerivationPath("standard", a.signer.type),
   )
   const bIndex = getIndexForPath(
     b.signer.derivationPath,
-    STANDARD_DERIVATION_PATH,
+    getBaseDerivationPath("standard", b.signer.type),
   )
+
   return aIndex - bIndex
+}
+
+export const sortAccountsBySignerPriority = (
+  a: SortableAccount,
+  b: SortableAccount,
+) => {
+  return signerPriority[a.signer.type] - signerPriority[b.signer.type]
 }
 
 export const sortMultisigByDerivationPath = (
@@ -32,26 +44,37 @@ export const sortMultisigByDerivationPath = (
 ) => {
   const aIndex = getIndexForPath(
     a.signer.derivationPath,
-    MULTISIG_DERIVATION_PATH,
+    getBaseDerivationPath("multisig", a.signer.type),
   )
   const bIndex = getIndexForPath(
     b.signer.derivationPath,
-    MULTISIG_DERIVATION_PATH,
+    getBaseDerivationPath("multisig", b.signer.type),
   )
   return aIndex - bIndex
 }
 
-export const accountSort = <T extends SortableAccount>(accounts: T[]): T[] => {
-  const sorted = [...accounts]
-  sorted.sort(sortAccountsByDerivationPath)
-  return sorted
+// Sorts accounts by derivation path and then by signer priority
+export const sortStandardAccounts = <T extends SortableAccount>(
+  accounts: T[],
+): T[] => {
+  return [...accounts]
+    .sort(sortAccountsByDerivationPath)
+    .sort(sortAccountsBySignerPriority)
 }
 
-export const multisigAndPendingMultisigSort = <T extends SortableAccount>(
+export const sortMultisigAccounts = <T extends SortableAccount>(
+  multisigAccounts: T[],
+): T[] => {
+  return [...multisigAccounts].sort(sortMultisigByDerivationPath)
+}
+
+export const sortMultisigAndPendingMultisigAccounts = <
+  T extends SortableAccount,
+>(
   pending: PendingMultisig[],
   full: T[],
 ): (PendingMultisig | T)[] => {
-  const sorted = [...pending, ...full]
-  sorted.sort(sortMultisigByDerivationPath)
-  return sorted
+  return [...pending, ...full]
+    .sort(sortMultisigByDerivationPath)
+    .sort(sortAccountsBySignerPriority)
 }

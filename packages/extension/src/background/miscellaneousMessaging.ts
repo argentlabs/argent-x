@@ -1,18 +1,18 @@
 import browser from "webextension-polyfill"
 
 import { MiscenalleousMessage as MiscellaneousMessage } from "../shared/messages/MiscellaneousMessage"
-import { resetDevice } from "../shared/shield/jwt"
+import { resetDevice } from "../shared/smartAccount/jwt"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
-import { openUi } from "./openUi"
+import { backgroundUIService } from "./services/ui"
 
 export const handleMiscellaneousMessage: HandleMessage<
   MiscellaneousMessage
 > = async ({ msg, messagingKeys: { publicKeyJwk }, respond }) => {
   switch (msg.type) {
     case "OPEN_UI": {
-      return openUi()
+      return backgroundUIService.openUi()
     }
 
     case "RESET_ALL": {

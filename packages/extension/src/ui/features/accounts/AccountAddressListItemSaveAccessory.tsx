@@ -1,8 +1,8 @@
-import { Button, icons } from "@argent/x-ui"
+import { Button, iconsDeprecated } from "@argent/x-ui"
 import { ButtonProps } from "@chakra-ui/react"
 import { FC } from "react"
 
-const { AddressBookIcon } = icons
+const { AddressBookIcon } = iconsDeprecated
 
 export const AccountAddressListItemSaveAccessory: FC<ButtonProps> = ({
   onClick,

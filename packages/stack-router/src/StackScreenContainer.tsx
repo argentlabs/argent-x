@@ -21,7 +21,7 @@ export const StackScreenMotionContainer: ChakraComponent<
     right: 0,
     bottom: 0,
     transform: "50% 0",
-    bg: "bg",
+    bg: "surface-default",
   },
 })
 

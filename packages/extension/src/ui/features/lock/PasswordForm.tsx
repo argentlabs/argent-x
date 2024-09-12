@@ -1,10 +1,9 @@
-import { FieldError, Input, icons } from "@argent/x-ui"
+import { FieldError, Input, iconsDeprecated } from "@argent/x-ui"
 import { Box, Flex, FlexProps, Text } from "@chakra-ui/react"
 import { isEmpty, isString } from "lodash-es"
 import { FC, ReactNode, useEffect } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
-import { validatePassword } from "../recovery/seedRecovery.state"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 
 interface FieldValues {
@@ -26,7 +25,7 @@ export const PasswordForm: FC<PasswordFormProps> = ({
   const { control, formState, handleSubmit, clearErrors, setError } =
     useForm<FieldValues>()
   const { errors, isDirty, isSubmitting } = formState
-  const { InfoIcon } = icons
+  const { InfoIcon } = iconsDeprecated
 
   useEffect(() => {
     if (isString(error)) {
@@ -58,7 +57,8 @@ export const PasswordForm: FC<PasswordFormProps> = ({
       <Controller
         name="password"
         control={control}
-        rules={{ required: true, validate: validatePassword }}
+        /** Note: do not add any extra validation here - should be handled only by `verifyPassword` */
+        rules={{ required: true }}
         defaultValue=""
         render={({ field: { ref, ...field } }) => (
           <Input
@@ -84,9 +84,6 @@ export const PasswordForm: FC<PasswordFormProps> = ({
           <Text fontSize="sm" color="error.500">
             <InfoIcon />
           </Text>
-          {errors.password?.type === "validate" && (
-            <FieldError>Password is too short</FieldError>
-          )}
           {errors.password?.type === "required" && (
             <FieldError>Password is required</FieldError>
           )}

@@ -4,7 +4,7 @@ import { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 
 import { nftService } from "../../../shared/nft"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"

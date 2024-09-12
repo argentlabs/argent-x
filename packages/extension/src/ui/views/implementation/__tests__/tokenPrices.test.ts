@@ -1,7 +1,8 @@
 import { addressSchema } from "@argent/x-shared"
-import { stark } from "starknet6"
+import { stark } from "starknet"
 import {
   getMockBaseToken,
+  getMockBaseTokenWithBalance,
   getMockTokenPriceDetails,
   getMockTokenWithBalance,
 } from "../../../../../test/token.mock"
@@ -34,7 +35,7 @@ describe("sortedTokensWithBalances", () => {
 
   describe("should verify add currency value to token list", () => {
     it("should add currency value to token list", () => {
-      const mockTokensWithBalances = [
+      const mockTokens = [
         getMockTokenWithBalance({
           ...mockBaseTokens[0],
           balance: BigInt(10e17).toString(),
@@ -44,6 +45,19 @@ describe("sortedTokensWithBalances", () => {
           ...mockBaseTokens[1],
           balance: BigInt(20e16).toString(),
           account: mockAccount,
+        }),
+      ]
+
+      const mockTokensWithBalances = [
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[0],
+          balance: BigInt(10e17).toString(),
+          account: mockAccount.address,
+        }),
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[1],
+          balance: BigInt(20e16).toString(),
+          account: mockAccount.address,
         }),
       ]
 
@@ -61,7 +75,7 @@ describe("sortedTokensWithBalances", () => {
       const tokensWithCurrencyValue = addCurrencyValueToTokensList(
         mockTokensWithBalances,
         mockTokenPrices,
-        mockTokensWithBalances,
+        mockTokens,
       )
 
       expect(tokensWithCurrencyValue[0].usdValue).toEqual("2534.515044")
@@ -69,7 +83,7 @@ describe("sortedTokensWithBalances", () => {
     })
 
     it("should add 0.00 currency value when price cannot be computed", () => {
-      const mockTokensWithBalances = [
+      const mockTokens = [
         getMockTokenWithBalance({
           ...mockBaseTokens[0],
           balance: BigInt(10e17).toString(),
@@ -79,6 +93,19 @@ describe("sortedTokensWithBalances", () => {
           ...mockBaseTokens[1],
           balance: BigInt(20e16).toString(),
           account: mockAccount,
+        }),
+      ]
+
+      const mockTokensWithBalances = [
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[0],
+          balance: BigInt(10e17).toString(),
+          account: mockAccount.address,
+        }),
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[1],
+          balance: BigInt(20e16).toString(),
+          account: mockAccount.address,
         }),
       ]
 
@@ -92,7 +119,7 @@ describe("sortedTokensWithBalances", () => {
       const tokensWithCurrencyValue = addCurrencyValueToTokensList(
         mockTokensWithBalances,
         mockTokenPrices,
-        mockTokensWithBalances,
+        mockTokens,
       )
 
       expect(tokensWithCurrencyValue[0].usdValue).toEqual("2534.515044")
@@ -101,15 +128,15 @@ describe("sortedTokensWithBalances", () => {
 
     it("should throw error if token not found", async () => {
       const mockTokensWithBalances = [
-        getMockTokenWithBalance({
+        getMockBaseTokenWithBalance({
           ...mockBaseTokens[0],
           balance: BigInt(10e17).toString(),
-          account: mockAccount,
+          account: mockAccount.address,
         }),
-        getMockTokenWithBalance({
+        getMockBaseTokenWithBalance({
           ...mockBaseTokens[1],
           balance: BigInt(20e16).toString(),
-          account: mockAccount,
+          account: mockAccount.address,
         }),
       ]
 
@@ -154,27 +181,47 @@ describe("sortedTokensWithBalances", () => {
         return {
           ...t,
           balance: BigInt(10e17).toString(),
+          account: mockAccount.address,
+        }
+      })
+
+      const mockDefaultTokenInfo = defaultTokens.map((t) => {
+        return {
+          ...t,
           account: mockAccount,
         }
       })
 
       const mockOtherTokensWithBalances = [
-        getMockTokenWithBalance({
+        getMockBaseTokenWithBalance({
           ...mockBaseTokens[0],
           balance: BigInt(10e17).toString(),
+          account: mockAccount.address,
+        }),
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[1],
+          balance: BigInt(20e16).toString(),
+          account: mockAccount.address,
+        }),
+      ]
+
+      const mockOtherTokensInfo = [
+        getMockTokenWithBalance({
+          ...mockBaseTokens[0],
           account: mockAccount,
         }),
         getMockTokenWithBalance({
           ...mockBaseTokens[1],
-          balance: BigInt(20e16).toString(),
           account: mockAccount,
         }),
       ]
 
-      const allTokensWithBalace = [
+      const allTokensWithBalance = [
         ...mockOtherTokensWithBalances,
         ...mockDefaultTokensWithBalances,
       ]
+
+      const allTokensInfo = [...mockDefaultTokenInfo, ...mockOtherTokensInfo]
 
       const mockTokenPrices = [
         getMockTokenPriceDetails({
@@ -194,9 +241,9 @@ describe("sortedTokensWithBalances", () => {
       ]
 
       const tokensWithCurrencyValue = addCurrencyValueToTokensList(
-        allTokensWithBalace,
+        allTokensWithBalance,
         mockTokenPrices,
-        allTokensWithBalace,
+        allTokensInfo,
       )
 
       const sortedTokens = sortTokensWithPrices(tokensWithCurrencyValue)
@@ -210,6 +257,24 @@ describe("sortedTokensWithBalances", () => {
 
     it("should sort other tokens by currency value", () => {
       const mockOtherTokensWithBalances = [
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[0],
+          balance: BigInt(10e17).toString(),
+          account: mockAccount.address,
+        }),
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[1],
+          balance: BigInt(20e16).toString(),
+          account: mockAccount.address,
+        }),
+        getMockBaseTokenWithBalance({
+          ...mockBaseTokens[2],
+          balance: BigInt(10e16).toString(),
+          account: mockAccount.address,
+        }),
+      ]
+
+      const mockOtherTokensInfo = [
         getMockTokenWithBalance({
           ...mockBaseTokens[0],
           balance: BigInt(10e17).toString(),
@@ -245,7 +310,7 @@ describe("sortedTokensWithBalances", () => {
       const tokensWithCurrencyValue = addCurrencyValueToTokensList(
         mockOtherTokensWithBalances,
         mockTokenPrices,
-        mockOtherTokensWithBalances,
+        mockOtherTokensInfo,
       )
 
       const sortedTokens = sortTokensWithPrices(tokensWithCurrencyValue)
@@ -264,24 +329,46 @@ describe("sortedTokensWithBalances", () => {
       return {
         ...t,
         balance: BigInt(10e17).toString(),
+        account: mockAccount.address,
+      }
+    })
+
+    const mockDefaultTokensInfo = defaultTokens.map((t) => {
+      return {
+        ...t,
         account: mockAccount,
       }
     })
 
     const mockOtherTokensWithBalances = [
-      getMockTokenWithBalance({
+      getMockBaseTokenWithBalance({
         ...mockBaseTokens[0],
         balance: BigInt(10e17).toString(),
+        account: mockAccount.address,
+      }),
+      getMockBaseTokenWithBalance({
+        ...mockBaseTokens[1],
+        balance: BigInt(20e16).toString(),
+        account: mockAccount.address,
+      }),
+      getMockBaseTokenWithBalance({
+        ...mockBaseTokens[2],
+        balance: BigInt(10e16).toString(),
+        account: mockAccount.address,
+      }),
+    ]
+
+    const mockOtherTokensInfo = [
+      getMockTokenWithBalance({
+        ...mockBaseTokens[0],
         account: mockAccount,
       }),
       getMockTokenWithBalance({
         ...mockBaseTokens[1],
-        balance: BigInt(20e16).toString(),
         account: mockAccount,
       }),
       getMockTokenWithBalance({
         ...mockBaseTokens[2],
-        balance: BigInt(10e16).toString(),
         account: mockAccount,
       }),
     ]
@@ -290,6 +377,8 @@ describe("sortedTokensWithBalances", () => {
       ...mockOtherTokensWithBalances,
       ...mockDefaultTokensWithBalances,
     ]
+
+    const allTokensInfo = [...mockOtherTokensInfo, ...mockDefaultTokensInfo]
 
     const mockTokenPrices = [
       getMockTokenPriceDetails({
@@ -315,7 +404,7 @@ describe("sortedTokensWithBalances", () => {
     const tokensWithCurrencyValue = addCurrencyValueToTokensList(
       allTokensWithBalace,
       mockTokenPrices,
-      allTokensWithBalace,
+      allTokensInfo,
     )
 
     const sortedTokens = sortTokensWithPrices(tokensWithCurrencyValue)

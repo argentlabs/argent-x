@@ -3,7 +3,7 @@ import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useSumTokenBalancesToCurrencyValue } from "./tokenPriceHooks"
 import { useTokensWithBalance } from "./tokens.state"
 
-export const usePrettyAccountBalance = (account: BaseWalletAccount) => {
+export const usePrettyAccountBalance = (account?: BaseWalletAccount) => {
   const tokenDetails = useTokensWithBalance(account)
   const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokenDetails)
   if (sumCurrencyValue === undefined) {

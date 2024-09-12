@@ -5,19 +5,31 @@ import {
   RpcProvider,
   constants,
   TransactionFinalityStatus,
+  num,
 } from "starknet"
-import { isEqualAddress } from "@argent/x-shared"
-import config from "../config"
+import commonConfig from "../config"
 import { expect } from "@playwright/test"
-import { sleep } from "./common"
+import { logInfo, sleep } from "./common"
 import { sendSlackMessage } from "./slack"
 
-export type TokenSymbol = "ETH" | "WBTC" | "STRK" | "AST" | "USDC" | "DAI"
+const isEqualAddress = (a?: string, b?: string) => {
+  try {
+    if (!a || !b) {
+      return false
+    }
+    return num.hexToDecimalString(a) === num.hexToDecimalString(b)
+  } catch {
+    // ignore parsing error
+  }
+  return false
+}
+
+export type TokenSymbol = "ETH" | "WBTC" | "STRK" | "SWAY" | "USDC" | "DAI"
 export type TokenName =
   | "Ethereum"
   | "Wrapped BTC"
   | "Starknet"
-  | "Astraly"
+  | "Standard Weighted Adalian Yield"
   | "USD Coin"
   | "DAI"
 export type FeeTokens = "ETH" | "STRK"
@@ -29,18 +41,12 @@ export interface AccountsToSetup {
   deploy?: boolean
   feeToken?: FeeTokens
 }
-const rpcUrl = process.env.ARGENT_TESTNET_RPC_URL
-console.log("Creating RPC provider with url", rpcUrl)
-if (!rpcUrl) {
-  throw new Error("Missing ARGENT_TESTNET_RPC_URL env variable")
-}
-const startScanUrl = config.starkscanTestNetUrl
-if (!startScanUrl) {
-  throw new Error("Missing STARKSCAN_TESTNET_URL env variable")
-}
+const rpcUrl = commonConfig.rpcUrl
+logInfo({ op: "Creating RPC provider with url", rpcUrl })
+
 const provider = new RpcProvider({
   nodeUrl: rpcUrl,
-  chainId: constants.StarknetChainId.SN_GOERLI,
+  chainId: constants.StarknetChainId.SN_SEPOLIA,
   headers: {
     "argent-version": process.env.VERSION || "Unknown version",
     "argent-client": "argent-x",
@@ -55,22 +61,22 @@ interface TokenInfo {
 const tokenAddresses = new Map<string, TokenInfo>()
 tokenAddresses.set("ETH", {
   name: "Ethereum",
-  address: "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+  address: "0x049D36570D4e46f48e99674bd3fcc84644DdD6b96F7C741B1562B82f9e004dC7",
   decimals: 18,
 })
 tokenAddresses.set("WBTC", {
   name: "Wrapped BTC",
-  address: "0x12d537dc323c439dc65c976fad242d5610d27cfb5f31689a0a319b8be7f3d56",
+  address: "0x00c6164dA852d230360333D6adE3551eE3e48124C815704f51fA7F12D8287Dcc",
   decimals: 8,
 })
 tokenAddresses.set("STRK", {
   name: "Starknet Token",
-  address: "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+  address: "0x04718f5a0Fc34cC1AF16A1cdee98fFB20C31f5cD61D6Ab07201858f4287c938D",
   decimals: 18,
 })
-tokenAddresses.set("AST", {
-  name: "Astraly",
-  address: "0x05A6B68181bb48501a7A447a3f99936827E41D77114728960f22892F02E24928",
+tokenAddresses.set("SWAY", {
+  name: "Standard Weighted Adalian Yield",
+  address: "0x0030058F19Ed447208015F6430F0102e8aB82D6c291566D7E73fE8e613c3D2ed",
   decimals: 18,
 })
 
@@ -99,30 +105,29 @@ const getAccount = async (amount: string, token: TokenSymbol) => {
   while (i < maxAttempts) {
     i++
     const randomAccountPosition = Math.floor(
-      Math.random() * config.senderKeys!.length,
+      Math.random() * commonConfig.senderKeys!.length,
     )
     const acc = new Account(
       provider,
-      config.senderAddrs![randomAccountPosition],
-      config.senderKeys![randomAccountPosition],
+      commonConfig.senderAddrs![randomAccountPosition],
+      commonConfig.senderKeys![randomAccountPosition],
       "1",
     )
-
     const initialBalance = await getBalance(acc.address, token)
     const initialBalanceFormatted =
       parseFloat(initialBalance) * Math.pow(10, 18)
     if (initialBalanceFormatted < parseInt(amount)) {
       log.push(
         `${
-          config.senderAddrs![randomAccountPosition]
-        } Not enough balance ${initialBalanceFormatted} < ${amount}`,
+          commonConfig.senderAddrs![randomAccountPosition]
+        } Not enough balance ${initialBalanceFormatted} ${token} < ${amount}`,
       )
     } else {
-      console.log({
+      logInfo({
         op: "getAccount",
         randomAccountPosition,
         address: acc.address,
-        balance: initialBalance,
+        balance: `initialBalance ${initialBalanceFormatted} ${token}`,
       })
       return acc
     }
@@ -184,7 +189,7 @@ export async function transferTokens(
 ) {
   const tokenInfo = getTokenInfo(token)
   const amountToTransfer = `${amount * Math.pow(10, tokenInfo.decimals)}`
-  console.log({ op: "transferTokens", amount, amountToTransfer, to, token })
+  logInfo({ op: "transferTokens", amount, amountToTransfer, to, token })
 
   const { low, high } = uint256.bnToUint256(amountToTransfer)
   let placeTXAttempt = 0
@@ -208,15 +213,15 @@ export async function transferTokens(
         tx.transaction_hash,
       )
       if (txProcessed) {
-        console.log({
+        logInfo({
           TxStatus: TransactionExecutionStatus.SUCCEEDED,
-          url: `${startScanUrl}/tx/${tx.transaction_hash}`,
+          transaction_hash: tx.transaction_hash,
         })
         return tx.transaction_hash
       }
 
       console.error(
-        `[Failed to place TX] ${startScanUrl}/tx/${tx.transaction_hash} ${txStatusResponse}`,
+        `[Failed to place TX] ${tx.transaction_hash} ${JSON.stringify(txStatusResponse)}`,
       )
     } catch (e) {
       if (e instanceof Error) {
@@ -236,7 +241,7 @@ export async function transferTokens(
 
 async function getBalance(accountAddress: string, token: TokenSymbol = "ETH") {
   const tokenInfo = getTokenInfo(token)
-  console.log({ op: "getBalance", accountAddress, token, tokenInfo })
+  logInfo({ op: "getBalance", accountAddress, token, tokenInfo })
   const balanceOfCall = {
     contractAddress: tokenInfo.address,
     entrypoint: "balanceOf",
@@ -247,7 +252,7 @@ async function getBalance(accountAddress: string, token: TokenSymbol = "ETH") {
     parseInt(low, 16) / Math.pow(10, tokenInfo.decimals)
   ).toFixed(4)
 
-  console.log({
+  logInfo({
     op: "getBalance",
     balance,
     formattedBalance: balance,
@@ -255,13 +260,24 @@ async function getBalance(accountAddress: string, token: TokenSymbol = "ETH") {
   return balance
 }
 
-export async function validateTx(
-  txHash: string,
-  receiver: string,
-  amount?: number,
-) {
+export async function validateTx({
+  txHash,
+  receiver,
+  amount,
+  txType = "token",
+}: {
+  txHash: string
+  receiver: string
+  amount?: number
+  txType?: "token" | "nft"
+}) {
   const log: string[] = []
-  log.push("validateTx txHash:", txHash)
+  logInfo({
+    op: "validateTx",
+    txHash,
+    receiver,
+    amount,
+  })
   const processed = await isTXProcessed(txHash)
   if (!processed) {
     throw new Error(`Transaction not processed: ${txHash}`)
@@ -278,7 +294,15 @@ export async function validateTx(
       `Invalid transaction data: ${txHash}, ${JSON.stringify(txData)}`,
     )
   }
-  const accAdd = txData.calldata[4].toString()
+  logInfo(log)
+  let accAdd
+  txType === "token"
+    ? (accAdd = txData.calldata[4].toString())
+    : (accAdd = txData.calldata[5].toString())
+
+  if (accAdd.length === 65) {
+    accAdd = accAdd.replace("0x", "0x0")
+  }
   expect(isEqualAddress(accAdd, receiver)).toBe(true)
   if (amount) {
     expect(formatAmount(txData.calldata[5].toString())).toBe(amount)
@@ -297,16 +321,31 @@ export function convertScientificToDecimal(num: number) {
 
 export async function notifyLowBalance() {
   let msg: string = ""
-  for (const acc of config.senderAddrs!) {
+  for (const acc of commonConfig.senderAddrs!) {
     for (const token of ["ETH", "STRK"]) {
       const balance = await getBalance(acc, token as TokenSymbol)
       if (parseFloat(balance) < 0.1) {
-        console.log(`###### Low balance for ${acc} ${balance}`)
+        logInfo(`###### Low balance for ${acc} ${balance}`)
         msg += "`" + acc + "`  *" + balance + " " + token + "*\n"
       }
     }
   }
   if (msg) {
-    await sendSlackMessage(`*Low balance for:*\n\n ${msg}\n`)
+    await sendSlackMessage(`*Low balance for:*\n\n${msg}\n`)
+  }
+}
+
+export async function getBalances() {
+  let msg: string = ""
+  for (const acc of commonConfig.senderAddrs!) {
+    for (const token of ["ETH", "STRK"]) {
+      const balance = await getBalance(acc, token as TokenSymbol)
+      logInfo(`###### Balance: ${acc} ${balance}`)
+      msg += "`" + acc + "`  *" + balance + " " + token + "*\n"
+    }
+  }
+  if (msg) {
+    logInfo(`\nBalance:\n\n${msg.replaceAll("`", "").replaceAll("*", "")}\n`)
+    await sendSlackMessage(`*Balance:*\n\n ${msg}\n`)
   }
 }

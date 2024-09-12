@@ -1,4 +1,4 @@
-import { BaseError } from "@argent-x/extension/src/shared/errors/baseError"
+import { BaseError } from "@argent/x-shared"
 import ErrorBoundaryFallbackWithCopyError from "@argent-x/extension/src/ui/components/ErrorBoundaryFallbackWithCopyError"
 
 export default {

@@ -25,7 +25,7 @@ export const getEscapeForAccount = async (account: BaseWalletAccount) => {
   const multicall = getMulticallForNetwork(network)
   const response = await multicallWithCairo0Fallback(call, multicall)
 
-  return shapeResponse(response.result)
+  return shapeResponse(response)
 }
 
 /*

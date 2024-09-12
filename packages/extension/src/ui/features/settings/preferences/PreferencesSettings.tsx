@@ -8,31 +8,38 @@ import { FC, ReactEventHandler } from "react"
 
 import { NftMarketplace } from "../../../../shared/nft/marketplaces"
 import { BlockExplorer } from "../../../../shared/settings/defaultBlockExplorers"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { routes } from "../../../routes"
+import { routes } from "../../../../shared/ui/routes"
 import { SettingsMenuItem, SettingsMenuItemLink } from "../ui/SettingsMenuItem"
+import { selectedNetworkIdView } from "../../../views/network"
+import { useView } from "../../../views/implementation/react"
 
 interface PreferencesSettingsProps {
   onBack: ReactEventHandler
-  hideTokensWithNoBalance: boolean
-  toggleHideTokensWithNoBalance: ReactEventHandler
-  isSignedIn: boolean
   returnTo: string
   blockExplorer: BlockExplorer
   nftMarketplace: NftMarketplace
-  selectedAccount?: BaseWalletAccount
+  disableAnimation: boolean
+  onDisableAnimationClick: ReactEventHandler
+  hideSpamTokens: boolean
+  onHideSpamTokensClick: ReactEventHandler
+  airGapEnabled: boolean
+  onEnableAirGapClick: ReactEventHandler
 }
 
 export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
   onBack,
-  toggleHideTokensWithNoBalance,
-  hideTokensWithNoBalance,
-  isSignedIn,
   returnTo,
   blockExplorer,
   nftMarketplace,
-  selectedAccount,
+  disableAnimation,
+  onDisableAnimationClick,
+  hideSpamTokens,
+  onHideSpamTokensClick,
+  airGapEnabled,
+  onEnableAirGapClick,
 }) => {
+  const selectedNetworkId = useView(selectedNetworkIdView)
+
   return (
     <NavigationContainer
       leftButton={<BarBackButton onClick={onBack} />}
@@ -40,13 +47,10 @@ export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
     >
       <CellStack>
         <SettingsMenuItem
-          onClick={toggleHideTokensWithNoBalance}
-          title={"Hide tokens with no balance"}
-          subtitle={"ETH and STRK will always be shown"}
-          rightIcon={<Switch isChecked={hideTokensWithNoBalance} />}
-        >
-          Change account implementation
-        </SettingsMenuItem>
+          rightIcon={<Switch isChecked={hideSpamTokens} pointerEvents="none" />}
+          title="Hide spam tokens"
+          onClick={onHideSpamTokensClick}
+        />
         <SettingsMenuItemLink
           to={routes.settingsBlockExplorer(returnTo)}
           title="Default block explorer"
@@ -58,16 +62,22 @@ export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
           subtitle={nftMarketplace.title}
         />
         <SettingsMenuItemLink
-          to={
-            isSignedIn
-              ? routes.settingsEmailNotifications(returnTo)
-              : routes.argentAccountEmail(
-                  selectedAccount?.address,
-                  "emailPreferences",
-                  returnTo,
-                )
+          to={routes.accountsHidden(selectedNetworkId, returnTo)}
+          title="Hidden accounts"
+        />
+        <SettingsMenuItem
+          rightIcon={<Switch isChecked={airGapEnabled} pointerEvents="none" />}
+          title="Air gap transaction with Ledger"
+          subtitle="Enable to show transaction details in QR"
+          onClick={onEnableAirGapClick}
+        />
+        <SettingsMenuItem
+          rightIcon={
+            <Switch isChecked={disableAnimation} pointerEvents="none" />
           }
-          title="Email notifications"
+          title="Disable animations"
+          subtitle="Disable to optimise for performance"
+          onClick={onDisableAnimationClick}
         />
       </CellStack>
     </NavigationContainer>

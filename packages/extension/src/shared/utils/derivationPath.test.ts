@@ -1,14 +1,14 @@
 import { describe, expect, test } from "vitest"
 
 import { getNextPathIndex } from "./derivationPath"
-import { STANDARD_DERIVATION_PATH } from "../wallet.service"
+import { STANDARD_ARGENT_DERIVATION_PATH } from "../signer/derivationPaths"
 
 describe("getNextPathIndex", () => {
   test("incrementing", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/1", "m/44'/9004'/0'/0/2"],
-        STANDARD_DERIVATION_PATH,
+        STANDARD_ARGENT_DERIVATION_PATH,
       ),
     ).toBe(3)
   })
@@ -17,7 +17,7 @@ describe("getNextPathIndex", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/1", "m/44'/9004'/0'/0/3"],
-        STANDARD_DERIVATION_PATH,
+        STANDARD_ARGENT_DERIVATION_PATH,
       ),
     ).toBe(2)
   })
@@ -26,7 +26,7 @@ describe("getNextPathIndex", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/0", "m/44'/9004'/0'/0/4", "m/44'/9004'/0'/0/11"],
-        STANDARD_DERIVATION_PATH,
+        STANDARD_ARGENT_DERIVATION_PATH,
       ),
     ).toBe(1)
   })
@@ -35,7 +35,7 @@ describe("getNextPathIndex", () => {
     expect(
       getNextPathIndex(
         ["m/44'/9004'/0'/0/3", "m/44'/9004'/0'/0/1"],
-        STANDARD_DERIVATION_PATH,
+        STANDARD_ARGENT_DERIVATION_PATH,
       ),
     ).toBe(0)
   })
@@ -47,7 +47,7 @@ describe("getNextPathIndex", () => {
           "m/2645'/1195502025'/1148870696'/0'/0'/0",
           "m/2645'/1195502025'/1148870696'/0'/0'/1",
         ],
-        STANDARD_DERIVATION_PATH,
+        STANDARD_ARGENT_DERIVATION_PATH,
       ),
     ).toBe(0)
   })
@@ -68,6 +68,6 @@ describe("getNextPathIndex", () => {
   })
 
   test("empty array", () => {
-    expect(getNextPathIndex([], STANDARD_DERIVATION_PATH)).toBe(0)
+    expect(getNextPathIndex([], STANDARD_ARGENT_DERIVATION_PATH)).toBe(0)
   })
 })

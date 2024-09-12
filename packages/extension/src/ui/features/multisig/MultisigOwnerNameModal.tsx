@@ -52,7 +52,7 @@ export const MultisigOwnerNameModal: FC<MultisigOwnerNameProps> = ({
           >
             Save
           </Button>
-          <Button w="100%" colorScheme="neutrals" onClick={onClose}>
+          <Button w="100%" onClick={onClose}>
             Cancel
           </Button>
         </ModalFooter>

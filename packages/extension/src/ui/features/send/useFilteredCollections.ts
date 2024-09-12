@@ -1,11 +1,12 @@
 import { useMemo } from "react"
 
-import { useAppState } from "../../app.state"
 import { useCollections } from "../accountNfts/nfts.state"
+import { selectedNetworkIdView } from "../../views/network"
+import { useView } from "../../views/implementation/react"
 
 export const useFilteredCollections = (query?: string) => {
-  const { switcherNetworkId } = useAppState()
-  const collections = useCollections(switcherNetworkId)
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const collections = useCollections(selectedNetworkId)
 
   const filteredCollections = useMemo(() => {
     if (!query) {

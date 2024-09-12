@@ -3,7 +3,7 @@ import { FC } from "react"
 
 import { FormError } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
-import { TokenIcon } from "./TokenIcon"
+import { TokenIcon } from "@argent/x-ui"
 
 interface HideTokenScreenProps {
   error: string

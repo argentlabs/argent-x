@@ -1,13 +1,18 @@
-import { Button, L2, icons, typographyStyles } from "@argent/x-ui"
+import {
+  Button,
+  L2,
+  iconsDeprecated,
+  typographyStyles,
+  TokenIcon,
+} from "@argent/x-ui"
 import { Flex, InputProps, Spinner, chakra } from "@chakra-ui/react"
 import { ReactNode, forwardRef, useCallback, useMemo, useState } from "react"
 import Measure, { ContentRect } from "react-measure"
 
-import { tokenService } from "../../services/tokens"
-import { TokenIcon } from "../accountTokens/TokenIcon"
+import { clientTokenService } from "../../services/tokens"
 import { Token } from "../../../shared/token/__new/types/token.model"
 
-const { ChevronDownIcon } = icons
+const { ChevronDownIcon } = iconsDeprecated
 
 interface TokenAmountInputProps extends InputProps {
   token: Token
@@ -67,7 +72,11 @@ const TokenAmountInput = forwardRef<HTMLInputElement, TokenAmountInputProps>(
       return Math.max(defaultFontSize * multiplier, minimumFontSize)
     }, [defaultFontSize, fullSizeTextWidth, inputWidth, minimumFontSize])
 
-    const { name, iconUrl: image, symbol } = tokenService.toTokenView(token)
+    const {
+      name,
+      iconUrl: image,
+      symbol,
+    } = clientTokenService.toTokenView(token)
     return (
       <Flex
         gap={1}
@@ -114,7 +123,7 @@ const TokenAmountInput = forwardRef<HTMLInputElement, TokenAmountInputProps>(
             leftIcon={<TokenIcon size={5} url={image} name={name} mr={2} />}
             rightIcon={<ChevronDownIcon fontSize={"2xs"} mx={1} />}
             minHeight={0}
-            bg={"neutrals.900"}
+            bg="surface-default"
             p={1}
             onClick={onTokenClick}
             sx={{

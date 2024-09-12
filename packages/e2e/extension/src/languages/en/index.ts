@@ -11,7 +11,7 @@ const texts = {
     unlock: "Unlock",
     showSettings: "Show settings",
     reset: "Reset",
-    confirmReset: "RESET",
+    confirmReset: "Reset",
     save: "Save",
     create: "Create",
     cancel: "Cancel",
@@ -19,13 +19,12 @@ const texts = {
       "GDPR statement for browser extension wallet: Argent takes the privacy and security of individuals very seriously and takes every reasonable measure and precaution to protect and secure the personal data that we process. The browser extension wallet does not collect any personal information nor does it correlate any of your personal information with anonymous data processed as part of its services. On top of this Argent has robust information security policies and procedures in place to make sure any processing complies with applicable laws. If you would like to know more or have any questions then please visit our website at https://www.argent.xyz/",
     approve: "Approve",
     addArgentShield: "Add Argent Shield",
-    removeArgentShield: "Remove Argent Shield",
-    argentShieldAdded: "Argent Shield Added",
-    argentShieldRemoved: "Argent Shield Removed",
+    changeAccountType: "Change",
+    accountUpgraded: "Account upgraded",
+    changedToStandardAccount: "Changed to Standard Account",
     dismiss: "Dismiss",
     reviewSend: "Review send",
-    hide: "Hide",
-    hiddenAccounts: "Hidden accounts",
+    hide: "Hide account",
     copy: "Copy",
     beforeYouContinue: "Before you continue...",
     seedWarning:
@@ -35,11 +34,12 @@ const texts = {
     confirmRecovery:
       "I have saved my recovery phrase and understand I should never share it with anyone else",
     remove: "Remove",
+    upgrade: "Upgrade",
   },
   account: {
     noAccounts: "You have no accounts on",
     createAccount: "Create account",
-    addFunds: "Fund",
+    fund: "Fund",
     fundsFromStarkNet: "From another Starknet wallet",
     fullAccountAddress: "Full account address",
     send: "Send",
@@ -49,11 +49,11 @@ const texts = {
     saveTheRecoveryPhrase: "Save the recovery phrase",
     confirmTheSeedPhrase:
       "I have saved my recovery phrase and understand I should never share it with anyone else",
-    pendingTransactions: "Pending transactions",
+    pendingTransactions: "Pending",
     recipientAddress: "Recipient's address",
     saveAddress: "Save address",
     deployFirst:
-      "You must deploy this account before Argent Shield can be added",
+      "You must deploy this account before upgrading to a Smart Account",
     wrongPassword: "Incorrect password",
     invalidStarkIdError: " not found",
     shortAddressError: "Address must be 66 characters long",
@@ -64,15 +64,16 @@ const texts = {
     notEnoughFoundsFee: "Insufficient funds to pay fee",
     newToken: "New token",
     argentShield: {
-      wrong2faCode: "Looks like the wrong code. Please try again.",
-      failed2faCode:
+      wrongCode: "Looks like the wrong code. Please try again.",
+      failedCode:
         "You have reached the maximum number of attempts. Please wait 30 minutes and request a new code.",
-      codeNotRequested2fa:
+      codeNotRequested:
         "You have not requested a verification code. Please request a new one.",
       emailInUse:
         "This address is associated with accounts from another seedphrase.Please enter another email address to continue.",
     },
     removedFromMultisig: "You were removed from this multisig",
+    copyAddress: "Copy address",
   },
   wallet: {
     //first screen
@@ -97,8 +98,8 @@ const texts = {
     //fourth screen
     banner4: "Your wallet is ready!",
     desc4: "Follow us for product updates or if you have any questions",
-    twitter: "Follow Argent X on Twitter",
-    discord: "Join the Argent X Discord",
+    twitter: "Follow Argent on X",
+    discord: "Join the Argent Discord",
     finish: "Finish",
   },
   settings: {
@@ -125,6 +126,7 @@ const texts = {
     preferences: {
       preferences: "Preferences",
       hideTokens: "Hide tokens with no balance",
+      hiddenAccounts: "Hidden accounts",
       defaultBlockExplorer: "Default block explorer",
       defaultNFTMarket: "Default NFT marketplace",
       emailNotifications: "Email notifications",

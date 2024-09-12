@@ -1,4 +1,4 @@
-import { H1, P2, logos } from "@argent/x-ui"
+import { H1, P2, logosDeprecated } from "@argent/x-ui"
 import { Box, Button } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import { FC, PropsWithChildren, ReactNode } from "react"
@@ -7,7 +7,7 @@ import { ContentWrapper } from "../../../components/FullScreenPage"
 import { ArrowBackIcon } from "../../../components/Icons/MuiIcons"
 import { StepIndicator } from "../../../components/StepIndicator"
 
-const { ArgentXLogo } = logos
+const { ArgentXLogo } = logosDeprecated
 
 export interface CreateMultisigScreen extends PropsWithChildren {
   back?: boolean
@@ -16,6 +16,7 @@ export interface CreateMultisigScreen extends PropsWithChildren {
   length?: number
   currentIndex?: number
   goBack?: () => void
+  filledIndicator?: boolean
 }
 
 const Panel = (props: React.HTMLAttributes<HTMLDivElement>) => (
@@ -48,7 +49,7 @@ const PageWrapper = (props: React.HTMLAttributes<HTMLDivElement>) => {
         display={{ md: "flex" }}
         backgroundColor={{ md: "black" }}
         height={{ md: "100%" }}
-        background={`url('./assets/onboarding-background.svg') no-repeat center`}
+        background={`url('./assets/onboarding-background.jpg') no-repeat center`}
         backgroundSize="cover"
       >
         <Panel>
@@ -67,6 +68,7 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
   length = 3,
   currentIndex,
   goBack,
+  filledIndicator,
 }) => {
   const indicator = isNumber(length) && isNumber(currentIndex)
 
@@ -92,7 +94,11 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
       <Panel>
         <ContentWrapper>
           {indicator && (
-            <StepIndicator length={length} currentIndex={currentIndex} />
+            <StepIndicator
+              length={length}
+              currentIndex={currentIndex}
+              filled={filledIndicator}
+            />
           )}
           <Box my={8} mx={0}>
             {title && typeof title === "string" ? (

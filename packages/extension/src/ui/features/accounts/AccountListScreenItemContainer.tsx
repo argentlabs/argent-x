@@ -1,29 +1,32 @@
-import { FC, useCallback, useMemo } from "react"
+import { FC, Suspense, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { BoxProps } from "@chakra-ui/react"
+import { accountsEqual } from "../../../shared/utils/accountsEqual"
+import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import { routes } from "../../../shared/ui/routes"
+import { clientAccountService } from "../../services/account"
+import { useStarknetId } from "../../services/useStarknetId"
+import { useIsAccountDeploying } from "../accountTokens/useIsAccountDeploying"
+import {
+  isSignerInMultisigView,
+  multisigView,
+} from "../multisig/multisig.state"
 import {
   useIsPreauthorized,
   useOriginatingPreAuthorizationHost,
 } from "../preAuthorizations/hooks"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { routes } from "../../routes"
-import { useAccountStatus } from "../accountTokens/useAccountStatus"
-import { usePrettyAccountBalance } from "../accountTokens/usePrettyAccountBalance"
-import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
-import { useMultisig } from "../multisig/multisig.state"
-import { Account } from "./Account"
 import { AccountListScreenItem } from "./AccountListScreenItem"
-import { BoxProps } from "@chakra-ui/react"
 import { useIsDeprecatedTxV0 } from "./accountUpgradeCheck"
-import { clientAccountService } from "../../services/account"
 import { useAccountOwnerIsSelf } from "./useAccountOwner"
-import { useStarknetId } from "../../services/useStarknetId"
+import { useShowAccountUpgrade } from "../accountTokens/useShowAccountUpgrade"
+import { useView } from "../../views/implementation/react"
+import { PrettyAccountBalance } from "../accountTokens/PrettyAccountBalance"
 
 interface AccountListScreenItemContainerProps
   extends Pick<BoxProps, "borderBottomRadius"> {
-  account: Account
+  account: WalletAccount
   selectedAccount?: BaseWalletAccount
-  needsUpgrade?: boolean
   clickNavigateSettings?: boolean
   returnTo?: string
   showRightElements?: boolean
@@ -34,20 +37,17 @@ export const AccountListScreenItemContainer: FC<
 > = ({
   account,
   selectedAccount,
-  needsUpgrade,
   clickNavigateSettings,
   returnTo,
   borderBottomRadius,
   showRightElements,
 }) => {
-  const prettyAccountBalance = usePrettyAccountBalance(account)
   const navigate = useNavigate()
   const originatingPreAuthorizationHost = useOriginatingPreAuthorizationHost()
-  // TODO: should not be needed when data layer was restructered, as all properties can be considered real time at that point.
-  const status = useAccountStatus(account, selectedAccount)
+  const isDeploying = useIsAccountDeploying(account)
   // TODO: waiting for multisig refactor to use views and services
-  const multisig = useMultisig(account)
-  const signerIsInMultisig = useIsSignerInMultisig(multisig)
+  const multisig = useView(multisigView(account))
+  const signerIsInMultisig = useView(isSignerInMultisigView(account))
   const accountOwnerIsSelf = useAccountOwnerIsSelf(account)
   const isRemovedFromMultisig = useMemo(() => {
     if (multisig) {
@@ -94,12 +94,20 @@ export const AccountListScreenItemContainer: FC<
   const accountDescription = isRemovedFromMultisig
     ? "Removed from multisig"
     : starknetId
-    ? starknetId
-    : undefined
+      ? starknetId
+      : undefined
 
   const accountExtraInfo = multisig
     ? `${multisig.threshold}/${multisig.signers.length}`
     : undefined
+
+  const accountNeedsUpgrade = useShowAccountUpgrade(account)
+
+  const prettyAccountBalance = !clickNavigateSettings ? (
+    <Suspense>
+      <PrettyAccountBalance account={account} />
+    </Suspense>
+  ) : undefined
 
   return (
     <AccountListScreenItem
@@ -110,17 +118,16 @@ export const AccountListScreenItemContainer: FC<
       accountExtraInfo={accountExtraInfo}
       networkId={account.networkId}
       accountType={account.type}
-      isShield={Boolean(account.guardian)}
+      isSmartAccount={Boolean(account.guardian)}
       isOwner={accountOwnerIsSelf}
-      avatarOutlined={status.code === "CONNECTED"}
-      deploying={status.code === "DEPLOYING"}
-      upgrade={needsUpgrade}
+      avatarOutlined={accountsEqual(account, selectedAccount)}
+      deploying={isDeploying}
+      upgrade={accountNeedsUpgrade}
       connectedHost={isConnected ? originatingPreAuthorizationHost : undefined}
       clickNavigateSettings={clickNavigateSettings}
       isDeprecated={isDeprecated}
-      prettyAccountBalance={
-        !clickNavigateSettings ? prettyAccountBalance : undefined
-      }
+      isLedger={account.signer.type === "ledger"}
+      prettyAccountBalance={prettyAccountBalance}
       borderBottomRadius={borderBottomRadius}
       showRightElements={showRightElements ?? true}
     />

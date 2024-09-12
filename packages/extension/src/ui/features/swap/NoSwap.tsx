@@ -1,6 +1,7 @@
-import { H5, icons } from "@argent/x-ui"
+import { H5, iconsDeprecated } from "@argent/x-ui"
 import { Flex, Text } from "@chakra-ui/react"
-const { SwapIcon } = icons
+
+const { SwapIcon } = iconsDeprecated
 
 export function NoSwap() {
   return (

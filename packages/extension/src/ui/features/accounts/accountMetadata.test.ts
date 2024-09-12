@@ -18,14 +18,14 @@ const mockAccounts = [
     ...getMockAccount({
       address: "0xabc",
       type: "standard",
-      network: { name: "goerli", id: "goerli" } as Network,
+      network: { name: "sepolia", id: "sepolia" } as Network,
     }),
   },
   {
     ...getMockAccount({
       address: "0xdef",
       type: "multisig",
-      network: { name: "goerli", id: "goerli" } as Network,
+      network: { name: "sepolia", id: "sepolia" } as Network,
     }),
   },
 ] as Account[]
@@ -36,7 +36,7 @@ const mockAccountNames = {
     "0x456": "Multisig 1",
     "0x789": "Account 2",
   },
-  goerli: {
+  sepolia: {
     "0xabc": "Account 3",
     "0xdef": "Multisig 2",
   },

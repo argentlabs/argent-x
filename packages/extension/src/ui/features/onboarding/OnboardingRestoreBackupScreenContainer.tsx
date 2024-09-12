@@ -3,8 +3,8 @@ import { useNavigateBack } from "@argent/x-ui"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useAppState } from "../../app.state"
-import { routes } from "../../routes"
+import { useLegacyAppState } from "../../app.state"
+import { routes } from "../../../shared/ui/routes"
 import { fileToString } from "../../services/files"
 import { clientRecoveryService } from "../../services/recovery"
 import { OnboardingRestoreBackupScreen } from "./OnboardingRestoreBackupScreen"
@@ -25,7 +25,7 @@ export const OnboardingRestoreBackupScreenContainer: FC = () => {
         if (error.toLowerCase().includes(legacyError)) {
           navigate(routes.legacy())
         } else {
-          useAppState.setState({ error })
+          useLegacyAppState.setState({ error })
           navigate(routes.error())
         }
       }

@@ -9,7 +9,7 @@ import {
   HeaderCell,
   NavigationContainer,
   TextareaAutosize,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import {
   Flex,
@@ -37,7 +37,7 @@ import { SendModalAddContactScreen } from "./SendModalAddContactScreen"
 import { FormType } from "./sendRecipientScreen.model"
 
 const { SearchIcon, WalletIcon, AddressBookIcon, CloseIcon, MultisigIcon } =
-  icons
+  iconsDeprecated
 
 interface SendRecipientScreenProps {
   errors: FieldErrors<FormType>
@@ -58,7 +58,7 @@ interface SendRecipientScreenProps {
   placeholderValidAddress: ReactNode
   query: string
   register: UseFormRegister<FormType>
-  switcherNetworkId: string
+  selectedNetworkId: string
   multisigAccounts: WalletAccount[]
   standardAccounts: WalletAccount[]
 }
@@ -82,7 +82,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
   placeholderValidAddress,
   query,
   register,
-  switcherNetworkId,
+  selectedNetworkId,
   multisigAccounts,
   standardAccounts,
 }) => {
@@ -203,7 +203,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                         pt={4}
                       >
                         <WalletIcon w={4} h={4} />
-                        <H6>Standard Accounts</H6>
+                        <H6>My Accounts</H6>
                       </Flex>
                       <AccountListWithBalance
                         accounts={standardAccounts}
@@ -267,7 +267,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
         </CellStack>
       </NavigationContainer>
       <SendModalAddContactScreen
-        contact={{ address: query, networkId: switcherNetworkId }}
+        contact={{ address: query, networkId: selectedNetworkId }}
         isOpen={isAddContactOpen}
         onClose={onCloseAddContact}
         finalFocusRef={inputRef}

@@ -1,9 +1,7 @@
 import { BaseToken, Token } from "../src/shared/token/__new/types/token.model"
+import { ApiTokensInfoResponse, ApiTokenInfo } from "@argent/x-shared"
 import {
-  ApiTokensInfoResponse,
-  ApiTokenInfo,
-} from "../src/shared/token/__new/types/tokenInfo.model"
-import {
+  BaseTokenWithBalance,
   TokenWithBalance,
   TokenWithOptionalBigIntBalance,
 } from "../src/shared/token/__new/types/tokenBalance.model"
@@ -49,6 +47,12 @@ const defaultTokenWithBalance: TokenWithBalance = {
   ...defaultToken,
   balance: BigInt(100).toString(),
   account: getMockWalletAccount({}),
+}
+
+const defaultBaseTokenWithBalance: BaseTokenWithBalance = {
+  ...defaultToken,
+  balance: BigInt(100).toString(),
+  account: getMockWalletAccount({}).address,
 }
 
 const defaultTokenWithOptionalBigIntBalance: TokenWithOptionalBigIntBalance = {
@@ -97,6 +101,13 @@ export const getMockTokenWithBalance = (
   overrides?: Partial<TokenWithBalance>,
 ) => ({
   ...defaultTokenWithBalance,
+  ...(overrides ?? {}),
+})
+
+export const getMockBaseTokenWithBalance = (
+  overrides?: Partial<BaseTokenWithBalance>,
+) => ({
+  ...defaultBaseTokenWithBalance,
   ...(overrides ?? {}),
 })
 

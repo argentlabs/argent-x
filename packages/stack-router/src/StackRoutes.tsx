@@ -6,7 +6,7 @@ import { Routes, useLocation } from "react-router-dom"
 import { getWrappedChildrenAndPresentation } from "./presentation/getWrappedChildrenAndPresentation"
 import { StackContextProvider } from "./StackContext"
 import { useStackRoutesConfig } from "./StackRoutesConfig"
-import { getMatchingPath } from "./utils/getMatchingPath"
+import { getMatchingPath } from "./utils/path"
 
 export const StackRoutes: FC<ComponentProps<typeof Flex>> = ({
   children,

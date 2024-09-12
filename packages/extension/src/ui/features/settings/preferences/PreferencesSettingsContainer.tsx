@@ -1,18 +1,13 @@
-import { FC, MouseEvent } from "react"
+import { FC, useCallback } from "react"
 import { defaultNftMarketplaces } from "../../../../shared/nft/marketplaces"
 import { settingsStore } from "../../../../shared/settings"
 import { defaultBlockExplorers } from "../../../../shared/settings/defaultBlockExplorers"
-import { useKeyValueStorage } from "../../../hooks/useStorage"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
-import { useCurrentPathnameWithQuery } from "../../../routes"
-import { selectedAccountView } from "../../../views/account"
-import { useView } from "../../../views/implementation/react"
-import { useIsSignedIn } from "../../argentAccount/hooks/useIsSignedIn"
+import { useKeyValueStorage } from "../../../hooks/useStorage"
+import { useCurrentPathnameWithQuery } from "../../../hooks/useRoute"
 import { PreferencesSettings } from "./PreferencesSettings"
 
 export const PreferencesSettingsContainer: FC = () => {
-  const isSignedIn = useIsSignedIn()
-  const selectedAccount = useView(selectedAccountView)
   const returnTo = useCurrentPathnameWithQuery()
   const onBack = useNavigateReturnToOrBack()
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
@@ -22,24 +17,31 @@ export const PreferencesSettingsContainer: FC = () => {
     "nftMarketplaceKey",
   )
   const nftMarketplace = defaultNftMarketplaces[nftMarketplaceKey]
-  const hideTokensWithNoBalance = useKeyValueStorage(
-    settingsStore,
-    "hideTokensWithNoBalance",
-  )
-  const toggleHideTokensWithNoBalance = (e: MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-    void settingsStore.set("hideTokensWithNoBalance", !hideTokensWithNoBalance)
-  }
+  const disableAnimation = useKeyValueStorage(settingsStore, "disableAnimation")
+  const onDisableAnimationClick = useCallback(() => {
+    void settingsStore.set("disableAnimation", !disableAnimation)
+  }, [disableAnimation])
+  const hideSpamTokens = useKeyValueStorage(settingsStore, "hideSpamTokens")
+  const onHideSpamTokensClick = useCallback(() => {
+    void settingsStore.set("hideSpamTokens", !hideSpamTokens)
+  }, [hideSpamTokens])
+  const airGapEnabled = useKeyValueStorage(settingsStore, "airGapEnabled")
+  const onEnableAirGapClick = useCallback(() => {
+    void settingsStore.set("airGapEnabled", !airGapEnabled)
+  }, [airGapEnabled])
+
   return (
     <PreferencesSettings
       onBack={onBack}
-      toggleHideTokensWithNoBalance={toggleHideTokensWithNoBalance}
-      hideTokensWithNoBalance={hideTokensWithNoBalance}
-      isSignedIn={isSignedIn}
       returnTo={returnTo}
       blockExplorer={blockExplorer}
       nftMarketplace={nftMarketplace}
-      selectedAccount={selectedAccount}
+      disableAnimation={disableAnimation}
+      onDisableAnimationClick={onDisableAnimationClick}
+      hideSpamTokens={hideSpamTokens}
+      onHideSpamTokensClick={onHideSpamTokensClick}
+      airGapEnabled={airGapEnabled}
+      onEnableAirGapClick={onEnableAirGapClick}
     />
   )
 }

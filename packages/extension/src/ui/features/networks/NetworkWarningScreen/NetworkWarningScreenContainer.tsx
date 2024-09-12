@@ -1,7 +1,8 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes, useReturnTo } from "../../../routes"
+import { useReturnTo } from "../../../hooks/useRoute"
+import { routes } from "../../../../shared/ui/routes"
 import { useNeedsToShowNetworkStatusWarning } from "../hooks/useNeedsToShowNetworkStatusWarning"
 import { NetworkWarningScreen } from "./NetworkWarningScreen"
 

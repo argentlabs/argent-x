@@ -1,7 +1,6 @@
-import { addressSchema } from "@argent/x-shared"
+import { addressSchema, callSchema } from "@argent/x-shared"
 import { z } from "zod"
 import { SwapDataSchema } from "./quote.model"
-import { CallSchema } from "@argent/x-window"
 
 export const SwapOrderRequestSchema = z.object({
   chain: z.literal("starknet"),
@@ -17,7 +16,7 @@ export const SwapOrderRequestSchema = z.object({
 export type SwapOrderRequest = z.infer<typeof SwapOrderRequestSchema>
 
 export const SwapOrderResponseSchema = z.object({
-  calls: z.array(CallSchema),
+  calls: z.array(callSchema),
 })
 
 export type SwapOrderResponse = z.infer<typeof SwapOrderResponseSchema>

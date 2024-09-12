@@ -14,6 +14,9 @@ import {
   pendingMultisigEqual,
   withoutHiddenPendingMultisig,
 } from "./selectors"
+import { getAccountClassHashFromChain } from "../../account/details"
+import { isEqualAddress } from "@argent/x-shared"
+import { accountsEqual } from "../../utils/accountsEqual"
 
 export async function getAllPendingMultisigs(
   selector: SelectorFn<PendingMultisig> = withoutHiddenPendingMultisig,
@@ -81,6 +84,15 @@ export async function pendingMultisigToMultisig(
     needsDeploy: false,
     hidden: false,
   }
+
+  const accountsWithClassHash = await getAccountClassHashFromChain([
+    fullMultisig,
+  ])
+  const classHash = accountsWithClassHash.find((ac) =>
+    accountsEqual(ac, fullMultisig),
+  )?.classHash
+
+  fullMultisig.classHash = classHash
 
   await removePendingMultisig(pendingMultisig)
   await addMultisigAccount(fullMultisig)

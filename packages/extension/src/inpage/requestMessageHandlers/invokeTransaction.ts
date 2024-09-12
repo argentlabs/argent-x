@@ -1,29 +1,15 @@
 import {
   AddInvokeTransactionParameters,
   AddInvokeTransactionResult,
-  BigNumberishSchema,
-} from "@argent/x-window"
+} from "@starknet-io/types-js"
+import { RpcCallsArraySchema } from "starknetkit/window"
 import { sendMessage, waitForMessage } from "../messageActions"
-import { z } from "zod"
-
-const CallSchema = z
-  .object({
-    contract_address: z.string(),
-    entrypoint: z.string(),
-    calldata: z.array(BigNumberishSchema).optional(),
-  })
-  .transform(({ contract_address, entrypoint, calldata }) => ({
-    contractAddress: contract_address,
-    entrypoint,
-    calldata: calldata || [],
-  }))
-
-const CallsArraySchema = z.array(CallSchema).nonempty()
+import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 
 export async function addInvokeTransactionHandler(
   params: AddInvokeTransactionParameters,
 ): Promise<AddInvokeTransactionResult> {
-  const parsedTransaction = CallsArraySchema.safeParse(params.calls)
+  const parsedTransaction = RpcCallsArraySchema.safeParse(params.calls)
 
   if (!parsedTransaction.success) {
     throw Error(`Invalid transaction: ${parsedTransaction.error.message}`)
@@ -57,10 +43,10 @@ export async function addInvokeTransactionHandler(
   ])
 
   if (result === "error") {
-    throw Error("User abort")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.UserAborted })
   }
   if (result === "timeout") {
-    throw Error("User action timed out")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.Unknown })
   }
 
   return {

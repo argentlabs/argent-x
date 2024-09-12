@@ -1,7 +1,7 @@
 import { H3, P3, PreBoxJsonStringify } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
-import { typedData } from "starknet"
+import { TypedData } from "@starknet-io/types-js"
 
 import {
   ConfirmScreen,
@@ -9,7 +9,7 @@ import {
 } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
 
 interface ApproveSignatureScreenProps extends ConfirmScreenProps {
-  dataToSign: typedData.TypedData
+  dataToSign: TypedData
   actionIsApproving?: boolean
   footer?: ReactNode
 }

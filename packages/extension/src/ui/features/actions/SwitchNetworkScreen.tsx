@@ -1,4 +1,4 @@
-import { B3, icons } from "@argent/x-ui"
+import { B3, iconsDeprecated } from "@argent/x-ui"
 import { Center, Flex, Text } from "@chakra-ui/react"
 import { FC, PropsWithChildren } from "react"
 
@@ -9,7 +9,7 @@ import {
   ConfirmScreenProps,
 } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
 
-const { ChevronRightIcon } = icons
+const { ChevronRightIcon } = iconsDeprecated
 
 export interface SwitchNetworkScreenProps extends ConfirmScreenProps {
   fromNetworkTitle?: string

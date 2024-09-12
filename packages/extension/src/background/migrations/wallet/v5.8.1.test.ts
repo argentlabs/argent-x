@@ -4,6 +4,7 @@ import {
   cryptoStarknetServiceMock,
   getWalletStoreMock,
 } from "../../wallet/test.utils"
+import { SignerType } from "../../../shared/wallet.model"
 
 describe("v5.8.1", () => {
   it("should detect falsey accounts for migration", async () => {
@@ -20,7 +21,7 @@ describe("v5.8.1", () => {
               networkId: "mainnet-alpha",
               signer: {
                 derivationPath: "m/44'/9004'/0'/0/0",
-                type: "local_secret",
+                type: SignerType.LOCAL_SECRET,
               },
               type: "standard",
             },
@@ -32,7 +33,7 @@ describe("v5.8.1", () => {
               networkId: "goerli-alpha",
               signer: {
                 derivationPath: "m/44'/9004'/0'/0/0",
-                type: "local_secret",
+                type: SignerType.LOCAL_SECRET,
               },
               type: "standard",
             },
@@ -44,7 +45,7 @@ describe("v5.8.1", () => {
               networkId: "goerli-alpha",
               signer: {
                 derivationPath: "m/44'/9004'/0'/0/1",
-                type: "local_secret",
+                type: SignerType.LOCAL_SECRET,
               },
               type: "standard",
             },

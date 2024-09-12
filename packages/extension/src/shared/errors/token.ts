@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 export enum TOKEN_ERROR_MESSAGES {
   NO_TOKEN_API_URL = "ARGENT_API_TOKENS_URL is not defined",

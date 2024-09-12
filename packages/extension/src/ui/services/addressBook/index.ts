@@ -1,4 +1,4 @@
-import { messageClient } from "../messaging/trpc"
-import { AddressBookService } from "./client"
+import { messageClient } from "../trpc"
+import { ClientAddressBookService } from "./ClientAddressBookService"
 
-export const addressBookService = new AddressBookService(messageClient)
+export const addressBookService = new ClientAddressBookService(messageClient)

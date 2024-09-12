@@ -7,11 +7,11 @@ import {
   CustomBottomSheet,
   CustomBottomSheetProps,
 } from "../../../components/BottomSheet"
-import { Button } from "../../../components/Button"
 import { CopyIconButton } from "../../../components/CopyIconButton"
 import Row from "../../../components/Row"
 import { scrollbarStyle } from "../../../theme"
 import { H3 } from "../../../theme/Typography"
+import { Button } from "@chakra-ui/react"
 
 const Container = styled.div`
   padding: 40px 24px 32px;

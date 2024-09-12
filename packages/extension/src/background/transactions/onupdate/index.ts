@@ -3,7 +3,6 @@ import { handleDeclareContractTransaction } from "./declareContract"
 import { handleDeployAccountTransaction } from "./deployAccount"
 import { handleMultisigUpdates } from "./multisigUpdates"
 import { checkResetStoredNonce } from "./nonce"
-import { notifyAboutCompletedTransactions } from "./notifications"
 import { TransactionUpdateListener } from "./type"
 import { handleUpgradeTransaction } from "./upgrade"
 
@@ -24,16 +23,4 @@ export const runAddedOrUpdatedHandlers: TransactionUpdateListener = async (
   for (const handler of addedOrUpdatedHandlers) {
     await handler(updates)
   }
-}
-
-const changedStatusHandlers: TransactionUpdateListener[] = [
-  notifyAboutCompletedTransactions,
-]
-
-export const runChangedStatusHandlers: TransactionUpdateListener = async (
-  updates,
-) => {
-  await Promise.allSettled(
-    changedStatusHandlers.map((handler) => handler(updates)),
-  )
 }

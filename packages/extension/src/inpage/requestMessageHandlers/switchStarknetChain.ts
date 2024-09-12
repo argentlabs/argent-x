@@ -1,5 +1,6 @@
-import { SwitchStarknetChainParameters } from "@argent/x-window"
+import { SwitchStarknetChainParameters } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
+import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 
 export async function switchStarknetChainHandler({
   chainId,
@@ -18,11 +19,16 @@ export async function switchStarknetChainHandler({
     throw Error(req.error)
   }
 
-  const { actionHash, exists } = req
+  const { actionHash, exists, isCurrentNetwork } = req
 
   if (!exists) {
     // If network does not exist, we cannot switch to it
     return false
+  }
+
+  if (isCurrentNetwork) {
+    // If the network is already the selected one, don't open the UI and return early
+    return true
   }
 
   sendMessage({ type: "OPEN_UI" })
@@ -53,11 +59,10 @@ export async function switchStarknetChainHandler({
   ])
 
   if (result === "error") {
-    throw Error("User abort")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.UserAborted })
   }
-
   if (result === "timeout") {
-    throw Error("User action timed out")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.Unknown })
   }
 
   return true

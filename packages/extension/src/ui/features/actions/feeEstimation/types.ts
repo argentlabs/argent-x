@@ -1,8 +1,9 @@
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
-import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+import { EstimatedFees } from "@argent/x-shared/simulation"
 import { TokenWithBalance, TransactionAction } from "@argent/x-shared"
+
 export interface TransactionsFeeEstimationProps {
-  feeToken: TokenWithBalance
+  feeToken?: TokenWithBalance
   transactionAction: TransactionAction
   defaultMaxFee?: bigint
   onChange?: (fee: bigint) => void
@@ -19,4 +20,5 @@ export interface TransactionsFeeEstimationProps {
   needsDeploy?: boolean
   allowFeeTokenSelection?: boolean
   onFeeTokenPickerOpen?: () => void
+  actionErrorApproving?: string
 }

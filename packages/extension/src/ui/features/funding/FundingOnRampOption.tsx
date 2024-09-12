@@ -1,22 +1,24 @@
 import { FC } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { icons, logos } from "@argent/x-ui"
+import { iconsDeprecated, logosDeprecated } from "@argent/x-ui"
 import { Option } from "../../components/Options"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
-const { CardIcon } = icons
-const { StarknetLogo } = logos
+const { CardIcon } = iconsDeprecated
+const { StarknetLogo } = logosDeprecated
 
 interface FundingOnRampOptionProps {
   allowFiatPurchase: boolean
   isMainnet: boolean
+  isSepolia: boolean
   isBanxaEnabled: boolean
 }
 
 export const FundingOnRampOption: FC<FundingOnRampOptionProps> = ({
   allowFiatPurchase,
   isMainnet,
+  isSepolia,
   isBanxaEnabled,
 }) => {
   const { state } = useLocation()
@@ -29,12 +31,27 @@ export const FundingOnRampOption: FC<FundingOnRampOptionProps> = ({
           title="Buy with card or bank transfer"
           icon={<CardIcon width={6} height={6} />}
           description={
-            isBanxaEnabled ? "Provided by Ramp and Banxa" : "Provided by Ramp"
+            isBanxaEnabled
+              ? "Provided by Ramp, Banxa and Topper"
+              : "Provided by Ramp and Topper"
           }
         />
       </Link>
     )
   }
+
+  if (isSepolia) {
+    return (
+      <Link to={routes.fundingFaucetSepolia()} state={state}>
+        <Option
+          title="Get test ETH & STRK"
+          icon={<StarknetLogo width={6} height={6} />}
+          description="From Sepolia token faucet"
+        />
+      </Link>
+    )
+  }
+
   if (!isMainnet) {
     const faucetUrl = network?.faucetUrl
 

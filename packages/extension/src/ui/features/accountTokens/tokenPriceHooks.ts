@@ -17,17 +17,13 @@ import {
 } from "../../../shared/token/types"
 import { lookupTokenPriceDetails } from "../../../shared/token/lookupTokenPriceDetails"
 import { sumTokenBalancesToCurrencyValue } from "../../../shared/token/sumTokenBalancesToCurrencyValue"
-import { argentApiFetcher } from "../../services/argentApiFetcher"
 import {
   useConditionallyEnabledSWR,
   withPolling,
 } from "../../services/swr.service"
 import { useIsDefaultNetwork } from "../networks/hooks/useIsDefaultNetwork"
 import { BigNumberish } from "starknet"
-import { RefreshInterval } from "../../../shared/config"
-import { useView } from "../../views/implementation/react"
-import { tokenPricesView } from "../../views/tokenPrices"
-import { allTokensView } from "../../views/token"
+import { RefreshIntervalInSeconds } from "../../../shared/config"
 import {
   TokenWithBalance,
   TokenWithOptionalBigIntBalance,
@@ -36,6 +32,9 @@ import {
   BaseTokenSchema,
   Token,
 } from "../../../shared/token/__new/types/token.model"
+import { allTokensView, allTokenPricesView } from "../../views/token"
+import { useView } from "../../views/implementation/react"
+import { useArgentApiFetcher } from "../../../shared/api/fetcher"
 
 /** @returns true if API is enabled, app is on mainnet and the user has enabled Argent services */
 
@@ -48,18 +47,19 @@ export const useCurrencyDisplayEnabled = () => {
 /** @returns price and token data which will be cached and refreshed periodically by SWR */
 
 export const usePriceAndTokenDataFromApi = () => {
+  const argentApiFetcher = useArgentApiFetcher()
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
   const { data: pricesData } = useConditionallyEnabledSWR<ApiPriceDataResponse>(
     !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_PRICES_URL}`,
     argentApiFetcher,
-    withPolling(RefreshInterval.MEDIUM * 1000) /** 60 seconds */,
+    withPolling(RefreshIntervalInSeconds.MEDIUM * 1000) /** 60 seconds */,
   )
   const { data: tokenData } = useConditionallyEnabledSWR<ApiTokenDataResponse>(
     !!currencyDisplayEnabled,
     `${ARGENT_API_TOKENS_INFO_URL}`,
     argentApiFetcher,
-    withPolling(RefreshInterval.SLOW * 1000) /** 5 minutes */,
+    withPolling(RefreshIntervalInSeconds.SLOW * 1000) /** 5 minutes */,
   )
   return {
     pricesData,
@@ -69,7 +69,7 @@ export const usePriceAndTokenDataFromApi = () => {
 
 export const usePriceAndTokenDataFromRepo = () => {
   const currencyDisplayEnabled = useCurrencyDisplayEnabled()
-  const pricesData = useView(tokenPricesView)
+  const pricesData = useView(allTokenPricesView)
   const tokenData = useView(allTokensView)
 
   if (!currencyDisplayEnabled) {

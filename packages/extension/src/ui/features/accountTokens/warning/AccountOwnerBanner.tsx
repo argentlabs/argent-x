@@ -1,8 +1,8 @@
-import { AlertButton, icons } from "@argent/x-ui"
+import { AlertButton, iconsDeprecated } from "@argent/x-ui"
 import { FC } from "react"
 import { LinkProps, useNavigate } from "react-router-dom"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 export interface AccountOwnerBannerProps extends LinkProps {}
 

@@ -11,21 +11,26 @@ import {
 import {
   WalletAccountSharedService,
   WalletSession,
-} from "../../shared/account/service/shared.service"
-import { WalletAccountStarknetService } from "./account/starknet.service"
-import { WalletBackupService } from "./backup/backup.service"
-import { WalletCryptoSharedService } from "./crypto/shared.service"
-import { WalletCryptoStarknetService } from "./crypto/starknet.service"
-import { WalletDeploymentStarknetService } from "./deployment/starknet.service"
-import { WalletRecoverySharedService } from "./recovery/shared.service"
-import { WalletRecoveryStarknetService } from "./recovery/starknet.service"
-import { WalletSessionService } from "./session/session.service"
+} from "../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import { WalletAccountStarknetService } from "./account/WalletAccountStarknetService"
+import { WalletBackupService } from "./backup/WalletBackupService"
+import { WalletCryptoSharedService } from "./crypto/WalletCryptoSharedService"
+import { WalletCryptoStarknetService } from "./crypto/WalletCryptoStarknetService"
+import { WalletDeploymentStarknetService } from "./deployment/WalletDeploymentStarknetService"
+import { WalletRecoverySharedService } from "./recovery/WalletRecoverySharedService"
+import { WalletRecoveryStarknetService } from "./recovery/WalletRecoveryStarknetService"
+import { WalletSessionService } from "./session/WalletSessionService"
 import { Wallet } from "."
-import { MultisigBackendService } from "../../shared/multisig/service/backend/implementation"
+import { MultisigBackendService } from "../../shared/multisig/service/backend/MultisigBackendService"
 import { WalletStorageProps } from "../../shared/wallet/walletStore"
-import { AnalyticsService } from "../../shared/analytics/implementation"
+import { AnalyticsService } from "../../shared/analytics/AnalyticsService"
+import { IReferralService } from "../services/referral/IReferralService"
 import { KeyValueStorage } from "../../shared/storage"
 import { ISettingsStorage } from "../../shared/settings/types"
+import { IHttpService } from "@argent/x-shared"
+import { LedgerSharedService } from "../../shared/ledger/service/LedgerSharedService"
+import { StarknetChainService } from "../../shared/chain/service/StarknetChainService"
+import { AccountService } from "../../shared/account/service/accountService/AccountService"
 
 const isDev = true
 const isTest = true
@@ -40,6 +45,13 @@ const defaultKeyValueStorage = {
   areaName: "local",
   defaults: {},
 }
+
+export const httpServiceMock = {
+  post: vi.fn(),
+  put: vi.fn(),
+  get: vi.fn(),
+  delete: vi.fn(),
+} as IHttpService
 
 // Replace with class store after migration
 const defaultArrayStorage = new MockFnRepository()
@@ -92,6 +104,10 @@ export const getPendingMultisigStoreMock = (
   overrides?: Partial<MockFnRepository<PendingMultisig>>,
 ) => getArrayStorage<PendingMultisig>(overrides)
 
+export const getAccountStoreMock = (
+  overrides?: Partial<MockFnRepository<WalletAccount>>,
+) => getArrayStorage<WalletAccount>(overrides)
+
 export const loadContractsMock = vi.fn()
 export const networkServiceMock = {
   getById: vi.fn(),
@@ -119,12 +135,30 @@ export const emitterMock = {
   once: vi.fn(),
 }
 
+export const multisigBackendServiceMock = new MultisigBackendService(
+  "mockBackendUrl",
+)
+
+const chainServiceMock = new StarknetChainService(networkServiceMock)
+
+export const accountServiceMock = new AccountService(
+  chainServiceMock,
+  getAccountStoreMock(),
+)
+
 export const accountSharedServiceMock = new WalletAccountSharedService(
   getStoreMock(),
   getWalletStoreMock(),
   getSessionStoreMock(),
   getMultisigStoreMock(),
   getPendingMultisigStoreMock(),
+  httpServiceMock,
+  accountServiceMock,
+)
+
+export const ledgerServiceMock = new LedgerSharedService(
+  networkServiceMock,
+  multisigBackendServiceMock,
 )
 
 export const cryptoStarknetServiceMock = new WalletCryptoStarknetService(
@@ -138,12 +172,14 @@ export const cryptoStarknetServiceMock = new WalletCryptoStarknetService(
   }),
   getPendingMultisigStoreMock(),
   accountSharedServiceMock,
+  ledgerServiceMock,
   loadContractsMock,
 )
 
 export const recoveryStarknetServiceMock = new WalletRecoveryStarknetService(
-  getWalletStoreMock(),
   getMultisigStoreMock(),
+  multisigBackendServiceMock,
+  ledgerServiceMock,
   cryptoStarknetServiceMock,
   accountSharedServiceMock,
 )
@@ -166,10 +202,6 @@ export const sessionServiceMock = new WalletSessionService(
   SCRYPT_N,
 )
 
-export const multisigBackendServiceMock = new MultisigBackendService(
-  "mockBackendUrl",
-)
-
 export const accountStarknetServiceMock = new WalletAccountStarknetService(
   getPendingMultisigStoreMock(),
   networkServiceMock,
@@ -177,9 +209,13 @@ export const accountStarknetServiceMock = new WalletAccountStarknetService(
   accountSharedServiceMock,
   cryptoStarknetServiceMock,
   multisigBackendServiceMock,
+  ledgerServiceMock,
 )
+export const getDefaultReferralService = (): IReferralService => {
+  return { trackReferral: () => Promise.resolve() }
+}
 
-const analyticsServiceMock = new AnalyticsService(
+export const analyticsServiceMock = new AnalyticsService(
   accountSharedServiceMock,
   getKeyValueStorage() as unknown as KeyValueStorage<ISettingsStorage>,
 )
@@ -196,6 +232,7 @@ export const deployStarknetServiceMock = new WalletDeploymentStarknetService(
   backupServiceMock,
   networkServiceMock,
   analyticsServiceMock,
+  getDefaultReferralService(),
 )
 
 export const cryptoSharedServiceMock = new WalletCryptoSharedService(

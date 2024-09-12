@@ -1,22 +1,10 @@
-import browser from "webextension-polyfill"
-
-import { uiService } from "../shared/__new/services/ui"
+import { uiService } from "../shared/ui"
 import { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
-import { Opened, backgroundUIService } from "./__new/services/ui"
+import { Opened, backgroundUIService } from "./services/ui"
 import { UnhandledMessage } from "./background"
 import { HandleMessage } from "./background"
-import { preAuthorizationService } from "../shared/preAuthorization/service"
-
-export function getOriginFromSender(
-  sender: browser.runtime.MessageSender,
-): string {
-  const url = sender.origin ?? sender.url
-  if (!url) {
-    throw new Error("Message sender has no origin or url")
-  }
-  const { origin } = new URL(url) // Firefox uses url, Chrome uses origin
-  return origin
-}
+import { preAuthorizationService } from "../shared/preAuthorization"
+import { respondToHost } from "./respond"
 
 export const handlePreAuthorizationMessage: HandleMessage<
   PreAuthorisationMessage
@@ -38,10 +26,13 @@ export const handlePreAuthorizationMessage: HandleMessage<
             host: origin,
           }))
         ) {
-          return respond({
-            type: "CONNECT_DAPP_RES",
-            data: selectedAccount,
-          })
+          return respondToHost(
+            {
+              type: "CONNECT_DAPP_RES",
+              data: selectedAccount,
+            },
+            origin,
+          )
         }
         return respond({
           type: "REJECT_PREAUTHORIZATION",
@@ -96,14 +87,18 @@ export const handlePreAuthorizationMessage: HandleMessage<
           if (await uiService.hasFloatingWindow()) {
             await uiService.closeFloatingWindow()
           }
-          if (uiService.hasPopup()) {
-            uiService.closePopup()
+          if (await backgroundUIService.hasPopup()) {
+            await backgroundUIService.closePopup()
           }
         }
-        return respond({
-          type: "CONNECT_DAPP_RES",
-          data: selectedAccount,
-        })
+
+        return respondToHost(
+          {
+            type: "CONNECT_DAPP_RES",
+            data: selectedAccount,
+          },
+          origin,
+        )
       }
 
       return

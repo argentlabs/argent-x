@@ -2,21 +2,22 @@ import { Address } from "@argent/x-shared"
 import { FC, useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 
-import { useAppState } from "../../app.state"
-import { routes } from "../../routes"
-import { tokenService } from "../../services/tokens"
+import { routes } from "../../../shared/ui/routes"
+import { clientTokenService } from "../../services/tokens"
 import { HideTokenScreen } from "./HideTokenScreen"
 import { useToken } from "./tokens.state"
+import { selectedNetworkIdView } from "../../views/network"
+import { useView } from "../../views/implementation/react"
 
 export const HideTokenScreenContainer: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const { tokenAddress } = useParams<"tokenAddress">() as {
     tokenAddress: Address
   }
   const token = useToken({
     address: tokenAddress || "0x0",
-    networkId: switcherNetworkId || "Unknown",
+    networkId: selectedNetworkId || "Unknown",
   })
   const [error, setError] = useState("")
 
@@ -24,11 +25,11 @@ export const HideTokenScreenContainer: FC = () => {
     return <Navigate to={routes.accountTokens()} />
   }
 
-  const { name, iconUrl } = tokenService.toTokenView(token)
+  const { name, iconUrl } = clientTokenService.toTokenView(token)
 
   const handleSubmit = () => {
     try {
-      void tokenService.removeToken(token)
+      void clientTokenService.removeToken(token)
       navigate(routes.accountTokens())
     } catch {
       setError("Token not hidden")

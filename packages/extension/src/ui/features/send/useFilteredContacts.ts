@@ -1,13 +1,13 @@
 import { isEqualAddress, normalizeAddressOrDomain } from "@argent/x-shared"
 import { useMemo } from "react"
 
-import { useAppState } from "../../app.state"
 import { addressBookContactsOnNetworkView } from "../../views/addressBook"
 import { useView } from "../../views/implementation/react"
+import { selectedNetworkIdView } from "../../views/network"
 
 export const useFilteredContacts = (query?: string) => {
-  const { switcherNetworkId } = useAppState()
-  const contacts = useView(addressBookContactsOnNetworkView(switcherNetworkId))
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const contacts = useView(addressBookContactsOnNetworkView(selectedNetworkId))
   const filteredContacts = useMemo(() => {
     if (!query) {
       return contacts

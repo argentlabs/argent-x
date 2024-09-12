@@ -1,26 +1,28 @@
+import { TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import { stark } from "starknet"
-
 import { accountService } from "../shared/account/service"
 import { ExtensionActionItem } from "../shared/actionQueue/types"
+import { ampli } from "../shared/analytics"
 import { MessageType } from "../shared/messages"
+import { multisigArraySignatureSchema } from "../shared/multisig/multisig.model"
+import { networkSchema } from "../shared/network"
 import { networkService } from "../shared/network/service"
-import { isEqualWalletAddress } from "../shared/wallet.service"
+import { preAuthorizationService } from "../shared/preAuthorization"
 import { assertNever } from "../shared/utils/assertNever"
+import { encodeChainId } from "../shared/utils/encodeChainId"
+import { isEqualWalletAddress } from "../shared/wallet.service"
 import { accountDeployAction } from "./accountDeployAction"
-
 import { addMultisigDeployAction } from "./multisig/multisigDeployAction"
-import { openUi } from "./openUi"
 import {
   TransactionAction,
   executeTransactionAction,
 } from "./transactions/transactionExecution"
 import { udcDeclareContract, udcDeployContract } from "./udcAction"
 import { Wallet } from "./wallet"
-import { preAuthorizationService } from "../shared/preAuthorization/service"
-import { networkSchema } from "../shared/network"
-import { encodeChainId } from "../shared/utils/encodeChainId"
-import { IFeeTokenService } from "../shared/feeToken/service/interface"
-import { analyticsService } from "../shared/analytics"
+import { respondToHost } from "./respond"
+import { backgroundUIService } from "./services/ui"
+import { isNetworkOnlyPlaceholderAccount } from "../shared/wallet.model"
+import { ActionItemExtra } from "../shared/actionQueue/schema"
 
 const handleTransactionAction = async ({
   action,
@@ -46,10 +48,11 @@ const handleTransactionAction = async ({
     }
   }
 }
+
 export const handleActionApproval = async (
   action: ExtensionActionItem,
   wallet: Wallet,
-  feeTokenService: IFeeTokenService,
+  extra?: ActionItemExtra,
 ): Promise<MessageType | undefined> => {
   const actionHash = action.meta.hash
   const selectedAccount = await wallet.getSelectedAccount()
@@ -60,7 +63,7 @@ export const handleActionApproval = async (
       const { host } = action.payload
 
       if (!selectedAccount) {
-        void openUi()
+        void backgroundUIService.openUi()
         return
       }
 
@@ -68,9 +71,17 @@ export const handleActionApproval = async (
         account: selectedAccount,
         host,
       })
-      analyticsService.dappPreauthorized({
+      ampli.dappPreauthorized({
         host,
+        "preauthorisation status": "accept",
+        "wallet platform": "browser extension",
       })
+
+      // `CONNECT_ACCOUNT_RES` triggers `handleConnect` inpage for this specific host, triggering dapp `accountsChanged` listeners
+      await respondToHost(
+        { type: "CONNECT_ACCOUNT_RES", data: selectedAccount },
+        host,
+      )
       return { type: "CONNECT_DAPP_RES", data: selectedAccount }
     }
 
@@ -84,11 +95,7 @@ export const handleActionApproval = async (
 
     case "DEPLOY_ACCOUNT": {
       try {
-        const txHash = await accountDeployAction(
-          action,
-          wallet,
-          feeTokenService,
-        )
+        const txHash = await accountDeployAction(action, wallet, extra)
 
         return {
           type: "DEPLOY_ACCOUNT_ACTION_SUBMITTED",
@@ -109,7 +116,7 @@ export const handleActionApproval = async (
 
     case "DEPLOY_MULTISIG": {
       try {
-        await addMultisigDeployAction(action, wallet)
+        await addMultisigDeployAction(action, wallet, extra)
 
         break
       } catch (exception) {
@@ -119,7 +126,10 @@ export const handleActionApproval = async (
           error = `${error}\n\nA 403 error means there's already something running on the selected port. On macOS, AirPlay is using port 5000 by default, so please try running your node on another port and changing the port in Argent X settings.`
         }
 
-        break
+        return {
+          type: "DEPLOY_MULTISIG_ACTION_FAILED",
+          data: { actionHash, error: `${error}` },
+        }
       }
     }
 
@@ -162,7 +172,32 @@ export const handleActionApproval = async (
 
       try {
         const signature = await starknetAccount.signMessage(typedData)
-        const formattedSignature = stark.signatureToDecimalArray(signature)
+        let formattedSignature
+
+        if (selectedAccount.type === "multisig") {
+          const multisigAccount =
+            await wallet.getMultisigAccount(selectedAccount)
+
+          // Should be [requestId, signer, r, s]
+          const parsedSignature =
+            multisigArraySignatureSchema.safeParse(signature)
+
+          if (!parsedSignature.success)
+            throw new Error("Invalid signature format")
+
+          const [requestId, ...multisigSignature] = parsedSignature.data
+
+          if (multisigAccount.threshold > 1) {
+            return {
+              type: "SIGNATURES_PENDING",
+              data: { requestId, actionHash },
+            }
+          }
+
+          formattedSignature = stark.signatureToDecimalArray(multisigSignature)
+        } else {
+          formattedSignature = stark.signatureToDecimalArray(signature)
+        }
 
         return {
           type: "SIGNATURE_SUCCESS",
@@ -193,7 +228,13 @@ export const handleActionApproval = async (
     case "REQUEST_ADD_CUSTOM_NETWORK": {
       try {
         const parsedNetwork = networkSchema.parse(action.payload)
-        await networkService.add(parsedNetwork)
+        await networkService.add({
+          ...parsedNetwork,
+          accountClassHash: {
+            // Add default class hashes
+            standard: TXV3_ACCOUNT_CLASS_HASH,
+          },
+        })
         return {
           type: "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
           data: { actionHash },
@@ -219,9 +260,10 @@ export const handleActionApproval = async (
         const accountsOnNetwork = await accountService.get((account) => {
           return account.networkId === network.id && !account.hidden
         })
-
+        let newAccount
         if (!accountsOnNetwork.length) {
-          throw Error(`No accounts found on network with chainId ${chainId}`)
+          // assuming we have only default accounts on custom networks
+          newAccount = await wallet.newAccount(network.id, "standard")
         }
 
         const currentlySelectedAccount = await wallet.getSelectedAccount()
@@ -233,13 +275,12 @@ export const handleActionApproval = async (
           )
 
         const selectedAccount = await wallet.selectAccount(
-          existingAccountOnNetwork ?? accountsOnNetwork[0],
+          existingAccountOnNetwork ?? accountsOnNetwork[0] ?? newAccount,
         )
 
-        if (!selectedAccount) {
+        if (isNetworkOnlyPlaceholderAccount(selectedAccount)) {
           throw Error(`No accounts found on network with chainId ${chainId}`)
         }
-
         return {
           type: "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
           data: { actionHash, selectedAccount },
@@ -312,6 +353,12 @@ export const handleActionRejection = async (
 
   switch (action.type) {
     case "CONNECT_DAPP": {
+      const { host } = action.payload
+      ampli.dappPreauthorized({
+        host,
+        "preauthorisation status": "reject",
+        "wallet platform": "browser extension",
+      })
       return {
         type: "REJECT_PREAUTHORIZATION",
         data: {
@@ -336,7 +383,10 @@ export const handleActionRejection = async (
     }
 
     case "DEPLOY_MULTISIG": {
-      break
+      return {
+        type: "DEPLOY_MULTISIG_ACTION_FAILED",
+        data: { actionHash },
+      }
     }
 
     case "SIGN": {

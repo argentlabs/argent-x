@@ -1,16 +1,17 @@
 import useSWR from "swr"
-import { Account } from "../../accounts/Account"
 import { accountService } from "../../../../shared/account/service"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
-import {
-  classHashSupportsTxV3,
-  feeTokenNeedsTxV3Support,
-} from "../../../../shared/network/txv3"
 import { Token } from "../../../../shared/token/__new/types/token.model"
-import { getAccountIdentifier } from "@argent/x-shared"
+import {
+  getAccountIdentifier,
+  feeTokenNeedsTxV3Support,
+  classHashSupportsTxV3,
+  getLatestArgentAccountClassHash,
+} from "@argent/x-shared"
+import { WalletAccount } from "../../../../shared/wallet.model"
 
 export function useRequiresTxV3Upgrade(
-  account: Account | undefined,
+  account: WalletAccount | undefined,
   token: Token,
 ) {
   return useSWR(
@@ -19,6 +20,7 @@ export function useRequiresTxV3Upgrade(
           "requiresTxV3Upgrade",
           getAccountIdentifier(account),
           getAccountIdentifier(token),
+          getLatestArgentAccountClassHash(), // update cache when class hash changes
         ]
       : null,
     async () => {

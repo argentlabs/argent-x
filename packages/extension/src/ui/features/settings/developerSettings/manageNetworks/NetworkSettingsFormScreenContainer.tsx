@@ -8,18 +8,21 @@ import { settingsStore } from "../../../../../shared/settings"
 import { defaultBlockExplorers } from "../../../../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../../../../hooks/useStorage"
 import { slugify } from "./slugify"
-import { addressSchema, isArgentNetworkId } from "@argent/x-shared"
+import {
+  addressSchema,
+  isArgentNetworkId,
+  TXV3_ACCOUNT_CLASS_HASH,
+} from "@argent/x-shared"
 import { addAddressPadding } from "starknet"
 import { NetworkSettingsFormScreen } from "./NetworkSettingsFormScreen"
 import {
   ETH_TOKEN_ADDRESS,
   MULTICALL_CONTRACT_ADDRESS,
-  TXV1_ACCOUNT_CLASS_HASH,
 } from "../../../../../shared/network/constants"
 import { networkService } from "../../../../../shared/network/service"
 import { Token } from "../../../../../shared/token/__new/types/token.model"
 import { TokenSchema } from "../../../../../shared/token/__new/types/token.model"
-import { tokenService } from "../../../../services/tokens"
+import { clientTokenService } from "../../../../services/tokens"
 import { useDisclosure } from "@chakra-ui/react"
 import { mainnetChainIdSchema } from "../../../../../shared/network/schema"
 import { AlertDialog } from "@argent/x-ui"
@@ -52,7 +55,7 @@ export const NetworkSettingsFormScreenContainer: FC<
         rpcUrl: "",
         status: "unknown",
         accountClassHash: {
-          standard: TXV1_ACCOUNT_CLASS_HASH,
+          standard: TXV3_ACCOUNT_CLASS_HASH,
         },
         possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS], // Default to ETH. User can change this if they want
         // should we add a default for this or use undefined? For better UX, its a good idea to have a default imo - Dhruv
@@ -108,7 +111,7 @@ export const NetworkSettingsFormScreenContainer: FC<
         async (feeTokenAddress) => {
           const parsedFeeTokenAddress = addressSchema.parse(feeTokenAddress)
 
-          const token = await tokenService.fetchDetails(
+          const token = await clientTokenService.fetchDetails(
             parsedFeeTokenAddress,
             network.id,
           )
@@ -129,7 +132,7 @@ export const NetworkSettingsFormScreenContainer: FC<
               showAlways: true, // fee token should always be shown
             }
 
-            await tokenService.addToken(addTokenData)
+            await clientTokenService.addToken(addTokenData)
           }
         },
       )

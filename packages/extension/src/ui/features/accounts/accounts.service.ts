@@ -3,19 +3,17 @@
  */
 import useSWR from "swr"
 
-import { updateAccountDetails } from "../../../shared/account/update"
 import {
   generateAvatarImage,
   id,
   stripAddressZeroPadding,
 } from "@argent/x-shared"
+import { updateAccountDetails } from "../../../shared/account/update"
+import { RefreshIntervalInSeconds } from "../../../shared/config"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { withPolling } from "../../services/swr.service"
 import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { Account } from "./Account"
-import { RefreshInterval } from "../../../shared/config"
 
 const argentColorsArray = [
   "02BBA8",
@@ -62,30 +60,6 @@ export const getNetworkAccountImageUrl = ({
   return generateAvatarImage(accountName, { background })
 }
 
-const isAccountDeployed = (account: Account): boolean =>
-  !account.deployTransaction
-
-export type AccountStatusCode = "CONNECTED" | "DEFAULT" | "DEPLOYING" | "ERROR"
-
-export interface AccountStatus {
-  code: AccountStatusCode
-  text: string
-}
-
-export const getStatus = (
-  account: Account,
-  activeAccount?: BaseWalletAccount,
-  forceDeployed = false,
-): AccountStatus => {
-  if (!isAccountDeployed(account) && !forceDeployed) {
-    return { code: "DEPLOYING", text: "Deploying..." }
-  }
-  if (activeAccount && accountsEqual(account, activeAccount)) {
-    return { code: "CONNECTED", text: "Active" }
-  }
-  return { code: "DEFAULT", text: "" }
-}
-
 /** periodically check ALL accounts for escape+guardian status so we can alert user to relevant changes */
 
 export const useUpdateAccountsOnChainEscapeState = () => {
@@ -97,7 +71,7 @@ export const useUpdateAccountsOnChainEscapeState = () => {
     },
     {
       ...withPolling(
-        RefreshInterval.SLOW * 1000,
+        RefreshIntervalInSeconds.SLOW * 1000,
       ) /** 5 minutes, or will refresh next time extension is opened */,
     },
   )

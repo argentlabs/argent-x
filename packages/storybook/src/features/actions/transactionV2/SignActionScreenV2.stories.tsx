@@ -17,9 +17,9 @@ export const Default = {
 export const Dapp = {
   args: {
     ...Default.args,
-    subtitle: "https://game-goerli.influenceth.io",
-    dappHost: "https://game-goerli.influenceth.io",
+    subtitle: "https://game-sepolia.influenceth.io",
+    dappHost: "https://game-sepolia.influenceth.io",
     dappLogoUrl:
-      "https://www.google.com/s2/favicons?sz=64&domain=https://game-goerli.influenceth.io",
+      "https://www.google.com/s2/favicons?sz=64&domain=https://game-sepolia.influenceth.io",
   },
 }

@@ -2,11 +2,9 @@ import {
   Token,
   bigDecimal,
   convertTokenAmountToCurrencyValue,
+  isEqualAddress,
 } from "@argent/x-shared"
-import { atom } from "jotai"
-import { atomFamily } from "jotai/utils"
 import { TokenError } from "../../shared/errors/token"
-import { tokenPriceRepo } from "../../shared/token/__new/repository/tokenPrice"
 import { BaseTokenWithBalance } from "../../shared/token/__new/types/tokenBalance.model"
 import {
   TokenPriceDetails,
@@ -14,16 +12,17 @@ import {
 } from "../../shared/token/__new/types/tokenPrice.model"
 import { equalToken, parsedDefaultTokens } from "../../shared/token/__new/utils"
 import { BaseWalletAccount } from "../../shared/wallet.model"
-import { atomFromRepo } from "./implementation/atomFromRepo"
-import { allTokensView } from "./token"
-import { tokenBalancesForAccountView } from "./tokenBalances"
-
-const tokenPricesAtom = atomFromRepo(tokenPriceRepo)
-
-export const tokenPricesView = atom(async (get) => {
-  const tokenPrices = await get(tokenPricesAtom)
-  return tokenPrices
-})
+import { atomFamily } from "jotai/utils"
+import { atomFamilyAccountsEqual } from "../../shared/utils/accountsEqual"
+import { useView } from "./implementation/react"
+import { atom } from "jotai"
+import { useTokensWithSpamFilter } from "../features/accountTokens/tokens.state"
+import { useMemo } from "react"
+import {
+  allTokenBalancesView,
+  allTokenPricesView,
+  allTokensView,
+} from "./token"
 
 export const addCurrencyValueToTokensList = (
   tokensWithBalance: BaseTokenWithBalance[],
@@ -52,26 +51,38 @@ export const addCurrencyValueToTokensList = (
     return {
       ...tb,
       ...token,
+      balance: BigInt(tb.balance),
       usdValue: usdValue || "0.00",
     }
   })
 }
 
-export const tokenBalancesAndOprionalPricesView = atomFamily(
+const tokenBalancesAndOptionalPricesViewFamily = atomFamily(
   (account?: BaseWalletAccount) => {
     return atom(async (get) => {
-      const tokensWithBalance = await get(tokenBalancesForAccountView(account))
-      const tokenPrices = await get(tokenPricesView)
-      const tokens = await get(allTokensView).then((tk) =>
-        tk.filter((t) => tokensWithBalance.some((tb) => equalToken(tb, t))),
+      const accountAddress = account?.address
+      const networkId = account?.networkId
+      if (!accountAddress || !networkId) {
+        return []
+      }
+      const [allTokenBalances, allTokenPrices, allTokens] = await Promise.all([
+        get(allTokenBalancesView),
+        get(allTokenPricesView),
+        get(allTokensView),
+      ])
+      const tokenBalances = allTokenBalances.filter(
+        (tokenBalance) =>
+          isEqualAddress(tokenBalance.account, accountAddress) &&
+          tokenBalance.networkId === networkId,
       )
       return addCurrencyValueToTokensList(
-        tokensWithBalance,
-        tokenPrices,
-        tokens,
+        tokenBalances,
+        allTokenPrices,
+        allTokens,
       )
     })
   },
+  atomFamilyAccountsEqual,
 )
 
 /**
@@ -81,21 +92,14 @@ export const tokenBalancesAndOprionalPricesView = atomFamily(
  * 2. The rest of the tokens are sorted in descending order by their currency value.
  *
  */
-export const sortedTokensWithBalances = atomFamily(
-  (account?: BaseWalletAccount) => {
-    return atom(async (get) => {
-      if (!account) {
-        return []
-      }
-      const tokensWithBalanceAndPrices = await get(
-        tokenBalancesAndOprionalPricesView(account),
-      )
-
-      // Separate default tokens and other tokens
-      return sortTokensWithPrices(tokensWithBalanceAndPrices)
-    })
-  },
-)
+export const useSortedTokensWithBalances = (account?: BaseWalletAccount) => {
+  const tokensWithBalanceAndPrices = useView(
+    tokenBalancesAndOptionalPricesViewFamily(account),
+  )
+  const tokens = useTokensWithSpamFilter(tokensWithBalanceAndPrices)
+  const sortedTokens = useMemo(() => sortTokensWithPrices(tokens), [tokens])
+  return sortedTokens
+}
 
 export const sortTokensWithPrices = (
   tokensWithBalanceAndPrices: TokenWithBalanceAndPrice[],
@@ -114,31 +118,27 @@ export const sortTokensWithPrices = (
     }
   })
 
-  // Sort other tokens by balance
-  otherTokens.sort((a, b) => {
-    // Convert balances to numbers, treating undefined balances as 0
+  return [...getArraySorted(defaultTokens), ...getArraySorted(otherTokens)]
+}
+
+const getArraySorted = (array: TokenWithBalanceAndPrice[]) => {
+  array.sort((a, b) => {
     const currencyValueA = bigDecimal.parseCurrency(a.usdValue || "0").value
     const currencyValueB = bigDecimal.parseCurrency(b.usdValue || "0").value
 
-    // If both balances are 0, keep the original order
     if (currencyValueA === 0n && currencyValueB === 0n) {
       return 0
     }
 
-    // If balanceA is 0, put it after balanceB
     if (currencyValueA === 0n) {
       return 1
     }
 
-    // If balanceB is 0, put it after balanceA
     if (currencyValueB === 0n) {
       return -1
     }
 
-    // If both balances are non-zero, sort in descending order
     return currencyValueB > currencyValueA ? 1 : -1
   })
-
-  // Return the sorted tokens
-  return [...defaultTokens, ...otherTokens]
+  return array
 }

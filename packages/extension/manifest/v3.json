@@ -2,13 +2,13 @@
   "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "name": "Argent X - Starknet Wallet",
   "description": "7 out of 10 Starknet users choose Argent X as their Starknet wallet. Join 2m+ Argent users now.",
-  "version": "5.14.4",
+  "version": "5.18.5",
   "manifest_version": 3,
   "action": {
     "default_icon": {
-      "16": "assets/logo.png",
-      "48": "assets/logo.png",
-      "128": "assets/logo.png"
+      "16": "assets/appicon.png",
+      "48": "assets/appicon.png",
+      "128": "assets/appicon.png"
     },
     "default_title": "Argent X",
     "default_popup": "index.html"
@@ -19,15 +19,21 @@
     "storage",
     "unlimitedStorage",
     "notifications",
-    "http://localhost/*"
+    "hid",
+    "webNavigation"
   ],
+  "host_permissions": ["http://localhost/*"],
   "icons": {
-    "16": "assets/logo.png",
-    "48": "assets/logo.png",
-    "128": "assets/logo.png"
+    "16": "assets/appicon.png",
+    "48": "assets/appicon.png",
+    "128": "assets/appicon.png"
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "externally_connectable": {
+    "matches": ["https://localhost:3005/*"],
+    "ids": ["*"]
   },
   "content_scripts": [
     {

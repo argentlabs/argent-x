@@ -1,64 +1,61 @@
-import { useMemo } from "react"
-
-import { SelectorFn } from "./../../../shared/storage/types"
+import { isEmpty } from "lodash-es"
+import { num } from "starknet"
+import { isUpgradeTransaction } from "../../../shared/activity/utils/transform/is"
 import {
   MultisigPendingTransaction,
-  byAccountSelector,
-  multisigPendingTransactionsStore,
+  multisigPendingTransactionsAccountView,
+  multisigPendingTxToTransformedTx,
 } from "../../../shared/multisig/pendingTransactionsStore"
-import { useArrayStorage } from "../../hooks/useStorage"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { useMultisig } from "./multisig.state"
-import { num } from "starknet"
+import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import { useView } from "../../views/implementation/react"
+import { multisigView } from "./multisig.state"
+import { useMemo } from "react"
 
-type UseMultisigAccountPendingTransactions = (
+export const useMultisigPendingTransactionsByAccount = (
   account?: BaseWalletAccount,
-) => MultisigPendingTransaction[]
-
-export const useMultisigPendingTransactions = (
-  selector?: SelectorFn<MultisigPendingTransaction>,
-  sorted = true,
 ) => {
-  const transactions = useArrayStorage(
-    multisigPendingTransactionsStore,
-    selector,
-  )
-
-  return useMemo(
-    () =>
-      sorted
-        ? transactions.sort((a, b) => b.timestamp - a.timestamp)
-        : transactions,
-    [transactions, sorted],
-  )
-}
-
-export const useMultisigPendingTransactionsByAccount: UseMultisigAccountPendingTransactions =
-  (account) => {
-    return useMultisigPendingTransactions(byAccountSelector(account))
-  }
-
-export const useMultisigPendingTransaction = (requestId?: string) => {
-  const [transaction] = useMultisigPendingTransactions(
-    (transaction) => transaction.requestId === requestId,
-  )
-
-  return useMemo(
-    () => (requestId ? transaction : undefined),
-    [requestId, transaction],
-  )
+  return useView(multisigPendingTransactionsAccountView(account))
 }
 
 export const useMultisigPendingTransactionsAwaitingConfirmation = (
   account?: BaseWalletAccount,
 ) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
+  const multisigPendingTransactionsByAccount =
+    useMultisigPendingTransactionsByAccount(account)
 
-  return useMultisigPendingTransactionsByAccount(account).filter(
-    (transaction) =>
-      multisig &&
+  return useMemo(() => {
+    if (!multisig || !multisigPendingTransactionsByAccount) {
+      return []
+    }
+    return multisigPendingTransactionsByAccount.filter((transaction) =>
       transaction.nonApprovedSigners.some(
         (signer) => num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
       ),
+    )
+  }, [multisig, multisigPendingTransactionsByAccount])
+}
+
+export const useMultisigPendingUpgradeTransactions = (
+  account?: WalletAccount,
+): MultisigPendingTransaction[] => {
+  const pendingTransactions = useView(
+    multisigPendingTransactionsAccountView(account),
   )
+
+  return useMemo(() => {
+    if (isEmpty(pendingTransactions) || !account) {
+      return []
+    }
+    return pendingTransactions.filter((transaction) => {
+      const transformedTransaction = multisigPendingTxToTransformedTx(
+        transaction,
+        account,
+      )
+
+      return (
+        transformedTransaction && isUpgradeTransaction(transformedTransaction)
+      )
+    })
+  }, [account, pendingTransactions])
 }

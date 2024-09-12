@@ -3,22 +3,23 @@ import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { FC, useState } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 
-import { Account } from "../accounts/Account"
 import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
-import { useRouteAccount } from "../shield/useRouteAccount"
+import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import { AddOwnersForm } from "./AddOwnerForm"
 import {
   FieldValuesCreateMultisigForm,
   useCreateMultisigForm,
 } from "./hooks/useCreateMultisigForm"
-import { useMultisig } from "./multisig.state"
+import { multisigView } from "./multisig.state"
 import { MultisigConfirmationsWithOwners } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { useNavigate } from "react-router-dom"
+import { useView } from "../../views/implementation/react"
+import { WalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigAddOwnersScreen: FC = () => {
-  const account = useRouteAccount()
-  const signerKey = useSignerKey()
+  const account = useRouteWalletAccount()
+  const signerKey = useSignerKey(account)
   const methods = useCreateMultisigForm(signerKey)
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
@@ -57,10 +58,10 @@ const MultisigAddOwners = ({
   account,
   goNext,
 }: {
-  account: Account
+  account: WalletAccount
   goNext: () => void
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
   const { trigger } = useFormContext<FieldValuesCreateMultisigForm>()
 
   const signerKeys = useEncodedPublicKeys(multisig?.signers ?? [])

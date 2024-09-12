@@ -4,20 +4,21 @@ import {
   L2,
   NavigationContainer,
   P3,
-  icons,
+  iconsDeprecated,
+  B3,
 } from "@argent/x-ui"
 import { FC, ReactEventHandler, useState } from "react"
 import { Button, Center, Flex } from "@chakra-ui/react"
 import copy from "copy-to-clipboard"
 
-import { useRouteAccountAddress } from "../../../routes"
+import { useRouteAccountAddress } from "../../../hooks/useRoute"
 import { usePrivateKey } from "../../accountTokens/usePrivateKey"
 import { PasswordFormProps } from "../../lock/PasswordForm"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 import { QrCode } from "../../../components/QrCode"
 import { PasswordWarningForm } from "../ui/PasswordWarningForm"
 
-const { AlertFillIcon } = icons
+const { AlertFillIcon, HideIcon } = iconsDeprecated
 
 export interface ExportPrivateKeyScreenProps
   extends Pick<PasswordFormProps, "verifyPassword"> {
@@ -58,6 +59,11 @@ function ExportPrivateKey({
 }: {
   privateKey?: string
 }) {
+  const [isBlurred, setIsBlurred] = useState(true)
+
+  const handleClick = () => {
+    setIsBlurred(!isBlurred)
+  }
   const [privateKeyCopied, setPrivateKeyCopied] = useState(false)
   const accountAddress = useRouteAccountAddress()
   const network = useCurrentNetwork()
@@ -88,7 +94,14 @@ function ExportPrivateKey({
           steal any assets held in your account
         </L2>
       </Flex>
-      <Center overflow={"hidden"} flexDirection={"column"} gap={6} px={6}>
+      <Center
+        onClick={handleClick}
+        filter={isBlurred ? "blur(5px)  brightness(30%)" : "none"}
+        overflow={"hidden"}
+        flexDirection={"column"}
+        gap={6}
+        px={6}
+      >
         <QrCode size={208} data={privateKey} data-key={privateKey} />
         <P3
           aria-label="Private key"
@@ -98,16 +111,35 @@ function ExportPrivateKey({
         >
           {privateKey}
         </P3>
-        <Button
-          colorScheme={privateKeyCopied ? "inverted" : undefined}
-          size={"sm"}
-          leftIcon={<AlertFillIcon color="warn.500" />}
-          mx={"auto"}
-          onClick={onCopy}
-        >
-          {privateKeyCopied ? "Copied" : "Copy"}
-        </Button>
       </Center>
+      {isBlurred && (
+        <Center
+          position="absolute"
+          top="0"
+          right="0"
+          left="0"
+          bottom="0"
+          alignItems="center"
+          justifyContent="center"
+          filter="none"
+          onClick={handleClick}
+          cursor="pointer"
+          flexDirection="column"
+        >
+          <HideIcon fontSize="2xl" mb={2} />
+          <B3 fontWeight="bold">Click to reveal private key</B3>
+        </Center>
+      )}
+      <Button
+        mt={3}
+        colorScheme={privateKeyCopied ? "inverted" : undefined}
+        size={"sm"}
+        leftIcon={<AlertFillIcon color="warn.500" />}
+        mx={"auto"}
+        onClick={onCopy}
+      >
+        {privateKeyCopied ? "Copied" : "Copy"}
+      </Button>
     </CellStack>
   )
 }

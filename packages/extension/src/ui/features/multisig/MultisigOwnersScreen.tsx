@@ -1,13 +1,12 @@
-import { B2, H4, P3, icons } from "@argent/x-ui"
+import { B2, H4, P3, iconsDeprecated } from "@argent/x-ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
-import { Account } from "../accounts/Account"
+import { routes } from "../../../shared/ui/routes"
 import { usePublicKey } from "../accounts/usePublicKey"
-import { useRouteAccount } from "../shield/useRouteAccount"
-import { useMultisig } from "./multisig.state"
+import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
+import { multisigView } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { num } from "starknet"
 import { MultisigOwner } from "./MultisigOwner"
@@ -15,11 +14,12 @@ import { publicKeyMultisigMetadataView } from "../../views/multisig"
 import { useView } from "../../views/implementation/react"
 import { isEqualAddress } from "@argent/x-shared"
 import { multisigService } from "../../services/multisig"
+import { WalletAccount } from "../../../shared/wallet.model"
 
-const { MultisigJoinIcon } = icons
+const { MultisigJoinIcon } = iconsDeprecated
 
 export const MultisigOwnersScreen: FC = () => {
-  const account = useRouteAccount()
+  const account = useRouteWalletAccount()
 
   return (
     <MultisigSettingsWrapper>
@@ -28,10 +28,10 @@ export const MultisigOwnersScreen: FC = () => {
   )
 }
 
-const MultisigOwners = ({ account }: { account: Account }) => {
-  const multisig = useMultisig(account)
+const MultisigOwners = ({ account }: { account: WalletAccount }) => {
+  const multisig = useView(multisigView(account))
 
-  const ownerPublicKey = usePublicKey()
+  const ownerPublicKey = usePublicKey(multisig)
   const navigate = useNavigate()
 
   const multisigMetadata = useView(publicKeyMultisigMetadataView(multisig))

@@ -1,6 +1,7 @@
-import { CallSchema } from "@argent/x-window"
+import { addressSchema, callSchema } from "@argent/x-shared"
+import { typedDataSchema } from "@argent/x-window"
 import { z } from "zod"
-import { multisigDataSchema } from "../wallet.model"
+import { multisigDataSchema, signerTypeSchema } from "../wallet.model"
 
 export const pubkeySchema = z
   .string()
@@ -8,7 +9,7 @@ export const pubkeySchema = z
 
 export const ApiMultisigContentSchema = z.object({
   address: z.string(),
-  creator: z.string(),
+  creator: addressSchema,
   signers: z.array(z.string()),
   threshold: z.number(),
 })
@@ -28,13 +29,25 @@ export const ApiMultisigDataForSignerBatchSchema = z.array(
   ApiMultisigDataForSignerSchema,
 )
 
-export const ApiMultisigCallSchema = CallSchema
+export const ApiMultisigCallSchema = callSchema
+
+const ApiMultisigResourceBoundsSchema = z.object({
+  l1_gas: z.object({
+    max_amount: z.string(),
+    max_price_per_unit: z.string(),
+  }),
+  l2_gas: z.object({
+    max_amount: z.string(),
+    max_price_per_unit: z.string(),
+  }),
+})
 
 export const ApiMultisigTransactionSchema = z.object({
-  maxFee: z.string(),
+  maxFee: z.string().optional(),
   nonce: z.string(),
   version: z.string(),
   calls: z.array(ApiMultisigCallSchema),
+  resource_bounds: ApiMultisigResourceBoundsSchema.optional(),
 })
 
 export const ApiMultisigStarknetSignature = z.object({
@@ -43,12 +56,12 @@ export const ApiMultisigStarknetSignature = z.object({
 })
 
 export const ApiMultisigPostRequestTxnSchema = z.object({
-  creator: z.string(),
+  creator: addressSchema,
   transaction: ApiMultisigTransactionSchema,
   starknetSignature: ApiMultisigStarknetSignature,
 })
 
-export const ApiMultisigStateSchema = z.union([
+export const ApiMultisigTransactionStateSchema = z.union([
   z.literal("AWAITING_SIGNATURES"),
   z.literal("SUBMITTING"),
   z.literal("SUBMITTED"),
@@ -57,39 +70,48 @@ export const ApiMultisigStateSchema = z.union([
   z.literal("COMPLETE"),
   z.literal("ERROR"),
   z.literal("CANCELLED"),
+  z.literal("REJECTED"), // this means that the tx was rejected by the sequencer, and the nonce was not consumed
+  z.literal("REVERTED"),
 ])
 
-export const ApiMultisigTxnResponseSchema = z.object({
+export const ApiMultisigOffchainSignatureStateSchema = z.union([
+  z.literal("AWAITING_SIGNATURES"),
+  z.literal("SIGNATURE_THRESHOLD_REACHED"),
+  z.literal("COMPLETE"),
+  z.literal("CANCELLED"),
+])
+
+export const ApiMultisigTransactionResponseSchema = z.object({
   content: z.object({
     id: z.string(),
     multisigAddress: z.string(),
-    creator: z.string(),
+    creator: addressSchema,
     transaction: ApiMultisigTransactionSchema,
     nonce: z.number(),
     approvedSigners: z.array(z.string()),
     nonApprovedSigners: z.array(z.string()),
-    state: ApiMultisigStateSchema,
+    state: ApiMultisigTransactionStateSchema,
     transactionHash: z.string().optional(),
   }),
 })
 
-export const ApiMultisigGetRequestsSchema = z.object({
+export const ApiMultisigGetTrasactionRequestSchema = z.object({
+  id: z.string(),
+  multisigAddress: z.string(),
+  creator: addressSchema,
+  transaction: ApiMultisigTransactionSchema,
+  nonce: z.number(),
+  approvedSigners: z.array(z.string()),
+  nonApprovedSigners: z.array(z.string()),
+  state: ApiMultisigTransactionStateSchema,
+  transactionHash: z.string().optional(),
+})
+
+export const ApiMultisigGetTransactionRequestsSchema = z.object({
   totalPages: z.number(),
   totalElements: z.number(),
   size: z.number(),
-  content: z.array(
-    z.object({
-      id: z.string(),
-      multisigAddress: z.string(),
-      creator: z.string(),
-      transaction: ApiMultisigTransactionSchema,
-      nonce: z.number(),
-      approvedSigners: z.array(z.string()),
-      nonApprovedSigners: z.array(z.string()),
-      state: ApiMultisigStateSchema,
-      transactionHash: z.string().optional(),
-    }),
-  ),
+  content: z.array(ApiMultisigGetTrasactionRequestSchema),
 })
 
 export const ApiMultisigAddRequestSignatureSchema = z.object({
@@ -97,6 +119,9 @@ export const ApiMultisigAddRequestSignatureSchema = z.object({
   starknetSignature: ApiMultisigStarknetSignature,
 })
 
+export type ApiMultisigRequest = z.infer<
+  typeof ApiMultisigGetTrasactionRequestSchema
+>
 export type ApiMultisigContent = z.infer<typeof ApiMultisigContentSchema>
 export type ApiMultisigDataForSigner = z.infer<
   typeof ApiMultisigDataForSignerSchema
@@ -118,18 +143,30 @@ export type ApiMultisigPostRequestTxn = z.infer<
   typeof ApiMultisigPostRequestTxnSchema
 >
 
-export type ApiMultisigGetRequests = z.infer<
-  typeof ApiMultisigGetRequestsSchema
+export type ApiMultisigGetTransactionRequests = z.infer<
+  typeof ApiMultisigGetTransactionRequestsSchema
 >
-export type ApiMultisigState = z.infer<typeof ApiMultisigStateSchema>
-export type ApiMultisigTxnResponse = z.infer<
-  typeof ApiMultisigTxnResponseSchema
+
+export type ApiMultisigTransactionState = z.infer<
+  typeof ApiMultisigTransactionStateSchema
+>
+export type ApiMultisigTransactionResponse = z.infer<
+  typeof ApiMultisigTransactionResponseSchema
 >
 export type ApiMultisigAddRequestSignature = z.infer<
   typeof ApiMultisigAddRequestSignatureSchema
 >
 
+export type ApiMultisigOffchainSignatureState = z.infer<
+  typeof ApiMultisigOffchainSignatureStateSchema
+>
+
+export type ApiMultisigResourceBounds = z.infer<
+  typeof ApiMultisigResourceBoundsSchema
+>
+
 export const addAccountSchema = multisigDataSchema.extend({
+  signerType: signerTypeSchema.optional(),
   networkId: z.string(),
 })
 
@@ -171,4 +208,108 @@ export const replaceOwnerMultisigSchema = z.object({
 
 export type ReplaceOwnerMultisigPayload = z.infer<
   typeof replaceOwnerMultisigSchema
+>
+
+export const typedDataToMessageSchema = typedDataSchema.transform((data) => ({
+  type: "EIP712",
+  content: data,
+}))
+
+export const offchainSigMessageSchema = z.object({
+  type: z.literal("EIP712"),
+  content: typedDataSchema,
+})
+
+export const createOffchainSignatureRequestSchema = z.object({
+  creator: addressSchema,
+  message: typedDataToMessageSchema,
+  signature: ApiMultisigStarknetSignature,
+})
+
+export type CreateOffchainSignatureRequestPayload = z.infer<
+  typeof createOffchainSignatureRequestSchema
+>
+
+export const multisigSignerSignatureSchema = z.object({
+  signer: addressSchema,
+  signature: ApiMultisigStarknetSignature,
+})
+
+export type MultisigSignerSignature = z.infer<
+  typeof multisigSignerSignatureSchema
+>
+
+export const multisigSignerSignaturesSchema = z.array(
+  multisigSignerSignatureSchema,
+)
+
+export type MultisigSignerSignatures = z.infer<
+  typeof multisigSignerSignaturesSchema
+>
+
+// Should be of a type [creator, r, s, ...] or [requestId, signer, r, s, ...]
+export const multisigArraySignatureSchema = z
+  .array(z.string())
+  .min(3, "Invalid signature format")
+
+export type MultisigArraySignature = z.infer<
+  typeof multisigArraySignatureSchema
+>
+
+export const multisigSignerSignaturesWithIdSchema = z.object({
+  id: z.string(),
+  signatures: multisigSignerSignaturesSchema,
+})
+
+export type MultisigSignerSignaturesWithId = z.infer<
+  typeof multisigSignerSignaturesWithIdSchema
+>
+
+const baseMultisigOffchainSignatureSchema = z.object({
+  id: z.string(),
+  creator: addressSchema,
+  multisigAddress: addressSchema,
+  message: offchainSigMessageSchema,
+  messageHash: z.string(),
+  signatures: multisigSignerSignaturesSchema,
+  approvedSigners: z.array(z.string()),
+  nonApprovedSigners: z.array(z.string()),
+  state: ApiMultisigOffchainSignatureStateSchema,
+})
+
+export const createOffchainSignatureResponseSchema = z.object({
+  content: baseMultisigOffchainSignatureSchema,
+})
+
+export type CreateOffchainSignatureResponsePayload = z.infer<
+  typeof createOffchainSignatureResponseSchema
+>
+
+export const apiMultisigGetSignatureRequestsSchema = z.object({
+  totalPages: z.number(),
+  totalElements: z.number(),
+  size: z.number(),
+  content: z.array(baseMultisigOffchainSignatureSchema),
+})
+
+export type ApiMultisigGetSignatureRequests = z.infer<
+  typeof apiMultisigGetSignatureRequestsSchema
+>
+
+export const apiMultisigGetSignatureRequestByIdSchema = z.object({
+  content: baseMultisigOffchainSignatureSchema,
+})
+
+export type ApiMultisigGetSignatureRequestById = z.infer<
+  typeof apiMultisigGetSignatureRequestByIdSchema
+>
+
+export const apiMultisigCancelOffchainSignatureRequestSchema = z.object({
+  state: ApiMultisigOffchainSignatureStateSchema,
+  signer: addressSchema,
+  signature: ApiMultisigStarknetSignature,
+})
+
+export type ApiMultisigCancelOffchainSignatureRequest = z.infer<
+  typeof apiMultisigCancelOffchainSignatureRequestSchema
 >

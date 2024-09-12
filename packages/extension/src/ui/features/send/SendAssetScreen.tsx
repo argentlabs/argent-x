@@ -3,7 +3,7 @@ import {
   CellStack,
   Empty,
   NavigationContainer,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import {
   Input,
@@ -20,16 +20,16 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { AccountCollections } from "../accountNfts/AccountCollections"
 import { TokenList } from "../accountTokens/TokenList"
-import { useSendQuery } from "./schema"
+import { useSendQuery } from "./useSendQuery"
 import { useFilteredCollections } from "./useFilteredCollections"
 import { useFilteredTokens } from "./useFilteredTokens"
 
-const { SearchIcon, WalletIcon, NftIcon } = icons
+const { SearchIcon, WalletIcon, NftIcon } = iconsDeprecated
 
 export const SendAssetScreen: FC = () => {
   const { recipientAddress, tokenId, amount, returnTo } = useSendQuery()

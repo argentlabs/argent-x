@@ -1,14 +1,15 @@
-import {
-  isETH,
-  maxAmountSpendFromTokenBalance,
-  maxAmountSpend,
-  bipsToPercent,
-} from "./index"
-import { BaseToken } from "../../../../shared/token/__new/types/token.model"
-import { MIN_ETH } from "./constants"
-import { ETH, USDC } from "../../../../shared/token/__new/constants"
 import { constants } from "starknet"
 import { getMockBaseToken, getMockToken } from "../../../../../test/token.mock"
+import { ETH, USDC } from "../../../../shared/token/__new/constants"
+import { BaseToken } from "../../../../shared/token/__new/types/token.model"
+import {
+  bipsToPercent,
+  isETH,
+  maxAmountSpend,
+  maxAmountSpendFromTokenBalance,
+  predefinedSortOrder,
+  sortSwapTokens,
+} from "./index"
 
 describe("swap utils", () => {
   describe("isETH", () => {
@@ -63,22 +64,6 @@ describe("swap utils", () => {
       }
       expect(maxAmountSpend(tokenAmount)).toBe(tokenAmount.amount)
     })
-
-    it("should return the amount minus MIN_ETH if the token is ETH and amount is greater than MIN_ETH", () => {
-      const tokenAmount = {
-        amount: 100000000000000000n,
-        ...ETH[constants.StarknetChainId.SN_MAIN],
-      }
-      expect(maxAmountSpend(tokenAmount)).toBe(tokenAmount.amount - MIN_ETH)
-    })
-
-    it("should return 0 if the token is ETH and amount is less than or equal to MIN_ETH", () => {
-      const tokenAmount = {
-        amount: MIN_ETH,
-        ...ETH[constants.StarknetChainId.SN_MAIN],
-      }
-      expect(maxAmountSpend(tokenAmount)).toBe(0n)
-    })
   })
 
   describe("bipsToPercent", () => {
@@ -87,6 +72,70 @@ describe("swap utils", () => {
       const percent = bipsToPercent(bips)
       expect(percent.value).toBe(BigInt(1))
       expect(percent.decimals).toBe(2)
+    })
+  })
+
+  describe("sortSwapTokens", () => {
+    it("sorts tokens by predefined order when applicable, then alphabetically", () => {
+      const mockTokens = [
+        getMockToken({ symbol: "DAI" }),
+        getMockToken({ symbol: "ETH" }),
+        getMockToken({ symbol: "ZEND" }),
+        getMockToken({ symbol: "BAT" }),
+        getMockToken({ symbol: "USDC" }),
+        getMockToken({ symbol: "SOL" }),
+        getMockToken({ symbol: "BTC" }),
+      ]
+
+      const expectedOrder = ["ETH", "USDC", "DAI", "ZEND", "BAT", "BTC", "SOL"]
+
+      const result = sortSwapTokens(mockTokens).map((token) => token.symbol)
+      expect(JSON.stringify(result)).toEqual(JSON.stringify(expectedOrder))
+    })
+
+    it("sorts tokens in the predefined order", () => {
+      const mockTokens = [
+        getMockToken({ symbol: "LORDS" }),
+        getMockToken({ symbol: "vSTRK" }),
+        getMockToken({ symbol: "EKUBO" }),
+        getMockToken({ symbol: "ZEND" }),
+        getMockToken({ symbol: "USDC" }),
+        getMockToken({ symbol: "DAI" }),
+        getMockToken({ symbol: "LUSD" }),
+      ]
+
+      const expectedOrder = predefinedSortOrder.filter((symbol) =>
+        mockTokens.some((token) => token.symbol === symbol),
+      )
+
+      const result = sortSwapTokens(mockTokens).map((token) => token.symbol)
+      expect(JSON.stringify(result)).toEqual(JSON.stringify(expectedOrder))
+    })
+
+    it("sorts tokens in alphabetial order", () => {
+      const mockTokens = [
+        getMockToken({ symbol: "XRP" }),
+        getMockToken({ symbol: "BNB" }),
+        getMockToken({ symbol: "SOL" }),
+        getMockToken({ symbol: "DOGE" }),
+        getMockToken({ symbol: "ADA" }),
+        getMockToken({ symbol: "LTC" }),
+        getMockToken({ symbol: "BTC" }),
+      ]
+
+      const expectedOrder = ["ADA", "BNB", "BTC", "DOGE", "LTC", "SOL", "XRP"]
+
+      const result = sortSwapTokens(mockTokens).map((token) => token.symbol)
+      expect(JSON.stringify(result)).toEqual(JSON.stringify(expectedOrder))
+    })
+
+    it("handles an empty array", () => {
+      expect(sortSwapTokens([])).toEqual([])
+    })
+
+    it("handles an array with a single token", () => {
+      const singleTokenArray = [getMockToken({ symbol: "ETH" })]
+      expect(sortSwapTokens(singleTokenArray)).toEqual(singleTokenArray)
     })
   })
 })

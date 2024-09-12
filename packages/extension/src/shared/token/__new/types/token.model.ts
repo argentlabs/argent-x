@@ -1,4 +1,4 @@
-import { addressSchema, addressSchemaArgentBackend } from "@argent/x-shared"
+import { addressSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 export const BaseTokenSchema = z.object(
@@ -29,26 +29,7 @@ export const TokenSchema = RequestTokenSchema.required().extend({
   custom: z.boolean().optional(),
   pricingId: z.number().optional(),
   tradable: z.boolean().optional(),
+  tags: z.string().array().optional(),
 })
 
 export type Token = z.infer<typeof TokenSchema>
-
-export const apiAccountTokenBalancesSchema = z
-  .object({
-    status: z.literal("initialising"),
-  })
-  .or(
-    z.object({
-      status: z.literal("initialised"),
-      balances: z.array(
-        z.object({
-          tokenAddress: addressSchemaArgentBackend,
-          tokenBalance: z.string(),
-        }),
-      ),
-    }),
-  )
-
-export type ApiAccountTokenBalances = z.infer<
-  typeof apiAccountTokenBalancesSchema
->

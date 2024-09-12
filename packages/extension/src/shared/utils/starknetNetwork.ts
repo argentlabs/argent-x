@@ -12,10 +12,10 @@ export const networkToStarknetNetwork = (network: Network) => {
   switch (network.chainId) {
     case "SN_MAIN":
       return "mainnet"
-    case "SN_GOERLI":
-      return "testnet"
+    case "SN_SEPOLIA":
+      return "sepolia"
     default:
-      return "testnet"
+      return "sepolia"
   }
 }
 
@@ -23,10 +23,10 @@ export const networkIdToStarknetNetwork = (networkId: string) => {
   switch (networkId) {
     case "mainnet-alpha":
       return "mainnet"
-    case "goerli-alpha":
-      return "testnet"
+    case "sepolia-alpha":
+      return "sepolia"
     default:
-      return "testnet"
+      return "sepolia"
   }
 }
 
@@ -36,10 +36,21 @@ export const chainIdToStarknetNetwork = (
   switch (chainId) {
     case constants.StarknetChainId.SN_MAIN:
       return "mainnet"
-    case constants.StarknetChainId.SN_GOERLI:
-      return "testnet"
+    case constants.StarknetChainId.SN_SEPOLIA:
+      return "sepolia"
     default:
-      return "testnet"
+      return "sepolia"
+  }
+}
+
+export const chainIdToArgentNetwork = (chainId: constants.StarknetChainId) => {
+  switch (chainId) {
+    case constants.StarknetChainId.SN_MAIN:
+      return "mainnet-alpha"
+    case constants.StarknetChainId.SN_SEPOLIA:
+      return "sepolia-alpha"
+    default:
+      throw new Error("No Argent network for chainId: " + chainId)
   }
 }
 
@@ -47,10 +58,10 @@ export const starknetNetworkToNetworkId = (network: string) => {
   switch (network) {
     case "mainnet":
       return "mainnet-alpha"
-    case "testnet":
-      return "goerli-alpha"
+    case "sepolia":
+      return "sepolia-alpha"
 
     default:
-      return "goerli-alpha"
+      return "sepolia-alpha"
   }
 }

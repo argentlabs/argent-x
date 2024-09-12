@@ -9,7 +9,7 @@ export const aspect: TransactionActionFixture = {
         name: "Xplorer",
         symbol: "XPLORER",
         decimals: 0,
-        networkId: "goerli-alpha",
+        networkId: "sepolia-alpha",
         tokenId: "1002606",
         type: "erc721",
       },

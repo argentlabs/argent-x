@@ -1,4 +1,5 @@
-import { FunctionInvocation, hash, uint256 } from "starknet"
+import { hash, uint256 } from "starknet"
+import { FunctionInvocation } from "starknet5"
 
 import { ApprovalEvent, EventsToTrack, TransferEvent } from "./types"
 

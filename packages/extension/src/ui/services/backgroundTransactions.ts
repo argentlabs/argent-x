@@ -3,7 +3,7 @@ import { Call } from "starknet"
 import { sendMessage, waitForMessage } from "../../shared/messages"
 import { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
 import { BaseWalletAccount } from "../../shared/wallet.model"
-import { messageClient } from "./messaging/trpc"
+import { messageClient } from "./trpc"
 import { DeclareContract, DeployContract } from "../../shared/udc/schema"
 import { Address } from "@argent/x-shared"
 

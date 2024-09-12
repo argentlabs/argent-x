@@ -3,18 +3,20 @@ import { FC, useMemo } from "react"
 import { Navigate, useParams } from "react-router-dom"
 
 import { compareTransactions } from "../../../shared/transactions"
-import { useAppState } from "../../app.state"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useContractAddresses } from "../accountNfts/nfts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { LoadingScreenContainer } from "../actions/LoadingScreenContainer"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { TransactionDetail } from "./TransactionDetail"
-import { transformExplorerTransaction, transformTransaction } from "./transform"
+import {
+  transformExplorerTransaction,
+  transformTransaction,
+} from "../../../shared/activity/utils/transform"
 import { useArgentExplorerTransaction } from "./useArgentExplorer"
+import { useTokensInCurrentNetworkIncludingSpam } from "../accountTokens/tokens.state"
 
 export const TransactionDetailScreen: FC = () => {
   const network = useCurrentNetwork()
@@ -30,8 +32,7 @@ export const TransactionDetailScreen: FC = () => {
   const isInitialLoad = !explorerTransaction && !error && isValidating
 
   const account = useView(selectedAccountView)
-  const { switcherNetworkId } = useAppState()
-  const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
+  const tokensByNetwork = useTokensInCurrentNetworkIncludingSpam()
   const nftContractAddresses = useContractAddresses()
 
   const { transactions } = useAccountTransactions(account)

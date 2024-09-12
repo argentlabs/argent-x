@@ -1,6 +1,6 @@
 import { memoize } from "lodash-es"
-import { RpcProvider, constants } from "starknet"
-import { RpcProvider as RpcProvider6, shortString } from "starknet6"
+import { RpcProvider as RpcProvider5 } from "starknet5"
+import { RpcProvider as RpcProvider, shortString, constants } from "starknet"
 import { RpcProvider as RpcProviderV4 } from "starknet4"
 
 import { Network } from "./type"
@@ -16,9 +16,10 @@ export const getProviderForRpcUrl = memoize(
   },
   (a: string, b: string = "") => `${a}::${b}`,
 )
-export const getProviderForRpcUrl6 = memoize(
-  (rpcUrl: string, chainId?: constants.StarknetChainId): RpcProvider6 => {
-    return new RpcProvider6({
+
+export const getProviderForRpcUrl5 = memoize(
+  (rpcUrl: string, chainId?: constants.StarknetChainId): RpcProvider5 => {
+    return new RpcProvider5({
       nodeUrl: rpcUrl,
       chainId,
       headers: argentXHeaders,
@@ -27,11 +28,6 @@ export const getProviderForRpcUrl6 = memoize(
   (a: string, b: string = "") => `${a}::${b}`,
 )
 
-/**
- * Returns a provider for the given network
- * @param network
- * @returns
- */
 export function getProvider(network: Network): RpcProvider {
   const chainId = shortString.encodeShortString(
     network.chainId,
@@ -39,11 +35,16 @@ export function getProvider(network: Network): RpcProvider {
   return getProviderForRpcUrl(network.rpcUrl, chainId)
 }
 
-export function getProvider6(network: Network): RpcProvider6 {
+/**
+ * Returns a provider for the given network
+ * @param network
+ * @returns
+ */
+export function getProvider5(network: Network): RpcProvider5 {
   const chainId = shortString.encodeShortString(
     network.chainId,
   ) as constants.StarknetChainId
-  return getProviderForRpcUrl6(network.rpcUrl, chainId)
+  return getProviderForRpcUrl5(network.rpcUrl, chainId)
 }
 
 /** ======================================================================== */

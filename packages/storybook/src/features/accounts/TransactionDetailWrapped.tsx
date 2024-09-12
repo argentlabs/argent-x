@@ -5,7 +5,7 @@ import {
 import {
   transformExplorerTransaction,
   transformTransaction,
-} from "@argent-x/extension/src/ui/features/accountActivity/transform"
+} from "@argent-x/extension/src/shared/activity/utils/transform"
 import { FC } from "react"
 
 interface TransactionDetailWrappedProps

@@ -11,6 +11,7 @@ export const enum MultisigEntryPointType {
   CHANGE_THRESHOLD = "change_threshold",
   REMOVE_SIGNERS = "remove_signers",
   REPLACE_SIGNER = "replace_signer",
+  UPGRADE = "upgrade",
 }
 
 export const enum MultisigTransactionType {
@@ -18,6 +19,7 @@ export const enum MultisigTransactionType {
   MULTISIG_CHANGE_THRESHOLD = "MULTISIG_CHANGE_THRESHOLD",
   MULTISIG_REMOVE_SIGNERS = "MULTISIG_REMOVE_SIGNERS",
   MULTISIG_REPLACE_SIGNER = "MULTISIG_REPLACE_SIGNER",
+  MULTISIG_REJECT_ON_CHAIN = "MULTISIG_REJECT_ON_CHAIN",
 }
 
 export interface BasePendingMultisig {

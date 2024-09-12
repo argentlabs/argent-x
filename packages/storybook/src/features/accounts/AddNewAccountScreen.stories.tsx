@@ -3,11 +3,11 @@ import {
   AccountType,
   AccountTypeId,
 } from "@argent-x/extension/src/ui/features/accounts/AddNewAccountScreen"
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 
 import { decorators } from "../../decorators/routerDecorators"
 
-const { WalletIcon, MultisigIcon } = icons
+const { WalletIcon, MultisigIcon } = iconsDeprecated
 
 const accountTypes: AccountType[] = [
   {

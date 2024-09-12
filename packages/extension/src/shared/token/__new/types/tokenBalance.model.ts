@@ -3,7 +3,7 @@ import { BaseTokenSchema, TokenSchema } from "./token.model"
 import { baseWalletAccountSchema } from "../../../wallet.model"
 
 export const BaseTokenWithBalanceSchema = BaseTokenSchema.extend({
-  account: baseWalletAccountSchema,
+  account: z.string(),
   balance: z.string(),
 })
 

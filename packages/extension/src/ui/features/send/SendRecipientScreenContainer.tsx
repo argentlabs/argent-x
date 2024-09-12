@@ -14,23 +14,24 @@ import { partition } from "lodash-es"
 import type { AddressBookContact } from "../../../shared/addressBook/type"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import {
-  sortAccountsByDerivationPath,
-  sortMultisigByDerivationPath,
+  sortMultisigAccounts,
+  sortStandardAccounts,
 } from "../../../shared/utils/accountsMultisigSort"
 import { IS_DEV } from "../../../shared/utils/dev"
 import type { WalletAccount } from "../../../shared/wallet.model"
-import { useAppState } from "../../app.state"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
-import { routes, useCurrentPathnameWithQuery } from "../../routes"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { AccountAddressListItem } from "../accounts/AccountAddressListItem"
 import { SendRecipientScreen } from "./SendRecipientScreen"
-import { useSendQuery } from "./schema"
+import { useSendQuery } from "./useSendQuery"
 import { FormType, formSchema } from "./sendRecipientScreen.model"
 import { useFilteredAccounts } from "./useFilteredAccounts"
 import { useFilteredContacts } from "./useFilteredContacts"
 import { useGetAddressFromDomainNameInput } from "./useGetAddressFromDomainName"
+import { selectedNetworkIdView } from "../../views/network"
 
 export const SendRecipientScreenContainer: FC = () => {
   const returnTo = useCurrentPathnameWithQuery()
@@ -41,7 +42,7 @@ export const SendRecipientScreenContainer: FC = () => {
     onClose: onCloseAddContact,
   } = useDisclosure()
   const account = useView(selectedAccountView)
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
 
   const navigate = useNavigate()
   const {
@@ -64,7 +65,7 @@ export const SendRecipientScreenContainer: FC = () => {
     error: starknetDomainError,
     result: starknetAddress,
     isValid: starknetAddressIsValid,
-  } = useGetAddressFromDomainNameInput(query, switcherNetworkId)
+  } = useGetAddressFromDomainNameInput(query, selectedNetworkId)
 
   const selectAddress = useCallback(
     (address: string) => {
@@ -127,14 +128,12 @@ export const SendRecipientScreenContainer: FC = () => {
   )
 
   const sortedMultisigAccounts = useMemo(
-    () => [...multisigAccounts].sort(sortMultisigByDerivationPath),
+    () => sortMultisigAccounts(multisigAccounts),
     [multisigAccounts],
   )
 
   const sortedStandardAccounts = useMemo(() => {
-    const sortedAccounts = [...standardAccounts].sort(
-      sortAccountsByDerivationPath,
-    )
+    const sortedAccounts = sortStandardAccounts(standardAccounts)
     return includeSelfAccount
       ? sortedAccounts
       : sortedAccounts.filter((a) => !accountsEqual(a, account))
@@ -234,7 +233,7 @@ export const SendRecipientScreenContainer: FC = () => {
       placeholderValidAddress={placeholderValidAddress}
       query={query}
       register={register}
-      switcherNetworkId={switcherNetworkId}
+      selectedNetworkId={selectedNetworkId}
     />
   )
 }

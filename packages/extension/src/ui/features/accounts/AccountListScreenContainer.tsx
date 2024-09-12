@@ -3,8 +3,8 @@ import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { isAccountHidden } from "../../../shared/wallet.service"
-import { useAppState } from "../../app.state"
-import { routes, useReturnTo } from "../../routes"
+import { useReturnTo } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import {
   selectedAccountView,
   allAccountsOnNetworkFamily,
@@ -14,25 +14,24 @@ import {
   isHiddenPendingMultisig,
   usePendingMultisigs,
 } from "../multisig/multisig.state"
-import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { recover } from "../recovery/recovery.service"
 import { Account } from "./Account"
 import { AccountListScreen } from "./AccountListScreen"
 import {
-  sortAccountsByDerivationPath,
-  sortMultisigByDerivationPath,
+  sortMultisigAccounts,
+  sortStandardAccounts,
 } from "../../../shared/utils/accountsMultisigSort"
-import { usePartitionDeprecatedAccounts } from "./accountUpgradeCheck"
 import { isEqualAddress } from "@argent/x-shared"
+import { selectedNetworkIdView, selectedNetworkView } from "../../views/network"
 
 /** TODO: we should be able to retreive all these account collections using queries from storage */
 export const AccountListScreenContainer: FC = () => {
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const selectedNetwork = useView(selectedNetworkView)
 
   const selectedAccount = useView(selectedAccountView)
-  const allAccounts = useView(allAccountsOnNetworkFamily(switcherNetworkId))
+  const allAccounts = useView(allAccountsOnNetworkFamily(selectedNetworkId))
 
   const [hiddenAccounts, visibleAccounts] = useMemo(
     () => partition(allAccounts, isAccountHidden),
@@ -46,83 +45,52 @@ export const AccountListScreenContainer: FC = () => {
     isHiddenPendingMultisig,
   )
 
-  // TODO: refactor to use view as soon as network is using views
-  const currentNetwork = useCurrentNetwork()
-
-  // TODO: make this a property of the account
-  const partitionedAccounts = usePartitionDeprecatedAccounts(
-    visibleAccounts,
-    currentNetwork,
-  )
-
   const accountFromAddress = useCallback(
     (accountAddress: string) => {
       return allAccounts.find(
         (account) =>
           isEqualAddress(account.address, accountAddress) &&
-          currentNetwork.id === account.networkId,
+          selectedNetworkId === account.networkId,
       )
     },
-    [allAccounts, currentNetwork],
+    [allAccounts, selectedNetworkId],
   )
 
-  const fullPartitionedAccounts = useMemo(() => {
-    if (!partitionedAccounts) {
-      return
-    }
-
-    const [newAccounts, deprecatedAccounts] = partitionedAccounts
-
-    const deprecatedFullAccounts = deprecatedAccounts
-      .map((accountAddress) => accountFromAddress(accountAddress))
-      .filter((account): account is Account => Boolean(account))
-
-    const newFullAccounts = newAccounts
-      .map((accountAddress) => accountFromAddress(accountAddress))
-      .filter((account): account is Account => Boolean(account))
-
-    return [newFullAccounts, deprecatedFullAccounts]
-  }, [accountFromAddress, partitionedAccounts])
+  const accounts = visibleAccounts
+    .map((account) => accountFromAddress(account.address))
+    .filter((account): account is Account => Boolean(account))
 
   const onClose = useCallback(() => {
-    if (returnTo) {
-      navigate(returnTo)
-    } else {
-      void recover().then(navigate)
-    }
+    navigate(returnTo || routes.accountTokens())
   }, [navigate, returnTo])
 
   const onAdd = useCallback(() => {
     navigate(routes.newAccount(returnTo))
   }, [navigate, returnTo])
 
-  const [accounts, deprecatedAccounts] = fullPartitionedAccounts || []
+  const { sortedMultisigAccounts, sortedStandardAccounts } = useMemo(() => {
+    const [multisigAccounts, standardAccounts] = partition(
+      accounts,
+      (account) => account.type === "multisig",
+    )
 
-  const [multisigAccounts, standardAccounts] = partition(
-    accounts,
-    (account) => account.type === "multisig",
-  )
+    const sortedMultisigAccounts = sortMultisigAccounts(multisigAccounts)
 
-  const sortedMultisigAccounts = useMemo(
-    () => [...multisigAccounts].sort(sortMultisigByDerivationPath),
-    [multisigAccounts],
-  )
+    const sortedStandardAccounts = sortStandardAccounts(standardAccounts)
 
-  const sortedStandardAccounts = useMemo(
-    () => [...standardAccounts].sort(sortAccountsByDerivationPath),
-    [standardAccounts],
-  )
+    return {
+      sortedMultisigAccounts,
+      sortedStandardAccounts,
+    }
+  }, [accounts])
 
-  const title = `${currentNetwork.name} accounts`
+  const title = `${selectedNetwork.name} accounts`
 
   return (
     <AccountListScreen
-      isLoading={!fullPartitionedAccounts}
-      deprecatedAccounts={deprecatedAccounts}
       hiddenAccounts={hiddenAccounts}
       hiddenPendingMultisigs={hiddenPendingMultisigs}
       multisigAccounts={sortedMultisigAccounts}
-      accounts={accounts}
       onAdd={onAdd}
       onClose={onClose}
       pendingMultisigs={pendingMultisigs}

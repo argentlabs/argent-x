@@ -2,7 +2,7 @@ import { uniqWith } from "lodash-es"
 import browser from "webextension-polyfill"
 
 import { networkService } from "../network/service"
-import { WalletAccount } from "../wallet.model"
+import { SignerType, WalletAccount } from "../wallet.model"
 import { accountsEqual } from "../utils/accountsEqual"
 import { accountService } from "./service"
 
@@ -57,9 +57,9 @@ async function checkAccountsForMigration(accounts: WalletAccount[]) {
               needMigration = true
             }
             // migrate signer.type local_signer to local_secret
-            if ((account.signer.type as any) !== "local_secret") {
+            if ((account.signer.type as any) !== SignerType.LOCAL_SECRET) {
               // currently there is just one type of signer
-              account.signer.type = "local_secret"
+              account.signer.type = SignerType.LOCAL_SECRET
               needMigration = true
             }
           } catch {

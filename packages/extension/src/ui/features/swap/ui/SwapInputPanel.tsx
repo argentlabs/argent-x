@@ -5,17 +5,21 @@ import {
   isAllowedNumericInputValue,
   prettifyTokenAmount,
 } from "@argent/x-shared"
-import { TokenIcon } from "../../accountTokens/TokenIcon"
 import { TokenValue } from "./TokenValue"
-import { MaxEthModal } from "./MaxEthModal"
 import { SwapTokensModal } from "./SwapTokensModal"
 import { Token } from "../../../../shared/token/__new/types/token.model"
 import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
-import { isETH } from "../utils"
 import { useDisclosure, Flex, Input, Button } from "@chakra-ui/react"
-import { H6, L2, LoadingPulse, P4, icons } from "@argent/x-ui"
+import {
+  H6,
+  L2,
+  LoadingPulse,
+  P4,
+  iconsDeprecated,
+  TokenIcon,
+} from "@argent/x-ui"
 
-const { ChevronDownIcon } = icons
+const { ChevronDownIcon } = iconsDeprecated
 
 interface SwapInputPanelProps {
   value: string
@@ -46,11 +50,6 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
   insufficientBalance,
 }) => {
   const {
-    isOpen: isOpenEthModal,
-    onOpen: onOpenEthModal,
-    onClose: onCloseEthModal,
-  } = useDisclosure()
-  const {
     isOpen: isTokenListOpen,
     onOpen: onOpenTokenList,
     onClose: onCloseTokenList,
@@ -59,12 +58,8 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
   const [inputValue, setInputValue] = useState("")
 
   const onMaxCheck = useCallback(() => {
-    if (token && isETH(token)) {
-      onOpenEthModal()
-    } else {
-      onMax?.()
-    }
-  }, [token, onMax, onOpenEthModal])
+    onMax?.()
+  }, [onMax])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const delayedOnChange = useCallback(
@@ -195,14 +190,6 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
           </L2>
         </Flex>
       </Flex>
-
-      {showMaxButton && (
-        <MaxEthModal
-          isOpen={isOpenEthModal}
-          onClose={onCloseEthModal}
-          onMax={onMax}
-        />
-      )}
 
       <SwapTokensModal
         isOpen={isTokenListOpen}

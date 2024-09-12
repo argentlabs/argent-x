@@ -1,28 +1,34 @@
+import { useCallback } from "react"
 import { defaultNetworks } from "../../../../../shared/network"
-import { useAppState } from "../../../../app.state"
+import { selectedNetworkIdView } from "../../../../views/network"
+import { useView } from "../../../../views/implementation/react"
 
-export const validateRemoveNetwork = async (networkId: string) => {
-  const { switcherNetworkId } = useAppState.getState()
-  if (switcherNetworkId === networkId) {
-    throw new Error(
-      `Network ${networkId} is the current network. Change networks before deleting.`,
-    )
-  }
-
-  return true
+export const useValidateRemoveNetwork = () => {
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  return useCallback(
+    (networkId: string) => {
+      if (selectedNetworkId === networkId) {
+        throw new Error(
+          `Network ${networkId} is the current network. Change networks before deleting.`,
+        )
+      }
+      return true
+    },
+    [selectedNetworkId],
+  )
 }
 
 /** check if current network id is outside the defaults */
 
-export const validateRestoreDefaultNetworks = async () => {
-  const { switcherNetworkId } = useAppState.getState()
-  const defaultNetworkIds = defaultNetworks.map((network) => network.id)
-
-  if (!defaultNetworkIds.includes(switcherNetworkId)) {
-    throw new Error(
-      `Current network ${switcherNetworkId} is a custom network and cannot be deleted. Change networks before resetting.`,
-    )
-  }
-
-  return true
+export const useValidateRestoreDefaultNetworks = () => {
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  return useCallback(() => {
+    const defaultNetworkIds = defaultNetworks.map((network) => network.id)
+    if (!defaultNetworkIds.includes(selectedNetworkId)) {
+      throw new Error(
+        `Current network ${selectedNetworkId} is a custom network and cannot be deleted. Change networks before resetting.`,
+      )
+    }
+    return true
+  }, [selectedNetworkId])
 }

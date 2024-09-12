@@ -1,7 +1,7 @@
 import { OnboardingScreen } from "@argent-x/extension/src/ui/features/onboarding/ui/OnboardingScreen"
-import { logos } from "@argent/x-ui"
+import { logosDeprecated } from "@argent/x-ui"
 
-const { ArgentXLogo } = logos
+const { ArgentXLogo } = logosDeprecated
 
 export default {
   component: OnboardingScreen,

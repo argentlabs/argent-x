@@ -2,14 +2,8 @@
   "transactions": [
     {
       "reviewOfTransaction": {
-        "assessment": "warn",
-        "warnings": [
-          {
-            "reason": "amount_mismatch_too_low",
-            "details": {},
-            "severity": "caution"
-          }
-        ],
+        "assessment": "neutral",
+        "warnings": [],
         "targetedDapp": {
           "name": "JediSwap",
           "description": "A community-led fully permissionless and composable AMM on Starknet.",
@@ -17,11 +11,7 @@
           "iconUrl": "https://www.dappland.com/dapps/jediswap/dapp-icon-jediswap.png",
           "argentVerified": true,
           "links": [
-            {
-              "name": "website",
-              "url": "https://jediswap.xyz/",
-              "position": 1
-            },
+            { "name": "website", "url": "https://jediswap.xyz", "position": 1 },
             {
               "name": "twitter",
               "url": "https://twitter.com/jediswap",
@@ -53,14 +43,14 @@
                     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
                     "type": "ERC20"
                   },
-                  "amount": "10771066479645102",
-                  "usd": "24.08",
+                  "amount": "1569838942266359",
+                  "usd": "5.94",
                   "editable": true
                 },
                 {
                   "type": "address",
                   "label": "ERC20_approve_to",
-                  "address": "0x02bcc885342ebbcbcd170ae6cafa8a4bed22bb993479f49806e72d96af94c965",
+                  "address": "0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023",
                   "addressName": "JediSwap: AMM Swap",
                   "verified": true
                 }
@@ -84,8 +74,8 @@
                   "label": "default_call",
                   "entrypoint": "approve",
                   "calldata": [
-                    "1238176885782598120369776599988227623713703144193463695957844450027561601381",
-                    "10771066479645102",
+                    "1865474183096745675831575676844391349131672372457503153362467315114684543011",
+                    "1569838942266359",
                     "0"
                   ]
                 }
@@ -93,14 +83,8 @@
             }
           },
           {
-            "assessment": "warn",
-            "warnings": [
-              {
-                "reason": "amount_mismatch_too_low",
-                "details": {},
-                "severity": "caution"
-              }
-            ],
+            "assessment": "neutral",
+            "warnings": [],
             "action": {
               "name": "Jediswap_swap",
               "properties": [
@@ -116,30 +100,30 @@
                     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
                     "type": "ERC20"
                   },
-                  "amount": "10771066479645102",
-                  "usd": "24.08",
+                  "amount": "1569838942266359",
+                  "usd": "5.94",
                   "editable": false
                 },
                 {
                   "type": "amount",
                   "label": "Jediswap_swap_receive_token",
                   "token": {
-                    "address": "0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9",
-                    "name": "Dai Stablecoin",
-                    "symbol": "DAI",
+                    "address": "0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49",
+                    "name": "Lords",
+                    "symbol": "LORDS",
                     "decimals": 18,
                     "unknown": false,
-                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png",
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/lords.png",
                     "type": "ERC20"
                   },
-                  "amount": "11471663166221121338",
-                  "usd": "11.47",
+                  "amount": "20856851528193346264",
+                  "usd": "6.17",
                   "editable": false
                 },
                 {
                   "type": "timestamp",
                   "label": "Jediswap_swap_deadline",
-                  "value": "1698229924"
+                  "value": "1709651490"
                 },
                 {
                   "type": "address",
@@ -152,7 +136,7 @@
                 {
                   "type": "address",
                   "label": "default_contract",
-                  "address": "0x02bcc885342ebbcbcd170ae6cafa8a4bed22bb993479f49806e72d96af94c965",
+                  "address": "0x041fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023",
                   "addressName": "JediSwap: AMM Swap",
                   "verified": true
                 },
@@ -161,15 +145,17 @@
                   "label": "default_call",
                   "entrypoint": "swap_exact_tokens_for_tokens",
                   "calldata": [
-                    "10771066479645102",
+                    "1569838942266359",
                     "0",
-                    "11471663166221121338",
+                    "20856851528193346264",
                     "0",
-                    "2",
+                    "4",
                     "2087021424722619777119509474943472645767659996348769578120564519014510906823",
-                    "1767481910113252210994791615708990276342505294349567333924577048691453030089",
+                    "2368576823837625528275935341135881659748932889268308403712618244410713532584",
+                    "385291772725090318157700937045086145273563247402457518748197066808155336371",
+                    "517125115337780208081305629975956820263165114138824120841711207270231259977",
                     "2689035213040902571798644155430358178496847363710771602620498934381075712549",
-                    "1698229924"
+                    "1709651490"
                   ]
                 }
               ]
@@ -178,16 +164,149 @@
         ]
       },
       "simulation": {
-        "approvals": [],
-        "transfers": [],
-        "summary": [],
-        "calculatedNonce": "0x34",
+        "approvals": [
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "owner": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "spender": "0x41fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023",
+            "value": "1569838942266359",
+            "usdValue": "5.94",
+            "approvalForAll": false,
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "owner": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "spender": "0x41fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023",
+            "value": "0",
+            "usdValue": "0.00",
+            "approvalForAll": false,
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          }
+        ],
+        "transfers": [
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "from": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "to": "0x4d0390b777b424e43839cd1e744799f3de6c176c7e32c1812a41dbd9c19db6a",
+            "value": "1569838942266359",
+            "usdValue": "5.94",
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0x53c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+            "from": "0x4d0390b777b424e43839cd1e744799f3de6c176c7e32c1812a41dbd9c19db6a",
+            "to": "0xcfd39f5244f7b617418c018204a8a9f9a7f72e71f0ef38f968eeb2a9ca302b",
+            "value": "5910367",
+            "usdValue": "5.91",
+            "details": {
+              "address": "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+              "name": "USD Coin",
+              "symbol": "USDC",
+              "decimals": 6,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+            "from": "0xcfd39f5244f7b617418c018204a8a9f9a7f72e71f0ef38f968eeb2a9ca302b",
+            "to": "0x56dc2aa83379f195de35ee699a270c76f1c2840b8b97385689d9137b38d9f44",
+            "value": "5899197697868001898",
+            "usdValue": "5.90",
+            "details": {
+              "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+              "name": "DAI",
+              "symbol": "DAI",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49",
+            "from": "0x56dc2aa83379f195de35ee699a270c76f1c2840b8b97385689d9137b38d9f44",
+            "to": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "value": "20961135785834312996",
+            "usdValue": "6.20",
+            "details": {
+              "address": "0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49",
+              "name": "Lords",
+              "symbol": "LORDS",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/lords.png",
+              "type": "ERC20"
+            }
+          }
+        ],
+        "summary": [
+          {
+            "type": "transfer",
+            "label": "simulation_summary_send",
+            "value": "1569838942266359",
+            "usdValue": "5.94",
+            "token": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            },
+            "sent": true
+          },
+          {
+            "type": "transfer",
+            "label": "simulation_summary_receive",
+            "value": "20961135785834312996",
+            "usdValue": "6.20",
+            "token": {
+              "address": "0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49",
+              "name": "Lords",
+              "symbol": "LORDS",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/lords.png",
+              "type": "ERC20"
+            },
+            "sent": false
+          }
+        ],
+        "calculatedNonce": "0x2d",
         "feeEstimation": {
-          "overallFee": "1678000015102",
-          "gasPrice": "1000000009",
-          "gasUsage": "1678",
+          "overallFee": "2206623487141398",
+          "gasPrice": "79652871066",
+          "gasUsage": "27703",
           "unit": "WEI",
-          "maxFee": "3355997170495"
+          "maxFee": "4413246974351661"
         }
       }
     }

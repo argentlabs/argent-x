@@ -1,4 +1,4 @@
-import { messageClient } from "../messaging/trpc"
-import { MultisigService } from "./implementation"
+import { messageClient } from "../trpc"
+import { ClientMultisigService } from "./ClientMultisigService"
 
-export const multisigService = new MultisigService(messageClient)
+export const multisigService = new ClientMultisigService(messageClient)

@@ -6,18 +6,24 @@ import { IExplorerTransaction } from "../../../shared/explorer/type"
 
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
-import { routes } from "../../routes"
-import { Account } from "../accounts/Account"
+import { routes } from "../../../shared/ui/routes"
 import { TransactionListErrorItem } from "./TransactionListErrorItem"
 import { TransactionListItem } from "./TransactionListItem"
-import { transformExplorerTransaction, transformTransaction } from "./transform"
-import { isActivityTransaction, isExplorerTransaction } from "./transform/is"
+import {
+  transformExplorerTransaction,
+  transformTransaction,
+} from "../../../shared/activity/utils/transform"
+import {
+  isActivityTransaction,
+  isExplorerTransaction,
+} from "../../../shared/activity/utils/transform/is"
 import { LoadMoreTrigger } from "./ui/LoadMoreTrigger"
-import { ActivityTransaction } from "./useActivity"
+import { ActivityTransaction } from "../../../shared/activity/utils/transform/type"
 import { Token } from "../../../shared/token/__new/types/token.model"
+import { WalletAccount } from "../../../shared/wallet.model"
 
 interface AccountActivityBaseProps {
-  account: Account
+  account: WalletAccount
   tokensByNetwork?: Token[]
   nftContractAddresses?: string[]
   loadMoreHashes: string[]
@@ -75,6 +81,7 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
       tokensByNetwork,
       nftContractAddresses,
     })
+
     if (transactionTransformed) {
       return (
         <TransactionListItem
@@ -86,7 +93,10 @@ const AccountActivityItem: FC<AccountActivityItemProps> = ({
         >
           {failureReason ? (
             <div style={{ display: "flex" }}>
-              <TransactionStatusIndicator status={"red"} />
+              <TransactionStatusIndicator
+                status={"red"}
+                label={failureReason}
+              />
             </div>
           ) : null}
         </TransactionListItem>

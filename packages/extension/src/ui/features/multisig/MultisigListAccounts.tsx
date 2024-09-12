@@ -7,7 +7,7 @@ import { Account } from "../accounts/Account"
 import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
 import { multisigIsPending } from "./Multisig"
 import { PendingMultisigListScreenItem } from "./PendingMultisigListScreenItem"
-import { multisigAndPendingMultisigSort } from "../../../shared/utils/accountsMultisigSort"
+import { sortMultisigAndPendingMultisigAccounts } from "../../../shared/utils/accountsMultisigSort"
 
 export interface MultisigListAccountsProps {
   accounts: Account[]
@@ -24,7 +24,7 @@ export const MultisigListAccounts: FC<MultisigListAccountsProps> = ({
 }) => {
   const multisigsOrAccounts = useMemo(() => {
     if (pendingMultisigs && !isEmpty(pendingMultisigs)) {
-      return multisigAndPendingMultisigSort(pendingMultisigs, accounts)
+      return sortMultisigAndPendingMultisigAccounts(pendingMultisigs, accounts)
     }
     return accounts
   }, [accounts, pendingMultisigs])

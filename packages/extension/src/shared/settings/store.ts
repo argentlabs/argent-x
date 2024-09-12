@@ -12,8 +12,10 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
     experimentalAllowChooseAccount: false,
     blockExplorerKey: defaultBlockExplorerKey,
     nftMarketplaceKey: "unframed",
-    hideTokensWithNoBalance: true,
     autoLockTimeMinutes: defaultAutoLockTimeMinutes,
+    disableAnimation: false,
+    hideSpamTokens: true,
+    airGapEnabled: false,
   },
   "core:settings",
 )

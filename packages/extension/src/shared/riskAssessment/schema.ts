@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { warningSchema } from "../transactionReview/schema"
+import { warningSchema } from "@argent/x-shared/simulation"
 
 const linkSchema = z.object({
   name: z.string(),

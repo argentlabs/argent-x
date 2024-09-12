@@ -1,11 +1,11 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
 import { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 import { useNavigate } from "react-router-dom"
 
 import { VisibilityOff } from "../../components/Icons/MuiIcons"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
@@ -13,7 +13,7 @@ import {
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { normalizeAddress } from "@argent/x-shared"
 
-const { MoreIcon } = icons
+const { MoreIcon } = iconsDeprecated
 
 export interface TokenMenuProps {
   tokenAddress: string

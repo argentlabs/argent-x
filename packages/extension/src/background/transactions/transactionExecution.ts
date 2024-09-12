@@ -1,34 +1,35 @@
+import {
+  estimatedFeeToMaxResourceBounds,
+  getTxVersionFromFeeToken,
+} from "@argent/x-shared"
 import { TransactionType, num } from "starknet"
 import {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
+import { AccountError } from "../../shared/errors/account"
+import { SessionError } from "../../shared/errors/session"
+import { TransactionError } from "../../shared/errors/transaction"
+import { getMultisigAccountFromBaseWallet } from "../../shared/multisig/utils/baseMultisig"
+import { getEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import {
   ExtendedFinalityStatus,
   TransactionRequest,
   nameTransaction,
 } from "../../shared/transactions"
-import { accountsEqual } from "../../shared/utils/accountsEqual"
-import { isAccountDeployed } from "../accountDeploy"
-import { getNonce, increaseStoredNonce } from "../nonce"
-import { Wallet } from "../wallet"
-import { getEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import {
   addTransaction,
   transactionsStore,
 } from "../../shared/transactions/store"
-import { getMultisigAccountFromBaseWallet } from "../../shared/multisig/utils/baseMultisig"
 import {
   checkTransactionHash,
   getTransactionStatus,
 } from "../../shared/transactions/utils"
-import { isAccountV5 } from "@argent/x-shared"
-import { estimatedFeeToMaxResourceBounds } from "../../shared/transactionSimulation/utils"
-import { SessionError } from "../../shared/errors/session"
-import { AccountError } from "../../shared/errors/account"
-import { getTxVersionFromFeeToken } from "../../shared/utils/getTransactionVersion"
-import { TransactionError } from "../../shared/errors/transaction"
-import { isSafeUpgradeTransaction } from "../../shared/utils/isUpgradeTransaction"
+import { accountsEqual } from "../../shared/utils/accountsEqual"
+import { isSafeUpgradeTransaction } from "../../shared/utils/isSafeUpgradeTransaction"
+import { isAccountDeployed } from "../accountDeploy"
+import { getNonce, increaseStoredNonce } from "../nonce"
+import { Wallet } from "../wallet"
 
 export type TransactionAction = ExtQueueItem<{
   type: "TRANSACTION"
@@ -121,12 +122,15 @@ export const executeTransactionAction = async (
     })
   }
 
-  const acc =
-    selectedAccount.type !== "standard"
-      ? wallet.getStarknetAccountOfType(starknetAccount, selectedAccount.type)
-      : starknetAccount
+  const signer = await wallet.getSignerForAccount(selectedAccount)
 
-  if (!isAccountV5(acc)) {
+  const acc = wallet.getStarknetAccountOfType(
+    starknetAccount,
+    signer,
+    selectedAccount,
+  )
+
+  if (!("transactionVersion" in acc)) {
     throw new Error("Old Accounts are not supported anymore")
   }
 
@@ -160,6 +164,7 @@ export const executeTransactionAction = async (
   // Add transaction with finality status NOT_RECEIVED for multisig transactions with threshold > 1
   await addTransaction(tx, { finality_status: finalityStatus })
 
+  // This will not execute for multisig transactions
   if (!nonceWasProvidedByUI && finalityStatus === "RECEIVED") {
     await increaseStoredNonce(selectedAccount)
   }

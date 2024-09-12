@@ -1,15 +1,18 @@
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
+import { useSmartAccountEnabled } from "../../../shared/smartAccount/useSmartAccountEnabled"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
-import { routes, useCurrentPathnameWithQuery } from "../../routes"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import { useStopSession } from "../../services/useStopSession"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { useAccount } from "../accounts/accounts.state"
-import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
-import { useShieldVerifiedEmail } from "../shield/useShieldVerifiedEmail"
-import { SettingsScreen } from "./SettingsScreen"
+import { useWalletAccount } from "../accounts/accounts.state"
 import { useIsSignedIn } from "../argentAccount/hooks/useIsSignedIn"
+import { useExtensionIsInTab, useOpenExtensionInTab } from "../browser/tabs"
+import { useSmartAccountVerifiedEmail } from "../smartAccount/useSmartAccountVerifiedEmail"
+import { SettingsScreen } from "./SettingsScreen"
+import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
 
 export const SettingsScreenContainer: FC = () => {
   const onBack = useNavigateReturnToOrBack()
@@ -17,11 +20,13 @@ export const SettingsScreenContainer: FC = () => {
   const extensionIsInTab = useExtensionIsInTab()
   const selectedAccount = useView(selectedAccountView)
   const returnTo = useCurrentPathnameWithQuery()
-  const account = useAccount(selectedAccount)
+  const account = useWalletAccount(selectedAccount)
   const navigate = useNavigate()
   const stopSession = useStopSession()
-  const verifiedEmail = useShieldVerifiedEmail()
+  const verifiedEmail = useSmartAccountVerifiedEmail()
   const isSignedIn = useIsSignedIn()
+  const isSmartAccountEnabled = useSmartAccountEnabled()
+  const isLedgerSigner = useIsLedgerSigner(account)
 
   const onSignIn = () => {
     navigate(
@@ -39,9 +44,11 @@ export const SettingsScreenContainer: FC = () => {
 
   const onLock = () => void stopSession(true)
 
-  const shouldDisplayGuardianBanner = Boolean(
-    account && !account.guardian && account.type !== "multisig",
-  )
+  const shouldDisplayGuardianBanner =
+    isSmartAccountEnabled &&
+    account?.type !== "multisig" &&
+    !account?.guardian &&
+    !isLedgerSigner
 
   return (
     <SettingsScreen

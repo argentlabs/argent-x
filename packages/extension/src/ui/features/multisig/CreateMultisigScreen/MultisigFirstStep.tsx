@@ -1,23 +1,28 @@
 import { P3 } from "@argent/x-ui"
-import { Box, Button, Divider, Input } from "@chakra-ui/react"
+import { Box, Divider, Input, Spinner } from "@chakra-ui/react"
 import { useFormContext } from "react-hook-form"
 
-import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { AddOwnersForm } from "../AddOwnerForm"
 import { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { ScreenLayout } from "./ScreenLayout"
+import { ActionButton } from "../../../components/FullScreenPage"
+
+interface MultisigFirstStepProps {
+  index: number
+  goNext: () => void
+  creatorSignerKey: string | undefined
+  totalSteps?: number
+  filledIndicator?: boolean
+}
 
 export const MultisigFirstStep = ({
   index,
   goNext,
-  networkId,
-}: {
-  networkId: string
-  index: number
-  goNext: () => void
-}) => {
+  creatorSignerKey,
+  totalSteps,
+  filledIndicator = false,
+}: MultisigFirstStepProps) => {
   const { register, trigger } = useFormContext<FieldValuesCreateMultisigForm>()
-  const creatorSignerKey = useNextSignerKey(networkId)
   const handleNavigationToConfirmationScreen = async () => {
     const isValid = await trigger("signerKeys")
     if (isValid) {
@@ -30,6 +35,8 @@ export const MultisigFirstStep = ({
       subtitle="Ask your co-owners to go to “Join existing multisig” in Argent X and send you their signer pubkey"
       currentIndex={index}
       title="Add owners"
+      length={totalSteps}
+      filledIndicator={filledIndicator}
     >
       <P3 color="primary.400">
         For security reasons each owner should have their own Argent X wallet.
@@ -37,24 +44,37 @@ export const MultisigFirstStep = ({
       </P3>
       <Divider color="neutrals.700" my="4" />
       <Box my="2" width="100%">
-        <P3 mb="1">Owner 1 (Me)</P3>
-        <Input
-          placeholder={creatorSignerKey}
-          {...register(`signerKeys.-1.key` as const, {
-            required: true,
-            value: creatorSignerKey,
-          })}
-          disabled={true}
-          value={creatorSignerKey}
-        />
+        <P3 mb="3">Owner 1 (Me)</P3>
+        <Box position="relative">
+          <Input
+            placeholder={
+              creatorSignerKey || "Assigning Ledger signer pubkey..."
+            }
+            {...register(`signerKeys.-1.key` as const, {
+              required: true,
+              value: creatorSignerKey,
+            })}
+            disabled={true}
+            value={creatorSignerKey}
+            position="relative"
+            _placeholder={{ opacity: 1 }}
+            _disabled={{ bg: "surface-elevated", opacity: 1 }}
+            color="neutrals.300"
+            fontSize="16px"
+            fontWeight="600"
+            lineHeight="20px"
+            border="none"
+            _hover={{ border: "none" }}
+          />
+          {!creatorSignerKey && (
+            <Spinner position="absolute" top="5" right="5" size="sm" />
+          )}
+        </Box>
       </Box>
       <AddOwnersForm nextOwnerIndex={2} />
-      <Button
-        colorScheme="primary"
-        onClick={handleNavigationToConfirmationScreen}
-      >
+      <ActionButton onClick={handleNavigationToConfirmationScreen}>
         Next
-      </Button>
+      </ActionButton>
     </ScreenLayout>
   )
 }

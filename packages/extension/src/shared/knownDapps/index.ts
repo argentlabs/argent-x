@@ -1,9 +1,9 @@
-import { ArgentKnownDappsBackendService } from "@argent/x-shared"
+import { KnownDappsBackendService } from "@argent/x-shared"
 import { ARGENT_API_BASE_URL } from "../api/constants"
-import { KnownDappService } from "./implementation"
-import { knownDappsRepository } from "../storage/__new/repositories/knownDapp"
+import { KnownDappService } from "./KnownDappService"
+import { knownDappsRepository } from "./storage"
 
-export const argentKnownDappsService = new ArgentKnownDappsBackendService(
+export const knownDappsBackendService = new KnownDappsBackendService(
   ARGENT_API_BASE_URL,
   {
     headers: {
@@ -15,5 +15,5 @@ export const argentKnownDappsService = new ArgentKnownDappsBackendService(
 
 export const knownDappsService = new KnownDappService(
   knownDappsRepository,
-  argentKnownDappsService,
+  knownDappsBackendService,
 )

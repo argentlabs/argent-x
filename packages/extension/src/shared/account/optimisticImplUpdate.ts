@@ -1,6 +1,9 @@
-import { Address, isEqualAddress } from "@argent/x-shared"
+import {
+  Address,
+  isEqualAddress,
+  getArgentAccountClassHashes,
+} from "@argent/x-shared"
 import { WalletAccount } from "../wallet.model"
-import { ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES } from "./starknet.constants"
 
 // Use this with caution, as it might not reflect the onchain state,
 // but just an optimistic update
@@ -10,7 +13,10 @@ export const optimisticImplUpdate = (
 ): WalletAccount => {
   if (!newClassHash) return account
 
-  const { CAIRO_0, CAIRO_1 } = ARGENT_ACCOUNT_CONTRACT_CLASS_HASHES
+  const [CAIRO_0, CAIRO_1] = [
+    getArgentAccountClassHashes("cairo0"),
+    getArgentAccountClassHashes("cairo1"),
+  ]
 
   const cairoVersion = CAIRO_1.some((c1) => isEqualAddress(c1, newClassHash))
     ? "1"

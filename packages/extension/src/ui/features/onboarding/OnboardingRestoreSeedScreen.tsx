@@ -1,5 +1,5 @@
 import { seedphraseSchema } from "@argent/x-shared"
-import { Alert, B3, FieldError, SeedInput, icons } from "@argent/x-ui"
+import { Alert, B3, FieldError, SeedInput, iconsDeprecated } from "@argent/x-ui"
 import { Flex, chakra } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FC, MouseEventHandler } from "react"
@@ -9,12 +9,13 @@ import { z } from "zod"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 interface OnboardingRestoreSeedScreenProps {
   onBack?: MouseEventHandler
   onRestore: (seedPhrase: string) => Promise<void>
   onUseBackup?: MouseEventHandler
+  presetSeed?: string
 }
 
 const seedFormSchema = z.object({
@@ -23,7 +24,7 @@ const seedFormSchema = z.object({
 
 export const OnboardingRestoreSeedScreen: FC<
   OnboardingRestoreSeedScreenProps
-> = ({ onBack, onRestore, onUseBackup }) => {
+> = ({ onBack, onRestore, onUseBackup, presetSeed }) => {
   const {
     control,
     formState: { errors, isSubmitting },
@@ -32,7 +33,7 @@ export const OnboardingRestoreSeedScreen: FC<
   } = useForm({
     resolver: zodResolver(seedFormSchema),
     defaultValues: {
-      seedPhrase: "",
+      seedPhrase: presetSeed || "",
     },
   })
 
@@ -47,8 +48,8 @@ export const OnboardingRestoreSeedScreen: FC<
   return (
     <OnboardingScreen
       onBack={onBack}
-      length={5}
-      currentIndex={2}
+      length={5} // there are 5 steps in the onboarding process
+      currentIndex={2} // this is the 3rd step
       title={"Restore accounts"}
       subtitle="Enter each of the 12 words from your recovery phrase separated by a
       space"
@@ -57,8 +58,8 @@ export const OnboardingRestoreSeedScreen: FC<
         <Controller
           name="seedPhrase"
           control={control}
-          render={({ field: { onChange } }) => (
-            <SeedInput onChange={onChange} />
+          render={({ field: { onChange, value } }) => (
+            <SeedInput onChange={onChange} value={value} />
           )}
         />
         {errors.seedPhrase?.message && (

@@ -1,4 +1,4 @@
 import { networkService } from "../../network/service"
-import { StarknetChainService } from "./implementation"
+import { StarknetChainService } from "./StarknetChainService"
 
 export const starknetChainService = new StarknetChainService(networkService)

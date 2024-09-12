@@ -1,6 +1,11 @@
 import { normalizeAddress } from "@argent/x-shared"
-import { Call, constants, validateAndParseAddress } from "starknet"
-import { num, uint256 } from "starknet"
+import {
+  Call,
+  constants,
+  num,
+  uint256,
+  validateAndParseAddress,
+} from "starknet"
 
 const { isUint256, uint256ToBN } = uint256
 
@@ -25,13 +30,12 @@ export const validateERC20Call = (call: Erc20Call) => {
     validateAndParseAddress(contractAddress)
     /** validate recipient address */
     const [recipientAddressDecimal, amountLowFelt, amountHighFelt] = calldata
-    validateAndParseAddress(recipientAddressDecimal)
+    validateAndParseAddress(num.toHex(recipientAddressDecimal))
     /** validate uint256 input amount */
-    const amountUint256: uint256.Uint256 = {
+    const amount = uint256ToBN({
       low: amountLowFelt,
       high: amountHighFelt,
-    }
-    const amount = uint256ToBN(amountUint256)
+    })
     /** final check for valid Unit256 that is > 0 */
     if (isUint256(amount) && amount > constants.ZERO) {
       return true
@@ -45,12 +49,14 @@ export const validateERC20Call = (call: Erc20Call) => {
 export const parseErc20Call = (call: Erc20Call) => {
   const { contractAddress, calldata } = call
   const [recipientAddressDecimal, amountLowFelt, amountHighFelt] = calldata
-  const recipientAddress = normalizeAddress(recipientAddressDecimal)
-  const amountUint256: uint256.Uint256 = {
+  const recipientAddressHex = num.toHex(recipientAddressDecimal)
+  const recipientAddress = normalizeAddress(recipientAddressHex)
+
+  const amount = uint256ToBN({
     low: amountLowFelt,
     high: amountHighFelt,
-  }
-  const amount = uint256ToBN(amountUint256).toString(10)
+  }).toString(10)
+
   return {
     contractAddress,
     recipientAddress,

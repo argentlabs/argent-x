@@ -12,6 +12,7 @@ import { getMultisigAccountFromBaseWallet } from "../../shared/multisig/utils/ba
 import { Transaction } from "../../shared/transactions"
 import {
   BaseWalletAccount,
+  isNetworkOnlyPlaceholderAccount,
   MultisigWalletAccount,
 } from "../../shared/wallet.model"
 import { accountsEqual } from "../../shared/utils/accountsEqual"
@@ -43,7 +44,10 @@ export const multisigPendingTransactionSelector = memoize(
 export const updateBadgeText = async () => {
   const selectedWalletAccount = await old_walletStore.get("selected")
 
-  if (!selectedWalletAccount) {
+  if (
+    !selectedWalletAccount ||
+    isNetworkOnlyPlaceholderAccount(selectedWalletAccount)
+  ) {
     hideNotificationBadge()
     return
   }

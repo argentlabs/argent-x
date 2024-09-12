@@ -5,6 +5,7 @@ import { useKeyValueStorage } from "../../../hooks/useStorage"
 import { NftMarketplaceSettingsScreen } from "./NftMarketplaceSettingsScreen"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { NftMarketplaceKey } from "../../../../shared/nft/marketplaces"
+import { ampli } from "../../../../shared/analytics"
 
 export const NftMarketplaceSettingsScreenContainer: FC = () => {
   const onBack = useNavigateReturnToOrBack()
@@ -13,6 +14,10 @@ export const NftMarketplaceSettingsScreenContainer: FC = () => {
     "nftMarketplaceKey",
   )
   const onChange = (key: NftMarketplaceKey) => {
+    void ampli.nftMarketplaceChanged({
+      provider: key,
+      "wallet platform": "browser extension",
+    })
     void settingsStore.set("nftMarketplaceKey", key)
   }
   return (

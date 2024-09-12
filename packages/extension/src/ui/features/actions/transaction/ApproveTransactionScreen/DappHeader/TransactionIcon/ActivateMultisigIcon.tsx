@@ -1,8 +1,8 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 
 import { IconWrapper } from "./IconWrapper"
 
-const { MultisigIcon } = icons
+const { MultisigIcon } = iconsDeprecated
 
 export const ActivateMultisigIcon = () => {
   return (

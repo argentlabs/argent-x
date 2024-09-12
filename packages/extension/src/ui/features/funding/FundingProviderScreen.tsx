@@ -2,26 +2,28 @@ import {
   BarBackButton,
   BarCloseButton,
   NavigationContainer,
-  logos,
+  logosDeprecated,
 } from "@argent/x-ui"
 import { colord } from "colord"
 import { FC } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 
+import { isFeatureEnabled, normalizeAddress } from "@argent/x-shared"
+import { Grid } from "@chakra-ui/react"
+import { isString } from "lodash-es"
+import useSWR from "swr"
+import { routes } from "../../../shared/ui/routes"
 import { urlWithQuery } from "../../../shared/utils/url"
 import { Option } from "../../components/Options"
 import { PageWrapper } from "../../components/Page"
 import { A } from "../../components/TrackingLink"
-import { routes } from "../../routes"
+import { clientOnRampService } from "../../services/onRamp"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
-import { isFeatureEnabled, normalizeAddress } from "@argent/x-shared"
-import { Grid } from "@chakra-ui/react"
-import { isString } from "lodash-es"
 
-const { RampLogo, BanxaLogo } = logos
+const { RampLogo, BanxaLogo, TopperLogo } = logosDeprecated
 
 // Can be used to highlight a specific option with a recommended badge
 const RecommendedText = styled.span`
@@ -45,7 +47,10 @@ const showRecommended = () => {
 
 const BANXA_ENABLED = isFeatureEnabled(process.env.FEATURE_BANXA)
 const RAMP_ENABLED =
-  isString(process.env.RAMP_API_KEY) && process.env.RAMP_API_KEY.length > 0
+  isString(process.env.RAMP_API_KEY) &&
+  process.env.RAMP_API_KEY &&
+  process.env?.RAMP_API_KEY.length > 0
+const TOPPER_ENABLED = isString(process.env.TOPPER_PEM_KEY)
 
 export const FundingProviderScreen: FC = () => {
   const navigate = useNavigate()
@@ -54,12 +59,16 @@ export const FundingProviderScreen: FC = () => {
 
   const allowFiatPurchase = account && isMainnet
   const normalizedAddress = account ? normalizeAddress(account.address) : ""
+  const { data: topperUrl } = useSWR(["topperUrl", normalizedAddress], () => {
+    return (
+      normalizedAddress && clientOnRampService.getTopperUrl(normalizedAddress)
+    )
+  })
 
   if (!allowFiatPurchase) {
     /** not possible via UI */
     return <Navigate to={routes.funding()} />
   }
-
   const banxaUrl = urlWithQuery("https://argentx.banxa.com/", {
     walletAddress: normalizedAddress,
   })
@@ -103,6 +112,15 @@ export const FundingProviderScreen: FC = () => {
                 title="Banxa"
                 description="Card or bank transfer"
                 icon={<BanxaLogo width={6} height={6} />}
+              />
+            </A>
+          )}
+          {TOPPER_ENABLED && topperUrl && (
+            <A href={topperUrl} targetBlank>
+              <Option
+                title="Topper"
+                description="Card or bank transfer"
+                icon={<TopperLogo width={6} height={6} />}
               />
             </A>
           )}

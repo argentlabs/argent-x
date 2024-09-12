@@ -2,9 +2,9 @@ import { Button, Flex } from "@chakra-ui/react"
 import { FC, useEffect, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
-import { L2, icons } from "@argent/x-ui"
+import { L2, iconsDeprecated } from "@argent/x-ui"
 
-const { AlertFillIcon } = icons
+const { AlertFillIcon } = iconsDeprecated
 
 export const CopySeedPhrase: FC<{ seedPhrase?: string }> = ({ seedPhrase }) => {
   const [seedPhraseCopied, setSeedPhraseCopied] = useState(false)

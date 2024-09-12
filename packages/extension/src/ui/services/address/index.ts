@@ -1,5 +1,5 @@
-import { messageClient } from "../messaging/trpc"
-import { ClientStarknetAddressService } from "./client"
+import { messageClient } from "../trpc"
+import { ClientStarknetAddressService } from "./ClientStarknetAddressService"
 
 export const clientStarknetAddressService = new ClientStarknetAddressService(
   messageClient,

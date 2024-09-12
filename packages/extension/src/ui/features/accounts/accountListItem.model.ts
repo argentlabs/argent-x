@@ -18,14 +18,15 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   avatarIcon?: ReactNode
   avatarOutlined?: boolean
   avatarSize?: number
-  isShield?: boolean
+  isSmartAccount?: boolean
   isOwner?: boolean
   isClickable?: boolean
   isDeprecated?: boolean
-  displayArgentShieldBanner?: boolean
+  displayArgentSmartAccountBanner?: boolean
   rightElementFlexProps?: FlexProps
   connectedTooltipLabel?: string
-  prettyAccountBalance?: string
+  prettyAccountBalance?: ReactNode
   accountExtraInfo?: string
   showRightElements?: boolean
+  isLedger?: boolean
 }

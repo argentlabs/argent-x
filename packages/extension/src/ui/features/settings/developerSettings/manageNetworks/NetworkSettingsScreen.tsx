@@ -7,7 +7,7 @@ import {
   Empty,
   NavigationContainer,
   StickyGroup,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
@@ -17,7 +17,7 @@ import {
   SettingsMenuItemRemove,
 } from "../../ui/SettingsMenuItem"
 
-const { NetworkIcon, RestoreIcon } = icons
+const { NetworkIcon, RestoreIcon } = iconsDeprecated
 
 interface NetworkSettingsScreenProps {
   onBack: ReactEventHandler

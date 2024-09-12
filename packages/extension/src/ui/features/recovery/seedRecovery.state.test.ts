@@ -2,7 +2,7 @@ import {
   useSeedRecovery,
   validateAndSetPassword,
   validateAndSetSeedPhrase,
-  validatePassword,
+  validateNewPassword,
   validateSeedPhrase,
   validateSeedRecoveryCompletion,
 } from "./seedRecovery.state"
@@ -67,15 +67,15 @@ describe("Seed Recovery", () => {
     })
   })
 
-  describe("validatePassword", () => {
+  describe("validateNewPassword", () => {
     it("should return true for a valid password", () => {
       const password = "password"
-      expect(validatePassword(password)).toBe(true)
+      expect(validateNewPassword(password)).toBe(true)
     })
 
     it("should return false for a password that is too short", () => {
       const password = "1234"
-      expect(validatePassword(password)).toBe(false)
+      expect(validateNewPassword(password)).toBe(false)
     })
   })
 

@@ -32,7 +32,7 @@ export default class AddressBook extends Navigation {
     return this.page.locator(`button:text-is("${lang.common.cancel}")`)
   }
 
-  networkOption(name: "Localhost 5050" | "Goerli" | "Mainnet") {
+  networkOption(name: "Localhost 5050" | "Sepolia" | "Mainnet") {
     return this.page.locator(`button[role="menuitem"]:text-is("${name}")`)
   }
 

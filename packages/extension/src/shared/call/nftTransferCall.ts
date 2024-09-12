@@ -25,20 +25,19 @@ export const isNftTransferCall = (call: Call): call is NftTransferCall => {
       call.calldata?.length === 4
     ) {
       const { contractAddress, calldata } = call
-      validateAndParseAddress(contractAddress)
+      validateAndParseAddress(num.toHex(contractAddress))
       const [
         fromAddressDecimal,
         toAddressDecimal,
         tokenIdLowFelt,
         tokenIdHighFelt,
       ] = CallData.compile(calldata)
-      validateAndParseAddress(fromAddressDecimal)
-      validateAndParseAddress(toAddressDecimal)
-      const tokenIdUnit256: uint256.Uint256 = {
+      validateAndParseAddress(num.toHex(fromAddressDecimal))
+      validateAndParseAddress(num.toHex(toAddressDecimal))
+      const tokenId = uint256ToBN({
         low: tokenIdLowFelt,
         high: tokenIdHighFelt,
-      }
-      const tokenId = uint256ToBN(tokenIdUnit256)
+      })
       return tokenId !== undefined
     }
   } catch (e) {
@@ -55,13 +54,16 @@ export const parseNftTransferCall = (call: NftTransferCall) => {
     tokenIdLowFelt,
     tokenIdHighFelt,
   ] = calldata
-  const fromAddress = normalizeAddress(fromAddressDecimal)
-  const toAddress = normalizeAddress(toAddressDecimal)
-  const tokenIdUnit256: uint256.Uint256 = {
+
+  const fromAddressHex = num.toHex(fromAddressDecimal)
+  const toAddressHex = num.toHex(toAddressDecimal)
+  const fromAddress = normalizeAddress(fromAddressHex)
+  const toAddress = normalizeAddress(toAddressHex)
+
+  const tokenId = uint256ToBN({
     low: tokenIdLowFelt,
     high: tokenIdHighFelt,
-  }
-  const tokenId = uint256ToBN(tokenIdUnit256).toString(10)
+  }).toString(10)
   return {
     contractAddress,
     fromAddress,

@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
+import { WithSmartAccountVerified } from "../smartAccount/WithSmartAccountVerified"
 import { ApproveSignatureScreenContainer } from "./ApproveSignatureScreenContainer"
 import { useActionScreen } from "./hooks/useActionScreen"
 
@@ -19,9 +19,10 @@ export const SignActionScreenContainer: FC = () => {
   }
 
   return (
-    <WithArgentShieldVerified>
+    <WithSmartAccountVerified>
       <ApproveSignatureScreenContainer
         dataToSign={action.payload.typedData}
+        host={action.meta.origin || ""}
         skipDeployWarning={action.payload.options?.skipDeploy}
         onSubmit={() => void approveAndClose()}
         onReject={() => void reject()}
@@ -29,6 +30,6 @@ export const SignActionScreenContainer: FC = () => {
         selectedAccount={selectedAccount}
         actionIsApproving={Boolean(action.meta.startedApproving)}
       />
-    </WithArgentShieldVerified>
+    </WithSmartAccountVerified>
   )
 }

@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 /**
  * localAccounts <-- all local accounts
@@ -15,8 +15,8 @@ import { BaseError, BaseErrorPayload } from "./baseError"
  * backendAccounts.length > 0 && localAccountsWithGuardian.length === 0
  */
 
-export const SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1 =
-  "SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1"
+export const SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_1 =
+  "SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_1"
 
 /**
  * Scenario 2: When there is 2FA locally, and there are no backend accounts (email never used)
@@ -27,8 +27,8 @@ export const SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1 =
  * backendAccounts.length === 0 && localAccountsWithGuardian.length > 0
  */
 
-export const SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2 =
-  "SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2"
+export const SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_2 =
+  "SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_2"
 
 /**
  * Scenario 3: When there is 2FA locally, and accounts do not match
@@ -45,16 +45,16 @@ export const SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2 =
  * backendAccounts.length === 0
  */
 
-export const SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3 =
-  "SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3"
+export const SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_3 =
+  "SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_3"
 
-export type ShieldValidationErrorMessage =
-  | typeof SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_1
-  | typeof SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_2
-  | typeof SHIELD_EMAIL_VALIDATION_FAILURE_SCENARIO_3
+export type SmartAccountValidationErrorMessage =
+  | typeof SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_1
+  | typeof SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_2
+  | typeof SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_3
 
-export class ArgentAccountError extends BaseError<ShieldValidationErrorMessage> {
-  constructor(payload: BaseErrorPayload<ShieldValidationErrorMessage>) {
+export class ArgentAccountError extends BaseError<SmartAccountValidationErrorMessage> {
+  constructor(payload: BaseErrorPayload<SmartAccountValidationErrorMessage>) {
     super(payload)
     this.name = "ArgentAccountError"
   }

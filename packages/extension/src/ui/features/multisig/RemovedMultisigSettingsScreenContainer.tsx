@@ -4,21 +4,25 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { hideMultisig } from "../../../shared/multisig/utils/baseMultisig"
-import { routes, useReturnTo, useRouteAccountAddress } from "../../routes"
+import { useReturnTo, useRouteAccountAddress } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import { autoSelectAccountOnNetwork } from "../accounts/switchAccount"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { useMultisig } from "./multisig.state"
+import { multisigView } from "./multisig.state"
 import { RemovedMultisigSettingsScreen } from "./RemovedMultisigSettingsScreen"
+import { useView } from "../../views/implementation/react"
 
 export const RemovedMultisigSettingsScreenContainer: FC = () => {
   const currentNetwork = useCurrentNetwork()
   const accountAddress = useRouteAccountAddress()
   const navigate = useNavigate()
   const returnTo = useReturnTo()
-  const multisig = useMultisig({
-    address: accountAddress ?? "",
-    networkId: currentNetwork.id,
-  })
+  const multisig = useView(
+    multisigView({
+      address: accountAddress ?? "",
+      networkId: currentNetwork.id,
+    }),
+  )
   const accountName = multisig ? multisig.name : "Unnamed Multisig"
 
   const onClose = useCallback(() => {

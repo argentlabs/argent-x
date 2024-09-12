@@ -12,8 +12,9 @@ export enum ApproveScreenType {
   MULTISIG_UPDATE_THRESHOLD,
   MULTISIG_REMOVE_SIGNERS,
   MULTISIG_REPLACE_SIGNER,
-  ADD_ARGENT_SHIELD,
-  REMOVE_ARGENT_SHIELD,
+  MULTISIG_ON_CHAIN_REJECT,
+  ADD_GUARDIAN,
+  REMOVE_GUARDIAN,
 }
 
 export type TransactionActionsType =
@@ -30,13 +31,13 @@ export type TransactionActionsType =
       }
     }
   | {
-      type: "ADD_ARGENT_SHIELD"
+      type: "ADD_GUARDIAN"
       payload: {
         accountAddress: string
       }
     }
   | {
-      type: "REMOVE_ARGENT_SHIELD"
+      type: "REMOVE_GUARDIAN"
       payload: {
         accountAddress: string
       }

@@ -16,13 +16,13 @@ describe("OnboardingPasswordScreen", () => {
       `input[name="repeatPassword"]`,
     )
 
-    expect(screen.getByText(/^Create wallet$/)).toBeDisabled()
+    expect(screen.getByText(/^Continue$/)).toBeDisabled()
 
     if (passwordElement) {
       fireEvent.change(passwordElement, { target: { value: "password123" } })
     }
 
-    fireEvent.click(screen.getByText(/^Create wallet$/))
+    fireEvent.click(screen.getByText(/^Continue$/))
 
     await waitFor(() => expect(onSubmit).not.toHaveBeenCalled())
 
@@ -32,9 +32,9 @@ describe("OnboardingPasswordScreen", () => {
       })
     }
 
-    expect(screen.getByText(/^Create wallet$/)).not.toBeDisabled()
+    expect(screen.getByText(/^Continue$/)).not.toBeDisabled()
 
-    fireEvent.click(screen.getByText(/^Create wallet$/))
+    screen.getByText(/^Continue$/).click()
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith("password123"))
   })
@@ -65,15 +65,15 @@ describe("OnboardingPasswordScreen", () => {
       target: { value: "password123" },
     })
 
-    expect(screen.getByText(/^Create wallet$/)).not.toBeDisabled()
+    expect(screen.getByText(/^Continue$/)).not.toBeDisabled()
 
-    fireEvent.click(screen.getByText(/^Create wallet$/))
+    screen.getByText(/^Continue$/).click()
 
     await waitFor(() => expect(onSubmit).not.toHaveBeenCalled())
 
     rerender(<OnboardingPasswordScreen onSubmit={onSubmit} />)
 
-    expect(screen.getByText(/^Creating wallet…$/)).toBeDisabled()
+    expect(screen.getByText(/^Continuing...$/)).toBeDisabled()
 
     await act(async () => {
       await onSubmit().catch(() => {
@@ -83,6 +83,6 @@ describe("OnboardingPasswordScreen", () => {
 
     rerender(<OnboardingPasswordScreen onSubmit={onSubmit} />)
 
-    expect(screen.getByText(/^Retry create wallet$/)).not.toBeDisabled()
+    expect(screen.getByText(/^Retry$/)).not.toBeDisabled()
   })
 })

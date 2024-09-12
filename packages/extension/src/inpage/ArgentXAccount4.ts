@@ -6,15 +6,15 @@ import {
   Signature,
   defaultProvider,
   ec,
-  typedData,
   Account,
   AccountInterface,
 } from "starknet4"
 
 import { sendMessage, waitForMessage } from "./messageActions"
-import { stark } from "starknet"
-import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import { TypedData } from "starknet"
+import { StarknetMethodArgumentsSchemas } from "starknetkit/window"
 import { SignMessageOptions } from "../shared/messages/ActionMessage"
+import { signTypedDataHandler } from "./requestMessageHandlers/signTypedData"
 
 /**
  *  This is Account Object is imported from starknet v4.
@@ -32,13 +32,12 @@ export class ArgentXAccount4 extends Account implements AccountInterface {
 
   public async execute(
     transactions: Call | Call[],
-    abis?: Abi[],
+    _?: Abi[],
     transactionsDetail?: InvocationsDetails,
   ): ReturnType<Account["execute"]> {
-    const [parsedTransactions, parseAbis, parsedTransactionsDetail] =
+    const [parsedTransactions, parsedTransactionsDetail] =
       await StarknetMethodArgumentsSchemas.execute.parseAsync([
         transactions,
-        abis,
         transactionsDetail,
       ])
 
@@ -46,7 +45,6 @@ export class ArgentXAccount4 extends Account implements AccountInterface {
       type: "EXECUTE_TRANSACTION",
       data: {
         transactions: parsedTransactions,
-        abis: parseAbis,
         transactionsDetail: parsedTransactionsDetail,
       },
     })
@@ -84,42 +82,12 @@ export class ArgentXAccount4 extends Account implements AccountInterface {
   }
 
   public async signMessage(
-    typedData: typedData.TypedData,
+    typedData: TypedData,
     options: SignMessageOptions = { skipDeploy: false },
   ): Promise<Signature> {
-    sendMessage({ type: "SIGN_MESSAGE", data: { typedData, options } })
-    const { actionHash } = await waitForMessage("SIGN_MESSAGE_RES", 1000)
-    sendMessage({ type: "OPEN_UI" })
-
-    const result = await Promise.race([
-      waitForMessage(
-        "SIGNATURE_SUCCESS",
-        11 * 60 * 1000,
-        (x) => x.data.actionHash === actionHash,
-      ),
-      waitForMessage(
-        "SIGNATURE_FAILURE",
-        10 * 60 * 1000,
-        (x) => x.data.actionHash === actionHash,
-      )
-        .then((x) => x)
-        .catch((e) => {
-          sendMessage({
-            type: "SIGNATURE_FAILURE",
-            data: { actionHash, error: e.message }, // this error will be thrown by waitForMessage after the timeout
-          })
-          return "timeout" as const
-        }),
-    ])
-
-    if (result === "timeout") {
-      throw Error("User action timed out")
-    }
-
-    if ("error" in result) {
-      throw Error(result.error)
-    }
-
-    return stark.formatSignature(result.signature)
+    return signTypedDataHandler({
+      ...typedData,
+      skipDeploy: options.skipDeploy, // Required because it's a custom field
+    } as TypedData)
   }
 }

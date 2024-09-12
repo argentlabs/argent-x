@@ -4,11 +4,11 @@ import {
   ProviderInterface,
   Signature,
   SignerInterface,
-  typedData,
 } from "starknet"
 
 import { Sender } from "./messages/exchange/bidirectional"
 import { StarknetMethods } from "./types"
+import { TypedData } from "@starknet-io/types-js"
 
 class UnimplementedSigner implements SignerInterface {
   async getPubKey(): Promise<string> {
@@ -43,11 +43,21 @@ export class MessageAccount extends Account implements AccountInterface {
     super(provider, address, new UnimplementedSigner())
   }
 
-  execute: StarknetMethods["execute"] = (calls, abis, transactionsDetail) => {
-    return this.remoteHandle.call("execute", calls, abis, transactionsDetail)
+  async execute(
+    calls: Parameters<StarknetMethods["execute"]>[0],
+    abiOrDetails?: Parameters<StarknetMethods["execute"]>[1] | any[],
+    transactionDetails: Parameters<StarknetMethods["execute"]>[1] = {},
+  ): ReturnType<StarknetMethods["execute"]> {
+    return this.remoteHandle.call(
+      "execute",
+      calls,
+      Array.isArray(abiOrDetails) ? transactionDetails : abiOrDetails,
+    )
   }
 
-  signMessage(typedData: typedData.TypedData): Promise<Signature> {
+  async signMessage(
+    typedData: TypedData & { message: Record<string, unknown> },
+  ): Promise<Signature> {
     return this.remoteHandle.call("signMessage", typedData)
   }
 }

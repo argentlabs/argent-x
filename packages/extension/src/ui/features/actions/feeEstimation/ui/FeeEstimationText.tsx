@@ -1,4 +1,4 @@
-import { B3, L2, P4, icons } from "@argent/x-ui"
+import { B3, L2, P4, iconsDeprecated } from "@argent/x-ui"
 import {
   Center,
   Flex,
@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
-const { InfoIcon, ChevronRightIcon } = icons
+const { InfoIcon, ChevronRightIcon } = iconsDeprecated
 
 export interface FeeEstimationTextProps extends ThemingProps<"Flex"> {
   allowFeeTokenSelection?: boolean

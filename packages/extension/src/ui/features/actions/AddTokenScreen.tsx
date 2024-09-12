@@ -6,7 +6,7 @@ import {
   CellStack,
   HeaderCell,
   NavigationContainer,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Flex, FormControl } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -19,8 +19,9 @@ import {
   RequestToken,
   RequestTokenSchema,
 } from "../../../shared/token/__new/types/token.model"
+import { ampli } from "../../../shared/analytics"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 export const AddTokenScreenSchema = RequestTokenSchema.omit({
   networkId: true,
@@ -83,6 +84,9 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   const handleForm = handleSubmit(async (values: AddTokenScreenSchemaType) => {
     try {
       await onContinue(values)
+      void ampli.customTokenAdded({
+        "wallet platform": "browser extension",
+      })
     } catch (error) {
       setError("root", { message: `${error}` })
     }
@@ -163,7 +167,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
               colorScheme={"primary"}
               w="full"
             >
-              Continue
+              Add token
             </Button>
           </Flex>
         </CellStack>

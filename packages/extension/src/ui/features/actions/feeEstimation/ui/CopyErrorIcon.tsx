@@ -1,8 +1,8 @@
-import { CopyTooltip, icons } from "@argent/x-ui"
+import { CopyTooltip, iconsDeprecated } from "@argent/x-ui"
 import { Box, Fade, useAccordionItemState } from "@chakra-ui/react"
 import { FC } from "react"
 
-const { CopyIcon } = icons
+const { CopyIcon } = iconsDeprecated
 
 interface CopyErrorIconProps {
   copyValue?: string

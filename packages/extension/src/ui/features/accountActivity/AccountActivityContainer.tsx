@@ -1,37 +1,47 @@
 import { FC, useCallback, useMemo } from "react"
 import { get, uniqBy } from "lodash-es"
-import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/x-ui"
+import {
+  CellStack,
+  Empty,
+  H4,
+  SpacerCell,
+  iconsDeprecated,
+  formatDate,
+} from "@argent/x-ui"
 import { Center, Skeleton } from "@chakra-ui/react"
 
 import { IExplorerTransaction } from "../../../shared/explorer/type"
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { useAppState } from "../../app.state"
 import { ErrorBoundary } from "../../components/ErrorBoundary"
 import ErrorBoundaryFallbackWithCopyError from "../../components/ErrorBoundaryFallbackWithCopyError"
-import { formatDate } from "../../services/dates"
 import { useContractAddresses } from "../accountNfts/nfts.state"
-import { Account } from "../accounts/Account"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { useMultisigPendingTransactionsByAccount } from "../multisig/multisigTransactions.state"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { AccountActivity } from "./AccountActivity"
 import { PendingMultisigTransactions } from "./PendingMultisigTransactions"
 import { PendingTransactions } from "./PendingTransactions"
-import { isVoyagerTransaction } from "./transform/is"
-import { ActivityTransaction } from "./useActivity"
+import { isVoyagerTransaction } from "../../../shared/activity/utils/transform/is"
+import { ActivityTransaction } from "../../../shared/activity/utils/transform/type"
 import { useArgentExplorerAccountTransactionsInfinite } from "./useArgentExplorer"
 import { isEqualAddress, normalizeAddress } from "@argent/x-shared"
-import { getTransactionFailureReason } from "./getTransactionFailureReason"
+import { getTransactionFailureReason } from "../../../shared/activity/utils/transform/getTransactionFailureReason"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
+import { useTokensInCurrentNetworkIncludingSpam } from "../accountTokens/tokens.state"
+import { useMultisigPendingOffchainSignaturesByAccount } from "../multisig/multisigOffchainSignatures.state"
+import { useView } from "../../views/implementation/react"
+import { selectedNetworkIdView } from "../../views/network"
+import { WalletAccount } from "../../../shared/wallet.model"
 
-const { ActivityIcon } = icons
+const { ActivityIcon } = iconsDeprecated
 
 export interface AccountActivityContainerProps {
-  account: Account
+  account: WalletAccount
 }
 
 const PAGE_SIZE = 10
+
+/** @deprecated Remove when Activity V2 is stable */
 
 export const AccountActivityContainer: FC<AccountActivityContainerProps> = ({
   account,
@@ -60,17 +70,31 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
 }) => {
   const network = useCurrentNetwork()
   const { pendingTransactions } = useAccountTransactions(account)
-  const { switcherNetworkId } = useAppState()
-  const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const tokensByNetwork = useTokensInCurrentNetworkIncludingSpam()
   const nftContractAddresses = useContractAddresses()
 
   const pendingMultisigTransactions =
     useMultisigPendingTransactionsByAccount(account)
 
+  const pendingMultisigOffchainSignatures =
+    useMultisigPendingOffchainSignaturesByAccount(account)
+
+  const pendingMultisigActions = useMemo(
+    () =>
+      [
+        ...pendingMultisigTransactions,
+        ...pendingMultisigOffchainSignatures,
+      ].sort((tx) => -tx.timestamp),
+    [pendingMultisigTransactions, pendingMultisigOffchainSignatures],
+  )
+  const pendingMultisigHashes = pendingMultisigTransactions.map(
+    (tx) => tx.transactionHash,
+  )
   const { data, setSize, error, isValidating } =
     useArgentExplorerAccountTransactionsInfinite({
       accountAddress: account.address,
-      network: switcherNetworkId,
+      network: selectedNetworkId,
       pageSize: PAGE_SIZE,
     })
 
@@ -175,9 +199,17 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
       (transaction) => transaction.status !== "NOT_RECEIVED",
     )
 
-    for (const transaction of submittedTransactions) {
+    const submittedTransactionsWithoutPendingMultisig =
+      submittedTransactions.filter(
+        (transaction) =>
+          !("hash" in transaction) ||
+          ("hash" in transaction &&
+            !pendingMultisigHashes.includes(transaction.hash)),
+      )
+    for (const transaction of submittedTransactionsWithoutPendingMultisig) {
       const date = new Date(transaction.timestamp * 1000).toISOString()
       const dateLabel = formatDate(date)
+
       if (!mergedActivity[dateLabel]) {
         mergedActivity[dateLabel] = []
       }
@@ -193,6 +225,7 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
           meta,
           failureReason,
         }
+
         mergedActivity[dateLabel].push(activityTransaction)
       } else {
         const failureReason = getTransactionFailureReason({
@@ -258,16 +291,8 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
     )
   }
 
-  return (
+  const SharedActivities = () => (
     <>
-      {pendingMultisigTransactions &&
-        pendingMultisigTransactions.length > 0 && (
-          <PendingMultisigTransactions
-            pendingTransactions={pendingMultisigTransactions}
-            account={account}
-            network={network}
-          />
-        )}
       <PendingTransactions
         pendingTransactions={pendingTransactions}
         network={network}
@@ -282,6 +307,24 @@ export const AccountActivityLoader: FC<AccountActivityContainerProps> = ({
         nftContractAddresses={nftContractAddresses}
         onLoadMore={onLoadMore}
       />
+    </>
+  )
+  return (
+    <>
+      {account.type === "multisig" ? (
+        <>
+          {pendingMultisigActions && pendingMultisigActions.length > 0 && (
+            <PendingMultisigTransactions
+              pendingMultisigActions={pendingMultisigActions}
+              account={account}
+              network={network}
+            />
+          )}
+          <SharedActivities />
+        </>
+      ) : (
+        <SharedActivities />
+      )}
     </>
   )
 }

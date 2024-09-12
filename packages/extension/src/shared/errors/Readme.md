@@ -10,7 +10,7 @@ Custom error handling based on:
 ### Create a domain error
 
 ```tsx
-import { BaseError } from "./baseError"
+import { BaseError } from "@argent/x-shared"
 
 export const ERROR_CODE_1 = "ERROR_CODE_1"
 export const ERROR_CODE_2 = "ERROR_CODE_2"

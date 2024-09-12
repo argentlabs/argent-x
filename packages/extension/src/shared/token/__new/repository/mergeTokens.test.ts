@@ -2,6 +2,10 @@ import { describe, test } from "vitest"
 
 import type { Token } from "../types/token.model"
 import { mergeTokens, mergeTokensWithDefaults } from "./mergeTokens"
+import {
+  getMockApiTokenDetails,
+  getMockToken,
+} from "../../../../../test/token.mock"
 
 const MOCK_TOKEN_1: Token = {
   symbol: "MOCK1",
@@ -46,6 +50,39 @@ describe("shared/token/repository", () => {
         pricingId: 1,
         symbol: "MOCK1",
       })
+    })
+    test("when there are no tags", () => {
+      const mockToken = getMockToken()
+      const mockApiToken = getMockApiTokenDetails()
+      const merged = mergeTokens(mockToken, mockApiToken)
+      expect(merged).toEqual({
+        address: "0x123",
+        category: "tokens",
+        decimals: 18,
+        iconUrl: "https://example.com",
+        id: 1,
+        listed: true,
+        name: "Token",
+        networkId: "mainnet-alpha",
+        popular: true,
+        pricingId: 1,
+        refundable: true,
+        sendable: true,
+        symbol: "TKN",
+        tradable: true,
+      })
+    })
+    test("when there are tags in both", () => {
+      const mockToken = getMockToken({ tags: ["defi"] })
+      const mockApiToken = getMockApiTokenDetails({ tags: ["defi", "scam"] })
+      const merged = mergeTokens(mockToken, mockApiToken)
+      expect(merged.tags).toEqual(["defi", "scam"])
+    })
+    test("when there are tags locally, but not in api", () => {
+      const mockToken = getMockToken({ tags: ["scam"] })
+      const mockApiToken = getMockApiTokenDetails()
+      const merged = mergeTokens(mockToken, mockApiToken)
+      expect(merged.tags).toBeUndefined()
     })
   })
   describe("mergeTokensWithDefaults", () => {

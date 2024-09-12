@@ -1,15 +1,17 @@
 import { useNavigateBack } from "@argent/x-ui"
 import { FC, useCallback } from "react"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 // import { useTimeSpentWithSuccessTracking } from "../../services/analytics"
 import { useCustomNavigate } from "../recovery/hooks/useCustomNavigate"
 import { useSeedRecovery } from "../recovery/seedRecovery.state"
 import { OnboardingRestoreSeedScreen } from "./OnboardingRestoreSeedScreen"
+import { useLocation } from "react-router-dom"
 
 export const OnboardingRestoreSeedScreenContainer: FC = () => {
   const customNavigate = useCustomNavigate()
   const onBack = useNavigateBack()
+  const { state } = useLocation()
 
   const onRestore = useCallback(
     async (seedPhrase: string) => {
@@ -29,6 +31,7 @@ export const OnboardingRestoreSeedScreenContainer: FC = () => {
       onBack={onBack}
       onRestore={onRestore}
       onUseBackup={onUseBackup}
+      presetSeed={state?.seed}
     />
   )
 }

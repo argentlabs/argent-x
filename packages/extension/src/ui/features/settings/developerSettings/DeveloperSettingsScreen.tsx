@@ -1,7 +1,7 @@
 import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
 import { FC } from "react"
 
-import { routes } from "../../../routes"
+import { routes } from "../../../../shared/ui/routes"
 import { SettingsMenuItemLink } from "../ui/SettingsMenuItem"
 
 interface DeveloperSettingsScreenProps {
@@ -47,6 +47,10 @@ export const DeveloperSettingsScreen: FC<DeveloperSettingsScreenProps> = ({
             title="Experimental"
           />
         )}
+        <SettingsMenuItemLink
+          to={routes.settingsDownloadLogs()}
+          title="Download application logs"
+        />
       </CellStack>
     </NavigationContainer>
   )

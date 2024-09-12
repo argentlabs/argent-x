@@ -1,4 +1,4 @@
-import { SwapService } from "./implementation"
-import { messageClient } from "../messaging/trpc"
+import { SwapService } from "./SwapService"
+import { messageClient } from "../trpc"
 
 export const swapService = new SwapService(messageClient)

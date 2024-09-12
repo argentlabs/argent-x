@@ -1,6 +1,11 @@
 import { test } from "@playwright/test"
-import { notifyLowBalance } from "./assets"
+import { getBalances, notifyLowBalance } from "./assets"
+import { isCI } from "../cfg/test"
 
-test("Slack notifications", async () => {
+test("Slack notifications - Low Balance", async () => {
   await notifyLowBalance()
+})
+test("Slack notifications - balances", async () => {
+  test.skip(isCI)
+  await getBalances()
 })

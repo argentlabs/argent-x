@@ -1,32 +1,40 @@
 import { Route, Routes, RoutesConfig } from "@argent/stack-router"
 import { chakra } from "@chakra-ui/react"
-import { FC, ReactNode, isValidElement, useMemo } from "react"
+import { FC, ReactNode, isValidElement, useEffect, useMemo } from "react"
 // import { Outlet, Route, Routes } from "react-router-dom" // reinstate in case of issues with @argent/stack-router
-import { Location, Outlet, useLocation } from "react-router-dom"
+import { Location, Navigate, Outlet, useLocation } from "react-router-dom"
 
-import { useAppState, useMessageStreamHandler } from "./app.state"
+import { isActivityV2FeatureEnabled } from "../shared/activity"
+import { routes } from "../shared/ui/routes"
+import { useMessageStreamHandler } from "./hooks/useMessageStreamHandler"
+import { AppBackgroundError } from "./AppBackgroundError"
 import { ResponsiveBox } from "./components/Responsive"
+import { SuspenseScreen } from "./components/SuspenseScreen"
 import { TransactionDetailScreen } from "./features/accountActivity/TransactionDetailScreen"
-import { AccountSettingsScreen } from "./features/settings/account/AccountSettingsScreen"
+import { ActivityDetailsScreenContainer } from "./features/accountActivityV2/ActivityDetailsScreenContainer"
 import { CollectionNftsContainer } from "./features/accountNfts/CollectionNftsContainer"
 import { NftScreenContainer } from "./features/accountNfts/NftScreenContainer"
-import { AddPluginScreen } from "./features/accountPlugins.tsx/AddPluginScreen"
-import { AccountDeprecatedModal } from "./features/accountTokens/warning/AccountDeprecatedModal"
 import { AccountListHiddenScreenContainer } from "./features/accounts/AccountListHiddenScreenContainer"
 import { AccountListScreenContainer } from "./features/accounts/AccountListScreenContainer"
-import { AccountScreen } from "./features/accounts/AccountScreen"
+import { RootTabsScreenContainer } from "./features/root/RootTabsScreenContainer"
 import { AddNewAccountScreenContainer } from "./features/accounts/AddNewAccountScreenContainer"
 import { HideOrDeleteAccountConfirmScreenContainer } from "./features/accounts/HideOrDeleteAccountConfirmScreenContainer"
 import { HideTokenScreenContainer } from "./features/accountTokens/HideTokenScreenContainer"
+import { AccountDeprecatedModal } from "./features/accountTokens/warning/AccountDeprecatedModal"
+import { AccountOwnerWarningScreen } from "./features/accountTokens/warning/AccountOwnerWarningScreen"
 import { ActionScreenContainer } from "./features/actions/ActionScreen"
 import { AddTokenScreenContainer } from "./features/actions/AddTokenScreenContainer"
 import { ErrorScreenContainer } from "./features/actions/ErrorScreenContainer"
 import { LoadingScreenContainer } from "./features/actions/LoadingScreenContainer"
+import { ArgentAccountEmailScreen } from "./features/argentAccount/ArgentAccountEmailScreen"
+import { ArgentAccountLoggedInScreenContainer } from "./features/argentAccount/ArgentAccountLoggedInScreenContainer"
 import { FundingBridgeScreen } from "./features/funding/FundingBridgeScreen"
 import { FundingFaucetFallbackScreen } from "./features/funding/FundingFaucetFallbackScreen"
+import { FundingFaucetSepoliaScreen } from "./features/funding/FundingFaucetSepoliaScreen"
 import { FundingProviderScreen } from "./features/funding/FundingProviderScreen"
+import { FundingQrCodeScreenContainer } from "./features/funding/FundingQrCodeScreenContainer"
 import { FundingScreen } from "./features/funding/FundingScreen"
-import { LockScreen } from "./features/lock/LockScreen"
+import { LedgerStartScreen } from "./features/ledger/LedgerStartScreen"
 import { ResetScreen } from "./features/lock/ResetScreen"
 import { CreateMultisigStartScreen } from "./features/multisig/CreateMultisigScreen/CreateMultisigStartScreen"
 import { JoinMultisigScreen } from "./features/multisig/JoinMultisigScreen"
@@ -34,16 +42,25 @@ import { JoinMultisigSettingsScreen } from "./features/multisig/JoinMultisigSett
 import { MultisigAddOwnersScreen } from "./features/multisig/MultisigAddOwnersScreen"
 import { MultisigConfirmationsScreen } from "./features/multisig/MultisigConfirmationsScreen"
 import { MultisigOwnersScreen } from "./features/multisig/MultisigOwnersScreen"
+import { MultisigPendingOffchainSignatureDetailsScreen } from "./features/multisig/MultisigPendingOffchainSignatureDetailsScreen"
+import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
 import { MultisigRemoveOwnersScreen } from "./features/multisig/MultisigRemoveOwnerScreen"
-import { MultisigTransactionConfirmationsScreen } from "./features/multisig/MultisigTransactionConfirmationsScreen"
+import { MultisigReplaceOwnerScreen } from "./features/multisig/MultisigReplaceOwnerScreen"
+import { MultisigSignatureScreenWarningV2 } from "./features/multisig/MultisigSignatureScreenWarning"
+import { MultisigSignerSelectionScreen } from "./features/multisig/MultisigSignerSelectionScreen"
+import { MultisigTransactionConfirmationsScreenContainer } from "./features/multisig/MultisigTransactionConfirmationsScreenContainer"
 import { NewMultisigScreen } from "./features/multisig/NewMultisigScreen"
 import { RemovedMultisigSettingsScreenContainer } from "./features/multisig/RemovedMultisigSettingsScreenContainer"
 import { NetworkWarningScreenContainer } from "./features/networks/NetworkWarningScreen/NetworkWarningScreenContainer"
+import { OnboardingAccountTypeContainer } from "./features/onboarding/OnboardingAccountTypeScreenContainer"
 import { OnboardingFinishScreenContainer } from "./features/onboarding/OnboardingFinishScreenContainer"
 import { OnboardingPasswordScreenContainer } from "./features/onboarding/OnboardingPasswordScreenContainer"
+import { OnboardingPrivacyScreenContainer } from "./features/onboarding/OnboardingPrivacyScreenContainer"
 import { OnboardingRestoreBackupScreenContainer } from "./features/onboarding/OnboardingRestoreBackupScreenContainer"
 import { OnboardingRestorePasswordScreenContainer } from "./features/onboarding/OnboardingRestorePasswordScreenContainer"
 import { OnboardingRestoreSeedScreenContainer } from "./features/onboarding/OnboardingRestoreSeedScreenContainer"
+import OnboardingSmartAccountEmailScreen from "./features/onboarding/OnboardingSmartAccountEmailScreen"
+import OnboardingSmartAccountOTPScreen from "./features/onboarding/OnboardingSmartAccountOTPScreen"
 import { OnboardingStartScreenContainer } from "./features/onboarding/OnboardingStartScreenContainer"
 import { RecoverySetupScreen } from "./features/recovery/RecoverySetupScreen"
 import { SeedRecoverySetupScreen } from "./features/recovery/SeedRecoverySetupScreen"
@@ -51,56 +68,58 @@ import { SendAmountAndAssetScreenContainer } from "./features/send/SendAmountAnd
 import { SendAssetScreen } from "./features/send/SendAssetScreen"
 import { SendCollectionNftsScreenContainer } from "./features/send/SendCollectionNftsScreenContainer"
 import { SendRecipientScreenContainer } from "./features/send/SendRecipientScreenContainer"
+import { AccountSettingsScreen } from "./features/settings/account/AccountSettingsScreen"
+import { ChangeAccountImplementationScreen } from "./features/settings/account/ChangeAccountImplementationScreen"
+import { ExportPrivateKeyScreenContainer } from "./features/settings/account/ExportPrivateKeyScreenContainer"
+import { ExportPublicKeyScreen } from "./features/settings/account/ExportPublicKeyScreen"
 import { AddressBookAddOrEditScreenContainer } from "./features/settings/addressBook/AddressBookAddOrEditScreenContainer"
 import { AddressBookSettingsScreenContainer } from "./features/settings/addressBook/AddressBookSettingsScreenContainer"
-import { BeforeYouContinueScreen } from "./features/settings/securityAndPrivacy/BeforeYouContinueScreen"
+import { DappConnectionsAccountListScreenContainer } from "./features/settings/connectedDapps/DappConnectionsAccountListScreenContainer"
 import { DappConnectionsAccountScreenContainer } from "./features/settings/connectedDapps/DappConnectionsAccountScreenContainer"
+import { BetaFeaturesSettingsScreenContainer } from "./features/settings/developerSettings/betaFeatures/BetaFeaturesSettingsScreenContainer"
+import { ClearLocalStorageScreen } from "./features/settings/developerSettings/clearLocalStorage/ClearLocalStorageScreen"
+import { DeploymentDataScreen } from "./features/settings/developerSettings/deploymentData/DeploymentDataScreen"
+import { DeveloperSettingsScreenContainer } from "./features/settings/developerSettings/DeveloperSettingsScreenContainer"
+import { DownloadLogsScreen } from "./features/settings/developerSettings/downloadLogs/DownloadLogsScreen"
+import { ExperimentalSettingsScreenContainer } from "./features/settings/developerSettings/experimental/ExperimentalSettingsScreenContainer"
+import { NetworkSettingsEditScreen } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsEditScreen"
+import { NetworkSettingsFormScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsFormScreenContainer"
+import { NetworkSettingsScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsScreenContainer"
 import { DeclareOrDeployContractSuccessScreenContainer } from "./features/settings/developerSettings/smartContractDevelopment/DeclareOrDeployContractSuccessScreenContainer"
 import { DeclareSmartContractScreen } from "./features/settings/developerSettings/smartContractDevelopment/DeclareSmartContractScreen"
 import { DeploySmartContractScreen } from "./features/settings/developerSettings/smartContractDevelopment/DeploySmartContractScreen"
-import { NetworkSettingsEditScreen } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsEditScreen"
-import { NetworkSettingsFormScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsFormScreenContainer"
-import { SeedSettingsScreenContainer } from "./features/settings/securityAndPrivacy/SeedSettingsScreenContainer"
 import { SmartContractDevelopmentScreen } from "./features/settings/developerSettings/smartContractDevelopment/SmartContractDevelopmentScreen"
-import { EscapeWarningScreen } from "./features/shield/escape/EscapeWarningScreen"
-import { ShieldAccountActionScreen } from "./features/shield/ShieldAccountActionScreen"
-import { ShieldAccountFinishScreen } from "./features/shield/ShieldAccountFinishScreen"
-import { ShieldAccountOTPScreen } from "./features/shield/ShieldAccountOTPScreen"
-import { ShieldAccountStartScreen } from "./features/shield/ShieldAccountStartScreen"
-import { WithArgentShieldVerified } from "./features/shield/WithArgentShieldVerified"
+import { BlockExplorerSettingsScreenContainer } from "./features/settings/preferences/BlockExplorerSettingsScreenContainer"
+import { NftMarketplaceSettingsScreenContainer } from "./features/settings/preferences/NftMarketplaceSettingsScreenContainer"
+import { PreferencesSettingsContainer } from "./features/settings/preferences/PreferencesSettingsContainer"
+import { AutoLockTimerSettingsScreenContainer } from "./features/settings/securityAndPrivacy/AutoLockTimerSettingsScreenContainer"
+import { BeforeYouContinueScreen } from "./features/settings/securityAndPrivacy/BeforeYouContinueScreen"
+import { SecurityAndPrivacySettingsScreenContainer } from "./features/settings/securityAndPrivacy/SecurityAndPrivacySettingsScreenContainer"
+import { SeedSettingsScreenContainer } from "./features/settings/securityAndPrivacy/SeedSettingsScreenContainer"
+import { SettingsScreenContainer } from "./features/settings/SettingsScreenContainer"
+import { CreateSmartAccountEmailScreen } from "./features/smartAccount/CreateSmartAccountEmailScreen"
+import { CreateSmartAccountOTPScreen } from "./features/smartAccount/CreateSmartAccountOTPScreen"
+import { EscapeWarningScreen } from "./features/smartAccount/escape/EscapeWarningScreen"
+import { SmartAccountActionScreen } from "./features/smartAccount/SmartAccountActionScreen"
+import { SmartAccountFinishScreen } from "./features/smartAccount/SmartAccountFinishScreen"
+import { SmartAccountOTPScreen } from "./features/smartAccount/SmartAccountOTPScreen"
+import { SmartAccountStartScreen } from "./features/smartAccount/SmartAccountStartScreen"
+import { WithSmartAccountVerified } from "./features/smartAccount/WithSmartAccountVerified"
 import { ReviewFeedbackScreenContainer } from "./features/userReview/ReviewFeedbackScreenContainer"
 import { ReviewRatingScreen } from "./features/userReview/ReviewRatingScreen"
 import { useOnAppRoutesAnimationComplete } from "./hooks/useOnAppRoutesAnimationComplete"
-import { routes } from "./routes"
-import { useEntryRoute } from "./useEntryRoute"
+import { useClientUINavigate } from "./services/ui/useClientUINavigate"
 import { hasActionsView } from "./views/actions"
 import { useView } from "./views/implementation/react"
-import { ArgentAccountEmailScreen } from "./features/argentAccount/ArgentAccountEmailScreen"
-import { ArgentAccountLoggedInScreenContainer } from "./features/argentAccount/ArgentAccountLoggedInScreenContainer"
-import { EmailNotificationsSettingsScreenContainer } from "./features/settings/preferences/EmailNotificationsSettingsScreenContainer"
-import { MultisigPendingTransactionDetailsScreen } from "./features/multisig/MultisigPendingTransactionDetailsScreen"
-import { SuspenseScreen } from "./components/SuspenseScreen"
-import { BetaFeaturesSettingsScreenContainer } from "./features/settings/developerSettings/betaFeatures/BetaFeaturesSettingsScreenContainer"
-import { ChangeAccountImplementationScreen } from "./features/settings/account/ChangeAccountImplementationScreen"
-import { MultisigReplaceOwnerScreen } from "./features/multisig/MultisigReplaceOwnerScreen"
-import { FundingQrCodeScreenContainer } from "./features/funding/FundingQrCodeScreenContainer"
-import { AppBackgroundError } from "./AppBackgroundError"
 import { isClearingStorageView, isRecoveringView } from "./views/recovery"
-import { SettingsScreenContainer } from "./features/settings/SettingsScreenContainer"
-import { PreferencesSettingsContainer } from "./features/settings/preferences/PreferencesSettingsContainer"
-import { BlockExplorerSettingsScreenContainer } from "./features/settings/preferences/BlockExplorerSettingsScreenContainer"
-import { NftMarketplaceSettingsScreenContainer } from "./features/settings/preferences/NftMarketplaceSettingsScreenContainer"
-import { SecurityAndPrivacySettingsScreenContainer } from "./features/settings/securityAndPrivacy/SecurityAndPrivacySettingsScreenContainer"
-import { AutoLockTimerSettingsScreenContainer } from "./features/settings/securityAndPrivacy/AutoLockTimerSettingsScreenContainer"
-import { DappConnectionsAccountListScreenContainer } from "./features/settings/connectedDapps/DappConnectionsAccountListScreenContainer"
-import { DeveloperSettingsScreenContainer } from "./features/settings/developerSettings/DeveloperSettingsScreenContainer"
-import { ExperimentalSettingsScreenContainer } from "./features/settings/developerSettings/experimental/ExperimentalSettingsScreenContainer"
-import { NetworkSettingsScreenContainer } from "./features/settings/developerSettings/manageNetworks/NetworkSettingsScreenContainer"
-import { AccountOwnerWarningScreen } from "./features/accountTokens/warning/AccountOwnerWarningScreen"
-import { ExportPrivateKeyScreenContainer } from "./features/settings/account/ExportPrivateKeyScreenContainer"
-import { ClearLocalStorageScreen } from "./features/settings/developerSettings/clearLocalStorage/ClearLocalStorageScreen"
-import { OnboardingPrivacyScreenContainer } from "./features/onboarding/OnboardingPrivacyScreenContainer"
-import { DeploymentDataScreen } from "./features/settings/developerSettings/deploymentData/DeploymentDataScreen"
+import { AirGapReviewScreen } from "./features/actions/transaction/airgap/AirGapReviewScreen"
+import {
+  RouteWithLockScreen,
+  WithLockScreen,
+} from "./features/lock/WithLockScreen"
+import { useIsOnboardingComplete } from "./hooks/appState"
+import { routerService } from "./services/router"
+import { useClientUIShowNotification } from "./services/ui/useClientUIShowNotification"
 
 interface LocationWithState extends Location {
   state: {
@@ -132,23 +151,21 @@ const ResponsiveRoutes: FC = () => (
 
 // Routes which don't need an unlocked wallet
 
-const nonWalletRoutes = (
+const withoutLockScreenRoutes = (
   <>
-    <Route path={"/index.html"} element={null} />
     <Route
       path={routes.backgroundError.path}
       element={<AppBackgroundError />}
     />
     <Route path={routes.error.path} element={<ErrorScreenContainer />} />
-    <Route path={routes.lockScreen.path} element={<LockScreen />} />
     <Route path={routes.reset.path} element={<ResetScreen />} />
   </>
 )
 
 // Routes which need an unlocked wallet and therefore can also sign actions
 
-const walletRoutes = (
-  <>
+const withLockScreenRoutes = (
+  <Route element={<RouteWithLockScreen />}>
     <Route
       presentation="modal"
       path={routes.accountNft.path}
@@ -175,27 +192,27 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.accountTokens.path}
-      element={<AccountScreen tab="tokens" />}
+      element={<RootTabsScreenContainer tab="tokens" />}
     />
     <Route
       presentation="push"
       path={routes.accountCollections.path}
-      element={<AccountScreen tab="collections" />}
+      element={<RootTabsScreenContainer tab="collections" />}
     />
     <Route
       presentation="push"
       path={routes.swap.path}
-      element={<AccountScreen tab="swap" />}
+      element={<RootTabsScreenContainer tab="swap" />}
     />
     <Route
       presentation="push"
       path={routes.accountActivity.path}
-      element={<AccountScreen tab="activity" />}
+      element={<RootTabsScreenContainer tab="activity" />}
     />
     <Route
       presentation="push"
       path={routes.accountDiscover.path}
-      element={<AccountScreen tab="discover" />}
+      element={<RootTabsScreenContainer tab="discover" />}
     />
     <Route
       presentation="modal"
@@ -218,13 +235,8 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
-      path={routes.shieldAccountStart.path}
-      element={<ShieldAccountStartScreen />}
-    />
-    <Route
-      presentation="push"
-      path={routes.shieldAccountStart.path}
-      element={<ShieldAccountStartScreen />}
+      path={routes.smartAccountStart.path}
+      element={<SmartAccountStartScreen />}
     />
     <Route
       presentation="push"
@@ -242,26 +254,31 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
-      path={routes.settingsEmailNotifications.path}
-      element={<EmailNotificationsSettingsScreenContainer />}
+      path={routes.smartAccountOTP.path}
+      element={<SmartAccountOTPScreen />}
     />
     <Route
       presentation="push"
-      path={routes.shieldAccountOTP.path}
-      element={<ShieldAccountOTPScreen />}
+      path={routes.createSmartAccountEmail.path}
+      element={<CreateSmartAccountEmailScreen />}
     />
     <Route
       presentation="push"
-      path={routes.shieldAccountAction.path}
-      element={<ShieldAccountActionScreen />}
+      path={routes.createSmartAccountOTP.path}
+      element={<CreateSmartAccountOTPScreen />}
     />
     <Route
       presentation="push"
-      path={routes.shieldAccountFinish.path}
-      element={<ShieldAccountFinishScreen />}
+      path={routes.smartAccountAction.path}
+      element={<SmartAccountActionScreen />}
     />
     <Route
-      path={routes.shieldEscapeWarning.path}
+      presentation="push"
+      path={routes.smartAccountFinish.path}
+      element={<SmartAccountFinishScreen />}
+    />
+    <Route
+      path={routes.smartAccountEscapeWarning.path}
       element={<EscapeWarningScreen />}
     />
     <Route
@@ -382,6 +399,11 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
+      path={routes.settingsDownloadLogs.path}
+      element={<DownloadLogsScreen />}
+    />
+    <Route
+      presentation="push"
       path={routes.deploymentData.path}
       element={<DeploymentDataScreen />}
     />
@@ -415,11 +437,23 @@ const walletRoutes = (
       path={routes.settingsNetworks.path}
       element={<NetworkSettingsScreenContainer />}
     />
-    <Route
-      presentation="modal"
-      path={routes.transactionDetail.path}
-      element={<TransactionDetailScreen />}
-    />
+    {isActivityV2FeatureEnabled ? (
+      <Route
+        presentation="push"
+        path={routes.transactionDetail.path}
+        element={
+          <SuspenseScreen list>
+            <ActivityDetailsScreenContainer />
+          </SuspenseScreen>
+        }
+      />
+    ) : (
+      <Route
+        presentation="modal"
+        path={routes.transactionDetail.path}
+        element={<TransactionDetailScreen />}
+      />
+    )}
     <Route
       presentation="push"
       path={routes.accountHideConfirm.path}
@@ -449,9 +483,9 @@ const walletRoutes = (
       path={routes.sendAmountAndAssetScreen.path}
       element={
         <SuspenseScreen>
-          <WithArgentShieldVerified>
+          <WithSmartAccountVerified>
             <SendAmountAndAssetScreenContainer />
-          </WithArgentShieldVerified>
+          </WithSmartAccountVerified>
         </SuspenseScreen>
       }
     />
@@ -518,6 +552,11 @@ const walletRoutes = (
       element={<FundingFaucetFallbackScreen />}
     />
     <Route
+      presentation="push"
+      path={routes.fundingFaucetSepolia.path}
+      element={<FundingFaucetSepoliaScreen />}
+    />
+    <Route
       path={routes.setupSeedRecovery.path}
       element={<SeedRecoverySetupScreen />}
     />
@@ -527,18 +566,24 @@ const walletRoutes = (
       path={routes.newToken.path}
       element={<AddTokenScreenContainer />}
     />
-    <Route
-      presentation="modal"
-      path={routes.addPlugin.path}
-      element={<AddPluginScreen />}
-    />
+
     <Route
       presentation="push"
       path={routes.exportPrivateKey.path}
       element={<ExportPrivateKeyScreenContainer />}
     />
+    <Route
+      presentation="push"
+      path={routes.exportPublicKey.path}
+      element={<ExportPublicKeyScreen />}
+    />
     {/* Multisig */}
     <Route path={routes.multisigNew.path} element={<NewMultisigScreen />} />
+    <Route
+      path={routes.multisigSignerSelection.path}
+      element={<MultisigSignerSelectionScreen />}
+      presentation="push"
+    />
     <Route
       presentation="push"
       path={routes.multisigJoin.path}
@@ -577,14 +622,18 @@ const walletRoutes = (
     <Route
       presentation="push"
       path={routes.multisigPendingTransactionDetails.path}
-      element={<MultisigPendingTransactionDetailsScreen />}
+      element={
+        <SuspenseScreen>
+          <MultisigPendingTransactionDetailsScreen />
+        </SuspenseScreen>
+      }
     />
     <Route
       presentation="push"
-      path={routes.multisigPendingTransactionConfirmations.path}
+      path={routes.multisigTransactionConfirmations.path}
       element={
         <SuspenseScreen>
-          <MultisigTransactionConfirmationsScreen />
+          <MultisigTransactionConfirmationsScreenContainer />
         </SuspenseScreen>
       }
     />
@@ -595,10 +644,20 @@ const walletRoutes = (
     />
     <Route
       presentation="push"
+      path={routes.multisigPendingOffchainSignatureDetails.path}
+      element={<MultisigPendingOffchainSignatureDetailsScreen />}
+    />
+    <Route
+      presentation="push"
+      path={routes.multisigOffchainSignatureWarning.path}
+      element={<MultisigSignatureScreenWarningV2 />}
+    />
+    <Route
+      presentation="push"
       path={routes.beforeYouContinue.path}
       element={<BeforeYouContinueScreen />}
     />
-  </>
+  </Route>
 )
 
 const fullscreenRoutes = (
@@ -631,6 +690,18 @@ const fullscreenRoutes = (
       path={routes.onboardingFinish.path}
       element={<OnboardingFinishScreenContainer />}
     />
+    <Route
+      path={routes.onboardingAccountType.path}
+      element={<OnboardingAccountTypeContainer />}
+    />
+    <Route
+      path={routes.onboardingSmartAccountEmail.path}
+      element={<OnboardingSmartAccountEmailScreen />}
+    />
+    <Route
+      path={routes.onboardingSmartAccountOTP.path}
+      element={<OnboardingSmartAccountOTPScreen />}
+    />
     <Route path={routes.userReview.path} element={<ReviewRatingScreen />} />
     <Route
       path={routes.userReviewFeedback.path}
@@ -640,34 +711,49 @@ const fullscreenRoutes = (
       path={routes.multisigCreate.path}
       element={<CreateMultisigStartScreen />}
     />
+    <Route path={routes.ledgerConnect.path} element={<LedgerStartScreen />} />
+    <Route path={routes.airGapReview.path} element={<AirGapReviewScreen />} />
   </>
 )
 
 /** Make a list of non-wallet routes which will show in place of actions */
-const nonWalletPaths = nonWalletRoutes.props.children.flatMap(
+export const nonWalletPaths = withoutLockScreenRoutes.props.children.flatMap(
   (child: ReactNode) => {
     return isValidElement(child) ? child.props.path : []
   },
 )
 
 export const AppRoutes: FC = () => {
-  useEntryRoute()
+  useClientUINavigate()
   useMessageStreamHandler()
   const location = useLocation()
   const { state, pathname } = location as LocationWithState
   const onAppRoutesAnimationComplete = useOnAppRoutesAnimationComplete()
-
-  const { isLoading } = useAppState()
   const hasActions = useView(hasActionsView)
   const isRecovering = useView(isRecoveringView)
   const isClearingStorage = useView(isClearingStorageView)
+  const isOnboardingComplete = useIsOnboardingComplete()
+  useClientUIShowNotification(pathname)
+
+  const query = new URLSearchParams(window.location.search)
+  const { entry: initialRoute, options = {} } = routerService.getInitialRoute({
+    query,
+    isOnboardingComplete,
+  })
+
+  /** remove the initial style overrides in index.html */
+  useEffect(() => {
+    document.documentElement.removeAttribute("style")
+    document.body.removeAttribute("style")
+  }, [])
 
   /** TODO: refactor: this should maybe be invoked by service + worker pattern */
+  const showOnTop = state?.showOnTop || options?.state?.showOnTop
+
   const showActions = useMemo(() => {
-    const isNonWalletRoute =
-      nonWalletPaths.includes(pathname) || state?.showOnTop
+    const isNonWalletRoute = nonWalletPaths.includes(pathname) || showOnTop
     return hasActions && !isNonWalletRoute
-  }, [hasActions, pathname, state])
+  }, [hasActions, pathname, showOnTop])
 
   if (isClearingStorage) {
     return <LoadingScreenContainer loadingTexts={["Clearing storage..."]} />
@@ -675,14 +761,13 @@ export const AppRoutes: FC = () => {
   if (isRecovering && !isClearingStorage) {
     return <LoadingScreenContainer loadingTexts={["Recovering accounts..."]} />
   }
-  if (isLoading) {
-    return <LoadingScreenContainer />
-  }
 
   if (showActions) {
     return (
       <ResponsiveContainer>
-        <ActionScreenContainer />
+        <WithLockScreen>
+          <ActionScreenContainer />
+        </WithLockScreen>
       </ResponsiveContainer>
     )
   }
@@ -694,10 +779,15 @@ export const AppRoutes: FC = () => {
     >
       <Routes>
         <Route element={<ResponsiveRoutes />}>
-          {nonWalletRoutes}
-          {walletRoutes}
+          {withoutLockScreenRoutes}
+          {withLockScreenRoutes}
         </Route>
         {fullscreenRoutes}
+        {/** immediately render initial route and screen */}
+        <Route
+          path="/index.html"
+          element={<Navigate to={initialRoute} replace {...options} />}
+        />
       </Routes>
     </RoutesConfig>
   )

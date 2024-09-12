@@ -2,6 +2,7 @@ import { Network } from "../src/shared/network"
 import { ETH_TOKEN_ADDRESS } from "../src/shared/network/constants"
 import {
   ArgentAccountType,
+  SignerType,
   WalletAccount,
   WalletAccountSigner,
 } from "../src/shared/wallet.model"
@@ -14,7 +15,7 @@ const defaultNetwork: Network = {
   rpcUrl: "rpcUrl",
 }
 const defaultSigner: WalletAccountSigner = {
-  type: "local_secret",
+  type: SignerType.LOCAL_SECRET,
   derivationPath: "derivationPath",
 }
 const defaultName = "Account 1"
@@ -32,6 +33,7 @@ const defaultWalletAccount: WalletAccount = {
   escape: undefined,
   needsDeploy: false,
   hidden: false,
+  salt: "0x0",
 }
 
 export const getMockWalletAccount = (overrides?: Partial<WalletAccount>) => ({

@@ -4,12 +4,12 @@ import {
   CellStack,
   NavigationContainer,
   SpacerCell,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { useCallback } from "react"
 import { Link } from "react-router-dom"
 
-const { ExpandIcon, SettingsIcon } = icons
+const { ExpandIcon, SettingsIcon } = iconsDeprecated
 
 export function Home() {
   const onOpenWindow = useCallback(() => {
@@ -37,6 +37,16 @@ export function Home() {
         </ButtonCell>
         <ButtonCell as={Link} to="/tokens/c">
           Token C
+        </ButtonCell>
+        <SpacerCell />
+        <ButtonCell as={Link} to="/activity">
+          Activities
+        </ButtonCell>
+        <ButtonCell as={Link} to="/activity/1">
+          Activity
+        </ButtonCell>
+        <ButtonCell as={Link} to="/activity/1" replace>
+          Activity (replace)
         </ButtonCell>
         <SpacerCell />
         <ButtonCell as={Link} to="/accounts/1">

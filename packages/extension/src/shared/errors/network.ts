@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 export enum NETWORK_ERROR_MESSAGES {
   NOT_FOUND = "Network not found",

@@ -1,7 +1,7 @@
 import { FC } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
-import { routes } from "../../../../routes"
+import { routes } from "../../../../../shared/ui/routes"
 import { DeclareOrDeployContractSuccessScreen } from "./DeclareOrDeployContractSuccessScreen"
 
 export const DeclareOrDeployContractSuccessScreenContainer: FC = () => {

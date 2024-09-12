@@ -7,6 +7,7 @@ import * as useRiskAssessmentParent from "./useRiskAssessment"
 import { mockNetworks } from "../../networks/NetworkSwitcher/NetworkSwitcher.test"
 import { MemoryRouter } from "react-router-dom"
 import { ChakraProvider } from "@chakra-ui/react"
+import { SignerType } from "../../../../shared/wallet.model"
 
 vi.mock("../hooks/useActionScreen", () => {
   return {
@@ -60,11 +61,11 @@ const useActionDefaultResponse = {
   selectedAccount: {
     type: "standard",
     address: "0x1",
-    networkId: "goerli",
+    networkId: "sepolia",
     name: "account_1",
     network: mockNetworks[1],
     signer: {
-      type: "local_secret",
+      type: SignerType.LOCAL_SECRET,
       derivationPath: "123",
     },
   },

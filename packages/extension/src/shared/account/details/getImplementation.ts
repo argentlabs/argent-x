@@ -1,12 +1,12 @@
 import { Call, num } from "starknet"
 import { accountsEqual } from "../../utils/accountsEqual"
 
+import { TXV1_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import { getMulticallForNetwork } from "../../multicall"
 import { getProvider } from "../../network"
-import { TXV1_ACCOUNT_CLASS_HASH } from "../../network/constants"
 import { networkService } from "../../network/service"
 import { BaseWalletAccount } from "../../wallet.model"
-import { IAccountService } from "../service/interface"
+import { IAccountService } from "../service/accountService/IAccountService"
 
 /**
  * Get implementation class hash of account
@@ -25,7 +25,7 @@ export const getImplementationForAccount = async (
     }
     const multicall = getMulticallForNetwork(network)
     const response = await multicall.callContract(call)
-    return response.result[0]
+    return response[0]
   } catch {
     try {
       // If it fails, get implementation Class Hash for Cairo 1 accounts
@@ -35,7 +35,7 @@ export const getImplementationForAccount = async (
       return classHash
     } catch {
       const [walletAccount] = await accountService.get((acc) =>
-        accountsEqual(acc, account),
+        accountsEqual(acc as any, account),
       )
 
       return (

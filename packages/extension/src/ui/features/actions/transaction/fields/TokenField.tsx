@@ -1,4 +1,4 @@
-import { TextWithAmount } from "@argent/x-ui"
+import { TextWithAmount, TokenIcon } from "@argent/x-ui"
 import { BigNumberish } from "starknet"
 import { FC } from "react"
 
@@ -8,7 +8,6 @@ import {
   FieldValue,
   LeftPaddedField,
 } from "../../../../components/Fields"
-import { TokenIcon } from "../../../accountTokens/TokenIcon"
 import { Token } from "../../../../../shared/token/__new/types/token.model"
 import { isEqualAddress, prettifyTokenAmount } from "@argent/x-shared"
 

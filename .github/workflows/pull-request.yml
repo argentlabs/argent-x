@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: [prod, staging, hydrogen]
+        env: [prod, staging, hydrogen, dev]
         extension_type: [chrome, firefox]
 
     environment: ${{ matrix.env }}
@@ -25,6 +25,7 @@ jobs:
       FEATURE_ORBITER: "true"
       FEATURE_VERIFIED_DAPPS: "true"
       FEATURE_MULTISIG: "true"
+      FEATURE_ACTIVITY_V2: "true"
 
       # API URLs
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
@@ -46,7 +47,7 @@ jobs:
       SAFE_ENV_VARS: false
       MULTICALL_MAX_BATCH_SIZE: 20
       NEW_CAIRO_0_ENABLED: false
-
+      TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
       # Refresh intervals
       FAST: 20 # 20s
       MEDIUM: 60 # 60s
@@ -60,11 +61,11 @@ jobs:
       # Setup Project
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - uses: actions/setup-node@v4
@@ -131,12 +132,11 @@ jobs:
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
       ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
       ARGENT_X_ENVIRONMENT: "hydrogen"
+      FEATURE_MULTISIG: "true"
 
     services:
       devnet:
-        # Temporary pin the previous version of the devnet image to avoid a bug introduced in the latest version
-        image: shardlabs/starknet-devnet-rs:78527decb3f76c4c808fa35f46228557af3df385-seed0
-        # image: shardlabs/starknet-devnet-rs:latest-seed0
+        image: shardlabs/starknet-devnet-rs:0.0.7-seed0
         ports:
           - 5050:5050
 
@@ -145,11 +145,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - uses: actions/setup-node@v4
@@ -178,7 +178,7 @@ jobs:
         run: pnpm run test:ci
       - name: SonarCloud Scan
         # TODO replace with master as soon as sonarcloud fixes the issue with action https://community.sonarsource.com/t/sonarsource-sonarcloud-github-action-failing-with-node-js-12-error/89664/2
-        uses: SonarSource/sonarcloud-github-action@v2.1.1
+        uses: SonarSource/sonarcloud-github-action@v2.3.0
         with:
           projectBaseDir: ./packages/extension
         env:
@@ -194,45 +194,46 @@ jobs:
         shardIndex: [1, 2, 3, 4, 5, 6, 7, 8]
         shardTotal: [8]
     env:
+      #default
       ARGENT_X_ENVIRONMENT: "hydrogen"
       ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
-      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
-      E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
-      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
-      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
-      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
-      E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
+
       ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
-      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES }}
-      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
-      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
-      STARKNET_TESTNET_URL: ${{ secrets.STARKNET_TESTNET_URL }}
-      STARKSCAN_TESTNET_URL: ${{ secrets.STARKSCAN_TESTNET_URL }}
-      ARGENT_TESTNET_RPC_URL: ${{ secrets.ARGENT_TESTNET_RPC_URL }}
-      ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
-      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
-      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
+      ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
       ##slack config
       SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
       SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+
+      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
+      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
+      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
+
+      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
+      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+
+      E2E_USE_STRK_AS_FEE_TOKEN: ${{ secrets.E2E_USE_STRK_AS_FEE_TOKEN }}
+      E2E_SKIP_TX_TESTS: ${{ secrets.E2E_SKIP_TX_TESTS}}
+      E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
+      E2E_GUARDIAN_EMAIL: ${{ secrets.E2E_GUARDIAN_EMAIL }}
       # Refresh intervals
       REFRESH_INTERVAL_FAST: 1 # 1s
       REFRESH_INTERVAL_MEDIUM: 5 # 5s
       REFRESH_INTERVAL_SLOW: 20 # 20s
       REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
-      ##webwallet default account config
-      WW_EMAIL: ${{ secrets.WW_EMAIL }}
-      WW_PIN: ${{ secrets.WW_PIN }}
-      WW_LOGIN_PASSWORD: ${{ secrets.WW_LOGIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - uses: actions/setup-node@v4
@@ -278,46 +279,206 @@ jobs:
           path: packages/e2e/blob-report/
           retention-days: 5
 
-  test-notify-low-balance:
+  test-e2e-prod:
     runs-on: ubuntu-latest
-    if: always()
-    needs: [build-all-artifacts, test-e2e]
+    needs: [build-all-artifacts]
+    strategy:
+      matrix:
+        project: [ArgentX]
+        shardIndex: [1, 2]
+        shardTotal: [2]
     env:
-      ARGENT_X_ENVIRONMENT: "hydrogen"
-      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
-      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
-      E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
-      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
-      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
-      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
-      E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
+      #default
+      ARGENT_X_ENVIRONMENT: "prod"
       ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
       E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES }}
       E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
-      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
-      STARKNET_TESTNET_URL: ${{ secrets.STARKNET_TESTNET_URL }}
-      STARKSCAN_TESTNET_URL: ${{ secrets.STARKSCAN_TESTNET_URL }}
-      ARGENT_TESTNET_RPC_URL: ${{ secrets.ARGENT_TESTNET_RPC_URL }}
-      ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
-      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
-      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+      ARGENT_MAINNET_RPC_URL: ${{ secrets.ARGENT_MAINNET_RPC_URL }}
+      ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
       ##slack config
       SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
       SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+
+      E2E_MAINNET_SEED1: ${{ secrets.E2E_MAINNET_SEED1 }}
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
       # Refresh intervals
       REFRESH_INTERVAL_FAST: 1 # 1s
       REFRESH_INTERVAL_MEDIUM: 5 # 5s
       REFRESH_INTERVAL_SLOW: 20 # 20s
       REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
+      E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: "pnpm"
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Restore cached build
+        uses: actions/cache@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }}
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
+      - name: Run e2e prod tests
+        run: xvfb-run --auto-servernum pnpm test:e2e:extension:prod --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-artifacts-prod-${{ matrix.shardIndex }}
+          path: |
+            packages/e2e/artifacts/playwright/
+            !packages/e2e/artifacts/playwright/*.webm
+          retention-days: 5
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-blob-reports-prod-${{ matrix.shardIndex }}
+          path: packages/e2e/blob-report/
+          retention-days: 5
+
+  test-e2e-tx:
+    runs-on: ubuntu-latest
+    needs: [build-all-artifacts]
+    strategy:
+      matrix:
+        project: [ArgentX]
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
+    env:
+      #default
+      ARGENT_X_ENVIRONMENT: "hydrogen"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
+      ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
+      ##slack config
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+
+      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
+      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
+      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
+
+      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
+      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+
+      E2E_USE_STRK_AS_FEE_TOKEN: ${{ secrets.E2E_USE_STRK_AS_FEE_TOKEN }}
+      E2E_SKIP_TX_TESTS: ${{ secrets.E2E_SKIP_TX_TESTS}}
+      E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
+      E2E_GUARDIAN_EMAIL: ${{ secrets.E2E_GUARDIAN_EMAIL }}
+      # Refresh intervals
+      REFRESH_INTERVAL_FAST: 1 # 1s
+      REFRESH_INTERVAL_MEDIUM: 5 # 5s
+      REFRESH_INTERVAL_SLOW: 20 # 20s
+      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 9
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          cache: "pnpm"
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Restore cached build
+        uses: actions/cache@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }}
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium
+
+      - name: Run e2e tx tests
+        run: xvfb-run --auto-servernum pnpm test:e2e:extension:tx --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-artifacts-tx-${{ matrix.shardIndex }}
+          path: |
+            packages/e2e/artifacts/playwright/
+            !packages/e2e/artifacts/playwright/*.webm
+          retention-days: 5
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-blob-reports-tx-${{ matrix.shardIndex }}
+          path: packages/e2e/blob-report/
+          retention-days: 5
+
+  test-notify-low-balance:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [build-all-artifacts, test-e2e, test-e2e-prod]
+    env:
+      ARGENT_X_ENVIRONMENT: "hydrogen"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
+      ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
+
+      ##slack config
+      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 9
           run_install: false
 
       - uses: actions/setup-node@v4
@@ -343,23 +504,23 @@ jobs:
         run: pnpm run test:e2e:slack-notifications
 
   merge-reports:
-    needs: [test-e2e, test-webwallet]
+    needs: [test-e2e, test-e2e-prod]
     if: always()
 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: "18.x"
           cache: "pnpm"
 
       - name: Restore pnpm cache
@@ -390,16 +551,16 @@ jobs:
   add_pr_comments:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'}} # Run only for pull requests and if not triggered by dependabot
-    needs: [build-all-artifacts, test-unit, test-e2e]
+    needs: [build-all-artifacts, test-unit, test-e2e, test-e2e-prod]
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - uses: actions/setup-node@v4
@@ -428,18 +589,18 @@ jobs:
   create_sentry_release:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'}} # Run only for pull requests and if not triggered by dependabot
-    needs: [build-all-artifacts, test-unit, test-e2e]
+    needs: [build-all-artifacts, test-unit, test-e2e, test-e2e-prod]
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9
           run_install: false
 
       - uses: actions/setup-node@v4
@@ -481,100 +642,10 @@ jobs:
           version: ${{ steps.package-version.outputs.current-version }}-rc__${{ github.sha }}
           ignore_missing: true
 
-  test-webwallet:
-    runs-on: ubuntu-latest
-    needs: [build-all-artifacts]
-    continue-on-error: true
-
-    environment: hydrogen
-    env:
-      NEXT_PUBLIC_NETWORK: "testnet"
-      NEXT_PUBLIC_RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
-      NEXT_PUBLIC_FEATURE_COSIGNER: "true"
-      NEXT_PUBLIC_ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
-      NEXT_PUBLIC_ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
-
-      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
-      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
-      E2E_TESTNET_SEED2: ${{ secrets.E2E_TESTNET_SEED2 }}
-      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
-      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
-      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
-      E2E_ACCOUNT_1_SEED3: ${{ secrets.E2E_ACCOUNT_1_SEED3 }}
-      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
-      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES }}
-      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
-      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
-      STARKNET_TESTNET_URL: ${{ secrets.STARKNET_TESTNET_URL }}
-      STARKSCAN_TESTNET_URL: ${{ secrets.STARKSCAN_TESTNET_URL }}
-      ARGENT_TESTNET_RPC_URL: ${{ secrets.ARGENT_TESTNET_RPC_URL }}
-      ARGENT_HEALTHCHECK_BASE_URL: ${{ secrets.ARGENT_HEALTHCHECK_BASE_URL }}
-      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
-      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
-      ##slack config
-      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-
-      ##webwallet default account config
-      WW_EMAIL: ${{ secrets.WW_EMAIL }}
-      WW_PIN: ${{ secrets.WW_PIN }}
-      WW_LOGIN_PASSWORD: ${{ secrets.WW_LOGIN_PASSWORD }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "18.x"
-          cache: "pnpm"
-
-      - name: Restore cached build
-        uses: actions/cache@v4
-        with:
-          path: ./*
-          key: ${{ github.sha }}
-
-      - name: Build webwallet
-        run: pnpm run build:web
-
-      - name: Install Playwright Browsers
-        run: pnpm playwright install --with-deps
-
-      - name: Run tests
-        run: |
-          pnpm run --filter @argent/web start:ci &
-          sleep 10 &&
-          curl http://localhost:3005 &&
-          pnpm run test:e2e:webwallet
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-artifacts-webwallet
-          path: |
-            packages/e2e/artifacts/playwright/
-          retention-days: 5
-
-      - name: Upload blob report to GitHub Actions Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: all-blob-reports-webwallet-webwallet
-          path: packages/e2e/blob-report/
-          retention-days: 5
-
   slack_notif:
     runs-on: ubuntu-latest
     if: always()
-    needs: [test-unit, test-e2e, test-webwallet]
+    needs: [test-unit, test-e2e]
 
     steps:
       - name: Send notification to Slack
@@ -596,4 +667,17 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BUILD_TYPE: ${{ github.event_name == 'pull_request' && 'pull request' || 'develop' }}
-          BUILD_STATUS: ${{ needs.test-unit.result == 'success' && needs.test-e2e.result == 'success' && needs.test-webwallet.result == 'success' && 'good' || 'danger' }}
+          BUILD_STATUS: ${{ needs.test-unit.result == 'success' && needs.test-e2e.result == 'success' && 'good' || 'danger' }}
+
+  check-ampli:
+    runs-on: ubuntu-latest
+    needs: [build-all-artifacts]
+    container:
+      image: amplitudeinc/ampli
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Verify analytics implementation and update status in Data
+        run: pwd && ampli status -t ${{secrets.AMPLI_TOKEN}} --update
+        working-directory: ./packages/extension

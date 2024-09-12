@@ -1,16 +1,16 @@
 import { getMessage } from "@extend-chrome/messages"
 import type { SendOptions } from "@extend-chrome/messages/types/types"
-
-import { AccountMessage } from "./AccountMessage"
-import { ActionMessage } from "./ActionMessage"
-import { MiscenalleousMessage } from "./MiscellaneousMessage"
-import { NetworkMessage } from "./NetworkMessage"
-import { PreAuthorisationMessage } from "./PreAuthorisationMessage"
-import { SessionMessage } from "./SessionMessage"
-import { TokenMessage } from "./TokenMessage"
-import { TransactionMessage } from "./TransactionMessage"
-import { UdcMessage } from "./UdcMessage"
 import { map } from "rxjs/operators"
+
+import type { AccountMessage } from "./AccountMessage"
+import type { ActionMessage } from "./ActionMessage"
+import type { MiscenalleousMessage } from "./MiscellaneousMessage"
+import type { NetworkMessage } from "./NetworkMessage"
+import type { PreAuthorisationMessage } from "./PreAuthorisationMessage"
+import type { SessionMessage } from "./SessionMessage"
+import type { TokenMessage } from "./TokenMessage"
+import type { TransactionMessage } from "./TransactionMessage"
+import type { UdcMessage } from "./UdcMessage"
 
 export type MessageType =
   | AccountMessage

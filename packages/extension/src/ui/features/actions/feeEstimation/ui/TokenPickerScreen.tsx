@@ -1,10 +1,9 @@
 import { TokenWithBalance } from "@argent/x-shared"
-import { NavigationContainer } from "@argent/x-ui"
+import { NavigationContainer, getTokenIconUrl } from "@argent/x-ui"
 import { FC, ReactNode } from "react"
 import { PageWrapper } from "../../../../components/Page"
 import { Grid } from "@chakra-ui/react"
 import { TokenOption } from "../../../../components/TokenOption"
-import { getTokenIconUrl } from "../../../accountTokens/TokenIcon"
 import { formatTokenBalance } from "../../../../services/tokens/utils"
 
 function toTokenView(token: TokenWithBalance): {

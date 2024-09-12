@@ -11,10 +11,10 @@ import {
   IStatusMessage,
   IStatusMessageLevel,
 } from "../../../shared/statusMessage/types"
-import { Button } from "../../components/Button"
 import { CloseRoundedIcon } from "../../components/Icons/MuiIcons"
 import { getColorForLevel } from "./getColorForLevel"
 import { StatusMessageIcon } from "./StatusMessageIcon"
+import { Button } from "@chakra-ui/react"
 
 export interface IStatusMessageBanner
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -152,11 +152,12 @@ export const StatusMessageBanner: FC<IStatusMessageBanner> = ({
           {linkTitle && linkUrl && (
             <Button
               as="a"
-              size="s"
-              variant={level}
+              size="2xs"
+              colorScheme={level}
               href={linkUrl}
               target="_blank"
-              style={{ marginTop: 16 }}
+              mt={4}
+              w="full"
             >
               {linkTitle}
             </Button>

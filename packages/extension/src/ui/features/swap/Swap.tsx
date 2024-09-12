@@ -1,22 +1,22 @@
-import { Button, CellStack, L2, icons } from "@argent/x-ui"
+import { Button, CellStack, L2, iconsDeprecated } from "@argent/x-ui"
 import { Box, Flex, IconButton, chakra, keyframes } from "@chakra-ui/react"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
+import { bigDecimal, ensureDecimals } from "@argent/x-shared"
+import { Token } from "../../../shared/token/__new/types/token.model"
+import { useSwapActionHandlers } from "./hooks/useSwapActionHandler"
+import { useSwapCallback } from "./hooks/useSwapCallback"
+import { SwapInputError, useSwapInfo } from "./hooks/useSwapInfo"
+import { Field, useSwapState } from "./state/fields"
+import { useUserState } from "./state/user"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
-import { SwapInputError, useSwapInfo } from "./hooks/useSwapInfo"
-import { bigDecimal, ensureDecimals } from "@argent/x-shared"
-import { Field, useSwapState } from "./state/fields"
-import { useSwapActionHandlers } from "./hooks/useSwapActionHandler"
-import { Token } from "../../../shared/token/__new/types/token.model"
-import { maxAmountSpendFromTokenBalance } from "./utils"
-import { SwapTradeLoading } from "./ui/SwapTradeLoading"
-import { useSwapCallback } from "./hooks/useSwapCallback"
-import { useAppState } from "../../app.state"
-import { useUserState } from "./state/user"
 import { SwapQuoteRefresh } from "./ui/SwapQuoteRefresh"
+import { SwapTradeLoading } from "./ui/SwapTradeLoading"
+import { maxAmountSpendFromTokenBalance } from "./utils"
+import { delay } from "../../../shared/utils/delay"
 
-const { SwitchDirectionIcon } = icons
+const { SwitchDirectionIcon } = iconsDeprecated
 
 const SwapContainer = chakra(CellStack, {
   baseStyle: {
@@ -71,11 +71,11 @@ const Swap = () => {
     parsedAmount,
     inputError: swapInputError,
   } = useSwapInfo()
-  const { independentField, typedValue } = useSwapState()
+
+  const { independentField, typedValue, resetTypedValue } = useSwapState()
   const { onTokenSelection, onUserInput, onSwitchTokens } =
     useSwapActionHandlers()
   const { userSlippageTolerance } = useUserState()
-  const { switcherNetworkId: networkId } = useAppState()
 
   const [rotate, setRotate] = useState(false)
   const [swapUnavailable, setSwapUnavailable] = useState(false)
@@ -96,6 +96,10 @@ const Swap = () => {
     }),
     [independentField, parsedAmount, trade],
   )
+
+  useEffect(() => {
+    resetTypedValue()
+  }, [resetTypedValue])
 
   const handleTypeInput = useCallback(
     (value: string) => {
@@ -179,17 +183,22 @@ const Swap = () => {
 
   const swapCallback = useSwapCallback(trade, userSlippageTolerance)
 
-  const handleSwap = useCallback(() => {
-    if (swapCallback) {
-      return swapCallback()
-        .then(() => {
-          onUserInput(Field.PAY, "")
-        })
-        .catch(() => {
-          setSwapUnavailable(true)
-        })
+  const handleSwap = useCallback(async () => {
+    if (!swapCallback) {
+      return
     }
-  }, [swapCallback, onUserInput, payToken, receiveToken, networkId])
+    try {
+      await swapCallback()
+      /**
+       * wait for store state to propagate into the ui and show the action screen
+       * otherwise the user will see a flash of the current screen resetting here
+       */
+      await delay(0)
+      onUserInput(Field.PAY, "")
+    } catch {
+      setSwapUnavailable(true)
+    }
+  }, [onUserInput, swapCallback])
 
   const showMaxButton = useMemo(
     () => !atMaxAmountInput && !formattedAmounts[Field.PAY] && !hasZeroBalance,

@@ -9,7 +9,7 @@ function getMockToken(options: {
   balance: string
 }): BaseTokenWithBalance {
   return {
-    account: { address: "0x0", networkId: "localhost" },
+    account: "0x0",
     address: options.address,
     balance: options.balance,
     networkId: "localhost",
@@ -28,7 +28,7 @@ const mockTokens: BaseTokenWithBalance[] = [
 
 describe("pickBestFeeToken", () => {
   it("should return the token from the default list", () => {
-    const result = pickBestFeeToken(mockTokens)
+    const result = pickBestFeeToken(mockTokens, "localhost")
     expect(result).toEqual(mockTokens[5])
   })
 
@@ -37,28 +37,35 @@ describe("pickBestFeeToken", () => {
       ...token,
       balance: "0",
     }))
-    const result = pickBestFeeToken(zeroBalanceTokens)
+    const result = pickBestFeeToken(zeroBalanceTokens, "localhost")
     expect(result).toEqual(zeroBalanceTokens[5])
   })
 
   it("should prefer tokens in the 'prefer' list", () => {
-    const result = pickBestFeeToken(mockTokens, { prefer: ["0x2", "0x7"] })
+    const result = pickBestFeeToken(mockTokens, "localhost", {
+      prefer: ["0x2", "0x7"],
+    })
     expect(result).toEqual(mockTokens[1])
   })
 
   it("should avoid tokens in the 'avoid' list", () => {
-    const result = pickBestFeeToken(mockTokens, { avoid: [STRK_TOKEN_ADDRESS] })
+    const result = pickBestFeeToken(mockTokens, "localhost", {
+      avoid: [STRK_TOKEN_ADDRESS],
+    })
     expect(result).toEqual(mockTokens[1])
   })
 
   it("should prefer tokens in the 'prefer' list even if they have a lower balance", () => {
-    const result = pickBestFeeToken(mockTokens, { prefer: ["0x2", "0x7"] })
+    const result = pickBestFeeToken(mockTokens, "localhost", {
+      prefer: ["0x2", "0x7"],
+    })
     expect(result).toEqual(mockTokens[1])
   })
 
   it("should return a token even if no token has a balance", () => {
     const result = pickBestFeeToken(
       mockTokens.filter((token) => token.balance === "0"),
+      "localhost",
     )
     expect(result).toEqual(mockTokens[0])
   })
@@ -66,6 +73,7 @@ describe("pickBestFeeToken", () => {
   it("should return a token even if no token has a balance and there are tokens in the 'prefer' list", () => {
     const result = pickBestFeeToken(
       mockTokens.filter((token) => token.balance === "0"),
+      "localhost",
       { prefer: ["0x2", "0x7"] },
     )
     expect(result).toEqual(mockTokens[0])

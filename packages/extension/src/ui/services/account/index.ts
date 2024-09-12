@@ -1,14 +1,12 @@
 import { accountRepo } from "../../../shared/account/store"
+import { multisigBaseWalletRepo } from "../../../shared/multisig/repository"
 import { settingsStore } from "../../../shared/settings"
 import { multisigService } from "../multisig"
-import { ClientAccountService } from "./implementation"
+import { ClientAccountService } from "./ClientAccountService"
 
-// export interfaces
-export type { IAccountService } from "./interface"
-
-// export singletons
 export const clientAccountService = new ClientAccountService(
   accountRepo,
+  multisigBaseWalletRepo,
   multisigService,
   settingsStore,
 )

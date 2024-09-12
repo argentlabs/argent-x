@@ -1,8 +1,6 @@
 import { accountSharedService } from "../account/service"
 import { settingsStore } from "../settings"
-import { AnalyticsService } from "./implementation"
+import { AnalyticsService } from "./AnalyticsService"
 
-export const analyticsService = new AnalyticsService(
-  accountSharedService,
-  settingsStore,
-)
+// We name this ampli for the CI to properly check the usage of the analytics service
+export const ampli = new AnalyticsService(accountSharedService, settingsStore)

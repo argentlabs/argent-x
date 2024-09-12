@@ -11,6 +11,7 @@ export interface StarknetIdCopyButtonProps extends ButtonProps {
 export const StarknetIdCopyButton: FC<StarknetIdCopyButtonProps> = ({
   starknetId,
   address,
+  ...rest
 }) => {
   const copyValue = normalizeAddress(address)
   return (
@@ -25,8 +26,7 @@ export const StarknetIdCopyButton: FC<StarknetIdCopyButtonProps> = ({
         borderRadius="100px"
         color="white.50"
         textAlign="center"
-        pb={1}
-        pt={0.5}
+        {...rest}
       >
         {starknetId}
       </Button>

@@ -36,7 +36,7 @@ export const FeeTokenPickerModal: FC<FeeTokenPickerModalProps> = ({
       size="full"
       initialFocusRef={initialFocusRef}
     >
-      <ModalContent bg="neutrals.900">
+      <ModalContent bg="surface-default">
         <ModalHeader>
           <H6 fontWeight="600" textAlign="center">
             Select fee token

@@ -1,4 +1,4 @@
-import { messageClient } from "../messaging/trpc"
-import { SessionService } from "./implementation"
+import { messageClient } from "../trpc"
+import { SessionService } from "./SessionService"
 
 export const sessionService = new SessionService(messageClient)

@@ -1,22 +1,26 @@
 import { useMemo } from "react"
-import { useView } from "../../views/implementation/react"
-import { knownDappsAtom } from "../../views/knownDapps"
+import { useKnownDapps } from "./knownDapps"
 
-export function useKnownDapps() {
-  const knownDapps = useView(knownDappsAtom)
-  return knownDapps
-}
+const normalizeHost = (h: string) => h.replace(/^www\./i, "")
 
 export function useDappFromKnownDappsByHost(host: string) {
   const knownDapps = useKnownDapps()
 
   return useMemo(
     () =>
-      knownDapps?.find(
-        (knownDapp) =>
-          knownDapp.dappUrl &&
-          new URL(knownDapp.dappUrl).host === new URL(host).host,
-      ),
+      knownDapps?.find((knownDapp) => {
+        if (!knownDapp.dappUrl) {
+          return undefined
+        }
+
+        try {
+          const knownHost = new URL(knownDapp.dappUrl).host
+          const inputHost = new URL(host).host
+          return normalizeHost(knownHost) === normalizeHost(inputHost)
+        } catch (error) {
+          return undefined
+        }
+      }),
     [host, knownDapps],
   )
 }
@@ -36,5 +40,20 @@ export function useDappFromKnownDappsByContractAddress(
         ),
       ),
     [contractAddress, knownDapps],
+  )
+}
+
+export function useDappFromKnownDappsByName(name?: string) {
+  const knownDapps = useKnownDapps()
+
+  return useMemo(
+    () =>
+      name
+        ? knownDapps?.find(
+            (knownDapp) =>
+              knownDapp.name.toLowerCase().trim() === name.toLowerCase().trim(),
+          )
+        : undefined,
+    [name, knownDapps],
   )
 }

@@ -1,15 +1,20 @@
-import { BarCloseButton, NavigationContainer, icons } from "@argent/x-ui"
+import {
+  BarCloseButton,
+  NavigationContainer,
+  iconsDeprecated,
+} from "@argent/x-ui"
 import { FC } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 import { Option } from "../../components/Options"
 import { PageWrapper, Paragraph, Title } from "../../components/Page"
-import { routes, useReturnTo } from "../../routes"
+import { useReturnTo } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import { CircleIconContainer } from "./ui/CircleIconContainer"
 import { ComingSoonIcon } from "./ui/ComingSoonIcon"
 import { Grid } from "@chakra-ui/react"
 
-const { RestoreIcon } = icons
+const { RestoreIcon } = iconsDeprecated
 
 export const RecoverySetupScreen: FC = () => {
   const navigate = useNavigate()

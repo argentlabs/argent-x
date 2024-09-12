@@ -6,16 +6,17 @@ import {
   getAccountIdentifier,
   isStarknetDomainName,
 } from "@argent/x-shared"
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { FC, ReactNode, useEffect, useMemo, useState } from "react"
 
-import { useAppState } from "../../app.state"
 import { AccountListItem } from "../accounts/AccountListItem"
 import { AccountListItemWithBalance } from "../accounts/AccountListItemWithBalance"
 import { useAccountOrContact } from "./useAccountOrContact"
 import { useGetAddressFromDomainName } from "../send/useGetAddressFromDomainName"
+import { useView } from "../../views/implementation/react"
+import { selectedNetworkIdView } from "../../views/network"
 
-const { WalletIcon } = icons
+const { WalletIcon } = iconsDeprecated
 
 interface AccountAddressListItemProps {
   accountAddress: AddressOrDomain
@@ -31,13 +32,13 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
   truncated = false,
 }) => {
   const [addressFromDomain, setAddressFromDomain] = useState("")
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
 
   const isStarknetDomainNameAddress = isStarknetDomainName(accountAddress)
 
   const { result, error } = useGetAddressFromDomainName(
     accountAddress,
-    switcherNetworkId,
+    selectedNetworkId,
   )
 
   const { contact, account } = useAccountOrContact(accountAddress)
@@ -56,7 +57,7 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
     error,
     isStarknetDomainNameAddress,
     result,
-    switcherNetworkId,
+    selectedNetworkId,
   ])
 
   const accountDescription = useMemo(() => {
@@ -90,6 +91,8 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
         networkId={account.networkId}
         accountName={account.name}
         onClick={onClick}
+        isSmartAccount={account.type === "smart"}
+        isLedger={account.signer.type === "ledger"}
       />
     )
   }
@@ -113,7 +116,7 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
       accountName={isStarknetDomainNameAddress ? accountAddress : ""}
       accountAddress=""
       accountDescription={accountDescription}
-      networkId={switcherNetworkId}
+      networkId={selectedNetworkId}
       avatarSize={9}
       avatarIcon={<WalletIcon />}
       onClick={onClick}

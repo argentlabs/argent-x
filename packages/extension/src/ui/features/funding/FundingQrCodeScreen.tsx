@@ -5,7 +5,7 @@ import {
   H4,
   NavigationContainer,
   P2,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Button, Flex } from "@chakra-ui/react"
 import { FC, useCallback, useRef } from "react"
@@ -13,7 +13,7 @@ import { FC, useCallback, useRef } from "react"
 import { formatFullAddress, normalizeAddress } from "@argent/x-shared"
 import { QrCode } from "../../components/QrCode"
 
-const { CopyIcon } = icons
+const { CopyIcon } = iconsDeprecated
 
 interface FundingQrCodeScreenProps {
   onClose?: () => void

@@ -1,9 +1,9 @@
-import React, { FC, useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { accountMessagingService } from "../../../../services/accountMessaging"
 import { Flex } from "@chakra-ui/react"
 import {
   Button,
-  icons,
+  iconsDeprecated,
   CopyTooltip,
   P4,
   scrollbarStyle,
@@ -11,7 +11,7 @@ import {
   NavigationContainer,
 } from "@argent/x-ui"
 
-const { CopyIcon } = icons
+const { CopyIcon } = iconsDeprecated
 
 export const DeploymentDataScreen: FC = () => {
   const [deploymentData, setDeploymentData] = useState("")

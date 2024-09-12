@@ -5,23 +5,24 @@ import { FC } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
-import { Account } from "../accounts/Account"
-import { useRouteAccount } from "../shield/useRouteAccount"
+import { routes } from "../../../shared/ui/routes"
+import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 import {
   FieldValuesThresholdForm,
   useUpdateThresholdForm,
 } from "./hooks/useUpdateThreshold"
-import { useMultisig } from "./multisig.state"
+import { multisigView } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { SetConfirmationsInput } from "./SetConfirmationsInput"
 import { multisigService } from "../../services/multisig"
 import { SignerMetadata } from "../../../shared/multisig/types"
 import { decodeBase58 } from "@argent/x-shared"
+import { useView } from "../../views/implementation/react"
+import { WalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigConfirmationsScreen: FC = () => {
-  const account = useRouteAccount()
+  const account = useRouteWalletAccount()
   return (
     <MultisigSettingsWrapper>
       {account && <MultisigConfirmationsWithFormProvider account={account} />}
@@ -32,9 +33,9 @@ export const MultisigConfirmationsScreen: FC = () => {
 const MultisigConfirmationsWithFormProvider = ({
   account,
 }: {
-  account: Account
+  account: WalletAccount
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
 
   const methods = useUpdateThresholdForm(multisig?.threshold)
   return (
@@ -46,9 +47,9 @@ const MultisigConfirmationsWithFormProvider = ({
 export const MultisigConfirmationsWithOwners = ({
   account,
 }: {
-  account: Account
+  account: WalletAccount
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
   const navigate = useNavigate()
 
   const {
@@ -105,9 +106,9 @@ export const MultisigConfirmationsWithOwners = ({
 export const MultisigConfirmationsWithoutOwners = ({
   account,
 }: {
-  account: Account
+  account: WalletAccount
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
   const navigate = useNavigate()
 
   const {
@@ -146,13 +147,13 @@ export const BaseMultisigConfirmations = ({
   threshold,
   buttonTitle = "Next",
 }: {
-  account: Account
+  account: WalletAccount
   handleNextClick: () => void | Promise<void>
   totalSigners?: number
   threshold?: number
   buttonTitle?: string
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
 
   return (
     <Flex

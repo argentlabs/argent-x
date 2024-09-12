@@ -99,7 +99,7 @@ describe("AddTokenScreen", () => {
     }
 
     await act(async () => {
-      fireEvent.click(screen.getByText(/^Continue/))
+      screen.getByRole("button", { name: "Add token" }).click()
     })
 
     expect(onFormSubmit).toHaveBeenCalledWith({

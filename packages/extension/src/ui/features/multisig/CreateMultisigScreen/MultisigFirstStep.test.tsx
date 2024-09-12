@@ -31,7 +31,7 @@ test("renders the MultisigFirstStep component", () => {
       <MultisigFirstStep
         index={0}
         goNext={goNext}
-        networkId={"goerli-alpha"}
+        creatorSignerKey="creatorSignerKey"
       />,
     )
     // Assert that the title and subtitle are rendered
@@ -56,7 +56,7 @@ test("renders the MultisigFirstStep component", () => {
       <MultisigFirstStep
         index={0}
         goNext={goNext}
-        networkId={"goerli-alpha"}
+        creatorSignerKey="creatorSignerKey"
       />,
     )
     expect(container.firstChild).toMatchSnapshot()

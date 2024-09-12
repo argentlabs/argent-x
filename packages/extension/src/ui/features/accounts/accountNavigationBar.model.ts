@@ -4,8 +4,9 @@ import { ReactEventHandler } from "react"
 export interface AccountNavigationBarProps
   extends AccountNavigationBarContainerProps {
   accountName?: string
-  isShield?: boolean
+  isSmartAccount?: boolean
   isMultisig?: boolean
+  isLedgerAccount?: boolean
   onAccountList?: ReactEventHandler
   onSettings?: ReactEventHandler
   envLabel?: string

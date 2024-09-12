@@ -1,10 +1,9 @@
-import { P4, icons } from "@argent/x-ui"
+import { P4, iconsDeprecated, CallDataModal } from "@argent/x-ui"
 import { Flex, FlexProps, useDisclosure } from "@chakra-ui/react"
 import { Call } from "starknet"
-import { CallDataModal } from "./action/properties/ui/CallDataModal"
 import { FC } from "react"
 
-const { AlertFillIcon } = icons
+const { AlertFillIcon } = iconsDeprecated
 
 interface ReviewFallbackProps extends FlexProps {
   calls: Call[]

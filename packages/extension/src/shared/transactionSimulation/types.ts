@@ -1,13 +1,14 @@
 import {
   ArraySignatureType,
   Calldata,
-  Sequencer,
   TransactionType,
   constants,
 } from "starknet"
 
+import { Sequencer } from "starknet5"
+
 import { Fetcher } from "../api/fetcher"
-import { EstimatedFees } from "./fees/fees.model"
+import { EstimatedFees } from "@argent/x-shared/simulation"
 
 export type WEI = "WEI" | "wei"
 export type FRI = "FRI" | "fri"

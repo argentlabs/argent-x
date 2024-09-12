@@ -64,6 +64,10 @@ describe("useSwapCallback", () => {
     expect(swapServices.swapService.makeSwap).toHaveBeenCalledWith(
       mockCalls,
       "Swap ETH to DAI",
+      [
+        "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+      ],
     )
   })
 
@@ -129,6 +133,10 @@ describe("useSwapCallback", () => {
     expect(swapServices.swapService.makeSwap).toHaveBeenCalledWith(
       mockCalls,
       "Swap ETH to DAI",
+      [
+        "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+      ],
     )
   })
 })

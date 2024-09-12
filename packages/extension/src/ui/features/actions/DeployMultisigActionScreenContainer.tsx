@@ -1,9 +1,12 @@
 import { isObject } from "lodash-es"
-import { FC, useCallback } from "react"
+import { FC, useCallback, useState } from "react"
 
-import { useMultisig } from "../multisig/multisig.state"
-import { useActionScreen } from "./hooks/useActionScreen"
 import { ApproveDeployAccountScreen } from "./ApproveDeployAccount"
+import { useActionScreen } from "./hooks/useActionScreen"
+import { LedgerActionModal } from "./transaction/ApproveTransactionScreen/ledger/LedgerActionModal"
+import { useLedgerForTransaction } from "./hooks/useLedgerForTransaction"
+import { useDefaultFeeToken } from "./useDefaultFeeToken"
+import { TokenWithBalance } from "@argent/x-shared"
 
 export const DeployMultisigActionScreenContainer: FC = () => {
   const {
@@ -18,33 +21,63 @@ export const DeployMultisigActionScreenContainer: FC = () => {
       "DeployMultisigActionScreenContainer used with incompatible action.type",
     )
   }
-  const multisig = useMultisig(selectedAccount)
+
+  const defaultFeeToken = useDefaultFeeToken(selectedAccount)
+  const [feeToken, setFeeToken] = useState<TokenWithBalance>(defaultFeeToken)
+
   const onSubmit = useCallback(async () => {
-    const result = await approve()
+    const result = await approve({ feeTokenAddress: feeToken.address })
     if (isObject(result) && "error" in result) {
       // stay on error screen
     } else {
-      if (
-        isObject(result) &&
-        "txHash" in result &&
-        typeof result.txHash === "string"
-      ) {
-        multisig?.updateDeployTx(result.txHash)
-      }
       void closePopupIfLastAction()
     }
-  }, [approve, closePopupIfLastAction, multisig])
+  }, [approve, closePopupIfLastAction, feeToken.address])
+
+  const {
+    disableLedgerApproval,
+    isLedgerApprovalOpen,
+    ledgerErrorMessage,
+    onLedgerApprovalClose,
+    onLedgerApprovalOpen,
+    isLedgerSigner,
+  } = useLedgerForTransaction(selectedAccount)
+
+  const onSubmitWithLedger = async () => {
+    onLedgerApprovalOpen()
+    await onSubmit()
+  }
+
+  const onConfirm = () => {
+    if (isLedgerSigner) {
+      return onSubmitWithLedger()
+    }
+    return onSubmit()
+  }
 
   return (
-    <ApproveDeployAccountScreen
-      actionHash={action.meta.hash}
-      title={action.meta?.title}
-      iconKey={action.meta?.icon}
-      displayCalldata={action.payload.displayCalldata}
-      onSubmit={() => void onSubmit()}
-      onReject={() => void rejectAllActions()}
-      selectedAccount={selectedAccount}
-      actionIsApproving={Boolean(action.meta.startedApproving)}
-    />
+    <>
+      <ApproveDeployAccountScreen
+        actionHash={action.meta.hash}
+        title={action.meta?.title}
+        iconKey={action.meta?.icon}
+        displayCalldata={action.payload.displayCalldata}
+        onSubmit={onConfirm}
+        onReject={() => void rejectAllActions()}
+        selectedAccount={selectedAccount}
+        actionIsApproving={Boolean(action.meta.startedApproving)}
+        isLedger={isLedgerSigner}
+        disableLedgerApproval={disableLedgerApproval}
+        feeToken={feeToken}
+        setFeeToken={setFeeToken}
+      />
+      <LedgerActionModal
+        isOpen={isLedgerApprovalOpen}
+        onClose={onLedgerApprovalClose}
+        onSubmit={onSubmit}
+        errorMessage={ledgerErrorMessage}
+        account={selectedAccount}
+      />
+    </>
   )
 }

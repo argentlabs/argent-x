@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 export enum RISK_ASSESSMENT_ERROR_MESSAGE {
   ERROR_FETCHING = "Encountered an error while fetching risk assessment",

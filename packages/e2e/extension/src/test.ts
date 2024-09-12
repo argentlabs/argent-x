@@ -51,8 +51,8 @@ const createBrowserContext = () => {
     recordVideo: {
       dir: artifactsDir,
       size: {
-        width: 800,
-        height: 900,
+        width: 1080,
+        height: 720,
       },
     },
   })
@@ -68,20 +68,23 @@ const initBrowserWithExtension = async () => {
     )
   })
 
+  await browserContext.addInitScript(() => {
+    window.localStorage.setItem("onboardingExperiment", "E1A1")
+  })
+
   let page: Page = browserContext.pages()[0]
 
   await page.bringToFront()
-  await page.goto("chrome://inspect/#extensions")
-  const url = await page
-    .locator('#pages-list div[class="url"]:has-text("chrome-extension://")')
-    .textContent()
-  if (!url || !url.split("/")[2]) {
-    throw new Error("Invalid extension URL")
-  }
-  const extensionId = url.split("/")[2]
+  await page.goto("chrome://extensions")
+  await page.locator('[id="devMode"]').click()
+  const extensionId = (
+    await page.locator('[id="extension-id"]').first().textContent()
+  )?.replace("ID: ", "")
+
   const extensionURL = `chrome-extension://${extensionId}/index.html`
-  await page.waitForTimeout(500)
   const pages = browserContext.pages()
+  await page.goto(extensionURL)
+  await page.waitForTimeout(500)
 
   const extPage = pages.find(
     (x: { url: () => string }) => x.url() === extensionURL,
@@ -94,6 +97,19 @@ const initBrowserWithExtension = async () => {
   }
 
   await page.emulateMedia({ reducedMotion: "reduce" })
+
+  /*const ex = await browserContext.addInitScript(() => {
+    window.localStorage.getItem("onboardingExperiment")
+  })
+  console.log('token previous', ex)
+
+  await browserContext.addInitScript((storage) => {
+    storage.setItem("onboardingExperiment", "E1A1")
+  })
+   const ex2 = await browserContext.addInitScript(() => {
+    window.localStorage.getItem("onboardingExperiment")
+  })
+  console.log('token after', ex2)*/
   return { browserContext, extensionURL, page }
 }
 
@@ -126,6 +142,7 @@ function getContext() {
 const test = testBase.extend<TestExtensions>({
   extension: createExtension("extension"),
   secondExtension: createExtension("secondExtension"),
+  thirdExtension: createExtension("thirdExtension"),
   browserContext: getContext(),
 })
 

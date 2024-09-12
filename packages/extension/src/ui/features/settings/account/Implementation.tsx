@@ -1,9 +1,9 @@
-import { H6, icons } from "@argent/x-ui"
+import { H6, iconsDeprecated } from "@argent/x-ui"
 import { ArgentAccountType } from "../../../../shared/wallet.model"
 import { FC, ReactNode } from "react"
 import { AutoColumn } from "../../../components/Column"
 
-const { WalletIcon, PluginIcon, MulticallIcon } = icons
+const { WalletIcon, PluginIcon, MulticallIcon } = iconsDeprecated
 
 export interface Implementation {
   id: ArgentAccountType

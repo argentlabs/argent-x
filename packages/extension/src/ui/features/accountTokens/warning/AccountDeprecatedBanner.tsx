@@ -1,9 +1,9 @@
-import { AlertButton, icons } from "@argent/x-ui"
+import { AlertButton, iconsDeprecated } from "@argent/x-ui"
 import { FC } from "react"
 import { To, useNavigate } from "react-router-dom"
 import { BannerRouteState } from "../UpgradeBanner"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 export interface UpgradeBannerProps {
   to: To

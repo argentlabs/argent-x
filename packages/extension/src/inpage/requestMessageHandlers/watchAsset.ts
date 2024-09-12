@@ -1,6 +1,7 @@
-import { WatchAssetParameters } from "@argent/x-window"
+import { WatchAssetParameters } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
 import { addressSchema } from "@argent/x-shared"
+import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 
 export async function watchAssetHandler(
   callParams: WatchAssetParameters,
@@ -50,10 +51,10 @@ export async function watchAssetHandler(
   ])
 
   if (result === "error") {
-    throw Error("User abort")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.UserAborted })
   }
   if (result === "timeout") {
-    throw Error("User action timed out")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.Unknown })
   }
 
   return true

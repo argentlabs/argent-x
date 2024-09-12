@@ -3,7 +3,7 @@ import {
   useERC20Transactions,
   useERC721Transactions,
 } from "@argent/x-shared"
-import { TextWithAmount, icons } from "@argent/x-ui"
+import { TextWithAmount, iconsDeprecated } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC, Fragment, PropsWithChildren, useMemo } from "react"
 
@@ -13,16 +13,13 @@ import {
   transactionReviewHasSwap,
   transactionReviewHasTransfer,
 } from "../../../../../../shared/transactionReview.service"
-import {
-  Property,
-  ReviewOfTransaction,
-} from "../../../../../../shared/transactionReview/schema"
+import { Property, ReviewOfTransaction } from "@argent/x-shared/simulation"
 import { useRemoteNft } from "../../../../accountNfts/useRemoteNft"
 import { useCurrentNetwork } from "../../../../networks/hooks/useCurrentNetwork"
 import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"
 
-const { ArrowRightIcon } = icons
+const { ArrowRightIcon } = iconsDeprecated
 
 export interface TransactionTitleArgentXProps {
   transactionReview?: ReviewOfTransaction
@@ -69,10 +66,10 @@ export const TransactionTitleArgentX: FC<TransactionTitleArgentXProps> = ({
       return <Title>Replace multisig owner</Title>
     case ApproveScreenType.MULTISIG_UPDATE_THRESHOLD:
       return <Title>Set confirmations</Title>
-    case ApproveScreenType.ADD_ARGENT_SHIELD:
-      return <Title>Add Argent Shield</Title>
-    case ApproveScreenType.REMOVE_ARGENT_SHIELD:
-      return <Title>Remove Argent Shield</Title>
+    case ApproveScreenType.ADD_GUARDIAN:
+      return <Title>Add Guardian</Title>
+    case ApproveScreenType.REMOVE_GUARDIAN:
+      return <Title>Remove Guardian</Title>
   }
 
   // Check for specific transaction types

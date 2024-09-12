@@ -15,7 +15,7 @@ import { getProvider } from "../network"
 import { networkService } from "../network/service"
 import { MultisigEntryPointType } from "../multisig/types"
 import { getAccountCairoVersionFromChain } from "./details/getAccountCairoVersionFromChain"
-import { getBatchProvider } from "@argent/x-multicall"
+import { RpcBatchProvider } from "@argent/x-multicall"
 
 type UpdateScope = "all" | "implementation" | "deploy" | "guardian"
 
@@ -87,12 +87,10 @@ export async function updateMultisigAccountDetails(
           const { address, networkId } = multisigAccount
           const network = await networkService.getById(networkId)
           const provider = getProvider(network)
-          const multicall = getBatchProvider(
-            provider,
-            undefined, // batch options
-            network.multicallAddress,
-          )
-          const { result } = await multicall.callContract({
+          const multicall = new RpcBatchProvider({
+            nodeUrl: provider.channel.nodeUrl,
+          })
+          const result = await multicall.callContract({
             contractAddress: address,
             entrypoint,
           })

@@ -3,7 +3,7 @@ import { Box, Flex } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 import { Call } from "starknet"
 
-import { ReviewOfTransaction } from "../../../../../../shared/transactionReview/schema"
+import { ReviewOfTransaction } from "@argent/x-shared/simulation"
 import { KnownDappButtonWrapper } from "../../../connectDapp/KnownDappButtonWrapper"
 import { ApproveScreenType } from "../../types"
 import { AggregatedSimData } from "../../useTransactionSimulatedData"

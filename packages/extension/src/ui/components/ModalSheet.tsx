@@ -23,7 +23,7 @@ export const ModalSheet: FC<DrawerProps> = ({ children, ...rest }) => {
         <ResponsiveBox display={"flex"} flex={1} flexDirection={"column"}>
           <Flex
             flex={1}
-            bg={"bg"}
+            bg={"surface-default"}
             borderTopRadius={"lg"}
             flexDirection={"column"}
             pointerEvents={"auto"}

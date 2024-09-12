@@ -5,11 +5,16 @@ import { BlockExplorerKey } from "../../../../shared/settings/defaultBlockExplor
 import { useKeyValueStorage } from "../../../hooks/useStorage"
 import { BlockExplorerSettingsScreen } from "./BlockExplorerSettingsScreen"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
+import { ampli } from "../../../../shared/analytics"
 
 export const BlockExplorerSettingsScreenContainer: FC = () => {
   const onBack = useNavigateReturnToOrBack()
   const blockExplorerKey = useKeyValueStorage(settingsStore, "blockExplorerKey")
   const onChange = (key: BlockExplorerKey) => {
+    void ampli.blockerExplorerChanged({
+      provider: key,
+      "wallet platform": "browser extension",
+    })
     void settingsStore.set("blockExplorerKey", key)
   }
   return (

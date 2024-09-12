@@ -1,7 +1,7 @@
 import { Button, Warning } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
-import { routes } from "../../../routes"
+import { routes } from "../../../../shared/ui/routes"
 
 export const BeforeYouContinueScreen = () => {
   const navigate = useNavigate()

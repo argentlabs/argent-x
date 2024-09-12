@@ -1,11 +1,9 @@
 import { useMemo } from "react"
 
-import { useAppState } from "../../app.state"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
+import { useTokensInCurrentNetwork } from "../accountTokens/tokens.state"
 
 export const useFilteredTokens = (query?: string) => {
-  const { switcherNetworkId } = useAppState()
-  const tokens = useTokensInNetwork(switcherNetworkId)
+  const tokens = useTokensInCurrentNetwork()
 
   const filteredTokens = useMemo(() => {
     if (!query) {

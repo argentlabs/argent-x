@@ -7,12 +7,12 @@ import {
   IStatusMessage,
   IStatusMessageLevel,
 } from "../../../shared/statusMessage/types"
-import { Button } from "../../components/Button"
 import { CloseIcon } from "../../components/Icons/CloseIcon"
 import { Paragraph, Title } from "../../components/Page"
 import { getColorForLevel } from "./getColorForLevel"
 import { StatusMessageIcon } from "./StatusMessageIcon"
 import { useStatusMessage } from "./useStatusMessage"
+import { Button } from "@chakra-ui/react"
 
 export interface IStatusMessageFullScreen {
   statusMessage: IStatusMessage | undefined
@@ -110,11 +110,11 @@ export const StatusMessageFullScreen: FC<IStatusMessageFullScreen> = ({
         <MessageText>{message}</MessageText>
       </SummaryContainer>
       {hasLink ? (
-        <Button as="a" variant={level} href={linkUrl} target="_blank">
+        <Button as="a" colorScheme={level} href={linkUrl} target="_blank">
           {linkTitle}
         </Button>
       ) : (
-        <Button variant={level} onClick={onClose}>
+        <Button colorScheme={level} onClick={onClose}>
           Got it
         </Button>
       )}

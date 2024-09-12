@@ -1,6 +1,6 @@
 export const testDappSignature = {
   domain: {
-    chainId: "SN_GOERLI",
+    chainId: "SN_SEPOLIA",
     name: "Example DApp",
     version: "0.0.1",
   },

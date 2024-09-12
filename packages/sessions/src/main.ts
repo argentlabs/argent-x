@@ -1,5 +1,0 @@
-export * from "./utils"
-export * from "./offchainSessionUtils"
-export { SessionAccount } from "./account"
-export { OffchainSessionAccount } from "./offchainSessionAccount"
-export { OffchainSessionAccount as default } from "./offchainSessionAccount"

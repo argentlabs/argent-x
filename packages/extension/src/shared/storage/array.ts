@@ -65,8 +65,8 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
     return isFunction(setterOrArray)
       ? setterOrArray(setterArg)
       : Array.isArray(setterOrArray)
-      ? setterOrArray
-      : [setterOrArray]
+        ? setterOrArray
+        : [setterOrArray]
   }
 
   public async push(value: AllowArray<T> | SetterFn<T>): Promise<void> {
@@ -100,8 +100,8 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
     const valuesToRemove = isFunction(value)
       ? await this.get(value)
       : Array.isArray(value)
-      ? value
-      : [value]
+        ? value
+        : [value]
     const newAll = differenceWith(all, valuesToRemove, this.compare)
     await this.storageImplementation.set(newAll)
     return valuesToRemove

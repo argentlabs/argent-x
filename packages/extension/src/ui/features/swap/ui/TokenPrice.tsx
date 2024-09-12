@@ -1,7 +1,6 @@
-import { P4, TokenButton } from "@argent/x-ui"
+import { P4, TokenButton, getTokenIconUrl } from "@argent/x-ui"
 import { FC } from "react"
 
-import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 import {
   useTokenAmountToCurrencyValue,
   useTokenPriceDetails,

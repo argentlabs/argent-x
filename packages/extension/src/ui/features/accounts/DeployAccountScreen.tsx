@@ -1,10 +1,10 @@
-import { Button, P3, icons } from "@argent/x-ui"
+import { Button, P3, iconsDeprecated } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
 import { StarknetAccountMessage } from "./ui/StarknetAccountMessage"
 
-const { DeployIcon } = icons
+const { DeployIcon } = iconsDeprecated
 
 interface DeployAccountScreenProps extends DeployAccountScreenContainerProps {
   onActivate: ReactEventHandler

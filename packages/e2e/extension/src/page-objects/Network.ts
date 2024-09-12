@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test"
 
-type NetworkName = "Devnet" | "Goerli" | "Mainnet" | "My Network"
+type NetworkName = "Devnet" | "Sepolia" | "Mainnet" | "My Network"
 
 export function getDefaultNetwork() {
   const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
@@ -17,7 +17,7 @@ export function getDefaultNetwork() {
 
     case "hydrogen":
     case "test":
-      defaultNetworkId = "goerli-alpha"
+      defaultNetworkId = "sepolia-alpha"
       break
 
     default:

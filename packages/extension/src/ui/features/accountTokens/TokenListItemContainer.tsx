@@ -2,15 +2,12 @@ import { FC } from "react"
 
 import { Account } from "../accounts/Account"
 import { TokenListItem, TokenListItemProps } from "./TokenListItem"
-import { useTokenBalanceToCurrencyValue } from "./tokenPriceHooks"
 import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
-import { Token } from "../../../shared/token/__new/types/token.model"
-import { hideTokensWithNoBalanceView } from "../../views/settings"
-import { useView } from "../../views/implementation/react"
+import { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
 
 export interface TokenListItemContainerProps
-  extends Omit<TokenListItemProps, "currencyValue"> {
-  token: Token
+  extends Omit<TokenListItemProps, "currencyValue" | "token"> {
+  token: TokenWithBalanceAndPrice
   account: Pick<Account, "network" | "address" | "networkId">
 }
 
@@ -27,21 +24,20 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
     token,
     account,
   })
-  const currencyValue = useTokenBalanceToCurrencyValue(tokenWithBalance)
-  const hideTokensWithNoBalance = useView(hideTokensWithNoBalanceView)
+
   const shouldShow =
     token.showAlways ||
-    !hideTokensWithNoBalance ||
+    token.custom ||
     (tokenWithBalance?.balance && tokenWithBalance.balance > 0n)
   if (!shouldShow || tokenWithBalance === undefined) {
     return null
   }
+
   return (
     <TokenListItem
-      token={tokenWithBalance}
-      currencyValue={currencyValue}
+      token={token}
+      currencyValue={token.usdValue}
       isLoading={false}
-      errorMessage={undefined}
       {...rest}
     />
   )

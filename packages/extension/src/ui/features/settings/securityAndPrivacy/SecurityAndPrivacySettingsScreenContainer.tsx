@@ -3,7 +3,7 @@ import { settingsStore } from "../../../../shared/settings"
 import { useKeyValueStorage } from "../../../hooks/useStorage"
 import { SecurityAndPrivacySettingsScreen } from "./SecurityAndPrivacySettingsScreen"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
-import { useCurrentPathnameWithQuery } from "../../../routes"
+import { useCurrentPathnameWithQuery } from "../../../hooks/useRoute"
 
 export const SecurityAndPrivacySettingsScreenContainer: FC = () => {
   const onBack = useNavigateReturnToOrBack()

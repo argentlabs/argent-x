@@ -25,6 +25,7 @@ export interface SwapState {
   typeInput: (params: TypeInput) => void
   replaceSwapState: (params: ReplaceSwapState) => void
   resetIndependentField: () => void
+  resetTypedValue: () => void
 }
 
 type SelectToken = {
@@ -47,7 +48,7 @@ type ReplaceSwapState = {
 const defaultNetworkChainId =
   defaultNetwork.id === "mainnet-alpha"
     ? constants.StarknetChainId.SN_MAIN
-    : constants.StarknetChainId.SN_GOERLI
+    : constants.StarknetChainId.SN_SEPOLIA
 
 export const initialState = {
   independentField: Field.PAY,
@@ -126,5 +127,11 @@ export const useSwapState = create<SwapState>()((set) => ({
     set((state) => ({
       ...state,
       independentField: Field.PAY,
+    })),
+
+  resetTypedValue: () =>
+    set((state) => ({
+      ...state,
+      typedValue: "",
     })),
 }))

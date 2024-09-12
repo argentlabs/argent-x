@@ -3,7 +3,6 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import { useIsPreauthorized } from "../../preAuthorizations/hooks"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
-import { useAppState } from "../../../app.state"
 import { visibleAccountsOnNetworkFamily } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { useActionScreen } from "../hooks/useActionScreen"
@@ -11,11 +10,12 @@ import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionSc
 import { ConnectDappScreen } from "./ConnectDappScreen"
 import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
 import { clientAccountService } from "../../../services/account"
-import { preAuthorizationService } from "../../../../shared/preAuthorization/service"
 import { useRiskAssessment } from "./useRiskAssessment"
 import { AccountNavigationBarContainer } from "../../accounts/AccountNavigationBarContainer"
 import { WarningBanner } from "../warning/WarningBanner"
 import { ReviewFooter } from "../warning/ReviewFooter"
+import { preAuthorizationUIService } from "../../../services/preAuthorization"
+import { selectedNetworkIdView } from "../../../views/network"
 
 export const ConnectDappScreenContainer: FC = () => {
   const {
@@ -57,9 +57,9 @@ export const ConnectDappScreenContainer: FC = () => {
     )
   }, [riskAssessment?.warning, reject])
 
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const visibleAccounts = useView(
-    visibleAccountsOnNetworkFamily(switcherNetworkId),
+    visibleAccountsOnNetworkFamily(selectedNetworkId),
   )
   const [connectedAccount, setConnectedAccount] = useState<
     BaseWalletAccount | undefined
@@ -91,7 +91,7 @@ export const ConnectDappScreenContainer: FC = () => {
 
   const onDisconnect = useCallback(async () => {
     if (selectedAccount) {
-      await preAuthorizationService.remove({
+      await preAuthorizationUIService.remove({
         account: selectedAccount,
         host: action.payload.host,
       })

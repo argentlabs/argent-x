@@ -1,7 +1,7 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { Box, Text } from "@chakra-ui/react"
 
-const { ImageIcon } = icons
+const { ImageIcon } = iconsDeprecated
 
 const NftFallback = () => (
   <Box height={0} width="100%" position="relative" pb="100%">

@@ -1,5 +1,7 @@
-import { TypedData } from "starknet"
+import { TypedData } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
+import { inpageMessageClient } from "../trpcClient"
+import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 
 export async function signTypedDataHandler(params: TypedData) {
   const skipDeploy = "skipDeploy" in params ? !!params.skipDeploy : false
@@ -18,6 +20,11 @@ export async function signTypedDataHandler(params: TypedData) {
       (x) => x.data.actionHash === actionHash,
     ),
     waitForMessage(
+      "SIGNATURES_PENDING",
+      10 * 60 * 1000,
+      (x) => x.data.actionHash === actionHash,
+    ),
+    waitForMessage(
       "SIGNATURE_FAILURE",
       10 * 60 * 1000,
       (x) => x.data.actionHash === actionHash,
@@ -33,11 +40,20 @@ export async function signTypedDataHandler(params: TypedData) {
   ])
 
   if (result === "timeout") {
-    throw Error("User action timed out")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.Unknown })
   }
 
   if ("error" in result) {
-    throw Error(result.error)
+    throw new WalletRPCError({
+      code: WalletRPCErrorCodes.UserAborted,
+      options: { error: result.error },
+    })
+  }
+
+  if ("requestId" in result) {
+    return await inpageMessageClient.multisig.waitForOffchainSignatures.mutate({
+      requestId: result.requestId,
+    })
   }
 
   return result.signature

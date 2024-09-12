@@ -70,15 +70,23 @@ export default class Settings {
     return this.page.locator(`button:text-is("${lang.common.hide}")`)
   }
   get hiddenAccounts() {
-    return this.page.locator(`button:text-is("${lang.common.hiddenAccounts}")`)
+    return this.page.locator(
+      `p:text-is("${lang.settings.preferences.hiddenAccounts}")`,
+    )
   }
 
   unhideAccount(accountName: string) {
     return this.page.locator(`button :text-is("${accountName}")`)
   }
 
-  argentShield() {
-    return this.page.locator('[data-testid="shield-switch"]')
+  get smartAccountButton() {
+    return this.page.locator('[data-testid="smart-account-button"]')
+  }
+
+  get changeToStandardAccountButton() {
+    return this.page.locator(
+      '[data-testid="smart-account-button"]:has-text("Change to Standard Account")',
+    )
   }
 
   get privateKey() {
@@ -98,12 +106,18 @@ export default class Settings {
   }
 
   get github() {
-    return this.page.getByRole("link", { name: "Github" })
+    return this.page.getByRole("link", { name: "GitHub" })
   }
 
   get viewOnStarkScanLocator() {
     return this.page.getByRole("button", {
       name: lang.settings.account.viewOnStarkScan,
+    })
+  }
+
+  get viewOnVoyagerLocator() {
+    return this.page.getByRole("button", {
+      name: lang.settings.account.viewOnVoyager,
     })
   }
 }

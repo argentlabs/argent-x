@@ -1,4 +1,4 @@
-import { AccordionIcon, P4, icons } from "@argent/x-ui"
+import { AccordionIcon, P4, iconsDeprecated } from "@argent/x-ui"
 import {
   Accordion,
   AccordionButton,
@@ -11,7 +11,7 @@ import { FC } from "react"
 import { FeeEstimationProps } from "../feeEstimation.model"
 import { CopyErrorIcon } from "./CopyErrorIcon"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 export const TransactionFailureAccordion: FC<
   Pick<FeeEstimationProps, "parsedFeeEstimationError">

@@ -4,31 +4,38 @@ import react from "@vitejs/plugin-react-swc"
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 
-export default defineConfig({
+import pkg from "./package.json"
+
+export default defineConfig(({ mode }) => ({
   plugins: [
     dts({
       insertTypesEntry: true,
+      tsconfigPath: resolvePath(__dirname, "tsconfig.json"),
+      exclude: [".eslintrc.js"],
     }),
     react(),
   ],
   build: {
     lib: {
-      entry: resolvePath(__dirname, "src/index.ts"),
+      entry: {
+        index: resolvePath(__dirname, "src/index.ts"),
+      },
       name: "stack-router",
-      formats: ["es", "umd"],
-      fileName: (format) => `stack-router.${format}.js`,
     },
-    emptyOutDir: false,
+    // only clean build folder in production - reduces 'hot reload' file system events in development
+    emptyOutDir: mode === "production",
+    // source maps only in development
+    sourcemap: mode === "development",
     rollupOptions: {
       external: [
-        "react",
-        "react-dom",
-        "react-router-dom",
+        // omit all peer dependencies
+        ...Object.keys(pkg.peerDependencies),
+        // additional used packages - check for these by setting preserveModules: true below and checking for node_modules in dist folder
         "react/jsx-runtime",
         "@chakra-ui/react",
-        "framer-motion",
       ],
       output: {
+        // preserveModules: true,
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
@@ -41,6 +48,7 @@ export default defineConfig({
     },
   },
   esbuild: {
-    pure: process.env.NODE_ENV === "production" ? ["console.log"] : [],
+    // strip console in production
+    pure: mode === "production" ? ["console.log", "console.warn"] : [],
   },
-})
+}))

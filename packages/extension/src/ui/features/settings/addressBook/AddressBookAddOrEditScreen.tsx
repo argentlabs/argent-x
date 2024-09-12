@@ -9,7 +9,7 @@ import {
   NavigationContainerProps,
   Select,
   SelectOptions,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import {
   addressInputCharactersAndLengthSchema,
@@ -41,7 +41,7 @@ import { ControlledInput } from "../../../components/ControlledInput"
 import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
 import { useGetAddressFromDomainNameInput } from "../../send/useGetAddressFromDomainName"
 
-const { ProfileIcon, BinIcon } = icons
+const { ProfileIcon, BinIcon } = iconsDeprecated
 
 export interface AddressBookAddOrEditScreeProps
   extends NavigationContainerProps {

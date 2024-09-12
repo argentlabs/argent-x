@@ -1,7 +1,7 @@
 import { Option } from "@argent-x/extension/src/ui/components/Options"
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 
-const { CardIcon } = icons
+const { CardIcon } = iconsDeprecated
 
 export default {
   component: Option,

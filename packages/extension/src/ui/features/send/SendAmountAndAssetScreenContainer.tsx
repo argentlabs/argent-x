@@ -2,13 +2,14 @@ import { FC, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useDisclosure } from "@chakra-ui/react"
-import { useAppState } from "../../app.state"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { SendAmountAndAssetNftScreenContainer } from "./SendAmountAndAssetNftScreenContainer"
 import { SendAmountAndAssetTokenScreenContainer } from "./SendAmountAndAssetTokenScreenContainer"
-import { useSendQuery } from "./schema"
+import { useSendQuery } from "./useSendQuery"
 import { useAccountOrContact } from "../accounts/useAccountOrContact"
+import { selectedNetworkIdView } from "../../views/network"
+import { useView } from "../../views/implementation/react"
 
 export const SendAmountAndAssetScreenContainer: FC = () => {
   const navigate = useNavigate()
@@ -23,7 +24,7 @@ export const SendAmountAndAssetScreenContainer: FC = () => {
     onOpen: onOpenAddContact,
     onClose: onCloseAddContact,
   } = useDisclosure()
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
 
   const onBack = useNavigateReturnToOrBack()
   const onCancel = () => navigate(routes.accountTokens(), { replace: true })
@@ -60,7 +61,7 @@ export const SendAmountAndAssetScreenContainer: FC = () => {
       returnTo={returnTo}
       isAddContactOpen={isAddContactOpen}
       onCloseAddContact={onCloseAddContact}
-      switcherNetworkId={switcherNetworkId}
+      selectedNetworkId={selectedNetworkId}
       onSaveContact={onSaveContact}
       showSaveAddressButton={!isExistingContactOrAccount}
     />

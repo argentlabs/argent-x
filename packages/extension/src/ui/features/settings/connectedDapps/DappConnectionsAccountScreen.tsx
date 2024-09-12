@@ -5,7 +5,7 @@ import {
   H6,
   NavigationContainer,
   P4,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
@@ -13,7 +13,7 @@ import { Flex } from "@chakra-ui/react"
 import { DappConnectionMenuItem } from "../ui/DappConnectionMenuItem"
 import { PreAuthorization } from "../../../../shared/preAuthorization/schema"
 
-const { LinkIcon } = icons
+const { LinkIcon } = iconsDeprecated
 
 interface DappConnectionsAccountScreenProps {
   accountName?: string

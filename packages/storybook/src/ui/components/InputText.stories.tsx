@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import { Button } from "@argent-x/extension/src/ui/components/Button"
 import Column from "@argent-x/extension/src/ui/components/Column"
 import { StyledControlledInput } from "@argent-x/extension/src/ui/components/InputText"
+import { Button } from "@chakra-ui/react"
 import { ComponentProps, FC, useCallback } from "react"
 import { useForm } from "react-hook-form"
 

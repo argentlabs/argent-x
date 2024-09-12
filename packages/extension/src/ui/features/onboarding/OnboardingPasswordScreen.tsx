@@ -9,8 +9,9 @@ import { ControlledInput } from "../../components/ControlledInput"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import { PasswordStrengthIndicator } from "@argent/x-ui"
+import { IS_DEV } from "../../../shared/utils/dev"
 
-const MIN_PASSWORD_LENGTH = 8
+const MIN_PASSWORD_LENGTH = IS_DEV ? 1 : 8
 const setPasswordFormSchema = z
   .object({
     password: z
@@ -67,10 +68,10 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
   const submitButtonText = useMemo(
     () =>
       errors.root?.message
-        ? submitText?.retryAfterError ?? "Retry create wallet"
+        ? submitText?.retryAfterError ?? "Retry"
         : isSubmitting
-          ? submitText?.submitting ?? "Creating wallet…"
-          : submitText?.start ?? "Create wallet",
+          ? submitText?.submitting ?? "Continuing..."
+          : submitText?.start ?? "Continue",
     [isSubmitting, errors.root?.message, submitText],
   )
 
@@ -85,8 +86,8 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
   return (
     <OnboardingScreen
       onBack={onBack}
-      length={length ?? 4}
-      currentIndex={currentIndex ?? 2}
+      length={length ?? 5} // there are 5 steps in the onboarding process
+      currentIndex={currentIndex ?? 2} // this is the 3rd step
       title={title}
       subtitle="Enter a password to protect your wallet"
     >

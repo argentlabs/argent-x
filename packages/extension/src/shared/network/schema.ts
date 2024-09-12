@@ -56,12 +56,6 @@ export const networkSchema = baseNetworkSchema.extend({
           message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,
         })
         .optional(),
-      txv1Standard: z
-        .string()
-        .regex(REGEX_HEXSTRING, {
-          message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,
-        })
-        .optional(),
       standardCairo0: z
         .string()
         .regex(REGEX_HEXSTRING, {
@@ -87,6 +81,12 @@ export const networkSchema = baseNetworkSchema.extend({
         })
         .optional(),
       argent5MinuteEscapeTestingAccount: z
+        .string()
+        .regex(REGEX_HEXSTRING, {
+          message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,
+        })
+        .optional(),
+      smart: z
         .string()
         .regex(REGEX_HEXSTRING, {
           message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,

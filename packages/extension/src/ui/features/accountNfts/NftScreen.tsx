@@ -6,7 +6,7 @@ import {
   H5,
   NavigationContainer,
   P4,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import {
   Accordion,
@@ -22,7 +22,7 @@ import { FC } from "react"
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { NftImage } from "./NftImage"
 
-const { SendIcon, ViewIcon } = icons
+const { SendIcon, ViewIcon } = iconsDeprecated
 
 interface NftScreenProps {
   nft: NftItem
@@ -88,7 +88,7 @@ export const NftScreen: FC<NftScreenProps> = ({
         )}
 
         <SimpleGrid
-          bg="neutrals.900"
+          bg="surface-default"
           position="fixed"
           bottom="0"
           left="0"

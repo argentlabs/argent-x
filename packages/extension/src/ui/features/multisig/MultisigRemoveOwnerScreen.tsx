@@ -2,21 +2,23 @@ import { FC, useMemo } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
-import { routes, useRouteSignerToRemove } from "../../routes"
-import { Account } from "../accounts/Account"
-import { useRouteAccount } from "../shield/useRouteAccount"
+import { useRouteSignerToRemove } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
+import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import {
   FieldValuesThresholdForm,
   useUpdateThresholdForm,
 } from "./hooks/useUpdateThreshold"
-import { useMultisig } from "./multisig.state"
+import { multisigView } from "./multisig.state"
 import { BaseMultisigConfirmations } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { multisigService } from "../../services/multisig"
 import { decodeBase58 } from "@argent/x-shared"
+import { useView } from "../../views/implementation/react"
+import { WalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigRemoveOwnersScreen: FC = () => {
-  const account = useRouteAccount()
+  const account = useRouteWalletAccount()
   const signerToRemove = useRouteSignerToRemove()
 
   return (
@@ -35,10 +37,10 @@ const MultisigRemoveOwnerAccountWrapper = ({
   account,
   signerToRemove,
 }: {
-  account: Account
+  account: WalletAccount
   signerToRemove: string
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
 
   const newTotalSigners = useMemo(
     () => (multisig?.signers.length ? multisig.signers.length - 1 : undefined),
@@ -75,7 +77,7 @@ const MultisigRemove = ({
   totalSigners,
   newThreshold,
 }: {
-  account: Account
+  account: WalletAccount
   multisigPublicKey?: string
   signerToRemove: string
   totalSigners?: number

@@ -1,4 +1,4 @@
-import { Center, Flex, chakra } from "@chakra-ui/react"
+import { Button, Center, Flex, chakra } from "@chakra-ui/react"
 
 export const Panel = chakra(Center, {
   baseStyle: {
@@ -18,7 +18,7 @@ export const DecoratedPanel = chakra(Panel, {
     _last: {
       background: [
         null,
-        `url('./assets/onboarding-background.svg') no-repeat center`,
+        `url('./assets/onboarding-background.jpg') no-repeat center`,
       ],
       backgroundSize: [null, "cover"],
     },
@@ -45,5 +45,14 @@ export const ContentWrapper = chakra(Flex, {
     justifyContent: "center",
     width: "full",
     maxWidth: "600px",
+  },
+})
+
+export const ActionButton = chakra(Button, {
+  baseStyle: {
+    width: "200px",
+    colorScheme: "primary",
+    padding: "19px 32px",
+    bg: "primary.500",
   },
 })

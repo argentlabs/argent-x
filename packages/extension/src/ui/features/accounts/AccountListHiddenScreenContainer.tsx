@@ -5,25 +5,24 @@ import { accountService } from "../../../shared/account/service"
 import { PendingMultisig } from "../../../shared/multisig/types"
 import { unhidePendingMultisig } from "../../../shared/multisig/utils/pendingMultisig"
 import { WalletAccount } from "../../../shared/wallet.model"
-import { useAppState } from "../../app.state"
 import { useNavigateReturnToOr } from "../../hooks/useNavigateReturnTo"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { useView } from "../../views/implementation/react"
 import { usePendingMultisigsOnNetwork } from "../multisig/multisig.state"
 import { AccountListHiddenScreen } from "./AccountListHiddenScreen"
 import { allAccountsOnNetworkFamily } from "../../views/account"
+import { selectedNetworkIdView } from "../../views/network"
 
 export const AccountListHiddenScreenContainer: FC = () => {
   const { networkId } = useParams()
-  // TODO: refactor to use view as soon as networks are using views
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const navigateReturnTo = useNavigateReturnToOr(routes.accounts())
 
-  const accounts = useView(allAccountsOnNetworkFamily(switcherNetworkId))
+  const accounts = useView(allAccountsOnNetworkFamily(selectedNetworkId))
 
   const pendingMultisigAccounts = usePendingMultisigsOnNetwork({
     showHidden: true,
-    networkId: networkId ?? switcherNetworkId,
+    networkId: networkId ?? selectedNetworkId,
   })
 
   const onToggleHiddenAccount = useCallback(

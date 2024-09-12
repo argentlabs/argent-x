@@ -8,7 +8,7 @@ import { DeployAccountActionScreenContainer } from "./DeployAccountActionScreenC
 import { DeployContractActionScreenContainer } from "./DeployContractActionScreenContainer"
 import { DeployMultisigActionScreenContainer } from "./DeployMultisigActionScreenContainer"
 import { useActionScreen } from "./hooks/useActionScreen"
-import { TransactionActionScreenContainerV2 } from "./transactionV2/TransactionActionScreenContainerV2"
+import { TransactionActionScreenContainer } from "./transactionV2/TransactionActionScreenContainer"
 import { SignActionScreenContainerV2 } from "./transactionV2/SignActionScreenContainerV2"
 import { SwitchNetworkScreenContainer } from "./SwitchNetworkScreenContainer"
 
@@ -30,7 +30,7 @@ export const ActionScreenContainer: FC = () => {
       return <SwitchNetworkScreenContainer />
 
     case "TRANSACTION":
-      return <TransactionActionScreenContainerV2 />
+      return <TransactionActionScreenContainer />
 
     case "DEPLOY_ACCOUNT":
       return <DeployAccountActionScreenContainer />

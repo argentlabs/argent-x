@@ -8,7 +8,7 @@
  * To update run 'ampli pull argent-x'
  *
  * Required dependencies: @amplitude/analytics-browser@^1.3.0
- * Tracking Plan Version: 2
+ * Tracking Plan Version: 41
  * Build: 1.0.0
  * Runtime: browser:typescript-ampli-v2
  *
@@ -30,10 +30,10 @@ export const ApiKey: Record<Environment, string> = {
  */
 export const DefaultConfiguration: BrowserOptions = {
   plan: {
-    version: "2",
+    version: "41",
     branch: "main",
     source: "argent-x",
-    versionId: "21095e9a-a2da-4853-9336-042690b8c4c0",
+    versionId: "b19d7e07-65a0-450d-9b22-cc8811e6f0a4",
   },
   ...{
     ingestionMetadata: {
@@ -64,26 +64,812 @@ export type LoadOptions =
   | LoadOptionsWithApiKey
   | LoadOptionsWithClientInstance
 
+export interface IdentifyProperties {
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Min Items | 0 |
+   * | Unique Items | false |
+   * | Item Type | string |
+   *
+   * @minItems 0
+   */
+  "AX Account Type Status"?: string[]
+  currency?: string
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Item Type | string |
+   */
+  devices?: string[]
+  "installation id"?: string
+  "onboarding push enabled"?: boolean
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | webwallet, mobile, browser extension |
+   */
+  "wallet platform"?: "webwallet" | "mobile" | "browser extension"
+}
+
 export interface AccountCreatedProperties {
-  "account index": string
-  "account type": string
+  /**
+   * Account index refers to how each account is indexed on the wallet from a technical perspective.
+   *
+   *  Message the product/engineering lead for each platform to understand how it works. It is not 0 to ... for ALL accounts universally due to differernt account/signer types, on Mobile, AX etc.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  "account index"?: number
+  /**
+   * Used to categorise into the 3 account types we offer today: Standard, Smart, Multisig.
+   *
+   *  For Mobile & Web wallet accounts, you'll have Smart as default (as they all require emails).
+   *
+   *  For Ledger accounts, this decision maybe later revisited but AX is firing them as Standard today.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | standard, smart, multisig |
+   */
+  "account type": "standard" | "smart" | "multisig"
+  /**
+   * accoun type(standard) + signer type (ledger) === Ledger user account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | argent, ledger |
+   */
+  "signer type"?: "argent" | "ledger"
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
 }
 
 export interface AccountDeployedProperties {
-  "account index": string
-  "account type": string
+  /**
+   * Used for Argent Mobile only to handle some legacy regarding multiple blockchain networks/chains.
+   *
+   *  Do not use this to indicate testnet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | ethereum, zksync lite, zksync era, starknet |
+   */
+  "account chain"?: "ethereum" | "zksync lite" | "zksync era" | "starknet"
+  /**
+   * Account index refers to how each account is indexed on the wallet from a technical perspective.
+   *
+   *  Message the product/engineering lead for each platform to understand how it works. It is not 0 to ... for ALL accounts universally due to differernt account/signer types, on Mobile, AX etc.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  "account index"?: number
+  /**
+   * Used by Argent Mobile to indicate AX Import status of the account.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | no_key, has_key |
+   */
+  "account key status"?: "no_key" | "has_key"
+  /**
+   * Used to categorise into the 3 account types we offer today: Standard, Smart, Multisig.
+   *
+   *  For Mobile & Web wallet accounts, you'll have Smart as default (as they all require emails).
+   *
+   *  For Ledger accounts, this decision maybe later revisited but AX is firing them as Standard today.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | standard, smart, multisig |
+   */
+  "account type": "standard" | "smart" | "multisig"
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface ActivityTabClickedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface ApplicationOpenedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface BlockerExplorerChangedProperties {
+  provider: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface CustomTokenAddedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
 }
 
 export interface DappPreauthorizedProperties {
-  host: string
+  host?: string
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | accept, reject |
+   */
+  "preauthorisation status"?: "accept" | "reject"
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | wallet connect, dapp browser |
+   */
+  "preauthorised via"?: "wallet connect" | "dapp browser"
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface DiscoverTabClickedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface FeedPostClickedProperties {
+  /**
+   * Used to categorise into the 3 account types we offer today: Standard, Smart, Multisig.
+   *
+   *  For Mobile & Web wallet accounts, you'll have Smart as default (as they all require emails).
+   *
+   *  For Ledger accounts, this decision maybe later revisited but AX is firing them as Standard today.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | standard, smart, multisig |
+   */
+  "account type": "standard" | "smart" | "multisig"
+  /**
+   * "Title" of the post in the Discover feed
+   */
+  title?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface HomeTabClickedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface LedgerUserAccountAddedProperties {
+  /**
+   *
+   *
+   *
+   * "Count" the number of accounts that are being added. In this screenshot's example, it's 2.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  "accounts added"?: number
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface MessageSignedProperties {
+  "from outside"?: boolean
+  host?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface NftMarketplaceChangedProperties {
+  provider?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingAccountTypeSelectedProperties {
+  /**
+   * Used to categorise into the 3 account types we offer today: Standard, Smart, Multisig.
+   *
+   *  For Mobile & Web wallet accounts, you'll have Smart as default (as they all require emails).
+   *
+   *  For Ledger accounts, this decision maybe later revisited but AX is firing them as Standard today.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | standard, smart, multisig |
+   */
+  "account type": "standard" | "smart" | "multisig"
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
 }
 
 export interface OnboardingAnalyticsDecidedProperties {
-  "analytics activated": boolean
+  "analytics activated"?: boolean
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
 }
 
 export interface OnboardingCompletedProperties {
-  "account type": string
+  /**
+   * Used to categorise into the 3 account types we offer today: Standard, Smart, Multisig.
+   *
+   *  For Mobile & Web wallet accounts, you'll have Smart as default (as they all require emails).
+   *
+   *  For Ledger accounts, this decision maybe later revisited but AX is firing them as Standard today.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | standard, smart, multisig |
+   */
+  "account type": "standard" | "smart" | "multisig"
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingEmailEnteredProperties {
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingEmailFlowAbortedProperties {
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingPasswordSetProperties {
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingStartedProperties {
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingVerificationCodeAcceptedProperties {
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingVerificationCodeRejectedProperties {
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface OnboardingVerificationCodeResentProperties {
+  /**
+   * This property is used for Argent X A/B test.
+   *  Goal is to improve conversion for Smart Account
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Regex | E1A1, E1A2, E1B, E2A1, E2A2, E2B |
+   */
+  "onboarding experiment"?: string
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface SwapQuoteFailedProperties {
+  /**
+   * "swap" error type
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | token is not tradable, quote expired, no liquidity, failed to fetch URL |
+   */
+  "error type"?:
+    | "token is not tradable"
+    | "quote expired"
+    | "no liquidity"
+    | "failed to fetch URL"
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface SwapTabClickedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface TransactionReviewedProperties {
+  host?: string
+  /**
+   * References the "Key" e.g. **insufficient token received**
+   */
+  "simulation error label"?: string
+  /**
+   * References the string/message of the error. E.g. **(“You’re trading at a poor exchange rate…..”**
+   */
+  "simulation error message"?: string
+  "simulation succeeded"?: boolean
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain |
+   */
+  "transaction type"?:
+    | "inapp swap"
+    | "inapp send"
+    | "upgrade contract"
+    | "enable smart account"
+    | "disable smart account"
+    | "keep smart account"
+    | "deploy user account"
+    | "deploy multisig account"
+    | "add owner"
+    | "remove owner"
+    | "set confirmation"
+    | "submit transaction intent"
+    | "dapp"
+    | "declare contract"
+    | "deploy contract"
+    | "replace owner"
+    | "remove guardian"
+    | "add guardian"
+    | "reject onchain"
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface TransactionSubmittedProperties {
+  /**
+   * Account index refers to how each account is indexed on the wallet from a technical perspective.
+   *
+   *  Message the product/engineering lead for each platform to understand how it works. It is not 0 to ... for ALL accounts universally due to differernt account/signer types, on Mobile, AX etc.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  "account index"?: number
+  /**
+   * Used to categorise into the 3 account types we offer today: Standard, Smart, Multisig.
+   *
+   *  For Mobile & Web wallet accounts, you'll have Smart as default (as they all require emails).
+   *
+   *  For Ledger accounts, this decision maybe later revisited but AX is firing them as Standard today.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | standard, smart, multisig |
+   */
+  "account type": "standard" | "smart" | "multisig"
+  host?: string
+  "is deployment"?: boolean
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Item Type | string |
+   */
+  "token addresses"?: string[]
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain |
+   */
+  "transaction type"?:
+    | "inapp swap"
+    | "inapp send"
+    | "upgrade contract"
+    | "enable smart account"
+    | "disable smart account"
+    | "keep smart account"
+    | "deploy user account"
+    | "deploy multisig account"
+    | "add owner"
+    | "remove owner"
+    | "set confirmation"
+    | "submit transaction intent"
+    | "dapp"
+    | "declare contract"
+    | "deploy contract"
+    | "replace owner"
+    | "remove guardian"
+    | "add guardian"
+    | "reject onchain"
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Item Type | string |
+   */
+  "warning label"?: string[]
+}
+
+export interface WalletLocalStorageClearedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export interface WalletRestoredProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web"
+}
+
+export class Identify implements BaseEvent {
+  event_type = amplitude.Types.SpecialEventType.IDENTIFY
+
+  constructor(public event_properties?: IdentifyProperties) {
+    this.event_properties = event_properties
+  }
 }
 
 export class AccountCreated implements BaseEvent {
@@ -102,14 +888,100 @@ export class AccountDeployed implements BaseEvent {
   }
 }
 
+export class ActivityTabClicked implements BaseEvent {
+  event_type = "Activity Tab Clicked"
+
+  constructor(public event_properties: ActivityTabClickedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
 export class ApplicationOpened implements BaseEvent {
   event_type = "Application Opened"
+
+  constructor(public event_properties: ApplicationOpenedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class BlockerExplorerChanged implements BaseEvent {
+  event_type = "Blocker Explorer Changed"
+
+  constructor(public event_properties: BlockerExplorerChangedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class CustomTokenAdded implements BaseEvent {
+  event_type = "Custom Token Added"
+
+  constructor(public event_properties: CustomTokenAddedProperties) {
+    this.event_properties = event_properties
+  }
 }
 
 export class DappPreauthorized implements BaseEvent {
   event_type = "Dapp Preauthorized"
 
   constructor(public event_properties: DappPreauthorizedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class DiscoverTabClicked implements BaseEvent {
+  event_type = "Discover Tab Clicked"
+
+  constructor(public event_properties: DiscoverTabClickedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class FeedPostClicked implements BaseEvent {
+  event_type = "Feed Post Clicked"
+
+  constructor(public event_properties: FeedPostClickedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class HomeTabClicked implements BaseEvent {
+  event_type = "Home Tab Clicked"
+
+  constructor(public event_properties: HomeTabClickedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class LedgerUserAccountAdded implements BaseEvent {
+  event_type = "Ledger User Account Added"
+
+  constructor(public event_properties: LedgerUserAccountAddedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class MessageSigned implements BaseEvent {
+  event_type = "Message Signed"
+
+  constructor(public event_properties: MessageSignedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class NftMarketplaceChanged implements BaseEvent {
+  event_type = "NFT Marketplace Changed"
+
+  constructor(public event_properties: NftMarketplaceChangedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class OnboardingAccountTypeSelected implements BaseEvent {
+  event_type = "Onboarding Account Type Selected"
+
+  constructor(
+    public event_properties: OnboardingAccountTypeSelectedProperties,
+  ) {
     this.event_properties = event_properties
   }
 }
@@ -130,16 +1002,114 @@ export class OnboardingCompleted implements BaseEvent {
   }
 }
 
+export class OnboardingEmailEntered implements BaseEvent {
+  event_type = "Onboarding Email Entered"
+
+  constructor(public event_properties: OnboardingEmailEnteredProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class OnboardingEmailFlowAborted implements BaseEvent {
+  event_type = "Onboarding Email Flow Aborted"
+
+  constructor(public event_properties: OnboardingEmailFlowAbortedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class OnboardingPasswordSet implements BaseEvent {
+  event_type = "Onboarding Password Set"
+
+  constructor(public event_properties: OnboardingPasswordSetProperties) {
+    this.event_properties = event_properties
+  }
+}
+
 export class OnboardingStarted implements BaseEvent {
   event_type = "Onboarding Started"
+
+  constructor(public event_properties: OnboardingStartedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class OnboardingVerificationCodeAccepted implements BaseEvent {
+  event_type = "Onboarding Verification Code Accepted"
+
+  constructor(
+    public event_properties: OnboardingVerificationCodeAcceptedProperties,
+  ) {
+    this.event_properties = event_properties
+  }
+}
+
+export class OnboardingVerificationCodeRejected implements BaseEvent {
+  event_type = "Onboarding Verification Code Rejected"
+
+  constructor(
+    public event_properties: OnboardingVerificationCodeRejectedProperties,
+  ) {
+    this.event_properties = event_properties
+  }
+}
+
+export class OnboardingVerificationCodeResent implements BaseEvent {
+  event_type = "Onboarding Verification Code Resent"
+
+  constructor(
+    public event_properties: OnboardingVerificationCodeResentProperties,
+  ) {
+    this.event_properties = event_properties
+  }
+}
+
+export class SwapQuoteFailed implements BaseEvent {
+  event_type = "Swap Quote Failed"
+
+  constructor(public event_properties: SwapQuoteFailedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class SwapTabClicked implements BaseEvent {
+  event_type = "Swap Tab Clicked"
+
+  constructor(public event_properties: SwapTabClickedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class TransactionReviewed implements BaseEvent {
+  event_type = "Transaction Reviewed"
+
+  constructor(public event_properties: TransactionReviewedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class TransactionSubmitted implements BaseEvent {
+  event_type = "Transaction Submitted"
+
+  constructor(public event_properties: TransactionSubmittedProperties) {
+    this.event_properties = event_properties
+  }
 }
 
 export class WalletLocalStorageCleared implements BaseEvent {
   event_type = "Wallet Local Storage Cleared"
+
+  constructor(public event_properties: WalletLocalStorageClearedProperties) {
+    this.event_properties = event_properties
+  }
 }
 
 export class WalletRestored implements BaseEvent {
   event_type = "Wallet Restored"
+
+  constructor(public event_properties: WalletRestoredProperties) {
+    this.event_properties = event_properties
+  }
 }
 
 export type PromiseResult<T> = { promise: Promise<T | void> }
@@ -205,10 +1175,12 @@ export class Ampli {
    * Identify a user and set user properties.
    *
    * @param userId The user's id.
+   * @param properties The user properties.
    * @param options Optional event options.
    */
   identify(
     userId: string | undefined,
+    properties?: IdentifyProperties,
     options?: EventOptions,
   ): PromiseResult<Result> {
     if (!this.isInitializedAndEnabled()) {
@@ -220,6 +1192,12 @@ export class Ampli {
     }
 
     const amplitudeIdentify = new amplitude.Identify();
+    const eventProperties = properties;
+    if (eventProperties != null) {
+      for (const [key, value] of Object.entries(eventProperties)) {
+        amplitudeIdentify.set(key, value);
+      }
+    }
     return this.amplitude!.identify(
       amplitudeIdentify,
       options,
@@ -256,11 +1234,24 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Account%20Created)
    *
-   * Event indicating when a new "mainnet" account is successfully created on the platform. It's undeploeyd and unfunded.
+   * **Argent x**
    *
-   * 2 places this is fired: 1/ Onboarding: will be fired once. 2/ Add Account (see screenshot):
+   * Event indicating when a new "mainnet" account is successfully created on the platform. It's undeployed and unfunded.
+   *
+   * This is fired at 2 places: 1/ When user Onboards to the app: will be fired once. 2/ When user Add Account (see screenshot).
+   *
+   * Regarding properties: - account type: Smart vs Standard account - account index:
    *
    *
+   *
+   *
+   * **Web Wallet**
+   *
+   * Event indicating when a new "mainnet" account is successfully created on the platform. It's undeployed and unfunded.
+   *
+   * This is fired in place: When the user sets a password successfully and shares with backend the encrypted key + the public key.
+   *
+   * Regarding properties: account index: 0 
    *
    *
    * @param properties The event's properties (e.g. account index)
@@ -278,9 +1269,13 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Account%20Deployed)
    *
-   * Event to track when a user successfully deploys their account
+   * This event is fired when the user successfully deploys an account. 
+   *  The account deployment flow is combined with the first transaction (see screenshot for an example).  
    *
-   * @param properties The event's properties (e.g. account index)
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. account chain)
    * @param options Amplitude event options.
    */
   accountDeployed(
@@ -291,18 +1286,97 @@ export class Ampli {
   }
 
   /**
+   * Activity Tab Clicked
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Activity%20Tab%20Clicked)
+   *
+   * This is fired when: A user clicks on the activity tab.
+   *
+   * Relevant properties: n/a
+   *
+   * Other comments: n/a
+   *
+   * Screenshots: 
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
+   * @param options Amplitude event options.
+   */
+  activityTabClicked(
+    properties: ActivityTabClickedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new ActivityTabClicked(properties), options);
+  }
+
+  /**
    * Application Opened
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Application%20Opened)
    *
-   * Event to track when users open the application
+   * **AX:**  
+   *  This event is fired when the user opens the AX application.
    *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
   applicationOpened(
+    properties: ApplicationOpenedProperties,
     options?: EventOptions,
   ) {
-    return this.track(new ApplicationOpened(), options);
+    return this.track(new ApplicationOpened(properties), options);
+  }
+
+  /**
+   * Blocker Explorer Changed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Blocker%20Explorer%20Changed)
+   *
+   * This is fired when: the user "Select" a new block explorer option
+   *
+   * Relevant properties: "provider" which defines the options of the explorer
+   *
+   * Other comments: n/a 
+   *
+   *  Screenshots: 
+   *
+   *
+   * @param properties The event's properties (e.g. provider)
+   * @param options Amplitude event options.
+   */
+  blockerExplorerChanged(
+    properties: BlockerExplorerChangedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new BlockerExplorerChanged(properties), options);
+  }
+
+  /**
+   * Custom Token Added
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Custom%20Token%20Added)
+   *
+   * This is fired when: the user clicks "Continue" on the Add tokens screen. It means that this user was able to successfully add the custom token. 
+   *
+   * Relevant properties:
+   *
+   * Other comments: 
+   *  Screenshots: 
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
+   * @param options Amplitude event options.
+   */
+  customTokenAdded(
+    properties: CustomTokenAddedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new CustomTokenAdded(properties), options);
   }
 
   /**
@@ -310,7 +1384,24 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Dapp%20Preauthorized)
    *
-   * Event has no description in tracking plan.
+   * **Argent X** This is fired when:  the account successfully "connects" with a dapp.
+   *
+   * Relevant properties: Check "host" to understand which dapp he connected to. Check "preauthorise status" to understand whether the connection was successful or not.
+   *
+   * Other comments:
+   *
+   *
+   *
+   *
+   * **Web Wallet:**
+   *
+   * This is fired when:  the account successfully "connects" with a dapp.
+   *
+   * Relevant properties: Check "host" to understand which dapp he connected to. Check "preauthorise status" to understand whether the connection was successful or not.
+   *
+   * Other comments: 
+   *
+   *
    *
    * @param properties The event's properties (e.g. host)
    * @param options Amplitude event options.
@@ -323,11 +1414,184 @@ export class Ampli {
   }
 
   /**
+   * Discover Tab Clicked
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Discover%20Tab%20Clicked)
+   *
+   * This is fired when: A user clicks on the discover tab.
+   *
+   * Relevant properties: n/a
+   *
+   * Other comments: Also check "Feed Post Clicked" event which tracks the specific item in the feed.
+   *
+   * Screenshots:
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
+   * @param options Amplitude event options.
+   */
+  discoverTabClicked(
+    properties: DiscoverTabClickedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new DiscoverTabClicked(properties), options);
+  }
+
+  /**
+   * Feed Post Clicked
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Feed%20Post%20Clicked)
+   *
+   * This is fired when: A user clicks on "a" post on the Feed (in Discover tab)
+   *
+   * Relevant properties: postID is passed in the property. Marketing team can then reference the postID in their dashboard to determine which content.
+   *
+   * Other comments:
+   *
+   * Screenshots: 
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. account type)
+   * @param options Amplitude event options.
+   */
+  feedPostClicked(
+    properties: FeedPostClickedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new FeedPostClicked(properties), options);
+  }
+
+  /**
+   * Home Tab Clicked
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Home%20Tab%20Clicked)
+   *
+   * **AX:**  
+   *  This is fired when: A user clicks on the home tab. (a.k.a assets tab)
+   *
+   * Relevant properties: n/a
+   *
+   * Other comments: n/a
+   *
+   * Screenshots:
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
+   * @param options Amplitude event options.
+   */
+  homeTabClicked(
+    properties: HomeTabClickedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new HomeTabClicked(properties), options);
+  }
+
+  /**
+   * Ledger User Account Added
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Ledger%20User%20Account%20Added)
+   *
+   * This is fired when: A user clicks "Add n accounts" button.
+   *
+   * Relevant properties: accounts added
+   *
+   * Other comments: This event is applicable only for the ledger user account flow. We have this event mainly to be able to "count" the number of the accounts that are being added (i.e. acquisition). 
+   *  For looking at other account types being created, check "Account Created" event. 
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. accounts added)
+   * @param options Amplitude event options.
+   */
+  ledgerUserAccountAdded(
+    properties: LedgerUserAccountAddedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new LedgerUserAccountAdded(properties), options);
+  }
+
+  /**
+   * Message Signed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Message%20Signed)
+   *
+   * This is fired when: the user clicks on "Confirm" button on message signing screen (i.e. Review signature request).
+   *
+   * Relevant properties: Check "host" to understand what is the dapp the user signed.
+   *
+   * Other comments: This does not include Session Key Singing. See Seesion Key Signed for such event. 
+   *
+   *
+   * @param properties The event's properties (e.g. from outside)
+   * @param options Amplitude event options.
+   */
+  messageSigned(
+    properties: MessageSignedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new MessageSigned(properties), options);
+  }
+
+  /**
+   * NFT Marketplace Changed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/NFT%20Marketplace%20Changed)
+   *
+   * This is fired when: the user "Select" a new nft market place option
+   *
+   * Relevant properties: "provider" which defines the options of the nft marketplaces
+   *
+   * Other comments: n/a
+   *
+   * Screenshots: 
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. provider)
+   * @param options Amplitude event options.
+   */
+  nftMarketplaceChanged(
+    properties: NftMarketplaceChangedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new NftMarketplaceChanged(properties), options);
+  }
+
+  /**
+   * Onboarding Account Type Selected
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Account%20Type%20Selected)
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. account type)
+   * @param options Amplitude event options.
+   */
+  onboardingAccountTypeSelected(
+    properties: OnboardingAccountTypeSelectedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new OnboardingAccountTypeSelected(properties), options);
+  }
+
+  /**
    * Onboarding Analytics Decided
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Analytics%20Decided)
    *
-   * Event to track user decisions and interactions during the onboarding process
+   * This even is fired upon user clicked "I agree". It indicates whether the user opt-in / out of the analytics (see the associated properties).  
+   *
+   *  When the user opts out, Argent doesn't track other events outside of the onboarding such as Application Opened.  
+   *
+   *
+   *
    *
    * @param properties The event's properties (e.g. analytics activated)
    * @param options Amplitude event options.
@@ -344,7 +1608,13 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Completed)
    *
-   * User completes the onboarding
+   * This event is fired when the user completes the onboarding flow, at the point where this window opens (i.e. not when the user clicks "finish"). Due to reliabilty, this event is actually fired right before this screen (from 5.15) 
+   *
+   *
+   * They are fired for both Smart Account and Standard Account onboarding flow (check event properties).
+   *
+   *
+   *
    *
    * @param properties The event's properties (e.g. account type)
    * @param options Amplitude event options.
@@ -357,18 +1627,251 @@ export class Ampli {
   }
 
   /**
+   * Onboarding Email Entered
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Email%20Entered)
+   *
+   * **AX:** This is fired when: the user clicks "Continue" (and that the user entered an email. After this action, our BE is sending an email to this address with the 4 digits verification code).
+   *
+   * Relevant properties:
+   *
+   * Other comments: Screenshots: 
+   *
+   *
+   * **Mobile:** 
+   *  This is fired when: the user taps CTA, and before the terms get accepted.
+   *
+   * @param properties The event's properties (e.g. onboarding experiment)
+   * @param options Amplitude event options.
+   */
+  onboardingEmailEntered(
+    properties: OnboardingEmailEnteredProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new OnboardingEmailEntered(properties), options);
+  }
+
+  /**
+   * Onboarding Email Flow Aborted
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Email%20Flow%20Aborted)
+   *
+   * This is fired when: the user clicks "Back" button and decides to go back to the previous screen where she can re-select between Smart vs Standard Account
+   *
+   * Relevant properties:
+   *
+   * Other comments: 
+   *  Screenshots: 
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. onboarding experiment)
+   * @param options Amplitude event options.
+   */
+  onboardingEmailFlowAborted(
+    properties: OnboardingEmailFlowAbortedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new OnboardingEmailFlowAborted(properties), options);
+  }
+
+  /**
+   * Onboarding Password Set
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Password%20Set)
+   *
+   * This is fired when: the user clicks "Continue" (and the user successfully created/set a password)
+   *
+   * Relevant properties:
+   *
+   * Other comments: 
+   *  Screenshots: 
+   *
+   *
+   * @param properties The event's properties (e.g. onboarding experiment)
+   * @param options Amplitude event options.
+   */
+  onboardingPasswordSet(
+    properties: OnboardingPasswordSetProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new OnboardingPasswordSet(properties), options);
+  }
+
+  /**
    * Onboarding Started
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Started)
    *
-   * This starts when user click "Create Wallet" Event to track when a user begins the onboarding process
+   * **Mobile:** This event is fired when this sheet is opened. 
    *
+   *
+   *
+   *
+   * **AX:** 
+   *  This event is fired when the user clicks "Create Wallet"
+   *
+   *
+   * ![](https://com-amplitude-orbit-media-prod-eu.s3.eu-central-1.amazonaws.com/100001676/dcd721f9-0ca3-4d06-a221-b37287bda59b.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAS6JMKSBO6OET5WMY%2F20240726%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20240726T093407Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEPf%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDGV1LWNlbnRyYWwtMSJHMEUCIQDuGcmhQU%2BT4Lw1dcPqFIFszZ42kwer8BYxZtoCwVX0aQIgERIxJFRc0a1ssKc8mDs6NSdO4lnvxyTM9GfsfAnqs4gqzQUI0P%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARADGgwyMDI0OTMzMDA4MjkiDMPxxl%2FKeojrdBx2ACqhBY%2FTYFuu%2BmDylyOlOQZQkz2dR2Lgqa1QYrBrMylxwK3QWotiv2poLthwp2yVwS6dbImvvRTSwQQtkgYI%2FMkBTsiEn7rPeS%2BboUxXl2Ki2%2Fjtv3s0lqaHRKLUgbmG9sOAWtELS2KtJnNTJkbcoD1P0ZpCvKPjd9lRR2yrWMXRfiO6N0epTXL%2BBoDg3de%2FV77YQnLIA8ZQEHXchnq43IvZgO9pDrgH5AO%2Bd%2FdVDvyqLeCPyrO9VQWNGC1%2BAbZy3LcNxk7kA%2FN%2BoZP7SiGaTiCwKk4MOPhJ0Cz9B%2BM1hBYy%2FJ5HVeMW1S3W%2FcfxgQO6g%2FZ5UhveVWgW7h6S2xacfn3DBCuPtLzW9k9H5x65jbB9jtnYbZqrVJ4uutKH9G3MuJeiBfnsFr4L47PmVIxf2I9xKlx5Hak28%2BPv%2FYau2jmKhWCi4YUlmKD5AgZ2AWK%2B8MEee%2BeCr94DKd%2F2TT0cXzAdvSqMDBm9Oe%2FL8wHcG63eW49QfIgkPKbvIyGsjn%2FCzcQwzo4FluhGKr99RR%2BRYJNnDlQ7G3g4GmYOLlmmLztdfVkoKWjhT6piS9Yc00yB%2FDvHeWIypVyv%2Bu4IS6jwD53X8e32oOhnyj70fLowZOAX6t%2FfhSbJXnQKcS%2FZLVOomIHYqH%2Bmlz1wnF38Ty7kbUf4rkdPyorTH037kUneIrzMchipKDMbjNbxGxs1qIdGFOmZ%2BvkeZCesfmyROcoUfcTh106s7kTZHrb3tHefRaDzyrMse%2BK6Bn73GlM7V%2FJqCiQCyZ%2BXmi3oDIvlSp3MfqANlS%2BD5eJdML1yM3w7%2Bjo1hmFTOFMyOYas2pDfVSqdqa6mJhqP2Ue4mFjDEvIsIeR%2FoXyDScZiCPA3fXK5Y3tM4lWqCbOK2CEYDJADs0ctdPPKd68w%2FoWNtQY6sQFJbj8OHAmoD%2F8ISKkA8XMRm9oYpQh4ZDNbVFRxUZ18mfp5d2tDKjU79Tnd35xhrrolylB2eUiStM6ouQYCRSHxCa7u0IPYLarkYzaYVUtM7qET70z%2F4qq1y95%2BTcFTRCIlzNvsF3qSaGsNfVM%2FmnWMg4DFFNWS9TDfBk%2FiFIbLguP1%2Bpfx7KGKstgaMbNgSc22Qame3eATULR3UW4w6t0ufS8bEi9GskIxIZheKdxmAME%3D&X-Amz-Signature=675fcc9125dc72fca0687b83b950bb139fb664fe9a1e7e2a2ba2f8b0f71a3986&X-Amz-SignedHeaders=host&x-id=GetObject)
+   *
+   * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
    */
   onboardingStarted(
+    properties: OnboardingStartedProperties,
     options?: EventOptions,
   ) {
-    return this.track(new OnboardingStarted(), options);
+    return this.track(new OnboardingStarted(properties), options);
+  }
+
+  /**
+   * Onboarding Verification Code Accepted
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Verification%20Code%20Accepted)
+   *
+   * Event has no description in tracking plan.
+   *
+   * @param properties The event's properties (e.g. onboarding experiment)
+   * @param options Amplitude event options.
+   */
+  onboardingVerificationCodeAccepted(
+    properties: OnboardingVerificationCodeAcceptedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new OnboardingVerificationCodeAccepted(properties), options);
+  }
+
+  /**
+   * Onboarding Verification Code Rejected
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Verification%20Code%20Rejected)
+   *
+   * Event has no description in tracking plan.
+   *
+   * @param properties The event's properties (e.g. onboarding experiment)
+   * @param options Amplitude event options.
+   */
+  onboardingVerificationCodeRejected(
+    properties: OnboardingVerificationCodeRejectedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new OnboardingVerificationCodeRejected(properties), options);
+  }
+
+  /**
+   * Onboarding Verification Code Resent
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Verification%20Code%20Resent)
+   *
+   * Event has no description in tracking plan.
+   *
+   * @param properties The event's properties (e.g. onboarding experiment)
+   * @param options Amplitude event options.
+   */
+  onboardingVerificationCodeResent(
+    properties: OnboardingVerificationCodeResentProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new OnboardingVerificationCodeResent(properties), options);
+  }
+
+  /**
+   * Swap Quote Failed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Swap%20Quote%20Failed)
+   *
+   * This is fired when: The client did no receive a valid quote from the BE (@Dev, pls put a more accurate description here)
+   *
+   * Relevant properties: n/a
+   *
+   * Other comments: n/a
+   *
+   * Screenshots: 
+   *  (@dev, pls can you include an example of swap quote failure)
+   *
+   * @param properties The event's properties (e.g. error type)
+   * @param options Amplitude event options.
+   */
+  swapQuoteFailed(
+    properties: SwapQuoteFailedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new SwapQuoteFailed(properties), options);
+  }
+
+  /**
+   * Swap Tab Clicked
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Swap%20Tab%20Clicked)
+   *
+   * This is fired when: A user clicks on the swap tab.
+   *
+   * Relevant properties: n/a
+   *
+   * Other comments: This tab only exists on Argent X.
+   *
+   * Screenshots:
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
+   * @param options Amplitude event options.
+   */
+  swapTabClicked(
+    properties: SwapTabClickedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new SwapTabClicked(properties), options);
+  }
+
+  /**
+   * Transaction Reviewed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Transaction%20Reviewed)
+   *
+   * This is fired when: A transaction review screen is displayed to the user (after receiging txn simulation response).
+   *
+   * Relevant properties: Check "host" to understand what dapp url the txn was for. Check "transaction type" to understand whether the txn reviewed was for: dapp (interacting on the web) or in-app swap/send. Check "simulation suceeded" to understand if the txn simulation succeeded or failed.
+   *
+   * Other comments: @dev, can we also classify some native actions other swap/send, such as "add guardian", "activate account" etc?
+   *
+   * Screenshots: 
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. host)
+   * @param options Amplitude event options.
+   */
+  transactionReviewed(
+    properties: TransactionReviewedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new TransactionReviewed(properties), options);
+  }
+
+  /**
+   * Transaction Submitted
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Transaction%20Submitted)
+   *
+   * This is fired when: A the user clicks "Confirm" button in the transaction review screen.
+   *
+   * Relevant properties: Check "transaction type" to categorise the type of txn that was submitted.
+   *
+   * Other comments: This event is fired all kinds of transactions (native flow such as Send, in-app Swap, as well as non-native flow like dapp interaction) 
+   *  Screenshots: 
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. account index)
+   * @param options Amplitude event options.
+   */
+  transactionSubmitted(
+    properties: TransactionSubmittedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new TransactionSubmitted(properties), options);
   }
 
   /**
@@ -376,14 +1879,21 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Wallet%20Local%20Storage%20Cleared)
    *
-   * User clears local storage. It is fired when the user access "delete local storage" buton on Settings.
+   * This event is fired when the user clicks "delete local storage" buton on Settings. 
    *
+   *  The user's settings and preferences will be reset but his accounts won’t be affected. 
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
   walletLocalStorageCleared(
+    properties: WalletLocalStorageClearedProperties,
     options?: EventOptions,
   ) {
-    return this.track(new WalletLocalStorageCleared(), options);
+    return this.track(new WalletLocalStorageCleared(properties), options);
   }
 
   /**
@@ -391,14 +1901,26 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Wallet%20Restored)
    *
-   * This event tracks when a user restores their wallet
+   * **Argent X** This event is fired when the user succesufully enters his seedphrase  (and therefore managed to restore the wallet).
    *
+   * Note that Smat Account users will have the additional authentication flow.
+   *
+   *
+   *
+   *
+   * **Web Wallet**  
+   *
+   *  This event is fired when the user succesufully enters his password for the first time in a new browser  (and therefore managed to restore the wallet) 
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
   walletRestored(
+    properties: WalletRestoredProperties,
     options?: EventOptions,
   ) {
-    return this.track(new WalletRestored(), options);
+    return this.track(new WalletRestored(properties), options);
   }
 }
 

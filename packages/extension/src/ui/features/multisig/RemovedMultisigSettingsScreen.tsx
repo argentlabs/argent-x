@@ -50,8 +50,7 @@ export const RemovedMultisigSettingsScreen: FC<
         <SpacerCell />
 
         <ButtonCell
-          color={"error.500"}
-          _hover={{ color: "error.500" }}
+          colorScheme={"neutrals-danger"}
           onClick={onHideMultisigModalOpen}
         >
           Hide account

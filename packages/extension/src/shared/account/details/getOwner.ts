@@ -20,5 +20,5 @@ export const getOwnerForAccount = async (
   const multicall = getMulticallForNetwork(network)
   const response = await multicallWithCairo0Fallback(call, multicall)
 
-  return response.result[0]
+  return response[0]
 }

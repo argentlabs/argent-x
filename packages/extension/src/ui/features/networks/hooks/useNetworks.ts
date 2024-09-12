@@ -12,7 +12,6 @@ export const useNetworks = () => {
 const expectedNetworkOrder = [
   "mainnet-alpha",
   "sepolia-alpha",
-  "goerli-alpha",
   "localhost",
   "integration",
 ]

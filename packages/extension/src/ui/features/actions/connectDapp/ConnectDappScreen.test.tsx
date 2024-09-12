@@ -15,7 +15,10 @@ describe("ConnectDappScreen", () => {
     onConnect,
     onDisconnect,
     accounts,
-    selectedAccount: accounts[0],
+    selectedAccount: {
+      address: accounts[0].address ?? "",
+      networkId: accounts[0].networkId ?? "",
+    },
     host: "http://localhost:3000",
     onSelectedAccountChange,
     isHighRisk: false,

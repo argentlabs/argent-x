@@ -1,4 +1,4 @@
-import { P4, icons } from "@argent/x-ui"
+import { P4, iconsDeprecated } from "@argent/x-ui"
 import { Circle, Flex, Link, SimpleGrid } from "@chakra-ui/react"
 import { FC, MouseEventHandler } from "react"
 
@@ -8,24 +8,28 @@ import {
   ARGENT_X_LEGAL_PRIVACY_POLICY_URL,
   ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL,
 } from "../../../shared/api/constants"
+import { IS_DEV } from "../../../shared/utils/dev"
 
-const { WalletIcon, RestoreIcon } = icons
+const { WalletIcon, RestoreIcon } = iconsDeprecated
 
 interface OnboardingStartScreenProps {
   /** Called when user clicks to create a new wallet */
   onCreate: MouseEventHandler
   /** Called when user clicks to restore an existing wallet */
   onRestore: MouseEventHandler
+  /** Called when user clicks to restore from preset seed (env variable) */
+  onRestorePreset: MouseEventHandler
 }
 
 export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
   onCreate,
   onRestore,
+  onRestorePreset,
 }) => {
   return (
     <OnboardingScreen
-      length={4}
-      currentIndex={0}
+      length={5} // there are 5 steps in the onboarding process
+      currentIndex={0} // this is the first step
       title="Welcome to Argent X"
       subtitle="Enjoy the security of Ethereum with the scale of Starknet"
     >
@@ -69,6 +73,14 @@ export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
           </Circle>
           Restore an existing wallet
         </OnboardingRectButton>
+        {IS_DEV && (
+          <OnboardingRectButton onClick={onRestorePreset}>
+            <Circle size={16} bg={"neutrals.700"}>
+              <RestoreIcon fontSize={"2xl"} />
+            </Circle>
+            Restore from preset seed
+          </OnboardingRectButton>
+        )}
       </SimpleGrid>
     </OnboardingScreen>
   )

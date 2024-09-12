@@ -8,10 +8,10 @@ import React, {
 } from "react"
 import browser from "webextension-polyfill"
 
-import { resetDevice } from "../../shared/shield/jwt"
+import { resetDevice } from "../../shared/smartAccount/jwt"
 import { delay } from "../../shared/utils/delay"
 import { IS_DEV } from "../../shared/utils/dev"
-import { useAppState } from "../app.state"
+import { useLegacyAppState } from "../app.state"
 
 export interface ISoftReloadContext {
   key: string
@@ -30,7 +30,7 @@ const SoftReloadProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [key, setKey] = useState(makeReloadKey())
 
   const softReload = useCallback(() => {
-    useAppState.setState({ isLoading: true, isFirstRender: true })
+    useLegacyAppState.setState({ isLoading: true })
     setKey(makeReloadKey())
   }, [])
 

@@ -1,16 +1,15 @@
-import { feeTokenBalancesView } from "./../../views/tokenBalances"
+import { useFeeTokenBalancesView } from "./../../views/tokenBalances"
 import { Account } from "../accounts/Account"
-import { useView } from "../../views/implementation/react"
-import { TokenWithBalance } from "@argent/x-shared"
 import {
-  classHashSupportsTxV3,
+  TokenWithBalance,
   feeTokenNeedsTxV3Support,
-} from "../../../shared/network/txv3"
+  classHashSupportsTxV3,
+} from "@argent/x-shared"
 
 export const useFeeTokenBalances = (
   account?: Pick<Account, "address" | "networkId">,
 ) => {
-  const feeTokenBalances = useView(feeTokenBalancesView(account))
+  const feeTokenBalances = useFeeTokenBalancesView(account)
 
   return account && feeTokenBalances
     ? feeTokenBalances.map((balance) => ({

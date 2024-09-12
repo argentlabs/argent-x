@@ -6,10 +6,11 @@ const playwrightConfig: PlaywrightTestConfig = {
     {
       name: "ArgentX",
       use: {
-        trace: "on-first-retry",
-        viewport: { width: 360, height: 800 },
+        trace: "retain-on-failure",
+        viewport: { width: 1080, height: 720 },
         actionTimeout: 120 * 1000, // 2 minute
         permissions: ["clipboard-read", "clipboard-write"],
+        screenshot: "only-on-failure",
       },
       timeout: 5 * 60e3, // 5 minutes
       expect: { timeout: 120 * 1000 }, // 2 minute

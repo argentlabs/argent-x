@@ -1,4 +1,4 @@
 import browser from "webextension-polyfill"
-import { ChromeScheduleService } from "./chromeService"
+import { ChromeScheduleService } from "./ChromeScheduleService"
 
 export const chromeScheduleService = new ChromeScheduleService(browser)

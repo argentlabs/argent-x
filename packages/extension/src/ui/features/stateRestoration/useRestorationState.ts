@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react"
 import { PathPattern } from "react-router"
 import { matchPath, useLocation } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { useRestorationState } from "./restoration.state"
 
 /**
@@ -12,8 +12,9 @@ import { useRestorationState } from "./restoration.state"
 
 const restorationStatePathnames: Array<string | PathPattern> = [
   /** Some users will close the extension when navigating to webmail to retreive the OTP */
-  routes.shieldAccountOTP.path,
+  routes.smartAccountOTP.path,
   routes.sendAmountAndAssetScreen.path,
+  routes.createSmartAccountOTP.path,
 ]
 
 const isRestorationStatePathname = memoize((pathname?: string) => {

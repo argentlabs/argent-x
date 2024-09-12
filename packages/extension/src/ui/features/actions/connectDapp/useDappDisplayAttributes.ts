@@ -1,4 +1,4 @@
-import { generateAvatarImage } from "@argent/x-shared"
+import { generateAvatarImage, getDapplandUrlForDapp } from "@argent/x-shared"
 import { getKnownDappForHost } from "../../../../shared/knownDapps"
 import { getColor } from "../../accounts/accounts.service"
 import { useDappFromKnownDappsByHost } from "../../../services/knownDapps"
@@ -47,7 +47,7 @@ export const useDappDisplayAttributes = (host: string) => {
     title,
     iconUrl,
     isKnown: !!dapp,
-    dapplandUrl: dapp?.dappland,
+    dapplandUrl: getDapplandUrlForDapp(dapp),
     verified: dapp?.argentVerified,
   }
 

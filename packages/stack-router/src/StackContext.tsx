@@ -65,7 +65,7 @@ export const StackContextProvider: FC<StackContextProviderProps> = ({
       /** store screen state in case we are re-mounted */
       _persistScreens = [...screens.current]
     }
-  })
+  }, [])
 
   const presentationByPath = useMemo(() => {
     /** only run once for same location in dev */

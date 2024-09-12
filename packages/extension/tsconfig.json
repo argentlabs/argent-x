@@ -28,7 +28,7 @@
     // "useDefineForClassFields": true,                  /* Emit ECMAScript-standard-compliant class fields. */
 
     /* Modules */
-    "module": "ESNext" /* Specify what module code is generated. */,
+    "module": "esnext" /* Specify what module code is generated. */,
     "moduleResolution": "bundler" /* Specify how TypeScript looks up a file from a given module specifier. */,
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
     // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */ /* Specify a set of entries that re-map imports to additional lookup locations. */,
@@ -105,6 +105,11 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "paths": {
       "@mui/styled-engine": ["./node_modules/@mui/styled-engine-sc"]
+    }
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS" /** use CommonJS for webpack.config.ts */
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "playwright.config.ts", ".eslintrc.js"],

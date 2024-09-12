@@ -27,18 +27,30 @@ export const ConnectDappAccountSelect: FC<ConnectDappAccountSelectProps> = ({
   const makeAccountListItem = useCallback(
     (account: WalletAccount): AccountListItemProps => {
       const accountName = account.name
+      const { address, networkId } = account
+
+      if (!account.address && !account.networkId) {
+        return {
+          accountName,
+          accountAddress: "",
+          networkId: "",
+          connectedHost: undefined,
+          accountType: account.type,
+        }
+      }
+
       const connected = Boolean(
         preAuths.some((preAuth) =>
           isEqualPreAuthorization(preAuth, {
             host,
-            account,
+            account: { address: address ?? "", networkId: networkId ?? "" },
           }),
         ),
       )
       return {
         accountName,
-        accountAddress: account.address,
-        networkId: account.networkId,
+        accountAddress: account.address ?? "",
+        networkId: account.networkId ?? "",
         connectedHost: connected ? host : undefined,
         accountType: account.type,
       }

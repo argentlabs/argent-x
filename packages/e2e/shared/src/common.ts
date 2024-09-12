@@ -1,14 +1,13 @@
-export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+import config from "../config"
 
-export const expireBESession = async (
-  email: string,
-  app: "webwallet" | "argentx",
-) => {
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+const app = "argentx"
+export const expireBESession = async (email: string) => {
   const requestOptions = {
     method: "GET",
   }
   const request = `${
-    process.env.ARGENT_API_BASE_URL
+    config.beAPIUrl
   }/debug/expireCredentials?application=${app}&email=${encodeURIComponent(
     email,
   )}`
@@ -18,4 +17,11 @@ export const expireBESession = async (
     throw new Error(`Error expiring session: ${request}`)
   }
   return response.status
+}
+
+export const logInfo = (message: string | object) => {
+  const canLogInfo = process.env.E2E_LOG_INFO || false
+  if (canLogInfo) {
+    console.log(message)
+  }
 }

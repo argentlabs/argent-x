@@ -14,13 +14,18 @@ import { entryPointToHumanReadable } from "../../../../../shared/transactions"
 import { TransactionActionsType } from "../types"
 import { formatCalldataSafe } from "../../utils"
 import { formatTruncatedAddress } from "@argent/x-shared"
-import { TransactionReviewProperty } from "../../transactionV2/action/properties/TransactionReviewProperty"
+import { TransactionReviewProperty } from "@argent/x-ui/simulation"
+import { Property } from "@argent/x-shared/simulation"
 
 export interface TransactionActionsProps {
   action: TransactionActionsType
+  networkId: string
 }
 
-export const TransactionActions: FC<TransactionActionsProps> = ({ action }) => {
+export const TransactionActions: FC<TransactionActionsProps> = ({
+  action,
+  networkId,
+}) => {
   return (
     <Box>
       <DetailAccordionHeader>Actions</DetailAccordionHeader>
@@ -55,22 +60,22 @@ export const TransactionActions: FC<TransactionActionsProps> = ({ action }) => {
           </DetailAccordionItem>
         )}
 
-        {/** Render Add Argent Shield */}
-        {action.type === "ADD_ARGENT_SHIELD" && (
+        {/** Render Add Guardian */}
+        {action.type === "ADD_GUARDIAN" && (
           <DetailAccordionItem key={action.payload.accountAddress} isDisabled>
             <DetailAccordionButton
-              label="Add Argent Shield"
+              label="Add Guardian"
               value={formatTruncatedAddress(action.payload.accountAddress)}
             />
             <DetailAccordionPanel />
           </DetailAccordionItem>
         )}
 
-        {/** Render Add Argent Shield */}
-        {action.type === "REMOVE_ARGENT_SHIELD" && (
+        {/** Render Remove Guardian */}
+        {action.type === "REMOVE_GUARDIAN" && (
           <DetailAccordionItem key={action.payload.accountAddress} isDisabled>
             <DetailAccordionButton
-              label="Remove Argent Shield"
+              label="Remove Guardian"
               value={formatTruncatedAddress(action.payload.accountAddress)}
             />
             <DetailAccordionPanel />
@@ -80,6 +85,12 @@ export const TransactionActions: FC<TransactionActionsProps> = ({ action }) => {
         {/** Render INVOKE_FUNCTION Calls */}
         {action.type === "INVOKE_FUNCTION" &&
           action.payload.map((transaction, txIndex) => {
+            const property: Property = {
+              type: "address",
+              address: transaction.contractAddress,
+              label: entryPointToHumanReadable(transaction.entrypoint),
+              verified: false,
+            }
             return (
               <DetailAccordionItem
                 key={txIndex}
@@ -89,10 +100,8 @@ export const TransactionActions: FC<TransactionActionsProps> = ({ action }) => {
               >
                 <DetailAccordionButton>
                   <TransactionReviewProperty
-                    type="address"
-                    address={transaction.contractAddress}
-                    label={entryPointToHumanReadable(transaction.entrypoint)}
-                    verified={false}
+                    property={property}
+                    networkId={networkId}
                   />
                 </DetailAccordionButton>
                 <DetailAccordionPanel>

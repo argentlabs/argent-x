@@ -1,9 +1,15 @@
-import { storybookDecorators, storybookGlobalTypes, theme } from "@argent/x-ui"
+import {
+  storybookDecorator,
+  storybookUIProviderDecorator,
+  storybookGlobalTypes,
+} from "@argent/x-ui"
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport"
 import { Preview } from "@storybook/react"
 import { merge } from "lodash-es"
 
-import { decorators as depreactedMuiDecorators } from "../src/decorators/depreactedMuiDecorators"
+import { theme } from "@argent-x/extension/src/ui/AppThemeProvider"
+
+import { depreactedMuiDecorator } from "../src/decorators/depreactedMuiDecorator"
 
 import mock from "./webextension-polyfill-mock"
 
@@ -64,20 +70,12 @@ const preview: Preview = {
       showPanel: true,
     },
   },
+  globalTypes: storybookGlobalTypes,
+  decorators: [
+    depreactedMuiDecorator,
+    storybookDecorator,
+    storybookUIProviderDecorator,
+  ],
 }
 
 export default preview
-
-const getDecorators = () => {
-  if (
-    Array.isArray(depreactedMuiDecorators) &&
-    Array.isArray(storybookDecorators)
-  ) {
-    return depreactedMuiDecorators.concat(storybookDecorators)
-  }
-  return storybookDecorators
-}
-
-const decorators = getDecorators()
-
-export { decorators, storybookGlobalTypes as globalTypes }

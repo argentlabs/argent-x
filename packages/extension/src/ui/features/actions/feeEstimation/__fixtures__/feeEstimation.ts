@@ -12,6 +12,8 @@ export const feeEstimationFixture1: FeeEstimationProps = {
     transactions: {
       amount: 6568907063569n,
       pricePerUnit: 32n,
+      dataGasConsumed: 100099n,
+      dataGasPrice: 10011n,
       feeTokenAddress: ETH_TOKEN_ADDRESS,
     },
   },
@@ -27,6 +29,8 @@ export const feeEstimationFixture2: FeeEstimationProps = {
     transactions: {
       amount: 1051n,
       pricePerUnit: 20n,
+      dataGasConsumed: 10n,
+      dataGasPrice: 10n,
       feeTokenAddress: ETH_TOKEN_ADDRESS,
     },
   },
@@ -42,6 +46,8 @@ export const feeEstimationFixture3: FeeEstimationProps = {
     transactions: {
       amount: 1051n,
       pricePerUnit: 20n,
+      dataGasConsumed: 10n,
+      dataGasPrice: 10n,
       feeTokenAddress: ETH_TOKEN_ADDRESS,
     },
   },

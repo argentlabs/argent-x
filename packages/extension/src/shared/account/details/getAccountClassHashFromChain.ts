@@ -7,12 +7,12 @@ import { networkService } from "../../network/service"
 import { mapImplementationToArgentAccountType } from "../../network/utils"
 import { ArgentAccountType, WalletAccount } from "../../wallet.model"
 import { accountsEqual } from "../../utils/accountsEqual"
-import { addressSchema } from "@argent/x-shared"
-import { tryGetClassHash } from "./tryGetClassHash"
 import {
-  MULTISIG_ACCOUNT_CLASS_HASH,
+  addressSchema,
   TXV1_ACCOUNT_CLASS_HASH,
-} from "../../network/constants"
+  TXV1_MULTISIG_CLASS_HASH,
+} from "@argent/x-shared"
+import { tryGetClassHash } from "./tryGetClassHash"
 
 export type AccountClassHashFromChain = Pick<
   WalletAccount,
@@ -20,11 +20,11 @@ export type AccountClassHashFromChain = Pick<
 >
 
 const getDefaultClassHash = (account: WalletAccount) => {
-  if (account.network.accountClassHash?.standard) {
-    return account.network.accountClassHash?.standard
+  if (account.network.accountClassHash?.[account.type]) {
+    return account.network.accountClassHash?.[account.type]
   }
   if (account.type === "multisig") {
-    return MULTISIG_ACCOUNT_CLASS_HASH
+    return TXV1_MULTISIG_CLASS_HASH
   }
   return TXV1_ACCOUNT_CLASS_HASH
 }
@@ -44,15 +44,24 @@ export async function getAccountClassHashFromChain(
     ([network, as]) =>
       [
         network,
-        as.map((account): { classHash: string | undefined; call: Call } => {
-          return {
-            classHash: account.classHash || getDefaultClassHash(account),
-            call: {
-              contractAddress: account.address,
-              entrypoint: "get_implementation",
-            },
-          }
-        }),
+        as.map(
+          (
+            account,
+          ): {
+            classHash: string | undefined
+            call: Call
+            fallbackType: ArgentAccountType
+          } => {
+            return {
+              classHash: account.classHash || getDefaultClassHash(account),
+              call: {
+                contractAddress: account.address,
+                entrypoint: "get_implementation",
+              },
+              fallbackType: account.type,
+            }
+          },
+        ),
       ] as const,
   )
 
@@ -88,8 +97,13 @@ export async function getAccountClassHashFromChain(
 
             const result = responses.map((response, i) => {
               const call = classHashWithCalls[i].call
+              const fallbackType = classHashWithCalls[i].fallbackType
               const type: ArgentAccountType =
-                mapImplementationToArgentAccountType(response, network)
+                mapImplementationToArgentAccountType(
+                  response,
+                  network,
+                  fallbackType,
+                )
               return {
                 address: call.contractAddress,
                 networkId,
@@ -106,11 +120,15 @@ export async function getAccountClassHashFromChain(
             ),
           )
           const results: string[] = responses.map((res) => num.toHex(res))
-          return classHashWithCalls.map(({ call }, i) => ({
+          return classHashWithCalls.map(({ call, fallbackType }, i) => ({
             address: call.contractAddress,
             networkId,
             classHash: results[i],
-            type: mapImplementationToArgentAccountType(results[i], network),
+            type: mapImplementationToArgentAccountType(
+              results[i],
+              network,
+              fallbackType,
+            ),
           }))
         },
       ),

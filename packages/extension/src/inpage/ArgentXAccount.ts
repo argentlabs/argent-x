@@ -7,14 +7,16 @@ import {
   InvocationsDetails,
   ProviderInterface,
   Signature,
+  UniversalDetails,
   defaultProvider,
   ec,
-  typedData,
 } from "starknet"
 
 import { sendMessage, waitForMessage } from "./messageActions"
-import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import { StarknetMethodArgumentsSchemas } from "starknetkit/window"
 import { SignMessageOptions } from "../shared/messages/ActionMessage"
+import { TypedData } from "@starknet-io/types-js"
+import { signTypedDataHandler } from "./requestMessageHandlers/signTypedData"
 
 /**
  *  This is the latest Account Object that is imported from starknet.js.
@@ -28,23 +30,36 @@ export class ArgentXAccount extends Account {
     super(provider || defaultProvider, address, pk)
   }
 
+  /**
+   * Executes a transaction or a batch of transactions.
+   *
+   * @param {AllowArray<Call>} calls - A single call or an array of calls to be executed.
+   * @param {Abi[] | UniversalDetails} [abiOrDetails] - Either an array of ABIs corresponding to the calls, or a UniversalDetails object.
+   * This param is required in this way to maintain backwards compatibility with the previous version of this method.
+   * which use method overloading to accept either an array of ABIs or a UniversalDetails object.
+   * We ignore the ABI array and use the UniversalDetails object as the transactionsDetail.
+   * @param {UniversalDetails} transactionsDetail - Details about the transaction, defaults to an empty object.
+   * @returns {Promise<InvokeFunctionResponse>} A promise that resolves to the response of the invoke function.
+   */
   public async execute(
     transactions: Call | Call[],
-    abis?: Abi[],
-    transactionsDetail?: InvocationsDetails,
+    abiOrDetails?: Abi[] | UniversalDetails,
+    transactionsDetail: UniversalDetails = {},
   ): ReturnType<Account["execute"]> {
-    const [parsedTransactions, parseAbis, parsedTransactionsDetail] =
+    const details = Array.isArray(abiOrDetails)
+      ? transactionsDetail
+      : abiOrDetails
+
+    const [parsedTransactions, parsedTransactionsDetail] =
       await StarknetMethodArgumentsSchemas.execute.parseAsync([
         transactions,
-        abis,
-        transactionsDetail,
+        details,
       ])
 
     sendMessage({
       type: "EXECUTE_TRANSACTION",
       data: {
         transactions: parsedTransactions,
-        abis: parseAbis,
         transactionsDetail: parsedTransactionsDetail,
       },
     })
@@ -89,7 +104,7 @@ export class ArgentXAccount extends Account {
       type: "REQUEST_DECLARE_CONTRACT",
       data: {
         payload: {
-          contract,
+          contract: contract as any,
           classHash,
           casm,
           compiledClassHash,
@@ -133,42 +148,12 @@ export class ArgentXAccount extends Account {
   }
 
   public async signMessage(
-    typedData: typedData.TypedData,
+    typedData: TypedData,
     options: SignMessageOptions = { skipDeploy: false },
   ): Promise<Signature> {
-    sendMessage({ type: "SIGN_MESSAGE", data: { typedData, options } })
-    const { actionHash } = await waitForMessage("SIGN_MESSAGE_RES", 1000)
-    sendMessage({ type: "OPEN_UI" })
-
-    const result = await Promise.race([
-      waitForMessage(
-        "SIGNATURE_SUCCESS",
-        11 * 60 * 1000,
-        (x) => x.data.actionHash === actionHash,
-      ),
-      waitForMessage(
-        "SIGNATURE_FAILURE",
-        10 * 60 * 1000,
-        (x) => x.data.actionHash === actionHash,
-      )
-        .then((x) => x)
-        .catch((e) => {
-          sendMessage({
-            type: "SIGNATURE_FAILURE",
-            data: { actionHash, error: e.message }, // this error will be thrown by waitForMessage after the timeout
-          })
-          return "timeout" as const
-        }),
-    ])
-
-    if (result === "timeout") {
-      throw Error("User action timed out")
-    }
-
-    if ("error" in result) {
-      throw Error(result.error)
-    }
-
-    return result.signature
+    return signTypedDataHandler({
+      ...typedData,
+      skipDeploy: options.skipDeploy, // Required because it's a custom field
+    } as TypedData)
   }
 }

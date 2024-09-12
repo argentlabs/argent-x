@@ -1,10 +1,10 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { AccountListItem } from "./AccountListItem"
 import type { AccountListItemProps } from "./accountListItem.model"
 
-const { ChevronRightIcon } = icons
+const { ChevronRightIcon } = iconsDeprecated
 
 interface AccountListScreenItemProps extends AccountListItemProps {
   clickNavigateSettings?: boolean

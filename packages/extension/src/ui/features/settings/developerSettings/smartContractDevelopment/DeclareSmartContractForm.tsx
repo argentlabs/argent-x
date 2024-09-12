@@ -2,17 +2,17 @@ import { CellStack, ErrorMessage, P3, Select, SpacerCell } from "@argent/x-ui"
 import { isEmpty } from "lodash-es"
 import { FC, ReactNode, useCallback, useRef, useState } from "react"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { CompiledSierraCasm, hash, isSierra } from "starknet6"
+import { CompiledSierraCasm, hash, isSierra } from "starknet"
 import { chakra } from "@chakra-ui/react"
 
 import { readFileAsString } from "@argent/x-shared"
-import { useAppState } from "../../../../app.state"
 import { FileNameWithClassHash } from "./ui/ContractWithClassHash"
 import { FileInputButton } from "./ui/FileInputButton"
 import { useFormSelects } from "./useFormSelects"
 import { udcService } from "../../../../services/udc"
 import { DeclareContractBackgroundPayload } from "../../../../../shared/udc/schema"
 import { clientAccountService } from "../../../../services/account"
+import { ampli } from "../../../../../shared/analytics"
 
 interface FieldValues {
   contractJson: string
@@ -127,7 +127,7 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
       const contractCasmClassHash =
         hash.computeCompiledClassHash(contractContentJson)
       if (!contractCasmClassHash) {
-        throw new Error("Invalid casm")
+        throw new Error("Invalid compiled contract")
       }
       contractCasmRef.current = contractContentJson
 
@@ -152,7 +152,6 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     if (!contractJsonRef.current) {
       return
     }
-    useAppState.setState({ switcherNetworkId: network })
     await clientAccountService.select({
       address: account,
       networkId: network,
@@ -165,13 +164,14 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
     }
     if (contractJsonIsSierra) {
       if (!contractCasmClassHash) {
-        throw new Error("Contract casm class hash is missing")
+        throw new Error("Compiled contract class hash is missing")
       }
       // can supply either the casm file or its compiledClassHash here
       // payload.casm = contractCasmRef.current
       payload.compiledClassHash = contractCasmClassHash
     }
     await udcService.declareContract(payload)
+
     clearErrors()
   }
 
@@ -217,7 +217,7 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
                     classHash={contractClassHash}
                   />
                 ) : (
-                  <P3>Click to upload contract JSON</P3>
+                  <P3>Click to upload contract class JSON</P3>
                 )}
               </FileInputButton>
             </>
@@ -265,7 +265,7 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
                       classHash={contractCasmClassHash}
                     />
                   ) : (
-                    <P3>Click to upload casm JSON</P3>
+                    <P3>Click to upload compiled contract JSON</P3>
                   )}
                 </FileInputButton>
               </>
@@ -277,7 +277,7 @@ export const DeclareSmartContractForm: FC<DeclareSmartContractFormProps> = ({
             message={
               errors.contractCasm.type === "required"
                 ? "A contract is required"
-                : "Invalid casm file"
+                : "Invalid compiled contract file"
             }
           />
         )}

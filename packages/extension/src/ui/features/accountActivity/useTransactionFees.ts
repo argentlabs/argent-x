@@ -1,7 +1,8 @@
 import useSWR from "swr"
 
-import { Network, getProvider6 } from "../../../shared/network"
-import { TransformedTransaction } from "./transform/type"
+import { Network, getProvider } from "../../../shared/network"
+import { TransformedTransaction } from "../../../shared/activity/utils/transform/type"
+import { isString } from "lodash-es"
 
 export const useTransactionFees = ({
   network,
@@ -21,10 +22,12 @@ export const useTransactionFees = ({
     //   return transactionTransformed.actualFee
     // }
 
-    const receipt = await getProvider6(network).getTransactionReceipt(hash)
+    const receipt = await getProvider(network).getTransactionReceipt(hash)
 
     const transactionFees =
-      "actual_fee" in receipt ? receipt.actual_fee : undefined
+      "actual_fee" in receipt && !isString(receipt.actual_fee)
+        ? receipt.actual_fee
+        : undefined
 
     return transactionFees
   }

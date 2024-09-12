@@ -4,7 +4,6 @@ import type {
   DeclareContractPayload,
   InvocationsDetails,
   UniversalDeployerContractPayload,
-  typedData,
 } from "starknet"
 import { z } from "zod"
 
@@ -13,6 +12,7 @@ import { TransactionMeta } from "../transactions"
 import { BaseWalletAccount } from "../wallet.model"
 import { ActionQueueItem } from "./schema"
 import { SignMessageOptions } from "../messages/ActionMessage"
+import { TypedData } from "@starknet-io/types-js"
 
 export type ExtQueueItem<T> = ActionQueueItem & T
 
@@ -51,7 +51,7 @@ export type ActionItem =
     }
   | {
       type: "SIGN"
-      payload: { typedData: typedData.TypedData; options: SignMessageOptions }
+      payload: { typedData: TypedData; options: SignMessageOptions }
     }
   | {
       type: "REQUEST_TOKEN"

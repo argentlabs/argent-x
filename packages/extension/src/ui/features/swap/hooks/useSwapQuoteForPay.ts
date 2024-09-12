@@ -1,7 +1,7 @@
 import useSWR from "swr"
 import { Token } from "../../../../shared/token/__new/types/token.model"
 import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { RefreshInterval } from "../../../../shared/config"
+import { RefreshIntervalInSeconds } from "../../../../shared/config"
 import { swapService } from "../../../services/swap"
 import { addressSchema } from "@argent/x-shared"
 
@@ -49,7 +49,7 @@ export function useSwapQuoteForPay({
     },
     {
       revalidateOnFocus: true,
-      refreshInterval: (RefreshInterval.MEDIUM * 1000) / 2, // 30s
+      refreshInterval: (RefreshIntervalInSeconds.MEDIUM * 1000) / 2, // 30s
       revalidateIfStale: true,
     },
   )

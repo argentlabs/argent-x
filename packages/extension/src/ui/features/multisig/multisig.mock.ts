@@ -5,6 +5,7 @@ import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
 import { Network, getProvider } from "../../../shared/network"
 import {
   ArgentAccountType,
+  SignerType,
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
 import { Multisig } from "./Multisig"
@@ -18,7 +19,7 @@ const defaultNetwork: Network = {
   rpcUrl: "rpcUrl",
 }
 const defaultSigner: WalletAccountSigner = {
-  type: "local_secret",
+  type: SignerType.LOCAL_SECRET,
   derivationPath: "derivationPath",
 }
 const defaultMultisigType: ArgentAccountType = "multisig"
@@ -39,9 +40,6 @@ const defaultMultisig: Multisig = {
   provider: getProvider(defaultNetwork),
   hidden: defaultHidden,
   needsDeploy: defaultNeedsDeploy,
-  getDeployTransactionStorageKey: () => "key",
-  updateDeployTx: defaultFn,
-  completeDeployTx: defaultFn,
   contract: new Contract(
     ArgentCompiledContractAbi as Abi,
     defaultAddress,

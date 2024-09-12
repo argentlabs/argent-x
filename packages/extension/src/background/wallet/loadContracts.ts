@@ -1,5 +1,5 @@
-import ArgentAccountCompiledContractUrl from "../../contracts/ArgentAccount.txt"
-import ProxyCompiledContractUrl from "../../contracts/Proxy.txt"
+import ArgentAccountSierraUrl from "../../contracts/ArgentAccount.txt"
+import ArgentAccountCasmUrl from "../../contracts/ArgentAccount.casm.txt"
 
 export type LoadContracts = (
   derivationPathBase?: string,
@@ -7,10 +7,7 @@ export type LoadContracts = (
 
 export const loadContracts: LoadContracts = async () =>
   Promise.all(
-    [ProxyCompiledContractUrl, ArgentAccountCompiledContractUrl].map(
-      async (url) => {
-        const response = await fetch(url)
-        return response.text()
-      },
+    [ArgentAccountSierraUrl, ArgentAccountCasmUrl].map((url) =>
+      fetch(url).then((res) => res.text()),
     ) as unknown as [string, string],
   )

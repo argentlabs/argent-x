@@ -1,5 +1,5 @@
-import { num, Account } from "starknet6"
-
+import { Account, num } from "starknet"
+import { argentMultisigBackendService } from "../shared/multisig/service/backend"
 import { KeyValueStorage } from "../shared/storage"
 import { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import { getAccountIdentifier } from "../shared/wallet.service"
@@ -29,8 +29,21 @@ export async function getNonce(
   const storedNonce = await nonceStore.get(storageAddress)
 
   if (account.type === "multisig") {
+    // Get the pending transactions from BE and take them into account when calculating the nonce
+    const { content } =
+      await argentMultisigBackendService.fetchMultisigTransactionRequests({
+        address: account.address,
+        networkId: account.network.id,
+      })
+
+    const maxNonce = content
+      .map((tx) => tx.nonce)
+      .reduce((a, b) => Math.max(a, b), 0)
+
+    // Increment the nonce by 1 if there are pending transactions
+    const nonceForPendingTransactions = content.length ? maxNonce + 1 : nonceBn
     // If the account is a multisig, we don't want to store the nonce
-    return num.toHex(nonceBn)
+    return num.toHex(nonceForPendingTransactions)
   }
 
   // If there's no nonce stored or the fetched nonce is bigger than the stored one, store the fetched nonce

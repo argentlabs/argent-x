@@ -1,7 +1,6 @@
 import {
   Address,
   TransactionAction,
-  bigDecimal,
   useConditionallyEnabledSWR,
 } from "@argent/x-shared"
 import { TransactionType, UniversalDeployerContractPayload } from "starknet"
@@ -16,12 +15,9 @@ import {
   getDeployContractEstimatedFee,
   getEstimatedFee,
 } from "../../../services/backgroundTransactions"
-import {
-  EstimatedFee,
-  EstimatedFees,
-} from "../../../../shared/transactionSimulation/fees/fees.model"
+import { EstimatedFee, EstimatedFees } from "@argent/x-shared/simulation"
 import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
-import { RefreshInterval } from "../../../../shared/config"
+import { RefreshIntervalInSeconds } from "../../../../shared/config"
 import { isString } from "lodash-es"
 
 interface UseMaxFeeEstimationReturnProps {
@@ -32,15 +28,22 @@ export const useMaxFeeEstimation = (
   actionHash: string,
   account: BaseWalletAccount,
   transactionAction: TransactionAction,
-  feeTokenAddress: Address,
+  feeTokenAddress?: Address,
   transactionSimulation?: ApiTransactionBulkSimulationResponse,
   isSimulationLoading?: boolean,
 ): UseMaxFeeEstimationReturnProps => {
-  const { data: fee, error } = useConditionallyEnabledSWR(
+  const enabled =
     !isSimulationLoading &&
-      (!transactionSimulation || transactionSimulation.length === 0),
+    (!transactionSimulation || transactionSimulation.length === 0) &&
+    Boolean(feeTokenAddress)
+  const { data: fee, error } = useConditionallyEnabledSWR(
+    enabled,
     [actionHash, feeTokenAddress, "feeEstimation"],
     () => {
+      // this should never happen, just to make typescript happy
+      if (!feeTokenAddress) {
+        return
+      }
       switch (transactionAction.type) {
         case TransactionType.INVOKE:
           return getEstimatedFee(
@@ -69,7 +72,7 @@ export const useMaxFeeEstimation = (
     },
     {
       suspense: false,
-      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
+      refreshInterval: RefreshIntervalInSeconds.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
@@ -85,18 +88,24 @@ interface UseMaxAccountDeploymentFeeEstimationReturnProps {
 export const useMaxAccountDeploymentFeeEstimation = (
   account: BaseWalletAccount | undefined,
   actionHash: string,
-  feeTokenAddress: string,
+  feeTokenAddress?: string,
 ): UseMaxAccountDeploymentFeeEstimationReturnProps => {
+  const shouldFetch = Boolean(account) && Boolean(feeTokenAddress)
   const {
     data: fee,
     error,
     isValidating,
-  } = useSWR(
+  } = useConditionallyEnabledSWR(
+    shouldFetch,
     [actionHash, "accountDeploymentFeeEstimation", feeTokenAddress],
-    () => getAccountDeploymentEstimatedFee(feeTokenAddress, account),
+    () => {
+      if (feeTokenAddress) {
+        return getAccountDeploymentEstimatedFee(feeTokenAddress, account)
+      }
+    },
     {
       suspense: false,
-      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
+      refreshInterval: RefreshIntervalInSeconds.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
@@ -116,7 +125,7 @@ export const useMaxDeclareContractFeeEstimation = (
     () => getDeclareContractEstimatedFee(declareContractPayload),
     {
       suspense: false,
-      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
+      refreshInterval: RefreshIntervalInSeconds.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )
@@ -139,7 +148,7 @@ export const useMaxDeployContractFeeEstimation = (
       }),
     {
       suspense: false,
-      refreshInterval: RefreshInterval.FAST * 1000, // 20 seconds
+      refreshInterval: RefreshIntervalInSeconds.FAST * 1000, // 20 seconds
       shouldRetryOnError: false,
     },
   )

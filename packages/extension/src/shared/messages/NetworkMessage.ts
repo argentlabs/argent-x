@@ -25,7 +25,7 @@ export type NetworkMessage =
     }
   | {
       type: "REQUEST_SWITCH_CUSTOM_NETWORK_RES"
-      data: { exists: boolean; actionHash?: string }
+      data: { exists: boolean; actionHash?: string; isCurrentNetwork: boolean }
     }
   | {
       type: "REQUEST_SWITCH_CUSTOM_NETWORK_REJ"

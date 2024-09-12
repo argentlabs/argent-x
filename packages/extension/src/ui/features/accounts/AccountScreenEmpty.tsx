@@ -1,9 +1,9 @@
-import { Empty, EmptyButton, icons } from "@argent/x-ui"
+import { Empty, EmptyButton, iconsDeprecated } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
-import { HiddenAccountsBarContainer } from "./HiddenAccountsBar"
+import { AccountListFooterContainer } from "./AccountListFooterContainer"
 
-const { WalletIcon, AddIcon } = icons
+const { WalletIcon, AddIcon } = iconsDeprecated
 
 interface AccountScreenEmptyProps {
   hasHiddenAccounts: boolean
@@ -28,7 +28,7 @@ export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
           Create account
         </EmptyButton>
       </Empty>
-      {hasHiddenAccounts && <HiddenAccountsBarContainer />}
+      {hasHiddenAccounts && <AccountListFooterContainer isHiddenAccounts />}
     </>
   )
 }

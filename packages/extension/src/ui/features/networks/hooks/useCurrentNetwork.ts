@@ -1,21 +1,23 @@
-import { useAppState } from "../../../app.state"
 import { useView } from "../../../views/implementation/react"
-import { allNetworksWithStatusesView } from "../../../views/network"
+import {
+  allNetworksWithStatusesView,
+  selectedNetworkIdView,
+} from "../../../views/network"
 import { useNetwork } from "./useNetwork"
 
 export const useCurrentNetwork = () => {
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
 
-  return useNetwork(switcherNetworkId)
+  return useNetwork(selectedNetworkId)
 }
 
 export const useCurrentNetworkWithStatus = () => {
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const networksStatuses = useView(allNetworksWithStatusesView)
 
-  const network = useNetwork(switcherNetworkId)
+  const network = useNetwork(selectedNetworkId)
   const networkWithStatus = networksStatuses.find(
-    (n) => n.id === switcherNetworkId,
+    (n) => n.id === selectedNetworkId,
   )
   return {
     ...network,

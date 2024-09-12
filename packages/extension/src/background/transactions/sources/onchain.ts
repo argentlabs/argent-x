@@ -40,19 +40,16 @@ export async function getTransactionsUpdate(transactions: Transaction[]) {
           SUCCESS_STATUSES.includes(finality_status)
         ) {
           const receipt = await provider.getTransactionReceipt(transaction.hash)
-          const {
-            finality_status: receiptFinalityStatus,
-            execution_status: receiptExecutionStatus,
-          } = receipt
 
           if (
-            finality_status !== receiptFinalityStatus ||
-            execution_status !== receiptExecutionStatus
+            receipt.isSuccess() &&
+            (finality_status !== receipt.finality_status ||
+              execution_status !== receipt.execution_status)
           ) {
             return transaction
           }
 
-          if ("revert_reason" in receipt) {
+          if (receipt.isReverted()) {
             return {
               ...transaction,
               revertReason: receipt.revert_reason,

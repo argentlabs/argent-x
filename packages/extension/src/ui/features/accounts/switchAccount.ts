@@ -1,20 +1,22 @@
 import { withHiddenSelector } from "../../../shared/account/selectors"
 import { accountService } from "../../../shared/account/service"
-import { isEqualWalletAddress } from "../../../shared/wallet.service"
+import { defaultNetwork } from "../../../shared/network"
+import { accountsEqual } from "../../../shared/utils/accountsEqual"
+import { isNetworkOnlyPlaceholderAccount } from "../../../shared/wallet.model"
 import { old_walletStore } from "../../../shared/wallet/walletStore"
-import { useAppState } from "../../app.state"
 import { clientAccountService } from "../../services/account"
 import { setDefaultAccountNames } from "./accountMetadata.state"
 import { mapWalletAccountsToAccounts } from "./accounts.state"
+import { getDefaultSortedAccounts } from "./getDefaultSortedAccount"
 
 /** Switches to the first visible account on network, otherwise sets selectedAccount to undefined */
 
 export const autoSelectAccountOnNetwork = async (networkId: string) => {
-  const { switcherNetworkId } = useAppState.getState()
   const selectedAccount = await old_walletStore.get("selected")
+  const selectedNetworkId = selectedAccount?.networkId ?? defaultNetwork.id
 
   /** switch network and set default account names */
-  if (switcherNetworkId !== networkId) {
+  if (selectedNetworkId !== networkId) {
     const allWalletAccounts = await accountService.get(withHiddenSelector)
     const allAccounts = mapWalletAccountsToAccounts(allWalletAccounts)
     const allAccountsHasNames = allAccounts.every((account) => account.name)
@@ -22,7 +24,6 @@ export const autoSelectAccountOnNetwork = async (networkId: string) => {
     if (!allAccountsHasNames) {
       setDefaultAccountNames(allAccounts)
     }
-    useAppState.setState({ switcherNetworkId: networkId })
   }
 
   const visibleAccountsOnNetwork = await accountService.get((account) => {
@@ -32,16 +33,23 @@ export const autoSelectAccountOnNetwork = async (networkId: string) => {
   if (visibleAccountsOnNetwork.length) {
     const existingAccountOnNetwork =
       selectedAccount &&
+      !isNetworkOnlyPlaceholderAccount(selectedAccount) &&
       visibleAccountsOnNetwork.find((account) =>
-        isEqualWalletAddress(account, selectedAccount),
+        accountsEqual(account, selectedAccount),
       )
 
-    // if the selected account is not on the network, switch to the first visible account
-    const account = existingAccountOnNetwork || visibleAccountsOnNetwork[0]
+    const lastUsedAccountOnNetwork =
+      await clientAccountService.getLastUsedAccountOnNetwork(networkId)
+
+    // if the selected account is not on the network, switch to the first visible account with standard accounts coming first
+    const account =
+      existingAccountOnNetwork ||
+      lastUsedAccountOnNetwork ||
+      getDefaultSortedAccounts(visibleAccountsOnNetwork)[0]
     await clientAccountService.select(account)
     return account
   } else {
-    await clientAccountService.select(null)
+    await clientAccountService.select({ networkId, address: null })
     return null
   }
 }

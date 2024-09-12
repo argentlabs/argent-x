@@ -7,14 +7,12 @@ const makeArgentXHeaders = () => ({
 
 export const argentXHeaders = makeArgentXHeaders()
 
-/** convert KnownNetworksType to 'goerli' or 'mainnet' expected by API */
+/** convert KnownNetworksType to 'sepolia' or 'mainnet' expected by API */
 
 export const argentApiNetworkForNetwork = (
   network: ArgentNetworkId | string,
 ): ArgentBackendNetworkId | null => {
   switch (network) {
-    case "goerli-alpha":
-      return "goerli"
     case "sepolia-alpha":
       return "sepolia"
     case "mainnet-alpha":

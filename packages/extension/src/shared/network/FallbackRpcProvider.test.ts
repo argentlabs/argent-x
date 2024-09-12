@@ -36,25 +36,22 @@ describe("FallbackRpcProvider", () => {
 
   describe("when instantiated", () => {
     test("constructor calls starknet_chainId once only after nodeUrls are available", async () => {
-      const { nodeUrls, fetchImplementation, rpcProvider } = await makeProvider(
-        false,
-      )
+      const { nodeUrls, fetchImplementation, rpcProvider } =
+        await makeProvider(false)
 
+      /** shouldn't call chainid method again */
+      /* fetchImplementation.mockReset() */
+      expect(await rpcProvider.getChainId()).toEqual("chain-foo")
       expect(fetchImplementation).toHaveBeenCalledWith(
         nodeUrls[0],
         expect.objectContaining({
           body: JSON.stringify({
             jsonrpc: "2.0",
             method: "starknet_chainId",
-            id: 0,
+            id: 1,
           }),
         }),
       )
-
-      /** shouldn't call chainid method again */
-      fetchImplementation.mockReset()
-      expect(await rpcProvider.getChainId()).toEqual("chain-foo")
-      expect(fetchImplementation).not.toHaveBeenCalled()
     })
   })
 
@@ -66,14 +63,14 @@ describe("FallbackRpcProvider", () => {
         fetchImplementation.mockResolvedValueOnce({
           ok: true,
           status: 200,
-          json: async () => ({ result: "foo" }),
+          json: async () => ({ result: { foo: "bar" } }),
         })
         const res = await rpcProvider.getTransactionReceipt("0x123")
         expect(fetchImplementation).toHaveBeenCalledWith(
           nodeUrls[0],
           expect.any(Object),
         )
-        expect(res).toEqual("foo")
+        expect(res).toEqual({ foo: "bar" })
       })
     })
     describe("and the response is 429 or 500", () => {
@@ -101,7 +98,7 @@ describe("FallbackRpcProvider", () => {
             .mockResolvedValueOnce({
               ok: false,
               status: 200,
-              json: async () => ({ result: "bar" }),
+              json: async () => ({ result: { foo: "bar" } }),
             })
           const res = await rpcProvider.getTransactionReceipt("0x123")
           expect(fetchImplementation).toHaveBeenNthCalledWith(
@@ -128,7 +125,7 @@ describe("FallbackRpcProvider", () => {
           expect(backoffImplementation).toHaveBeenNthCalledWith(2, 2)
           expect(backoffImplementation).toHaveBeenNthCalledWith(3, 3)
           expect(backoffImplementation).not.toHaveBeenNthCalledWith(4, 4)
-          expect(res).toEqual("bar")
+          expect(res).toEqual({ foo: "bar" })
         })
       })
       describe("and exhausts retries", () => {

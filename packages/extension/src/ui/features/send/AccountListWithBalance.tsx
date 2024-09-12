@@ -22,6 +22,8 @@ const AccountListWithBalance: FC<AccountListWithBalanceProps> = ({
         accountAddress={account.address}
         networkId={account.networkId}
         accountName={account.name}
+        isSmartAccount={account.type === "smart"}
+        isLedger={account.signer.type === "ledger"}
         onClick={() => onAccountClick(account)}
       />
     ))}

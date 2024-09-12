@@ -1,4 +1,4 @@
-import { RequestAccountsParameters } from "@argent/x-window"
+import { RequestAccountsParameters } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
 
 export async function requestAccountsHandler(
@@ -6,7 +6,7 @@ export async function requestAccountsHandler(
 ) {
   sendMessage({
     type: "CONNECT_DAPP",
-    data: { silent: params?.silentMode },
+    data: { silent: params?.silent_mode },
   })
   const result = await Promise.race([
     waitForMessage("CONNECT_DAPP_RES", 10 * 60 * 1000),

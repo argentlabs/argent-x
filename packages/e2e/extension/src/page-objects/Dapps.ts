@@ -2,12 +2,13 @@ import { ChromiumBrowserContext, Page, expect } from "@playwright/test"
 
 import { lang } from "../languages"
 import Navigation from "./Navigation"
-import config from "../../../shared/config"
+import config from "../config"
 
 type DappUrl =
-  | "https://goerli.app.starknet.id"
+  | "https://app.starknet.id"
   | "https://dapp-argentlabs.vercel.app"
   | "https://starknetkit-blacked-listed.vercel.app"
+  | "https://app.avnu.fi/"
 export default class Dapps extends Navigation {
   constructor(page: Page) {
     super(page)
@@ -81,15 +82,23 @@ export default class Dapps extends Navigation {
     const dapp = await browserContext.newPage()
     await dapp.setViewportSize({ width: 1080, height: 720 })
     await dapp.goto("chrome://inspect/#extensions")
-    await dapp.waitForTimeout(5000)
+    await dapp.waitForTimeout(1000)
     await dapp.goto(dappUrl)
 
     if (
       dappUrl === "https://dapp-argentlabs.vercel.app" ||
-      dappUrl === "https://starknetkit-blacked-listed.vercel.app"
+      dappUrl === "https://starknetkit-blacked-listed.vercel.app" ||
+      dappUrl === "https://app.avnu.fi/"
     ) {
-      await expect(dapp.locator('button:has-text("Connect")')).toHaveCount(1)
-      await dapp.locator('button:has-text("Connect")').first().click()
+      if (dappUrl === "https://dapp-argentlabs.vercel.app") {
+        await dapp
+          .locator('button:has-text("starknetkit@latest")')
+          .first()
+          .click()
+      } else {
+        await dapp.locator('button:has-text("Connect")').first().click()
+      }
+      //  await expect(dapp.locator('button:has-text("Connect")')).toHaveCount(1)
       await expect(dapp.locator("text=Argent X")).toBeVisible()
       await dapp.locator("text=Argent X").click()
     } else {
@@ -103,8 +112,8 @@ export default class Dapps extends Navigation {
         .catch(async () => {
           null
         })
-      await expect(dapp.getByRole("button", { name: "Argent X" })).toBeVisible()
-      await dapp.getByRole("button", { name: "Argent X" }).click()
+      await expect(dapp.getByText("Argent X")).toBeVisible()
+      await dapp.getByText("Argent X").click()
     }
     return dapp
   }
@@ -115,7 +124,7 @@ export default class Dapps extends Navigation {
     const dapp = await browserContext.newPage()
     await dapp.setViewportSize({ width: 1080, height: 720 })
     await dapp.goto("chrome://inspect/#extensions")
-    await dapp.waitForTimeout(5000)
+    await dapp.waitForTimeout(1000)
     await dapp.goto(spokCampaignUrl)
     await dapp.getByRole("button", { name: "Check eligibility" }).click()
     await expect(dapp.locator("text=Argent X")).toBeVisible()
@@ -143,8 +152,11 @@ export default class Dapps extends Navigation {
     await this.page.getByRole("button", { name: "Review" }).click()
     await Promise.all([
       expect(
+        this.page.locator(`//header[@title="1 risk identified"]`),
+      ).toBeVisible(),
+      expect(
         this.page.locator(
-          `//header[@title="1 risk identified"]//label[text()="We strongly recommend you do not proceed with this transaction"]`,
+          '//label[text()="We strongly recommend you do not proceed with this transaction"]',
         ),
       ).toBeVisible(),
       expect(

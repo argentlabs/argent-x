@@ -1,5 +1,5 @@
 import { TokenWithBalance } from "@argent/x-shared"
-import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
+import { EstimatedFees } from "@argent/x-shared/simulation"
 import { ParsedFeeError } from "./feeError"
 
 export interface FeeEstimationProps {

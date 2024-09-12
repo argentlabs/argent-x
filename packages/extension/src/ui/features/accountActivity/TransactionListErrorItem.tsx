@@ -1,10 +1,10 @@
-import { H6, icons } from "@argent/x-ui"
+import { H6, iconsDeprecated } from "@argent/x-ui"
 import { Circle, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 
-const { DocumentIcon } = icons
+const { DocumentIcon } = iconsDeprecated
 
 export const TransactionListErrorItem: FC = () => {
   return (

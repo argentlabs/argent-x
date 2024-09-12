@@ -1,4 +1,4 @@
-import { Button, H2, P3, icons, logos } from "@argent/x-ui"
+import { Button, H2, P1, iconsDeprecated, logosDeprecated } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import { FC, MouseEventHandler, PropsWithChildren, ReactNode } from "react"
@@ -11,12 +11,12 @@ import {
 } from "../../../components/FullScreenPage"
 import { StepIndicator } from "../../../components/StepIndicator"
 
-const { ArrowLeftIcon } = icons
-const { ArgentXLogo } = logos
+const { ArrowLeftIcon } = iconsDeprecated
+const { ArgentXLogo } = logosDeprecated
 
 interface OnboardingScreenProps extends PropsWithChildren {
   title?: string
-  subtitle?: string
+  subtitle?: string | ReactNode
   length?: number
   currentIndex?: number
   icon?: ReactNode
@@ -53,7 +53,7 @@ export const OnboardingScreen: FC<OnboardingScreenProps> = ({
           )}
           <Flex flexDirection={"column"} gap={2} my={8}>
             {title && <H2>{title}</H2>}
-            {subtitle && <P3 color="neutrals.200">{subtitle}</P3>}
+            {subtitle && <P1 color="text-secondary-web">{subtitle}</P1>}
           </Flex>
           {children}
         </ContentWrapper>

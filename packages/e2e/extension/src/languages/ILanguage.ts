@@ -18,13 +18,12 @@ export interface ILanguage {
     privacyStatement: string
     approve: string
     addArgentShield: string
-    removeArgentShield: string
-    argentShieldAdded: string
-    argentShieldRemoved: string
+    changeAccountType: string
+    accountUpgraded: string
+    changedToStandardAccount: string
     dismiss: string
     reviewSend: string
     hide: string
-    hiddenAccounts: string
     copy: string
     beforeYouContinue: string
     seedWarning: string
@@ -32,11 +31,12 @@ export interface ILanguage {
     copied: string
     confirmRecovery: string
     remove: string
+    upgrade: string
   }
   account: {
     noAccounts: string
     createAccount: string
-    addFunds: string
+    fund: string
     fundsFromStarkNet: string
     fullAccountAddress: string
     send: string
@@ -59,12 +59,13 @@ export interface ILanguage {
     notEnoughFoundsFee: string
     newToken: string
     argentShield: {
-      wrong2faCode: string
-      failed2faCode: string
-      codeNotRequested2fa: string
+      wrongCode: string
+      failedCode: string
+      codeNotRequested: string
       emailInUse: string
     }
     removedFromMultisig: string
+    copyAddress: string
   }
   wallet: {
     //first screen
@@ -114,6 +115,7 @@ export interface ILanguage {
     preferences: {
       preferences: string
       hideTokens: string
+      hiddenAccounts: string
       defaultBlockExplorer: string
       defaultNFTMarket: string
       emailNotifications: string

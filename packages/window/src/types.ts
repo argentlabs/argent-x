@@ -1,8 +1,16 @@
-import { InvokeFunctionResponse, Signature } from "starknet"
+import { Call, InvokeFunctionResponse, Signature } from "starknet"
 import { z } from "zod"
-
+import { callDetailsSchema } from "@argent/x-shared"
 const HEX_REGEX = /^0x[0-9a-f]+$/i
 const DECIMAL_REGEX = /^\d+$/
+
+export const callSchema: z.ZodSchema<Call> = z.lazy(() =>
+  callDetailsSchema.and(
+    z.object({
+      entrypoint: z.string(),
+    }),
+  ),
+)
 
 const shortStringSchema = z
   .string()
@@ -35,15 +43,7 @@ export const BigNumberishSchema = z.union([
   z.bigint(),
 ])
 
-export const CallSchema = z.object({
-  contractAddress: z.string(),
-  entrypoint: z.string(),
-  calldata: z
-    .array(BigNumberishSchema.or(z.array(BigNumberishSchema)))
-    .optional(),
-})
-
-export const CallsArraySchema = z.array(CallSchema).nonempty()
+export const CallsArraySchema = z.array(callSchema).nonempty()
 
 export const typedDataSchema = z.object({
   types: z.record(
@@ -51,12 +51,17 @@ export const typedDataSchema = z.object({
       z.union([
         z.object({
           name: z.string(),
-          type: z.string(),
+          type: z.literal("merkletree"),
+          contains: z.string(),
         }),
         z.object({
           name: z.string(),
-          type: z.literal("merkletree"),
+          type: z.literal("enum"),
           contains: z.string(),
+        }),
+        z.object({
+          name: z.string(),
+          type: z.string(),
         }),
       ]),
     ),
@@ -66,6 +71,45 @@ export const typedDataSchema = z.object({
   message: z.record(z.unknown()),
 })
 
+export const AssetSchema = z.object({
+  type: z.literal("ERC20"),
+  options: z.object({
+    address: z.string(),
+    symbol: z.string().optional(),
+    decimals: z.number().optional(),
+    image: z.string().optional(),
+    name: z.string().optional(),
+  }),
+})
+
+export const AddStarknetChainParametersSchema = z.union([
+  z.object({
+    id: z.string(),
+    chain_id: z.string(),
+    chain_name: z.string(),
+    rpc_urls: z.array(z.string()).optional(),
+    native_currency: AssetSchema.optional(),
+    block_explorer_url: z.array(z.string()).optional(),
+  }),
+  z
+    .object({
+      id: z.string(),
+      chainId: z.string(),
+      chainName: z.string(),
+      rpcUrls: z.array(z.string()).optional(),
+      nativeCurrency: AssetSchema.optional(),
+      blockExplorerUrl: z.array(z.string()).optional(),
+    })
+    // for backwards compatibility
+    .transform((value) => ({
+      id: value.id,
+      chain_id: value.chainId,
+      chain_name: value.chainName,
+      rpc_urls: value.rpcUrls,
+      native_currency: value.nativeCurrency,
+      block_explorer_url: value.blockExplorerUrl,
+    })),
+])
 export const StarknetMethodArgumentsSchemas = {
   enable: z
     .tuple([
@@ -78,47 +122,20 @@ export const StarknetMethodArgumentsSchemas = {
         .optional(),
     ])
     .or(z.tuple([])),
-  addStarknetChain: z.tuple([
-    z.object({
-      id: z.string(),
-      chainId: z.string(),
-      chainName: z.string(),
-      rpcUrls: z.array(z.string()).optional(),
-      nativeCurrency: z
-        .object({
-          name: z.string(),
-          symbol: z.string(),
-          decimals: z.number(),
-        })
-        .optional(),
-      blockExplorerUrls: z.array(z.string()).optional(),
-    }),
-  ]),
+  addStarknetChain: z.tuple([AddStarknetChainParametersSchema]),
   switchStarknetChain: z.tuple([
     z.object({
       chainId: z.string(),
     }),
   ]),
-  watchAsset: z.tuple([
-    z.object({
-      type: z.literal("ERC20"),
-      options: z.object({
-        address: z.string(),
-        symbol: z.string().optional(),
-        decimals: z.number().optional(),
-        image: z.string().optional(),
-        name: z.string().optional(),
-      }),
-    }),
-  ]),
+  watchAsset: z.tuple([AssetSchema]),
   requestAccounts: z.tuple([
     z.object({
-      silentMode: z.boolean().optional(),
+      silent_mode: z.boolean().optional(),
     }),
   ]),
   execute: z.tuple([
-    CallsArraySchema.or(CallSchema),
-    z.array(z.any()).optional(),
+    CallsArraySchema.or(callSchema),
     z
       .object({
         nonce: BigNumberishSchema.optional(),
@@ -159,6 +176,49 @@ export type StarknetMethods = {
   >
 }
 
+export const BackwardsCallSchema = z.object({
+  contractAddress: z.string(),
+  entrypoint: z.string(),
+  calldata: z
+    .array(BigNumberishSchema.or(z.array(BigNumberishSchema)))
+    .optional(),
+})
+
+export const StarknetExecuteBackwardCompatibleArgumentsSchemas = {
+  execute: z
+    .tuple([
+      CallsArraySchema.or(BackwardsCallSchema),
+      z
+        .object({
+          nonce: BigNumberishSchema.optional(),
+          maxFee: BigNumberishSchema.optional(),
+          version: BigNumberishSchema.optional(),
+        })
+        .optional(),
+    ])
+    .or(
+      z.tuple([
+        CallsArraySchema.or(BackwardsCallSchema),
+        z.array(z.any()).optional(),
+        z
+          .object({
+            nonce: BigNumberishSchema.optional(),
+            maxFee: BigNumberishSchema.optional(),
+            version: BigNumberishSchema.optional(),
+          })
+          .optional(),
+      ]),
+    ),
+} as const
+
+export type StarknetExecuteBackwardCompatibleMethods = {
+  execute: (
+    ...args: z.infer<
+      typeof StarknetExecuteBackwardCompatibleArgumentsSchemas.execute
+    >
+  ) => Promise<InvokeFunctionResponse>
+}
+
 export type ConnectMethods = {
   connect: () => void
 }
@@ -174,3 +234,40 @@ export type WebWalletMethods = ConnectMethods & ModalMethods
 export type IframeMethods = {
   connect: () => void
 }
+
+export const OffchainSessionDetailsSchema = z.object({
+  nonce: BigNumberishSchema,
+  maxFee: BigNumberishSchema.optional(),
+  version: z.string(),
+})
+
+export type OffchainSessionDetails = z.infer<
+  typeof OffchainSessionDetailsSchema
+>
+
+const OFFCHAIN_SESSION_ENTRYPOINT = "use_offchain_session"
+
+export const RpcCallSchema = z
+  .object({
+    contract_address: z.string(),
+    entry_point: z.string(),
+    calldata: z.array(BigNumberishSchema).optional(),
+    offchainSessionDetails: OffchainSessionDetailsSchema.optional(),
+  })
+  .transform(
+    ({ contract_address, entry_point, calldata, offchainSessionDetails }) =>
+      entry_point === OFFCHAIN_SESSION_ENTRYPOINT
+        ? {
+            contractAddress: contract_address,
+            entrypoint: entry_point,
+            calldata: calldata || [],
+            offchainSessionDetails: offchainSessionDetails || undefined,
+          }
+        : {
+            contractAddress: contract_address,
+            entrypoint: entry_point,
+            calldata: calldata || [],
+          },
+  )
+
+export const RpcCallsArraySchema = z.array(RpcCallSchema).nonempty()

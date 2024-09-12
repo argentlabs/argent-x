@@ -5,6 +5,7 @@ import * as fs from "fs"
 import path from "path"
 
 import { Page, TestInfo } from "@playwright/test"
+import { logInfo } from "../src/common"
 export const artifactsDir = path.resolve(
   __dirname,
   "../../artifacts/playwright",
@@ -37,7 +38,7 @@ export const saveHtml = async (
   page: Page,
   label: string,
 ) => {
-  console.log({
+  logInfo({
     op: "saveHtml",
     label,
   })
@@ -58,7 +59,7 @@ export const keepVideos = async (
   page: Page,
   label: string,
 ) => {
-  console.log({
+  logInfo({
     op: "keepVideos",
     label,
   })

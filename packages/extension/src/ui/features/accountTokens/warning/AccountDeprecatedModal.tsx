@@ -1,5 +1,5 @@
 import {
-  icons,
+  iconsDeprecated,
   Button,
   NavigationContainer,
   BarCloseButton,
@@ -7,19 +7,21 @@ import {
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
-import { routes, useCurrentPathnameWithQuery } from "../../../routes"
-import { useAppState } from "../../../app.state"
+import { useCurrentPathnameWithQuery } from "../../../hooks/useRoute"
+import { routes } from "../../../../shared/ui/routes"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
+import { selectedNetworkIdView } from "../../../views/network"
+import { useView } from "../../../views/implementation/react"
 
-const { ExpandIcon } = icons
+const { ExpandIcon } = iconsDeprecated
 
 export const AccountDeprecatedModal = () => {
   const onBack = useNavigateReturnToOrBack()
   const returnTo = useCurrentPathnameWithQuery()
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const navigate = useNavigate()
   const navigateToHiddenAccounts = () => {
-    navigate(routes.accountsHidden(switcherNetworkId, returnTo))
+    navigate(routes.accountsHidden(selectedNetworkId, returnTo))
   }
   return (
     <NavigationContainer

@@ -1,11 +1,16 @@
-import { FieldError, P3, icons } from "@argent/x-ui"
+import {
+  FieldError,
+  P3,
+  iconsDeprecated,
+  scrollbarStyleThin,
+} from "@argent/x-ui"
 import { Box, Button, Center, Flex, Input, InputGroup } from "@chakra-ui/react"
 import { useCallback, useEffect, useRef } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
 import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 
-const { AddIcon, RemoveIcon } = icons
+const { AddIcon, RemoveIcon } = iconsDeprecated
 
 interface AddOwnerFormProps {
   nextOwnerIndex: number
@@ -42,7 +47,7 @@ export const AddOwnersForm = ({
   }, [addOwner])
   return (
     <Flex direction="column" justifyContent="space-between" w="100%">
-      <Box maxHeight={300} overflowY="auto">
+      <Box maxHeight={300} overflowY="auto" sx={scrollbarStyleThin}>
         {fields.map((field, index) => {
           return (
             <Box
@@ -52,7 +57,7 @@ export const AddOwnersForm = ({
               data-testid={`signerContainer.${index}`}
             >
               <Flex justify="space-between" align="center">
-                <P3 mb="1">Owner {nextOwnerIndex + index}</P3>
+                <P3>Owner {nextOwnerIndex + index}</P3>
                 <Button
                   data-testid={`closeButton.${index}`}
                   onClick={() => {
@@ -61,17 +66,15 @@ export const AddOwnersForm = ({
                     }
                     remove(index)
                   }}
-                  height="5"
-                  size="xs"
-                  mr="2"
-                  my="0"
-                  pb="0"
-                  variant="link"
+                  width={7}
+                  height={7}
+                  size="auto"
+                  colorScheme="transparent"
                 >
                   <RemoveIcon />
                 </Button>
               </Flex>
-              <InputGroup display="flex" alignItems="center">
+              <InputGroup display="flex" alignItems="center" mt={3}>
                 <Input
                   isInvalid={Boolean(errors?.signerKeys?.[index]?.name)}
                   placeholder="Name"
@@ -105,10 +108,11 @@ export const AddOwnersForm = ({
       <Center width="100%">
         <Button
           data-testid="addOwnerButton"
-          variant="link"
-          onClick={addOwner}
-          size="xs"
+          size={"sm"}
+          colorScheme={"transparent"}
           leftIcon={<AddIcon />}
+          color="text-secondary"
+          onClick={addOwner}
         >
           Add another owner
         </Button>

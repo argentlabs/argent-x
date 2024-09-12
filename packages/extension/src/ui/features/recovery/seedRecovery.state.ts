@@ -3,6 +3,7 @@ import { create } from "zustand"
 import { splitPhrase } from "./phraseUtils"
 import { validateMnemonic } from "@scure/bip39"
 import { wordlist } from "@scure/bip39/wordlists/english"
+import { IS_DEV } from "../../../shared/utils/dev"
 
 interface State {
   seedPhrase?: string
@@ -23,12 +24,16 @@ export const validateSeedPhrase = (seedPhrase: string): boolean => {
   return isValid
 }
 
-export const passwordSchema = z
+const MIN_PASSWORD_LENGTH = IS_DEV ? 1 : 8
+const newPasswordSchema = z
   .string()
-  .min(5, "Password must be at least 5 characters")
+  .min(
+    MIN_PASSWORD_LENGTH,
+    `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+  )
 
-export const validatePassword = (password: string): boolean => {
-  const { success } = passwordSchema.safeParse(password)
+export const validateNewPassword = (password: string): boolean => {
+  const { success } = newPasswordSchema.safeParse(password)
   return success
 }
 
@@ -40,7 +45,7 @@ export const validateAndSetSeedPhrase = (seedPhrase: string): void => {
 }
 
 export const validateAndSetPassword = (password: string): void => {
-  if (!validatePassword(password)) {
+  if (!validateNewPassword(password)) {
     throw new Error("Invalid password")
   }
   return useSeedRecovery.setState({ password })
@@ -53,5 +58,5 @@ export const validateSeedRecoveryCompletion = (
     state.seedPhrase &&
       state.password &&
       validateSeedPhrase(state.seedPhrase) &&
-      validatePassword(state.password),
+      validateNewPassword(state.password),
   )

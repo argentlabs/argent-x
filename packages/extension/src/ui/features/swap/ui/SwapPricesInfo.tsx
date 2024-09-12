@@ -1,4 +1,4 @@
-import { P4, icons } from "@argent/x-ui"
+import { P4, iconsDeprecated } from "@argent/x-ui"
 import { Box, Flex, Text, Tooltip, useDisclosure } from "@chakra-ui/react"
 import { FC, useCallback, useMemo, useState } from "react"
 import {
@@ -12,7 +12,7 @@ import { prettifyTokenAmount } from "@argent/x-shared"
 import { SlippageModal } from "./SlippageModal"
 import { Trade } from "../../../../shared/swap/model/trade.model"
 
-const { InfoIcon, EditIcon } = icons
+const { InfoIcon, EditIcon } = iconsDeprecated
 
 interface SwapPricesInfoProps {
   tokenIn?: Token
@@ -64,7 +64,7 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
     <>
       <Flex
         flexDirection="column"
-        bg="neutrals.900"
+        bg="surface-default"
         border="solid 1px"
         borderColor="neutrals.700"
         borderRadius="lg"

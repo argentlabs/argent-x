@@ -4,9 +4,9 @@
     "name": "Ether",
     "symbol": "ETH",
     "decimals": 18,
-    "network": "goerli-alpha",
+    "network": "sepolia-alpha",
     "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-    "networkId": "goerli-alpha",
+    "networkId": "sepolia-alpha",
     "balance": "1000000000000000000"
   },
   {
@@ -14,9 +14,9 @@
     "name": "DAI",
     "symbol": "DAI",
     "decimals": 18,
-    "network": "goerli-alpha",
+    "network": "sepolia-alpha",
     "image": "https://dv3jj1unlp2jl.cloudfront.net/128/color/dai.png",
-    "networkId": "goerli-alpha",
+    "networkId": "sepolia-alpha",
     "balance": "1000000000000000000"
   }
 ]

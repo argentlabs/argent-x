@@ -2,12 +2,12 @@ import { renderHook, waitFor } from "@testing-library/react"
 import { describe, expect, test, vi } from "vitest"
 
 import { Network } from "../../../shared/network"
-import { TransformedTransaction } from "./transform/type"
+import { TransformedTransaction } from "../../../shared/activity/utils/transform/type"
 import { useTransactionFees } from "./useTransactionFees"
 
 describe("useTransactionFees", () => {
   vi.mock("../../../shared/network", () => ({
-    getProvider6: vi.fn(() => {
+    getProvider: vi.fn(() => {
       return {
         getTransactionReceipt: vi.fn(() => {
           return {

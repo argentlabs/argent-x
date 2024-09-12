@@ -1,11 +1,11 @@
-import { H6, P4, icons } from "@argent/x-ui"
+import { H6, P4, iconsDeprecated } from "@argent/x-ui"
 import { Button, Center, Circle } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 
-const { PasswordIcon } = icons
+const { PasswordIcon } = iconsDeprecated
 
 export const SaveRecoverySeedphraseBanner: FC = () => {
   const navigate = useNavigate()

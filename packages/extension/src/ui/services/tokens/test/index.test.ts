@@ -1,7 +1,7 @@
 import { Address } from "@argent/x-shared"
 
-import { messageClient } from "../../messaging/trpc"
-import { TokenService } from "../implementation"
+import { messageClient } from "../../trpc"
+import { ClientTokenService } from "../ClientTokenService"
 import { Mocked } from "vitest"
 
 const messageClientMock = {
@@ -20,12 +20,12 @@ const messageClientMock = {
       query: vi.fn().mockResolvedValue([
         {
           address: "0x123",
-          networkId: "goerli-alpha",
+          networkId: "sepolia-alpha",
           balance: "100",
         },
         {
           address: "0x456",
-          networkId: "goerli-alpha",
+          networkId: "sepolia-alpha",
           balance: "200",
         },
       ]),
@@ -34,10 +34,10 @@ const messageClientMock = {
 } as unknown as Mocked<typeof messageClient>
 
 describe("TokenService", () => {
-  let testClass: TokenService
+  let testClass: ClientTokenService
 
   beforeEach(() => {
-    testClass = new TokenService(messageClientMock)
+    testClass = new ClientTokenService(messageClientMock)
   })
 
   afterEach(() => {

@@ -1,8 +1,8 @@
-import { typedData } from "starknet"
+import { TypedData } from "@starknet-io/types-js"
 
-export const dataToSign: typedData.TypedData = {
+export const dataToSign: TypedData = {
   domain: {
-    chainId: "SN_GOERLI2",
+    chainId: "SN_SEPOLIA",
     name: "Example DApp",
     version: "0.0.1",
   },

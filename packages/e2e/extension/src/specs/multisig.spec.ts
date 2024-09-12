@@ -1,10 +1,10 @@
 import { expect } from "@playwright/test"
 import test from "../test"
-import config from "../../../shared/config"
+import config from "../config"
 import { sleep } from "../../../shared/src/common"
-import { lang } from "../languages"
 
-test.describe("Multisig", () => {
+test.describe("Multisig", { tag: "@tx" }, () => {
+  test.skip(config.skipTXTests === "true")
   test.slow()
   test("add and activate 1/1 multisig", async ({ extension }) => {
     await extension.setupWallet({
@@ -366,92 +366,65 @@ test.describe("Multisig", () => {
     extension,
   }) => {
     await extension.open()
-    await extension.recoverWallet(config.testNetSeed3!)
+    await extension.recoverWallet(config.testSeed3!)
     await expect(extension.network.networkSelector).toBeVisible()
     await extension.network.selectDefaultNetwork()
 
     await extension.account.accountListSelector.click()
-    await expect(
-      extension.account.account(extension.account.accountName1),
-    ).toBeVisible()
-    await expect(
-      extension.account.account(extension.account.accountNameMulti1),
-    ).toBeHidden()
-  })
-  //https://argent.atlassian.net/browse/BLO-1935
-  test.skip("User should be able to hide/unhide Multisig account", async ({
-    extension,
-  }) => {
-    await extension.open()
-    await extension.recoverWallet(config.testNetSeed2!)
-    await expect(extension.network.networkSelector).toBeVisible()
-    await extension.network.selectDefaultNetwork()
-
-    await extension.account.selectAccount(extension.account.accountNameMulti1)
-    await extension.navigation.showSettingsLocator.click()
-    await extension.settings
-      .account(extension.account.accountNameMulti1)
-      .click()
-    await extension.settings.hideAccount.click()
-    await extension.settings.confirmHide.click()
-
-    await expect(
-      extension.account.account(extension.account.accountNameMulti1),
-    ).toBeHidden()
-
-    await extension.settings.hiddenAccounts.click()
-    await extension.settings
-      .unhideAccount(extension.account.accountNameMulti1)
-      .click()
-    await extension.navigation.backLocator.click()
-    await expect(extension.settings.hiddenAccounts).toBeHidden()
-    await expect(
-      extension.account.account(extension.account.accountNameMulti1),
-    ).toBeVisible()
-  })
-
-  test("Add token, token should only be visible if preference is set", async ({
-    extension,
-  }) => {
-    await extension.setupWallet({
-      accountsToSetup: [],
-    })
-    await extension.account.addMultisigAccount({})
-    await extension.navigation.closeLocator.click()
-    await expect(
-      extension.page.locator('[data-testid="activate-multisig"]'),
-    ).toBeHidden()
-    await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      amount: 0.001,
-    })
-    await expect(
-      extension.page.locator('[data-testid="activate-multisig"]'),
-    ).toBeVisible()
-    await extension.activateMultisig(extension.account.accountNameMulti1)
-    await extension.page
-      .getByRole("link", { name: lang.account.newToken })
-      .click()
-    await extension.page
-      .locator('[name="address"]')
-      .fill(
-        "0x05A6B68181bb48501a7A447a3f99936827E41D77114728960f22892F02E24928",
-      )
-    await expect(extension.page.locator('[name="name"]')).toHaveValue("Astraly")
     await Promise.all([
-      extension.navigation.continueLocator.click(),
-      extension.page.locator('text="Token added"').click(),
+      expect(
+        extension.account.account(extension.account.accountName1),
+      ).toBeVisible(),
+      expect(
+        extension.account.account(extension.account.accountNameMulti1),
+      ).toBeVisible(),
+      expect(
+        extension.account.account(extension.account.accountNameMulti2),
+      ).toBeHidden(),
+      expect(
+        extension.account.account(extension.account.accountNameMulti3),
+      ).toBeVisible(),
     ])
-
-    await expect(extension.account.token("AST")).toBeHidden()
-    await extension.navigation.showSettingsLocator.click()
-    await extension.settings.preferences.click()
-    await expect(extension.preferences.hideTokensStatus).toBeEnabled()
-    await extension.preferences.hideTokens.click()
-    await extension.navigation.backLocator.click()
-    await extension.navigation.closeLocator.click()
-    await expect(extension.account.token("AST")).toBeVisible()
   })
+
+  test(
+    "User should be able to hide/unhide Multisig account",
+    {
+      tag: "@all",
+    },
+    async ({ extension }) => {
+      await extension.open()
+      await extension.recoverWallet(config.testSeed1!)
+      await expect(extension.network.networkSelector).toBeVisible()
+      await extension.network.selectDefaultNetwork()
+
+      await extension.account.selectAccount(extension.account.accountNameMulti1)
+      await extension.navigation.showSettingsLocator.click()
+      await extension.settings
+        .account(extension.account.accountNameMulti1)
+        .click()
+      await extension.settings.hideAccount.click()
+      await extension.settings.confirmHide.click()
+
+      await expect(
+        extension.account.account(extension.account.accountNameMulti1),
+      ).toBeHidden()
+      await extension.navigation.closeButtonLocator.click()
+      await extension.navigation.showSettingsLocator.click()
+      await extension.settings.preferences.click()
+      await extension.settings.hiddenAccounts.click()
+      await extension.settings
+        .unhideAccount(extension.account.accountNameMulti1)
+        .click()
+      await extension.navigation.backLocator.click()
+      await extension.navigation.backLocator.click()
+      await extension.navigation.closeLocator.click()
+      await extension.account.accountListSelector.click()
+      await expect(
+        extension.account.account(extension.account.accountNameMulti1),
+      ).toBeVisible()
+    },
+  )
 
   test("add owner to 1/1 activated multisig", async ({
     extension,
@@ -518,7 +491,7 @@ test.describe("Multisig", () => {
       originAccountName: extension.account.accountNameMulti1,
       recipientAddress: config.destinationAddress!,
       token: "ETH",
-      amount: 0.0015,
+      amount: 0.0001,
     })
     const txHash = await extension.activity.getLastTxHash()
     await extension.navigation.menuTokensLocator.click()
@@ -576,5 +549,94 @@ test.describe("Multisig", () => {
         { timeout: 120000 },
       ),
     ])
+  })
+
+  test("create 3 multisig with same keys, owner should all, others should see only the first", async ({
+    extension,
+    secondExtension,
+    thirdExtension,
+  }) => {
+    await extension.setupWallet({
+      accountsToSetup: [],
+    })
+    await secondExtension.setupWallet({
+      accountsToSetup: [],
+    })
+    await thirdExtension.setupWallet({
+      accountsToSetup: [],
+    })
+    const pubKey = await secondExtension.account.joinMultisig()
+    const pubKey2 = await thirdExtension.account.joinMultisig()
+    await extension.account.addMultisigAccount({ signers: [pubKey, pubKey2] })
+    await extension.navigation.closeLocator.click()
+    await extension.account.addMultisigAccount({ signers: [pubKey, pubKey2] })
+    await extension.navigation.closeLocator.click()
+    await extension.account.addMultisigAccount({ signers: [pubKey, pubKey2] })
+    await extension.navigation.closeLocator.click()
+
+    await extension.fundMultisigAccount({
+      accountName: extension.account.accountNameMulti1,
+      amount: 0.002,
+    })
+    await extension.activateMultisig(extension.account.accountNameMulti1)
+
+    await extension.fundMultisigAccount({
+      accountName: extension.account.accountNameMulti2,
+      amount: 0.002,
+    })
+    await extension.activateMultisig(extension.account.accountNameMulti2)
+
+    await extension.fundMultisigAccount({
+      accountName: extension.account.accountNameMulti3,
+      amount: 0.002,
+    })
+    await extension.activateMultisig(extension.account.accountNameMulti3)
+
+    await expect(
+      secondExtension.account.accountListConfirmations(
+        secondExtension.account.accountNameMulti1,
+      ),
+    ).toHaveText("1/3")
+    await secondExtension.navigation.closeLocator.click()
+    await secondExtension.account.selectAccount(
+      secondExtension.account.accountNameMulti1,
+    )
+    await expect(
+      thirdExtension.account.accountListConfirmations(
+        thirdExtension.account.accountNameMulti1,
+      ),
+    ).toHaveText("1/3")
+    await thirdExtension.navigation.closeLocator.click()
+    await thirdExtension.account.selectAccount(
+      thirdExtension.account.accountNameMulti1,
+    )
+
+    await Promise.all([
+      expect(extension.account.accountViewConfirmations).toHaveText(
+        "1/3 multisig",
+      ),
+      expect(secondExtension.account.accountViewConfirmations).toHaveText(
+        "1/3 multisig",
+      ),
+      expect(thirdExtension.account.accountViewConfirmations).toHaveText(
+        "1/3 multisig",
+      ),
+    ])
+
+    await extension.account.accountListSelector.click()
+    let accountList = await extension.account.accountNames()
+    expect(accountList).toEqual([
+      "Account 1",
+      "Multisig 1",
+      "Multisig 2",
+      "Multisig 3",
+    ])
+    await secondExtension.account.accountListSelector.click()
+    accountList = await secondExtension.account.accountNames()
+    expect(accountList).toEqual(["Account 1", "Multisig 1"])
+
+    await thirdExtension.account.accountListSelector.click()
+    accountList = await thirdExtension.account.accountNames()
+    expect(accountList).toEqual(["Account 1", "Multisig 1"])
   })
 })

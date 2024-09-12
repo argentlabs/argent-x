@@ -3,7 +3,7 @@ import { FC } from "react"
 import styled from "styled-components"
 
 import { useDisplayTokenAmountAndCurrencyValue } from "../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
-import { TransformedTransactionAction } from "../transform/type"
+import { TransformedTransactionAction } from "../../../../shared/activity/utils/transform/type"
 
 const TitleCurrencyValue = styled.span`
   font-size: 17px;

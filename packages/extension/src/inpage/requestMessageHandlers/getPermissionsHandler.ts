@@ -1,6 +1,6 @@
-import { Permission } from "@argent/x-window"
+import { Permission } from "@starknet-io/types-js"
 import { getIsPreauthorized } from "../messaging"
 
 export async function getPermissionsHandler() {
-  return (await getIsPreauthorized()) ? [Permission.Accounts] : []
+  return (await getIsPreauthorized()) ? [Permission.ACCOUNTS] : []
 }

@@ -4,7 +4,8 @@ import { TransactionUpdateListener } from "./type"
 export const handleChangeGuardianTransaction: TransactionUpdateListener =
   async (transactions) => {
     const changeGuardians = transactions.filter(
-      (transaction) => transaction.meta?.isChangeGuardian,
+      (transaction) =>
+        transaction.meta?.isChangeGuardian || transaction.meta?.isCancelEscape,
     )
     if (changeGuardians.length > 0) {
       await updateAccountDetails(

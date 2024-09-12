@@ -13,7 +13,7 @@ export const Default = {
       {
         name: "Account 1 Lorem Ipsum Dolor Sit Amet",
         address: "0x123",
-        networkId: "goerli-alpha",
+        networkId: "sepolia-alpha",
       },
     ],
     hiddenPendingMultisigAccounts: [

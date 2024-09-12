@@ -9,7 +9,7 @@ import {
 import { FC, ReactEventHandler } from "react"
 
 import { ISettingsStorage } from "../../../../shared/settings/types"
-import { routes } from "../../../routes"
+import { routes } from "../../../../shared/ui/routes"
 import { SettingsMenuItemLink } from "../ui/SettingsMenuItem"
 import { getTitleForAutoLockTimeMinutes } from "../../../../shared/settings/defaultAutoLockTimes"
 

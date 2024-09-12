@@ -1,7 +1,7 @@
 import { MessageType } from "../../shared/messages"
-import { preAuthorizationService } from "../../shared/preAuthorization/service"
+import { preAuthorizationService } from "../../shared/preAuthorization"
 import { migrateWallet } from "../migrations/wallet/storeMigration"
-import { backgroundActionService } from "../__new/services/action"
+import { backgroundActionService } from "../services/action"
 import { handleAccountMessage } from "../accountMessaging"
 import { handleActionMessage } from "../actionMessaging"
 import { addTab, hasTab, sendMessageToActiveTabs } from "../activeTabs"
@@ -13,13 +13,11 @@ import {
 import { getMessagingKeys } from "../keys/messagingKeys"
 import { handleMiscellaneousMessage } from "../miscellaneousMessaging"
 import { handleNetworkMessage } from "../networkMessaging"
-import {
-  getOriginFromSender,
-  handlePreAuthorizationMessage,
-} from "../preAuthorizationMessaging"
+import { handlePreAuthorizationMessage } from "../preAuthorizationMessaging"
+import { getIsSafeMessageSender } from "../../shared/messages/getIsSafeMessageSender"
 import { respond } from "../respond"
 import { handleTokenMessaging } from "../tokenMessaging"
-import { transactionTrackerWorker } from "../transactions/service/worker"
+import { transactionTrackerWorker } from "../services/transactionTracker/worker"
 import { handleTransactionMessage } from "../transactions/transactionMessaging"
 import { handleUdcMessaging } from "../udcMessaging"
 import { walletSingleton } from "../walletSingleton"
@@ -27,6 +25,7 @@ import { safeMessages, safeIfPreauthorizedMessages } from "./messages"
 import browser from "webextension-polyfill"
 import { feeTokenService } from "../../shared/feeToken/service"
 import { z } from "zod"
+import { getOriginFromSender } from "../../shared/messages/getOriginFromSender"
 
 const handlers = [
   handleAccountMessage,
@@ -66,17 +65,15 @@ export const handleMessage = async (
     feeTokenService,
   }
 
-  const extensionUrl = browser.runtime.getURL("")
-  const safeOrigin = extensionUrl.replace(/\/$/, "")
-  const origin = getOriginFromSender(sender)
-  const isSafeOrigin = Boolean(origin === safeOrigin)
+  const isSafeOrigin = getIsSafeMessageSender(sender)
+  const senderOrigin = getOriginFromSender(sender)
 
   const currentAccount = await walletSingleton.getSelectedAccount()
   const senderIsPreauthorized =
     !!currentAccount &&
     (await preAuthorizationService.isPreAuthorized({
       account: currentAccount,
-      host: origin,
+      host: senderOrigin,
     }))
 
   if (
@@ -85,7 +82,7 @@ export const handleMessage = async (
     !(senderIsPreauthorized && safeIfPreauthorizedMessages.includes(msg.type)) // allow additional messages if sender is preauthorized
   ) {
     console.warn(
-      `received message of type ${msg.type} from ${origin} but it is not allowed`,
+      `received message of type ${msg.type} from ${senderOrigin} but it is not allowed`,
     )
     return // this return must not be removed
   }
@@ -100,7 +97,7 @@ export const handleMessage = async (
   if (sender.tab?.id && port) {
     await addTab({
       id: sender.tab?.id,
-      host: origin,
+      host: senderOrigin,
       port,
     })
   }
@@ -110,7 +107,7 @@ export const handleMessage = async (
       await handleMessage({
         msg,
         sender,
-        origin,
+        origin: senderOrigin,
         background,
         messagingKeys,
         port,

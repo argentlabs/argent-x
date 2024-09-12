@@ -4,8 +4,11 @@ import {
   InvocationsSignerDetails,
   Signature,
   Signer,
+  TypedData,
   stark,
-} from "starknet6"
+  hash,
+} from "starknet"
+import { ApiMultisigOffchainSignatureState } from "./multisig.model"
 
 export class MultisigSigner extends Signer {
   constructor(pk: Uint8Array | string) {
@@ -18,12 +21,8 @@ export class MultisigSigner extends Signer {
     const signatures = await super.signDeployAccountTransaction(
       deployAccountSignerDetails,
     )
-
-    const formattedSignatures = stark.signatureToDecimalArray(signatures)
-
     const publicSigner = await this.getPubKey()
-
-    return [publicSigner, ...formattedSignatures] // Intentionally publicSigner is hex and signatures are decimal. Backend should be able to handle this
+    return [publicSigner, ...stark.signatureToDecimalArray(signatures)] // Intentionally publicSigner is hex and signatures are decimal. Backend should be able to handle this
   }
 
   public async signTransaction(
@@ -34,11 +33,31 @@ export class MultisigSigner extends Signer {
       transactions,
       transactionsDetail,
     )
-
-    const formattedSignatures = stark.signatureToDecimalArray(signatures)
-
     const publicSigner = await this.getPubKey()
+    return [publicSigner, ...stark.signatureToDecimalArray(signatures)]
+  }
 
-    return [publicSigner, ...formattedSignatures]
+  public async signMessage(
+    typedData: TypedData,
+    accountAddress: string,
+  ): Promise<Signature> {
+    const signature = await super.signMessage(typedData, accountAddress)
+    const publicSigner = await this.getPubKey()
+    return [publicSigner, ...stark.signatureToDecimalArray(signature)]
+  }
+
+  public async signStateMessage(
+    msgHash: string,
+    state: ApiMultisigOffchainSignatureState,
+  ): Promise<Signature> {
+    // Pedersen hash of the state and the message hash
+    // pedersen(starknet_keccak(state), msg_hash)
+    const stateMsghash = hash.computePedersenHash(
+      hash.starknetKeccak(state),
+      msgHash,
+    )
+    const signature = await this.signRaw(stateMsghash)
+    const publicSigner = await this.getPubKey()
+    return [publicSigner, ...stark.signatureToDecimalArray(signature)]
   }
 }

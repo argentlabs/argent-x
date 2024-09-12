@@ -2,11 +2,11 @@ import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import {
-  routes,
   useReturnTo,
   useRouteAccountAddress,
   useRouteFlow,
-} from "../../routes"
+} from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import { ArgentAccountBaseEmailScreen } from "../argentAccount/ArgentAccountBaseEmailScreen"
 
 export const ArgentAccountEmailScreen: FC = () => {
@@ -22,7 +22,7 @@ export const ArgentAccountEmailScreen: FC = () => {
   const onEmailRequested = useCallback(
     (email: string) => {
       if (accountAddress) {
-        navigate(routes.shieldAccountOTP(accountAddress, email, flow))
+        navigate(routes.smartAccountOTP(accountAddress, email, flow))
       }
     },
     [accountAddress, navigate, flow],

@@ -11,11 +11,11 @@ import { ApproveScreenType } from "../../../types"
 import { AggregatedSimData } from "@argent/x-shared"
 import { ActivateAccountIcon } from "./ActivateAccountIcon"
 import { ActivateMultisigIcon } from "./ActivateMultisigIcon"
-import { AddArgentShieldIcon } from "./AddArgentShieldIcon"
+import { UpgradeSmartAccountdIcon } from "./UpgradeSmartAccountIcon"
 import { AddOwnerIcon } from "./AddOwnerIcon"
 import { DeclareContractIcon } from "./DeclareTransactionIcon"
 import { NftTransactionIcon } from "./NftTransactionIcon"
-import { RemoveArgentShieldIcon } from "./RemoveArgentShieldIcon"
+import { DowngradeSmartAccouIcon } from "./DowngradeSmartAccountIcon"
 import { RemoveOwnerIcon } from "./RemoveOwnerIcon"
 import { SendTransactionIcon } from "./SendTransactionIcon"
 import { SwapTransactionIcon } from "./SwapTransactionIcon"
@@ -23,7 +23,7 @@ import { UnknownDappIcon } from "./UnknownDappIcon"
 import { UpdateThresholdIcon } from "./UpdateThresholdIcon"
 import { VerifiedDappIcon } from "./VerifiedDappIcon"
 import { ReplaceOwnerIcon } from "./ReplaceOwnerIcon"
-import { ReviewOfTransaction } from "../../../../../../../shared/transactionReview/schema"
+import { ReviewOfTransaction } from "@argent/x-shared/simulation"
 
 export interface TransactionIconProps {
   transactionReview?: ReviewOfTransaction
@@ -62,10 +62,10 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       return <ReplaceOwnerIcon />
     case ApproveScreenType.MULTISIG_UPDATE_THRESHOLD:
       return <UpdateThresholdIcon />
-    case ApproveScreenType.ADD_ARGENT_SHIELD:
-      return <AddArgentShieldIcon />
-    case ApproveScreenType.REMOVE_ARGENT_SHIELD:
-      return <RemoveArgentShieldIcon />
+    case ApproveScreenType.ADD_GUARDIAN:
+      return <UpgradeSmartAccountdIcon />
+    case ApproveScreenType.REMOVE_GUARDIAN:
+      return <DowngradeSmartAccouIcon />
     default:
       // Check if swap transaction review is available
       if (isSwap) {

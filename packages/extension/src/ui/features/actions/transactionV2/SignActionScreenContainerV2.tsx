@@ -1,28 +1,37 @@
-import { FC, useCallback } from "react"
-import { isObject } from "lodash-es"
-
-import { WithArgentShieldVerified } from "../../shield/WithArgentShieldVerified"
-import { useActionScreen } from "../hooks/useActionScreen"
-import { useMultisig } from "../../multisig/multisig.state"
-import { useIsSignerInMultisig } from "../../multisig/hooks/useIsSignerInMultisig"
-import { useAccount } from "../../accounts/accounts.state"
-import { useDappDisplayAttributes } from "../connectDapp/useDappDisplayAttributes"
+import { FC, useCallback, useMemo } from "react"
+import { getErrorMessageAndLabelFromSimulation } from "@argent/x-shared/simulation"
+import { Label, ActionScreenErrorFooter } from "@argent/x-ui"
+import { useNavigate } from "react-router-dom"
+import { routes } from "../../../../shared/ui/routes"
 import { DeployAccountScreenContainer } from "../../accounts/DeployAccountScreenContainer"
+import { useIsAccountDeploying } from "../../accountTokens/useIsAccountDeploying"
 import { RemovedMultisigWarningScreen } from "../../multisig/RemovedMultisigWarningScreen"
-import { MultisigSignatureScreenWarning } from "../../multisig/MultisigSignatureScreenWarning"
+import { WithSmartAccountVerified } from "../../smartAccount/WithSmartAccountVerified"
+import { useDappDisplayAttributes } from "../connectDapp/useDappDisplayAttributes"
 import { ExecuteFromOutsideScreen } from "../ExecuteFromOutsideScreen"
-import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
+import { useActionScreen } from "../hooks/useActionScreen"
+import { useDefaultFeeToken } from "../useDefaultFeeToken"
 import { SignActionScreenV2 } from "./SignActionScreenV2"
-import { validateOutsideExecution } from "../transaction/executeFromOutside/utils"
+import { useSignatureReview } from "./useTransactionReviewV2"
+import { ampli } from "../../../../shared/analytics"
+import { LedgerActionModal } from "../transaction/ApproveTransactionScreen/ledger/LedgerActionModal"
+import { useLedgerForTransaction } from "../hooks/useLedgerForTransaction"
+import { useView } from "../../../views/implementation/react"
+import {
+  isSignerInMultisigView,
+  multisigView,
+} from "../../multisig/multisig.state"
+import useValidateOutsideExecution from "../transaction/executeFromOutside/useValidateOutsideExecution"
 
 export const SignActionScreenContainerV2: FC = () => {
   const {
     action,
     selectedAccount,
     approve,
+    approveAndClose,
     reject,
     rejectWithoutClose,
-    closePopupIfLastAction,
+    clearLastActionError,
   } = useActionScreen()
   if (action?.type !== "SIGN") {
     throw new Error(
@@ -30,34 +39,96 @@ export const SignActionScreenContainerV2: FC = () => {
     )
   }
 
-  const multisig = useMultisig(selectedAccount)
-  const signerIsInMultisig = useIsSignerInMultisig(multisig)
-  const accountWithDeployState = useAccount(selectedAccount)
-  const dappDisplayAttributes = useDappDisplayAttributes(
-    action.meta.origin || "",
-  )
+  const navigate = useNavigate()
+  const multisig = useView(multisigView(selectedAccount))
+  const signerIsInMultisig = useView(isSignerInMultisigView(selectedAccount))
+  const isAccountDeploying = useIsAccountDeploying(selectedAccount)
 
+  const host = action.meta.origin || ""
+  const dappDisplayAttributes = useDappDisplayAttributes(host)
+  const feeToken = useDefaultFeeToken(selectedAccount)
   const dataToSign = action.payload.typedData
+  const {
+    data: review,
+    error,
+    isValidating,
+  } = useSignatureReview({
+    dataToSign: dataToSign,
+    feeTokenAddress: feeToken.address,
+    appDomain: action.meta.origin,
+  })
+  const isOutsideExecution =
+    dataToSign.domain.name === "Account.execute_from_outside"
   const skipDeployWarning = action.payload.options?.skipDeploy
 
+  const isValidOutsideExecution = useValidateOutsideExecution(
+    action.payload.typedData,
+    host,
+    selectedAccount?.network,
+  )
+
+  const {
+    isLedgerApprovalOpen,
+    onLedgerApprovalOpen,
+    onLedgerApprovalClose,
+    isLedgerSigner,
+    ledgerErrorMessage,
+    disableLedgerApproval,
+  } = useLedgerForTransaction(selectedAccount)
+
   const onSubmit = useCallback(async () => {
-    const result = await approve()
-    if (isObject(result) && "error" in result) {
-      // stay on error screen
-    } else {
-      closePopupIfLastAction()
+    if (isLedgerSigner) {
+      await clearLastActionError()
+      onLedgerApprovalOpen()
     }
-  }, [closePopupIfLastAction, approve])
+
+    if (multisig && multisig.threshold > 1) {
+      await approve()
+      return navigate(routes.multisigOffchainSignatureWarning())
+    }
+    ampli.messageSigned({
+      host: action.meta.origin || "",
+      "from outside": isOutsideExecution,
+      "wallet platform": "browser extension",
+    })
+
+    return approveAndClose()
+  }, [
+    isLedgerSigner,
+    multisig,
+    action.meta.origin,
+    isOutsideExecution,
+    approveAndClose,
+    clearLastActionError,
+    onLedgerApprovalOpen,
+    approve,
+    navigate,
+  ])
+
+  const transactionReviewSimulationError = useMemo(() => {
+    const errorMessageAndLabel = getErrorMessageAndLabelFromSimulation(review)
+    if (!errorMessageAndLabel) {
+      return null
+    }
+    const { label, message } = errorMessageAndLabel
+
+    return (
+      <ActionScreenErrorFooter
+        title={<Label prefix="Tx not executed:" label={label} />}
+        errorMessage={message}
+      />
+    )
+  }, [review])
 
   if (
     !skipDeployWarning &&
     selectedAccount?.needsDeploy &&
-    !accountWithDeployState?.deployTransaction
+    !isAccountDeploying
   ) {
     return (
-      <WithArgentShieldVerified>
+      <WithSmartAccountVerified>
         <DeployAccountScreenContainer onReject={() => void reject()} />
-      </WithArgentShieldVerified>
+      </WithSmartAccountVerified>
     )
   }
 
@@ -69,24 +140,7 @@ export const SignActionScreenContainerV2: FC = () => {
     )
   }
 
-  if (multisig) {
-    return (
-      <MultisigSignatureScreenWarning
-        selectedAccount={selectedAccount}
-        onReject={() => void reject()}
-      />
-    )
-  }
-
-  const isValidOutsideExecution = validateOutsideExecution(
-    action.payload.typedData,
-    selectedAccount?.network,
-  )
-
-  if (
-    dataToSign.domain.name === "Account.execute_from_outside" &&
-    !isValidOutsideExecution
-  ) {
+  if (isOutsideExecution && !isValidOutsideExecution) {
     return (
       <ExecuteFromOutsideScreen
         selectedAccount={selectedAccount}
@@ -95,19 +149,38 @@ export const SignActionScreenContainerV2: FC = () => {
     )
   }
 
+  const confirmButtonDisabled = disableLedgerApproval
+
+  const signatureReview = transactionReviewSimulationError ? undefined : review // If we have simulation errors, fallback to the normal signature screen
+
   return (
-    <WithArgentShieldVerified>
+    <WithSmartAccountVerified>
       <SignActionScreenV2
-        title={action.meta.title}
+        title={
+          isOutsideExecution ? "Review transaction intent" : action.meta.title
+        }
         subtitle={action.meta.origin}
         dappLogoUrl={dappDisplayAttributes.iconUrl}
         dappHost={action.meta.origin || ""}
         dataToSign={dataToSign}
         onSubmit={() => void onSubmit()}
-        footer={<WithActionScreenErrorFooter />}
         onReject={() => void reject()}
         actionIsApproving={Boolean(action.meta.startedApproving)}
+        review={signatureReview}
+        networkId={selectedAccount?.network.id || ""}
+        error={error}
+        isValidating={isValidating}
+        confirmButtonDisabled={confirmButtonDisabled}
+        isLedger={isLedgerSigner}
       />
-    </WithArgentShieldVerified>
+      <LedgerActionModal
+        isOpen={isLedgerApprovalOpen}
+        onClose={onLedgerApprovalClose}
+        onSubmit={onSubmit}
+        errorMessage={ledgerErrorMessage}
+        account={selectedAccount}
+        actionType="signature"
+      />
+    </WithSmartAccountVerified>
   )
 }

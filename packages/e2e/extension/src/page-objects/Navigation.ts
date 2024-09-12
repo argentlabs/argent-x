@@ -1,23 +1,29 @@
 import type { Page } from "@playwright/test"
 
 import { lang } from "../languages"
+import Utils from "../../../shared/src/Utils"
 
-export default class Navigation {
-  page: Page
+export default class Navigation extends Utils {
   constructor(page: Page) {
-    this.page = page
+    super(page)
   }
 
   get backLocator() {
-    return this.page.locator(`[aria-label="${lang.common.back}"]`).first()
+    return this.page.getByLabel(`${lang.common.back}`).first()
   }
 
   get closeLocator() {
     return this.page.locator(`[aria-label="${lang.common.close}"]`)
   }
+
   get closeButtonLocator() {
-    return this.page.locator('[data-testid="close-button"]')
+    return this.page.getByLabel("close")
   }
+
+  get closeButtonDappInfoLocator() {
+    return this.page.getByTestId("close-button")
+  }
+
   get confirmLocator() {
     return this.page.locator(`button:text-is("${lang.common.confirm}")`)
   }
@@ -49,7 +55,7 @@ export default class Navigation {
   }
 
   get unlockLocator() {
-    return this.page.locator(`button:text-is("${lang.common.unlock}")`)
+    return this.page.locator(`button:text-is("${lang.common.unlock}")`).first()
   }
 
   get showSettingsLocator() {
@@ -63,7 +69,7 @@ export default class Navigation {
   }
 
   get resetLocator() {
-    return this.page.locator(`a:text-is("${lang.common.reset}")`)
+    return this.page.getByText("Reset").first()
   }
 
   get confirmResetLocator() {
@@ -114,9 +120,9 @@ export default class Navigation {
     return this.page.locator(`button:text-is("${lang.common.addArgentShield}")`)
   }
 
-  get removeArgentShieldLocator() {
+  get confirmChangeAccountTypeLocator() {
     return this.page.locator(
-      `button:text-is("${lang.common.removeArgentShield}")`,
+      `button:text-is("${lang.common.changeAccountType}")`,
     )
   }
 
@@ -126,5 +132,9 @@ export default class Navigation {
 
   get removeLocator() {
     return this.page.locator(`button:text-is("${lang.common.remove}")`)
+  }
+
+  get upgradeLocator() {
+    return this.page.locator(`button:text-is("${lang.common.upgrade}")`)
   }
 }

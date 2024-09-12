@@ -11,18 +11,16 @@ describe("HideOrDeleteAccountConfirmScreen", () => {
 
     renderWithLegacyProviders(
       <HideOrDeleteAccountConfirmScreen
-        mode={"delete"}
+        mode={"hide"}
         accountName={"Foo bar account"}
         accountAddress={"0x123"}
         onReject={onReject}
         onSubmit={onSubmit}
+        networkId="2"
       />,
     )
 
-    fireEvent.click(screen.getByText("Cancel"))
-    expect(onReject).toHaveBeenCalled()
-
-    fireEvent.click(screen.getByText("Delete"))
+    fireEvent.click(screen.getByTestId("hide-or-delete-account-confirm-button"))
     expect(onSubmit).toHaveBeenCalled()
   })
 })

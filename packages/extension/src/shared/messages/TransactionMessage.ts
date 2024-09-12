@@ -7,7 +7,7 @@ import {
 } from "../transactionSimulation/types"
 import { DeclareContract, DeployContract } from "../udc/schema"
 import { TransactionError } from "../errors/transaction"
-import { EstimatedFees } from "../transactionSimulation/fees/fees.model"
+import { EstimatedFees } from "@argent/x-shared/simulation"
 import { Address } from "@argent/x-shared"
 
 export interface ExecuteTransactionRequest {

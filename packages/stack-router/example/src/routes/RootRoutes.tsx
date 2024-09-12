@@ -13,6 +13,8 @@ import { Settings } from "../screens/Settings"
 import { SettingsNested } from "../screens/SettingsNested"
 import { TabScreen1, TabScreen2, TabScreen3 } from "../screens/Tabs"
 import { Token } from "../screens/Token"
+import { Activities } from "../screens/Activities"
+import { Activity } from "../screens/Activity"
 
 export const RootRoutes: FC = () => {
   return (
@@ -34,6 +36,10 @@ export const RootRoutes: FC = () => {
             path="/accounts"
             element={<Accounts />}
           />
+        </>
+        <>
+          <Route path="/activity/:id" element={<Activity />} />
+          <Route path="/activity" element={<Activities />} />
         </>
         <>
           <Route path="/settings" presentation="modal" element={<Settings />} />

@@ -1,11 +1,11 @@
-import { Button, H6, icons } from "@argent/x-ui"
+import { Button, H6, iconsDeprecated } from "@argent/x-ui"
 import { Box, ScaleFade } from "@chakra-ui/react"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 
 import { Transaction } from "../../../../../shared/transactions"
 import { ClassHashOption } from "./ClassHashOption"
 
-const { HistoryIcon, CloseIcon } = icons
+const { HistoryIcon, CloseIcon } = iconsDeprecated
 
 interface ClassHashInputActionsProps {
   classHash: string

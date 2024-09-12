@@ -1,4 +1,4 @@
-import { CellStack, Empty, H4, SpacerCell, icons } from "@argent/x-ui"
+import { CellStack, Empty, H4, SpacerCell, iconsDeprecated } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { FC } from "react"
@@ -6,7 +6,7 @@ import { FC } from "react"
 import { NewsItem } from "../../../shared/discover/schema"
 import { NewsItemCardCollection } from "./ui/NewsItemCardCollection"
 
-const { NetworkIcon } = icons
+const { NetworkIcon } = iconsDeprecated
 
 interface AccountDiscoverScreenProps {
   newsItems?: NewsItem[]

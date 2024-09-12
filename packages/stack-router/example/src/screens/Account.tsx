@@ -6,11 +6,11 @@ import {
   HeaderCell,
   NavigationContainer,
   SpacerCell,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
-const { MoreIcon } = icons
+const { MoreIcon } = iconsDeprecated
 
 export function Account() {
   const { id } = useParams()

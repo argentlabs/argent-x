@@ -1,9 +1,10 @@
 import {
   AddDeclareTransactionParameters,
   AddDeclareTransactionResult,
-} from "@argent/x-window"
+} from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
 import { json } from "starknet"
+import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 
 export async function addDeclareTransactionHandler(
   params: AddDeclareTransactionParameters,
@@ -47,10 +48,10 @@ export async function addDeclareTransactionHandler(
   ])
 
   if (result === "error") {
-    throw Error("User abort")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.UserAborted })
   }
   if (result === "timeout") {
-    throw Error("User action timed out")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.Unknown })
   }
 
   return {

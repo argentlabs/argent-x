@@ -26,32 +26,12 @@ export const ETH = {
   },
 }
 
-export const DAI = {
+export const STRK = {
   ...Default,
   args: {
     label: "Send",
     contractAddress: tokensByNetwork[1].address,
     amount: String(1e18),
-    tokensByNetwork,
-  },
-}
-
-export const WBTC = {
-  ...Default,
-  args: {
-    label: "Send",
-    contractAddress: tokensByNetwork[2].address,
-    amount: String(1e12),
-    tokensByNetwork,
-  },
-}
-
-export const USDC = {
-  ...Default,
-  args: {
-    label: "Send",
-    contractAddress: tokensByNetwork[3].address,
-    amount: String(1e12),
     tokensByNetwork,
   },
 }

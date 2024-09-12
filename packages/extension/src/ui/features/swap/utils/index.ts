@@ -1,8 +1,10 @@
 import { bigDecimal, BigDecimal } from "@argent/x-shared"
-import { BaseToken } from "../../../../shared/token/__new/types/token.model"
+import {
+  BaseToken,
+  Token,
+} from "../../../../shared/token/__new/types/token.model"
 import { BaseTokenAmount } from "../../../../shared/token/__new/types/tokenAmount.model"
 import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
-import { MIN_ETH } from "./constants"
 import {
   SwapQuoteRoute,
   SwapQuoteRouteSchema,
@@ -44,16 +46,7 @@ export function maxAmountSpendFromTokenBalance(
 export function maxAmountSpend(
   tokenAmount?: BaseTokenAmount,
 ): bigint | undefined {
-  if (!tokenAmount) {
-    return undefined
-  }
-  if (!isETH(tokenAmount)) {
-    return tokenAmount.amount
-  }
-  if (tokenAmount.amount > MIN_ETH) {
-    return tokenAmount.amount - MIN_ETH
-  }
-  return 0n
+  return tokenAmount?.amount
 }
 
 /**
@@ -85,4 +78,40 @@ export function bipsToPercent(bips: number): BigDecimal {
     decimals: 2,
   }
   return bigDecimal.div(numerator, denominator)
+}
+
+export const predefinedSortOrder = [
+  "ETH",
+  "STRK",
+  "USDC",
+  "USDT",
+  "DAI",
+  "DAIv0",
+  "LUSD",
+  "vSTRK",
+  "UNI",
+  "EKUBO",
+  "LORDS",
+  "ZEND",
+]
+
+export function sortSwapTokens(tokens: Token[]) {
+  return tokens.sort((a, b) => {
+    const indexA = predefinedSortOrder.indexOf(a.symbol)
+    const indexB = predefinedSortOrder.indexOf(b.symbol)
+
+    if (indexA !== -1 && indexB !== -1) {
+      // Both tokens are in the predefined order
+      return indexA - indexB
+    } else if (indexA !== -1) {
+      // Only token A is in the predefined order
+      return -1
+    } else if (indexB !== -1) {
+      // Only token B is in the predefined order
+      return 1
+    } else {
+      // Neither token is in the predefined order, sort alphabetically
+      return a.symbol.localeCompare(b.symbol)
+    }
+  })
 }

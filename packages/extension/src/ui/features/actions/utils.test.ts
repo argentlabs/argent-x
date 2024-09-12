@@ -13,7 +13,7 @@ describe("getV3UpgradeCall", () => {
         contractAddress: "0x0000000000",
         entrypoint: "upgrade",
         calldata: [
-          "0x29927c8af6bccf3f6fda035981e765a7bdbf18a2dc0d630494f8758aa908e2b", // TXV3_ACCOUNT_CLASS_HASH
+          "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f", // TXV3_ACCOUNT_CLASS_HASH
         ],
       },
     ]
@@ -48,7 +48,7 @@ describe("getV3UpgradeCall", () => {
         contractAddress: "0x0000000000",
         entrypoint: "set_implementation",
         calldata: [
-          "0x02fadbf77a721b94bdcc3032d86a8921661717fa55145bccf88160ee2a5efcd1", // TXV3_ACCOUNT_CLASS_HASH
+          "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f", // TXV3_ACCOUNT_CLASS_HASH
         ],
       },
     ]
@@ -66,7 +66,7 @@ describe("getV3UpgradeCall", () => {
         contractAddress: "0x0000000000",
         entrypoint: "upgrade",
         calldata: [
-          1175227876648481476947357169641801659537058431979519277343402598445203099179n, // num.toBigInt(TXV3_ACCOUNT_CLASS_HASH)
+          1527385455757960447222183650373907436110918566631056279654792814069834683007n, // num.toBigInt(TXV3_ACCOUNT_CLASS_HASH)
         ],
       },
     ]

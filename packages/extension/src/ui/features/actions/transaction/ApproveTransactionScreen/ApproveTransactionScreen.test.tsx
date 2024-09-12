@@ -1,24 +1,39 @@
-import { act, fireEvent, screen } from "@testing-library/react"
+import "fake-indexeddb/auto"
+
+import { act, screen } from "@testing-library/react"
 import { noop } from "lodash-es"
 import { describe, expect, it } from "vitest"
 
+import userEvent from "@testing-library/user-event"
+import { TransactionType } from "starknet"
 import { delay } from "../../../../../shared/utils/delay"
 import { renderWithLegacyProviders } from "../../../../test/utils"
 import {
   accounts,
   aspect,
-  jediswap,
-  jediswapUnsafe,
   transfer,
   transferV3,
   transferWithWarnings,
 } from "../../__fixtures__"
 import { TransactionActionFixture } from "../../__fixtures__/types"
+import * as txReviewUtils from "../../warning/helper"
 import { ApproveScreenType } from "../types"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
-import { TransactionType } from "starknet"
-import userEvent from "@testing-library/user-event"
+import { ITransactionReviewWarning } from "@argent/x-shared"
+
+vi.mock("../../hooks/useActionScreen", () => ({
+  useActionScreen: vi.fn().mockReturnValue({
+    action: {
+      meta: {
+        origin: "origin",
+        title: "Transaction title",
+        subtitle: "Transaction subtitle",
+        icon: "InfoIcon",
+      },
+    },
+  }),
+}))
 
 const renderWithProps = async (
   props: TransactionActionFixture &
@@ -28,15 +43,6 @@ const renderWithProps = async (
     renderWithLegacyProviders(
       <ApproveTransactionScreen
         actionHash="0x123"
-        multisigModalDisclosure={{
-          isOpen: false,
-          onOpen: () => undefined,
-          onClose: () => undefined,
-          onToggle: () => undefined,
-          isControlled: false,
-          getButtonProps: () => undefined,
-          getDisclosureProps: () => undefined,
-        }}
         multisigBannerProps={{
           account: accounts[0],
           confirmations: 0,
@@ -64,51 +70,6 @@ const renderWithProps = async (
 }
 
 describe("ApproveTransactionScreen", () => {
-  it("should render jediswap scenario as expected", async () => {
-    const onReject = vi.fn()
-    const onSubmit = vi.fn()
-    await renderWithProps({
-      ...jediswap,
-      transactionActionsType: {
-        type: "INVOKE_FUNCTION",
-        payload: jediswap.transactions,
-      },
-      onReject,
-      onSubmit,
-    })
-    expect(screen.getByText(/Confirm/)).toBeInTheDocument()
-    expect(screen.getByText(/https:\/\/jediswap.xyz/)).toBeInTheDocument()
-    expect(screen.getByText(/Estimated balance change/)).toBeInTheDocument()
-    expect(screen.getByText(/USD Coin/)).toBeInTheDocument()
-    expect(screen.getByText(/\+0.0148 USDC/)).toBeInTheDocument()
-    expect(screen.getByText(/Swap exact tokens for tokens/)).toBeInTheDocument()
-    fireEvent.click(screen.getByText("Cancel"))
-    expect(onReject).toHaveBeenCalled()
-    fireEvent.click(screen.getByText("Confirm"))
-    expect(onSubmit).toHaveBeenCalled()
-  })
-  it("should render jediswapUnsafe scenario as expected", async () => {
-    window.scrollTo = vi.fn(noop)
-    const onReject = vi.fn()
-    const onSubmit = vi.fn()
-    await renderWithProps({
-      ...jediswapUnsafe,
-      transactionActionsType: {
-        type: "INVOKE_FUNCTION",
-        payload: jediswap.transactions,
-      },
-      onReject,
-      onSubmit,
-    })
-    expect(
-      screen.getByText(/Warning: Approved spending limit/),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        / spend more tokens than you’re using in this transaction/,
-      ),
-    ).toBeInTheDocument()
-  })
   it("should render transfer scenario as expected", async () => {
     window.scrollTo = vi.fn(noop)
     const onReject = vi.fn()
@@ -122,9 +83,8 @@ describe("ApproveTransactionScreen", () => {
       onReject,
       onSubmit,
     })
-    expect(screen.getByText(/Balance change/)).toBeInTheDocument()
 
-    expect(screen.getByText("-0.001 ETH")).toBeInTheDocument()
+    expect(await screen.findByText(/Unknown token/)).toBeInTheDocument()
   })
   it("should render transfer v3 scenario as expected", async () => {
     window.scrollTo = vi.fn(noop)
@@ -139,8 +99,7 @@ describe("ApproveTransactionScreen", () => {
       onReject,
       onSubmit,
     })
-    expect(screen.getByText(/Balance change/)).toBeInTheDocument()
-    expect(screen.getByText("-0.001 ETH")).toBeInTheDocument()
+    expect(await screen.findByText("0.0001 ETH")).toBeInTheDocument()
   })
   it("should render aspect scenario as expected", async () => {
     const onReject = vi.fn()
@@ -154,10 +113,31 @@ describe("ApproveTransactionScreen", () => {
       onReject,
       onSubmit,
     })
-    expect(screen.getByText(/Unknown NFT/)).toBeInTheDocument()
-    expect(screen.getByText(/\+1 NFT/)).toBeInTheDocument()
+    expect(await screen.findByText(/Xplorer/)).toBeInTheDocument()
+    expect(await screen.findByText(/\+1 NFT/)).toBeInTheDocument()
   })
   it("should render warning for transfer", async () => {
+    const warningsInStore = {
+      reason: "undeployed_account",
+      title: "Sending to the correct account?",
+      severity: "caution",
+      description:
+        "The account you are sending to hasn't done any transactions, please double check the address",
+    } as ITransactionReviewWarning
+
+    vi.mock("../../warning/helper", () => ({
+      useWarningsByReason: vi.fn(),
+      getHighestSeverity: vi.fn(),
+      useWarningsTitle: vi.fn(),
+    }))
+    vi.mocked(txReviewUtils.useWarningsByReason).mockReturnValue(
+      warningsInStore,
+    )
+
+    vi.mocked(txReviewUtils.useWarningsTitle).mockReturnValue(
+      "Sending to the correct account?",
+    )
+
     window.scrollTo = vi.fn(noop)
     const onReject = vi.fn()
     const onSubmit = vi.fn()
@@ -170,9 +150,9 @@ describe("ApproveTransactionScreen", () => {
       onReject,
       onSubmit,
     })
-    expect(screen.getByText(/Caution/)).toBeInTheDocument()
+    expect(await screen.findByText(/Caution/)).toBeInTheDocument()
     expect(
-      screen.getByText(/Sending to the correct account?/),
+      await screen.findByText(/Sending to the correct account?/),
     ).toBeInTheDocument()
 
     expect(screen.getByRole("button", { name: "Review" })).toBeInTheDocument()
@@ -184,10 +164,31 @@ describe("ApproveTransactionScreen", () => {
 
     await userEvent.click(actionsAccordion)
 
-    expect(screen.getByText("Erc 20 transfer amount")).toBeInTheDocument()
-    expect(screen.getByText("0.0001 ETH")).toBeInTheDocument()
+    expect(
+      await screen.findByText("Erc 20 transfer amount"),
+    ).toBeInTheDocument()
+    expect(await screen.findByText("0.0001 ETH")).toBeInTheDocument()
 
-    expect(screen.getByText("Erc 20 transfer recipient")).toBeInTheDocument()
-    expect(screen.getAllByText(/0x0014…5911/)).toHaveLength(2)
+    expect(
+      await screen.getByText("Erc 20 transfer recipient"),
+    ).toBeInTheDocument()
+    expect(await screen.findAllByText(/0x0014…5911/)).toHaveLength(1)
+  })
+  it("should render transaction header as expected", async () => {
+    window.scrollTo = vi.fn(noop)
+    const onReject = vi.fn()
+    const onSubmit = vi.fn()
+    await renderWithProps({
+      ...transfer,
+      transactionActionsType: {
+        type: "INVOKE_FUNCTION",
+        payload: transfer.transactions,
+      },
+      onReject,
+      onSubmit,
+    })
+
+    expect(await screen.findByText(/Transaction title/)).toBeInTheDocument()
+    expect(await screen.findByText(/Transaction subtitle/)).toBeInTheDocument()
   })
 })

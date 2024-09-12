@@ -7,41 +7,40 @@ import {
   FlowHeader,
   Input,
   NavigationContainer,
-  icons,
+  iconsDeprecated,
   useToast,
 } from "@argent/x-ui"
 import { FC } from "react"
 import { useForm } from "react-hook-form"
 
-import { resetDevice } from "../../../shared/shield/jwt"
-import { IS_DEV } from "../../../shared/utils/dev"
-import { coerceErrorToString } from "../../../shared/utils/error"
+import { Box, Link, Text } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArgentAccountFeaturesList } from "./ArgentAccountFeaturesList"
-import { argentAccountService } from "../../services/argentAccount"
-import { Box } from "@chakra-ui/react"
+import { ARGENT_X_LEGAL_PRIVACY_POLICY_URL } from "../../../shared/api/constants"
+import { resetDevice } from "../../../shared/smartAccount/jwt"
+import { coerceErrorToString } from "../../../shared/utils/error"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
+import { clientArgentAccountService } from "../../services/argentAccount"
 import {
   ArgentAccountBaseEmailScreenProps,
   emailSchema,
 } from "./argentAccountBaseEmailScreen.model"
 
-const { EmailIcon } = icons
+const { EmailIcon } = iconsDeprecated
 
 const screenContent = {
-  shield: {
-    title: "Argent Shield",
+  toggleSmartAccount: {
+    title: undefined,
     subtitle:
-      "Enter email to sign in to Argent, and activate two-factor authentication",
+      "Enter email to sign in to Argent, and activate smart account features",
+  },
+  createSmartAccount: {
+    title: undefined,
+    subtitle:
+      "Smart Account uses email to enable additional security features on your account",
   },
   argentAccount: {
     title: undefined,
     subtitle: "By signing in to Argent you can use:",
-  },
-  emailPreferences: {
-    title: "Email notifications",
-    subtitle:
-      "Enter email to sign in to Argent, and activate email notifications",
   },
 }
 
@@ -60,10 +59,10 @@ export const ArgentAccountBaseEmailScreen: FC<
     try {
       /** reset to ensure if new email validates it is always associated with fresh device */
       await resetDevice()
-      await argentAccountService.requestEmail(email)
+      await clientArgentAccountService.requestEmail(email)
       onEmailRequested(email)
     } catch (error) {
-      IS_DEV && console.warn(coerceErrorToString(error))
+      console.warn(coerceErrorToString(error))
       toast({
         title: "Unable to verify email",
         status: "error",
@@ -114,12 +113,22 @@ export const ArgentAccountBaseEmailScreen: FC<
             isInvalid={Boolean(formState.errors.email)}
             placeholder="Email"
             disabled={formState.isSubmitting}
+            data-testid="email-input"
           />
           <FieldError>{formState.errors.email?.message}</FieldError>
+          <Text mt={3} fontSize={13} color="neutrals.300" lineHeight={4}>
+            We use email for security alerts. For unsubscribing and other
+            details see our{" "}
+            <Link
+              href={ARGENT_X_LEGAL_PRIVACY_POLICY_URL}
+              target="_blank"
+              color="primary.500"
+            >
+              Privacy Policy
+            </Link>
+          </Text>
         </Box>
-        {flow === "argentAccount" && (
-          <ArgentAccountFeaturesList isLoggedIn={false} />
-        )}
+
         <Button
           colorScheme={"primary"}
           type="submit"

@@ -1,25 +1,28 @@
 import { FC } from "react"
-import type { typedData } from "starknet"
 
-import { useAccount } from "../accounts/accounts.state"
+import { TypedData } from "@starknet-io/types-js"
 import { DeployAccountScreenContainer } from "../accounts/DeployAccountScreenContainer"
-import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
-import { useMultisig } from "../multisig/multisig.state"
+import { useIsAccountDeploying } from "../accountTokens/useIsAccountDeploying"
+import {
+  isSignerInMultisigView,
+  multisigView,
+} from "../multisig/multisig.state"
 import { RemovedMultisigWarningScreen } from "../multisig/RemovedMultisigWarningScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
+import { ExecuteFromOutsideScreen } from "./ExecuteFromOutsideScreen"
 import { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
 import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
-import { MultisigSignatureScreenWarning } from "../multisig/MultisigSignatureScreenWarning"
-import { ExecuteFromOutsideScreen } from "./ExecuteFromOutsideScreen"
-import { validateOutsideExecution } from "./transaction/executeFromOutside/utils"
+import { useView } from "../../views/implementation/react"
+import useValidateOutsideExecution from "./transaction/executeFromOutside/useValidateOutsideExecution"
 
 interface ApproveSignatureScreenContainerProps
   extends Omit<ConfirmScreenProps, "onSubmit"> {
-  dataToSign: typedData.TypedData
+  dataToSign: TypedData
   skipDeployWarning?: boolean
-  onSubmit: (data: typedData.TypedData) => void
+  onSubmit: (data: TypedData) => void
   onReject: () => void
   onRejectWithoutClose?: () => void
+  host: string
   actionIsApproving?: boolean
 }
 
@@ -31,15 +34,22 @@ export const ApproveSignatureScreenContainer: FC<
   onSubmit,
   selectedAccount,
   onRejectWithoutClose,
+  host,
   ...props
 }) => {
-  const multisig = useMultisig(selectedAccount)
-  const signerIsInMultisig = useIsSignerInMultisig(multisig)
-  const accountWithDeployState = useAccount(selectedAccount)
+  const multisig = useView(multisigView(selectedAccount))
+  const signerIsInMultisig = useView(isSignerInMultisigView(selectedAccount))
+  const isAccountDeploying = useIsAccountDeploying(selectedAccount)
+  const isValidOutsideExecution = useValidateOutsideExecution(
+    dataToSign,
+    host,
+    selectedAccount?.network,
+  )
+
   if (
     !skipDeployWarning &&
     selectedAccount?.needsDeploy &&
-    !accountWithDeployState?.deployTransaction
+    !isAccountDeploying
   ) {
     return <DeployAccountScreenContainer {...props} />
   }
@@ -47,20 +57,6 @@ export const ApproveSignatureScreenContainer: FC<
   if (multisig && !signerIsInMultisig) {
     return <RemovedMultisigWarningScreen onReject={onRejectWithoutClose} />
   }
-
-  if (multisig) {
-    return (
-      <MultisigSignatureScreenWarning
-        selectedAccount={selectedAccount}
-        {...props}
-      />
-    )
-  }
-
-  const isValidOutsideExecution = validateOutsideExecution(
-    dataToSign,
-    selectedAccount?.network,
-  )
 
   if (
     dataToSign.domain.name === "Account.execute_from_outside" &&

@@ -1,13 +1,13 @@
 import { isObject } from "lodash-es"
 import { FC, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
-import { WithArgentShieldVerified } from "../shield/WithArgentShieldVerified"
+import { TransactionType } from "starknet"
+import { routes } from "../../../shared/ui/routes"
+import { WithSmartAccountVerified } from "../smartAccount/WithSmartAccountVerified"
 import { useActionScreen } from "./hooks/useActionScreen"
 import { ApproveTransactionScreenContainer } from "./transaction/ApproveTransactionScreen/ApproveTransactionScreenContainer"
 import { ApproveScreenType } from "./transaction/types"
-import { TransactionType } from "starknet"
 
 export const DeclareContractActionScreenContainer: FC = () => {
   const {
@@ -39,8 +39,12 @@ export const DeclareContractActionScreenContainer: FC = () => {
     }
   }, [approve, closePopupIfLastAction, action, navigate])
 
+  if (!selectedAccount) {
+    return <Navigate to={routes.accounts()} />
+  }
+
   return (
-    <WithArgentShieldVerified>
+    <WithSmartAccountVerified>
       <ApproveTransactionScreenContainer
         actionHash={action.meta.hash}
         actionIsApproving={Boolean(action.meta.startedApproving)}
@@ -54,6 +58,6 @@ export const DeclareContractActionScreenContainer: FC = () => {
         onReject={rejectAllActions}
         selectedAccount={selectedAccount}
       />
-    </WithArgentShieldVerified>
+    </WithSmartAccountVerified>
   )
 }

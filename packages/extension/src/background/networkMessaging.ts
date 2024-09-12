@@ -75,9 +75,12 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
         isHexChainId ? shortString.decodeShortString(chainId) : chainId,
       )
 
+      const account = await wallet.getSelectedAccount()
+      const isCurrentNetwork = account?.network.id === network?.id
+
       const exists = Boolean(network)
       let actionHash: string | undefined
-      if (exists) {
+      if (exists && !isCurrentNetwork) {
         // Switch only if network exists
         const { meta } = await actionService.add(
           {
@@ -97,6 +100,7 @@ export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({
         data: {
           actionHash,
           exists,
+          isCurrentNetwork,
         },
       })
     }

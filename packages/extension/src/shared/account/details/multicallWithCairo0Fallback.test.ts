@@ -15,15 +15,13 @@ describe("shared/account/details", () => {
           entrypoint: "fooBar",
           contractAddress: "0x0",
         }
-        multicall.callContract.mockResolvedValueOnce({ result: ["baz"] })
+        multicall.callContract.mockResolvedValueOnce(["baz"])
         const result = await multicallWithCairo0Fallback(call, multicall)
         expect(multicall.callContract).toHaveBeenCalledOnce()
         expect(multicall.callContract).toHaveBeenLastCalledWith(
           expect.objectContaining({ entrypoint: "foo_bar" }),
         )
-        expect(result).toEqual({
-          result: ["baz"],
-        })
+        expect(result).toEqual(["baz"])
       })
     })
     describe("when the call fails", () => {
@@ -38,8 +36,8 @@ describe("shared/account/details", () => {
         // { result: undefined } is not valid, but is returned if the first call fails
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        multicall.callContract.mockResolvedValueOnce({ result: undefined })
-        multicall.callContract.mockResolvedValueOnce({ result: ["baz"] })
+        multicall.callContract.mockResolvedValueOnce(undefined)
+        multicall.callContract.mockResolvedValueOnce(["baz"])
         const result = await multicallWithCairo0Fallback(call, multicall)
         expect(multicall.callContract).toHaveBeenCalledTimes(2)
         expect(multicall.callContract).toHaveBeenNthCalledWith(
@@ -50,9 +48,7 @@ describe("shared/account/details", () => {
           2,
           expect.objectContaining({ entrypoint: "fooBar" }),
         )
-        expect(result).toEqual({
-          result: ["baz"],
-        })
+        expect(result).toEqual(["baz"])
       })
     })
   })

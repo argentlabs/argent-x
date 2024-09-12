@@ -1,4 +1,8 @@
-import { hexSchema } from "@argent/x-shared"
+import {
+  isNFTTransferTransaction,
+  isTokenTransferTransaction,
+} from "./../activity/utils/transform/is"
+import { formatAddress, hexSchema } from "@argent/x-shared"
 import { constants, num } from "starknet"
 
 import { TransactionError } from "../errors/transaction"
@@ -12,7 +16,9 @@ import {
   SUCCESS_STATUSES,
 } from "../transactions"
 import { z } from "zod"
-import { isSafeUpgradeTransaction } from "../utils/isUpgradeTransaction"
+import { isSafeUpgradeTransaction } from "../utils/isSafeUpgradeTransaction"
+import { NativeActivity } from "@argent/x-shared/simulation"
+import { TransformedTransaction } from "../activity/utils/transform/type"
 
 export function getTransactionIdentifier(transaction: BaseTransaction): string {
   return `${transaction.networkId}::${hexSchema.parse(transaction.hash)}`
@@ -117,3 +123,55 @@ export const isSuccessfulTransaction = (tx: Transaction) => {
   const { finality_status } = getTransactionStatus(tx)
   return finality_status && SUCCESS_STATUSES.includes(finality_status)
 }
+
+export const getNativeActivityStatusForTransaction = (
+  tx: Transaction,
+): NativeActivity["status"] => {
+  const { finality_status, execution_status } = getTransactionStatus(tx)
+  if (execution_status) {
+    if (execution_status === "REVERTED") {
+      return "rejected"
+    } else if (execution_status === "SUCCEEDED") {
+      return "success"
+    } else if (execution_status === "NOT_RECEIVED") {
+      return "pending"
+    }
+  }
+  if (finality_status) {
+    if (finality_status === "NOT_RECEIVED") {
+      return "queued"
+    } else if (finality_status === "RECEIVED") {
+      return "pending"
+    } else if (finality_status === "REJECTED") {
+      return "rejected"
+    } else if (finality_status === "CANCELLED") {
+      return "cancelled"
+    } else if (SUCCESS_STATUSES.includes(finality_status)) {
+      return "success"
+    }
+  }
+  console.warn("Falling back to pending for tx status", {
+    tx,
+    finality_status,
+    execution_status,
+  })
+  return "pending"
+  // "failure"
+}
+
+export const getNativeActivitySubtitleForTransaction = (
+  tx?: TransformedTransaction,
+): string | undefined => {
+  if (!tx) {
+    return
+  }
+
+  const isTransfer =
+    isTokenTransferTransaction(tx) || isNFTTransferTransaction(tx)
+
+  if (isTransfer) {
+    return `To: ${formatAddress(tx.toAddress)}`
+  }
+}
+
+export const DAPP_TRANSACTION_TITLE = "Review transaction"

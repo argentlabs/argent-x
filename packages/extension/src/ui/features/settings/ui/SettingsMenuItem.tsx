@@ -1,9 +1,9 @@
-import { ButtonCell, P4, icons } from "@argent/x-ui"
+import { ButtonCell, P4, iconsDeprecated } from "@argent/x-ui"
 import { Box, Button, ButtonProps, Flex, Text } from "@chakra-ui/react"
 import { FC, PropsWithChildren, ReactEventHandler } from "react"
 import { Link, LinkProps } from "react-router-dom"
 
-const { ChevronRightIcon, RemoveIcon } = icons
+const { ChevronRightIcon, RemoveIcon } = iconsDeprecated
 
 export interface SettingsMenuItemProps extends ButtonProps {
   title: string
@@ -50,7 +50,7 @@ export const SettingsMenuItemRemove: FC<SettingsMenuItemRemoveProps> = ({
         rounded={"full"}
         size={"auto"}
         p={1.5}
-        bg={"neutrals.900"}
+        bg="surface-default"
         _hover={{ bg: "neutrals.600" }}
         pointerEvents={"auto"}
         onClick={(e) => {

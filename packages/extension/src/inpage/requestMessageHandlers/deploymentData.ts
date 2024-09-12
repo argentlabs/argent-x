@@ -1,4 +1,4 @@
-import { GetDeploymentDataResult } from "@argent/x-window"
+import { AccountDeploymentData } from "@starknet-io/types-js"
 import { inpageMessageClient } from "../trpcClient"
 
 const toHex = (x: bigint) => `0x${x.toString(16)}`
@@ -6,7 +6,7 @@ const toHex = (x: bigint) => `0x${x.toString(16)}`
 const isStringArray = (x: any): x is string[] =>
   x.every((y: any) => typeof y === "string")
 
-export async function deploymentDataHandler(): Promise<GetDeploymentDataResult> {
+export async function deploymentDataHandler(): Promise<AccountDeploymentData> {
   const deploymentData =
     await inpageMessageClient.accountMessaging.getAccountDeploymentPayload.query()
 

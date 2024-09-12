@@ -1,11 +1,11 @@
 import { FieldError, H1 } from "@argent/x-ui"
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
 import { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
 
-const { AddIcon, RemoveIcon } = icons
+const { AddIcon, RemoveIcon } = iconsDeprecated
 
 export const SetConfirmationsInput = ({
   existingThreshold,
@@ -34,14 +34,13 @@ export const SetConfirmationsInput = ({
                   justifyContent="space-between"
                   width="100%"
                   p="3"
-                  backgroundColor="neutrals.800"
+                  backgroundColor="surface-elevated"
                   borderRadius={"lg"}
                   mb="1.5"
                 >
                   <Button
                     data-testid="decrease-threshold"
-                    borderRadius="full"
-                    backgroundColor="neutrals.900"
+                    backgroundColor="surface-default"
                     onClick={() =>
                       field.onChange(field.value > 1 ? field.value - 1 : 1)
                     }
@@ -54,8 +53,7 @@ export const SetConfirmationsInput = ({
                   </H1>
                   <Button
                     data-testid="increase-threshold"
-                    borderRadius="90"
-                    backgroundColor="neutrals.900"
+                    backgroundColor="surface-default"
                     onClick={() =>
                       field.onChange(
                         totalSigners && field.value < totalSigners

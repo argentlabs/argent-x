@@ -1,11 +1,6 @@
 import { isEqualAddress } from "@argent/x-shared"
-import { BaseWalletAccount, WalletAccount } from "./wallet.model"
-
-// from https://community.starknet.io/t/account-keys-and-addresses-derivation-standard/1230
-// m / purpose' / coin_type' / account' / change / address_index
-
-export const STANDARD_DERIVATION_PATH = "m/44'/9004'/0'/0"
-export const MULTISIG_DERIVATION_PATH = "m/44'/9004'/1'/0"
+import { BaseWalletAccount, SignerType, WalletAccount } from "./wallet.model"
+import { getBaseDerivationPath } from "./signer/utils"
 
 export const DEPRECATED_TX_V0_ACCOUNT_IMPLEMENTATION_CLASS_HASH = [
   "0x01a7820094feaf82d53f53f214b81292d717e7bb9a92bb2488092cd306f3993f", // Bad old contract - ask Julien about it
@@ -16,17 +11,31 @@ export const DEPRECATED_TX_V0_ACCOUNT_IMPLEMENTATION_CLASS_HASH = [
   "0x02c3348ad109f7f3967df6494b3c48741d61675d9a7915b265aa7101a631dc33", // Argent Account Deprecated
 ]
 
-export const hasNewDerivationPath = (derivationPath?: string): boolean =>
-  Boolean(derivationPath?.startsWith(STANDARD_DERIVATION_PATH))
+export const hasNewDerivationPath = (
+  signerType: SignerType,
+  derivationPath?: string,
+): boolean =>
+  Boolean(
+    derivationPath?.startsWith(getBaseDerivationPath("standard", signerType)),
+  )
 
-export const hasMultisigDerivationPath = (derivationPath?: string): boolean =>
-  Boolean(derivationPath?.startsWith(MULTISIG_DERIVATION_PATH))
+export const hasMultisigDerivationPath = (
+  signerType: SignerType,
+  derivationPath?: string,
+): boolean =>
+  Boolean(
+    derivationPath?.startsWith(getBaseDerivationPath("multisig", signerType)),
+  )
+
 export const isDeprecated = ({ signer, network }: WalletAccount): boolean => {
   const isOldPathDeprecated =
     Boolean(network.accountClassHash) &&
-    !hasNewDerivationPath(signer.derivationPath)
+    !hasNewDerivationPath(signer.type, signer.derivationPath)
 
-  const isNotMultisig = !hasMultisigDerivationPath(signer.derivationPath)
+  const isNotMultisig = !hasMultisigDerivationPath(
+    signer.type,
+    signer.derivationPath,
+  )
 
   return isOldPathDeprecated && isNotMultisig
 }

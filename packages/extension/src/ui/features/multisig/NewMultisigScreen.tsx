@@ -1,23 +1,31 @@
 import {
+  B2,
+  BarBackButton,
   BarCloseButton,
   H6,
   NavigationContainer,
   P4,
-  icons,
+  StickyGroup,
+  iconsDeprecated,
+  logosDeprecated,
 } from "@argent/x-ui"
-import { Center, Flex, Text } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
+import { Button, Center, Flex, Text } from "@chakra-ui/react"
+import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { urlWithQuery } from "../../../shared/utils/url"
-import { useAppState } from "../../app.state"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
-import { routes } from "../../routes"
-import { assertNever } from "../../../shared/utils/assertNever"
-import { useCreatePendingMultisig } from "./hooks/useCreatePendingMultisig"
-import { uiService } from "../../../shared/__new/services/ui"
+import { routes } from "../../../shared/ui/routes"
+import { useOnLedgerStart } from "../ledger/hooks/useOnLedgerStart"
+import { useIsFirefox } from "../../hooks/useUserAgent"
+import { selectedNetworkIdView } from "../../views/network"
+import { useView } from "../../views/implementation/react"
 
-const { AddIcon, MultisigJoinIcon, MultisigImageIcon: MultisigDiagram } = icons
+const {
+  AddIcon,
+  MultisigJoinIcon,
+  MultisigImageIcon: MultisigDiagram,
+} = iconsDeprecated
+const { LedgerLogo } = logosDeprecated
 
 type MultisigOptionType = "create" | "join"
 
@@ -36,7 +44,6 @@ const multisigOptions: MultisigOption[] = [
   },
   {
     title: "Join existing multisig",
-    subtitle: "Create a new signer pubkey",
     type: "join",
     icon: <MultisigJoinIcon />,
   },
@@ -44,44 +51,20 @@ const multisigOptions: MultisigOption[] = [
 
 export const NewMultisigScreen: FC = () => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const { createPendingMultisig } = useCreatePendingMultisig()
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const isFirefox = useIsFirefox()
 
-  const onClick = useCallback(
-    async (type: MultisigOptionType) => {
-      switch (type) {
-        case "create": {
-          const url = urlWithQuery("index.html", {
-            goto: "multisig",
-            networkId: switcherNetworkId,
-          })
-          void chrome.tabs.create({
-            url,
-          })
-          navigate(routes.accounts())
-          void uiService.closePopup()
-          break
-        }
+  const onClick = (type: MultisigOptionType) =>
+    navigate(routes.multisigSignerSelection(type))
 
-        case "join": {
-          // Initialize the multisig account with a zero multisig
-          const pendingMultisig = await createPendingMultisig(switcherNetworkId)
-          if (pendingMultisig) {
-            navigate(routes.multisigJoin(pendingMultisig.publicKey))
-          }
-          break
-        }
-
-        default:
-          assertNever(type)
-      }
-    },
-    [switcherNetworkId, createPendingMultisig, navigate],
-  )
+  const onLedgerStart = useOnLedgerStart("multisig")
 
   return (
     <NavigationContainer
-      rightButton={<BarCloseButton onClick={() => navigate(-1)} />}
+      rightButton={
+        <BarCloseButton onClick={() => navigate(routes.accounts())} />
+      }
+      leftButton={<BarBackButton onClick={() => navigate(-1)} />}
       title="Multisig account"
     >
       <Flex p={4} gap={2} direction="column">
@@ -111,7 +94,7 @@ export const NewMultisigScreen: FC = () => {
             alignItems="center"
             justifyContent="space-between"
             gap={3}
-            onClick={() => void onClick(option.type)}
+            onClick={() => onClick(option.type)}
             _hover={{
               backgroundColor: "neutrals.700",
               "& > .icon-wrapper": {
@@ -141,6 +124,27 @@ export const NewMultisigScreen: FC = () => {
           </CustomButtonCell>
         ))}
       </Flex>
+
+      {!isFirefox && (
+        <StickyGroup>
+          <Button
+            variant="ghost"
+            p="6"
+            borderTop="1px solid"
+            borderRadius="0"
+            color="neutrals.800"
+            boxShadow="menu"
+            onClick={() => onLedgerStart("restore", selectedNetworkId)}
+          >
+            <Center>
+              <Flex gap="2" align="center" justify="center">
+                <LedgerLogo h={4} w={4} color="white.50" />
+                <B2 color="white.50">Restore multisig with Ledger</B2>
+              </Flex>
+            </Center>
+          </Button>
+        </StickyGroup>
+      )}
     </NavigationContainer>
   )
 }

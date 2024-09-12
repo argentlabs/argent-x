@@ -8,7 +8,7 @@ import {
   H6,
   L2,
   P4,
-  icons,
+  iconsDeprecated,
   typographyStyles,
 } from "@argent/x-ui"
 import {
@@ -30,14 +30,15 @@ import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { AccountAvatar } from "./AccountAvatar"
 import { AccountLabel } from "./AccountLabel"
 import { AccountListItemWarningBadge } from "./AccountListItemDeprecatedBadge"
-import { AccountListItemShieldBadgeContainer } from "./AccountListItemShieldBadgeContainer"
+import { AccountListItemSmartAccountBadgeContainer } from "./AccountListItemSmartAccountBadgeContainer"
 import { AccountListItemUpgradeBadge } from "./AccountListItemUpgradeBadge"
 import { AccountListItemProps } from "./accountListItem.model"
 import { getNetworkAccountImageUrl } from "./accounts.service"
-import { useAccount } from "./accounts.state"
+import { useWalletAccount } from "./accounts.state"
 import { useOnSettingsAccountNavigate } from "./useOnSettingsAccountNavigate"
+import { AccountListItemLedgerBadge } from "./AccountListItemLedgerBadge"
 
-const { LinkIcon, MoreIcon } = icons
+const { LinkIcon, MoreIcon } = iconsDeprecated
 
 const NetworkStatusWrapper = chakra(Flex, {
   baseStyle: {
@@ -71,7 +72,10 @@ const AccountListRightElements: FC<
   isHovering,
   hidden,
 }) => {
-  const account = useAccount({ address: accountAddress, networkId: networkId })
+  const account = useWalletAccount({
+    address: accountAddress,
+    networkId: networkId,
+  })
   const onSettingsClick = useOnSettingsAccountNavigate(account)
 
   const handleButtonClick = (
@@ -83,7 +87,7 @@ const AccountListRightElements: FC<
   if (deploying) {
     return (
       <NetworkStatusWrapper>
-        <TransactionStatusIndicator status="amber" />
+        <TransactionStatusIndicator status="amber" label="Deploying" />
         Deploying
       </NetworkStatusWrapper>
     )
@@ -96,6 +100,7 @@ const AccountListRightElements: FC<
       <Flex alignItems="center" gap={3} data-testid="connected-dapp">
         {isHovering ? (
           <BarIconButton
+            data-testid="goto-settings"
             as={Link}
             onClick={handleButtonClick}
             backgroundColor="neutrals.900"
@@ -118,8 +123,9 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   networkName,
   accountType,
   isClickable = true,
-  isShield,
+  isSmartAccount,
   isOwner,
+  isLedger,
   deploying,
   upgrade,
   connectedHost,
@@ -150,9 +156,12 @@ export const AccountListItem: FC<AccountListItemProps> = ({
     if (upgrade) {
       return <AccountListItemUpgradeBadge />
     }
-    if (isShield) {
+    if (isLedger) {
+      return <AccountListItemLedgerBadge />
+    }
+    if (isSmartAccount) {
       return (
-        <AccountListItemShieldBadgeContainer
+        <AccountListItemSmartAccountBadgeContainer
           accountAddress={accountAddress}
           networkId={networkId}
         />

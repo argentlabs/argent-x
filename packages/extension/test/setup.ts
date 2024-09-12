@@ -28,6 +28,9 @@ vi.stubGlobal("chrome", {
     onConnect: {
       addListener: noop,
     },
+    onMessage: {
+      addListener: noop,
+    },
     sendMessage: noop,
   },
   storage: chromeStorageMock,

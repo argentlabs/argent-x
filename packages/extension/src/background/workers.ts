@@ -1,16 +1,17 @@
 import { multisigWorker } from "./multisig/worker"
-import { nftsWorker } from "./__new/services/nft/worker"
-import { networkWorker } from "./__new/services/network"
-import { onboardingWorker } from "./__new/services/onboarding"
-import { tokenWorker } from "./__new/services/token/worker"
-import { accountWorker } from "./__new/services/account/worker"
-import { knownDappsWorker } from "./__new/services/knownDapps/worker"
-import { transactionReviewWorker } from "./__new/services/transactionReview/worker"
+import { nftsWorker } from "./services/nft/worker"
+import { networkWorker } from "./services/network"
+import { onboardingWorker } from "./services/onboarding"
+import { tokenWorker } from "./services/token/worker"
+import { accountWorker } from "./services/account/worker"
+import { knownDappsWorker } from "./services/knownDapps/worker"
+import { transactionReviewWorker } from "./services/transactionReview/worker"
 import { walletSessionWorker } from "./wallet/session/worker"
-import { preAuthorisationWorker } from "./__new/services/preAuthorization/worker"
-import { transactionsWorker } from "./__new/services/transactions/worker"
-import { scheduleWorker } from "./__new/services/schedule/worker"
-import { analyticsWorker } from "./__new/services/analytics"
+import { transactionsWorker } from "./services/transactions/worker"
+import { scheduleWorker } from "./services/schedule/worker"
+import { analyticsWorker } from "./services/analytics"
+import { activityCacheWorker } from "./services/activity/cache/worker"
+import { activityWorker } from "./services/activity"
 
 /** TODO: refactor: remove this facade */
 export function initWorkers() {
@@ -24,9 +25,10 @@ export function initWorkers() {
     knownDappsWorker,
     transactionReviewWorker,
     walletSessionWorker,
-    preAuthorisationWorker,
     transactionsWorker,
     scheduleWorker,
     analyticsWorker,
+    activityCacheWorker,
+    activityWorker,
   }
 }

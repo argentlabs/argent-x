@@ -1,18 +1,18 @@
 import type {
   AccountChangeEventHandler,
-  BackwardsCompatibleStarknetWindowObject,
   NetworkChangeEventHandler,
   WalletEvents,
-} from "@argent/x-window"
+} from "@starknet-io/types-js"
+import type { BackwardsCompatibleStarknetWindowObject } from "starknetkit/window"
 
 import { assertNever } from "../shared/utils/assertNever"
-import { ArgentXAccount } from "./ArgentXAccount"
 import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./messaging"
 import { requestMessageHandler } from "./requestMessageHandlers"
 import { ArgentXAccount4 } from "./ArgentXAccount4"
-import { ArgentXProvider } from "./ArgentXProvider"
+import { ArgentXAccount5 } from "./ArgentXAccount5"
 import { ArgentXProviderV4 } from "./ArgentXProvider4"
+import { ArgentXProvider5 } from "./ArgentXProvider5"
 
 const VERSION = `${process.env.VERSION}`
 
@@ -61,9 +61,9 @@ export const starknetWindowObject: BackwardsCompatibleStarknetWindowObject = {
 
     if (starknetVersion === "v5") {
       ;(starknet as any).starknetJsVersion = "v5"
-      const provider = new ArgentXProvider(network)
+      const provider = new ArgentXProvider5(network)
       starknet.provider = provider
-      starknet.account = new ArgentXAccount(address, provider)
+      starknet.account = new ArgentXAccount5(address, provider)
     } else if (starknetVersion === "v4") {
       ;(starknet as any).starknetJsVersion = "v4"
       const provider = new ArgentXProviderV4(network)

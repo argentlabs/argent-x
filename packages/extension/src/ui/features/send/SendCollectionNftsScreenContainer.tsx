@@ -3,10 +3,10 @@ import { BarBackButton, BarCloseButton } from "@argent/x-ui"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { CollectionNfts } from "../accountNfts/CollectionNfts"
 import { useCollection, useCollectionNfts } from "../accountNfts/nfts.state"
-import { useSendQuery } from "./schema"
+import { useSendQuery } from "./useSendQuery"
 
 export const SendCollectionNftsScreenContainer: FC = () => {
   const navigate = useNavigate()

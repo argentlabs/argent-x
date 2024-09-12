@@ -6,10 +6,10 @@ import { getProvider } from "../../network"
 import { getMulticallForNetwork } from "../../multicall"
 import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import {
-  MULTISIG_ACCOUNT_CLASS_HASH,
+  addressSchema,
   TXV1_ACCOUNT_CLASS_HASH,
-} from "../../network/constants"
-import { addressSchema } from "@argent/x-shared"
+  TXV1_MULTISIG_CLASS_HASH,
+} from "@argent/x-shared"
 import {
   getMockNetwork,
   getMockNetworkWithoutMulticall,
@@ -98,7 +98,7 @@ describe("getAccountClassHashFromChain", () => {
       ...mockNetwork,
       accountClassHash: {
         standard: TXV1_ACCOUNT_CLASS_HASH,
-        multisig: MULTISIG_ACCOUNT_CLASS_HASH,
+        multisig: TXV1_MULTISIG_CLASS_HASH,
       },
     })
 
@@ -113,14 +113,14 @@ describe("getAccountClassHashFromChain", () => {
         address: "0x02",
         networkId: mockNetwork.id,
         network: mockNetwork,
-        classHash: MULTISIG_ACCOUNT_CLASS_HASH,
+        classHash: TXV1_MULTISIG_CLASS_HASH,
         type: "multisig",
       }),
     ]
 
     mockTryGetClassHash
       .mockResolvedValueOnce(TXV1_ACCOUNT_CLASS_HASH)
-      .mockResolvedValueOnce(MULTISIG_ACCOUNT_CLASS_HASH)
+      .mockResolvedValueOnce(TXV1_MULTISIG_CLASS_HASH)
 
     const first_call = {
       contractAddress: accounts[0].address,
@@ -149,7 +149,7 @@ describe("getAccountClassHashFromChain", () => {
 
     expect(results[1].classHash).not.toBeUndefined()
     expect(results[1].classHash).toEqual(
-      addressSchema.parse(MULTISIG_ACCOUNT_CLASS_HASH),
+      addressSchema.parse(TXV1_MULTISIG_CLASS_HASH),
     )
 
     expect(mockTryGetClassHash).toHaveBeenNthCalledWith(
@@ -169,7 +169,7 @@ describe("getAccountClassHashFromChain", () => {
         callContract: expect.any(Function),
         getClassHashAt: expect.any(Function),
       }),
-      MULTISIG_ACCOUNT_CLASS_HASH,
+      TXV1_MULTISIG_CLASS_HASH,
     )
 
     expect(results[0]).toEqual({
@@ -183,7 +183,7 @@ describe("getAccountClassHashFromChain", () => {
       address: accounts[1].address,
       networkId: accounts[1].networkId,
       type: "multisig",
-      classHash: addressSchema.parse(MULTISIG_ACCOUNT_CLASS_HASH),
+      classHash: addressSchema.parse(TXV1_MULTISIG_CLASS_HASH),
     })
   })
 

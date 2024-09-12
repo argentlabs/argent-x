@@ -50,10 +50,6 @@ const fetcherErrorSchema = z.object({
   }),
 })
 
-/** Fallback - a generic error containing a message */
-
-// {message: 'Argent Shield token is expired'}
-
 export const genericErrorSchema = z.object({
   message: z.string(),
 })

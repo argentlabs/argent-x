@@ -6,7 +6,7 @@ import { Network } from "../../../shared/network"
 import { Transaction } from "../../../shared/transactions"
 import { openBlockExplorerTransaction } from "../../services/blockExplorer.service"
 import { TransactionListItem } from "./TransactionListItem"
-import { transformTransaction } from "./transform"
+import { transformTransaction } from "../../../shared/activity/utils/transform"
 import { Token } from "../../../shared/token/__new/types/token.model"
 
 interface PendingTransactionsProps {

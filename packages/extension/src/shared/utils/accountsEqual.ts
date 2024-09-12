@@ -1,6 +1,17 @@
 import { isEqualAddress } from "@argent/x-shared"
 import type { BaseWalletAccount, WalletAccount } from "../wallet.model"
 
+/** prevents infinite re-renders when both accounts are undefined */
+export const atomFamilyAccountsEqual = (
+  a?: BaseWalletAccount,
+  b?: BaseWalletAccount,
+) => {
+  if (!a && !b) {
+    return true
+  }
+  return accountsEqual(a, b)
+}
+
 export const accountsEqual = (a?: BaseWalletAccount, b?: BaseWalletAccount) => {
   try {
     if (!a || !b) {

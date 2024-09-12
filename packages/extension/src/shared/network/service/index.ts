@@ -1,4 +1,4 @@
 import { networkRepo } from "../store"
-import { NetworkService } from "./implementation"
+import { NetworkService } from "./NetworkService"
 
 export const networkService = new NetworkService(networkRepo)

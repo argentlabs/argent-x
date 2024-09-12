@@ -1,18 +1,21 @@
 import { num } from "starknet"
 
+import {
+  estimatedFeeToMaxFeeTotal,
+  getTxVersionFromFeeToken,
+} from "@argent/x-shared"
 import { ExtensionActionItemOfType } from "../../shared/actionQueue/types"
-import { addTransaction } from "../../shared/transactions/store"
-import { Wallet } from "../wallet"
-import { estimatedFeeToMaxFeeTotal } from "../../shared/transactionSimulation/utils"
-import { checkTransactionHash } from "../../shared/transactions/utils"
-import { ETH_TOKEN_ADDRESS } from "../../shared/network/constants"
-import { TransactionInvokeVersion } from "../../shared/utils/transactionVersion"
 import { AccountError } from "../../shared/errors/account"
 import { SessionError } from "../../shared/errors/session"
+import { addTransaction } from "../../shared/transactions/store"
+import { checkTransactionHash } from "../../shared/transactions/utils"
+import { Wallet } from "../wallet"
+import { DeployActionExtra } from "../../shared/actionQueue/schema"
 
 export const addMultisigDeployAction = async (
   action: ExtensionActionItemOfType<"DEPLOY_MULTISIG">,
   wallet: Wallet,
+  extra?: DeployActionExtra,
 ) => {
   if (!(await wallet.isSessionOpen())) {
     throw new SessionError({ code: "NO_OPEN_SESSION" })
@@ -26,9 +29,12 @@ export const addMultisigDeployAction = async (
     throw new AccountError({ code: "ACCOUNT_ALREADY_DEPLOYED" })
   }
 
-  // TODO: TXV3 - allow for deploying multisig with STRK fee token
-  const version: TransactionInvokeVersion = "0x1"
-  const feeTokenAddress = ETH_TOKEN_ADDRESS
+  if (!extra) {
+    throw Error("Missing fee token address data")
+  }
+
+  const { feeTokenAddress } = extra
+  const version = getTxVersionFromFeeToken(feeTokenAddress)
 
   // TODO: refactor to use the fee estimation repo
   const maxFee = await wallet

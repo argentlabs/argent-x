@@ -24,7 +24,7 @@ export const ConfirmationModal: FC<ConfirmationModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
-      <ModalContent background="neutrals.700" borderRadius="2xl">
+      <ModalContent color="text-primary" bg="surface-elevated" rounded="2xl">
         <ModalHeader>
           <H5 fontWeight="600" textAlign="center">
             Dangerous transaction!
@@ -37,11 +37,11 @@ export const ConfirmationModal: FC<ConfirmationModalProps> = ({
           </P3>
         </ModalBody>
 
-        <ModalFooter flexDirection="column" gap="3">
-          <Button w="100%" colorScheme="danger" onClick={onConfirm}>
+        <ModalFooter flexDirection="column" gap="2">
+          <Button colorScheme="danger" size="sm" w="full" onClick={onConfirm}>
             Confirm
           </Button>
-          <Button w="100%" backgroundColor="neutrals.600" onClick={onClose}>
+          <Button colorScheme="secondary" size="sm" w="full" onClick={onClose}>
             Go back
           </Button>
         </ModalFooter>

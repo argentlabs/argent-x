@@ -1,22 +1,32 @@
-import { AddStarknetChainParameters } from "@argent/x-window"
-import { sendMessage, waitForMessage } from "../messageActions"
 import { Address } from "@argent/x-shared"
+import { AddStarknetChainParameters } from "@starknet-io/types-js"
+import { AddStarknetChainParametersSchema } from "starknetkit/window"
 import { ETH_TOKEN_ADDRESS } from "../../shared/network/constants"
+import { sendMessage, waitForMessage } from "../messageActions"
+import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 
 export async function addStarknetChainHandler(
   callParams: AddStarknetChainParameters,
 ): Promise<boolean> {
+  const {
+    chain_id,
+    chain_name,
+    id,
+    block_explorer_url,
+    native_currency,
+    rpc_urls,
+  } = AddStarknetChainParametersSchema.parse(callParams)
+
   sendMessage({
     type: "REQUEST_ADD_CUSTOM_NETWORK",
     data: {
-      id: callParams.id,
-      name: callParams.chainName,
-      chainId: callParams.chainId,
-      rpcUrl: callParams.rpcUrls?.[0],
-      explorerUrl: callParams.blockExplorerUrls?.[0],
-      accountClassHash: (callParams as any).accountImplementation,
+      id,
+      name: chain_name,
+      chainId: chain_id,
+      rpcUrl: rpc_urls?.[0],
+      explorerUrl: block_explorer_url?.[0],
       possibleFeeTokenAddresses: [
-        (callParams.nativeCurrency?.address as Address) ?? ETH_TOKEN_ADDRESS,
+        (native_currency?.options.address as Address) ?? ETH_TOKEN_ADDRESS,
       ],
     },
   })
@@ -65,10 +75,10 @@ export async function addStarknetChainHandler(
   ])
 
   if (result === "error") {
-    throw Error("User abort")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.UserAborted })
   }
   if (result === "timeout") {
-    throw Error("User action timed out")
+    throw new WalletRPCError({ code: WalletRPCErrorCodes.Unknown })
   }
 
   return true

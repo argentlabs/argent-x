@@ -1,5 +1,5 @@
 import { AlertButton } from "@argent/x-ui"
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { Spinner } from "@chakra-ui/react"
 import { FC, useCallback, useMemo } from "react"
 
@@ -7,7 +7,7 @@ import { useIsMultisigDeploying } from "./hooks/useIsMultisigDeploying"
 import { Multisig } from "./Multisig"
 import { clientAccountService } from "../../services/account"
 
-const { MultisigIcon } = icons
+const { MultisigIcon } = iconsDeprecated
 
 export const MultisigBanner: FC<{
   multisig: Multisig

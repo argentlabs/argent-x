@@ -1,8 +1,8 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { BoxProps, Center } from "@chakra-ui/react"
 import { FC } from "react"
 
-const { QuestionMarkIcon } = icons
+const { QuestionMarkIcon } = iconsDeprecated
 
 export const UnknownTokenIcon: FC<BoxProps> = ({ ...props }) => {
   return (

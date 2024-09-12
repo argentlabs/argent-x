@@ -2,14 +2,15 @@ import { FC } from "react"
 import { usePreAuthorizationsGroupedByAccountIdentifierForNetworkId } from "../../preAuthorizations/hooks"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { DappConnectionsAccountListScreen } from "./DappConnectionsAccountListScreen"
-import { useAppState } from "../../../app.state"
+import { selectedNetworkIdView } from "../../../views/network"
+import { useView } from "../../../views/implementation/react"
 
 export const DappConnectionsAccountListScreenContainer: FC = () => {
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const onBack = useNavigateReturnToOrBack()
   const preAuthorizationsByAccountIdentifier =
     usePreAuthorizationsGroupedByAccountIdentifierForNetworkId(
-      switcherNetworkId,
+      selectedNetworkId,
     )
   return (
     <DappConnectionsAccountListScreen

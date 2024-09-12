@@ -3,10 +3,10 @@ import { useMemo } from "react"
 import { Token } from "../../../shared/token/__new/types/token.model"
 import { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
 import { equalToken } from "../../../shared/token/__new/utils"
-import { useView } from "../../views/implementation/react"
-import { ethTokenOnNetworkView } from "../../views/token"
-import { tokenBalancesForAccountView } from "../../views/tokenBalances"
 import { Account } from "../accounts/Account"
+import { tokenBalancesForAccountViewFamily } from "../../views/tokenBalances"
+import { ethTokenOnNetworkView } from "../../views/token"
+import { useView } from "../../views/implementation/react"
 
 /**
  * Interface for the arguments of useTokenBalanceForAccount function
@@ -25,7 +25,9 @@ export function useTokenBalanceForAccount({
   token,
   account,
 }: UseTokenBalanceForAccountArgs): TokenWithOptionalBigIntBalance | undefined {
-  const tokenBalancesForAccount = useView(tokenBalancesForAccountView(account))
+  const tokenBalancesForAccount = useView(
+    tokenBalancesForAccountViewFamily(account),
+  )
   const ethToken = useView(ethTokenOnNetworkView(account?.networkId))
 
   return useMemo(() => {

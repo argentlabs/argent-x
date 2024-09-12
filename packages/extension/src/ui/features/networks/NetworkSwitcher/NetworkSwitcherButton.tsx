@@ -21,7 +21,6 @@ export const NetworkSwitcherButton: FC<NetworkSwitcherButtonProps> = ({
       aria-label="Selected network"
       data-testid="network-switcher-button"
       isDisabled={disabled}
-      colorScheme={"neutrals"}
       size={"2xs"}
       as={Button}
       rightIcon={<StatusIndicator status={currentNetworkStatus} />}

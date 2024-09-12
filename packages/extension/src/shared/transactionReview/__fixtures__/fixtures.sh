@@ -81,7 +81,7 @@ curl 'https://cloud.argent-api.com/v1/reviewer/transactions/v2/review/starknet' 
   --compressed \
   --insecure | jq > upgrade.json
 
-# Add Shield
+# Upgrade to Smart Account
 
 curl 'https://cloud.argent-api.com/v1/reviewer/transactions/v2/review/starknet' \
   -H 'Accept: application/json' \
@@ -93,9 +93,9 @@ curl 'https://cloud.argent-api.com/v1/reviewer/transactions/v2/review/starknet' 
   -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36' \
   --data-raw '{"transactions":[{"type":"INVOKE","chainId":"0x534e5f474f45524c49","cairoVersion":"1","nonce":"0x1e","version":"0x100000000000000000000000000000001","account":"0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25","calls":[{"contractAddress":"0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25","entrypoint":"change_guardian","calldata":["2741694347102943600871280873022221851817804225003651186046337463495789335483"]}]}]}' \
   --compressed \
-  --insecure | jq > shield-add.json
+  --insecure | jq > smart-account-add.json
 
-# Remove Shield
+# Change to Standard Account
 
 curl 'https://cloud.argent-api.com/v1/reviewer/transactions/v2/review/starknet' \
   -H 'Accept: application/json' \
@@ -104,9 +104,9 @@ curl 'https://cloud.argent-api.com/v1/reviewer/transactions/v2/review/starknet' 
   -H 'Content-Type: application/json' \
   --data-raw '{"transactions":[{"type":"INVOKE","chainId":"0x534e5f474f45524c49","cairoVersion":"1","nonce":"0x1e","version":"0x100000000000000000000000000000001","account":"0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25","calls":[{"contractAddress":"0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25","entrypoint":"change_guardian","calldata":["0"]}]}]}' \
   --compressed \
-  --insecure | jq > shield-remove.json
+  --insecure | jq > smart-account-remove.json
 
-# Keep Shield
+# Keep Smart Account
 
 curl 'https://cloud.argent-api.com/v1/reviewer/transactions/v2/review/starknet' \
   -H 'Accept: application/json' \
@@ -115,7 +115,7 @@ curl 'https://cloud.argent-api.com/v1/reviewer/transactions/v2/review/starknet' 
   -H 'Content-Type: application/json' \
   --data-raw '{"transactions":[{"type":"INVOKE","chainId":"0x534e5f474f45524c49","cairoVersion":"1","nonce":"0x1e","version":"0x100000000000000000000000000000001","account":"0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25","calls":[{"contractAddress":"0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25","entrypoint":"cancel_escape","calldata":[]}]}]}' \
   --compressed \
-  --insecure | jq > shield-keep.json
+  --insecure | jq > smart-account-keep.json
 
 # Multisig add signer
 

@@ -1,43 +1,37 @@
 import { FC } from "react"
-import styled from "styled-components"
+import { Box, BoxProps } from "@chakra-ui/react"
 
-interface StepIndicatorProps {
+interface StepIndicatorProps extends BoxProps {
   length: number
   currentIndex: number
-
-  className?: string
-  style?: React.CSSProperties
+  filled?: boolean
 }
-
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-`
-
-const Point = styled.div<{ active?: boolean }>`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #33302f;
-
-  ${({ active }) =>
-    active &&
-    `
-        background: #F36A3D;
-    `}
-`
 
 export const StepIndicator: FC<StepIndicatorProps> = ({
   currentIndex,
   length,
+  filled = false,
   ...divProps
 }) => {
+  const primaryColorCondition = (i: number) => {
+    if (!filled) {
+      return i === currentIndex ? "primary.500" : "surface-elevated"
+    }
+
+    return i <= currentIndex ? "primary.500" : "surface-elevated"
+  }
+
   return (
-    <Wrapper {...divProps}>
+    <Box display="flex" justifyContent="center" gap={2} {...divProps}>
       {Array.from({ length }).map((_, i) => (
-        <Point key={i} active={i === currentIndex} />
+        <Box
+          key={i}
+          w={2}
+          h={2}
+          borderRadius="50%"
+          bg={primaryColorCondition(i)}
+        />
       ))}
-    </Wrapper>
+    </Box>
   )
 }

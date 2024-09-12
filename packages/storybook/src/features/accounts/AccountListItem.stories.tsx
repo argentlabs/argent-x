@@ -1,10 +1,10 @@
 import { StoryObj } from "@storybook/react"
 import { AccountListItem } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
-import { Button, CellStack, icons } from "@argent/x-ui"
+import { Button, CellStack, iconsDeprecated } from "@argent/x-ui"
 import { ComponentProps } from "react"
 import { decorators } from "../../decorators/routerDecorators"
 
-const { AddressBookIcon, WalletIcon } = icons
+const { AddressBookIcon, WalletIcon } = iconsDeprecated
 
 export default {
   component: AccountListItem,
@@ -20,7 +20,7 @@ const account = {
   accountName: "Account Lorem Ipsum Dolor Sit Amet 10",
   accountAddress:
     "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-  networkId: "goerli-alpha",
+  networkId: "sepolia-alpha",
 }
 
 export const Default: StoryObj<typeof AccountListItem> = {
@@ -33,7 +33,7 @@ export const StarknetID: StoryObj<typeof AccountListItem> = {
   args: {
     accountName: "foobar.stark",
     accountAddress: "foobar.stark",
-    networkId: "goerli-alpha",
+    networkId: "sepolia-alpha",
   },
 }
 
@@ -151,6 +151,13 @@ export const AvatarIcon: StoryObj<typeof AccountListItem> = {
   args: {
     ...account,
     avatarIcon: <WalletIcon />,
+  },
+}
+
+export const Ledger: StoryObj<typeof AccountListItem> = {
+  args: {
+    ...account,
+    isLedger: true,
   },
 }
 

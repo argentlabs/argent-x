@@ -1,4 +1,4 @@
-import { messageClient } from "../messaging/trpc"
-import { DiscoverService } from "./client"
+import { messageClient } from "../trpc"
+import { ClientDiscoverService } from "./ClientDiscoverService"
 
-export const clientDiscoverService = new DiscoverService(messageClient)
+export const clientDiscoverService = new ClientDiscoverService(messageClient)

@@ -1,7 +1,7 @@
-import { Button, H6, icons } from "@argent/x-ui"
+import { Button, H6, iconsDeprecated } from "@argent/x-ui"
 import { FC } from "react"
 
-const { RemoveIcon } = icons
+const { RemoveIcon } = iconsDeprecated
 
 interface SettingsNetworkListItemProps {
   host: string

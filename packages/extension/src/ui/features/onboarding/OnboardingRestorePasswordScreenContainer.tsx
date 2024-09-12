@@ -2,28 +2,28 @@ import { useNavigateBack, useToast } from "@argent/x-ui"
 import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { getMessageFromTrpcError } from "@argent/x-shared"
+import { useAtom } from "jotai"
+import { isErrorOfType } from "../../../shared/errors/errorData"
+import {
+  RecoveryError,
+  RecoveryErrorMessage,
+} from "../../../shared/errors/recovery"
+import {
+  WALLET_ERROR_MESSAGES,
+  WalletValidationErrorMessage,
+} from "../../../shared/errors/wallet"
+import { routes } from "../../../shared/ui/routes"
 import { clientRecoveryService } from "../../services/recovery"
+import { useView } from "../../views/implementation/react"
+import { errorRecoveringView } from "../../views/recovery"
+import { hasSavedRecoverySeedphraseAtom } from "../recovery/hasSavedRecoverySeedphraseAtom"
 import {
   useSeedRecovery,
   validateAndSetPassword,
   validateSeedRecoveryCompletion,
 } from "../recovery/seedRecovery.state"
 import { OnboardingPasswordScreen } from "./OnboardingPasswordScreen"
-import { useAtom } from "jotai"
-import { hasSavedRecoverySeedphraseAtom } from "../recovery/hasSavedRecoverySeedphraseAtom"
-import { isErrorOfType } from "../../../shared/errors/errorData"
-import {
-  WALLET_ERROR_MESSAGES,
-  WalletValidationErrorMessage,
-} from "../../../shared/errors/wallet"
-import {
-  RecoveryError,
-  RecoveryErrorMessage,
-} from "../../../shared/errors/recovery"
-import { errorRecoveringView } from "../../views/recovery"
-import { useView } from "../../views/implementation/react"
-import { getMessageFromTrpcError } from "../../../shared/errors/schema"
 
 export const OnboardingRestorePasswordScreenContainer: FC = () => {
   const toast = useToast()

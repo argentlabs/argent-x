@@ -1,4 +1,4 @@
-import { messageClient } from "../messaging/trpc"
-import { FeeTokenService } from "./implementation"
+import { messageClient } from "../trpc"
+import { FeeTokenService } from "./FeeTokenService"
 
 export const feeTokenService = new FeeTokenService(messageClient)

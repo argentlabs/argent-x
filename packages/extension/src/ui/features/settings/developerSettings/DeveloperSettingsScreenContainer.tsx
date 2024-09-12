@@ -9,6 +9,7 @@ import { DeveloperSettingsScreen } from "./DeveloperSettingsScreen"
 
 export const DeveloperSettingsScreenContainer: FC = () => {
   const isMainnet = useIsMainnet()
+
   return (
     <DeveloperSettingsScreen
       showBetaFeatures={isBetaFeaturesEnabled && isMainnet}

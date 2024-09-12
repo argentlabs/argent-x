@@ -13,6 +13,7 @@ import { OwnedToken } from "./OwnedToken"
 import { TokenPrice } from "./TokenPrice"
 import { Token } from "../../../../shared/token/__new/types/token.model"
 import { useTradableTokensInCurrentNetwork } from "../../accountTokens/tokens.state"
+import { sortSwapTokens } from "../utils"
 
 interface SwapTokensModalProps {
   onClose: () => void
@@ -58,10 +59,12 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
     return <></>
   }
 
+  const sortedTokens = sortSwapTokens(filteredTokens)
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} size="full" motionPreset="none">
-        <ModalContent bg="neutrals.900">
+        <ModalContent bg="surface-default">
           <ModalHeader>
             <H5 fontWeight="600" textAlign="center">
               {isPay ? "Pay with" : "Receive "}
@@ -70,9 +73,9 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
           <ModalCloseButton />
           <ModalBody flexDirection="column">
             <CellStack px="0" gap={3}>
-              <SearchInput placeholder="Search" {...register("query")} />
+              <SearchInput {...register("query")} />
 
-              {filteredTokens?.map((token) => (
+              {sortedTokens?.map((token) => (
                 <Fragment key={token.address}>
                   {isPay ? (
                     <OwnedToken

@@ -1,23 +1,41 @@
 import { expect, test } from "vitest"
 
+import { ArgentSigner } from "../src/shared/signer"
 import {
-  getStarkPair,
-  pathHash,
+  getBaseDerivationPath,
   grindKey,
-} from "../src/background/keys/keyDerivation"
-import { STANDARD_DERIVATION_PATH } from "../src/shared/wallet.service"
+  pathHash,
+} from "../src/shared/signer/utils"
+import { getPathForIndex } from "../src/shared/utils/derivationPath"
+import { SignerType } from "../src/shared/wallet.model"
 
-test("generate Stark Pair", () => {
+test("generate Stark Pair", async () => {
   const secret =
     "0xe6904d63affe7a13cd30345b000c9b1ffc087832332d7303cf237ffda8a177d0"
 
-  const starkPair5 = getStarkPair(5, secret, STANDARD_DERIVATION_PATH)
-  expect(starkPair5.pubKey).toBe(
-    "0x05c7c65bfda7a85af0681c85c9c440f0aa6825feef6f9c96e55fb2ce08c8d4bc",
+  let argentSigner = new ArgentSigner(
+    secret,
+    getPathForIndex(
+      5,
+      getBaseDerivationPath("standard", SignerType.LOCAL_SECRET),
+    ),
   )
 
-  const starkPair7 = getStarkPair(7, secret, STANDARD_DERIVATION_PATH)
-  expect(starkPair7.pubKey).toBe(
+  const starkKey = argentSigner.getStarkKey()
+  const pubKey = await argentSigner.getPubKey()
+
+  expect(starkKey).toBe(
+    "0x05c7c65bfda7a85af0681c85c9c440f0aa6825feef6f9c96e55fb2ce08c8d4bc",
+  )
+  expect(pubKey).toEqual(starkKey)
+  argentSigner = new ArgentSigner(
+    secret,
+    getPathForIndex(
+      7,
+      getBaseDerivationPath("standard", SignerType.LOCAL_SECRET),
+    ),
+  )
+  expect(argentSigner.getStarkKey()).toBe(
     "0x0605d5a0ece3b316f0d72221228acb7f01dcb34db74e0c02790db156741f5a86",
   )
 })

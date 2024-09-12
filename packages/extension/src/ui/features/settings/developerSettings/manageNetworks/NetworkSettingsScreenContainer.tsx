@@ -7,11 +7,11 @@ import {
   type Network,
 } from "../../../../../shared/network"
 import { networkService } from "../../../../../shared/network/service"
-import { routes } from "../../../../routes"
+import { routes } from "../../../../../shared/ui/routes"
 import { useNetworks } from "../../../networks/hooks/useNetworks"
 import {
-  validateRemoveNetwork,
-  validateRestoreDefaultNetworks,
+  useValidateRemoveNetwork,
+  useValidateRestoreDefaultNetworks,
 } from "./validateRemoveNetwork"
 import { NetworkSettingsScreen } from "./NetworkSettingsScreen"
 import { useNavigateReturnToOrBack } from "../../../../hooks/useNavigateReturnTo"
@@ -25,6 +25,8 @@ export const NetworkSettingsScreenContainer: FC = () => {
     onOpen: onAlertDialogOpen,
     onClose: onAlertDialogClose,
   } = useDisclosure()
+  const validateRemoveNetwork = useValidateRemoveNetwork()
+  const validateRestoreDefaultNetworks = useValidateRestoreDefaultNetworks()
 
   const [errorMessage, setErrorMessage] = useState("")
 
@@ -35,7 +37,7 @@ export const NetworkSettingsScreenContainer: FC = () => {
   const onRemoveNetwork = useCallback(
     async (network: Network) => {
       try {
-        const shouldRemoveNetwork = await validateRemoveNetwork(network.id)
+        const shouldRemoveNetwork = validateRemoveNetwork(network.id)
         if (shouldRemoveNetwork) {
           await networkService.removeById(network.id)
         }
@@ -49,12 +51,12 @@ export const NetworkSettingsScreenContainer: FC = () => {
         }
       }
     },
-    [onAlertDialogOpen],
+    [onAlertDialogOpen, validateRemoveNetwork],
   )
 
   const onRestoreDefaults = useCallback(async () => {
     try {
-      const shouldRemoveNetwork = await validateRestoreDefaultNetworks()
+      const shouldRemoveNetwork = validateRestoreDefaultNetworks()
       if (shouldRemoveNetwork) {
         await networkService.restoreDefaults()
       }
@@ -67,7 +69,7 @@ export const NetworkSettingsScreenContainer: FC = () => {
         throw error
       }
     }
-  }, [onAlertDialogOpen])
+  }, [onAlertDialogOpen, validateRestoreDefaultNetworks])
 
   const onViewNetwork = (network: Network) => {
     navigate(routes.settingsEditCustomNetwork(network.id))

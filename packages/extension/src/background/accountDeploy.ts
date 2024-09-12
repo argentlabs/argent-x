@@ -1,7 +1,7 @@
 import { BlockNumber, CallData, num } from "starknet"
 import type { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import type { Wallet } from "./wallet"
-import type { IBackgroundActionService } from "./__new/services/action/interface"
+import type { IBackgroundActionService } from "./services/action/IBackgroundActionService"
 
 export interface IDeployAccount {
   account: BaseWalletAccount
@@ -43,6 +43,7 @@ export const addDeployAccountAction = async ({
     },
     {
       title: "Activate account",
+      shortTitle: "Account activation",
       icon: "DeployIcon",
     },
   )

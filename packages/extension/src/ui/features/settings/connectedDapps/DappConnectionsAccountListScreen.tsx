@@ -4,18 +4,18 @@ import {
   Empty,
   NavigationContainer,
   P3,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { FC, ReactEventHandler } from "react"
 
 import { PreAuthorization } from "../../../../shared/preAuthorization/schema"
-import { useAccount } from "../../accounts/accounts.state"
+import { useWalletAccount } from "../../accounts/accounts.state"
 import { AccountListItem } from "../../accounts/AccountListItem"
 import { useNavigate } from "react-router-dom"
-import { routes } from "../../../routes"
+import { routes } from "../../../../shared/ui/routes"
 import { Flex } from "@chakra-ui/react"
 
-const { LinkIcon, ChevronRightIcon } = icons
+const { LinkIcon, ChevronRightIcon } = iconsDeprecated
 
 interface DappConnectionsAccountListScreenProps {
   onBack: ReactEventHandler
@@ -67,7 +67,7 @@ function DappConnectionsAccountListItem({
   preAuthorizations: PreAuthorization[]
 }) {
   const navigate = useNavigate()
-  const account = useAccount(preAuthorizations[0].account)
+  const account = useWalletAccount(preAuthorizations[0].account)
   const onClick = () => {
     navigate(routes.settingsDappConnectionsAccount(account?.address))
   }
@@ -86,7 +86,8 @@ function DappConnectionsAccountListItem({
       accountDescription={accountDescription}
       networkId={account.networkId}
       accountType={account.type}
-      isShield={Boolean(account.guardian)}
+      isSmartAccount={Boolean(account.guardian)}
+      isLedger={account.signer.type === "ledger"}
       onClick={onClick}
     >
       <ChevronRightIcon opacity={0.6} />

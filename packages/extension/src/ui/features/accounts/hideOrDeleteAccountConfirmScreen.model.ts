@@ -8,4 +8,5 @@ export interface HideOrDeleteAccountConfirmScreenProps
   accountAddress: string
   onSubmit: () => void
   onReject: () => void
+  networkId: string
 }

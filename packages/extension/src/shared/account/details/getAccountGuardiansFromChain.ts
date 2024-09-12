@@ -15,17 +15,37 @@ export async function getAccountGuardiansFromChain(
       return getGuardianForAccount(account)
     }),
   )
+
   const accountsWithGuardians = accounts.map((account, index) => {
     const guardianResult = guardianResults[index]
-    const guardian =
+    const onChainGuardian =
       guardianResult.status === "fulfilled" ? guardianResult.value : undefined
+    const guardian = resolveOnChainGuardianForAcccount(onChainGuardian, account)
+    const type = guardian
+      ? "smart"
+      : account.type === "multisig"
+        ? "multisig"
+        : "standard"
     const { address, networkId } = account
     return {
       address,
       networkId,
       guardian,
+      type,
     }
   })
 
   return accountsWithGuardians
+}
+
+function resolveOnChainGuardianForAcccount(
+  onChainGuardian: string | undefined,
+  account: WalletAccount,
+) {
+  // there might be undeployed smart accounts which have a guardian,
+  // so don't replace it with onChainGuardian
+  if (account.needsDeploy && account.guardian) {
+    return account.guardian
+  }
+  return onChainGuardian
 }

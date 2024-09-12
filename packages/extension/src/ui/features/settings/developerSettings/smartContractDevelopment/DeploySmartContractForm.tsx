@@ -17,7 +17,7 @@ import {
 } from "react-hook-form"
 
 import { Transaction } from "../../../../../shared/transactions"
-import { useAppState } from "../../../../app.state"
+import { useLegacyAppState } from "../../../../app.state"
 
 import { ClassHashInputActions } from "./ClassHashInputActions"
 import { useLastDeclaredContracts } from "./udc.state"
@@ -28,6 +28,7 @@ import { udcService } from "../../../../services/udc"
 import { DeployContractPayload } from "../../../../../shared/udc/service/interface"
 import { clientAccountService } from "../../../../services/account"
 import { FieldValues } from "../../../../../shared/udc/schema"
+import { ampli } from "../../../../../shared/analytics"
 
 interface DeploySmartContractFormProps {
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
@@ -70,7 +71,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
     unique,
   }: FieldValues) => {
     try {
-      useAppState.setState({ switcherNetworkId: network })
+      // useAppState.setState({ selectedNetworkId: network })
 
       await clientAccountService.select({
         address: account,
@@ -81,7 +82,7 @@ const DeploySmartContractForm: FC<DeploySmartContractFormProps> = ({
         address: account,
         networkId: network,
         classHash,
-        constructorCalldata: parameters,
+        constructorCalldata: parameters ?? [],
         unique,
         salt: !salt ? "0" : salt, // Using empty string will cause toBigInt to fail. Therefore we use 0 salt.
       }

@@ -75,8 +75,8 @@ export const NetworkSettingsFormScreen: FC<NetworkSettingsFormScreenProps> = ({
           <ControlledInputText
             autoComplete="off"
             control={control}
-            placeholder="Chain ID (e.g. SN_GOERLI)"
-            defaultValue="SN_GOERLI"
+            placeholder="Chain ID (e.g. SN_SEPOLIA)"
+            defaultValue="SN_SEPOLIA"
             name="chainId"
             type="text"
             disabled={defaultNetwork.readonly}

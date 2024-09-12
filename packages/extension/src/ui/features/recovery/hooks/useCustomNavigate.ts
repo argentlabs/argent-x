@@ -1,7 +1,7 @@
 import { NavigateOptions, To, useNavigate } from "react-router-dom"
 import browser from "webextension-polyfill"
 
-import { routes } from "../../../routes"
+import { routes } from "../../../../shared/ui/routes"
 import { extensionIsInTab, openExtensionInTab } from "../../browser/tabs"
 
 const getPlatformOS = async () => {

@@ -1,18 +1,18 @@
 import { isFunction } from "lodash-es"
 import { FC, useEffect, useMemo } from "react"
-import { TokenWithBalance } from "@argent/x-shared"
-import { useAccount } from "../../accounts/accounts.state"
+import {
+  TokenWithBalance,
+  estimatedFeesToTotal,
+  estimatedFeesToMaxFeeTotal,
+} from "@argent/x-shared"
+import { useWalletAccount } from "../../accounts/accounts.state"
 import {
   useCurrencyDisplayEnabled,
   useTokenAmountToCurrencyValue,
 } from "../../accountTokens/tokenPriceHooks"
 import { FeeEstimation } from "../feeEstimation/FeeEstimation"
 import { ParsedFeeError, getParsedFeeError } from "../feeEstimation/feeError"
-import { EstimatedFees } from "../../../../shared/transactionSimulation/fees/fees.model"
-import {
-  estimatedFeesToMaxFeeTotal,
-  estimatedFeesToTotal,
-} from "../../../../shared/transactionSimulation/utils"
+import { EstimatedFees } from "@argent/x-shared/simulation"
 
 export interface FeeEstimationContainerV2Props {
   onChange?: (fee: bigint) => void
@@ -24,10 +24,11 @@ export interface FeeEstimationContainerV2Props {
   transactionSimulationFeeError?: Error
   needsDeploy?: boolean
   error?: any
-  fee: EstimatedFees
-  feeToken: TokenWithBalance
+  fee?: EstimatedFees
+  feeToken?: TokenWithBalance
   onOpenFeeTokenPicker?: () => void
   allowFeeTokenSelection?: boolean
+  isSendingMoreThanBalanceAndGas?: boolean
 }
 
 export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
@@ -42,19 +43,24 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
   feeToken,
   onOpenFeeTokenPicker,
   allowFeeTokenSelection = true,
+  isSendingMoreThanBalanceAndGas,
 }) => {
-  const account = useAccount({ address: accountAddress, networkId })
+  const account = useWalletAccount({ address: accountAddress, networkId })
   if (!account) {
     throw new Error("Account not found")
   }
 
-  const enoughBalance = useMemo(
-    () => feeToken.balance >= estimatedFeesToMaxFeeTotal(fee),
-    [feeToken?.balance, fee],
-  )
+  const enoughBalance = useMemo(() => {
+    if (!feeToken || !fee) {
+      return false
+    }
+    return feeToken.balance >= estimatedFeesToMaxFeeTotal(fee)
+  }, [feeToken, fee])
 
   const showFeeError = Boolean(
-    fee && typeof feeToken?.balance === "bigint" && !enoughBalance,
+    fee &&
+      typeof feeToken?.balance === "bigint" &&
+      (!enoughBalance || isSendingMoreThanBalanceAndGas),
   )
   const showEstimateError =
     Boolean(error) || Boolean(transactionSimulationFeeError)
@@ -87,12 +93,12 @@ export const FeeEstimationContainerV2: FC<FeeEstimationContainerV2Props> = ({
 
   const amountCurrencyValue = useTokenAmountToCurrencyValue(
     showCurrencyValue && feeToken ? feeToken : undefined,
-    estimatedFeesToTotal(fee),
+    fee && estimatedFeesToTotal(fee),
   ) // will return undefined if no feeToken or showCurrencyValue is false
 
   const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
     showCurrencyValue && feeToken ? feeToken : undefined,
-    estimatedFeesToMaxFeeTotal(fee),
+    fee && estimatedFeesToMaxFeeTotal(fee),
   )
 
   return (

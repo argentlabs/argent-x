@@ -17,7 +17,7 @@ export const getConstructorParamsSchema = z.object({
 })
 
 export const basicContractClassSchema = z.object({
-  abi: z.array(z.any()),
+  abi: z.any(), // TODO: check why not compiling with z.array(z.any())
   contract_class_version: z.string(),
   entry_points_by_type: z.any().optional(),
   sierra_program: z.array(z.string()).optional(),

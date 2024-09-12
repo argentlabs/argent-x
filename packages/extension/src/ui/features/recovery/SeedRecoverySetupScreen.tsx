@@ -3,19 +3,19 @@ import {
   CellStack,
   NavigationContainer,
   P4,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { FC, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAtom } from "jotai"
 import { Button, Flex } from "@chakra-ui/react"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { SeedPhraseWithCopyButton } from "./SeedPhraseWithCopyButton"
 import { hasSavedRecoverySeedphraseAtom } from "./hasSavedRecoverySeedphraseAtom"
 import { useSeedPhrase } from "./hooks/useSeedPhrase"
 
-const { CheckboxDefaultIcon, CheckboxActiveIcon } = icons
+const { CheckboxDefaultIcon, CheckboxActiveIcon } = iconsDeprecated
 
 export const SeedRecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
@@ -46,7 +46,11 @@ export const SeedRecoverySetupScreen: FC = () => {
           whiteSpace={"initial"}
           leftIcon={
             isChecked ? (
-              <CheckboxActiveIcon fontSize={"4xl"} color={"success.500"} />
+              <CheckboxActiveIcon
+                data-testid="recovery-phrase-checked"
+                fontSize={"4xl"}
+                color={"success.500"}
+              />
             ) : (
               <CheckboxDefaultIcon fontSize={"4xl"} color={"neutrals.500"} />
             )

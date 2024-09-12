@@ -1,13 +1,14 @@
 import { FC, useCallback } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { useMultisig } from "../multisig/multisig.state"
+import { multisigView } from "../multisig/multisig.state"
 import { AccountNavigationBar } from "./AccountNavigationBar"
 import { AccountNavigationBarContainerProps } from "./accountNavigationBar.model"
 import { useOnSettingsNavigate } from "./useOnSettingsNavigate"
+import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
 
 const argentXEnv = process.env.ARGENT_X_ENVIRONMENT || ""
 
@@ -20,11 +21,12 @@ export const AccountNavigationBarContainer: FC<
   const account = useView(selectedAccountView)
   const hasAccount = Boolean(account)
 
-  // TODO: refactor multisig to use services and views
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
 
-  const isShield = Boolean(account?.guardian)
+  const isGuardian = Boolean(account?.guardian)
   const isMultisig = Boolean(multisig)
+
+  const isLedgerAccount = useIsLedgerSigner(account) && !isMultisig // Multisig has higher icon priority
 
   const onAccountList = useCallback(() => {
     navigate(routes.accounts(location.pathname))
@@ -40,8 +42,9 @@ export const AccountNavigationBarContainer: FC<
     <AccountNavigationBar
       showAccountButton={hasAccount}
       accountName={accountName}
-      isShield={isShield}
+      isSmartAccount={isGuardian}
       isMultisig={isMultisig}
+      isLedgerAccount={isLedgerAccount}
       onAccountList={onAccountList}
       onSettings={onSettings}
       envLabel={envLabel}

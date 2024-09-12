@@ -5,21 +5,23 @@ import { useNavigate } from "react-router-dom"
 import { decodeBase58 } from "@argent/x-shared"
 import { H4, P3, P4 } from "@argent/x-ui"
 import { Button, Divider, Flex } from "@chakra-ui/react"
-import { routes, useRouteSignerToReplace } from "../../routes"
+import { useRouteSignerToReplace } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import { multisigService } from "../../services/multisig"
-import { Account } from "../accounts/Account"
-import { useRouteAccount } from "../shield/useRouteAccount"
+import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { ReplaceOwnerForm } from "./ReplaceOwnerForm"
 import {
   FieldValuesReplaceOwnerForm,
   useReplaceOwnerForm,
 } from "./hooks/useReplaceOwnerForm"
-import { useMultisig } from "./multisig.state"
+import { multisigView } from "./multisig.state"
 import { isEmpty } from "lodash-es"
+import { useView } from "../../views/implementation/react"
+import { WalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigReplaceOwnerScreen: FC = () => {
-  const account = useRouteAccount()
+  const account = useRouteWalletAccount()
   const signerToReplace = useRouteSignerToReplace()
 
   return (
@@ -38,10 +40,10 @@ const MultisigReplaceOwnerAccountWrapper = ({
   account,
   signerToReplace,
 }: {
-  account: Account
+  account: WalletAccount
   signerToReplace: string
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
   const methods = useReplaceOwnerForm()
 
   return (
@@ -62,7 +64,7 @@ const MultisigReplace = ({
   multisigPublicKey,
   signerToRemove,
 }: {
-  account: Account
+  account: WalletAccount
   multisigPublicKey?: string
   signerToRemove: string
 }) => {

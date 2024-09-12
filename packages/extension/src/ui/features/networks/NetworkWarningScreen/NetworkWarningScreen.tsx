@@ -1,8 +1,8 @@
-import { H3, P3, icons } from "@argent/x-ui"
+import { H3, P3, iconsDeprecated } from "@argent/x-ui"
 import { Button, Center, Circle, Text } from "@chakra-ui/react"
 import { FC } from "react"
 
-const { NetworkIcon } = icons
+const { NetworkIcon } = iconsDeprecated
 
 type NetworkWarningScreenProps = {
   onClick?: () => void
@@ -13,7 +13,11 @@ export const NetworkWarningScreen: FC<NetworkWarningScreenProps> = ({
   return (
     <Center flex={1} flexDirection={"column"} py={6} px={5}>
       <Center flex={1} flexDirection={"column"} textAlign={"center"}>
-        <Circle backgroundColor={"panel"} size={24} position="relative">
+        <Circle
+          backgroundColor={"surface-elevated"}
+          size={24}
+          position="relative"
+        >
           <Text fontSize={"6xl"}>
             <NetworkIcon />
           </Text>

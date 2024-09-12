@@ -1,17 +1,17 @@
 import { AllowArray } from "starknet"
 
+import { getLatestArgentMultisigClassHash } from "@argent/x-shared"
 import { withoutHiddenSelector } from "../../account/selectors"
 import { accountService } from "../../account/service"
 import { SelectorFn } from "../../storage/types"
+import { accountsEqual } from "../../utils/accountsEqual"
 import {
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   MultisigWalletAccount,
   WalletAccount,
 } from "../../wallet.model"
-import { accountsEqual } from "../../utils/accountsEqual"
 import { multisigBaseWalletRepo } from "../repository"
-import { MULTISIG_ACCOUNT_CLASS_HASH } from "../../network/constants"
 
 export async function getBaseMultisigAccounts(): Promise<
   BaseMultisigWalletAccount[]
@@ -85,7 +85,7 @@ export async function addMultisigAccount(
     hidden: account.hidden,
     guardian: account.guardian,
     needsDeploy: account.needsDeploy,
-    classHash: MULTISIG_ACCOUNT_CLASS_HASH,
+    classHash: account.classHash || getLatestArgentMultisigClassHash(),
     cairoVersion: "1",
   })
 

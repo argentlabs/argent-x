@@ -15,7 +15,7 @@ export const getGuardianForAccount = async (
   }
   const multicall = getMulticallForNetwork(network)
   const response = await multicallWithCairo0Fallback(call, multicall)
-  return num.toHex(response.result[0]) === num.toHex(constants.ZERO)
+  return num.toHex(response[0]) === num.toHex(constants.ZERO)
     ? undefined
-    : response.result[0]
+    : response[0]
 }

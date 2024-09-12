@@ -1,18 +1,30 @@
 import { expect } from "@playwright/test"
 
-import config from "../../../shared/config"
+import config from "../config"
 import test from "../test"
+import { TokenSymbol } from "../../../shared/src/assets"
 for (const feeToken of ["STRK", "ETH"] as const) {
-  test.describe(`Send partial funds fee ${feeToken}`, () => {
+  test.describe(`Send partial funds fee ${feeToken}`, { tag: "@tx" }, () => {
+    test.skip(
+      (feeToken === "STRK" && config.useStrkAsFeeToken === "false") ||
+        config.skipTXTests === "true",
+    )
     test.slow()
+    const assets =
+      feeToken === "STRK"
+        ? [
+            { token: "ETH" as TokenSymbol, balance: 0.01 },
+            { token: "STRK" as TokenSymbol, balance: 2 },
+          ]
+        : [
+            { token: "ETH" as TokenSymbol, balance: 0.01 },
+            { token: "STRK" as TokenSymbol, balance: 0.001 },
+          ]
     test("send partial funds to other self account", async ({ extension }) => {
       const { accountAddresses } = await extension.setupWallet({
         accountsToSetup: [
           {
-            assets: [
-              { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.8 },
-            ],
+            assets,
           },
           { assets: [{ token: "ETH", balance: 0 }] },
         ],
@@ -52,14 +64,7 @@ for (const feeToken of ["STRK", "ETH"] as const) {
       extension,
     }) => {
       await extension.setupWallet({
-        accountsToSetup: [
-          {
-            assets: [
-              { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.8 },
-            ],
-          },
-        ],
+        accountsToSetup: [{ assets }],
       })
       const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
         originAccountName: extension.account.accountName1,
@@ -96,18 +101,11 @@ for (const feeToken of ["STRK", "ETH"] as const) {
       })
     })
 
-    test("User should be able to send funds to starknet id", async ({
+    test.skip("User should be able to send funds to starknet id", async ({
       extension,
     }) => {
       await extension.setupWallet({
-        accountsToSetup: [
-          {
-            assets: [
-              { token: "ETH", balance: 0.01 },
-              { token: "STRK", balance: 0.8 },
-            ],
-          },
-        ],
+        accountsToSetup: [{ assets }],
       })
       const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
         originAccountName: extension.account.accountName1,

@@ -1,4 +1,5 @@
 export * from "get-starknet-core"
+export { Permission } from "get-starknet-core"
 
 export type { StarknetWindowObject as OldStarknetWindowObject } from "get-starknet-coreV3"
 
@@ -15,6 +16,7 @@ export type {
   WebWalletMethods,
   ConnectMethods,
   ModalMethods,
+  OffchainSessionDetails,
 } from "./types"
 export type {
   Listener,
@@ -34,8 +36,13 @@ export { Sender, Receiver } from "./messages/exchange/bidirectional"
 export { Relayer } from "./messages/exchange/relayer"
 export {
   StarknetMethodArgumentsSchemas,
-  CallSchema,
   CallsArraySchema,
   BigNumberishSchema,
+  RpcCallSchema,
+  RpcCallsArraySchema,
+  typedDataSchema,
+  StarknetExecuteBackwardCompatibleArgumentsSchemas,
+  AddStarknetChainParametersSchema,
+  /* OffchainSessionDetailsSchema, */
 } from "./types"
 export * from "./utils/mittx"

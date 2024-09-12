@@ -2,13 +2,13 @@ import { BarBackButton, NavigationContainer } from "@argent/x-ui"
 import { FC, PropsWithChildren, ReactNode, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useRouteAccount } from "../shield/useRouteAccount"
+import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 
 export const MultisigSettingsWrapper: FC<
   PropsWithChildren & { goBack?: () => void }
 > = ({ children, goBack }: { children?: ReactNode; goBack?: () => void }) => {
   const navigate = useNavigate()
-  const account = useRouteAccount()
+  const account = useRouteWalletAccount()
 
   const onClose = useCallback(() => {
     if (goBack) {

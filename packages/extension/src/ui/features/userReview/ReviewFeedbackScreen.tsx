@@ -1,11 +1,11 @@
 import { FC } from "react"
 import styled from "styled-components"
 
-import { Button } from "../../components/Button"
 import { ColumnCenter } from "../../components/Column"
 import { IconBar } from "../../components/IconBar"
 import { HeartFilled } from "../../components/Icons/HeartFilled"
 import { H2 } from "../../theme/Typography"
+import { Button } from "@chakra-ui/react"
 
 const MainWrapper = styled.div`
   height: 100vh;
@@ -36,11 +36,6 @@ const ButtonsContainer = styled.div`
 
   ${({ theme }) => theme.flexColumnNoWrap}
   gap: 8px;
-`
-
-const ActionButton = styled(Button)`
-  background-color: white;
-  color: black;
 `
 
 interface ReviewFeedbackScreenProps {
@@ -77,9 +72,9 @@ export const ReviewFeedbackScreen: FC<ReviewFeedbackScreenProps> = ({
       </Container>
 
       <ButtonsContainer>
-        <ActionButton onClick={onSubmit}>
+        <Button colorScheme="inverted" onClick={onSubmit}>
           {rating === 5 ? `Rate on ${browserName} store` : "Give Feedback"}
-        </ActionButton>
+        </Button>
       </ButtonsContainer>
     </MainWrapper>
   )

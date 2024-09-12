@@ -1,32 +1,22 @@
-import { memoize } from "lodash-es"
-import { useArrayStorage } from "../../hooks/useStorage"
 import { Transaction } from "../../../shared/transactions"
-import { transactionsStore } from "../../../shared/transactions/store"
 import { useMemo } from "react"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
-import { isSafeUpgradeTransaction } from "../../../shared/utils/isUpgradeTransaction"
+import { isSafeUpgradeTransaction } from "../../../shared/utils/isSafeUpgradeTransaction"
+import { useView } from "../../views/implementation/react"
+import { networkTransactionsView } from "../../views/transactions"
 
 type UseTransactionsOnNetwork = (networkId?: string) => {
   transactions: Transaction[]
   pendingTransactions: Transaction[]
 }
 
-const byNetworkSelector = memoize(
-  (networkId?: string) => (transaction: Transaction) =>
-    Boolean(networkId && transaction.account.networkId === networkId),
-  (networkId) => (networkId ? networkId : "unknown-network"),
-)
-
 export const useUpgradeTransactionsOnNetwork: UseTransactionsOnNetwork = (
   networkId,
 ) => {
-  const transactions = useArrayStorage(
-    transactionsStore,
-    byNetworkSelector(networkId),
-  )
+  const transactions = useView(networkTransactionsView(networkId))
 
   const sortedTransactions = useMemo(
-    () => transactions.sort((a, b) => b.timestamp - a.timestamp),
+    () => [...transactions].sort((a, b) => b.timestamp - a.timestamp),
     [transactions],
   )
 

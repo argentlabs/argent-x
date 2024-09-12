@@ -1,0 +1,196 @@
+import {
+  Account,
+  ArraySignatureType,
+  CairoCustomEnum,
+  CairoVersion,
+  Call,
+  CallData,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  ProviderInterface,
+  Signature,
+  TransactionType,
+  UniversalDetails,
+  constants,
+  extractContractHashes,
+  hash,
+  num,
+  stark,
+  transaction,
+} from "starknet"
+import {
+  DeclareSignerBuilderPayload,
+  DeployAccountSignerBuilderPayload,
+  InvocationsSignerBuilderPayload,
+} from "./types"
+import { Address, EDAMode } from "@starknet-io/types-js"
+import { BaseSignerInterface } from "../signer/BaseSignerInterface"
+import {
+  isEqualAddress,
+  getArgentAccountWithMultiSignerClassHashes,
+  ensureArray,
+  txVersionSchema,
+} from "@argent/x-shared"
+
+const { v3Details } = stark
+
+export class BaseStarknetAccount extends Account {
+  constructor(
+    provider: ProviderInterface,
+    address: Address,
+    public signer: BaseSignerInterface,
+    cairoVersion: CairoVersion,
+    public readonly classHash: string | undefined,
+  ) {
+    super(provider, address, signer, cairoVersion)
+  }
+
+  async buildInvocationSignerDetailsPayload(
+    details: UniversalDetails,
+  ): Promise<InvocationsSignerBuilderPayload> {
+    const nonce = num.toBigInt(details.nonce ?? (await this.getNonce()))
+    const chainId = await this.getChainId()
+
+    return {
+      ...v3Details(details),
+      walletAddress: this.address,
+      nonce,
+      chainId,
+      cairoVersion: await this.getCairoVersion(),
+    }
+  }
+
+  async buildDeclareSignerDetailsPayload(
+    payload: DeclareContractPayload,
+    details: UniversalDetails = {},
+  ): Promise<DeclareSignerBuilderPayload> {
+    const { classHash, compiledClassHash } = extractContractHashes(payload)
+    if (
+      typeof compiledClassHash === "undefined" &&
+      (details.version === constants.TRANSACTION_VERSION.F3 ||
+        details.version === constants.TRANSACTION_VERSION.V3)
+    ) {
+      throw Error(
+        "V3 Transaction work with Cairo1 Contracts and require compiledClassHash",
+      )
+    }
+
+    const nonce = num.toBigInt(details.nonce ?? (await this.getNonce()))
+    const chainId = await this.getChainId()
+
+    return {
+      ...v3Details(details),
+      classHash,
+      senderAddress: this.address,
+      compiledClassHash: compiledClassHash as string, // TODO: TS, cast because optional for v2 and required for v3, thrown if not present
+      nonce,
+      chainId,
+    }
+  }
+
+  public async buildAccountDeploySignerDetailsPayload(
+    {
+      classHash,
+      constructorCalldata = [],
+      addressSalt = 0,
+      contractAddress: providedContractAddress,
+    }: DeployAccountContractPayload,
+    details: UniversalDetails = {},
+  ): Promise<DeployAccountSignerBuilderPayload> {
+    const nonce = 0n // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
+    const chainId = await this.getChainId()
+
+    const compiledCalldata = CallData.compile(constructorCalldata)
+    const contractAddress =
+      providedContractAddress ??
+      hash.calculateContractAddressFromHash(
+        addressSalt,
+        classHash,
+        compiledCalldata,
+        0,
+      )
+
+    return {
+      ...v3Details(details),
+      classHash,
+      addressSalt,
+      constructorCalldata: compiledCalldata,
+      contractAddress,
+      nonce,
+      chainId,
+    }
+  }
+
+  public async buildInvokeTransactionPayload(
+    calls: Call | Call[],
+    details: UniversalDetails = {},
+  ) {
+    const version = txVersionSchema.parse(details.version)
+
+    const { cairoVersion, walletAddress, ...payload } =
+      await this.buildInvocationSignerDetailsPayload(details)
+
+    const nonceDataAvailabilityMode = payload.nonceDataAvailabilityMode
+      ? stark.intDAM(payload.nonceDataAvailabilityMode)
+      : EDAMode.L1
+
+    const feeDataAvailabilityMode = payload.feeDataAvailabilityMode
+      ? stark.intDAM(payload.feeDataAvailabilityMode)
+      : EDAMode.L1
+
+    const compiledCalldata = transaction.getExecuteCalldata(
+      ensureArray(calls),
+      cairoVersion,
+    )
+
+    const estimate = await this.getUniversalSuggestedFee(
+      version,
+      { type: TransactionType.INVOKE, payload: calls },
+      details,
+    )
+
+    return {
+      ...payload,
+      ...estimate,
+      compiledCalldata,
+      nonceDataAvailabilityMode,
+      feeDataAvailabilityMode,
+      senderAddress: walletAddress,
+      version: version as any, // TS, cast because version is issue in snjs
+    }
+  }
+
+  public async getInvokeTransactionHash(
+    calls: Call | Call[],
+    details: UniversalDetails = {},
+  ) {
+    const payload = await this.buildInvokeTransactionPayload(calls, details)
+
+    return hash.calculateInvokeTransactionHash(payload)
+  }
+
+  protected supportsMultiSigner() {
+    return getArgentAccountWithMultiSignerClassHashes().some((ch) =>
+      isEqualAddress(ch, this.classHash),
+    )
+  }
+
+  protected buildStarknetSignature(signer: string, signature: Signature) {
+    const formattedSig = stark.formatSignature(signature)
+    return new CairoCustomEnum({
+      Starknet: { signer, r: formattedSig[0], s: formattedSig[1] },
+      Secp256k1: undefined,
+      Secp256r1: undefined,
+      Eip191: undefined,
+      Webauthn: undefined,
+    })
+  }
+
+  protected prependWithSignatureLength(
+    ...args: CairoCustomEnum[]
+  ): ArraySignatureType {
+    const signatureLength = args.length.toString()
+    const compiledSigs = CallData.compile(args)
+    return [signatureLength, ...compiledSigs]
+  }
+}

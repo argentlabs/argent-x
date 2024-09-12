@@ -3,6 +3,7 @@ import {
   isEqualAddress,
   type ArgentNetworkId,
   isArgentNetworkId,
+  getArgentAccountClassHashes,
 } from "@argent/x-shared"
 
 import type { ArgentAccountType } from "../wallet.model"
@@ -14,19 +15,28 @@ import { argentApiNetworkForNetwork } from "../api/headers"
 export function mapImplementationToArgentAccountType(
   implementation: string,
   network: Network,
+  fallbackAccountType?: ArgentAccountType,
 ): ArgentAccountType {
   if (isEqualAddress(implementation, network.accountClassHash?.plugin)) {
     return "plugin"
-  }
-
-  if (isEqualAddress(implementation, network.accountClassHash?.multisig)) {
-    return "multisig"
   }
 
   if (
     isEqualAddress(implementation, network.accountClassHash?.betterMulticall)
   ) {
     return "betterMulticall"
+  }
+
+  const multisigClassHashes = getArgentAccountClassHashes("multisig")
+  if (multisigClassHashes.find((ch) => isEqualAddress(implementation, ch))) {
+    return "multisig"
+  }
+
+  // the class hash for a smart account is the same as the standard account, so we need to check the account type
+  if (fallbackAccountType && fallbackAccountType === "smart") {
+    if (isEqualAddress(implementation, network.accountClassHash?.smart)) {
+      return "smart"
+    }
   }
 
   return "standard"
@@ -38,9 +48,6 @@ export function getNetworkIdFromChainId(
   switch (encodedChainId) {
     case constants.StarknetChainId.SN_MAIN:
       return "mainnet-alpha"
-
-    case constants.StarknetChainId.SN_GOERLI:
-      return "goerli-alpha"
 
     case constants.StarknetChainId.SN_SEPOLIA:
       return "sepolia-alpha"
@@ -58,7 +65,6 @@ export function getDefaultNetworkId(): DefaultNetworkId {
   }
 
   switch (argentXEnv.toLowerCase()) {
-    case "dev":
     case "integration":
       return "integration"
 
@@ -67,8 +73,9 @@ export function getDefaultNetworkId(): DefaultNetworkId {
       return "mainnet-alpha"
 
     case "hydrogen":
+    case "dev":
     case "test":
-      return "goerli-alpha"
+      return "sepolia-alpha"
 
     default:
       throw new Error(`Unknown ARGENTX_ENVIRONMENT: ${argentXEnv}`)

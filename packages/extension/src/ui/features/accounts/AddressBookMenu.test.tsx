@@ -23,7 +23,7 @@ describe("AddressBookMenu", () => {
             name: "Account 1",
             address:
               "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-            networkId: "goerli-alpha",
+            networkId: "sepolia-alpha",
           },
         ],
         contacts: [
@@ -32,7 +32,7 @@ describe("AddressBookMenu", () => {
             name: "Contact 1",
             address:
               "0x7f14339f5d364946ae5e27eccbf60757a5c496bf45baf35ddf2ad30b583541a",
-            networkId: "goerli-alpha",
+            networkId: "sepolia-alpha",
           },
         ],
       } as unknown as AddressBook
@@ -75,7 +75,7 @@ describe("AddressBookMenu", () => {
             name: "Account 1",
             address:
               "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-            networkId: "goerli-alpha",
+            networkId: "sepolia-alpha",
           },
         ],
       } as AddressBook

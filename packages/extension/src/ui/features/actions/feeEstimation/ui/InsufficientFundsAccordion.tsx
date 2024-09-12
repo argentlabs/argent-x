@@ -1,4 +1,4 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import {
   Accordion,
   AccordionButton,
@@ -10,7 +10,7 @@ import { FC } from "react"
 
 import { FeeEstimationText, FeeEstimationTextProps } from "./FeeEstimationText"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 export const InsufficientFundsAccordion: FC<FeeEstimationTextProps> = (
   props,

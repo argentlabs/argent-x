@@ -1,7 +1,7 @@
 import { num } from "starknet"
 
-// this is used as a default overhead to have a 2x overhead to the fee
-const DEFAULT_OVERHEAD = 2
+// this is used as a default overhead to have a 3x overhead to the fee
+const DEFAULT_OVERHEAD = 3
 export const FEE_OVERHEAD = process.env.FEE_OVERHEAD
   ? parseFloat(process.env.FEE_OVERHEAD)
   : DEFAULT_OVERHEAD

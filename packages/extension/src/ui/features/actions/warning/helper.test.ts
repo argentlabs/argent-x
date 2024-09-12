@@ -1,57 +1,55 @@
-import { Warning } from "../../../../shared/transactionReview/schema"
-import { getHighestSeverity, getTitleForWarnings } from "./helper"
+import { Warning } from "@argent/x-shared/simulation"
+import { ITransactionReviewWarning } from "@argent/x-shared"
+import { renderHook, waitFor } from "@testing-library/react"
+import * as reactViews from "../../../views/implementation/react"
+import { useWarningsTitle } from "./helper"
 
-describe("getHighestSeverity", () => {
-  it("should return null for an empty array", () => {
-    expect(getHighestSeverity([])).toBeNull()
-  })
+describe("useWarningsTitle", () => {
+  const warningsInStore = [
+    {
+      reason: "undeployed_account",
+      title: "Sending to the correct account?",
+      severity: "caution",
+      description:
+        "The account you are sending to hasn't done any transactions, please double check the address",
+    },
+    {
+      reason: "token_a_black_listed",
+      title: "Use of an unsafe token",
+      severity: "caution",
+      description: "You are using an unsafe token. Be aware of the risks.",
+    },
+    {
+      reason: "approval_too_high",
+      title: "Approval of spending limit is too high",
+      severity: "caution",
+      description:
+        "You're approving one or more addresses to spend more tokens than you're using in this transaction. These funds will not be spent but you should not proceed if you don’t trust this app.",
+    },
+  ] as ITransactionReviewWarning[]
+  vi.mock("../../../views/implementation/react", () => ({
+    useView: vi.fn(),
+  }))
+  vi.mocked(reactViews.useView).mockReturnValue(warningsInStore)
 
-  it("should return the warning with the highest severity", () => {
-    const warnings = [
-      { severity: "info" },
-      { severity: "high" },
-      { severity: "critical" },
-      { severity: "caution" },
-    ] as unknown as Warning[]
-    expect(getHighestSeverity(warnings)).toEqual({ severity: "critical" })
-  })
-
-  it("should return the first warning if all have the same severity", () => {
-    const warnings = [
-      { severity: "high" },
-      { severity: "high" },
-      { severity: "high" },
-    ] as unknown as Warning[]
-    expect(getHighestSeverity(warnings)).toEqual({ severity: "high" })
-  })
-
-  it("should handle a single warning", () => {
-    const warnings = [{ severity: "caution" }] as unknown as Warning[]
-    expect(getHighestSeverity(warnings)).toEqual({ severity: "caution" })
-  })
-
-  it("should return the first occurrence of the highest severity", () => {
-    const warnings = [
-      { severity: "high" },
-      { severity: "critical" },
-      { severity: "critical" },
-    ] as unknown as Warning[]
-    expect(getHighestSeverity(warnings)).toEqual({ severity: "critical" })
-  })
-})
-
-describe("getTitleForWarnings", () => {
-  it("should return the title for a single warning", () => {
+  it("should return the title for a single warning", async () => {
     const warnings = [{ reason: "undeployed_account" }] as unknown as Warning[]
-    expect(getTitleForWarnings(warnings)).toEqual(
-      "Sending to the correct account?",
-    )
+    const { result } = renderHook(() => useWarningsTitle(warnings))
+
+    await waitFor(() => {
+      expect(result.current).toEqual("Sending to the correct account?")
+    })
   })
+
   it("should return the title for multiple warnings", () => {
     const warnings = [
       { reason: "undeployed_account" },
-      { reason: "contract_is_not_verified" },
+      { reason: "approval_too_high" },
     ] as unknown as Warning[]
-    expect(getTitleForWarnings(warnings)).toEqual("2 risks identified")
+    expect(useWarningsTitle(warnings)).toEqual("2 risks identified")
+  })
+
+  it("should return the title for 0 warnings", () => {
+    expect(useWarningsTitle([])).toEqual("0 risks identified")
   })
 })

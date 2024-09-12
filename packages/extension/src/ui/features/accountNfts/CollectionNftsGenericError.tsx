@@ -3,7 +3,7 @@ import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { NftFallback } from "./NftFallback"
 
 export const CollectionNftsGenericError: FC = () => {

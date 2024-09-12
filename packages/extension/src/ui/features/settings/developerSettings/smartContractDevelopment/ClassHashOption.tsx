@@ -1,10 +1,9 @@
-import { H6, P4 } from "@argent/x-ui"
+import { H6, P4, formatDateTimeBase } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { Transaction } from "../../../../../shared/transactions"
 import { formatTruncatedAddress } from "@argent/x-shared"
-import { formatDateTimeBase } from "../../../../services/dates"
 import { AccountAvatar } from "../../../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../../../accounts/accounts.service"
 

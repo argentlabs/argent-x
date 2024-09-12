@@ -1,17 +1,15 @@
 import { Abi, Contract } from "starknet"
 
+import { ETH_TOKEN_ADDRESS, TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import ArgentCompiledContractAbi from "../src/abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../src/abis/Proxy.json"
 import { Network, getProvider } from "../src/shared/network"
 import {
   ArgentAccountType,
+  SignerType,
   WalletAccountSigner,
 } from "../src/shared/wallet.model"
 import { Account } from "../src/ui/features/accounts/Account"
-import {
-  ETH_TOKEN_ADDRESS,
-  TXV3_ACCOUNT_CLASS_HASH,
-} from "../src/shared/network/constants"
 
 const defaultNetwork: Network = {
   id: "localhost",
@@ -21,7 +19,7 @@ const defaultNetwork: Network = {
   rpcUrl: "rpcUrl",
 }
 const defaultSigner: WalletAccountSigner = {
-  type: "local_secret",
+  type: SignerType.LOCAL_SECRET,
   derivationPath: "derivationPath",
 }
 const defaultAccountType: ArgentAccountType = "standard"
@@ -53,9 +51,6 @@ const defaultAccount: Account = {
   provider: getProvider(defaultNetwork),
   hidden: defaultHidden,
   needsDeploy: defaultNeedsDeploy,
-  getDeployTransactionStorageKey: () => "key",
-  updateDeployTx: defaultFn,
-  completeDeployTx: defaultFn,
   getCurrentImplementation: defaultFn,
   toWalletAccount: () => ({
     name: defaultName,
@@ -72,7 +67,7 @@ const defaultAccount: Account = {
   }),
 }
 
-export const getMockAccount = (overrides: Partial<Account>) => ({
+export const getMockAccount = (overrides?: Partial<Account>) => ({
   ...defaultAccount,
-  ...overrides,
+  ...(overrides || {}),
 })

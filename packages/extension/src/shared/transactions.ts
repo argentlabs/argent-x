@@ -1,5 +1,6 @@
 import { lowerCase, uniq, upperFirst } from "lodash-es"
-import { Call, TransactionType, num, RPC } from "starknet"
+import { Call, TransactionType, num } from "starknet"
+import { SPEC } from "@starknet-io/types-js"
 
 import { WalletAccount } from "./wallet.model"
 import {
@@ -8,15 +9,18 @@ import {
 } from "./multisig/types"
 import { getTransactionStatus } from "./transactions/utils"
 import { Address } from "@argent/x-shared"
+import { ActionQueueItemMeta } from "./actionQueue/schema"
+import { TransactionSubmittedProperties } from "../ampli"
 
-export type FinaliyStatus = RPC.SPEC.TXN_STATUS
-export type ExecutionStatus = RPC.SPEC.TXN_EXECUTION_STATUS
+export type FinaliyStatus = SPEC.TXN_STATUS
+export type ExecutionStatus = SPEC.TXN_EXECUTION_STATUS
 
 export type ExtendedFinalityStatus =
   | FinaliyStatus
   | "PENDING" // For backward compatibility on mainnet
   | "CANCELLED" // Required for multisig
   | "NOT_RECEIVED" // Required for multisig
+  | "REVERTED" // Required for multisig
 
 // Extends RPC.TransactionStatus from starknet.js
 export type ExtendedTransactionStatus = {
@@ -45,11 +49,11 @@ export type StarknetTransactionTypes = keyof typeof TransactionType
 export type ExtendedTransactionType =
   | StarknetTransactionTypes
   | MultisigTransactionType
-  | "ADD_ARGENT_SHIELD"
-  | "REMOVE_ARGENT_SHIELD"
+  | "ADD_GUARDIAN"
+  | "REMOVE_GUARDIAN"
 
-export interface TransactionMeta {
-  title?: string
+export interface TransactionMeta extends Partial<ActionQueueItemMeta> {
+  // title?: string
   subTitle?: string
   newClassHash?: Address
   isChangeGuardian?: boolean
@@ -58,6 +62,8 @@ export interface TransactionMeta {
   isMaxSend?: boolean
   transactions?: Call | Call[]
   type?: ExtendedTransactionType
+  ampliProperties?: TransactionSubmittedProperties
+  // transactionReview?: EnrichedSimulateAndReview
 }
 
 export interface TransactionBase {

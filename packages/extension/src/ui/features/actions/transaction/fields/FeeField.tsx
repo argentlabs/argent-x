@@ -4,8 +4,8 @@ import { FC } from "react"
 
 import { Field, FieldKey, LeftPaddedField } from "../../../../components/Fields"
 import { useDisplayTokenAmountAndCurrencyValue } from "../../../accountTokens/useDisplayTokenAmountAndCurrencyValue"
-import { useToken } from "../../../accountTokens/tokens.state"
 import { Address } from "@argent/x-shared"
+import { useToken } from "../../../accountTokens/tokens.state"
 
 interface FeeFieldProps {
   title?: string

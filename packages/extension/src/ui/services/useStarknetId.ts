@@ -32,16 +32,17 @@ export async function getStarknetId(account: BaseWalletAccount) {
 
     const starknetIdContractAddress = starknetId.getStarknetIdContract(chainId)
 
+    const hint: string[] = []
+
     const call: Call = {
       contractAddress: starknetIdContractAddress,
       entrypoint: "address_to_domain",
-      calldata: [account.address],
+      calldata: [account.address, hint],
     }
 
     const response = await multicall.callContract(call)
-    const decimalDomain = response.result
-      .map((element) => BigInt(element))
-      .slice(1)
+
+    const decimalDomain = response.map((element) => BigInt(element)).slice(1)
 
     const stringDomain = starknetId.useDecoded(decimalDomain)
 

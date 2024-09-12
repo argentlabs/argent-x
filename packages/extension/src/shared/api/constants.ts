@@ -70,12 +70,16 @@ export const ARGENT_KNOWN_DAPPS_URL = ARGENT_API_ENABLED
   ? urlJoin(ARGENT_API_BASE_URL, "tokens/dapps")
   : undefined
 
-export const ARGENT_ACCOUNT_URL = ARGENT_API_ENABLED
+export const ARGENT_ACCOUNT_PREFERENCES_URL = ARGENT_API_ENABLED
   ? urlJoin(ARGENT_API_BASE_URL, "account")
   : undefined
 
 export const ARGENT_ACCOUNT_DISCOVERY_URL = ARGENT_API_ENABLED
   ? urlJoin(ARGENT_API_BASE_URL, "explorer/discover/starknet")
+  : undefined
+
+export const ARGENT_SMART_ACCOUNT_DISCOVERY_URL = ARGENT_API_ENABLED
+  ? urlJoin(ARGENT_API_BASE_URL, "explorer/discover/starknet/2fa")
   : undefined
 
 export const ARGENT_MULTISIG_DISCOVERY_URL = ARGENT_MULTISIG_URL
@@ -92,30 +96,7 @@ export const ARGENT_X_LEGAL_PRIVACY_POLICY_URL =
 export const ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL =
   "https://www.argent.xyz/legal/argent-extension-terms-of-service/"
 
-const ARGENT_HEALTHCHECK_BASE_URL = process.env
-  .ARGENT_HEALTHCHECK_BASE_URL as any // we validate it with isValidString
-
-const ARGENT_HEALTHCHECK_ENABLED = isValidString(ARGENT_HEALTHCHECK_BASE_URL)
-
-export const PROVISION_STATUS_ENDPOINT = ARGENT_HEALTHCHECK_ENABLED
-  ? urlJoin(ARGENT_HEALTHCHECK_BASE_URL, "provision-status.json")
-  : undefined
-
 export const isProd = process.env.ARGENT_X_ENVIRONMENT === "prod"
-
-export const PROVISION_CONTRACT_ADDRESSES = isProd
-  ? [
-      "0x071808540ed1139bcc8bb55eb975e8168758f2a342ce3f22c512a1c8da1b84dc",
-      "0x0128492AB86D97475CDC074A06A827014E6AA10DA9BD745B26CCAFB8C1A54A9A",
-      "0x06793D9E6ED7182978454C79270E5B14D2655204BA6565CE9B0AA8A3C3121025",
-      "0x0517daba3622259ae4fffab72bb716d89c30df0994c6ab25ede61bd139639724",
-    ]
-  : [
-      "0x02b2e8b8eb3429540c58c0dc69ebb2981267196fe0ca2e361056b852445ee766",
-      "0x0512e19eb3daa35c94592a251f939c8bb7e81795b6eca6148964b5778bf7dd6d",
-      "0x0761357121b07055dae758496c210da9ab7b422a831a6b90efa3704d85d128d0",
-      "0x0524983b9b9322fa94d94758d9d8cdd94c936479c77775babcc921bf1e1ad2b6",
-    ]
 
 export const ARGENT_NETWORK_STATUS = ARGENT_API_ENABLED
   ? urlJoin(ARGENT_API_BASE_URL, "status/starknet")
@@ -126,3 +107,28 @@ export const ARGENT_PORTFOLIO_MAINNET_BASE_URL =
   "https://portfolio.argent.xyz/overview/"
 export const ARGENT_PORTFOLIO_GOERLI_BASE_URL =
   "https://portfolio.hydrogen.argent47.net/overview/"
+
+export const ARGENT_REFERRAL_URL = ARGENT_API_ENABLED
+  ? urlJoin(ARGENT_API_BASE_URL, "affiliate/referral")
+  : undefined
+
+export const ARGENT_OPTIMIZER_URL =
+  process.env.ARGENT_OPTIMIZER_URL ?? "https://content.argent.net/image"
+
+export const ARGENT_ACCOUNT_URL = ARGENT_API_ENABLED
+  ? urlJoin(ARGENT_API_BASE_URL, "accounts/starknet")
+  : undefined
+
+export const ARGENT_ACCOUNTS_URL = ARGENT_API_ENABLED
+  ? urlJoin(ARGENT_API_BASE_URL, "accounts")
+  : undefined
+
+export const TOPPER_WIDGET_ID = isProd
+  ? "e03fb9ad-a21a-48f6-bbdf-47a23e5b8e74"
+  : "975934b4-47ce-4329-bded-011c6ec3b8f3"
+export const TOPPER_KEY_ID = isProd
+  ? "11e7962e-7d2a-42d6-840d-83f1966a4696"
+  : "f8b3a9b7-3abc-43bf-8f4b-41d4fac39f7c"
+export const TOPPER_BASE_URL = isProd
+  ? "https://app.topperpay.com/"
+  : "https://app.sandbox.topperpay.com/"

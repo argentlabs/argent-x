@@ -1,4 +1,4 @@
-import { Listener, Message, Messenger } from "@argent/x-window"
+import { Listener, Message, Messenger } from "../messages"
 import browser from "webextension-polyfill"
 
 export class ExtensionMessenger implements Messenger {

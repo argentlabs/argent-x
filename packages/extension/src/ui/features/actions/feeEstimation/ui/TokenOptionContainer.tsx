@@ -1,23 +1,21 @@
-import { TokenWithBalance } from "../../../../../shared/token/__new/types/tokenBalance.model"
-import { TokenOption } from "../../../../components/TokenOption"
-import { getTokenIconUrl } from "../../../accountTokens/TokenIcon"
-import { num } from "starknet"
-import { FC, useCallback, useMemo, useState } from "react"
-import {
-  useCurrencyDisplayEnabled,
-  useTokenBalanceToCurrencyValue,
-} from "../../../accountTokens/tokenPriceHooks"
 import {
   Address,
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "@argent/x-shared"
-import { feeTokenNeedsTxV3Support } from "../../../../../shared/network/txv3"
-import { useAccount } from "../../../accounts/accounts.state"
-import { clientAccountService } from "../../../../services/account"
+import { getTokenIconUrl } from "@argent/x-ui"
+import { FC, useCallback, useEffect, useState } from "react"
+import { num } from "starknet"
 import { AccountError } from "../../../../../shared/errors/account"
-import { isEmpty } from "lodash-es"
-import { useUpgradeAccountTransactions } from "../../../accounts/accountTransactions.state"
+import { TokenWithBalance } from "../../../../../shared/token/__new/types/tokenBalance.model"
+import { TokenOption } from "../../../../components/TokenOption"
+import { clientAccountService } from "../../../../services/account"
+import {
+  useCurrencyDisplayEnabled,
+  useTokenBalanceToCurrencyValue,
+} from "../../../accountTokens/tokenPriceHooks"
+import { useHasPendingUpgradeAccountTransactions as useHasPendingUpgradeAccountTransactions } from "../../../accounts/accountTransactions.state"
+import { useWalletAccount } from "../../../accounts/accounts.state"
 import { useRequiresTxV3Upgrade } from "../useRequiresTxV3Upgrade"
 
 function toTokenView(token: TokenWithBalance): {
@@ -51,27 +49,22 @@ export const TokenOptionContainer: FC<TokenOptionContainerProps> = ({
   onFeeTokenSelect,
   ref,
 }) => {
-  const account = useAccount(token.account)
+  const account = useWalletAccount(token.account)
   const { name, iconUrl, symbol, address, balance } = toTokenView(token)
   const showCurrencyValue = useCurrencyDisplayEnabled()
   const currencyValue = useTokenBalanceToCurrencyValue(token)
   const ccyBalance = prettifyCurrencyValue(currencyValue)
   const minBalance = minBalances[token.address] ?? BigInt(1)
-  const { pendingTransactions: pendingUpgradeTransactions } =
-    useUpgradeAccountTransactions(account)
+  const hasUpgradeAccountTransactions =
+    useHasPendingUpgradeAccountTransactions(account)
 
-  const initLoading = useMemo(() => {
-    if (!account) {
-      return false
-    }
-    return (
-      feeTokenNeedsTxV3Support(token) && !isEmpty(pendingUpgradeTransactions)
-    )
-  }, [account, pendingUpgradeTransactions, token])
-
-  const [upgradeLoading, setUpgradeLoading] = useState(initLoading)
+  const [upgradeLoading, setUpgradeLoading] = useState(false)
 
   const { data: requiresTxV3Upgrade } = useRequiresTxV3Upgrade(account, token)
+
+  useEffect(() => {
+    setUpgradeLoading(!!requiresTxV3Upgrade && hasUpgradeAccountTransactions)
+  }, [hasUpgradeAccountTransactions, requiresTxV3Upgrade])
 
   // disabled if the token balance is less than the min balance or the token requires a tx v3 upgrade
   const disabled =
@@ -83,7 +76,6 @@ export const TokenOptionContainer: FC<TokenOptionContainerProps> = ({
       throw new AccountError({ code: "NOT_SELECTED" })
     }
     await clientAccountService.upgrade(account)
-    setUpgradeLoading(false)
   }, [account])
 
   return (

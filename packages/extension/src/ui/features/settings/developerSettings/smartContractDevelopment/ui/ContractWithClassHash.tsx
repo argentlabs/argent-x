@@ -1,8 +1,8 @@
-import { CopyTooltip, P3, P4, icons } from "@argent/x-ui"
+import { CopyTooltip, P3, P4, iconsDeprecated } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
-const { CopyIcon } = icons
+const { CopyIcon } = iconsDeprecated
 
 interface FileNameWithClassHashProps {
   fileName?: string

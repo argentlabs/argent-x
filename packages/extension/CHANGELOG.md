@@ -1,5 +1,175 @@
 # @argent-x/extension
 
+## 6.18.5
+
+### Patch Changes
+
+- b3260d0: Release
+
+## 6.18.4
+
+### Patch Changes
+
+- 32466bc: Release
+
+## 6.18.3
+
+### Patch Changes
+
+- 8960f1f: Release
+
+## 6.18.2
+
+### Patch Changes
+
+- ab56b94: Release
+
+## 6.18.1
+
+### Patch Changes
+
+- 9243380: Release
+
+## 6.18.0
+
+### Minor Changes
+
+- 19ae452: Release
+
+## 6.17.8
+
+### Patch Changes
+
+- 7faa8d0: Release
+
+## 6.17.7
+
+### Patch Changes
+
+- e192de3: Release
+
+## 6.17.6
+
+### Patch Changes
+
+- 2a7c3fd: Release
+
+## 6.17.5
+
+### Patch Changes
+
+- eab2b82: Release
+
+## 6.17.4
+
+### Patch Changes
+
+- 3be2982: Release
+
+## 6.17.3
+
+### Patch Changes
+
+- 464a518: Release
+
+## 6.17.2
+
+### Patch Changes
+
+- 5a56274: Release
+
+## 6.17.1
+
+### Patch Changes
+
+- e7f5f68: Release
+
+## 6.17.0
+
+### Minor Changes
+
+- 4ff90a3: Release
+
+## 6.16.7
+
+### Patch Changes
+
+- 7e08676: Release
+
+## 6.16.6
+
+### Patch Changes
+
+- 9f49f50: Release
+- Updated dependencies [9f49f50]
+  - @argent/x-window@6.4.2
+
+## 6.16.5
+
+### Patch Changes
+
+- 7707a28: Release
+
+## 6.16.4
+
+### Patch Changes
+
+- 0eef0b2: Release
+
+## 6.16.3
+
+### Patch Changes
+
+- d864b94: Release
+
+## 6.16.2
+
+### Patch Changes
+
+- b6154e0: Release
+
+## 6.16.1
+
+### Patch Changes
+
+- 91fc9f8: Release
+
+## 6.16.0
+
+### Minor Changes
+
+- 9f9013b: Release
+
+## 6.15.3
+
+### Patch Changes
+
+- 5715f34: Release
+
+## 6.15.2
+
+### Patch Changes
+
+- b9d8a76: Release
+
+## 6.15.1
+
+### Patch Changes
+
+- badd500: Release
+
+## 6.15.0
+
+### Minor Changes
+
+- ef9eb7c: Release
+
+### Patch Changes
+
+- 8754c52: Release
+- Updated dependencies [ef9eb7c]
+  - @argent/guardian@6.3.4
+
 ## 6.14.4
 
 ### Patch Changes

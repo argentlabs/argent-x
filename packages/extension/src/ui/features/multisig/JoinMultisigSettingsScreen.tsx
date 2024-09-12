@@ -15,7 +15,8 @@ import {
   deletePendingMultisig,
   hidePendingMultisig,
 } from "../../../shared/multisig/utils/pendingMultisig"
-import { routes, useReturnTo } from "../../routes"
+import { useReturnTo } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { usePendingMultisig } from "./multisig.state"

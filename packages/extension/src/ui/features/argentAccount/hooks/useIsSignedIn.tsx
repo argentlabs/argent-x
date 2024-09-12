@@ -1,9 +1,10 @@
-import { useShieldVerifiedEmail } from "../../shield/useShieldVerifiedEmail"
+import { useSmartAccountVerifiedEmail } from "../../smartAccount/useSmartAccountVerifiedEmail"
 import { useArgentAccountTokenExpired } from "./useArgentAccountTokenExpired"
 
 export const useIsSignedIn = () => {
-  const verifiedEmail = useShieldVerifiedEmail()
-  const { data: isArgentAccountTokenExpired } = useArgentAccountTokenExpired()
-  const isSignedIn = Boolean(verifiedEmail && !isArgentAccountTokenExpired)
+  const verifiedEmail = useSmartAccountVerifiedEmail()
+  const { data: isArgentAccountTokenExpired } =
+    useArgentAccountTokenExpired(verifiedEmail)
+  const isSignedIn = verifiedEmail ? !isArgentAccountTokenExpired : false
   return isSignedIn
 }

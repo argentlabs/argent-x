@@ -6,18 +6,18 @@ import { decorators } from "../../decorators/routerDecorators"
 
 const baseAccount = {
   needsDeploy: false,
-  networkId: "goerli-alpha",
+  networkId: "sepolia-alpha",
   signer: {
     derivationPath: "m/44'/9004'/0'/0/1",
     type: "local_secret",
   },
   type: "standard",
   network: {
-    id: "goerli-alpha",
+    id: "sepolia-alpha",
     name: "Testnet",
-    chainId: "SN_GOERLI",
+    chainId: "SN_SEPOLIA",
     baseUrl: "https://alpha4.starknet.io",
-    explorerUrl: "https://goerli.voyager.online",
+    explorerUrl: "https://sepolia.voyager.online",
     accountClassHash: {
       standard:
         "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2",

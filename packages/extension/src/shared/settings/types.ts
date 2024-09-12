@@ -9,8 +9,10 @@ export interface ISettingsStorage {
   experimentalAllowChooseAccount: boolean
   blockExplorerKey: BlockExplorerKey
   nftMarketplaceKey: NftMarketplaceKey
-  hideTokensWithNoBalance: boolean
   autoLockTimeMinutes: number
+  disableAnimation: boolean
+  hideSpamTokens: boolean
+  airGapEnabled: boolean
 }
 
 export type SettingsStorageKey = keyof ISettingsStorage

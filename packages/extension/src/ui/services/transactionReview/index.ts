@@ -1,4 +1,4 @@
-import { messageClient } from "../messaging/trpc"
+import { messageClient } from "../trpc"
 import { ClientTransactionReviewService } from "./client"
 
 export const clientTransactionReviewService =

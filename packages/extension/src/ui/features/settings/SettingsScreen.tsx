@@ -5,16 +5,15 @@ import {
   NavigationContainer,
   NavigationContainerProps,
   SpacerCell,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
 import { FC, ReactEventHandler } from "react"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
-import { routes } from "../../routes"
-import { Account } from "../accounts/Account"
+import { routes } from "../../../shared/ui/routes"
 import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
-import { ClickableShieldBanner } from "../accounts/ClickableShieldBanner"
+import { ClickableSmartAccountBanner } from "../accounts/ClickableSmartAccountBanner"
 import { DapplandFooter } from "./ui/DapplandFooter"
 import {
   SettingsMenuItem,
@@ -23,6 +22,8 @@ import {
 } from "./ui/SettingsMenuItem"
 import { SupportFooter } from "./ui/SupportFooter"
 import { formatTruncatedString } from "@argent/x-shared"
+import { IS_DEV } from "../../../shared/utils/dev"
+import { WalletAccount } from "../../../shared/wallet.model"
 
 const {
   LockIcon,
@@ -31,17 +32,17 @@ const {
   ExpandIcon,
   ExtendedIcon,
   LinkIcon,
-  ShieldIcon,
+  SmartAccountIcon,
   EmailIcon,
   ChevronRightIcon,
   PreferencesIcon,
-} = icons
+} = iconsDeprecated
 
 interface SettingsScreenProps extends NavigationContainerProps {
   onBack: ReactEventHandler
   onLock: ReactEventHandler
   onNavigateToAccount: ReactEventHandler
-  account?: Account
+  account?: WalletAccount
   shouldDisplayGuardianBanner: boolean
   isSignedIn: boolean
   onSignIn: ReactEventHandler
@@ -84,7 +85,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
                   showRightElements={false}
                 />
                 {shouldDisplayGuardianBanner && (
-                  <ClickableShieldBanner address={account.address} />
+                  <ClickableSmartAccountBanner account={account} />
                 )}
               </Flex>
               <SpacerCell />
@@ -98,7 +99,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
             />
             {isPrivacySettingsEnabled && (
               <SettingsMenuItemLink
-                leftIcon={<ShieldIcon />}
+                leftIcon={<SmartAccountIcon />}
                 to={routes.settingsPrivacy(returnTo)}
                 title="Security & privacy"
               />
@@ -136,6 +137,15 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
               onClick={onLock}
             />
           </SettingsMenuItemGroup>
+          {IS_DEV && (
+            <SettingsMenuItemGroup>
+              <SettingsMenuItemLink
+                leftIcon={<CodeIcon />}
+                to={routes.settingsClearLocalStorage()}
+                title="Clear local storage"
+              />
+            </SettingsMenuItemGroup>
+          )}
           <DapplandFooter />
           <SupportFooter />
         </CellStack>
@@ -144,7 +154,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
         <Center
           borderTop="1px solid"
           borderTopColor="border"
-          background="bg"
+          background="surface-default"
           boxShadow="menu"
         >
           <Button
@@ -170,7 +180,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
         <Center
           borderTop="1px solid"
           borderTopColor="border"
-          background="bg"
+          background="surface-default"
           boxShadow="menu"
         >
           <Button

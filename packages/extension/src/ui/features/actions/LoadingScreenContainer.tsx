@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 
-import { useLoadingProgress } from "../../app.state"
+import { useLegacyLoadingProgress } from "../../app.state"
 import { LoadingScreen } from "./LoadingScreen"
 
 export const LoadingScreenContainer = ({
@@ -8,7 +8,7 @@ export const LoadingScreenContainer = ({
 }: {
   loadingTexts?: string[]
 }) => {
-  const { progress, clearProgress } = useLoadingProgress()
+  const { progress, clearProgress } = useLegacyLoadingProgress()
 
   // TODO: make clearProgress function stable
   // reset to 'indeterminate' spinner type on unmount

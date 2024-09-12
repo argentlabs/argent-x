@@ -9,10 +9,10 @@ import {
   ArgentAccountType,
   BaseWalletAccount,
   CreateAccountType,
+  SignerType,
   WalletAccount,
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
-import { getAccountIdentifier } from "../../../shared/wallet.service"
 import { clientAccountService } from "../../services/account"
 import { Address } from "@argent/x-shared"
 
@@ -26,7 +26,6 @@ export interface AccountConstructorProps {
   cairoVersion?: CairoVersion
   guardian?: string | undefined
   escape?: Escape
-  deployTransaction?: string
   hidden?: boolean
   needsDeploy?: boolean
   contract?: Contract
@@ -43,7 +42,6 @@ export class Account {
   cairoVersion?: CairoVersion
   guardian?: string | undefined
   escape?: Escape
-  deployTransaction?: string
   contract: Contract
   proxyContract: Contract
   provider: ProviderInterface
@@ -60,7 +58,6 @@ export class Account {
     guardian,
     cairoVersion,
     escape,
-    deployTransaction,
     hidden,
     needsDeploy = false,
     contract,
@@ -72,7 +69,6 @@ export class Account {
       network?.id /** network is sometimes undefined here in the wild */
     this.signer = signer
     this.hidden = hidden
-    this.deployTransaction = deployTransaction
     this.needsDeploy = needsDeploy
     this.type = type
     this.classHash = classHash
@@ -88,30 +84,6 @@ export class Account {
       address,
       this.provider,
     )
-
-    const key = this.getDeployTransactionStorageKey()
-    if (deployTransaction) {
-      localStorage.setItem(key, deployTransaction)
-    } else if (localStorage.getItem(key)) {
-      this.deployTransaction = localStorage.getItem(key) ?? undefined
-    }
-  }
-
-  public getDeployTransactionStorageKey(): string {
-    const key = `deployTransaction:${getAccountIdentifier(this)}`
-    return key
-  }
-
-  public updateDeployTx(deployTransaction: string) {
-    const key = this.getDeployTransactionStorageKey()
-    this.deployTransaction = deployTransaction
-    localStorage.setItem(key, deployTransaction)
-  }
-
-  public completeDeployTx(): void {
-    const key = this.getDeployTransactionStorageKey()
-    localStorage.removeItem(key)
-    this.deployTransaction = undefined
   }
 
   public getCurrentImplementation(): string | undefined {
@@ -125,8 +97,13 @@ export class Account {
   public static async create(
     networkId: string,
     type: CreateAccountType = "standard",
+    signerType: SignerType = SignerType.LOCAL_SECRET,
   ): Promise<Account> {
-    const account = await clientAccountService.create(type, networkId)
+    const account = await clientAccountService.create(
+      type,
+      signerType,
+      networkId,
+    )
     const network = await networkService.getById(networkId)
 
     if (!network) {

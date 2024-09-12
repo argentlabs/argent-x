@@ -7,10 +7,10 @@ import { ChromeRepository } from "../../storage/__new/chrome"
 import {
   EstimatedFees,
   EstimatedFeesEnriched,
-  IEstimatedFeesRepository,
-} from "./fees.model"
+} from "@argent/x-shared/simulation"
 import { objectHash } from "../../objectHash"
 import { assertNever } from "../../utils/assertNever"
+import { IEstimatedFeesRepository } from "./fees.model"
 
 export const estimatedFeesRepo: IEstimatedFeesRepository =
   new ChromeRepository<EstimatedFeesEnriched>(browser, {

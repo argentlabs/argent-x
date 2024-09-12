@@ -1,4 +1,4 @@
-import { BaseError, BaseErrorPayload } from "./baseError"
+import { BaseError, BaseErrorPayload } from "@argent/x-shared"
 
 export enum PUB_KEY_ERROR_MESSAGES {
   FAILED_NEXT_PUB_KEY_GENERATION = "Failed to generate next PubKey",

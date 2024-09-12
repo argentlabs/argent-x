@@ -18,7 +18,6 @@ const mockProps = {
   showAddFundsButton: true,
   showSendButton: true,
   onSend: vi.fn(),
-  onPlugins: vi.fn(),
   showHideMultisigButton: true,
   onHideMultisigModalOpen: vi.fn(),
   isHideMultisigModalOpen: true,

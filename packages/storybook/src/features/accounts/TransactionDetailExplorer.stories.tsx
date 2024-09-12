@@ -18,7 +18,7 @@ import {
   erc20Transfer,
   erc721MintAspect,
   erc721Transfer,
-} from "@argent-x/extension/src/ui/features/accountActivity/transform/explorerTransaction/__test__/__fixtures__/explorer-transactions/goerli-alpha"
+} from "@argent-x/extension/src/shared/activity/utils/transform/explorerTransaction/__fixtures__/explorer-transactions/sepolia-alpha"
 import { ComponentProps } from "react"
 
 import { decorators } from "../../decorators/routerDecorators"

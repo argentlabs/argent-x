@@ -1,19 +1,16 @@
-import { icons, H6 } from "@argent/x-ui"
-import { FC } from "react"
+import { H6, iconsDeprecated } from "@argent/x-ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
+import { FC } from "react"
 
-const { ArgentShieldIcon, EmailIcon, AddressBookIcon } = icons
+const { SmartAccountActiveIcon } = iconsDeprecated
 
 type ArgentAccountFeaturesListProps = {
-  isEmailNotificationsEnabled?: boolean
   isLoggedIn: boolean
-  accountsWithShieldEnabled?: { accountName: string }[]
+  accountsWithGuardianEnabled?: { accountName: string }[]
 }
 
 export const ArgentAccountFeaturesList: FC<ArgentAccountFeaturesListProps> = ({
-  isEmailNotificationsEnabled,
-  accountsWithShieldEnabled,
-  isLoggedIn,
+  accountsWithGuardianEnabled,
 }) => {
   return (
     <Flex
@@ -23,15 +20,15 @@ export const ArgentAccountFeaturesList: FC<ArgentAccountFeaturesListProps> = ({
       borderRadius="lg"
       mb={1}
     >
-      <Flex alignItems="start" mb={5}>
-        <ArgentShieldIcon fontSize={20} mr={2} />
+      <Flex alignItems="start">
+        <SmartAccountActiveIcon fontSize={20} mr={2} />
         <Flex direction="column">
-          <H6 lineHeight={4}>Argent Shield</H6>
+          <H6 lineHeight={4}>Smart Account</H6>
           <Text mt={1} fontSize={13} color="neutrals.300" lineHeight={4}>
             Protect your account with two-factor authentication (2FA)
           </Text>
-          {accountsWithShieldEnabled &&
-            accountsWithShieldEnabled.length > 0 && (
+          {accountsWithGuardianEnabled &&
+            accountsWithGuardianEnabled.length > 0 && (
               <Text
                 color="primary.500"
                 fontSize={13}
@@ -39,45 +36,16 @@ export const ArgentAccountFeaturesList: FC<ArgentAccountFeaturesListProps> = ({
               >
                 Enabled on{" "}
                 <Tooltip
-                  label={accountsWithShieldEnabled.map((acc) => (
+                  label={accountsWithGuardianEnabled.map((acc) => (
                     <Text key={acc.accountName}>{acc.accountName}</Text>
                   ))}
                 >
                   <Text as="u">
-                    {accountsWithShieldEnabled.length} accounts
+                    {accountsWithGuardianEnabled.length} accounts
                   </Text>
                 </Tooltip>
               </Text>
             )}
-        </Flex>
-      </Flex>
-      <Flex alignItems="start" mb={5}>
-        <EmailIcon fontSize={20} mr={2} />
-        <Flex direction="column">
-          <H6 lineHeight={4}>Email notifications</H6>
-          <Text mt={1} fontSize={13} color="neutrals.300" lineHeight={4}>
-            Receive important security updates and announcements{" "}
-          </Text>
-          {isLoggedIn && (
-            <Text color="primary.500" fontSize={13}>
-              {isEmailNotificationsEnabled ? "Enabled" : "Disabled"}
-            </Text>
-          )}
-        </Flex>
-      </Flex>
-      <Flex alignItems="start">
-        <AddressBookIcon fontSize={20} mr={2} />
-        <Flex direction="column">
-          <H6 lineHeight={4}>Save account preferences</H6>
-          <Text mt={1} fontSize={13} color="neutrals.300" lineHeight={4}>
-            Retain your contacts and other preferences when your account is
-            restored
-          </Text>{" "}
-          {isLoggedIn && (
-            <Text color="primary.500" fontSize={13}>
-              Coming soon
-            </Text>
-          )}
         </Flex>
       </Flex>
     </Flex>

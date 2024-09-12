@@ -1,4 +1,4 @@
-import { usePresence, useReducedMotion } from "framer-motion"
+import { usePresence, useReducedMotionConfig } from "framer-motion"
 import { FC, PropsWithChildren, useEffect, useMemo, useRef } from "react"
 
 import {
@@ -32,13 +32,8 @@ export const StackScreen: FC<StackScreenProps> = ({
   } = useStackContext()
   const [isPresent, safeToRemove] = usePresence()
 
-  /**
-   * FIXME: Currently `prefersReducedMotion = true` hotfix disables animated transitions - re-enable when ui is more performant.
-   *
-   * Note that framer `<MotionConfig reducedMotion="..."` does not affect the `useReducedMotion` hook
-   */
-  // const prefersReducedMotion = true
-  const prefersReducedMotion = useReducedMotion()
+  /** honour user accessiblity setting, allowing override via <MotionConfig reducedMotion="..."> */
+  const prefersReducedMotion = useReducedMotionConfig()
 
   const { variant, presentation, zIndex } = presentationByPath[path] || {}
   const { enter, active, exit } = variant || {}

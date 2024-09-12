@@ -15,20 +15,22 @@ describe("encodeDomainChainId", () => {
     expect(encodeChainId("SN_MAIN")).toBe(constants.StarknetChainId.SN_MAIN)
   })
 
-  test("should return 0x534e5f474f45524c49 if domainChainId is SN_GOERLI", () => {
-    expect(encodeChainId("SN_GOERLI")).toBe("0x534e5f474f45524c49")
-    expect(encodeChainId("SN_GOERLI")).toBe(constants.StarknetChainId.SN_GOERLI)
+  test("should return 0x534e5f474f45524c49 if domainChainId is SN_SEPOLIA", () => {
+    expect(encodeChainId("SN_SEPOLIA")).toBe("0x534e5f5345504f4c4941")
+    expect(encodeChainId("SN_SEPOLIA")).toBe(
+      constants.StarknetChainId.SN_SEPOLIA,
+    )
   })
 
-  test("should return 0x534e5f4d41494e if domainChainId is 0x534e5f4d41494e", () => {
+  test("should return 0x534e5f4d41494e if domainChainId is 0x534e5f5345504f4c4941", () => {
     expect(encodeChainId("0x534e5f4d41494e")).toBe(
       constants.StarknetChainId.SN_MAIN,
     )
   })
 
-  test("should return 0x534e5f474f45524c49 if domainChainId is 0x534e5f474f45524c49", () => {
-    expect(encodeChainId(constants.StarknetChainId.SN_GOERLI)).toBe(
-      "0x534e5f474f45524c49",
+  test("should return 0x534e5f474f45524c49 if domainChainId is 0x534e5f5345504f4c4941", () => {
+    expect(encodeChainId(constants.StarknetChainId.SN_SEPOLIA)).toBe(
+      "0x534e5f5345504f4c4941",
     )
   })
 })

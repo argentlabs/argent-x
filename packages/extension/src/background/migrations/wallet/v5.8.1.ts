@@ -1,14 +1,18 @@
-import { isEqualAddress } from "@argent/x-shared"
+import { getAccountContractAddress, isEqualAddress } from "@argent/x-shared"
 import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
 import {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import {
+  BaseWalletAccount,
+  defaultNetworkOnlyPlaceholderAccount,
+  isNetworkOnlyPlaceholderAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { WalletCryptoStarknetService } from "../../wallet/crypto/starknet.service"
+import { WalletCryptoStarknetService } from "../../wallet/crypto/WalletCryptoStarknetService"
 import { WalletStorageProps } from "../../../shared/wallet/walletStore"
-import { getAccountContractAddress } from "../../wallet/findImplementationForAddress"
 
 export async function determineMigrationNeededV581(
   cryptoStarknetService: WalletCryptoStarknetService,
@@ -18,9 +22,10 @@ export async function determineMigrationNeededV581(
 
   const accountNeedsToMigrate: [WalletAccount, boolean][] = await Promise.all(
     accounts.map(async (account) => {
-      const { pubKey } = await cryptoStarknetService.getKeyPairByDerivationPath(
-        account.signer.derivationPath,
-      )
+      const pubKey =
+        await cryptoStarknetService.getArgentPubKeyByDerivationPath(
+          account.signer.derivationPath,
+        )
       const falseyAccountAddress = getAccountContractAddress(
         "1",
         STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
@@ -61,7 +66,10 @@ export async function migrateAccountsV581(
 
   // if selected account is in list of falsey accounts, select another one
   const { selected } = await store.get()
-  if (isFalseyAccount(selected ?? undefined)) {
+  if (
+    !isNetworkOnlyPlaceholderAccount(selected) &&
+    isFalseyAccount(selected ?? undefined)
+  ) {
     const [firstValidAccount] = await walletStore.get(
       (account) => !account.hidden,
     )
@@ -71,7 +79,7 @@ export async function migrateAccountsV581(
             address: firstValidAccount.address,
             networkId: firstValidAccount.networkId,
           }
-        : null,
+        : defaultNetworkOnlyPlaceholderAccount,
     })
   }
 }

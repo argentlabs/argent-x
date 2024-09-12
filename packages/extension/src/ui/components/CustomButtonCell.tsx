@@ -1,13 +1,13 @@
 import { Button } from "@argent/x-ui"
 import { ButtonProps } from "@chakra-ui/react"
-import { FC } from "react"
+import { FC, memo } from "react"
 
 export interface CustomButtonCellProps extends ButtonProps {
   highlighted?: boolean
   transparent?: boolean
 }
 
-export const CustomButtonCell: FC<CustomButtonCellProps> = ({
+const CustomButtonCellRaw: FC<CustomButtonCellProps> = ({
   highlighted,
   transparent,
   ...rest
@@ -15,8 +15,8 @@ export const CustomButtonCell: FC<CustomButtonCellProps> = ({
   const colorScheme = transparent
     ? "transparent"
     : highlighted
-      ? "tertiary"
-      : "neutrals"
+      ? "secondary"
+      : "default"
   return (
     <Button
       gap={3}
@@ -30,3 +30,7 @@ export const CustomButtonCell: FC<CustomButtonCellProps> = ({
     />
   )
 }
+
+const CustomButtonCell = memo(CustomButtonCellRaw)
+
+export { CustomButtonCell }

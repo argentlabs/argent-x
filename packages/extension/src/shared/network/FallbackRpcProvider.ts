@@ -1,7 +1,7 @@
 import {
+  RpcChannel,
   RpcProvider,
   RpcProviderOptions,
-  constants,
   json as starknetJson,
 } from "starknet"
 import { delay } from "../utils/delay"
@@ -25,9 +25,9 @@ export type FallbackRpcProviderOptions = Omit<RpcProviderOptions, "nodeUrl"> & {
   backoffImplementation?: (retryCount: number) => number
 }
 
-export class FallbackRpcProvider extends RpcProvider {
+export class FallbackRpcChannel extends RpcChannel {
   public nodeUrls: string[]
-  private nodeIndex
+  private nodeIndex: number
   private maxRetryCount
   private fetchImplementation
   private backoffImplementation
@@ -41,43 +41,20 @@ export class FallbackRpcProvider extends RpcProvider {
       backoffImplementation = exponentialBackoff,
       ...rest
     } = optionsOrProvider
-    if (!nodeUrls.length) {
-      throw new Error("nodeUrls must contain at least one element")
-    }
-    super({
-      ...rest,
-      nodeUrl: nodeUrls[0],
-    })
+    super({ ...rest, nodeUrl: nodeUrls[0] })
     this.nodeUrls = randomise ? shuffle(nodeUrls) : nodeUrls
     this.nodeIndex = randomise ? Math.floor(Math.random() * nodeUrls.length) : 0
     this.maxRetryCount = maxRetryCount
     this.fetchImplementation = fetchImplementation
     this.backoffImplementation = backoffImplementation
-    void this.getChainId()
   }
 
-  /**
-   * TODO: follow-up - update starknet.js that removes the following behaviour
-   *
-   * super calls async getChainId() in constructor before `this` or `this.nodeUrls` etc. are initialised
-   * as a workaround we return undefined here so that chainId doesn't get set
-   * then we call it again at the end of the constructor once `this` and `this.nodeUrls` are initialised
-   */
-  public async getChainId(): Promise<constants.StarknetChainId> {
-    if (!this.nodeUrls) {
-      // return undefined so the result doesn't get set
-      return undefined as unknown as constants.StarknetChainId
-    }
-    return super.getChainId()
-  }
-
-  /** TODO: follow-up - update starknet.js that also takes an id here */
-  public fetch(method: string, params?: object) {
+  public fetch(method: string, params?: object, id?: string | number) {
     const rpcRequestBody: RequestBody = {
       jsonrpc: "2.0",
       method,
       ...(params && { params }),
-      id: 0,
+      id,
     }
     return this.fetchWithRetry({
       method: "POST",
@@ -118,4 +95,37 @@ export class FallbackRpcProvider extends RpcProvider {
       throw e
     }
   }
+}
+
+export class FallbackRpcProvider extends RpcProvider {
+  public nodeUrls: string[]
+
+  constructor(optionsOrProvider: FallbackRpcProviderOptions) {
+    const { nodeUrls, randomise = true } = optionsOrProvider
+    if (!nodeUrls.length) {
+      throw new Error("nodeUrls must contain at least one element")
+    }
+
+    super(optionsOrProvider)
+
+    this.channel = new FallbackRpcChannel({ ...optionsOrProvider })
+    this.nodeUrls = randomise ? shuffle(nodeUrls) : nodeUrls
+  }
+
+  /**
+   * TODO: follow-up - update starknet.js that removes the following behaviour
+   *
+   * super calls async getChainId() in constructor before `this` or `this.nodeUrls` etc. are initialised
+   * as a workaround we return undefined here so that chainId doesn't get set
+   * then we call it again at the end of the constructor once `this` and `this.nodeUrls` are initialised
+   */
+  /* public async getChainId(): Promise<constants.StarknetChainId> {
+    if (!this.nodeUrls) {
+      // return undefined so the result doesn't get set
+      return undefined as unknown as constants.StarknetChainId
+    }
+    return super.getChainId()
+  } */
+
+  /** TODO: follow-up - update starknet.js that also takes an id here */
 }

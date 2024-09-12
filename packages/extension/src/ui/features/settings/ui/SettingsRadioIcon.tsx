@@ -1,10 +1,9 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated } from "@argent/x-ui"
 import { ComponentProps, FC } from "react"
 
-const { CheckboxActiveIcon, CheckboxDefaultIcon } = icons
+const { CheckboxActiveIcon, CheckboxDefaultIcon } = iconsDeprecated
 
-interface SettingsRadioIconProps
-  extends ComponentProps<typeof CheckboxDefaultIcon> {
+type SettingsRadioIconProps = ComponentProps<typeof CheckboxActiveIcon> & {
   checked: boolean
 }
 

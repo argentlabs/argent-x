@@ -23,10 +23,13 @@ describe("getTransactionsUpdate", () => {
     async (status) => {
       const mockTransaction = {
         hash: "0x123" as Hex,
-        networkId: "goerli-alpha",
+        networkId: "sepolia-alpha",
         status: { finality_status: "RECEIVED" as ExtendedFinalityStatus },
         timestamp: 123,
-        account: { address: "0x1", networkId: "goerli-alpha" } as WalletAccount,
+        account: {
+          address: "0x1",
+          networkId: "sepolia-alpha",
+        } as WalletAccount,
       }
 
       const getTransactionReceipt = vi.fn()
@@ -52,12 +55,12 @@ describe("getTransactionsUpdate", () => {
   test("should return correct status, given rejected tx", async () => {
     const mockTransaction = {
       hash: "0x123" as Hex,
-      networkId: "goerli-alpha",
+      networkId: "sepolia-alpha",
       status: {
         finality_status: "RECEIVED" as ExtendedFinalityStatus,
       },
       timestamp: 123,
-      account: { address: "0x1", networkId: "goerli-alpha" } as WalletAccount,
+      account: { address: "0x1", networkId: "sepolia-alpha" } as WalletAccount,
     }
 
     const getTransactionReceipt = vi.fn()
@@ -80,18 +83,23 @@ describe("getTransactionsUpdate", () => {
   test("should return correct status, given reverted tx", async () => {
     const mockTransaction = {
       hash: "0x123" as Hex,
-      networkId: "goerli-alpha",
+      networkId: "sepolia-alpha",
       status: {
         finality_status: "RECEIVED" as ExtendedFinalityStatus,
       },
       timestamp: 123,
-      account: { address: "0x1", networkId: "goerli-alpha" } as WalletAccount,
+      account: {
+        address: "0x1",
+        networkId: "sepolia-alpha",
+      } as WalletAccount,
     }
 
     const getTransactionReceipt = vi.fn().mockResolvedValue({
       revert_reason: "foo",
       execution_status: "REVERTED",
       finality_status: "RECEIVED",
+      isReverted: () => true,
+      isSuccess: () => false,
     })
 
     vi.mocked(mocks).getProvider.mockReturnValue({
@@ -114,12 +122,12 @@ describe("getTransactionsUpdate", () => {
   test("should return correct status, given failing receipt call", async () => {
     const mockTransaction = {
       hash: "0x123" as Hex,
-      networkId: "goerli-alpha",
+      networkId: "sepolia-alpha",
       status: {
         finality_status: "RECEIVED" as ExtendedFinalityStatus,
       },
       timestamp: 123,
-      account: { address: "0x1", networkId: "goerli-alpha" } as WalletAccount,
+      account: { address: "0x1", networkId: "sepolia-alpha" } as WalletAccount,
     }
 
     const getTransactionReceipt = vi.fn().mockRejectedValue({ error: "foo" })

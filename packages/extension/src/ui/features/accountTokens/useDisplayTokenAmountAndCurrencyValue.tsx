@@ -1,7 +1,5 @@
 import { BigNumberish } from "starknet"
-import { useAppState } from "../../app.state"
 import { useTokenAmountToCurrencyValue } from "./tokenPriceHooks"
-import { useTokensInNetwork } from "./tokens.state"
 import {
   isEqualAddress,
   prettifyCurrencyValue,
@@ -9,6 +7,7 @@ import {
   prettifyTokenAmount,
   isUnlimitedAmount,
 } from "@argent/x-shared"
+import { useTokensInCurrentNetworkIncludingSpam } from "./tokens.state"
 
 export interface IUseDisplayTokenAmountAndCurrencyValue {
   amount: BigNumberish
@@ -21,8 +20,7 @@ export const useDisplayTokenAmountAndCurrencyValue = ({
   tokenAddress,
   currencySymbol = "$",
 }: IUseDisplayTokenAmountAndCurrencyValue) => {
-  const { switcherNetworkId } = useAppState()
-  const tokensByNetwork = useTokensInNetwork(switcherNetworkId)
+  const tokensByNetwork = useTokensInCurrentNetworkIncludingSpam()
   const token = tokenAddress
     ? tokensByNetwork.find(({ address }) =>
         isEqualAddress(address, tokenAddress),

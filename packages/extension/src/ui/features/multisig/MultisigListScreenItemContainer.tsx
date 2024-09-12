@@ -3,7 +3,7 @@ import { PendingMultisig } from "../../../shared/multisig/types"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
 import { Account } from "../accounts/Account"
 import { isEmpty } from "lodash-es"
-import { multisigAndPendingMultisigSort } from "../../../shared/utils/accountsMultisigSort"
+import { sortMultisigAndPendingMultisigAccounts } from "../../../shared/utils/accountsMultisigSort"
 import { multisigIsPending } from "./Multisig"
 import { PendingMultisigListScreenItem } from "./PendingMultisigListScreenItem"
 import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
@@ -20,7 +20,7 @@ export const MultisigListScreenItemContainer: FC<
 > = ({ pendingMultisigs, accounts, selectedAccount, returnTo }) => {
   const multisigsOrAccounts = useMemo(() => {
     if (pendingMultisigs && !isEmpty(pendingMultisigs)) {
-      return multisigAndPendingMultisigSort(pendingMultisigs, accounts)
+      return sortMultisigAndPendingMultisigAccounts(pendingMultisigs, accounts)
     }
     return accounts
   }, [accounts, pendingMultisigs])

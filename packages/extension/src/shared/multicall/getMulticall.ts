@@ -1,7 +1,8 @@
 import { memoize } from "lodash-es"
 
 import { Network, getProvider } from "../network"
-import { getBatchProvider } from "@argent/x-multicall"
+import { RpcBatchProvider } from "@argent/x-multicall"
+import { argentXHeaders } from "../api/headers"
 
 const MAX_BATCH_SIZE = process.env.MULTICALL_MAX_BATCH_SIZE
 
@@ -35,14 +36,12 @@ const getMemoizeKey = (network: Network) => {
 
 export const getMulticallForNetwork = memoize(
   (network: Network) => {
-    const multicall = getBatchProvider(
-      getProvider(network),
-      {
-        batchInterval: 500,
-        maxBatchSize,
-      },
-      getMulticallAddress(network),
-    )
+    const multicall = new RpcBatchProvider({
+      nodeUrl: getProvider(network).channel.nodeUrl,
+      batchInterval: 500,
+      maxBatchSize,
+      headers: argentXHeaders,
+    })
     return multicall
   },
   (network: Network) => getMemoizeKey(network),

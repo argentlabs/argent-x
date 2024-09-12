@@ -11,13 +11,14 @@ import {
 } from "react"
 import { To, useNavigate } from "react-router-dom"
 
-import { routes, useCurrentPathnameWithQuery } from "../../routes"
-import { Account } from "../accounts/Account"
-import { SendQuery, isSendQuery } from "../send/schema"
-import { useTokensWithBalance } from "./tokens.state"
-import { useAccountIsDeployed } from "./useAccountStatus"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
-import { useBestFeeToken } from "../actions/useBestFeeToken"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
+import { routes } from "../../../shared/ui/routes"
+import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
+import { SendQuery, isSendQuery } from "../../../shared/send/schema"
+import { useTokensWithBalance } from "./tokens.state"
+import { useIsAccountDeploying } from "./useIsAccountDeploying"
+import { WalletAccount } from "../../../shared/wallet.model"
 
 interface AddFundsDialogContextProps {
   onSend: (queryOrTo?: SendQuery | To) => void
@@ -27,13 +28,13 @@ const AddFundsDialogContext = createContext<AddFundsDialogContextProps | null>(
   null,
 )
 
-export const useAddFundsDialogContext = () => useContext(AddFundsDialogContext)
+const useAddFundsDialogContext = () => useContext(AddFundsDialogContext)
 
 export const useAddFundsDialogSend = () =>
   useAddFundsDialogContext()?.onSend ?? noop
 
 interface AddFundsDialogProviderProps extends PropsWithChildren {
-  account: Account
+  account?: WalletAccount
 }
 
 export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
@@ -41,11 +42,11 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
   children,
 }) => {
   const navigate = useNavigate()
-  const accountIsDeployed = useAccountIsDeployed(account)
+  const accountIsDeploying = useIsAccountDeploying(account)
   const returnTo = useCurrentPathnameWithQuery()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const tokenDetails = useTokensWithBalance(account)
-  const bestFeeToken = useBestFeeToken(account)
+  const bestFeeToken = useDefaultFeeToken(account)
 
   const hasNonZeroBalance = useMemo(() => {
     return tokenDetails.some(({ balance }) => balance && balance > 0n)
@@ -59,7 +60,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
   const onSend = useCallback(
     (queryOrTo?: SendQuery | To) => {
       /** tokenDetailsIsInitialising - balance is unknown, let the Send screen deal with it */
-      if (accountIsDeployed && hasNonZeroBalance) {
+      if (!accountIsDeploying && hasNonZeroBalance) {
         if (isSendQuery(queryOrTo)) {
           navigate(
             routes.sendRecipientScreen({
@@ -80,7 +81,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
       }
     },
     [
-      accountIsDeployed,
+      accountIsDeploying,
       bestFeeToken?.address,
       hasNonZeroBalance,
       navigate,
@@ -90,7 +91,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
   )
 
   const { title, message, cancelTitle, onConfirm } = useMemo(() => {
-    if (accountIsDeployed) {
+    if (!accountIsDeploying) {
       return {
         title: "Add funds",
         message: `You need to add funds to this account before you can send`,
@@ -102,7 +103,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
       message: `You need to wait for this account to deploy before you can send`,
       cancelTitle: "OK",
     }
-  }, [accountIsDeployed, onAddFunds])
+  }, [accountIsDeploying, onAddFunds])
 
   return (
     <AddFundsDialogContext.Provider

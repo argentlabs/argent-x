@@ -1,34 +1,26 @@
-import { memoize } from "lodash-es"
+import { isEmpty } from "lodash-es"
 import { useMemo } from "react"
 
-import { transactionsStore } from "../../../shared/transactions/store"
-import { useArrayStorage } from "../../hooks/useStorage"
 import { Transaction } from "../../../shared/transactions"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { getAccountIdentifier } from "@argent/x-shared"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
-import { isSafeUpgradeTransaction } from "../../../shared/utils/isUpgradeTransaction"
+import { isSafeUpgradeTransaction } from "../../../shared/utils/isSafeUpgradeTransaction"
+import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import { useView } from "../../views/implementation/react"
+import { accountTransactionsView } from "../../views/transactions"
+import { useMultisigPendingUpgradeTransactions } from "../multisig/multisigTransactions.state"
+import { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
+import { Account } from "./Account"
 
 type UseAccountTransactions = (account?: BaseWalletAccount) => {
   transactions: Transaction[]
   pendingTransactions: Transaction[]
 }
 
-const byAccountSelector = memoize(
-  (account?: BaseWalletAccount) => (transaction: Transaction) =>
-    accountsEqual(transaction.account, account),
-  (account) => (account ? getAccountIdentifier(account) : "unknown-account"),
-)
-
 const useSortedTransactions = (account?: BaseWalletAccount) => {
-  const transactions = useArrayStorage(
-    transactionsStore,
-    byAccountSelector(account),
-  )
+  const transactions = useView(accountTransactionsView(account))
 
   const sortedTransactions = useMemo(
-    () => transactions.sort((a, b) => b.timestamp - a.timestamp),
+    () => [...transactions].sort((a, b) => b.timestamp - a.timestamp),
     [transactions],
   )
 
@@ -59,17 +51,25 @@ export const useDeployAccountTransactions: UseAccountTransactions = (
   return { transactions, pendingTransactions }
 }
 
-export const useUpgradeAccountTransactions: UseAccountTransactions = (
-  account,
+export const useHasPendingUpgradeAccountTransactions = (
+  account?: WalletAccount,
 ) => {
-  const { transactions, sortedTransactions } = useSortedTransactions(account)
+  const { sortedTransactions } = useSortedTransactions(account)
 
-  const pendingTransactions = sortedTransactions.filter((transaction) => {
-    const { finality_status } = getTransactionStatus(transaction)
-    return (
-      finality_status === "RECEIVED" && isSafeUpgradeTransaction(transaction)
-    )
-  })
+  const pendingMultisigTransactions =
+    useMultisigPendingUpgradeTransactions(account)
 
-  return { transactions, pendingTransactions }
+  const pendingTransactions = useMemo(() => {
+    const transactions = sortedTransactions.filter((transaction) => {
+      const { finality_status } = getTransactionStatus(transaction)
+
+      return (
+        finality_status === "RECEIVED" && isSafeUpgradeTransaction(transaction)
+      )
+    })
+
+    return transactions
+  }, [sortedTransactions])
+
+  return !isEmpty(pendingTransactions) || !isEmpty(pendingMultisigTransactions)
 }

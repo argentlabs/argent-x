@@ -1,9 +1,10 @@
 import { memoize } from "lodash-es"
-import { Account, AccountInterface, hash } from "starknet"
+import { Account, AccountInterface, CairoAssembly, hash } from "starknet"
 import urlJoin from "url-join"
 
 import { Network, getProvider } from "../../shared/network"
 import { LoadContracts } from "../wallet/loadContracts"
+import { cairoAssemblySchema } from "@argent/x-shared"
 
 interface PreDeployedAccount {
   address: string
@@ -40,47 +41,30 @@ export const getPreDeployedAccount = async (
   }
 }
 
+// Declare latest Cairo1 contract if not already declared
 export const declareContracts = memoize(
   async (
     _network: Network,
     deployAccount: AccountInterface,
     _loadContracts: LoadContracts,
   ) => {
-    const [proxyContract, accountContract] = await _loadContracts()
-
-    let proxyClassHash: string | undefined
+    const [accountContract, accountCasm] = await _loadContracts()
     let accountClassHash: string | undefined
 
-    const computedProxyClassHash = hash.computeContractClassHash(proxyContract)
     const computedAccountClassHash =
       hash.computeContractClassHash(accountContract)
 
-    const isProxyClassDeclared = await checkIfClassIsDeclared(
-      deployAccount,
-      computedProxyClassHash,
-    )
+    const parsedCasm = JSON.parse(accountCasm) as CairoAssembly
 
     const isAccountClassDeclared = await checkIfClassIsDeclared(
       deployAccount,
       computedAccountClassHash,
     )
 
-    if (!isProxyClassDeclared) {
-      const proxy = await deployAccount.declare({
-        classHash: computedProxyClassHash,
-        contract: proxyContract,
-      })
-
-      await deployAccount.waitForTransaction(proxy.transaction_hash, {
-        retryInterval: 1e3,
-      })
-
-      proxyClassHash = proxy.class_hash
-    }
-
     if (!isAccountClassDeclared) {
       const account = await deployAccount.declare({
         classHash: computedAccountClassHash,
+        casm: parsedCasm,
         contract: accountContract,
       })
 
@@ -91,10 +75,7 @@ export const declareContracts = memoize(
       accountClassHash = account.class_hash
     }
 
-    return {
-      proxyClassHash: proxyClassHash ?? computedProxyClassHash,
-      accountClassHash: accountClassHash ?? computedAccountClassHash,
-    }
+    return accountClassHash ?? computedAccountClassHash
   },
   (network) => `${network.rpcUrl}`,
 )

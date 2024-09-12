@@ -2,7 +2,7 @@ import { Action as NavigationType } from "history"
 import { Location } from "react-router-dom"
 
 import { Presentation, PresentationDirection, ScreenProps } from "../types"
-import { getMatchingPath } from "../utils/getMatchingPath"
+import { getMatchingPath, isDirectChildOfParentPath } from "../utils/path"
 
 interface UpdateScreenStackProps {
   navigationType: NavigationType
@@ -80,10 +80,28 @@ export const updateScreenStack = ({
       if (currentLocation.key !== "default") {
         presentationDirection = PresentationDirection.Forwards
       }
+
       poppedScreens = []
       /** add the new screen */
       const screen = screenForCurrentLocation()
-      updatedScreens = screens.concat(screen)
+      /** special check for e.g. deep link into a child page then navigating to its parent */
+      const lastScreen = screens.length
+        ? screens[screens.length - 1]
+        : undefined
+      const hasSingleLastScreen = lastScreen && screens.length === 1
+      if (
+        hasSingleLastScreen &&
+        isDirectChildOfParentPath(screen.path, lastScreen.path)
+      ) {
+        presentationDirection = PresentationDirection.Backwards
+        /** pop last screen */
+        poppedScreens = [lastScreen]
+        /** insert new screen below */
+        updatedScreens = [screen, ...screens.slice(0, screens.length - 1)]
+      } else {
+        /** insert new screen above */
+        updatedScreens = screens.concat(screen)
+      }
     }
   } else {
     if (existingScreenIndexWithPath !== -1) {

@@ -1,16 +1,25 @@
-import { render } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
-import { describe, expect, it, vi } from "vitest"
+import { render, act, screen } from "@testing-library/react"
+import { describe, expect, it, vi, beforeAll } from "vitest"
 
 import {
   OnboardingFinishScreen,
   OnboardingFinishScreenProps,
 } from "./OnboardingFinishScreen"
 
+// mock useShowExperimentalFinishScreen
+
 describe("OnboardingFinishScreen", () => {
   const defaultProps: OnboardingFinishScreenProps = {
     onFinish: vi.fn(),
   }
+
+  beforeAll(() => {
+    vi.mock("../../services/onboarding/useOnboardingExperiment", () => ({
+      useShowExperimentalFinishScreen: () => ({
+        showExperimentalFinishScreen: true,
+      }),
+    }))
+  })
 
   const renderComponent = (
     props: OnboardingFinishScreenProps = defaultProps,
@@ -18,61 +27,49 @@ describe("OnboardingFinishScreen", () => {
     return render(<OnboardingFinishScreen {...props} />)
   }
 
-  it("renders the title, subtitle, and icon correctly", () => {
-    const screen = renderComponent()
-
-    expect(screen.getByText("Your wallet is ready!")).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        "Follow us for product updates or if you have any questions",
-      ),
-    ).toBeInTheDocument()
-    expect(screen.getByTestId("TickCircleIcon")).toBeInTheDocument()
-  })
-
-  it("renders the follow Twitter button and link", () => {
-    const screen = renderComponent()
-
-    const twitterButton = screen.getByText("Follow Argent X on Twitter")
+  it("renders the follow X button and link", async () => {
+    await act(async () => {
+      renderComponent()
+    })
+    const twitterButton = await screen.findByTestId("twitter-link")
     expect(twitterButton).toBeInTheDocument()
-    expect(twitterButton.closest("a")).toHaveAttribute(
+    expect(twitterButton).toHaveAttribute(
       "href",
       "https://twitter.com/argenthq",
     )
-    expect(twitterButton.closest("a")).toHaveAttribute("target", "_blank")
+    expect(twitterButton).toHaveAttribute("target", "_blank")
   })
 
-  it("renders the join Discord button and link", () => {
-    const screen = renderComponent()
-
-    const discordButton = screen.getByText("Join the Argent X Discord")
-    expect(discordButton).toBeInTheDocument()
-    expect(discordButton.closest("a")).toHaveAttribute(
-      "href",
-      "https://discord.gg/T4PDFHxm6T",
-    )
-    expect(discordButton.closest("a")).toHaveAttribute("target", "_blank")
-  })
-
-  it("renders the finish button and calls onFinishClick when clicked", async () => {
-    const onFinish = vi.fn()
-    const screen = renderComponent({
-      onFinish,
+  it("renders the dappland button and link", async () => {
+    await act(async () => {
+      renderComponent()
     })
-
-    const finishButton = screen.getByText("Finish")
-    expect(finishButton).toBeInTheDocument()
-
-    await userEvent.click(finishButton)
-    expect(onFinish).toHaveBeenCalledTimes(1)
+    const dapplandButton = await screen.getByTestId("dappland-link")
+    expect(dapplandButton).toBeInTheDocument()
+    expect(dapplandButton).toHaveAttribute("href", "https://dappland.com")
+    expect(dapplandButton).toHaveAttribute("target", "_blank")
   })
 
-  it.skip("renders the snackbar with pin extension message and icon", () => {
-    const screen = renderComponent()
-
+  it.skip("renders the snackbar with pin extension message and icon", async () => {
+    await act(async () => {
+      renderComponent()
+    })
     expect(
       screen.getByText("Pin the Argent X extension for quick access"),
     ).toBeInTheDocument()
     expect(screen.getByTestId("extension-icon")).toBeInTheDocument()
+  })
+
+  it("renders the title, subtitle, and icon correctly", async () => {
+    await act(async () => {
+      renderComponent()
+    })
+    expect(screen.getByText("Your account is ready!")).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Get ready to experience the power of Argent + Starknet",
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByTestId("TickCircleIcon")).toBeInTheDocument()
   })
 })

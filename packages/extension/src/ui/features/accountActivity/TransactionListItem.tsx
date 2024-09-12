@@ -8,25 +8,23 @@ import {
   CustomButtonCellProps,
 } from "../../components/CustomButtonCell"
 import {
-  isDeclareContractTransaction,
-  isDeployContractTransaction,
   isNFTTransaction,
-  isNFTTransferTransaction,
-  isProvisionTransaction,
   isSwapTransaction,
   isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
-} from "./transform/is"
-import { TransformedTransaction } from "./transform/type"
+} from "../../../shared/activity/utils/transform/is"
+import { TransformedTransaction } from "../../../shared/activity/utils/transform/type"
 import { NFTImage } from "./ui/NFTImage"
 import { SwapAccessory } from "./ui/SwapAccessory"
 import { SwapTransactionIcon } from "./ui/SwapTransactionIcon"
-import { TransactionIcon } from "./ui/TransactionIcon"
+import { TransactionIconContainer } from "./ui/TransactionIcon"
 import { TransferAccessory } from "./ui/TransferAccessory"
-import { PrettyAccountAddressArgentX } from "../accounts/PrettyAccountAddressArgentX"
-import { ActivityTransactionFailureReason } from "./getTransactionFailureReason"
+import { ActivityTransactionFailureReason } from "../../../shared/activity/utils/transform/getTransactionFailureReason"
 import { lowerCase, upperFirst } from "lodash-es"
+import { getTransactionSubtitle } from "../../../shared/activity/utils/transform/transaction/getTransactionSubtitle"
+import { addressService } from "../../../shared/address"
+import useSWR from "swr"
 
 export interface TransactionListItemProps extends CustomButtonCellProps {
   transactionTransformed: TransformedTransaction
@@ -48,23 +46,24 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   children,
   ...props
 }) => {
-  const { action, displayName, dapp } = transactionTransformed
+  const { displayName } = transactionTransformed
   const isNFT = isNFTTransaction(transactionTransformed)
-  const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
   const isSwap = isSwapTransaction(transactionTransformed)
   const isTokenMint = isTokenMintTransaction(transactionTransformed)
   const isTokenApprove = isTokenApproveTransaction(transactionTransformed)
-  const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
-  const isDeployContract = isDeployContractTransaction(transactionTransformed)
-  const isProvision = isProvisionTransaction(transactionTransformed)
+  const getAddressName = addressService.getAddressName.bind(this)
 
-  const subtitle = useMemo(() => {
-    if (isTransfer || isNFTTransfer || isProvision) {
-      const titleShowsTo =
-        (isTransfer || isNFTTransfer) &&
-        (action === "SEND" || action === "TRANSFER")
-      const { toAddress, fromAddress } = transactionTransformed
+  const { data: subtitle } = useSWR([transactionTransformed], async () =>
+    getTransactionSubtitle({
+      transactionTransformed,
+      networkId: network.id,
+      getAddressName,
+    }),
+  )
+
+  const subtitleWithFailureReason = useMemo(() => {
+    if (!failureReason) {
       return (
         <Flex align="center">
           <P4
@@ -73,68 +72,10 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
             overflow="hidden"
             textOverflow="ellipsis"
           >
-            {titleShowsTo ? "To: " : "From: "}
-            <PrettyAccountAddressArgentX
-              accountAddress={titleShowsTo ? toAddress : fromAddress}
-              networkId={network.id}
-              icon={false}
-            />
+            {subtitle}
           </P4>
         </Flex>
       )
-    }
-    if (dapp) {
-      return (
-        <P4
-          color="neutrals.300"
-          fontWeight="semibold"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {dapp.title}
-        </P4>
-      )
-    }
-    if (isDeclareContract) {
-      return (
-        <P4
-          color="neutrals.300"
-          fontWeight="semibold"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {transactionTransformed.classHash}
-        </P4>
-      )
-    }
-    if (isDeployContract) {
-      return (
-        <P4
-          color="neutrals.300"
-          fontWeight="semibold"
-          overflow="hidden"
-          textOverflow="ellipsis"
-        >
-          {transactionTransformed.contractAddress}
-        </P4>
-      )
-    }
-    return null
-  }, [
-    isTransfer,
-    isNFTTransfer,
-    dapp,
-    isDeclareContract,
-    isDeployContract,
-    isProvision,
-    action,
-    transactionTransformed,
-    network.id,
-  ])
-
-  const subtitleWithFailureReason = useMemo(() => {
-    if (!failureReason) {
-      return subtitle
     }
 
     return (
@@ -183,7 +124,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
       )
     }
     return (
-      <TransactionIcon
+      <TransactionIconContainer
         transaction={transactionTransformed}
         size={9}
         failureReason={failureReason}
@@ -192,7 +133,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
   }, [isNFT, isSwap, transactionTransformed, failureReason, network.id])
 
   const accessory = useMemo(() => {
-    if (isTransfer || isTokenMint || isTokenApprove || isProvision) {
+    if (isTransfer || isTokenMint || isTokenApprove) {
       return (
         <TransferAccessory
           transaction={transactionTransformed}
@@ -216,7 +157,6 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
     isSwap,
     transactionTransformed,
     failureReason,
-    isProvision,
   ])
 
   const isCancelled = failureReason === "CANCELLED"
@@ -228,6 +168,7 @@ export const TransactionListItem: FC<TransactionListItemProps> = ({
       onClick={(e) => !isCancelled && onClick?.(e)} // disable navigation to transaction detail if cancelled
       _hover={{ cursor: isCancelled ? "default" : "pointer" }}
       _active={!isCancelled ? _active : {}}
+      w="100%"
       {...props}
     >
       {icon}

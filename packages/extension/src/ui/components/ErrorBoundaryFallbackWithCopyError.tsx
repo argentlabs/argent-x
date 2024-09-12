@@ -1,6 +1,6 @@
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated, useToast } from "@argent/x-ui"
 import { Collapse } from "@mui/material"
-import { FC, useMemo, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import styled from "styled-components"
 
 import { settingsStore } from "../../shared/settings"
@@ -18,11 +18,11 @@ import {
   KeyboardArrowDownRounded,
   RefreshIcon,
 } from "./Icons/MuiIcons"
-import { WarningIcon } from "./Icons/WarningIcon"
 import IOSSwitch from "./IOSSwitch"
 import { useClearLocalStorage } from "../features/settings/developerSettings/clearLocalStorage/useClearLocalStorage"
 import { useDisclosure } from "@chakra-ui/react"
 import { ClearStorageModal } from "./ClearStorageModal"
+import { browserExtensionSentryWithScope } from "../../shared/sentry/scope"
 
 const Title = styled.h3`
   font-weight: 600;
@@ -128,7 +128,7 @@ const fallbackErrorPayload = `v${version}
 Unable to parse error
 `
 
-const { BroomIcon } = icons
+const { BroomIcon } = iconsDeprecated
 export interface IErrorBoundaryFallbackWithCopyError
   extends ErrorBoundaryState {
   message?: string
@@ -145,7 +145,7 @@ const ErrorBoundaryFallbackWithCopyError: FC<
   privacyErrorReporting: privacyErrorReportingProp,
 }) => {
   const [viewLogs, setViewLogs] = useState(false)
-
+  const toast = useToast()
   const {
     isOpen: isClearStorageModalOpen,
     onOpen: onClearStorageModalOpen,
@@ -174,6 +174,30 @@ ${displayStack}
     return fallbackErrorPayload
   }, [error, errorInfo])
 
+  const reportToSentry = useCallback(
+    (manuallySubmitted = true) => {
+      browserExtensionSentryWithScope((scope) => {
+        try {
+          Object.keys(errorInfo).forEach((key) => {
+            scope.setExtra(key, errorInfo[key])
+          })
+        } catch {
+          // noop
+        }
+        scope.setExtra("submittedManually", manuallySubmitted)
+        scope.captureException(error)
+      })
+      if (manuallySubmitted) {
+        toast({
+          title: "The error was reported successfully",
+          status: "success",
+          duration: 3000,
+        })
+      }
+    },
+    [error, errorInfo, toast],
+  )
+
   const privacyErrorReportingSetting = useKeyValueStorage(
     settingsStore,
     "privacyErrorReporting",
@@ -188,7 +212,11 @@ ${displayStack}
     settingsStore,
     "privacyAutomaticErrorReporting",
   )
-
+  useEffect(() => {
+    if (privacyErrorReporting && privacyAutomaticErrorReporting) {
+      reportToSentry(false)
+    }
+  }, [privacyErrorReporting, privacyAutomaticErrorReporting, reportToSentry])
   return (
     <MessageContainer>
       <AlertIcon style={{ marginBottom: "15px" }} />

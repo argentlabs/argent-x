@@ -1,176 +1,344 @@
-import { HeaderCell, L2, icons } from "@argent/x-ui"
-import { Center, Flex } from "@chakra-ui/react"
-import { memoize, partition } from "lodash-es"
-import { FC } from "react"
+import { CellStack, iconsDeprecated } from "@argent/x-ui"
+import {
+  Box,
+  Center,
+  Divider,
+  Flex,
+  FlexProps,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react"
+import { memoize } from "lodash-es"
+import { FC, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { createNativeActivity } from "@argent/x-shared/simulation"
+import { ActivityRow } from "@argent/x-ui/simulation"
+import { num } from "starknet"
+import { transformTransaction } from "../../../shared/activity/utils/transform"
+import { buildBasicActivitySummary } from "../../../shared/activity/utils/transform/activity/buildActivitySummary"
+import { getTransactionFromPendingMultisigTransaction } from "../../../shared/activity/utils/transform/transaction/transformers/pendingMultisigTransactionAdapter"
+import { MultisigPendingOffchainSignature } from "../../../shared/multisig/pendingOffchainSignaturesStore"
 import { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
 import { Network } from "../../../shared/network"
-import { routes } from "../../routes"
-import { Account } from "../accounts/Account"
+import {
+  getNativeActivityStatusForTransaction,
+  getNativeActivitySubtitleForTransaction,
+} from "../../../shared/transactions/utils"
+import { routes } from "../../../shared/ui/routes"
 import { Multisig } from "../multisig/Multisig"
-import { useMultisig } from "../multisig/multisig.state"
-import { TransactionListItem } from "./TransactionListItem"
-import { transformTransaction } from "./transform"
-import { getTransactionFromPendingMultisigTransaction } from "./transform/transaction/transformers/pendingMultisigTransactionAdapter"
-import { num } from "starknet"
+import { multisigView } from "../multisig/multisig.state"
+import { OffchainSignatureListItem } from "./OffchainSignatureListItem"
+import { WalletAccount } from "../../../shared/wallet.model"
+import { useView } from "../../views/implementation/react"
+import { isMultisigTransactionRejectedAndNonceNotConsumed } from "../../../shared/multisig/utils/getMultisigTransactionType"
 
-const { MultisigIcon } = icons
-interface PendingTransactionsProps {
-  pendingTransactions: MultisigPendingTransaction[]
-  account: Account
+const { MultisigIcon, InfoIcon } = iconsDeprecated
+
+interface PendingMultisigActionsProps extends FlexProps {
+  pendingMultisigActions: (
+    | MultisigPendingTransaction
+    | MultisigPendingOffchainSignature
+  )[]
+  account: WalletAccount
   network: Network
 }
 
-export const PendingMultisigTransactions: FC<PendingTransactionsProps> = ({
-  pendingTransactions,
+export const isOffchainSignatureAction = (
+  pendingMultisigAction:
+    | MultisigPendingTransaction
+    | MultisigPendingOffchainSignature,
+): pendingMultisigAction is MultisigPendingOffchainSignature => {
+  return "messageHash" in pendingMultisigAction
+}
+
+export const PendingMultisigTransactions: FC<PendingMultisigActionsProps> = ({
+  pendingMultisigActions,
   account,
   network,
+  ...rest
 }) => {
-  const multisig = useMultisig(account)
+  const multisig = useView(multisigView(account))
   if (!multisig) {
     return null
   }
-  if (!pendingTransactions.length) {
+  if (!pendingMultisigActions.length) {
     return null
   }
 
-  const [selfPendingTxns, othersPendingTxns] = partition(
-    pendingTransactions,
-    (pendingTransaction) =>
-      pendingTransaction.nonApprovedSigners.some(
-        (signer) => num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
-      ),
+  return (
+    <CellStack {...rest}>
+      <PendingMultisigActionsContainer
+        pendingMultisigActions={pendingMultisigActions}
+        multisig={multisig}
+        account={account}
+        network={network}
+      />
+    </CellStack>
   )
+}
+
+interface PendingMultisigActionsContainerProps
+  extends PendingMultisigActionsProps {
+  multisig: Multisig
+}
+
+export const PendingMultisigActionsContainer: FC<
+  PendingMultisigActionsContainerProps
+> = ({ pendingMultisigActions, account, multisig, network }) => {
+  const navigate = useNavigate()
+
+  const getConfirmationSubtext = memoize((approvedSigners: string[]) => {
+    return `${approvedSigners.length} out of ${multisig.threshold}`
+  })
+
+  const onClick = (
+    action: MultisigPendingTransaction | MultisigPendingOffchainSignature,
+  ) => {
+    return isOffchainSignatureAction(action)
+      ? navigate(
+          routes.multisigPendingOffchainSignatureDetails(
+            account.address,
+            action.requestId,
+          ),
+        )
+      : navigate(
+          routes.multisigPendingTransactionDetails(
+            account.address,
+            action.requestId,
+          ),
+        )
+  }
+
+  /** this is for backwards compatibility, before multisig queing, to support existing multiple pending transactions with the same nonce
+   *  this can be removed once all accounts have upgraded to 5.17.0 and replace it with the index
+   */
+  const orderedQueuePositions = useMemo(() => {
+    let currentQueuePosition = 0
+    let lastNonce: number
+
+    return pendingMultisigActions.map((item) => {
+      if (isOffchainSignatureAction(item)) {
+        return
+      } else {
+        if (item.nonce !== lastNonce) {
+          lastNonce = item.nonce
+          return ++currentQueuePosition
+        }
+        return currentQueuePosition
+      }
+    })
+  }, [pendingMultisigActions])
 
   return (
     <>
-      {othersPendingTxns.length > 0 && (
-        <>
-          <HeaderCell>
-            <Flex alignItems={"center"} gap={1}>
-              Waiting for others to confirm
-            </Flex>
-          </HeaderCell>
-          <PendingMultisigTransactionContainer
-            pendingTransactions={othersPendingTxns}
-            multisig={multisig}
-            account={account}
-            network={network}
-          />
-        </>
-      )}
-      {selfPendingTxns.length > 0 && (
-        <>
-          <HeaderCell>
-            <Flex alignItems={"center"} gap={1}>
-              Awaiting review
-              <Center
-                color={"neutrals.900"}
-                backgroundColor={"skyBlue.500"}
-                rounded={"full"}
-                height={4}
-                minWidth={4}
-                fontWeight={"extrabold"}
-                fontSize={"2xs"}
-                px={0.5}
-              >
-                {selfPendingTxns.length}
-              </Center>
-            </Flex>
-          </HeaderCell>
-          <PendingMultisigTransactionContainer
-            pendingTransactions={selfPendingTxns}
-            multisig={multisig}
-            account={account}
-            network={network}
-          />
-        </>
-      )}
+      {pendingMultisigActions.map((pendingTransaction, index) => {
+        const requiresSelfAction = pendingTransaction.nonApprovedSigners.some(
+          (signer: string) =>
+            num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
+        )
+        if (isOffchainSignatureAction(pendingTransaction)) {
+          const additionalInfo = (
+            <MultisigPendingTransactionsFooter
+              getConfirmationSubtext={getConfirmationSubtext(
+                pendingTransaction.approvedSigners,
+              )}
+              requiresSelfAction={requiresSelfAction}
+              isApprovedByEnoughSigners={
+                pendingTransaction.approvedSigners.length >= multisig.threshold
+              }
+            />
+          )
+
+          return (
+            <OffchainSignatureListItem
+              key={pendingTransaction.requestId}
+              onClick={() => onClick(pendingTransaction)}
+              pendingOffchainSignature={pendingTransaction}
+              additionalInfo={additionalInfo}
+            />
+          )
+        } else {
+          const transaction = getTransactionFromPendingMultisigTransaction(
+            pendingTransaction,
+            account,
+          )
+
+          const transactionTransformed = transformTransaction({
+            transaction,
+            accountAddress: account.address,
+          })
+
+          if (transactionTransformed) {
+            const status = getNativeActivityStatusForTransaction(transaction)
+            const submitted = transaction.timestamp * 1000
+            const lastModified = submitted
+            const subtitle =
+              pendingTransaction.meta?.subtitle ||
+              getNativeActivitySubtitleForTransaction(transactionTransformed)
+            const icon = pendingTransaction.meta?.icon
+            const title =
+              transactionTransformed.displayName ||
+              pendingTransaction.meta?.title
+
+            const nativeActivity = createNativeActivity({
+              simulateAndReview: pendingTransaction.meta?.transactionReview,
+              meta: {
+                title,
+                subtitle,
+                icon,
+              },
+              transaction,
+              status,
+              submitted,
+              lastModified,
+            })
+
+            if (!nativeActivity.transferSummary) {
+              const activitySummary = buildBasicActivitySummary(
+                transactionTransformed,
+              )
+              nativeActivity.transferSummary = activitySummary
+            }
+
+            const txNeedsRetry =
+              isMultisigTransactionRejectedAndNonceNotConsumed(
+                pendingTransaction.state,
+              )
+            const additionalInfo = (
+              <MultisigPendingTransactionsFooter
+                getConfirmationSubtext={getConfirmationSubtext(
+                  pendingTransaction.approvedSigners,
+                )}
+                requiresSelfAction={requiresSelfAction}
+                index={orderedQueuePositions[index]}
+                isApprovedByEnoughSigners={
+                  pendingTransaction.approvedSigners.length >=
+                  multisig.threshold
+                }
+                txNeedsRetry={txNeedsRetry}
+              />
+            )
+            return (
+              <ActivityRow
+                key={transaction.hash}
+                onClick={() => onClick(pendingTransaction)}
+                activity={nativeActivity}
+                networkId={network.id}
+                additionalInfo={additionalInfo}
+              />
+            )
+          }
+          return null
+        }
+      })}
     </>
   )
 }
 
-interface PendingMultisigTransactionContainerProps
-  extends PendingTransactionsProps {
-  multisig: Multisig
+interface MultisigPendingTransactionsFooterProps {
+  getConfirmationSubtext: string
+  requiresSelfAction: boolean
+  index?: number
+  isApprovedByEnoughSigners?: boolean
+  txNeedsRetry?: boolean
 }
 
-export const PendingMultisigTransactionContainer: FC<
-  PendingMultisigTransactionContainerProps
-> = ({ pendingTransactions, account, multisig, network }) => {
-  const navigate = useNavigate()
+const MultisigPendingTransactionsFooter: FC<
+  MultisigPendingTransactionsFooterProps
+> = ({
+  getConfirmationSubtext,
+  requiresSelfAction,
+  index,
+  isApprovedByEnoughSigners,
+  txNeedsRetry,
+}) => {
+  const TxStateDescription = () => {
+    if (txNeedsRetry) {
+      return (
+        <Flex
+          color="accent-red"
+          _hover={{
+            cursor: "default",
+          }}
+        >
+          Transaction failed{" "}
+          <Tooltip
+            label={
+              "This transaction failed with a validation error. Please retry or reject it"
+            }
+            width={54}
+            padding={3}
+          >
+            <Box
+              marginLeft={1}
+              _hover={{
+                cursor: "pointer",
+              }}
+            >
+              <InfoIcon />
+            </Box>
+          </Tooltip>
+        </Flex>
+      )
+    } else if (requiresSelfAction) {
+      return "Needs your confirmation"
+    } else if (isApprovedByEnoughSigners) {
+      return (
+        <Flex
+          color={"accent-green"}
+          _hover={{
+            cursor: "default",
+          }}
+        >
+          Awaiting execution{" "}
+          <Tooltip
+            label={
+              "This transaction will only execute once the transactions in front have been confirmed"
+            }
+            width={54}
+            padding={3}
+          >
+            <Box
+              marginLeft={1}
+              _hover={{
+                cursor: "pointer",
+              }}
+            >
+              <InfoIcon />
+            </Box>
+          </Tooltip>
+        </Flex>
+      )
+    }
+    return "Awaiting confirmations"
+  }
 
-  const getConfirmationSubtext = memoize((approvedSigners: string[]) => {
-    return `${approvedSigners.length} confirmation${
-      approvedSigners.length === 1 ? "" : "s"
-    } • ${
-      multisig.threshold - approvedSigners.length > 0
-        ? multisig.threshold - approvedSigners.length
-        : 0
-    } remaining `
-  })
   return (
     <>
-      {pendingTransactions.map((pendingTransaction) => {
-        const transaction = getTransactionFromPendingMultisigTransaction(
-          pendingTransaction,
-          account,
-        )
-        const transactionTransformed = transformTransaction({
-          transaction,
-          accountAddress: account.address,
-        })
-        if (transactionTransformed) {
-          const { hash } = transaction
-          const onClick = () => {
-            navigate(
-              routes.multisigPendingTransactionDetails(
-                account.address,
-                pendingTransaction.requestId,
-              ),
-            )
-          }
-          return (
-            <Flex key={pendingTransaction.requestId} flexDirection="column">
-              <TransactionListItem
-                txHash={hash}
-                transactionTransformed={transactionTransformed}
-                network={network}
-                onClick={onClick}
-                borderBottomRadius={0}
-              />
-              <Flex
-                alignItems="center"
-                justifyContent="space-between"
-                px={4}
-                py={1}
-                backgroundColor="neutrals.800"
-                borderBottomRadius="xl"
-                borderTop="1px solid black"
-                _hover={{
-                  cursor: "pointer",
-                }}
-                onClick={onClick}
-              >
-                <Flex alignItems="center">
-                  <MultisigIcon mr={1} />
-                  {getConfirmationSubtext(pendingTransaction.approvedSigners)}
-                </Flex>
-                <L2
-                  color="neutrals.500"
-                  _hover={{
-                    cursor: "pointer",
-                  }}
-                >
-                  Click to review
-                </L2>
-              </Flex>
-            </Flex>
-          )
-        }
-        return null
-      })}
+      <Center height={"full"}>
+        {index && (
+          <>
+            <Text color="text-secondary-web">#{index}</Text>
+            <Divider
+              color="black"
+              orientation="vertical"
+              mx={2}
+              height={"130%"}
+            />{" "}
+          </>
+        )}
+        <MultisigIcon />
+        <Text ml={1}>{getConfirmationSubtext}</Text>
+      </Center>
+      <Text
+        color="accent-yellow"
+        _hover={{
+          cursor: "pointer",
+        }}
+      >
+        <TxStateDescription />
+      </Text>
     </>
   )
 }

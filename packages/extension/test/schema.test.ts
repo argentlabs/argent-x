@@ -5,7 +5,7 @@ import backupSchema from "../src/background/schema/backup.schema"
 import backupWrong from "./backup_wrong.mock.json"
 import backupEthers from "./backup-ethers.mock.json"
 import backup from "./backup.mock.json"
-import { WalletBackupService } from "../src/background/wallet/backup/backup.service"
+import { WalletBackupService } from "../src/background/wallet/backup/WalletBackupService"
 
 const backupString = JSON.stringify(backup)
 const backupEthersString = JSON.stringify(backupEthers)

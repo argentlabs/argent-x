@@ -3,16 +3,16 @@ import {
   CellStack,
   Empty,
   NavigationBar,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { FC } from "react"
 
-import { routes } from "../../../../routes"
+import { routes } from "../../../../../shared/ui/routes"
 import { selectedAccountView } from "../../../../views/account"
 import { useView } from "../../../../views/implementation/react"
 import { SettingsMenuItemLink } from "../../ui/SettingsMenuItem"
 
-const { ShieldIcon } = icons
+const { SmartAccountIcon } = iconsDeprecated
 
 const SmartContractDevelopmentScreen: FC = () => {
   const account = useView(selectedAccountView)
@@ -25,10 +25,8 @@ const SmartContractDevelopmentScreen: FC = () => {
       />
       {hasGuardian ? (
         <Empty
-          icon={<ShieldIcon />}
-          title={
-            "You must remove Argent Shield from this account to access this feature"
-          }
+          icon={<SmartAccountIcon />}
+          title={"You must change to Standard Account to access this feature"}
         />
       ) : (
         <CellStack>

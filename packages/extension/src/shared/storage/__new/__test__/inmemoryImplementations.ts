@@ -88,8 +88,8 @@ export class InMemoryRepository<T> implements IRepository<T> {
     const items = isFunction(value)
       ? value(oldValue)
       : isArray(value)
-      ? value
-      : [value]
+        ? value
+        : [value]
 
     let created = 0
     let updated = 0
@@ -121,8 +121,8 @@ export class InMemoryRepository<T> implements IRepository<T> {
     const selector: SelectorFn<T> = isFunction(value)
       ? value
       : isArray(value)
-      ? (item) => value.some((v) => this._compare(v, item))
-      : (item) => this._compare(value, item)
+        ? (item) => value.some((v) => this._compare(v, item))
+        : (item) => this._compare(value, item)
     const removed: T[] = []
 
     this._data = this._data.filter((item) => {

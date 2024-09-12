@@ -1,7 +1,7 @@
-import { AlertButton, icons } from "@argent/x-ui"
+import { AlertButton, iconsDeprecated } from "@argent/x-ui"
 import { FC } from "react"
 
-const { MultisigIcon } = icons
+const { MultisigIcon } = iconsDeprecated
 
 export interface ActivateMultisigBannerProps {
   onClick: () => void

@@ -1,5 +1,5 @@
 import {
-  icons,
+  iconsDeprecated,
   NavigationContainer,
   BarCloseButton,
   Input,
@@ -9,14 +9,13 @@ import { FC } from "react"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { ArgentAccountFeaturesList } from "./ArgentAccountFeaturesList"
 
-const { LogoutIcon } = icons
+const { LogoutIcon } = iconsDeprecated
 
 type ArgentAccountLoggedInScreenProps = {
   handleClose: () => void
   handleLogout: () => Promise<void>
   verifiedEmail: string
-  isEmailNotificationsEnabled: boolean
-  accountsWithShieldEnabled: { accountName: string }[]
+  accountsWithGuardianEnabled: { accountName: string }[]
 }
 
 export const ArgentAccountLoggedInScreen: FC<
@@ -25,8 +24,7 @@ export const ArgentAccountLoggedInScreen: FC<
   handleClose,
   handleLogout,
   verifiedEmail,
-  isEmailNotificationsEnabled,
-  accountsWithShieldEnabled,
+  accountsWithGuardianEnabled,
 }) => {
   return (
     <>
@@ -49,8 +47,7 @@ export const ArgentAccountLoggedInScreen: FC<
           </H6>
           <Box my={5}>
             <ArgentAccountFeaturesList
-              isEmailNotificationsEnabled={isEmailNotificationsEnabled}
-              accountsWithShieldEnabled={accountsWithShieldEnabled}
+              accountsWithGuardianEnabled={accountsWithGuardianEnabled}
               isLoggedIn={true}
             />
           </Box>

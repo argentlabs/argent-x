@@ -1,16 +1,25 @@
-import { BarIconButton, L2, NavigationBar, icons } from "@argent/x-ui"
+import {
+  BarIconButton,
+  L2,
+  NavigationBar,
+  iconsDeprecated,
+  logosDeprecated,
+} from "@argent/x-ui"
 import { Button, Flex, Text } from "@chakra-ui/react"
 import { FC } from "react"
-
 import { NetworkSwitcherContainer } from "../networks/NetworkSwitcher/NetworkSwitcherContainer"
 import { AccountNavigationBarProps } from "./accountNavigationBar.model"
 
-const { SettingsIcon, DropdownDownIcon, ArgentShieldIcon, MultisigIcon } = icons
+const { SettingsIcon, DropdownDownIcon, SmartAccountActiveIcon, MultisigIcon } =
+  iconsDeprecated
+
+const { LedgerLogo } = logosDeprecated
 
 export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   accountName,
-  isShield,
+  isSmartAccount,
   isMultisig,
+  isLedgerAccount,
   onAccountList,
   onSettings,
   scroll,
@@ -24,13 +33,16 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
       {showAccountButton && (
         <Button
           aria-label={"Show account list"}
-          colorScheme={"neutrals"}
           size={"2xs"}
           onClick={onAccountList}
         >
-          {isShield && (
-            <Text fontSize={"2xs"} mr={1} data-testid="shield-on-account-view">
-              <ArgentShieldIcon />
+          {isSmartAccount && (
+            <Text
+              fontSize={"2xs"}
+              mr={1}
+              data-testid="smart-account-on-account-view"
+            >
+              <SmartAccountActiveIcon />
             </Text>
           )}
           {isMultisig && (
@@ -38,7 +50,17 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
               <MultisigIcon />
             </Text>
           )}
-          <Text lineHeight="5" noOfLines={1} maxW={"180px"}>
+          {isLedgerAccount && (
+            <Text fontSize={"sm"} mr={1}>
+              <LedgerLogo />
+            </Text>
+          )}
+          <Text
+            lineHeight="5"
+            noOfLines={1}
+            maxW={"90px"}
+            style={{ textOverflow: "ellipsis" }}
+          >
             {accountName}
           </Text>
           <Text fontSize={"2xs"} ml={1}>
@@ -55,11 +77,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
         )}
         {showNetworkSwitcher && <NetworkSwitcherContainer />}
         {showSettingsButton && (
-          <BarIconButton
-            aria-label="Show settings"
-            onClick={onSettings}
-            colorScheme={"neutrals"}
-          >
+          <BarIconButton aria-label="Show settings" onClick={onSettings}>
             <SettingsIcon />
           </BarIconButton>
         )}

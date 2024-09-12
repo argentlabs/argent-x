@@ -41,7 +41,7 @@ describe("OnboardingRestoreSeedScreen", async () => {
     })
 
     await act(async () => {
-      fireEvent.click(screen.getByText(/^Continue$/))
+      screen.getByText(/^Continue$/).click()
     })
 
     await waitFor(() => expect(onRestore).toHaveBeenCalledWith(seed))

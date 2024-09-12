@@ -1,5 +1,5 @@
-import { messageClient } from "../messaging/trpc"
-import { ClientNftService } from "./implementation"
+import { messageClient } from "../trpc"
+import { ClientNftService } from "./ClientNftService"
 import { clientStarknetAddressService } from "../address"
 
 export const clientNftService = new ClientNftService(

@@ -1,8 +1,8 @@
-import { Button, icons } from "@argent/x-ui"
+import { Button, iconsDeprecated } from "@argent/x-ui"
 import { ButtonProps, Spinner } from "@chakra-ui/react"
 import { FC, useMemo } from "react"
 
-const { DocumentIcon, UploadDocumentIcon } = icons
+const { DocumentIcon, UploadDocumentIcon } = iconsDeprecated
 
 interface FileInputButtonProps extends ButtonProps {
   isInvalid?: boolean

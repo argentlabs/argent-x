@@ -1,21 +1,19 @@
 import { FC } from "react"
-import { useShieldVerifiedEmail } from "../shield/useShieldVerifiedEmail"
+import { useSmartAccountVerifiedEmail } from "../smartAccount/useSmartAccountVerifiedEmail"
 
+import { useToast } from "@argent/x-ui"
 import { useNavigate } from "react-router-dom"
-import { routes } from "../../routes"
-import { ArgentAccountLoggedInScreen } from "./ArgentAccountLoggedInScreen"
+import { routes } from "../../../shared/ui/routes"
+import { clientArgentAccountService } from "../../services/argentAccount"
 import { allAccountsWithGuardianView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { argentAccountService } from "../../services/argentAccount"
-import { useToast } from "@argent/x-ui"
-import { useEmailPreferences } from "./hooks/useEmailPreferences"
+import { ArgentAccountLoggedInScreen } from "./ArgentAccountLoggedInScreen"
 
 export const ArgentAccountLoggedInScreenContainer: FC = () => {
-  const verifiedEmail = useShieldVerifiedEmail()
+  const verifiedEmail = useSmartAccountVerifiedEmail()
   const navigate = useNavigate()
   const accountsWithGuardian = useView(allAccountsWithGuardianView)
   const toast = useToast()
-  const { data: emailPreferences } = useEmailPreferences()
   if (!verifiedEmail) {
     return null
   }
@@ -25,7 +23,7 @@ export const ArgentAccountLoggedInScreenContainer: FC = () => {
   }
   const handleLogout = async () => {
     try {
-      await argentAccountService.logout()
+      await clientArgentAccountService.logout()
       navigate(routes.accountTokens())
     } catch (e) {
       console.error(e)
@@ -37,19 +35,15 @@ export const ArgentAccountLoggedInScreenContainer: FC = () => {
     }
   }
 
-  const accountsWithShieldEnabled = accountsWithGuardian.map((acc) => ({
+  const accountsWithGuardianEnabled = accountsWithGuardian.map((acc) => ({
     accountName: acc.name,
   }))
   return (
     <ArgentAccountLoggedInScreen
       handleClose={handleClose}
       handleLogout={handleLogout}
-      isEmailNotificationsEnabled={Boolean(
-        emailPreferences?.isAnnouncementsEnabled ||
-          emailPreferences?.isNewsletterEnabled,
-      )}
       verifiedEmail={verifiedEmail}
-      accountsWithShieldEnabled={accountsWithShieldEnabled}
+      accountsWithGuardianEnabled={accountsWithGuardianEnabled}
     />
   )
 }

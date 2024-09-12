@@ -1,13 +1,12 @@
 import { Circle, Square, SquareProps } from "@chakra-ui/react"
 import { FC } from "react"
-import { icons } from "@argent/x-ui"
+import { iconsDeprecated, TokenIcon } from "@argent/x-ui"
 
-import { TokenIcon } from "../../accountTokens/TokenIcon"
-import { isSwapTransaction } from "../transform/is"
-import { TransformedTransaction } from "../transform/type"
-import { ActivityTransactionFailureReason } from "../getTransactionFailureReason"
+import { isSwapTransaction } from "../../../../shared/activity/utils/transform/is"
+import { TransformedTransaction } from "../../../../shared/activity/utils/transform/type"
+import { ActivityTransactionFailureReason } from "../../../../shared/activity/utils/transform/getTransactionFailureReason"
 
-const { FailIcon } = icons
+const { FailIcon } = iconsDeprecated
 
 export interface SwapTransactionIconProps extends Omit<SquareProps, "size"> {
   transaction: TransformedTransaction

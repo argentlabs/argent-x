@@ -1,4 +1,4 @@
-import { H6, L2, P4, icons } from "@argent/x-ui"
+import { H6, L2, P4, iconsDeprecated } from "@argent/x-ui"
 import { Box, Flex, List, ListIcon, ListItem, Text } from "@chakra-ui/react"
 import { FC, PropsWithChildren, ReactNode } from "react"
 
@@ -10,8 +10,9 @@ import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmSc
 import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
 import { DappDisplayAttributes } from "./useDappDisplayAttributes"
 import { DappActionHeader } from "./DappActionHeader"
+import { getDefaultSortedAccounts } from "../../accounts/getDefaultSortedAccount"
 
-const { TickIcon, LinkIcon } = icons
+const { TickIcon, LinkIcon } = iconsDeprecated
 
 export interface ConnectDappScreenProps extends PropsWithChildren {
   isConnected: boolean
@@ -73,7 +74,7 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
         {children}
         <Flex mt={4} w={"full"} flexDirection={"column"}>
           <ConnectDappAccountSelect
-            accounts={accounts}
+            accounts={getDefaultSortedAccounts(accounts)}
             selectedAccount={selectedAccount}
             onSelectedAccountChange={onSelectedAccountChange}
             host={host}

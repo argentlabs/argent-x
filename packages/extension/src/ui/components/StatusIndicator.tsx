@@ -1,6 +1,7 @@
 import { Box, Tooltip, keyframes } from "@chakra-ui/react"
 
 import { ColorStatus } from "../../shared/network"
+import { upperFirst } from "lodash-es"
 
 export type StatusIndicatorColor =
   | "green"
@@ -25,7 +26,7 @@ export const networkStatusMapping: { [key in ColorStatus]: StatusResponse } = {
 export const transactionStatusMapping: {
   [key in ColorStatus]: StatusResponse
 } = {
-  red: { color: "red", hexColor: "#FF675C", label: "Reverted" },
+  red: { color: "red", hexColor: "#FF675C" },
   amber: { color: "orange", hexColor: "#FFBF3D" },
   green: { color: "green", hexColor: "#08A681" },
   unknown: { color: "hidden", hexColor: "#BFBFBF" },
@@ -82,15 +83,18 @@ const PulseAnimation = keyframes`
 
 export const TransactionStatusIndicator = ({
   status,
+  label,
 }: {
   status: ColorStatus
+  label?: string
 }) => {
-  const { color, label, hexColor } = mapTransactionStatus(status)
+  const { color, hexColor } = mapTransactionStatus(status)
+  const labelUpper = upperFirst(label?.toLowerCase())
   const animation =
     status === "amber" ? `${PulseAnimation} 1.5s infinite` : undefined
 
   return (
-    <Tooltip label={label} aria-label={label}>
+    <Tooltip label={labelUpper} aria-label={labelUpper}>
       <Box
         height={2}
         width={2}

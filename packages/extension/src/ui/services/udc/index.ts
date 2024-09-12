@@ -1,5 +1,5 @@
-import { messageClient } from "../messaging/trpc"
+import { messageClient } from "../trpc"
 
-import { UdcService } from "./implementation"
+import { UdcService } from "./UdcService"
 
 export const udcService = new UdcService(messageClient)

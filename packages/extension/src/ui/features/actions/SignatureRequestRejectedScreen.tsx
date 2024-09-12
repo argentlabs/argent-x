@@ -2,10 +2,10 @@ import React, { FC } from "react"
 
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { Circle, Flex } from "@chakra-ui/react"
-import { H5, P4, icons } from "@argent/x-ui"
+import { H5, P4, iconsDeprecated } from "@argent/x-ui"
 import { WalletAccount } from "../../../shared/wallet.model"
 
-const { AlertFillIcon, SignIcon } = icons
+const { AlertFillIcon, SignIcon } = iconsDeprecated
 
 interface SignatureRequestRejectedScreenProps {
   selectedAccount?: WalletAccount

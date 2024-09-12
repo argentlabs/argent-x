@@ -1,43 +1,48 @@
 import {
   formatAddress,
   isAddress,
+  isEqualAddress,
   nonNullable,
   parseAmount,
-  transferCalldataSchema,
-  prettifyTokenNumber,
   prettifyCurrencyValue,
+  prettifyTokenNumber,
+  TokenWithBalance,
+  transferCalldataSchema,
 } from "@argent/x-shared"
 import { FieldError } from "@argent/x-ui"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC, useCallback, useMemo } from "react"
+import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { z } from "zod"
 
-import { prettifyTokenBalance } from "../../../shared/token/prettifyTokenBalance"
+import { formatUnits } from "ethers"
 import type { Token } from "../../../shared/token/__new/types/token.model"
+import { prettifyTokenBalance } from "../../../shared/token/prettifyTokenBalance"
+import { routes } from "../../../shared/ui/routes"
+import { delay } from "../../../shared/utils/delay"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
-import { routes } from "../../routes"
+import { clientStarknetAddressService } from "../../services/address"
+import { clientTokenService } from "../../services/tokens"
 import { formatTokenBalance } from "../../services/tokens/utils"
 import { getUint256CalldataFromBN } from "../../services/transactions"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
+import { tokenBalancesForAccountAndTokenView } from "../../views/tokenBalances"
 import { useTokenUnitAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
 import { useToken } from "../accountTokens/tokens.state"
+import { useFeeTokenBalances } from "../accountTokens/useFeeTokenBalance"
+import { useMaxFeeEstimateForTransfer } from "../accountTokens/useMaxFeeForTransfer"
+import { useFeeTokenSelection } from "../actions/transactionV2/useFeeTokenSelection"
+import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { amountInputSchema } from "./amountInput"
 import {
   SendAmountAndAssetScreen,
   SendAmountAndAssetScreenProps,
 } from "./SendAmountAndAssetScreen"
 import { TokenAmountInput } from "./TokenAmountInput"
-import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { tokenService } from "../../services/tokens"
-import { clientStarknetAddressService } from "../../services/address"
-import { useMaxFeeEstimateForTransfer } from "../accountTokens/useMaxFeeForTransfer"
-import { useBestFeeToken } from "../actions/useBestFeeToken"
-import { formatUnits } from "ethers"
-import { tokenBalanceForAccountAndTokenView } from "../../views/tokenBalances"
 
 const formSchema = z.object({
   amount: amountInputSchema,
@@ -55,7 +60,7 @@ export const SendAmountAndAssetTokenScreenContainer: FC<
     networkId: account?.networkId || "Unknown",
   })
   const tokenWithBalance = useView(
-    tokenBalanceForAccountAndTokenView({ token, account }),
+    tokenBalancesForAccountAndTokenView({ account, token }),
   )
 
   if (!token) {
@@ -90,6 +95,7 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
   GuardedSendAmountAndAssetTokenScreenContainerProps
 > = ({ onCancel, returnTo, token, balance, account, ...rest }) => {
   const navigate = useNavigate()
+  const [fetchMaxFee, setFetchMaxFee] = useState(false)
   const { recipientAddress, tokenAddress, amount: propAmount } = rest
   const {
     watch,
@@ -114,17 +120,35 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
 
   const currencyValue = useTokenUnitAmountToCurrencyValue(token, inputAmount)
 
-  const feeToken = useBestFeeToken(account)
+  const defaultFeeToken = useDefaultFeeToken(account)
+  const feeTokens = useFeeTokenBalances(account)
+
+  const [feeToken, setFeeToken] = useState<TokenWithBalance>(defaultFeeToken)
+  const [isFeeTokenSelectionReady, setIsFeeTokenSelectionReady] =
+    useState(false)
+
   const {
     data: maxFee,
     error: maxFeeError,
     isValidating: maxFeeLoading,
   } = useMaxFeeEstimateForTransfer(
-    feeToken.address,
+    feeToken?.address,
     tokenAddress,
     account,
     balance,
+    fetchMaxFee,
   )
+
+  useFeeTokenSelection({
+    isFeeTokenSelectionReady,
+    setIsFeeTokenSelectionReady,
+    feeToken,
+    setFeeToken,
+    account,
+    fee: maxFee,
+    defaultFeeToken,
+    feeTokens,
+  })
 
   const onSubmit = useCallback(async () => {
     if (token && recipientAddress && inputAmount) {
@@ -140,7 +164,7 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
         ? formatAddress(recipient)
         : recipient
 
-      await tokenService.send({
+      await clientTokenService.send({
         to: token.address,
         method: "transfer",
         calldata: transferCalldataSchema.parse({
@@ -150,19 +174,34 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
           ),
         }),
         title: `Send ${prettifyTokenNumber(inputAmount)} ${token.symbol}`,
-        subtitle: `to ${formattedRecipient}`,
+        shortTitle: `Send`,
+        subtitle: `To: ${formattedRecipient}`,
         isMaxSend,
       })
+
+      /**
+       * wait for store state to propagate into the ui and show the action screen
+       * otherwise the user will see a flash of the token screen here
+       */
+      await delay(0)
     }
     onCancel()
   }, [token, recipientAddress, inputAmount, onCancel, network.id, isMaxSend])
 
   const onMaxClick = useCallback(() => {
+    setFetchMaxFee(true)
+  }, [])
+
+  useEffect(() => {
     if (balance && nonNullable(maxFee)) {
       const tokenDecimals = token.decimals
       const tokenBalance = formatTokenBalance(Infinity, balance, tokenDecimals)
 
-      const maxAmount = balance - maxFee
+      const deductMaxFeeFromMaxAmount = isEqualAddress(
+        tokenAddress,
+        feeToken.address,
+      )
+      const maxAmount = deductMaxFeeFromMaxAmount ? balance - maxFee : balance
       const formattedMaxAmount = formatUnits(maxAmount, tokenDecimals)
 
       setValue("isMaxSend", true)
@@ -170,13 +209,22 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
         shouldDirty: true,
       })
     }
-  }, [balance, maxFee, token.decimals, setValue])
+  }, [
+    balance,
+    maxFee,
+    token.decimals,
+    setValue,
+    tokenAddress,
+    feeToken.address,
+  ])
 
   const parsedInputAmount = parseAmount(
     inputAmount || "0",
     token.decimals,
   ).value
-  const parsedTokenBalance = balance ?? 0n
+
+  const parsedTokenBalance = useMemo(() => balance ?? 0n, [balance])
+
   const isInputAmountGtBalance = useMemo(() => {
     return parsedInputAmount > parsedTokenBalance
   }, [parsedInputAmount, parsedTokenBalance])
@@ -211,11 +259,21 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     )
   }, [inputAmount, navigate, recipientAddress, returnTo, tokenAddress])
 
-  const hasInputAmount = parsedInputAmount !== 0n
+  const hasInputAmount = useMemo(
+    () => parsedInputAmount !== 0n,
+    [parsedInputAmount],
+  )
 
-  const validBalance = balance !== undefined && balance > 0n
+  const validBalance = useMemo(
+    () => balance !== undefined && balance > 0n,
+    [balance],
+  )
 
-  const showMaxButton = !hasInputAmount && !maxFeeError && validBalance
+  const showMaxButton = useMemo(
+    () => !hasInputAmount && !maxFeeError && validBalance,
+    [hasInputAmount, maxFeeError, validBalance],
+  )
+
   const leftText = useMemo(() => {
     if (!maxFeeError) {
       return prettifyCurrencyValue(currencyValue)
@@ -223,28 +281,45 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     return <FieldError>Unable to estimate max</FieldError>
   }, [currencyValue, maxFeeError])
 
-  const rightText =
-    balance !== undefined ? (
-      <span data-testid="tokenBalance">
-        Balance: {prettifyTokenBalance({ ...token, balance })}
-      </span>
-    ) : null
+  const rightText = useMemo(
+    () =>
+      balance !== undefined ? (
+        <span data-testid="tokenBalance">
+          Balance: {prettifyTokenBalance({ ...token, balance })}
+        </span>
+      ) : null,
+    [balance, token],
+  )
 
-  const isInvalid =
-    hasAmountError ||
-    !hasInputAmount ||
-    isInputAmountGtBalance ||
-    Boolean(maxFeeError?.message)
-  const submitButtonError = isInputAmountGtBalance
-    ? `Insufficient balance`
-    : undefined
+  const isInvalid = useMemo(
+    () =>
+      hasAmountError ||
+      !hasInputAmount ||
+      isInputAmountGtBalance ||
+      Boolean(maxFeeError?.message),
+    [
+      hasAmountError,
+      hasInputAmount,
+      isInputAmountGtBalance,
+      maxFeeError?.message,
+    ],
+  )
+  const submitButtonError = useMemo(
+    () => (isInputAmountGtBalance ? `Insufficient balance` : undefined),
+    [isInputAmountGtBalance],
+  )
+
+  const disableButton = useMemo(
+    () => isInvalid || (fetchMaxFee && !maxFee),
+    [fetchMaxFee, isInvalid, maxFee],
+  )
 
   return (
     <SendAmountAndAssetScreen
       {...rest}
       onCancel={onCancel}
       onSubmit={onSubmit}
-      isInvalid={isInvalid}
+      isInvalid={disableButton}
       submitButtonError={submitButtonError}
       input={
         <form onSubmit={handleSubmit(onAmountInputSubmit)}>
@@ -260,6 +335,7 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
                 /** Disallow non-schema characters */
                 if (amountInputSchema.safeParse(e.target.value).success) {
                   setValue("isMaxSend", false)
+                  setFetchMaxFee(false)
                   void onChange(e)
                 }
               }}

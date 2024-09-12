@@ -4,7 +4,7 @@ import {
   TransactionListItem,
   TransactionListItemProps,
 } from "@argent-x/extension/src/ui/features/accountActivity/TransactionListItem"
-import { transformExplorerTransaction } from "@argent-x/extension/src/ui/features/accountActivity/transform"
+import { transformExplorerTransaction } from "@argent-x/extension/src/shared/activity/utils/transform"
 import {
   accountCreated,
   accountUpgrade,
@@ -22,7 +22,7 @@ import {
   erc20Transfer,
   erc721MintAspect,
   erc721Transfer,
-} from "@argent-x/extension/src/ui/features/accountActivity/transform/explorerTransaction/__test__/__fixtures__/explorer-transactions/goerli-alpha"
+} from "@argent-x/extension/src/shared/activity/utils/transform/explorerTransaction/__fixtures__/explorer-transactions/sepolia-alpha"
 import { CellStack } from "@argent/x-ui"
 import { ComponentProps, FC } from "react"
 

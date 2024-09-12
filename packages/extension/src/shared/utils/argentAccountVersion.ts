@@ -10,8 +10,8 @@ export async function getAccountCairoVersion(
   type: ArgentAccountType = "standard",
 ): Promise<CairoVersion | undefined> {
   try {
-    if (type === "multisig") {
-      return "1" // Only Cairo version 1 is supported for multisig
+    if (type === "multisig" || type === "smart") {
+      return "1" // Only Cairo version 1 is supported for multisig and smart accounts
     }
 
     let encodedString: string
@@ -24,7 +24,7 @@ export async function getAccountCairoVersion(
         entrypoint: "getVersion",
       })
 
-      encodedString = response.result[0]
+      encodedString = response[0]
     } else {
       const provider = getProvider(network)
       const response = await provider.callContract({
@@ -32,7 +32,7 @@ export async function getAccountCairoVersion(
         entrypoint: "getVersion",
       })
 
-      encodedString = response.result[0]
+      encodedString = response[0]
     }
 
     const accountContractVersion = shortString.decodeShortString(encodedString)

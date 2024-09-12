@@ -1,4 +1,11 @@
-import { Button, L2, P3, P4, icons, logos } from "@argent/x-ui"
+import {
+  Button,
+  L2,
+  P3,
+  P4,
+  iconsDeprecated,
+  logosDeprecated,
+} from "@argent/x-ui"
 import { SimpleGrid, VStack, StackProps, Link, Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -7,8 +14,8 @@ import {
   ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL,
 } from "../../../../shared/api/constants"
 
-const { SupportIcon } = icons
-const { DiscordLogo, GithubLogo, TwitterLogo } = logos
+const { SupportIcon } = iconsDeprecated
+const { DiscordLogo, GithubLogo, XLogo } = logosDeprecated
 
 interface SupportFooterProps extends StackProps {
   privacyStatement?: boolean
@@ -60,19 +67,17 @@ const SupportFooter: FC<SupportFooterProps> = ({
         title="Post an issue on Argent X GitHub"
         target="_blank"
       >
-        Github
+        GitHub
       </Button>
       <Button
         as="a"
         size="sm"
         rounded={"lg"}
-        leftIcon={<TwitterLogo />}
+        leftIcon={<XLogo />}
         href="https://twitter.com/argenthq"
-        title="Follow Argent X on Twitter"
+        title="Follow Argent on X"
         target="_blank"
-      >
-        Twitter
-      </Button>
+      />
     </SimpleGrid>
     {privacyStatement && (
       <Flex color="text-secondary" gap={2}>

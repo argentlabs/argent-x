@@ -2,17 +2,17 @@ import { FC } from "react"
 import { usePreAuthorizationsForAccount } from "../../preAuthorizations/hooks"
 import { PreAuthorization } from "../../../../shared/preAuthorization/schema"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
-import { useRouteAccount } from "../../shield/useRouteAccount"
+import { useRouteWalletAccount } from "../../smartAccount/useRouteWalletAccount"
 import { DappConnectionsAccountScreen } from "./DappConnectionsAccountScreen"
-import { preAuthorizationService } from "../../../../shared/preAuthorization/service"
+import { preAuthorizationUIService } from "../../../services/preAuthorization"
 
 export const DappConnectionsAccountScreenContainer: FC = () => {
   const onBack = useNavigateReturnToOrBack()
-  const account = useRouteAccount()
+  const account = useRouteWalletAccount()
   const preAuthorizations = usePreAuthorizationsForAccount(account)
 
   const onRemove = (preAuthorization: PreAuthorization) => {
-    void preAuthorizationService.remove(preAuthorization)
+    void preAuthorizationUIService.remove(preAuthorization)
     if (preAuthorizations.length === 1) {
       onBack()
     }
@@ -20,7 +20,7 @@ export const DappConnectionsAccountScreenContainer: FC = () => {
 
   const onRemoveAll = () => {
     if (account) {
-      void preAuthorizationService.removeAll(account)
+      void preAuthorizationUIService.removeAll(account)
     }
     onBack()
   }

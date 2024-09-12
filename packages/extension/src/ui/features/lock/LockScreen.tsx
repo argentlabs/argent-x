@@ -1,26 +1,25 @@
 import { FC, useState } from "react"
-import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
-import { Button, H2, P3, P4, logos } from "@argent/x-ui"
-import { Box, Flex, Text } from "@chakra-ui/react"
+import { Button, H2, P3, P4, logosDeprecated } from "@argent/x-ui"
+import { Box, Flex, FlexProps, Text } from "@chakra-ui/react"
 
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { sessionService } from "../../services/session"
-import { recover } from "../recovery/recovery.service"
 import { PasswordForm } from "./PasswordForm"
+import { useResetAll } from "../../hooks/useResetAll"
+import { IS_DEV } from "../../../shared/utils/dev"
 
-const { ArgentXLogo } = logos
+const { ArgentXLogo } = logosDeprecated
 
-export const LockScreen: FC = () => {
+export const LockScreen: FC<FlexProps> = (props) => {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>()
+  const resetAll = useResetAll()
   const handleVerifyPassword = async (password: string) => {
     setIsLoading(true)
     try {
       await sessionService.startSession(password)
-      const target = await recover()
-      navigate(target, { replace: true })
       return true
     } catch {
       setError("Incorrect password")
@@ -29,8 +28,17 @@ export const LockScreen: FC = () => {
       setIsLoading(false)
     }
   }
+
+  const handleResetClick = () => {
+    if (IS_DEV) {
+      resetAll(true)
+    } else {
+      navigate(routes.reset())
+    }
+  }
+
   return (
-    <Flex flex={1} flexDirection={"column"} py={6} px={5}>
+    <Flex flex={1} flexDirection={"column"} py={6} px={5} {...props}>
       <Flex
         flex={1}
         flexDirection="column"
@@ -39,12 +47,12 @@ export const LockScreen: FC = () => {
         position="relative"
       >
         <P4
-          as={Link}
-          to={routes.reset()}
-          color="neutrals.300"
+          onClick={handleResetClick}
+          color="text-secondary"
           position="absolute"
           right={0}
           top={0}
+          cursor="pointer"
         >
           Reset
         </P4>
@@ -53,7 +61,7 @@ export const LockScreen: FC = () => {
         </Text>
         <Box mt="8" mb="8" width="100%">
           <H2>Welcome back</H2>
-          <P3 color="neutrals.300">Unlock your wallet to continue</P3>
+          <P3 color="text-secondary">Unlock your wallet to continue</P3>
         </Box>
 
         <Box width="100%">

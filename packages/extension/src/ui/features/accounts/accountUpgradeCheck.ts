@@ -1,5 +1,4 @@
 import { partition } from "lodash-es"
-import { num } from "starknet"
 
 import { isDeprecatedTxV0 } from "../../../shared/wallet.service"
 import { Network } from "../../../shared/network"
@@ -9,6 +8,7 @@ import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/con
 import { useMemo } from "react"
 import { useWalletAccount } from "./accounts.state"
 import { Account } from "./Account"
+import { isEqualAddress } from "@argent/x-shared"
 
 export function checkIfUpgradeAvailable(
   account: WalletAccount,
@@ -35,8 +35,7 @@ export function checkIfUpgradeAvailable(
 
     const isInKnownImplementationsList = targetImplementations.some(
       (targetImplementation) =>
-        num.toBigInt(currentImplementation) ===
-        num.toBigInt(targetImplementation),
+        isEqualAddress(targetImplementation, currentImplementation),
     )
 
     return !!targetImplementations && !isInKnownImplementationsList
@@ -74,15 +73,12 @@ export function partitionDeprecatedAccount(
       {},
     )
 
-    const targetImplementations = Object.values(network.accountClassHash).map(
-      (ti) => num.toBigInt(ti),
-    )
+    const targetImplementations = Object.values(network.accountClassHash)
 
     return partition(accountAddresses, (accountAddress) =>
-      targetImplementations.some((ti) => {
-        const impl = implementationsToAccountsMap[accountAddress]
-        return !!impl && num.toBigInt(impl) === ti
-      }),
+      targetImplementations.some((ti) =>
+        isEqualAddress(implementationsToAccountsMap[accountAddress], ti),
+      ),
     )
   } catch (error) {
     console.error("Error while checking for deprecated accounts", error)
@@ -110,7 +106,7 @@ export const useCheckUpgradeAvailable = (account?: Account | WalletAccount) => {
   return checkIfUpgradeAvailable(account, accountClassHash)
 }
 
-export const useIsDeprecatedTxV0 = (account: BaseWalletAccount) => {
+export const useIsDeprecatedTxV0 = (account?: BaseWalletAccount) => {
   const walletAccount = useWalletAccount(account)
 
   return useMemo(() => {

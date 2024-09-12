@@ -1,10 +1,10 @@
+import { TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import { Call, CallData, RawArgs, num } from "starknet"
 import { ActionQueueItem } from "../../../shared/actionQueue/schema"
 import { TransactionActionPayload } from "../../../shared/actionQueue/types"
 import { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
-import { ApproveScreenType } from "./transaction/types"
 import { MultisigTransactionType } from "../../../shared/multisig/types"
-import { TXV3_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
+import { ApproveScreenType } from "./transaction/types"
 
 export const getApproveScreenTypeFromAction = (
   action: ActionQueueItem & {
@@ -21,10 +21,12 @@ export const getApproveScreenTypeFromAction = (
       return ApproveScreenType.MULTISIG_REMOVE_SIGNERS
     case MultisigTransactionType.MULTISIG_REPLACE_SIGNER:
       return ApproveScreenType.MULTISIG_REPLACE_SIGNER
-    case "ADD_ARGENT_SHIELD":
-      return ApproveScreenType.ADD_ARGENT_SHIELD
-    case "REMOVE_ARGENT_SHIELD":
-      return ApproveScreenType.REMOVE_ARGENT_SHIELD
+    case MultisigTransactionType.MULTISIG_REJECT_ON_CHAIN:
+      return ApproveScreenType.MULTISIG_ON_CHAIN_REJECT
+    case "ADD_GUARDIAN":
+      return ApproveScreenType.ADD_GUARDIAN
+    case "REMOVE_GUARDIAN":
+      return ApproveScreenType.REMOVE_GUARDIAN
     default:
       return ApproveScreenType.TRANSACTION
   }
@@ -42,7 +44,8 @@ export const getApproveScreenTypeFromPendingTransaction = (
       return ApproveScreenType.MULTISIG_REMOVE_SIGNERS
     case MultisigTransactionType.MULTISIG_REPLACE_SIGNER:
       return ApproveScreenType.MULTISIG_REPLACE_SIGNER
-
+    case MultisigTransactionType.MULTISIG_REJECT_ON_CHAIN:
+      return ApproveScreenType.MULTISIG_ON_CHAIN_REJECT
     default:
       return ApproveScreenType.TRANSACTION
   }

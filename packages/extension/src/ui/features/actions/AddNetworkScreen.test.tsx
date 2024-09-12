@@ -56,12 +56,12 @@ describe("AddNetworkScreen", () => {
   })
 
   it("should call onSubmit when add network button is clicked", () => {
-    fireEvent.click(screen.getByTestId("submit-button"))
+    screen.getByTestId("submit-button").click()
     expect(onSubmit).toHaveBeenCalled()
   })
 
   it("should call onReject when reject button is clicked", () => {
-    fireEvent.click(screen.getByTestId("reject-button"))
+    screen.getByTestId("reject-button").click()
     expect(onReject).toHaveBeenCalled()
   })
 })

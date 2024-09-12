@@ -2,9 +2,11 @@ import { accountsEqual } from "../utils/accountsEqual"
 import { baseWalletAccountSchema } from "../wallet.model"
 import { z } from "zod"
 
+export const preAuthorizationHostSchema = z.string().url()
+
 export const preAuthorizationSchema = z.object({
   account: baseWalletAccountSchema,
-  host: z.string().url(),
+  host: preAuthorizationHostSchema,
 })
 
 export type PreAuthorization = z.infer<typeof preAuthorizationSchema>

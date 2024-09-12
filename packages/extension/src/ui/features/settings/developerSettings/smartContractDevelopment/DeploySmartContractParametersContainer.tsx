@@ -1,11 +1,11 @@
 import { FC } from "react"
 
-import { Alert, SpacerCell, icons } from "@argent/x-ui"
+import { Alert, SpacerCell, iconsDeprecated } from "@argent/x-ui"
 
 import { useConstructorParams } from "./useConstructorParams"
 import { DeploySmartContractParameters } from "./DeploySmartContractParameters"
 
-const { AlertIcon } = icons
+const { AlertIcon } = iconsDeprecated
 
 export const DeploySmartContractParametersContainer: FC<{
   currentClassHash: string

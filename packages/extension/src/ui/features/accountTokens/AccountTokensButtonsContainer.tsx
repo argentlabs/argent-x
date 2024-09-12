@@ -3,25 +3,27 @@ import { FC, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { hideMultisig } from "../../../shared/multisig/utils/baseMultisig"
-import { useAppState } from "../../app.state"
-import { routes } from "../../routes"
+import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
+import { routes } from "../../../shared/ui/routes"
 import { hasSavedRecoverySeedPhraseView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { Account } from "../accounts/Account"
 import { autoSelectAccountOnNetwork } from "../accounts/switchAccount"
-import { useIsSignerInMultisig } from "../multisig/hooks/useIsSignerInMultisig"
-import { useMultisig } from "../multisig/multisig.state"
+import { usePortfolioUrl } from "../actions/hooks/usePortfolioUrl"
+import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
+import {
+  isSignerInMultisigView,
+  multisigView,
+} from "../multisig/multisig.state"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import { AccountTokensButtons } from "./AccountTokensButtons"
-import { useAddFundsDialogSend } from "./useAddFundsDialog"
 import { useToken } from "./tokens.state"
-import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
-import { useBestFeeToken } from "../actions/useBestFeeToken"
+import { useAddFundsDialogSend } from "./useAddFundsDialog"
 import { useHasFeeTokenBalance } from "./useFeeTokenBalance"
-import { usePortfolioUrl } from "../actions/hooks/usePortfolioUrl"
+import { WalletAccount } from "../../../shared/wallet.model"
+import { selectedNetworkIdView } from "../../views/network"
 
 interface AccountTokensButtonsContainerProps {
-  account: Account
+  account?: WalletAccount
   hideSend?: boolean
 }
 
@@ -29,14 +31,15 @@ export const AccountTokensButtonsContainer: FC<
   AccountTokensButtonsContainerProps
 > = ({ account }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
-  const multisig = useMultisig(account)
-  const signerIsInMultisig = useIsSignerInMultisig(multisig)
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  const multisig = useView(multisigView(account))
+  const signerIsInMultisig = useView(isSignerInMultisigView(account))
   const isMainnet = useIsMainnet()
-  const bestFeeToken = useBestFeeToken(account)
+  const feeToken = useDefaultFeeToken(account)
+
   const sendToken = useToken({
-    address: bestFeeToken?.address ?? ETH_TOKEN_ADDRESS,
-    networkId: switcherNetworkId,
+    address: feeToken?.address ?? ETH_TOKEN_ADDRESS,
+    networkId: selectedNetworkId,
   })
   const hasFeeTokenBalance = useHasFeeTokenBalance(account)
 
@@ -47,10 +50,6 @@ export const AccountTokensButtonsContainer: FC<
   const onAddFunds = useCallback(() => {
     navigate(routes.funding())
   }, [navigate])
-
-  const onPlugins = useCallback(() => {
-    navigate(routes.addPlugin(account?.address))
-  }, [account?.address, navigate])
 
   const showSaveRecoveryPhraseModal = useMemo(() => {
     return !hasSavedRecoverySeedPhrase && isMainnet
@@ -95,7 +94,7 @@ export const AccountTokensButtonsContainer: FC<
   const onHideConfirm = useCallback(async () => {
     if (multisig) {
       await hideMultisig(multisig)
-      const account = await autoSelectAccountOnNetwork(switcherNetworkId)
+      const account = await autoSelectAccountOnNetwork(selectedNetworkId)
       onHideMultisigModalClose()
       if (account) {
         navigate(routes.accounts())
@@ -104,7 +103,7 @@ export const AccountTokensButtonsContainer: FC<
         navigate(routes.accountTokens())
       }
     }
-  }, [multisig, navigate, onHideMultisigModalClose, switcherNetworkId])
+  }, [multisig, navigate, onHideMultisigModalClose, selectedNetworkId])
 
   const onSend = () => addFundsDialogSend()
 
@@ -118,12 +117,10 @@ export const AccountTokensButtonsContainer: FC<
 
   return (
     <AccountTokensButtons
-      account={account}
       onAddFunds={onAddFunds}
       showAddFundsButton={showAddFundsButton}
       showSendButton={showSendButton}
       onSend={onSend}
-      onPlugins={onPlugins}
       showHideMultisigButton={showHideMultisigButton}
       onHideMultisigModalOpen={onHideMultisigModalOpen}
       onHideMultisigModalClose={onHideMultisigModalClose}

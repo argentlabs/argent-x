@@ -3,7 +3,7 @@ import { Flex } from "@chakra-ui/react"
 import { FC } from "react"
 
 import { prettifyTokenAmount } from "@argent/x-shared"
-import { SwapTransaction } from "../transform/type"
+import { SwapTransaction } from "../../../../shared/activity/utils/transform/type"
 
 export interface SwapAccessoryProps {
   transaction: SwapTransaction

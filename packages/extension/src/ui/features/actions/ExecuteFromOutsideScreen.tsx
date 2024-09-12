@@ -16,7 +16,7 @@ export const ExecuteFromOutsideScreen: FC<ExecuteFromOutsideScreenProps> = ({
     <SignatureRequestRejectedScreen
       onReject={onReject}
       selectedAccount={selectedAccount}
-      error={"Off-chain signatures for meta transactions are not yet supported"}
+      error={"Transaction intent not supported"}
     />
   )
 }

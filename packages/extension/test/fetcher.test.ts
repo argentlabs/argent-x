@@ -1,4 +1,4 @@
-import { rest } from "msw"
+import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
@@ -14,17 +14,19 @@ const INVALID_URL_ENDPOINT = "http://foo/v1/bar/invalid"
 const INVALID_PAYLOAD_URL_ENDPOINT = "http://foo/v1/bar/invalid/payload"
 
 const server = setupServer(
-  rest.get(BASE_URL_ENDPOINT, (req, res, ctx) => {
-    return res(ctx.json({ foo: "bar" }))
+  http.get(BASE_URL_ENDPOINT, () => {
+    return HttpResponse.json({ foo: "bar" })
   }),
-  rest.get(INVALID_URL_ENDPOINT, (req, res, ctx) => {
-    return res(
-      ctx.status(429),
-      ctx.body("<html><body>Non-json error response</body></html>"),
+  http.get(INVALID_URL_ENDPOINT, () => {
+    return new HttpResponse(
+      "<html><body>Non-json error response</body></html>",
+      {
+        status: 429,
+      },
     )
   }),
-  rest.get(INVALID_PAYLOAD_URL_ENDPOINT, (req, res, ctx) => {
-    return res(ctx.body("<html><body>Non-json error response</body></html>"))
+  http.get(INVALID_PAYLOAD_URL_ENDPOINT, () => {
+    return new HttpResponse("<html><body>Non-json error response</body></html>")
   }),
 )
 
@@ -88,7 +90,7 @@ describe("fetcher", () => {
     const MOCK_VERSION = "testing.1.2.3"
     const fetcher = vi.fn(async () => "foo") as Fetcher
     const fetcherWithArgentApiHeaders = fetcherWithArgentApiHeadersForNetwork(
-      "goerli-alpha",
+      "sepolia-alpha",
       fetcher,
     )
 
@@ -109,7 +111,7 @@ describe("fetcher", () => {
           headers: {
             "argent-version": MOCK_VERSION,
             "argent-client": "argent-x",
-            "argent-network": "goerli",
+            "argent-network": "sepolia",
           },
         })
       })
@@ -133,7 +135,7 @@ describe("fetcher", () => {
             "Content-Type": "application/json",
             "argent-version": MOCK_VERSION,
             "argent-client": "argent-x",
-            "argent-network": "goerli",
+            "argent-network": "sepolia",
           },
           method: "POST",
         })

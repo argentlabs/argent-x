@@ -13,6 +13,7 @@ import Wallet from "./Wallet"
 import config from "../../../shared/config"
 import Nfts from "./Nfts"
 import Preferences from "./Preferences"
+
 import {
   transferTokens,
   AccountsToSetup,
@@ -21,6 +22,8 @@ import {
   convertScientificToDecimal,
   FeeTokens,
 } from "../../../shared/src/assets"
+import Utils from "../../../shared/src/Utils"
+import { logInfo } from "../../../shared/src/common"
 
 export default class ExtensionPage {
   page: Page
@@ -36,7 +39,11 @@ export default class ExtensionPage {
   dapps: Dapps
   nfts: Nfts
   preferences: Preferences
-  constructor(page: Page, private extensionUrl: string) {
+  utils: Utils
+  constructor(
+    page: Page,
+    private extensionUrl: string,
+  ) {
     this.page = page
     this.wallet = new Wallet(page)
     this.network = new Network(page)
@@ -51,9 +58,11 @@ export default class ExtensionPage {
     this.dapps = new Dapps(page)
     this.nfts = new Nfts(page)
     this.preferences = new Preferences(page)
+    this.utils = new Utils(page)
   }
 
   async open() {
+    await this.page.setViewportSize({ width: 360, height: 800 })
     await this.page.goto(this.extensionUrl)
   }
 
@@ -61,27 +70,22 @@ export default class ExtensionPage {
     await this.navigation.showSettingsLocator.click()
     await this.navigation.lockWalletLocator.click()
     await this.navigation.resetLocator.click()
+    await this.page.locator('[name="validationString"]').fill("RESET WALLET")
+    await this.page.locator('label[type="checkbox"]').click({ force: true })
     await this.navigation.confirmResetLocator.click()
-  }
-
-  async paste() {
-    const key = process.env.CI ? "Control" : "Meta"
-    await this.page.keyboard.press(`${key}+KeyV`)
   }
 
   async pasteSeed() {
     await this.page.locator('[data-testid="seed-input-0"]').focus()
-    await this.paste()
-  }
-
-  async setClipBoardContent(text: string) {
-    await this.page.evaluate(`navigator.clipboard.writeText('${text}')`)
+    await this.utils.paste()
   }
 
   async recoverWallet(seed: string, password?: string) {
+    await this.page.setViewportSize({ width: 1080, height: 720 })
+
     await this.wallet.restoreExistingWallet.click()
     await this.wallet.agreeLoc.click()
-    await this.setClipBoardContent(seed)
+    await this.utils.setClipBoardContent(seed)
     await this.pasteSeed()
     await this.navigation.continueLocator.click()
 
@@ -95,14 +99,10 @@ export default class ExtensionPage {
     await expect(this.network.networkSelector).toBeVisible()
   }
 
-  async getClipboard() {
-    return String(await this.page.evaluate(`navigator.clipboard.readText()`))
-  }
-
   async addAccount() {
     await this.account.addAccount({ firstAccount: false })
     await this.account.copyAddress.click()
-    const accountAddress = await this.getClipboard()
+    const accountAddress = await this.utils.getClipboard()
     expect(accountAddress).toMatch(/^0x0/)
     return accountAddress
   }
@@ -121,18 +121,18 @@ export default class ExtensionPage {
     await this.navigation.backLocator.click()
     await this.navigation.closeLocator.click()
     await this.navigation.menuActivityLocator.click()
+
     await expect(
-      this.page.getByText(
-        /(Account created and transfer|Contract interaction)/,
-      ),
+      this.page.getByText(/(Account created and transfer|Account activation)/),
     ).toBeVisible()
+
     await this.navigation.showSettingsLocator.click()
     await expect(this.page.getByText("Deploying")).toBeHidden()
     await this.navigation.closeLocator.click()
     await this.navigation.menuTokensLocator.click()
   }
 
-  async activate2fa({
+  async activateSmartAccount({
     accountName,
     email,
     pin = "111111",
@@ -146,16 +146,16 @@ export default class ExtensionPage {
     await this.account.ensureSelectedAccount(accountName)
     await this.navigation.showSettingsLocator.click()
     await this.settings.account(accountName).click()
-    await this.settings.argentShield().click()
+    await this.settings.smartAccountButton.click()
     await this.navigation.nextLocator.click()
     if (!validSession) {
       await this.account.email.fill(email)
       await this.navigation.nextLocator.first().click()
       await this.account.fillPin(pin)
     }
-    await this.navigation.addArgentShieldLocator.click()
+    await this.navigation.upgradeLocator.click()
     await this.account.confirmTransaction()
-    await expect(this.account.addedArgentShieldLocator).toBeVisible()
+    await expect(this.account.accountUpgraded).toBeVisible()
     await this.navigation.doneLocator.click()
     await this.navigation.backLocator.click()
     await this.navigation.closeLocator.click()
@@ -164,22 +164,24 @@ export default class ExtensionPage {
         this.activity.menuPendingTransactionsIndicatorLocator,
       ).toBeHidden(),
       expect(
-        this.page.locator('[data-testid="shield-on-account-view"]'),
+        this.page.locator('[data-testid="smart-account-on-account-view"]'),
       ).toBeVisible(),
     ])
     await this.navigation.showSettingsLocator.click()
     await expect(
-      this.page.locator('[data-testid="shield-on-settings"]'),
+      this.page.locator('[data-testid="smart-account-on-settings"]'),
     ).toBeVisible()
     await this.settings.account(accountName).click()
     await expect(
-      this.page.locator('[data-testid="shield-switch"]'),
+      this.page.locator(
+        '[data-testid="smart-account-button"]:has-text("Change to Standard Account")',
+      ),
     ).toBeEnabled()
     await this.navigation.backLocator.click()
     await this.navigation.closeLocator.click()
   }
 
-  async disable2fa({
+  async changeToStandardAccount({
     accountName,
     email,
     pin = "111111",
@@ -193,20 +195,21 @@ export default class ExtensionPage {
     await this.account.ensureSelectedAccount(accountName)
     await this.navigation.showSettingsLocator.click()
     await this.settings.account(accountName).click()
-    await this.settings.argentShield().click()
-    await this.navigation.nextLocator.click()
+    await this.settings.changeToStandardAccountButton.click()
+    //await this.navigation.nextLocator.click()
     if (!validSession) {
       await this.account.email.fill(email)
       await this.navigation.nextLocator.first().click()
       await this.account.fillPin(pin)
     }
-    await this.navigation.removeArgentShieldLocator.click()
+
+    await this.navigation.confirmChangeAccountTypeLocator.click()
     await this.account.confirmTransaction()
-    await expect(this.account.removedArgentShieldLocator).toBeVisible()
+    await expect(this.account.changedToStandardAccountLabel).toBeVisible()
     await this.navigation.doneLocator.click()
     await this.navigation.backLocator.click()
     await this.navigation.closeLocator.click()
-    await this.account.ensure2FANotEnabled(accountName)
+    await this.account.ensureSmartAccountNotEnabled(accountName)
   }
 
   async fundAccount(
@@ -216,19 +219,28 @@ export default class ExtensionPage {
   ) {
     let expectedTokenValue
     for (const [assetIndex, asset] of acc.assets.entries()) {
-      console.log({ op: "fundAccount", assetIndex, asset })
+      logInfo({
+        op: "fundAccount",
+        assetIndex,
+        asset,
+        isProdTesting: config.isProdTesting,
+      })
       if (asset.balance > 0) {
         await transferTokens(
           asset.balance,
           accountAddress, // receiver wallet address
           asset.token,
         )
-        expectedTokenValue = `${asset.balance} ${asset.token}`
+
         if (isScientific(asset.balance)) {
-          expectedTokenValue = `${convertScientificToDecimal(asset.balance)} ${
-            asset.token
-          }`
+          expectedTokenValue = `${convertScientificToDecimal(asset.balance)}`
+        } else {
+          expectedTokenValue = `${asset.balance}`
         }
+        if (!expectedTokenValue.includes(".")) {
+          expectedTokenValue += ".0"
+        }
+        expectedTokenValue += ` ${asset.token}`
         await this.account.ensureAsset(
           `Account ${accIndex + 1}`,
           asset.token,
@@ -244,29 +256,43 @@ export default class ExtensionPage {
 
   async setupWallet({
     accountsToSetup,
+    email,
+    pin = "111111",
+    success = true,
   }: {
     accountsToSetup: AccountsToSetup[]
+    email?: string
+    success?: boolean
+    pin?: string
   }) {
-    await this.wallet.newWalletOnboarding()
+    await this.wallet.newWalletOnboarding(email, pin, success)
+    if (!success) {
+      return { accountAddresses: [], seed: "" }
+    }
     await this.open()
     const seed = await this.account.setupRecovery()
+    await this.network.selectDefaultNetwork()
+    const noAccount = await this.account.noAccountBanner.isVisible({
+      timeout: 1000,
+    })
     const accountAddresses: string[] = []
-
     for (const [accIndex, acc] of accountsToSetup.entries()) {
-      if (accIndex !== 0) {
+      if (noAccount) {
+        await this.account.addAccount({ firstAccount: true })
+      } else if (accIndex !== 0) {
         await this.account.addAccount({ firstAccount: false })
       }
       await this.account.copyAddress.click()
-      const accountAddress = await this.getClipboard().then((adr) =>
-        String(adr),
-      )
+      const accountAddress = await this.utils
+        .getClipboard()
+        .then((adr) => String(adr))
       expect(accountAddress).toMatch(/^0x0/)
       accountAddresses.push(accountAddress)
       if (acc.assets[0].balance > 0) {
         await this.fundAccount(acc, accountAddress, accIndex)
       }
     }
-    console.log({
+    logInfo({
       op: "setupWallet",
       accountsNbr: accountAddresses.length,
       accountAddresses,
@@ -281,14 +307,16 @@ export default class ExtensionPage {
     sendAmountFE,
     sendAmountTX,
     uniqLocator,
+    txType = "token",
   }: {
     txHash: string
     receiver: string
     sendAmountFE?: string
     sendAmountTX?: number
     uniqLocator?: boolean
+    txType?: "token" | "nft"
   }) {
-    console.log({
+    logInfo({
       op: "validateTx",
       txHash,
       receiver,
@@ -311,6 +339,14 @@ export default class ExtensionPage {
       if (uniqLocator) {
         activityAmountElement = activityAmountLocator.first()
       }
+      expect(this.activity.historyButton)
+        .toBeVisible({ timeout: 1000 })
+        .then(async () => {
+          await this.activity.historyButton.click()
+        })
+        .catch(async () => {
+          null
+        })
       const activityAmount = await activityAmountElement
         .textContent()
         .then((text) => text?.match(/[\d|.]+/)![0])
@@ -328,7 +364,7 @@ export default class ExtensionPage {
       }
     }
     await this.activity.ensureNoPendingTransactions()
-    await validateTx(txHash, receiver, sendAmountTX)
+    await validateTx({ txHash, receiver, amount: sendAmountTX, txType })
   }
 
   async fundMultisigAccount({
@@ -340,7 +376,9 @@ export default class ExtensionPage {
   }) {
     await this.account.ensureSelectedAccount(accountName)
     await this.account.copyAddress.click()
-    const accountAddress = await this.getClipboard().then((adr) => String(adr))
+    const accountAddress = await this.utils
+      .getClipboard()
+      .then((adr) => String(adr))
     await transferTokens(
       amount,
       accountAddress, // receiver wallet address
@@ -351,7 +389,7 @@ export default class ExtensionPage {
   async activateMultisig(accountName: string) {
     await this.account.ensureSelectedAccount(accountName)
     await expect(
-      this.page.locator("label:has-text('Not activated')"),
+      this.page.locator("label:has-text('Add ETH or STRK and activate')"),
     ).toBeVisible()
     await this.page.locator('[data-testid="activate-multisig"]').click()
     await this.account.confirmTransaction()
@@ -359,7 +397,9 @@ export default class ExtensionPage {
       this.page.locator('[data-testid="activating-multisig"]'),
     ).toBeVisible()
     await Promise.all([
-      expect(this.page.locator("label:has-text('Not activated')")).toBeHidden(),
+      expect(
+        this.page.locator("label:has-text('Add ETH or STRK and activate')"),
+      ).toBeHidden(),
       expect(
         this.page.locator('[data-testid="activating-multisig"]'),
       ).toBeHidden(),

@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from "vitest"
 
 import { Network } from "../../network"
 import { defaultNetworks } from "../../network/defaults"
-import type { StoredWalletAccount, WalletAccount } from "../../wallet.model"
+import {
+  SignerType,
+  type StoredWalletAccount,
+  type WalletAccount,
+} from "../../wallet.model"
 import { deserializeFactory, migrateAccount, serialize } from "./serialize"
 
 const defaultNetwork = defaultNetworks[1]
@@ -22,8 +26,8 @@ const mockAccounts: WalletAccount[] = [
     name: "Account1",
     type: "standard",
     address: "0x1",
-    signer: { derivationPath: "1", type: "local_secret" },
-    networkId: "goerli-alpha",
+    signer: { derivationPath: "1", type: SignerType.LOCAL_SECRET },
+    networkId: "sepolia-alpha",
     network: defaultNetwork,
   },
 ]
@@ -33,8 +37,8 @@ const mockStoredAccounts: StoredWalletAccount[] = [
     name: "Account1",
     type: "standard",
     address: "0x1",
-    signer: { derivationPath: "1", type: "local_secret" },
-    networkId: "goerli-alpha",
+    signer: { derivationPath: "1", type: SignerType.LOCAL_SECRET },
+    networkId: "sepolia-alpha",
   },
 ]
 
@@ -56,8 +60,8 @@ describe("Wallet Account Serialization and Deserialization", () => {
         name: "Account2",
         type: "standard",
         address: "0x2",
-        signer: { derivationPath: "1", type: "local_secret" },
-        networkId: "goerli-beta",
+        signer: { derivationPath: "1", type: SignerType.LOCAL_SECRET },
+        networkId: "sepolia-beta",
       },
     ]
 
@@ -73,8 +77,8 @@ describe("Wallet Account Migration", () => {
       // @ts-expect-error This is a migration, so we can ignore the type error
       type: "argent",
       address: "0x1",
-      signer: { derivationPath: "1", type: "local_secret" },
-      networkId: "goerli-alpha",
+      signer: { derivationPath: "1", type: SignerType.LOCAL_SECRET },
+      networkId: "sepolia-alpha",
       network: defaultNetwork,
     }
 

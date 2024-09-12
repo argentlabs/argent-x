@@ -6,34 +6,27 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/stack-router.umd.js",
-  "module": "./dist/stack-router.es.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/stack-router.es.js",
-      "require": "./dist/stack-router.umd.js",
-      "types": "./dist/stack-router.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --cache --ext .ts,.tsx",
-    "dev": "vite build --watch",
+    "dev": "NODE_ENV=development vite build --mode development --watch",
     "setup": "vite build",
     "build": "vite build",
     "example": "cd example && react-scripts start"
   },
-  "dependencies": {
-    "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
-    "framer-motion": "^11.0.5",
-    "history": "^5.3.0",
-    "lodash-es": "^4.17.21"
-  },
   "devDependencies": {
-    "@argent/x-ui": "^1.0.2",
     "@types/lodash-es": "^4.17.6",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -47,10 +40,16 @@
     "typescript": "^5.0.4",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.0.0",
-    "vitest": "^1.0.0"
+    "vitest": "2.0.4"
   },
   "peerDependencies": {
+    "@argent/x-ui": "^1.42.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
     "colord": "^2.9.2",
+    "framer-motion": "^11.0.5",
+    "history": "^5.3.0",
     "lodash-es": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

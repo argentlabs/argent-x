@@ -15,7 +15,7 @@ describe("AccountListScreenItem", async () => {
   const account = {
     accountName: "Account 1",
     accountAddress: "0x123",
-    networkId: "goerli-alpha",
+    networkId: "sepolia-alpha",
   }
   describe("With default accessory", () => {
     it("Calls expected methods when clicked", async () => {

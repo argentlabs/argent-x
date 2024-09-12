@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { AX_LEDGER_ERROR_MESSAGES } from "../../../../shared/errors/ledger"
 
 const exceptionMappings = [
   {
@@ -8,6 +9,18 @@ const exceptionMappings = [
     title: "Tx not executed: high traffic",
   },
 ]
+
+export const ledgerErrorMessageSchema = z.string().refine((err) => {
+  if (err?.includes("LedgerError:")) {
+    return true
+  }
+  const axledgerErrors = Object.values(AX_LEDGER_ERROR_MESSAGES)
+  return axledgerErrors.includes(err as AX_LEDGER_ERROR_MESSAGES)
+})
+
+export function isLedgerError(errorMessage?: unknown) {
+  return ledgerErrorMessageSchema.safeParse(errorMessage).success
+}
 
 const transactionErrorMessageSchema = z
   .string()

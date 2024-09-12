@@ -1,9 +1,16 @@
-import { Button, H5, L2, P3, icons, logos } from "@argent/x-ui"
-import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react"
+import {
+  Button,
+  H5,
+  L2,
+  P3,
+  iconsDeprecated,
+  logosDeprecated,
+} from "@argent/x-ui"
+import { Box, Flex, Text } from "@chakra-ui/react"
 import { FC, ReactNode } from "react"
 
-const { NftIcon } = icons
-const { BriqLogo, UnframedLogo, FlexLogo } = logos
+const { NftIcon } = iconsDeprecated
+const { UnframedLogo, ElementLogo } = logosDeprecated
 
 const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
   icon,
@@ -12,10 +19,11 @@ const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
 }) => (
   <Box>
     <Button
-      h="56px"
-      mb="2"
+      display="flex"
+      h={14}
+      w={23}
       as={"a"}
-      rounded="3xl"
+      mb={0.5}
       href={href}
       title={title}
       target="_blank"
@@ -55,28 +63,22 @@ const EmptyCollections: FC<{ networkId: string }> = () => (
       </Flex>
       <H5 color="neutrals.400">No NFTs</H5>
     </Flex>
-    <Flex direction="column" flex={1} bg="black" p="-4">
-      <P3 color="neutrals.400" mb="3" mt="12">
+    <Flex direction="column" flex={1} bg="black" p="-4" alignItems="center">
+      <P3 color="neutrals.400" mt="12">
         Discover NFTs on Starknet
       </P3>
-
-      <SimpleGrid columns={3} gap="2" mx="8">
+      <Flex gap="2" mt={6}>
         <ButtonLink
           title="Unframed"
           icon={<UnframedLogo />}
           href="https://unframed.co/"
         />
         <ButtonLink
-          title="Flex"
-          icon={<FlexLogo />}
-          href="https://hyperflex.market/"
+          title="Element"
+          icon={<ElementLogo />}
+          href="https://element.market/starknet"
         />
-        <ButtonLink
-          title="Briq"
-          icon={<BriqLogo />}
-          href="https://briq.construction/"
-        />
-      </SimpleGrid>
+      </Flex>
     </Flex>
   </Flex>
 )

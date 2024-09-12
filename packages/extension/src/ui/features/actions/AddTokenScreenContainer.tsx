@@ -8,15 +8,16 @@ import useSWR from "swr"
 import { ZodError } from "zod"
 
 import { getAccountIdentifier } from "../../../shared/wallet.service"
-import { useAppState } from "../../app.state"
-import { routes } from "../../routes"
+import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { useTokensInNetwork } from "../accountTokens/tokens.state"
 import { AddTokenScreen, AddTokenScreenSchemaType } from "./AddTokenScreen"
 import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { RequestToken } from "../../../shared/token/__new/types/token.model"
-import { tokenService } from "../../services/tokens"
+import { clientTokenService } from "../../services/tokens"
+import { useTokensInCurrentNetworkIncludingSpam } from "../accountTokens/tokens.state"
+import { mergeTokens } from "../../../shared/token/__new/repository/mergeTokens"
+import { selectedNetworkIdView } from "../../views/network"
 
 interface AddTokenScreenContainerProps {
   hideBackButton?: boolean
@@ -32,9 +33,9 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
   onReject,
 }) => {
   const navigate = useNavigate()
-  const { switcherNetworkId } = useAppState()
+  const selectedNetworkId = useView(selectedNetworkIdView)
   const account = useView(selectedAccountView)
-  const tokensInNetwork = useTokensInNetwork(switcherNetworkId)
+  const tokensInNetwork = useTokensInCurrentNetworkIncludingSpam()
   const toast = useToast()
   const [fetchedTokenAddress, setFetchedTokenAddress] = useState(
     defaultToken?.address,
@@ -60,22 +61,46 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
           getAccountIdentifier(account),
         ]
       : null,
-    () => tokenService.fetchDetails(fetchedTokenAddress, account?.networkId),
+    () =>
+      clientTokenService.fetchDetails(fetchedTokenAddress, account?.networkId),
     {
       revalidateOnFocus: false,
       shouldRetryOnError: false,
     },
   )
 
+  const tokenDetails = fetchedTokenDetails ?? defaultToken
+
+  const { isExistingToken, existingToken } = useMemo(() => {
+    if (!tokenDetails) {
+      return {
+        isExistingToken: false,
+      }
+    }
+    const existingToken = tokensInNetwork.find((token) =>
+      isEqualAddress(token.address, tokenDetails?.address),
+    )
+    const isExistingToken = Boolean(existingToken)
+    return {
+      isExistingToken,
+      existingToken,
+    }
+  }, [tokenDetails, tokensInNetwork])
+
   const onContinue = useCallback(
     async (token: AddTokenScreenSchemaType) => {
       try {
-        const addTokenData = {
+        /** merge existing token info to retain icon, tags etc. */
+        const rawTokenData = {
           ...token,
           address: addressSchema.parse(addAddressPadding(token.address)),
-          networkId: switcherNetworkId,
+          networkId: selectedNetworkId,
         }
-        await tokenService.addToken(addTokenData)
+
+        const addTokenData = isExistingToken
+          ? mergeTokens(rawTokenData, existingToken)
+          : rawTokenData
+        await clientTokenService.addToken(addTokenData)
         void onSubmit?.()
         navigate(routes.accountTokens())
         toast({
@@ -91,19 +116,15 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
         }
       }
     },
-    [navigate, onSubmit, switcherNetworkId, toast],
+    [
+      existingToken,
+      isExistingToken,
+      navigate,
+      onSubmit,
+      selectedNetworkId,
+      toast,
+    ],
   )
-
-  const tokenDetails = fetchedTokenDetails ?? defaultToken
-
-  const isExistingToken = useMemo(() => {
-    if (!tokenDetails) {
-      return false
-    }
-    return tokensInNetwork.some((token) =>
-      isEqualAddress(token.address, tokenDetails?.address),
-    )
-  }, [tokenDetails, tokensInNetwork])
 
   const error = fetchTokenError
     ? `Unable to validate token - please check that this is a valid ERC20 contract address for this network`

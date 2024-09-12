@@ -1,4 +1,4 @@
-import { JsonValue } from "./baseError"
+import { JsonValue } from "@argent/x-shared"
 
 export interface ErrorData<T> {
   code?: T

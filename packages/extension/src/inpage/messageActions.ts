@@ -19,6 +19,9 @@ export function waitForMessage<
   return new Promise((resolve, reject) => {
     const pid = setTimeout(() => reject(new Error("Timeout")), timeout)
     const handler = (event: MessageEvent<WindowMessageType>) => {
+      if (event.origin !== window.location.origin) {
+        return
+      }
       if (event.data.type === type && predicate(event.data as any)) {
         clearTimeout(pid)
         window.removeEventListener("message", handler)

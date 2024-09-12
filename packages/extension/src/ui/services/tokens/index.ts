@@ -1,4 +1,4 @@
-import { messageClient } from "../messaging/trpc"
-import { TokenService } from "./implementation"
+import { messageClient } from "../trpc"
+import { ClientTokenService } from "./ClientTokenService"
 
-export const tokenService = new TokenService(messageClient)
+export const clientTokenService = new ClientTokenService(messageClient)

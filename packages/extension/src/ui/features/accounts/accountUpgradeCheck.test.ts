@@ -28,7 +28,7 @@ describe("accountUpgradeCheck", () => {
     network = getMockNetwork({
       id: "localhost",
       name: "localhostNetwork",
-      chainId: "SN_GOERLI",
+      chainId: "SN_SEPOLIA",
       accountClassHash: {
         standard: "0x1234",
         multisig: "0x5678",

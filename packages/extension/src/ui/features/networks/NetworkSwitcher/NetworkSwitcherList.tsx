@@ -1,4 +1,4 @@
-import { B3, L2 } from "@argent/x-ui"
+import { B3, L2, buttonHoverStyle } from "@argent/x-ui"
 import { Flex, MenuItem, MenuList, MenuListProps } from "@chakra-ui/react"
 import { FC } from "react"
 
@@ -21,18 +21,13 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
     <MenuList {...rest}>
       {allNetworks.map(({ id, name, status, rpcUrl, readonly }) => {
         const isCurrent = id === currentNetwork.id
+        const extraProps = isCurrent ? buttonHoverStyle : {}
         return (
           <MenuItem
             key={id}
             onClick={() => onChangeNetwork(id)}
             data-testid={name}
-            sx={
-              isCurrent
-                ? {
-                    backgroundColor: "neutrals.600",
-                  }
-                : {}
-            }
+            {...extraProps}
             data-group
           >
             <Flex ml={"auto"} justifyContent={"flex-end"} alignItems={"center"}>
@@ -47,6 +42,10 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
                     color: "neutrals.100",
                     _groupHover: { color: "white" },
                   }}
+                  maxW={45}
+                  overflow="hidden"
+                  whiteSpace="nowrap"
+                  textOverflow="ellipsis"
                 >
                   {name}
                 </B3>
@@ -56,6 +55,10 @@ export const NetworkSwitcherList: FC<NetworkSwitcherListProps> = ({
                       color: "neutrals.100",
                       _groupHover: { color: "white" },
                     }}
+                    maxW={45}
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
                   >
                     {rpcUrl}
                   </L2>

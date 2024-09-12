@@ -1,5 +1,5 @@
 import { AccountActivity } from "@argent-x/extension/src/ui/features/accountActivity/AccountActivity"
-import { DailyActivity } from "@argent-x/extension/src/ui/features/accountActivity/useActivity"
+import { DailyActivity } from "@argent-x/extension/src/shared/activity/utils/transform/type"
 import { Account } from "@argent-x/extension/src/ui/features/accounts/Account"
 import { CellStack } from "@argent/x-ui"
 import { ComponentProps } from "react"

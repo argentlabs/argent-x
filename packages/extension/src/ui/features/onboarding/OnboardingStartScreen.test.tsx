@@ -7,11 +7,18 @@ describe("OnboardingStartScreen", () => {
   test("calls onCreate or onRestore when appropriate button is clicked", () => {
     const onCreate = vi.fn()
     const onRestore = vi.fn()
+    const onRestorePreset = vi.fn()
 
-    render(<OnboardingStartScreen onCreate={onCreate} onRestore={onRestore} />)
+    render(
+      <OnboardingStartScreen
+        onCreate={onCreate}
+        onRestore={onRestore}
+        onRestorePreset={onRestorePreset}
+      />,
+    )
 
     fireEvent.click(screen.getByText(/^Create/))
-    fireEvent.click(screen.getByText(/^Restore/))
+    fireEvent.click(screen.getByText(/^Restore an existing wallet/))
 
     expect(onCreate).toHaveBeenCalled()
     expect(onRestore).toHaveBeenCalled()

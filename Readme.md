@@ -38,9 +38,7 @@
 
 You can try the extension using our example dapp hosted at:
 
-[https://argentlabs.github.io/argent-x/](https://argentlabs.github.io/argent-x/)
-
-The example dapp is also contained in this repository.
+[https://github.com/argentlabs/starknetkit-example-dapp](https://github.com/argentlabs/starknetkit-example-dapp)
 
 ## 🌐 Usage with your dapp
 
@@ -138,13 +136,13 @@ For convenience this service can be started with [Docker desktop](https://www.do
 - For ARM computers (e.g. Mac computers with Apple silicon)
 
   ```bash
-  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-arm-seed0
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet-rs:0.0.7-arm-seed0
   ```
 
 - Otherwise
 
   ```bash
-  docker run -it -p 5050:5050 shardlabs/starknet-devnet:latest-seed0
+  docker run -it -p 5050:5050 shardlabs/starknet-devnet-rs:0.0.7-seed0
   ```
 
 ### Run tests

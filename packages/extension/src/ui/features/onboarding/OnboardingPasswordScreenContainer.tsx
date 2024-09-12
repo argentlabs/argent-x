@@ -1,42 +1,37 @@
-import { useNavigateBack } from "@argent/x-ui"
 import { FC, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { defaultNetwork } from "../../../shared/network"
-import { routes } from "../../routes"
-import { clientAccountService } from "../../services/account"
-import { OnboardingPasswordScreen } from "./OnboardingPasswordScreen"
+import { routes } from "../../../shared/ui/routes"
 import { sessionService } from "../../services/session"
+import { OnboardingPasswordScreen } from "./OnboardingPasswordScreen"
+import { ampli } from "../../../shared/analytics"
+import { useOnboardingExperiment } from "../../services/onboarding/useOnboardingExperiment"
 
 export const OnboardingPasswordScreenContainer: FC = () => {
   const navigate = useNavigate()
-  const onBack = useNavigateBack()
+  const { onboardingExperimentCohort } = useOnboardingExperiment()
 
-  // NOTE: no need to pull this from any state, as the extension was not setup yet, so defaultNetwork is fine
-  // we should still get rid of useAppState and any generic global state
-  const networkId = defaultNetwork.id
+  const onBack = useCallback(() => {
+    navigate(routes.onboardingPrivacy("password"))
+  }, [navigate])
 
-  const handleDeploy = useCallback(
+  const handleSubmit = useCallback(
     async (password: string) => {
       await sessionService.startSession(password)
-
-      const newAccount = await clientAccountService.create(
-        "standard",
-        networkId,
-      )
-
-      await clientAccountService.select(newAccount)
-
-      return navigate(routes.onboardingFinish.path, { replace: true })
+      ampli.onboardingPasswordSet({
+        "wallet platform": "browser extension",
+        "onboarding experiment": onboardingExperimentCohort,
+      })
+      return navigate(routes.onboardingAccountType.path, { replace: true })
     },
-    [navigate, networkId],
+    [navigate, onboardingExperimentCohort],
   )
 
   return (
     <OnboardingPasswordScreen
       onBack={onBack}
       title={"New wallet"}
-      onSubmit={handleDeploy}
+      onSubmit={handleSubmit}
     />
   )
 }

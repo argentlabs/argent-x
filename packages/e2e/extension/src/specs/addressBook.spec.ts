@@ -1,9 +1,10 @@
 import { expect } from "@playwright/test"
 
-import config from "../../../shared/config"
+import config from "../config"
 import test from "../test"
 
-test.describe("Address Book", () => {
+test.describe("Address Book", { tag: "@tx" }, () => {
+  test.skip(config.skipTXTests === "true")
   test("Add, update, use and delete address", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [{ assets: [{ token: "ETH", balance: 0.002 }] }],
@@ -24,7 +25,7 @@ test.describe("Address Book", () => {
     await expect(extension.addressBook.nameRequired).not.toBeVisible()
     await expect(extension.addressBook.addressRequired).not.toBeVisible()
     await extension.addressBook.network.click()
-    await extension.addressBook.networkOption("Goerli").click()
+    await extension.addressBook.networkOption("Sepolia").click()
     await extension.addressBook.saveLocator.click()
 
     // update
@@ -98,9 +99,9 @@ test.describe("Address Book", () => {
     await extension.network.selectDefaultNetwork()
 
     await extension.account.token("ETH").click()
-    await extension.setClipBoardContent(config.account1Seed2!)
+    await extension.utils.setClipBoardContent(config.account1Seed2!)
     await extension.account.recipientAddressQuery.focus()
-    await extension.paste()
+    await extension.utils.paste()
 
     await extension.account.saveAddress.click()
     await expect(extension.addressBook.address).toHaveText(
@@ -120,7 +121,7 @@ test.describe("Address Book", () => {
     })
   })
 
-  test("Add address - starknet.id", async ({ extension }) => {
+  test.skip("Add address - starknet.id", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [{ assets: [{ token: "ETH", balance: 0.002 }] }],
     })

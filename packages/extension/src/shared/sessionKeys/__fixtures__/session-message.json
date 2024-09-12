@@ -1,0 +1,69 @@
+{
+  "domain": {
+    "chainId": "0x534e5f5345504f4c4941",
+    "name": "SessionAccount.session",
+    "revision": "1",
+    "version": "0x31"
+  },
+  "message": {
+    "Allowed Methods": [
+      {
+        "Contract Address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "selector": "transfer"
+      }
+    ],
+    "Expires At": 1718722046,
+    "Metadata": "{\"projectID\":\"test-dapp\",\"txFees\":[{\"tokenAddress\":\"0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7\",\"maxAmount\":\"100000000000000000\"}]}",
+    "Session Key": "0x5000d0fb7b4b8e10372de61efb762f62a92cbbfcc7b5e3492e05166f91b6175"
+  },
+  "primaryType": "Session",
+  "types": {
+    "Allowed Method": [
+      {
+        "name": "Contract Address",
+        "type": "ContractAddress"
+      },
+      {
+        "name": "selector",
+        "type": "selector"
+      }
+    ],
+    "Session": [
+      {
+        "name": "Expires At",
+        "type": "timestamp"
+      },
+      {
+        "contains": "Allowed Method",
+        "name": "Allowed Methods",
+        "type": "merkletree"
+      },
+      {
+        "name": "Metadata",
+        "type": "string"
+      },
+      {
+        "name": "Session Key",
+        "type": "felt"
+      }
+    ],
+    "StarknetDomain": [
+      {
+        "name": "name",
+        "type": "shortstring"
+      },
+      {
+        "name": "version",
+        "type": "shortstring"
+      },
+      {
+        "name": "chainId",
+        "type": "shortstring"
+      },
+      {
+        "name": "revision",
+        "type": "shortstring"
+      }
+    ]
+  }
+}

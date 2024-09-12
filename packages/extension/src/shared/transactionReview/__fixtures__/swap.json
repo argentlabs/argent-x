@@ -2,34 +2,24 @@
   "transactions": [
     {
       "reviewOfTransaction": {
-        "assessment": "warn",
-        "warnings": [
-          {
-            "reason": "amount_mismatch_too_high",
-            "details": {},
-            "severity": "info"
-          }
-        ],
+        "assessment": "neutral",
+        "warnings": [],
         "targetedDapp": {
-          "name": "JediSwap",
-          "description": "A community-led fully permissionless and composable AMM on Starknet.",
-          "logoUrl": "https://www.dappland.com/dapps/jediswap/dapp-icon-jediswap.png",
-          "iconUrl": "https://www.dappland.com/dapps/jediswap/dapp-icon-jediswap.png",
+          "name": "AVNU",
+          "description": "Best execution on Starknet. No fluff.",
+          "logoUrl": "https://static.argent.net/dapp/logos/57c19c8d-c95d-4daf-8c58-48862565e60c.jpg",
+          "iconUrl": "https://static.argent.net/dapp/logos/57c19c8d-c95d-4daf-8c58-48862565e60c.jpg",
           "argentVerified": true,
           "links": [
-            {
-              "name": "website",
-              "url": "https://jediswap.xyz/",
-              "position": 1
-            },
+            { "name": "website", "url": "https://avnu.fi", "position": 1 },
             {
               "name": "twitter",
-              "url": "https://twitter.com/jediswap",
+              "url": "https://twitter.com/avnu_fi",
               "position": 2
             },
             {
               "name": "discord",
-              "url": "https://discord.gg/jediswap",
+              "url": "https://discord.gg/invite/avnu-fi",
               "position": 3
             }
           ]
@@ -53,16 +43,16 @@
                     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
                     "type": "ERC20"
                   },
-                  "amount": "9771066479645102",
-                  "usd": "21.85",
+                  "amount": "569838942266359",
+                  "usd": "2.15",
                   "editable": true
                 },
                 {
                   "type": "address",
                   "label": "ERC20_approve_to",
-                  "address": "0x02bcc885342ebbcbcd170ae6cafa8a4bed22bb993479f49806e72d96af94c965",
-                  "addressName": "JediSwap: AMM Swap",
-                  "verified": true
+                  "address": "0x04270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+                  "addressName": "AVNU: Exchange",
+                  "verified": false
                 }
               ],
               "defaultProperties": [
@@ -84,29 +74,23 @@
                   "label": "default_call",
                   "entrypoint": "approve",
                   "calldata": [
-                    "1238176885782598120369776599988227623713703144193463695957844450027561601381",
-                    "9771066479645102",
-                    "0"
+                    "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+                    "0x20643f7bba3f7",
+                    "0x0"
                   ]
                 }
               ]
             }
           },
           {
-            "assessment": "warn",
-            "warnings": [
-              {
-                "reason": "amount_mismatch_too_high",
-                "details": {},
-                "severity": "info"
-              }
-            ],
+            "assessment": "neutral",
+            "warnings": [],
             "action": {
-              "name": "Jediswap_swap",
+              "name": "Avnu_swap",
               "properties": [
                 {
                   "type": "amount",
-                  "label": "Jediswap_swap_pay_token",
+                  "label": "Avnu_swap_pay_token",
                   "token": {
                     "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
                     "name": "Ether",
@@ -116,34 +100,45 @@
                     "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
                     "type": "ERC20"
                   },
-                  "amount": "9771066479645102",
-                  "usd": "21.85",
+                  "amount": "569838942266359",
+                  "usd": "2.15",
                   "editable": false
                 },
                 {
                   "type": "amount",
-                  "label": "Jediswap_swap_receive_token",
+                  "label": "Avnu_swap_receive_token",
                   "token": {
-                    "address": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
-                    "name": "Goerli USD Coin",
-                    "symbol": "USDC",
-                    "decimals": 6,
+                    "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+                    "name": "DAI",
+                    "symbol": "DAI",
+                    "decimals": 18,
                     "unknown": false,
-                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
                     "type": "ERC20"
                   },
-                  "amount": "329694585016",
-                  "usd": "329724.92",
+                  "amount": "2141103864757319833",
+                  "usd": "2.14",
                   "editable": false
                 },
                 {
-                  "type": "timestamp",
-                  "label": "Jediswap_swap_deadline",
-                  "value": "1698229751"
+                  "type": "amount",
+                  "label": "Avnu_swap_receive_min_token",
+                  "token": {
+                    "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+                    "name": "DAI",
+                    "symbol": "DAI",
+                    "decimals": 18,
+                    "unknown": false,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
+                    "type": "ERC20"
+                  },
+                  "amount": "2130398345433533233",
+                  "usd": "2.13",
+                  "editable": false
                 },
                 {
                   "type": "address",
-                  "label": "Jediswap_swap_recipient",
+                  "label": "Avnu_swap_recipient",
                   "address": "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
                   "verified": false
                 }
@@ -152,24 +147,33 @@
                 {
                   "type": "address",
                   "label": "default_contract",
-                  "address": "0x02bcc885342ebbcbcd170ae6cafa8a4bed22bb993479f49806e72d96af94c965",
-                  "addressName": "JediSwap: AMM Swap",
-                  "verified": true
+                  "address": "0x04270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+                  "addressName": "AVNU: Exchange",
+                  "verified": false
                 },
                 {
                   "type": "calldata",
                   "label": "default_call",
-                  "entrypoint": "swap_exact_tokens_for_tokens",
+                  "entrypoint": "multi_route_swap",
                   "calldata": [
-                    "9771066479645102",
-                    "0",
-                    "329694585016",
-                    "0",
-                    "2",
-                    "2087021424722619777119509474943472645767659996348769578120564519014510906823",
-                    "159707947995249021625440365289670166666892266109381225273086299925265990694",
-                    "2689035213040902571798644155430358178496847363710771602620498934381075712549",
-                    "1698229751"
+                    "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "0x20643f7bba3f7",
+                    "0x0",
+                    "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+                    "0x1db6ba9ef6137899",
+                    "0x0",
+                    "0x1d90b20201a54b31",
+                    "0x0",
+                    "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+                    "0x0",
+                    "0x3e90652c3fe1f5f42578ffefca7fb00c88d4d18b5fb2bbeeee1a0d0d7d7d82d",
+                    "0x1",
+                    "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+                    "0x10884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28",
+                    "0x64",
+                    "0x1",
+                    "0x2"
                   ]
                 }
               ]
@@ -178,16 +182,199 @@
         ]
       },
       "simulation": {
-        "approvals": [],
-        "transfers": [],
-        "summary": [],
-        "calculatedNonce": "0x34",
+        "approvals": [
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "owner": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "spender": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "value": "569838942266359",
+            "usdValue": "2.15",
+            "approvalForAll": false,
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "owner": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "spender": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "value": "0",
+            "usdValue": "0.00",
+            "approvalForAll": false,
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "owner": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "spender": "0x10884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28",
+            "value": "569838942266359",
+            "usdValue": "2.15",
+            "approvalForAll": false,
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "owner": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "spender": "0x10884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28",
+            "value": "0",
+            "usdValue": "0.00",
+            "approvalForAll": false,
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          }
+        ],
+        "transfers": [
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "from": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "to": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "value": "569838942266359",
+            "usdValue": "2.15",
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "from": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "to": "0x10884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28",
+            "value": "569838942266359",
+            "usdValue": "2.15",
+            "details": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+            "from": "0x10884171baf1914edc28d7afb619b40a4051cfae78a094a55d230f19e944a28",
+            "to": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "value": "2141532171191557246",
+            "usdValue": "2.14",
+            "details": {
+              "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+              "name": "DAI",
+              "symbol": "DAI",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+            "from": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "to": "0x360fb3a51bd291e5db0892b6249918a5689bc61760adcb350fe39cd725e1d22",
+            "value": "428306434238311",
+            "usdValue": "0.00",
+            "details": {
+              "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+              "name": "DAI",
+              "symbol": "DAI",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "tokenAddress": "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+            "from": "0x4270219d365d6b017231b52e92b3fb5d7c8378b05e9abc97724537a80e93b0f",
+            "to": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "value": "2141103864757318935",
+            "usdValue": "2.14",
+            "details": {
+              "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+              "name": "DAI",
+              "symbol": "DAI",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
+              "type": "ERC20"
+            }
+          }
+        ],
+        "summary": [
+          {
+            "type": "transfer",
+            "label": "simulation_summary_send",
+            "value": "569838942266359",
+            "usdValue": "2.15",
+            "token": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            },
+            "sent": true
+          },
+          {
+            "type": "transfer",
+            "label": "simulation_summary_receive",
+            "value": "2141103864757318935",
+            "usdValue": "2.14",
+            "token": {
+              "address": "0x00da114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+              "name": "DAI",
+              "symbol": "DAI",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/mcd.png",
+              "type": "ERC20"
+            },
+            "sent": false
+          }
+        ],
+        "calculatedNonce": "0x2d",
         "feeEstimation": {
-          "overallFee": "1678000015102",
-          "gasPrice": "1000000009",
-          "gasUsage": "1678",
+          "overallFee": "806072340913490",
+          "gasPrice": "80246126522",
+          "gasUsage": "10045",
           "unit": "WEI",
-          "maxFee": "3356011345043"
+          "maxFee": "1612144692830385"
         }
       }
     }

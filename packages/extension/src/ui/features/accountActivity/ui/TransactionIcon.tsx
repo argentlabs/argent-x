@@ -1,18 +1,16 @@
-import { icons } from "@argent/x-ui"
+import { getTokenIconUrl, iconsDeprecated } from "@argent/x-ui"
 import { Circle, Image, SquareProps } from "@chakra-ui/react"
 import { FC } from "react"
 
-import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
+import { ActivityTransactionFailureReason } from "../../../../shared/activity/utils/transform/getTransactionFailureReason"
 import {
-  isProvisionTransaction,
   isSwapTransaction,
   isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
-} from "../transform/is"
-import { TransformedTransaction } from "../transform/type"
+} from "../../../../shared/activity/utils/transform/is"
+import { TransformedTransaction } from "../../../../shared/activity/utils/transform/type"
 import { DappIconContainer } from "../../actions/connectDapp/DappIconContainer"
-import { ActivityTransactionFailureReason } from "../getTransactionFailureReason"
 
 const {
   DocumentIcon,
@@ -23,31 +21,30 @@ const {
   NftIcon,
   SwapIcon,
   ActivityIcon,
-  ArgentShieldIcon,
-  ArgentShieldDeactivateIcon,
+  SmartAccountActiveIcon,
+  SmartAccountInactiveIcon,
   MultisigJoinIcon,
   MultisigRemoveIcon,
   MultisigReplaceIcon,
   FailIcon,
-  ParachuteIcon,
-} = icons
+  CloseIcon,
+} = iconsDeprecated
 
-export interface TransactionIconProps extends Omit<SquareProps, "outline"> {
+export interface TransactionIconContainerProps
+  extends Omit<SquareProps, "outline"> {
   transaction: TransformedTransaction
   outline?: boolean
   failureReason?: ActivityTransactionFailureReason
   size?: number
 }
 
-export const TransactionIcon: FC<TransactionIconProps> = ({
+export const TransactionIconContainer: FC<TransactionIconContainerProps> = ({
   transaction,
   size = 18,
   outline = false,
   failureReason,
   ...rest
 }) => {
-  const badgeSize = Math.min(32, Math.round((size * 16) / 36))
-  const iconSize = Math.round((4 * (size * 16)) / 36)
   const { action, entity, dapp } = transaction
   let iconComponent = <ActivityIcon />
   let badgeComponent
@@ -57,7 +54,11 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
       break
     case "GUARDIAN":
       iconComponent =
-        action === "ADD" ? <ArgentShieldIcon /> : <ArgentShieldDeactivateIcon />
+        action === "ADD" ? (
+          <SmartAccountActiveIcon />
+        ) : (
+          <SmartAccountInactiveIcon />
+        )
       break
     case "SIGNER":
       iconComponent =
@@ -93,8 +94,8 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     case "APPROVE":
       iconComponent = <ApproveIcon />
       break
-    case "PROVISION":
-      iconComponent = <ParachuteIcon />
+    case "REJECT_ON_CHAIN":
+      iconComponent = <CloseIcon />
       break
   }
 
@@ -105,8 +106,7 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   if (
     isTokenTransferTransaction(transaction) ||
     isTokenMintTransaction(transaction) ||
-    isTokenApproveTransaction(transaction) ||
-    isProvisionTransaction(transaction)
+    isTokenApproveTransaction(transaction)
   ) {
     const { token } = transaction
     if (token) {
@@ -130,15 +130,43 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
     badgeComponent = <DappIconContainer host={dapp.hosts[0]} />
   }
   return (
+    <TransactionIcon
+      iconComponent={failureReason ? <FailIcon /> : iconComponent}
+      badgeComponent={badgeComponent}
+      size={size}
+      outline={outline}
+      {...rest}
+    />
+  )
+}
+
+export interface TransactionIconProps extends Omit<SquareProps, "outline"> {
+  iconComponent?: JSX.Element
+  badgeComponent?: JSX.Element
+  outline?: boolean
+  size?: number
+}
+
+export const TransactionIcon: FC<TransactionIconProps> = ({
+  iconComponent,
+  badgeComponent,
+  outline,
+  size = 18,
+  ...rest
+}: TransactionIconProps) => {
+  const badgeSize = Math.min(32, Math.round((size * 16) / 36))
+  const iconSize = Math.round((4 * (size * 16)) / 36)
+
+  return (
     <Circle
       size={size}
       border={outline ? `1px solid white` : undefined}
-      position={"relative"}
       bg={"neutrals.600"}
       fontSize={iconSize}
+      position={"relative"}
       {...rest}
     >
-      {failureReason ? <FailIcon /> : iconComponent}
+      {iconComponent}
       {badgeComponent && (
         <Circle
           overflow={"hidden"}

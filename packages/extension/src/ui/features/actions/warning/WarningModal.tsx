@@ -1,4 +1,15 @@
-import { Button, icons, H6, B3, P4, L1 } from "@argent/x-ui"
+import { pluralise, type ITransactionReviewWarning } from "@argent/x-shared"
+import type { Warning } from "@argent/x-shared/simulation"
+import {
+  B3,
+  Button,
+  H6,
+  L1,
+  P4,
+  iconsDeprecated,
+  scrollbarStyleThin,
+  riskToSemanticTokenMap,
+} from "@argent/x-ui"
 import {
   Badge,
   Flex,
@@ -8,109 +19,114 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  ModalProps,
 } from "@chakra-ui/react"
 import { FC } from "react"
-import { Warning } from "../../../../shared/transactionReview/schema"
-import {
-  riskToBadgeMap,
-  riskToColorMap,
-  riskToInvertedColorMap,
-  warningMap,
-} from "./warningMap"
 
-const { AlertFillIcon } = icons
-interface WarningModalProps {
-  isOpen: boolean
+import { riskToBadgeMap, riskToColorSchemeMap } from "./warningMap"
+
+const { AlertFillIcon } = iconsDeprecated
+
+export type WarningsByReason = Record<string, ITransactionReviewWarning>
+
+export interface WarningModalProps extends Omit<ModalProps, "children"> {
   onReject?: () => void
-  onClose: () => void
-  color: string
-  warnings: Warning[]
   highestSeverityWarning: Warning
+  warningsByReason: WarningsByReason
+  warnings: Warning[]
 }
 
 export const WarningModal: FC<WarningModalProps> = ({
-  isOpen,
   onReject,
   onClose,
-  color,
   warnings,
   highestSeverityWarning,
+  warningsByReason,
+  ...rest
 }) => {
-  const title = `${warnings.length} risk${
-    warnings.length === 1 ? "" : "s"
-  } identified`
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      isCentered
-      size="xs"
-      data-testid="warning-modal"
-    >
-      <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
+  const semanticToken = riskToSemanticTokenMap[highestSeverityWarning.severity]
+  const risks = pluralise(warnings.length, "risk")
 
-      <ModalContent background="neutrals.700" borderRadius="2xl">
-        <ModalHeader flexDir="column" pb={1} px={4} title={title}>
-          <Flex justifyContent="center">
-            <AlertFillIcon color={color} width={10} height={10} />
-          </Flex>
-          <H6 fontWeight="600" textAlign="center" mt={2}>
+  const title = `${risks} identified`
+
+  return (
+    <Modal onClose={onClose} isCentered data-testid="warning-modal" {...rest}>
+      <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
+      <ModalContent
+        color="text-primary"
+        bgColor="surface-elevated"
+        rounded="2xl"
+        py={5}
+        w={312}
+        gap={5}
+      >
+        <ModalHeader
+          display="flex"
+          alignItems="center"
+          px={4}
+          flexDir="column"
+          p={0}
+          title={title}
+          gap={1}
+        >
+          <AlertFillIcon color={semanticToken} width={10} height={10} />
+          <H6 fontWeight="bold" textAlign="center">
             {title}
           </H6>
+        </ModalHeader>
+        <ModalBody
+          display="flex"
+          flexDirection="column"
+          p={0}
+          maxHeight={350}
+          overflowY={"auto"}
+          gap={2}
+          sx={scrollbarStyleThin}
+        >
           {highestSeverityWarning.severity === "critical" && (
             <Flex
               flexDir="column"
               p={2}
               px={4}
               borderRadius={8}
-              backgroundColor={color}
-              mt={3}
+              backgroundColor={semanticToken}
+              mx={4}
             >
-              <L1 color="white" textAlign="center">
+              <L1 color="white.white" textAlign="center">
                 We strongly recommend you do not proceed with this transaction
               </L1>
             </Flex>
           )}
-        </ModalHeader>
-        <ModalBody px={4} maxHeight={350} overflowY={"auto"}>
           {warnings.map((warning, index) => (
             <Flex
               key={`warning-${index}`}
               flexDir="column"
               p={3}
-              my={1}
               borderRadius={8}
-              border="1px solid var(--neutrals-600, #595959)"
+              border="1px solid"
+              borderColor="stroke-default-web"
+              mx={4}
+              alignItems="flex-start"
             >
               <Badge
-                backgroundColor={riskToColorMap[warning.severity]}
-                color={riskToInvertedColorMap[warning.severity]}
-                textTransform="none"
-                maxWidth="fit-content"
+                colorScheme={riskToColorSchemeMap[warning.severity]}
                 my={1}
               >
                 {riskToBadgeMap[warning.severity]}
               </Badge>
-              <B3 my={1} color="white">
-                {warningMap[warning.reason].title}
-              </B3>
-              <P4 my={1} color="white">
-                {warningMap[warning.reason].description(
-                  warning?.details?.reason,
-                )}
-              </P4>
+              <B3 my={1}>{warningsByReason[warning.reason].title}</B3>
+              <P4 my={1}>{warningsByReason[warning.reason].description}</P4>
             </Flex>
           ))}
         </ModalBody>
-
-        <ModalFooter flexDirection="row" gap="3">
-          <Button w="100%" onClick={onReject}>
+        <ModalFooter p={0} gap="2" px={4}>
+          <Button w="full" size="sm" onClick={onReject} colorScheme="secondary">
             Cancel
           </Button>
           <Button
-            w="100%"
-            backgroundColor={riskToColorMap[highestSeverityWarning.severity]}
-            color={riskToInvertedColorMap[highestSeverityWarning.severity]}
+            w="full"
+            size="sm"
+            colorScheme={riskToColorSchemeMap[highestSeverityWarning.severity]}
             onClick={onClose}
             px={12}
           >

@@ -1,7 +1,8 @@
 import { defaultNetwork } from "../../../../shared/network"
-import { useAppState } from "../../../app.state"
+import { useView } from "../../../views/implementation/react"
+import { selectedNetworkIdView } from "../../../views/network"
 
 export const useIsDefaultNetwork = () => {
-  const { switcherNetworkId } = useAppState()
-  return switcherNetworkId === defaultNetwork.id
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  return selectedNetworkId === defaultNetwork.id
 }

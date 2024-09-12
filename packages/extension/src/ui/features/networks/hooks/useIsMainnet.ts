@@ -1,6 +1,7 @@
-import { useAppState } from "../../../app.state"
+import { selectedNetworkIdView } from "../../../views/network"
+import { useView } from "../../../views/implementation/react"
 
 export const useIsMainnet = () => {
-  const { switcherNetworkId } = useAppState()
-  return switcherNetworkId === "mainnet-alpha"
+  const selectedNetworkId = useView(selectedNetworkIdView)
+  return selectedNetworkId === "mainnet-alpha"
 }

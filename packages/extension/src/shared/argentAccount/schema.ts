@@ -13,9 +13,8 @@ export const preferencesEndpointPayload = z.object({
 
 export type PreferencesPayload = z.infer<typeof preferencesEndpointPayload>
 
-export const emailPreferencesSchema = z.object({
-  isNewsletterEnabled: z.boolean(),
-  isAnnouncementsEnabled: z.boolean(),
-})
+export const flowSchema = z
+  .enum(["toggleSmartAccount", "argentAccount", "createSmartAccount"])
+  .default("toggleSmartAccount")
 
-export type EmailPreferences = z.infer<typeof emailPreferencesSchema>
+export type Flow = z.infer<typeof flowSchema>

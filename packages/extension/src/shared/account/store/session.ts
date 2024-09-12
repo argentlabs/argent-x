@@ -1,6 +1,6 @@
 import { ObjectStorage } from "../../storage"
 import { adaptObjectStorage } from "../../storage/__new/object"
-import { WalletSession } from "../service/shared.service"
+import { WalletSession } from "../service/accountSharedService/WalletAccountSharedService"
 
 /**
  * @deprecated use `sessionRepo` instead

@@ -3,7 +3,7 @@ import {
   BarIconButton,
   CellStack,
   NavigationContainer,
-  icons,
+  iconsDeprecated,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { isEmpty, some } from "lodash-es"
@@ -11,23 +11,19 @@ import { FC, ReactEventHandler } from "react"
 
 import { PendingMultisig } from "../../../shared/multisig/types"
 import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { MultisigListAccounts } from "../multisig/MultisigListAccounts"
 import { Account } from "./Account"
+import { AccountListFooterContainer } from "./AccountListFooterContainer"
 import { AccountListScreenItemContainer } from "./AccountListScreenItemContainer"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 import { GroupedAccountList } from "./GroupedAccountList"
-import { HiddenAccountsBarContainer } from "./HiddenAccountsBar"
-import { AccountListItemSkeleton } from "./AccountListItemSkeleton"
 
-const { AddIcon, WalletIcon, MultisigIcon } = icons
+const { AddIcon, WalletIcon, MultisigIcon } = iconsDeprecated
 
 interface AccountListScreenProps {
-  isLoading: boolean
-  deprecatedAccounts: Account[]
+  deprecatedAccounts?: Account[] // deprecated accounts are different from upgradeable accounts. Should remove this prop in future
   hiddenAccounts: BaseWalletAccount[]
   hiddenPendingMultisigs: PendingMultisig[]
   multisigAccounts: Account[]
-  accounts: Account[]
   onAdd: () => void
   onClose: ReactEventHandler
   pendingMultisigs: PendingMultisig[]
@@ -39,12 +35,10 @@ interface AccountListScreenProps {
 }
 
 export const AccountListScreen: FC<AccountListScreenProps> = ({
-  isLoading,
-  deprecatedAccounts,
+  deprecatedAccounts = [],
   hiddenAccounts,
   hiddenPendingMultisigs,
   multisigAccounts,
-  accounts,
   onAdd,
   onClose,
   pendingMultisigs,
@@ -60,13 +54,21 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
   const hasMultisigAccounts =
     !isEmpty(multisigAccounts) || !isEmpty(pendingMultisigs)
 
+  const hasStandardAccounts = !isEmpty(standardAccounts)
+
+  const hasAccounts = hasStandardAccounts || hasMultisigAccounts
+
+  const hasDeprecatedAccounts = some(deprecatedAccounts)
+
   const hasMultipleAccountTypes =
     !isEmpty(standardAccounts) && hasMultisigAccounts
 
-  const hasOnlyMultisigAccounts =
-    hasMultisigAccounts && isEmpty(standardAccounts)
+  const showMultisigGroupTitle =
+    hasMultipleAccountTypes || multisigAccounts.length > 1
 
-  const hasDeprecatedAccounts = some(deprecatedAccounts)
+  const showStandardGroupTitle =
+    hasMultipleAccountTypes || multisigAccounts.length > 1
+
   return (
     <>
       <NavigationContainer
@@ -78,69 +80,50 @@ export const AccountListScreen: FC<AccountListScreenProps> = ({
           </BarIconButton>
         }
       >
-        {isLoading ? (
-          <CellStack pt={0}>
-            <AccountListItemSkeleton />
-            <AccountListItemSkeleton />
-            <AccountListItemSkeleton />
-          </CellStack>
-        ) : (
-          <CellStack pt={0}>
-            {hasMultipleAccountTypes ? (
-              <Flex direction="column" gap={6}>
-                <GroupedAccountList
-                  title="Standard Accounts"
-                  accounts={standardAccounts}
-                  icon={<WalletIcon w={4} h={4} />}
-                  selectedAccount={selectedAccount}
-                  returnTo={returnTo}
-                  type="standard"
-                />
-                <GroupedAccountList
-                  title="Multisig Accounts"
-                  accounts={multisigAccounts}
-                  icon={<MultisigIcon w={4} h={4} />}
-                  selectedAccount={selectedAccount}
-                  returnTo={returnTo}
-                  type="multisig"
-                  pendingMultisigs={visiblePendingMultisigs}
-                />
-              </Flex>
-            ) : hasOnlyMultisigAccounts ? (
-              <MultisigListAccounts
-                accounts={accounts}
-                pendingMultisigs={visiblePendingMultisigs}
+        <CellStack pt={0}>
+          <Flex direction="column" gap={6}>
+            {hasStandardAccounts && (
+              <GroupedAccountList
+                title="My accounts"
+                accounts={standardAccounts}
+                icon={<WalletIcon w={4} h={4} />}
                 selectedAccount={selectedAccount}
                 returnTo={returnTo}
+                type="standard"
+                showTitle={showStandardGroupTitle}
               />
-            ) : (
-              standardAccounts.map((account) => (
+            )}
+            {hasMultisigAccounts && (
+              <GroupedAccountList
+                title="Multisig Accounts"
+                accounts={multisigAccounts}
+                icon={<MultisigIcon w={4} h={4} />}
+                selectedAccount={selectedAccount}
+                returnTo={returnTo}
+                type="multisig"
+                pendingMultisigs={visiblePendingMultisigs}
+                showTitle={showMultisigGroupTitle}
+              />
+            )}
+          </Flex>
+          {hasDeprecatedAccounts && (
+            <>
+              <DeprecatedAccountsWarning />
+              {deprecatedAccounts.map((account) => (
                 <AccountListScreenItemContainer
                   key={account.address}
                   account={account}
                   selectedAccount={selectedAccount}
                   returnTo={returnTo}
                 />
-              ))
-            )}
-            {hasDeprecatedAccounts && (
-              <>
-                <DeprecatedAccountsWarning />
-                {deprecatedAccounts.map((account) => (
-                  <AccountListScreenItemContainer
-                    key={account.address}
-                    account={account}
-                    selectedAccount={selectedAccount}
-                    returnTo={returnTo}
-                    needsUpgrade
-                  />
-                ))}
-              </>
-            )}
-          </CellStack>
-        )}
+              ))}
+            </>
+          )}
+        </CellStack>
       </NavigationContainer>
-      {hasHiddenAccounts && <HiddenAccountsBarContainer />}
+      <AccountListFooterContainer
+        isHiddenAccounts={!hasAccounts && hasHiddenAccounts}
+      />
     </>
   )
 }

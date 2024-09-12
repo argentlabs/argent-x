@@ -1,20 +1,25 @@
-import { icons } from "@argent/x-ui"
+import {
+  iconsDeprecated,
+  buttonBaseStyle,
+  buttonHoverStyle,
+  scrollbarStyleThin,
+} from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { FC, useCallback } from "react"
 import ReactSelect, {
-  ControlProps,
-  MenuListProps,
-  MenuProps,
-  OptionProps,
-  SingleValue,
-  SingleValueProps,
-  ValueContainerProps,
+  type ControlProps,
+  type MenuListProps,
+  type MenuProps,
+  type OptionProps,
+  type SingleValue,
+  type SingleValueProps,
+  type ValueContainerProps,
 } from "react-select"
 
 import { AccountListItem } from "./AccountListItem"
 import type { AccountListItemProps } from "./accountListItem.model"
 
-const { ChevronDownIcon } = icons
+const { ChevronDownIcon } = iconsDeprecated
 
 const Control = ({
   children,
@@ -24,9 +29,12 @@ const Control = ({
   return (
     <Flex
       {...innerProps}
-      backgroundColor={isFocused ? "neutrals.700" : "neutrals.800"}
+      boxShadow={
+        isFocused ? buttonHoverStyle.boxShadow : buttonBaseStyle.boxShadow
+      }
+      backgroundColor={"surface-elevated"}
       rounded={"lg"}
-      _hover={{ bg: "neutrals.700" }}
+      _hover={{ boxShadow: buttonHoverStyle.boxShadow }}
       transitionProperty={"common"}
       transitionDuration={"fast"}
       cursor={"pointer"}
@@ -91,6 +99,7 @@ const MenuList = ({
       position={"relative"}
       boxShadow={"menu"}
       mt={2}
+      sx={scrollbarStyleThin}
     >
       {children}
     </Box>
@@ -117,9 +126,12 @@ const Option = ({
         _active={{
           transform: false,
         }}
-        backgroundColor={
-          isFocused || isSelected ? "neutrals.600" : "neutrals.800"
+        boxShadow={
+          isFocused || isSelected
+            ? buttonHoverStyle.boxShadow
+            : buttonBaseStyle.boxShadow
         }
+        backgroundColor={"surface-elevated"}
       />
     </Box>
   )

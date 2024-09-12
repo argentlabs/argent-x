@@ -1,4 +1,4 @@
-import { B3, H6, icons } from "@argent/x-ui"
+import { B3, H6, iconsDeprecated } from "@argent/x-ui"
 import {
   Modal,
   ModalContent,
@@ -21,7 +21,7 @@ import { useCallback, useState } from "react"
 import { isAllowedNumericInputValue } from "@argent/x-shared"
 import { isNumber } from "lodash-es"
 
-const { AddIcon, RemoveIcon, TickIcon } = icons
+const { AddIcon, RemoveIcon, TickIcon } = iconsDeprecated
 
 const MAX_SLIPPAGE = 10000
 
@@ -60,7 +60,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="xs">
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
-      <ModalContent background="neutrals.700" borderRadius="2xl">
+      <ModalContent background="surface-elevated" borderRadius="2xl">
         <ModalHeader>
           <Flex justifyContent="space-between" alignItems="center" px="1">
             <H6 color="color">Edit max slippage</H6>
@@ -70,7 +70,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
         <ModalBody>
           <Flex
             gap="0"
-            bg="neutrals.900"
+            bg="surface-default"
             border="1px solid"
             borderColor="neutrals.600"
             borderRadius="lg"
@@ -89,7 +89,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
             />
             <InputGroup
               flexGrow="1"
-              bgColor="neutrals.900"
+              bg="surface-default"
               justifyContent="center"
               alignItems="center"
               borderLeft="1px solid"
@@ -99,7 +99,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
             >
               <Input
                 type="number"
-                bg="neutrals.900"
+                bg="surface-default"
                 value={localSlippage / 100} // Convert bips to percentage for display
                 placeholder="0"
                 size="sm"
@@ -154,17 +154,13 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
         <ModalFooter>
           <Flex justifyContent="center" alignItems="center" w="full">
             <Button
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              gap="2"
-              borderRadius="full"
-              bgColor="neutrals.600"
+              colorScheme="secondary"
               onClick={onSave}
               isDisabled={isNaN(localSlippage)}
+              leftIcon={<TickIcon />}
+              size="sm"
             >
-              <TickIcon />
-              <B3 color="white">Save</B3>
+              Save
             </Button>
           </Flex>
         </ModalFooter>

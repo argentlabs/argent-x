@@ -1,15 +1,15 @@
-import { ArgentBackendNftService } from "@argent/x-shared"
+import { BackendNftService } from "@argent/x-shared"
 import { networkService } from "../network/service"
 import {
   nftsCollectionsRepository,
   nftsContractsRepository,
   nftsRepository,
-} from "../storage/__new/repositories/nft"
-import { NFTService } from "./implementation"
-import { ARGENT_API_BASE_URL } from "../api/constants"
+} from "./store"
+import { NFTService } from "./NFTService"
+import { ARGENT_API_BASE_URL, ARGENT_OPTIMIZER_URL } from "../api/constants"
 import { settingsStore } from "../settings/store"
 
-export const argentNftService = new ArgentBackendNftService(
+export const backendNftService = new BackendNftService(
   ARGENT_API_BASE_URL,
   {
     headers: {
@@ -17,6 +17,7 @@ export const argentNftService = new ArgentBackendNftService(
       "argent-client": "argent-x",
     },
   },
+  ARGENT_OPTIMIZER_URL,
 )
 
 export const nftService = new NFTService(
@@ -24,6 +25,6 @@ export const nftService = new NFTService(
   nftsRepository,
   nftsCollectionsRepository,
   nftsContractsRepository,
-  argentNftService,
+  backendNftService,
   settingsStore,
 )

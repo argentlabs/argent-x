@@ -16,15 +16,16 @@ import { HandleMessage, UnhandledMessage } from "../background"
 import { AccountError } from "../../shared/errors/account"
 import { fetchTransactionBulkSimulation } from "../../shared/transactionSimulation/transactionSimulation.service"
 import { TransactionError } from "../../shared/errors/transaction"
-import { getEstimatedFeeFromBulkSimulation } from "../../shared/transactionSimulation/utils"
-import { isAccountV4, isAccountV5 } from "@argent/x-shared"
-import { EstimatedFees } from "../../shared/transactionSimulation/fees/fees.model"
-import { addEstimatedFee } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
 import {
-  getSimulationTxVersionFromFeeToken,
+  isAccountV4,
   getTxVersionFromFeeToken,
+  getSimulationTxVersionFromFeeToken,
   getTxVersionFromFeeTokenForDeclareContract,
-} from "../../shared/utils/getTransactionVersion"
+  getEstimatedFeeFromBulkSimulation,
+} from "@argent/x-shared"
+import { EstimatedFees } from "@argent/x-shared/simulation"
+import { addEstimatedFee } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
+import { DAPP_TRANSACTION_TITLE } from "../../shared/transactions/utils"
 
 export const handleTransactionMessage: HandleMessage<
   TransactionMessage
@@ -43,7 +44,7 @@ export const handleTransactionMessage: HandleMessage<
         },
         {
           origin,
-          title: "Review transaction",
+          title: DAPP_TRANSACTION_TITLE,
           icon: "NetworkIcon",
         },
       )
@@ -70,6 +71,8 @@ export const handleTransactionMessage: HandleMessage<
           feeTokenAddress,
           amount: 0n,
           pricePerUnit: 0n,
+          dataGasConsumed: 0n,
+          dataGasPrice: 0n,
         },
       }
 
@@ -121,6 +124,10 @@ export const handleTransactionMessage: HandleMessage<
               feeTokenAddress,
               amount: num.toBigInt(estimateFeeBulk[0].gas_consumed),
               pricePerUnit: num.toBigInt(estimateFeeBulk[0].gas_price),
+              dataGasConsumed: num.toBigInt(
+                estimateFeeBulk[0].data_gas_consumed,
+              ),
+              dataGasPrice: num.toBigInt(estimateFeeBulk[0].data_gas_price),
             }
 
             if (
@@ -132,26 +139,43 @@ export const handleTransactionMessage: HandleMessage<
               )
             }
 
-            fees.transactions.amount = num.toBigInt(
-              estimateFeeBulk[1].gas_consumed,
-            )
-            fees.transactions.pricePerUnit = num.toBigInt(
-              estimateFeeBulk[1].gas_price,
-            )
+            const {
+              gas_consumed,
+              gas_price,
+              data_gas_consumed,
+              data_gas_price,
+            } = estimateFeeBulk[1]
+
+            fees.transactions = {
+              feeTokenAddress,
+              amount: num.toBigInt(gas_consumed),
+              pricePerUnit: num.toBigInt(gas_price),
+              dataGasConsumed: num.toBigInt(data_gas_consumed),
+              dataGasPrice: num.toBigInt(data_gas_price),
+            }
           }
         } else {
           if ("estimateDeclareFee" in selectedStarknetAccount) {
-            const { gas_consumed, gas_price } =
-              await selectedStarknetAccount.estimateDeclareFee(payload, {
-                version,
-              })
+            const {
+              gas_consumed,
+              gas_price,
+              data_gas_consumed,
+              data_gas_price,
+            } = await selectedStarknetAccount.estimateDeclareFee(payload, {
+              version,
+            })
 
             if (!gas_consumed || !gas_price) {
               throw Error("gas_consumed or gas_price is undefined")
             }
 
-            fees.transactions.amount = num.toBigInt(gas_consumed)
-            fees.transactions.pricePerUnit = num.toBigInt(gas_price)
+            fees.transactions = {
+              feeTokenAddress,
+              amount: num.toBigInt(gas_consumed),
+              pricePerUnit: num.toBigInt(gas_price),
+              dataGasConsumed: num.toBigInt(data_gas_consumed),
+              dataGasPrice: num.toBigInt(data_gas_price),
+            }
           } else {
             throw Error("estimateDeclareFee not supported")
           }
@@ -197,6 +221,8 @@ export const handleTransactionMessage: HandleMessage<
           feeTokenAddress,
           amount: 0n,
           pricePerUnit: 0n,
+          dataGasConsumed: 0n,
+          dataGasPrice: 0n,
         },
       }
 
@@ -239,6 +265,10 @@ export const handleTransactionMessage: HandleMessage<
               feeTokenAddress,
               amount: num.toBigInt(estimateFeeBulk[0].gas_consumed),
               pricePerUnit: num.toBigInt(estimateFeeBulk[0].gas_price),
+              dataGasConsumed: num.toBigInt(
+                estimateFeeBulk[0].data_gas_consumed,
+              ),
+              dataGasPrice: num.toBigInt(estimateFeeBulk[0].data_gas_price),
             }
 
             if (
@@ -250,26 +280,38 @@ export const handleTransactionMessage: HandleMessage<
               )
             }
 
-            fees.transactions.amount = num.toBigInt(
-              estimateFeeBulk[1].gas_consumed,
-            )
-            fees.transactions.pricePerUnit = num.toBigInt(
-              estimateFeeBulk[1].gas_price,
-            )
+            fees.transactions = {
+              feeTokenAddress,
+              amount: num.toBigInt(estimateFeeBulk[1].gas_consumed),
+              pricePerUnit: num.toBigInt(estimateFeeBulk[1].gas_price),
+              dataGasConsumed: num.toBigInt(
+                estimateFeeBulk[1].data_gas_consumed,
+              ),
+              dataGasPrice: num.toBigInt(estimateFeeBulk[1].data_gas_price),
+            }
           }
         } else {
           if ("estimateDeployFee" in selectedStarknetAccount) {
-            const { gas_consumed, gas_price } =
-              await selectedStarknetAccount.estimateDeployFee(payload, {
-                version,
-              })
+            const {
+              gas_consumed,
+              gas_price,
+              data_gas_consumed,
+              data_gas_price,
+            } = await selectedStarknetAccount.estimateDeployFee(payload, {
+              version,
+            })
 
             if (!gas_consumed || !gas_price) {
               throw Error("gas_consumed or gas_price is undefined")
             }
 
-            fees.transactions.amount = num.toBigInt(gas_consumed)
-            fees.transactions.pricePerUnit = num.toBigInt(gas_price)
+            fees.transactions = {
+              feeTokenAddress,
+              amount: num.toBigInt(gas_consumed),
+              pricePerUnit: num.toBigInt(gas_price),
+              dataGasConsumed: num.toBigInt(data_gas_consumed),
+              dataGasPrice: num.toBigInt(data_gas_price),
+            }
           } else {
             throw Error("estimateDeployFee not supported")
           }
@@ -308,7 +350,7 @@ export const handleTransactionMessage: HandleMessage<
         }
         const starknetAccount = await wallet.getSelectedStarknetAccount()
 
-        if (!isAccountV5(starknetAccount)) {
+        if (!("transactionVersion" in starknetAccount)) {
           // Old accounts are not supported
           return respond({
             type: "SIMULATE_TRANSACTION_INVOCATION_RES",
@@ -461,7 +503,7 @@ export const handleTransactionMessage: HandleMessage<
         const result = await fetchTransactionBulkSimulation({
           invocations,
           networkId: selectedAccount.networkId,
-          chainId: chainId as any, // TODO: migrate to snjsv6 completely
+          chainId,
         })
 
         const estimatedFee = getEstimatedFeeFromBulkSimulation(result)

@@ -1,8 +1,13 @@
-import { TextWithAmount } from "@argent/x-ui"
+import { TextWithAmount, getTokenIconUrl } from "@argent/x-ui"
 import { FC, useMemo } from "react"
 
 import { isUndefined } from "lodash-es"
-import { prettifyCurrencyValue, prettifyTokenAmount } from "@argent/x-shared"
+import {
+  prettifyCurrencyValue,
+  prettifyTokenAmount,
+  estimatedFeesToTotal,
+  estimatedFeesToMaxFeeTotal,
+} from "@argent/x-shared"
 import {
   FeeEstimationBox,
   FeeEstimationBoxWithDeploy,
@@ -12,11 +17,6 @@ import { FeeEstimationText } from "./ui/FeeEstimationText"
 import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
 import { getTooltipText } from "./utils"
 import { FeeEstimationProps } from "./feeEstimation.model"
-import {
-  estimatedFeesToMaxFeeTotal,
-  estimatedFeesToTotal,
-} from "../../../../shared/transactionSimulation/utils"
-import { getTokenIconUrl } from "../../accountTokens/TokenIcon"
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
   amountCurrencyValue,

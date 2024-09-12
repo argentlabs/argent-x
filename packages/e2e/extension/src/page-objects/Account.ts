@@ -7,6 +7,8 @@ import {
   TokenSymbol,
   getTokenInfo,
 } from "../../../shared/src/assets"
+import config from "../../../shared/config"
+import { logInfo, sleep } from "../../../shared/src/common"
 
 export interface IAsset {
   name: string
@@ -22,6 +24,7 @@ export default class Account extends Activity {
   accountName2 = "Account 2"
   accountNameMulti1 = "Multisig 1"
   accountNameMulti2 = "Multisig 2"
+  accountNameMulti3 = "Multisig 3"
 
   get noAccountBanner() {
     return this.page.locator(`div h5:has-text("${lang.account.noAccounts}")`)
@@ -31,8 +34,8 @@ export default class Account extends Activity {
     return this.page.locator(`button:text-is("${lang.account.createAccount}")`)
   }
 
-  get addFunds() {
-    return this.page.locator(`button:text-is("${lang.account.addFunds}")`)
+  get fundMenu() {
+    return this.page.locator(`button:text-is("${lang.account.fund}")`)
   }
 
   get addFundsFromStartNet() {
@@ -59,6 +62,19 @@ export default class Account extends Activity {
     )
   }
 
+  async accountNames() {
+    await expect(
+      this.page.locator('[data-testid="account-name"]').first(),
+    ).toBeVisible()
+    return await this.page
+      .locator('[data-testid="account-name"]')
+      .all()
+      .then(
+        async (els) =>
+          await Promise.all(els.map(async (el) => await el.textContent())),
+      )
+  }
+
   token(tkn: TokenSymbol) {
     const tokenInfo = getTokenInfo(tkn)
     if (!tokenInfo) {
@@ -83,12 +99,20 @@ export default class Account extends Activity {
     return this.page.locator('[aria-label="Multisig Account"]')
   }
 
+  get createWithArgent() {
+    return this.page.locator('[aria-label="Create with Argent"]')
+  }
+
   get createNewMultisig() {
     return this.page.locator('[aria-label="Create new multisig"]')
   }
 
   get joinExistingMultisig() {
     return this.page.locator('[aria-label="Join existing multisig"]')
+  }
+
+  get joinWithArgent() {
+    return this.page.locator('[aria-label="Join with Argent"]')
   }
 
   get assetsList() {
@@ -104,7 +128,7 @@ export default class Account extends Activity {
   }
 
   get recipientAddressQuery() {
-    return this.page.locator('[name="query"]')
+    return this.page.locator('[data-testid="recipient-input"]')
   }
 
   account(accountName: string) {
@@ -151,6 +175,10 @@ export default class Account extends Activity {
     )
   }
 
+  get failPredict() {
+    return this.page.locator('[data-testid="tx-error"]')
+  }
+
   async addAccountMainnet({ firstAccount = true }: { firstAccount?: boolean }) {
     if (firstAccount) {
       await this.createAccount.click()
@@ -159,9 +187,15 @@ export default class Account extends Activity {
       await this.addANewAccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
-
+    await this.continueLocator.click()
     await this.account("").last().click()
     await expect(this.accountListSelector).toBeVisible()
+  }
+
+  async dismissAccountRecoveryBanner() {
+    await this.showAccountRecovery.click()
+    await this.confirmTheSeedPhrase.click()
+    await this.doneLocator.click()
   }
 
   async addAccount({ firstAccount = true }: { firstAccount?: boolean }) {
@@ -172,10 +206,11 @@ export default class Account extends Activity {
       await this.addANewAccountFromAccountList.click()
     }
     await this.addStandardAccountFromNewAccountScreen.click()
+    await this.continueLocator.click()
 
     await this.account("").last().click()
     await expect(this.accountListSelector).toBeVisible()
-    await this.addFunds.click()
+    await this.fundMenu.click()
     await this.addFundsFromStartNet.click()
     const accountAddress = await this.accountAddress
       .textContent()
@@ -247,7 +282,7 @@ export default class Account extends Activity {
       .getAttribute("data-tx-value")
     const sendAmountFE = sendAmountFEText!.split(" ")[0]
     const sendAmountTX = parseInt(sendAmountTXText!)
-    console.log({ sendAmountFE, sendAmountTX })
+    logInfo({ sendAmountFE, sendAmountTX })
     expect(sendAmountFE).toBe(`${trxAmountHeader}`)
 
     if (feAmount != "MAX") {
@@ -265,25 +300,32 @@ export default class Account extends Activity {
     fillRecipientAddress?: "typing" | "paste"
     validAddress?: boolean
   }) {
-    fillRecipientAddress === "paste"
-      ? await this.recipientAddressQuery.fill(recipientAddress)
-      : await this.recipientAddressQuery.type(recipientAddress)
+    if (fillRecipientAddress === "paste") {
+      await this.setClipBoardContent(recipientAddress)
+      await this.recipientAddressQuery.focus()
+      await this.paste()
+    } else {
+      await this.recipientAddressQuery.type(recipientAddress)
+      await this.page.keyboard.press("Enter")
+    }
     if (validAddress) {
       if (recipientAddress.endsWith("stark")) {
         await this.page.click(`button:has-text("${recipientAddress}")`)
-      } else {
-        await this.recipientAddressQuery.focus()
-        await this.page.keyboard.press("Enter")
       }
     }
   }
 
   async confirmTransaction() {
-    const failPredict = this.page.getByText("Transaction fail")
-    await expect(failPredict)
-      .toBeVisible({ timeout: 1000 * 5 })
-      .then(async (_) => await failPredict.click())
-      .catch(async (_) => await this.confirmLocator.click())
+    await Promise.race([
+      expect(this.confirmLocator)
+        .toBeEnabled()
+        .then((_) => this.confirmLocator.click()),
+      expect(this.failPredict).toBeVisible(),
+    ])
+    if (await this.failPredict.isVisible()) {
+      await this.failPredict.click()
+      console.error("failPredict", this.paste)
+    }
   }
 
   async transfer({
@@ -315,6 +357,7 @@ export default class Account extends Activity {
     }
 
     await this.reviewSendLocator.click()
+
     if (submit) {
       if (feeToken) {
         await this.selectFeeToken(feeToken)
@@ -324,6 +367,21 @@ export default class Account extends Activity {
     const { sendAmountFE, sendAmountTX } = await this.txValidations(
       amount.toString(),
     )
+    try {
+      await expect(this.failPredict)
+        .toBeVisible({ timeout: 1000 * 3 })
+        .then(async (_) => {
+          await this.failPredict.click()
+          await this.page.locator('[data-testid="copy-error"]').click()
+          console.error(
+            "Error message copied to clipboard",
+            await this.getClipboard(),
+          )
+          throw new Error("Transaction failed")
+        })
+    } catch (e) {
+      null
+    }
     return { sendAmountTX, sendAmountFE }
   }
 
@@ -345,7 +403,7 @@ export default class Account extends Activity {
   }
 
   get password() {
-    return this.page.locator('input[name="password"]')
+    return this.page.locator('input[name="password"]').first()
   }
 
   get exportPrivateKey() {
@@ -386,7 +444,11 @@ export default class Account extends Activity {
   }
 
   get copyAddress() {
-    return this.page.locator('[data-testid="account-tokens"] button').first()
+    return this.page.locator('[data-testid="address-copy-button"]').first()
+  }
+
+  get copyAddressFromFundMenu() {
+    return this.page.locator(`button:text-is("${lang.account.copyAddress}")`)
   }
 
   contact(label: string) {
@@ -437,10 +499,13 @@ export default class Account extends Activity {
         this.page.locator(`button:has-text("${lang.common.copied}")`),
       ).toBeVisible(),
     ])
+    await expect(this.doneLocator).toBeDisabled()
     await this.page
       .locator(`p:has-text("${lang.common.confirmRecovery}")`)
       .click()
-    await this.doneLocator.click()
+    await expect(this.page.getByTestId("recovery-phrase-checked")).toBeVisible()
+    await expect(this.doneLocator).toBeEnabled()
+    await this.doneLocator.click({ force: true })
     const seedPhraseCopied = await this.page.evaluate(
       `navigator.clipboard.readText();`,
     )
@@ -448,34 +513,41 @@ export default class Account extends Activity {
     return String(seedPhraseCopied)
   }
 
-  // 2FA
+  // Smart Account
   get email() {
     return this.page.locator('input[name="email"]')
   }
 
-  get pinInput() {
+  get pinLocator() {
     return this.page.locator('[aria-label="Please enter your pin code"]')
   }
 
-  async fillPin(pin: string) {
-    await this.pinInput.first().click()
-    await this.pinInput.first().fill(pin)
+  async fillPin(pin: string = "111111") {
+    //avoid BE error PIN not requested
+    await sleep(2000)
+    await expect(this.pinLocator).toHaveCount(6)
+    await this.pinLocator.first().click()
+    await this.pinLocator.first().fill(pin)
   }
 
   async setupRecovery() {
-    await this.accountAddressFromAssetsView.click()
+    if (config.isProdTesting) {
+      await this.showAccountRecovery.click()
+    } else {
+      await this.accountAddressFromAssetsView.click()
+    }
     return this.saveRecoveryPhrase().then((adr) => String(adr))
   }
 
-  get addedArgentShieldLocator() {
+  get accountUpgraded() {
     return this.page.getByRole("heading", {
-      name: lang.common.argentShieldAdded,
+      name: lang.common.accountUpgraded,
     })
   }
 
-  get removedArgentShieldLocator() {
+  get changedToStandardAccountLabel() {
     return this.page.getByRole("heading", {
-      name: lang.common.argentShieldRemoved,
+      name: lang.common.changedToStandardAccount,
     })
   }
 
@@ -506,11 +578,14 @@ export default class Account extends Activity {
     await this.accountListSelector.click()
     await this.addANewAccountFromAccountList.click()
     await this.addMultisigAccountFromNewAccountScreen.click()
+    await this.continueLocator.click()
+    await this.createNewMultisig.click()
 
     const [pages] = await Promise.all([
       this.page.context().waitForEvent("page"),
-      this.createNewMultisig.click(),
+      this.createWithArgent.click(),
     ])
+
     const tabs = pages.context().pages()
     await tabs[1].waitForLoadState("load")
     await expect(tabs[1].locator('[name^="signerKeys.0.key"]')).toHaveCount(1)
@@ -563,8 +638,10 @@ export default class Account extends Activity {
     await this.accountListSelector.click()
     await this.addANewAccountFromAccountList.click()
     await this.addMultisigAccountFromNewAccountScreen.click()
+    await this.continueLocator.click()
 
     await this.joinExistingMultisig.click()
+    await this.joinWithArgent.click()
     await this.page.locator('[data-testid="copy-pubkey"]').click()
     await this.page.locator('[data-testid="button-done"]').click()
     return String(await this.page.evaluate(`navigator.clipboard.readText()`))
@@ -622,7 +699,7 @@ export default class Account extends Activity {
   }
 
   get accountViewConfirmations() {
-    return this.page.locator('[data-testid="confirmations"]')
+    return this.page.locator('[data-testid="confirmations"]').first()
   }
 
   async acceptTx(tx: string) {
@@ -658,27 +735,29 @@ export default class Account extends Activity {
     ])
   }
 
-  async ensure2FANotEnabled(accountName: string) {
+  async ensureSmartAccountNotEnabled(accountName: string) {
     await this.selectAccount(accountName)
     await Promise.all([
       expect(this.menuPendingTransactionsIndicatorLocator).toBeHidden(),
       expect(
-        this.page.locator('[data-testid="shield-on-account-view"]'),
+        this.page.locator('[data-testid="smart-account-on-account-view"]'),
       ).toBeHidden(),
     ])
     await this.showSettingsLocator.click()
     await Promise.all([
       expect(
-        this.page.locator('[data-testid="shield-on-settings"]'),
+        this.page.locator('[data-testid="smart-account-on-settings"]'),
       ).toBeHidden(),
       expect(
-        this.page.locator('[data-testid="shield-not-activated"]'),
+        this.page.locator('[data-testid="smart-account-not-activated"]'),
       ).toBeVisible(),
     ])
     await this.account(accountName).click()
     await expect(
-      this.page.locator('[data-testid="shield-switch"]'),
-    ).not.toBeChecked()
+      this.page.locator(
+        '[data-testid="smart-account-button"]:has-text("Upgrade to Smart Account")',
+      ),
+    ).toBeVisible()
   }
 
   editOwnerLocator(owner: string) {
@@ -741,5 +820,19 @@ export default class Account extends Activity {
       await this.feeTokenLoc(token).click()
       await expect(this.selectedFeeTokenLoc(token)).toBeVisible()
     }
+  }
+
+  async gotoSettingsFromAccountList(accountName: string) {
+    await this.account(accountName).first().hover()
+    await sleep(1000)
+    await this.account(accountName)
+      .first()
+      .locator('[data-testid="goto-settings"]')
+      .click()
+    await expect(
+      this.page.locator(
+        `[data-testid="account-settings-${accountName.replaceAll(/ /g, "")}"]`,
+      ),
+    ).toBeVisible()
   }
 }
