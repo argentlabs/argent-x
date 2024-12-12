@@ -1,8 +1,8 @@
 import React from "react"
+import type { SmartAccountValidationErrorMessage } from "../../../../shared/errors/argentAccount"
 import {
   SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
   SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
-  SmartAccountValidationErrorMessage,
 } from "../../../../shared/errors/argentAccount"
 import { ZENDESK_LINK } from "../../userReview/constants"
 import { Link } from "@chakra-ui/react"
@@ -21,10 +21,10 @@ const SmartAccountError: React.FC<SmartAccountErrorProps> = ({ error }) => {
     <>
       {FAILURE_SCENARIO_1 && (
         <>
-          This address is associated with accounts from another seedphrase.
+          This address is associated with accounts from another seedphrase
           <br />
           <br />
-          Please enter another email address to continue.
+          Please enter another email address to continue
         </>
       )}
       {FAILURE_SCENARIO_2 && (
@@ -35,7 +35,7 @@ const SmartAccountError: React.FC<SmartAccountErrorProps> = ({ error }) => {
       )}
       {!FAILURE_SCENARIO_1 && !FAILURE_SCENARIO_2 && (
         <>
-          This address is associated with accounts from another seedphrase.
+          This address is associated with accounts from another seedphrase
           <br />
           <br />
           Please enter the right email address to continue

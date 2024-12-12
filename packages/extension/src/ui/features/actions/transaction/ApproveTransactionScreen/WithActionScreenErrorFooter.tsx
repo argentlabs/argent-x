@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 import { ActionScreenErrorFooter } from "@argent/x-ui"
 
 import { useActionScreen } from "../../hooks/useActionScreen"

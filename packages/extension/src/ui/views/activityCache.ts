@@ -1,10 +1,10 @@
-import { getAccountIdentifier, isEqualAddress } from "@argent/x-shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 
 import { activityCacheStore } from "../../shared/activity/cache/storage"
 import { atomFamilyAccountsEqual } from "../../shared/utils/accountsEqual"
-import { BaseWalletAccount } from "../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../shared/wallet.model"
 import { atomFromStore } from "./implementation/atomFromStore"
 
 export const activityCacheStoreView = atomFromStore(activityCacheStore)
@@ -17,8 +17,7 @@ export const activityCacheItemForAccountView = atomFamily(
       }
       const activityCacheStore = await get(activityCacheStoreView)
       const { cache: activityCache } = activityCacheStore
-      const key = getAccountIdentifier(account)
-      return activityCache[key]
+      return activityCache[account.id]
     })
   },
   atomFamilyAccountsEqual,

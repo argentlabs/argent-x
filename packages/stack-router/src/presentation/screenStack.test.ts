@@ -1,7 +1,7 @@
 import { Action as NavigationType } from "history"
 import { describe, expect, test } from "vitest"
 
-import { DeclaredPresentationByPath } from "../types"
+import type { DeclaredPresentationByPath } from "../types"
 import { updateScreenStack } from "./screenStack"
 
 const declaredPresentationByPath: DeclaredPresentationByPath = {

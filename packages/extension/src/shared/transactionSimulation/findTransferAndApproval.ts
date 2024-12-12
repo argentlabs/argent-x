@@ -1,7 +1,7 @@
 import { hash, uint256 } from "starknet"
-import { FunctionInvocation } from "starknet5"
+import type { FunctionInvocation } from "starknet5"
 
-import { ApprovalEvent, EventsToTrack, TransferEvent } from "./types"
+import type { ApprovalEvent, EventsToTrack, TransferEvent } from "./types"
 
 export const EventsBySelector: { [key in EventsToTrack]: string } = {
   Transfer: hash.getSelectorFromName("Transfer"), // 0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9

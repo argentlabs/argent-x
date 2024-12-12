@@ -1,12 +1,12 @@
-import { useNavigateBack, useToast } from "@argent/x-ui"
-import { FC, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import { useToast } from "@argent/x-ui"
+import type { FC } from "react"
+import { useCallback } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 
 import { useAction } from "../../hooks/useAction"
 import { useReturnTo } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import { assertNever } from "../../../shared/utils/assertNever"
-import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import {
   type AccountType,
   AccountTypeId,
@@ -20,8 +20,11 @@ import { resetDevice } from "../../../shared/smartAccount/jwt"
 import { SignerType } from "../../../shared/wallet.model"
 import { useOnLedgerStart } from "../ledger/hooks/useOnLedgerStart"
 import { useIsFirefox } from "../../hooks/useUserAgent"
+import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
+import { useNetwork } from "../networks/hooks/useNetwork"
 
 export const AddNewAccountScreenContainer: FC = () => {
+  const { networkId } = useParams()
   const navigate = useNavigate()
   const { action: addAccount, loading: isAdding } = useAction(
     clientAccountService.create.bind(clientAccountService),
@@ -29,9 +32,9 @@ export const AddNewAccountScreenContainer: FC = () => {
   const verifiedEmail = useSmartAccountVerifiedEmail()
   // TODO: should be view after networks was refactored
 
-  const network = useCurrentNetwork()
   const returnTo = useReturnTo()
-  const accountTypes = useAccountTypesForNetwork(network, true)
+  const network = useNetwork(networkId ?? "")
+  const accountTypes = useAccountTypesForNetwork(network)
   const onLedgerStart = useOnLedgerStart("standard")
   const toast = useToast()
   const isFirefox = useIsFirefox()
@@ -85,7 +88,10 @@ export const AddNewAccountScreenContainer: FC = () => {
           return navigate(routes.multisigNew())
 
         case AccountTypeId.LEDGER:
-          return onLedgerStart("create", network.id)
+          return onLedgerStart("import", network.id)
+
+        case AccountTypeId.IMPORTED:
+          return navigate(routes.privateKeyImport(returnTo))
 
         default:
           assertNever(accountTypeId) // Should always be handled
@@ -126,15 +132,17 @@ export const AddNewAccountScreenContainer: FC = () => {
     [isFirefox],
   )
 
-  const onClose = useNavigateBack()
+  const onBack = useNavigateReturnToOrBack()
 
   return (
     <AddNewAccountScreen
-      onClose={onClose}
+      onClose={onBack}
       accountTypes={accountTypes}
       isAccountTypeLoading={isAccountTypeLoading}
       isAccountTypeDisabled={isAccountTypeDisabled}
-      onAccountTypeConfirmed={onAccountTypeConfirmed}
+      onAccountTypeConfirmed={(accountTypeId) =>
+        void onAccountTypeConfirmed(accountTypeId)
+      }
     />
   )
 }

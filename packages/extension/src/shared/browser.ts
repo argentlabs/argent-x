@@ -1,4 +1,4 @@
-import { DeepPick } from "../shared/types/deepPick"
+import type { DeepPick } from "../shared/types/deepPick"
 
 export type MinimalActionBrowser = DeepPick<
   typeof chrome,

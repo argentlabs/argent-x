@@ -1,9 +1,10 @@
-import { B3, iconsDeprecated } from "@argent/x-ui"
+import { B3, icons } from "@argent/x-ui"
 import { Button } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
-import { BaseWalletAccount } from "../../../../../shared/wallet.model"
-import { BigNumberish, Call } from "starknet"
-import { EstimatedFees } from "@argent/x-shared/simulation"
+import type { FC } from "react"
+import { useCallback } from "react"
+import type { BaseWalletAccount } from "../../../../../shared/wallet.model"
+import type { BigNumberish, Call } from "starknet"
+import type { EstimatedFees } from "@argent/x-shared/simulation"
 import { useKeyValueStorage } from "../../../../hooks/useStorage"
 import { settingsStore } from "../../../../../shared/settings"
 import { useAirGapData } from "../../transactionV2/useAirGapData"
@@ -12,7 +13,7 @@ import { useIsLedgerSigner } from "../../../ledger/hooks/useIsLedgerSigner"
 import { multisigView } from "../../../multisig/multisig.state"
 import { useView } from "../../../../views/implementation/react"
 
-const { QrIcon } = iconsDeprecated
+const { QrIcon } = icons
 
 interface AirGapReviewButtonProps {
   selectedAccount?: BaseWalletAccount
@@ -26,7 +27,7 @@ export const AirGapReviewButtonContainer: FC<AirGapReviewButtonProps> = ({
   ...rest
 }) => {
   const airGapEnabled = useKeyValueStorage(settingsStore, "airGapEnabled")
-  const isLedger = useIsLedgerSigner(selectedAccount)
+  const isLedger = useIsLedgerSigner(selectedAccount?.id)
   const multisig = useView(multisigView(selectedAccount))
   if (!airGapEnabled || !isLedger || !multisig) {
     return null
@@ -40,17 +41,12 @@ const AirGapReviewButton: FC<AirGapReviewButtonProps> = ({
   estimatedFees,
   nonce,
 }) => {
-  const airGapEnabled = useKeyValueStorage(settingsStore, "airGapEnabled")
-
   const { data } = useAirGapData(
     selectedAccount,
     transactions,
     estimatedFees,
     nonce,
   )
-
-  const isLedger = useIsLedgerSigner(selectedAccount)
-  const multisig = useView(multisigView(selectedAccount))
 
   const onOpenAirGapReview = useCallback(() => {
     if (!data) return
@@ -64,7 +60,7 @@ const AirGapReviewButton: FC<AirGapReviewButtonProps> = ({
     })
   }, [data])
 
-  if (!airGapEnabled || !isLedger || !multisig || !data) {
+  if (!data) {
     return null
   }
 

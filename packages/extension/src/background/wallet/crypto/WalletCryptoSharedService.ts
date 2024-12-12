@@ -1,4 +1,4 @@
-import { WalletBackupService } from "../backup/WalletBackupService"
+import type { WalletBackupService } from "../backup/WalletBackupService"
 
 import {
   decryptKeystoreJson,
@@ -7,11 +7,11 @@ import {
   Mnemonic,
 } from "ethers"
 import { defaultNetwork } from "../../../shared/network"
-import { WalletRecoverySharedService } from "../recovery/WalletRecoverySharedService"
-import { WalletSessionService } from "../session/WalletSessionService"
+import type { WalletRecoverySharedService } from "../recovery/WalletRecoverySharedService"
+import type { WalletSessionService } from "../session/WalletSessionService"
 import type { WalletSession } from "../session/walletSession.model"
-import { IWalletDeploymentService } from "../deployment/IWalletDeploymentService"
-import { IObjectStore } from "../../../shared/storage/__new/interface"
+import type { IWalletDeploymentService } from "../deployment/IWalletDeploymentService"
+import type { IObjectStore } from "../../../shared/storage/__new/interface"
 import { walletToKeystore } from "../utils"
 
 export class WalletCryptoSharedService {

@@ -1,9 +1,6 @@
-import {
-  Presentation,
-  PresentationByPath,
-  PresentationDirection,
-} from "../types"
-import { ScreenProps } from "../types"
+import type { Presentation, PresentationByPath } from "../types"
+import { PresentationDirection } from "../types"
+import type { ScreenProps } from "../types"
 import { isModalPresentation } from "../utils/is"
 import { variantForPresentation } from "./presentationVariants"
 
@@ -70,16 +67,16 @@ export const getPresentationByPath = ({
       modalsSheetsAbove > 1
         ? "stackedStacked"
         : modalsSheetsAbove === 1
-        ? "stacked"
-        : modalsAbove > 0
-        ? "modalStacked"
-        : isModalSheetBeneathPush || isPushAboveModalSheet
-        ? "pushModalSheet"
-        : isModalBeneathPush
-        ? "push"
-        : isAboveReplace
-        ? "replace"
-        : screen.presentation
+          ? "stacked"
+          : modalsAbove > 0
+            ? "modalStacked"
+            : isModalSheetBeneathPush || isPushAboveModalSheet
+              ? "pushModalSheet"
+              : isModalBeneathPush
+                ? "push"
+                : isAboveReplace
+                  ? "replace"
+                  : screen.presentation
 
     const variant = variantForPresentation(presentation, !isForwards)
     result[screen.path] = {

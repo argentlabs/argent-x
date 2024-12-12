@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Example usage:
+#
+#   # Repeats test until it fails:
+#   ./until-failure pnpm playwright test --config=./extension src/specs/accountSettings.spec.ts:95
+#
+
+while "$@"; do :; done

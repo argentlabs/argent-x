@@ -5,6 +5,9 @@ import { AxLedgerError } from "../../../../shared/errors/ledger"
 
 export function useLedgerConnectCallback() {
   return useCallback(async () => {
+    if (!navigator.hid) {
+      return false
+    }
     // Check for connected devices
     const devices = await navigator.hid.getDevices()
     let ledgerDevices = devices.filter(
@@ -14,11 +17,7 @@ export function useLedgerConnectCallback() {
     // If no ledger devices are connected, request one
     if (ledgerDevices.length === 0) {
       ledgerDevices = await navigator.hid.requestDevice({
-        filters: [
-          {
-            vendorId: LEDGER_VENDOR_ID,
-          },
-        ],
+        filters: [{ vendorId: LEDGER_VENDOR_ID }],
       })
     }
 

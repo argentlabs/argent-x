@@ -1,4 +1,4 @@
-import { ApiMultisigRequest } from "../multisig.model"
+import type { ApiMultisigRequest } from "../multisig.model"
 import multisigRequests from "./fixtures/multisigRequests.json"
 import multisigRequestsWithRejectedTx from "./fixtures/multisigRequestsWithRejected.json"
 import multisigRequestsWithRetriedTx from "./fixtures/multisigRequestsWithRetried.json"

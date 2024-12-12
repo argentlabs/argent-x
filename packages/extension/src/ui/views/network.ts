@@ -9,17 +9,38 @@ import { selectedBaseAccountView } from "./account"
 import { useView } from "./implementation/react"
 
 export const allNetworksView = atomFromRepo(networkRepo)
+
 const networkStatusesView = atomFromRepo(networkStatusRepo)
+
+const expectedNetworkOrder = [
+  "mainnet-alpha",
+  "sepolia-alpha",
+  "localhost",
+  "integration",
+]
 
 export const allNetworksWithStatusesView = atom(async (get) => {
   const networks = await get(allNetworksView)
 
   const networkStatuses = await get(networkStatusesView)
-  return networks.map((network) => ({
+  const unsortedNetworks = networks.map((network) => ({
     ...network,
     status:
       networkStatuses.find((n) => n.id === network.id)?.status ?? "unknown",
   }))
+
+  const sortedNetworks = unsortedNetworks.sort((a, b) => {
+    const indexA = expectedNetworkOrder.indexOf(a.id)
+    const indexB = expectedNetworkOrder.indexOf(b.id)
+
+    // Handle values not in the order array - i.e custom networks - by giving them a high index
+    const sortOrderA = indexA === -1 ? expectedNetworkOrder.length : indexA
+    const sortOrderB = indexB === -1 ? expectedNetworkOrder.length : indexB
+
+    return sortOrderA - sortOrderB
+  })
+
+  return sortedNetworks
 })
 
 export const networkView = atomFamily((networkId?: string) =>
@@ -45,7 +66,7 @@ export const selectedNetworkIdView = atom(async (get) => {
 })
 
 export const selectedNetworkView = atom(async (get) => {
-  const selectedNetworkId = useView(selectedNetworkIdView)
+  const selectedNetworkId = await get(selectedNetworkIdView)
   const selectedNetwork = await get(networkView(selectedNetworkId))
   return selectedNetwork ?? defaultNetwork
 })

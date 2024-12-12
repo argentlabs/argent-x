@@ -1,4 +1,5 @@
-import { Atom, atom } from "jotai"
+import type { Atom } from "jotai"
+import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 
 import { isEqualAddress } from "@argent/x-shared"
@@ -7,8 +8,8 @@ import {
   multisigMetadataRepo,
   pendingMultisigRepo,
 } from "../../shared/multisig/repository"
-import { MultisigMetadata } from "../../shared/multisig/types"
-import { BaseMultisigWalletAccount } from "../../shared/wallet.model"
+import type { MultisigMetadata } from "../../shared/multisig/types"
+import type { BaseMultisigWalletAccount } from "../../shared/wallet.model"
 import { atomFromRepo } from "./implementation/atomFromRepo"
 
 const allMultisigMetadataAtom = atomFromRepo(multisigMetadataRepo)

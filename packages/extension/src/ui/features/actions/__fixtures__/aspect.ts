@@ -1,62 +1,6 @@
-import { TransactionActionFixture } from "./types"
+import type { TransactionActionFixture } from "./types"
 
 export const aspect: TransactionActionFixture = {
-  aggregatedData: [
-    {
-      token: {
-        address:
-          "0x031f9085c75917a4860da8628ffc3b4d4587da88dc2ee664516a9271a94cf266",
-        name: "Xplorer",
-        symbol: "XPLORER",
-        decimals: 0,
-        networkId: "sepolia-alpha",
-        tokenId: "1002606",
-        type: "erc721",
-      },
-      approvals: [],
-      amount: BigInt("1"),
-      usdValue: "0",
-      recipients: [
-        {
-          address:
-            "0x325c46cdbf81d35020f95a82a4dc4d043599f58cfb979b03e2efffdeab20477",
-          amount: BigInt("1"),
-        },
-      ],
-      safe: true,
-    },
-    {
-      token: {
-        address:
-          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-        name: "Ether",
-        symbol: "ETH",
-        decimals: 18,
-        iconUrl: "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-        showAlways: true,
-        networkId: "localhost",
-        type: "erc20",
-      },
-      approvals: [],
-      amount: BigInt("-100000000000000"),
-      usdValue: "-0.1661",
-      recipients: [
-        {
-          address:
-            "0x6a0bd9a21ca429395565127efca751660b503c3966b964bdda5029e031380b7",
-          amount: BigInt("-97000000000000"),
-          usdValue: "0.161117",
-        },
-        {
-          address:
-            "0x4c83d3fa770187d7b0a23b3aa7132c7c8273fb4ec3db416f86e4a385596769a",
-          amount: BigInt("-3000000000000"),
-          usdValue: "0.004983",
-        },
-      ],
-      safe: true,
-    },
-  ],
   transactionReview: {
     transactions: [
       {

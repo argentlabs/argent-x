@@ -1,4 +1,5 @@
-import { Trade, TradeType } from "../src/shared/swap/model/trade.model"
+import type { Trade } from "../src/shared/swap/model/trade.model"
+import { TradeType } from "../src/shared/swap/model/trade.model"
 
 const defaultTrade: Trade = {
   receiveAmount: "2480805239052254504",

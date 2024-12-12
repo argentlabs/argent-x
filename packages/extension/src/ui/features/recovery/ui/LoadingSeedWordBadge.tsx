@@ -1,5 +1,6 @@
-import { FlexProps, Skeleton } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FlexProps } from "@chakra-ui/react"
+import { Skeleton } from "@chakra-ui/react"
+import type { FC } from "react"
 
 import { SeedWordBadge } from "./SeedWordBadge"
 

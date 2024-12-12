@@ -1,4 +1,5 @@
 import { AccountListHiddenScreen } from "@argent-x/extension/src/ui/features/accounts/AccountListHiddenScreen"
+import { accounts } from "@argent-x/extension/src/ui/features/actions/__fixtures__"
 
 import { decorators } from "../../decorators/routerDecorators"
 
@@ -9,13 +10,7 @@ export default {
 
 export const Default = {
   args: {
-    hiddenAccounts: [
-      {
-        name: "Account 1 Lorem Ipsum Dolor Sit Amet",
-        address: "0x123",
-        networkId: "sepolia-alpha",
-      },
-    ],
+    accounts,
     hiddenPendingMultisigAccounts: [
       {
         name: "Multi Sig",

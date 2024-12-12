@@ -1,4 +1,4 @@
-import { TxHash } from "@argent/x-shared"
+import type { TxHash } from "@argent/x-shared"
 
 export interface BaseTransaction {
   hash: TxHash

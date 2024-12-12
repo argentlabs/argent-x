@@ -1,6 +1,6 @@
-import { IExplorerTransaction } from "../../../../../explorer/type"
-import { Token } from "../../../../../token/__new/types/token.model"
-import { TransformedTransaction } from "../../type"
+import type { IExplorerTransaction } from "../../../../../explorer/type"
+import type { Token } from "../../../../../token/__new/types/token.model"
+import type { TransformedTransaction } from "../../type"
 
 export interface IExplorerTransactionTransformer {
   result: TransformedTransaction

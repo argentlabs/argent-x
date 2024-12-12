@@ -1,63 +1,76 @@
+import type { Address, Collection } from "@argent/x-shared"
 import {
-  Address,
-  Collection,
   addressSchema,
+  generateAvatarImage,
   getNftPicture,
 } from "@argent/x-shared"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
 import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
 import { useCollectionNftsByAccountAndNetwork } from "./nfts.state"
-import { selectedAccountView } from "../../views/account"
-import { useView } from "../../views/implementation/react"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
+import { theme } from "@argent/x-ui"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 
 interface AccountCollectionProps {
+  account: BaseWalletAccount
   collection: Collection
   navigateToSend?: boolean
   onClick?: (collection: Collection) => void
 }
 
 const AccountCollection: FC<AccountCollectionProps> = ({
+  account,
   collection,
   navigateToSend,
   onClick: onClickProp,
 }) => {
   const navigate = useNavigate()
-  const selectedAccount = useView(selectedAccountView)
+  const returnTo = useCurrentPathnameWithQuery()
 
   const nfts = useCollectionNftsByAccountAndNetwork(
     addressSchema.parse(collection?.contractAddress),
-    (selectedAccount?.address as Address) ?? "0x0",
-    selectedAccount?.networkId,
+    account.address as Address,
+    account.networkId,
   )
+
   const onClick = useCallback(() => {
     if (onClickProp) {
       onClickProp(collection)
     } else {
-      navigate(routes.collectionNfts(collection.contractAddress), {
+      navigate(routes.collectionNfts(collection.contractAddress, returnTo), {
         state: { navigateToSend },
       })
     }
-  }, [collection, navigate, navigateToSend, onClickProp])
+  }, [collection, navigate, navigateToSend, onClickProp, returnTo])
 
-  if (nfts.length === 0) {
-    return <></>
-  }
+  const thumbnailSrc =
+    nfts.length > 0
+      ? (getNftPicture(nfts[0]) ?? collection.imageUri)
+      : collection.imageUri
+
+  const logoSrc = useMemo(() => {
+    if (collection.imageUri) {
+      return collection.imageUri
+    }
+    return generateAvatarImage(collection.name, {
+      background: theme.colors["neutrals.700"],
+    })
+  }, [collection.imageUri, collection.name])
 
   return (
-    <>
-      <NftFigure key={collection.contractAddress} onClick={onClick}>
-        <NftItem
-          name={collection.name}
-          thumbnailSrc={getNftPicture(nfts[0]) ?? ""}
-          logoSrc={collection.imageUri}
-          total={nfts.length}
-        />
-      </NftFigure>
-    </>
+    <NftFigure key={collection.contractAddress} onClick={onClick}>
+      <NftItem
+        name={collection.name}
+        thumbnailSrc={thumbnailSrc}
+        logoSrc={logoSrc}
+        total={nfts.length}
+      />
+    </NftFigure>
   )
 }
 

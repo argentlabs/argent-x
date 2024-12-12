@@ -1,6 +1,6 @@
-import { ActionMessage } from "../shared/messages/ActionMessage"
+import type { ActionMessage } from "../shared/messages/ActionMessage"
 import { UnhandledMessage } from "./background"
-import { HandleMessage } from "./background"
+import type { HandleMessage } from "./background"
 
 export const handleActionMessage: HandleMessage<ActionMessage> = async ({
   msg,

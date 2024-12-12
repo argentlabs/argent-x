@@ -1,10 +1,10 @@
-import { L2 } from "@argent/x-ui"
-import { FC } from "react"
+import { L2Bold } from "@argent/x-ui"
+import type { FC } from "react"
 
-import { ArgentAccountType } from "../../../shared/wallet.model"
+import type { WalletAccountType } from "../../../shared/wallet.model"
 
 export interface AccountLabelProps {
-  accountType: ArgentAccountType
+  accountType: WalletAccountType
 }
 
 export const AccountLabel: FC<AccountLabelProps> = ({ accountType }) => {
@@ -24,7 +24,7 @@ export const AccountLabel: FC<AccountLabelProps> = ({ accountType }) => {
   }
 
   return label ? (
-    <L2
+    <L2Bold
       backgroundColor={"neutrals.900"}
       px={1}
       py={0.5}
@@ -36,6 +36,6 @@ export const AccountLabel: FC<AccountLabelProps> = ({ accountType }) => {
       borderColor={"neutrals.700"}
     >
       {label}
-    </L2>
+    </L2Bold>
   ) : null
 }

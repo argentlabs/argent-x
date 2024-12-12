@@ -1,5 +1,5 @@
-import { Address } from "@argent/x-shared"
-import {
+import type { Address } from "@argent/x-shared"
+import type {
   BaseWalletAccount,
   ImportedLedgerAccount,
   RecoveredLedgerMultisig,

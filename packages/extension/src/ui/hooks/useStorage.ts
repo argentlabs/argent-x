@@ -1,11 +1,25 @@
-import { memoize } from "lodash-es"
+import memoize from "memoizee"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { swrCacheProvider } from "../services/swr.service"
-import { IArrayStorage } from "../../shared/storage/array"
-import { IKeyValueStorage } from "../../shared/storage/keyvalue"
-import { IObjectStorage } from "../../shared/storage/object"
-import { SelectorFn } from "../../shared/storage/types"
+import type { IArrayStorage } from "../../shared/storage/array"
+import type { IKeyValueStorage } from "../../shared/storage/keyvalue"
+import type { IObjectStorage } from "../../shared/storage/object"
+import type { SelectorFn } from "../../shared/storage/types"
+
+export function useGetSetKeyValueStorage<
+  T extends Record<string, any> = Record<string, any>,
+  K extends keyof T = keyof T,
+>(storage: IKeyValueStorage<T>, key: K): [T[K], (value: T[K]) => void] {
+  const value = useKeyValueStorage(storage, key)
+  const setValue = useCallback(
+    (value: T[K]) => {
+      void storage.set(key, value)
+    },
+    [storage, key],
+  )
+  return [value, setValue]
+}
 
 export function useKeyValueStorage<
   T extends Record<string, any> = Record<string, any>,
@@ -25,7 +39,7 @@ export function useKeyValueStorage<
   )
 
   useEffect(() => {
-    storage.get(key).then(set)
+    void storage.get(key).then(set)
     const sub = storage.subscribe(key, set)
     return () => sub()
   }, [storage, key, set])
@@ -47,7 +61,7 @@ export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
   )
 
   useEffect(() => {
-    storage.get().then(set)
+    void storage.get().then(set)
     const sub = storage.subscribe(set)
     return () => sub()
   }, [set, storage])
@@ -55,10 +69,7 @@ export function useObjectStorage<T>(storage: IObjectStorage<T>): T {
   return value
 }
 
-const defaultSelector = memoize(
-  () => true,
-  () => "default",
-)
+const defaultSelector = memoize(() => true, { normalizer: () => "default" })
 
 export function useArrayStorage<T>(
   storage: IArrayStorage<T>,
@@ -83,7 +94,7 @@ export function useArrayStorage<T>(
   }, [selector])
 
   useEffect(() => {
-    storage.get().then(set)
+    void storage.get().then(set)
     const sub = storage.subscribe(set)
     return () => sub()
   }, [storage, set])

@@ -1,33 +1,28 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import { useResetAll } from "../../hooks/useResetAll"
+import type { CheckboxProps } from "@chakra-ui/react"
 import {
   Box,
   Button,
   Checkbox,
-  CheckboxProps,
   Circle,
   Flex,
   Input,
   Text,
 } from "@chakra-ui/react"
-import {
-  FieldError,
-  H3,
-  P3,
-  P4,
-  iconsDeprecated,
-  useNavigateBack,
-} from "@argent/x-ui"
-import { Controller, ControllerRenderProps, useForm } from "react-hook-form"
+import { FieldError, H2, icons, P2, P3, useNavigateBack } from "@argent/x-ui"
+import type { ControllerRenderProps } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { isEmpty } from "lodash-es"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
+
+const { ResetPrimaryIcon } = icons
 
 type ResetWalletFormValues = {
   validationString: string
   understood: boolean
 }
-const { RestoreIcon } = iconsDeprecated
 
 export const ResetScreen: FC = () => {
   const onCancel = useNavigateBack()
@@ -54,14 +49,15 @@ export const ResetScreen: FC = () => {
       px={5}
       direction="column"
       as="form"
+      /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
       onSubmit={handleSubmit(submitReset)}
     >
       <Flex flex={1} align="center" flexDirection="column">
         <Circle bg="black" p={4} mt={12} mb={4}>
-          <RestoreIcon w={12} h={12} />
+          <ResetPrimaryIcon w={12} h={12} />
         </Circle>
-        <H3 my={3}>Reset wallet</H3>
-        <P3 color="text-secondary" mb={6} mx={2} textAlign="center">
+        <H2 my={3}>Reset wallet</H2>
+        <P2 color="text-secondary" mb={6} mx={2} textAlign="center">
           Argent does not store your password. You need to reset your wallet.
           Before resetting it is important to{" "}
           <Text as="span" color="text-primary">
@@ -69,7 +65,7 @@ export const ResetScreen: FC = () => {
           </Text>
           (in Argent X settings) otherwise there is no other way to recover your
           wallet
-        </P3>
+        </P2>
         <Controller
           name="validationString"
           control={control}
@@ -121,10 +117,10 @@ export const ResetScreen: FC = () => {
           render={({ field }) => (
             <Flex>
               <CheckboxInput color="text-secondary" {...field} />
-              <P4 color="text-secondary">
+              <P3 color="text-secondary">
                 I understand that if I have not backed up my recovery phrase I
                 cannot recover my wallet
-              </P4>
+              </P3>
             </Flex>
           )}
         />

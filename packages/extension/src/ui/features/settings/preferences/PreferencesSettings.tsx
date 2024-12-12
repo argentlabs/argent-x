@@ -4,10 +4,10 @@ import {
   NavigationContainer,
   Switch,
 } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
-import { NftMarketplace } from "../../../../shared/nft/marketplaces"
-import { BlockExplorer } from "../../../../shared/settings/defaultBlockExplorers"
+import type { NftMarketplace } from "../../../../shared/nft/marketplaces"
+import type { BlockExplorer } from "../../../../shared/settings/defaultBlockExplorers"
 import { routes } from "../../../../shared/ui/routes"
 import { SettingsMenuItem, SettingsMenuItemLink } from "../ui/SettingsMenuItem"
 import { selectedNetworkIdView } from "../../../views/network"
@@ -20,10 +20,9 @@ interface PreferencesSettingsProps {
   nftMarketplace: NftMarketplace
   disableAnimation: boolean
   onDisableAnimationClick: ReactEventHandler
-  hideSpamTokens: boolean
-  onHideSpamTokensClick: ReactEventHandler
   airGapEnabled: boolean
   onEnableAirGapClick: ReactEventHandler
+  selectedIdProvider: "starknetid" | "brotherid"
 }
 
 export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
@@ -33,10 +32,9 @@ export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
   nftMarketplace,
   disableAnimation,
   onDisableAnimationClick,
-  hideSpamTokens,
-  onHideSpamTokensClick,
   airGapEnabled,
   onEnableAirGapClick,
+  selectedIdProvider,
 }) => {
   const selectedNetworkId = useView(selectedNetworkIdView)
 
@@ -46,10 +44,9 @@ export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
       title={"Preferences"}
     >
       <CellStack>
-        <SettingsMenuItem
-          rightIcon={<Switch isChecked={hideSpamTokens} pointerEvents="none" />}
-          title="Hide spam tokens"
-          onClick={onHideSpamTokensClick}
+        <SettingsMenuItemLink
+          to={routes.settingsHiddenAndSpamTokens(returnTo)}
+          title="Hidden and spam tokens"
         />
         <SettingsMenuItemLink
           to={routes.settingsBlockExplorer(returnTo)}
@@ -60,6 +57,13 @@ export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
           to={routes.settingsNftMarketplace(returnTo)}
           title="Default NFT marketplace"
           subtitle={nftMarketplace.title}
+        />
+        <SettingsMenuItemLink
+          to={routes.settingsIdProvider(returnTo)}
+          title="Default Identity provider"
+          subtitle={
+            selectedIdProvider === "brotherid" ? "BrotherID" : "StarknetID"
+          }
         />
         <SettingsMenuItemLink
           to={routes.accountsHidden(selectedNetworkId, returnTo)}

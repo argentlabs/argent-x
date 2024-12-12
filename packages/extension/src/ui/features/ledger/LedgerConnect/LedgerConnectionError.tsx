@@ -1,14 +1,13 @@
-import { L2, P2 } from "@argent/x-ui"
+import { L2Bold, P1 } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 export const LedgerConnectionError: FC<{ error: string }> = ({ error }) => {
   return (
     <Flex gap="8" direction="column">
-      <P2 color="neutrals.200">
+      <P1 color="neutrals.200">
         Please make sure your Ledger is unlocked and the Starknet app is opened
-      </P2>
-
+      </P1>
       <Box
         px={2.5}
         py={3}
@@ -17,7 +16,7 @@ export const LedgerConnectionError: FC<{ error: string }> = ({ error }) => {
         width="max-content"
         borderRadius="12px"
       >
-        <L2>LedgerError: {error}</L2>
+        <L2Bold>LedgerError: {error}</L2Bold>
       </Box>
     </Flex>
   )

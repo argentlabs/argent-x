@@ -1,25 +1,23 @@
-import { Button, H2, P1, iconsDeprecated, logosDeprecated } from "@argent/x-ui"
+import { Button, H1, icons, P1 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
-import { FC, MouseEventHandler, PropsWithChildren, ReactNode } from "react"
+import type { FC, MouseEventHandler, PropsWithChildren, ReactNode } from "react"
 
 import {
-  ContentWrapper,
-  DecoratedPanel,
-  PageWrapper,
-  Panel,
-} from "../../../components/FullScreenPage"
+  OnboardingIllustration,
+  OnboardingContent,
+  OnboardingContainer,
+} from "./OnboardingContainer"
 import { StepIndicator } from "../../../components/StepIndicator"
 
-const { ArrowLeftIcon } = iconsDeprecated
-const { ArgentXLogo } = logosDeprecated
+const { HelpCircleSecondaryIcon, ArrowLeftPrimaryIcon } = icons
 
 interface OnboardingScreenProps extends PropsWithChildren {
   title?: string
   subtitle?: string | ReactNode
   length?: number
   currentIndex?: number
-  icon?: ReactNode
+  illustration?: OnboardingIllustration
   onBack?: MouseEventHandler
 }
 
@@ -29,36 +27,51 @@ export const OnboardingScreen: FC<OnboardingScreenProps> = ({
   length,
   currentIndex,
   onBack,
-  icon = <ArgentXLogo />,
+  illustration,
   children,
 }) => {
   const indicator = isNumber(length) && isNumber(currentIndex)
   return (
-    <PageWrapper>
-      {onBack && (
+    <OnboardingContainer>
+      <OnboardingIllustration illustration={illustration} />
+      <OnboardingContent>
+        {onBack && (
+          <Button
+            size={{ base: "sm", md: "lg" }}
+            position={{ md: "absolute" }}
+            left={8}
+            top={8}
+            onClick={onBack}
+            bgColor={{ md: "surface-default" }}
+            mb={4}
+          >
+            <ArrowLeftPrimaryIcon fontSize={{ base: "base", md: "2xl" }} />
+          </Button>
+        )}
         <Button
-          size={"lg"}
+          size="sm"
+          bg="surface-default"
+          border="1px solid"
+          borderColor="surface-sunken"
           position={"absolute"}
-          left={8}
-          top={8}
-          onClick={onBack}
+          right={8}
+          bottom={8}
+          as="a"
+          href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
+          target="_blank"
+          leftIcon={<HelpCircleSecondaryIcon />}
         >
-          <ArrowLeftIcon fontSize={"2xl"} />
+          Help
         </Button>
-      )}
-      <Panel>
-        <ContentWrapper>
-          {indicator && (
-            <StepIndicator length={length} currentIndex={currentIndex} />
-          )}
-          <Flex flexDirection={"column"} gap={2} my={8}>
-            {title && <H2>{title}</H2>}
-            {subtitle && <P1 color="text-secondary-web">{subtitle}</P1>}
-          </Flex>
-          {children}
-        </ContentWrapper>
-      </Panel>
-      <DecoratedPanel fontSize={"80px"}>{icon}</DecoratedPanel>
-    </PageWrapper>
+        {indicator && (
+          <StepIndicator filled length={length} currentIndex={currentIndex} />
+        )}
+        <Flex flexDirection={"column"} gap={2} mt={10} mb={8}>
+          {title && <H1>{title}</H1>}
+          {subtitle && <P1 color="text-secondary-web">{subtitle}</P1>}
+        </Flex>
+        {children}
+      </OnboardingContent>
+    </OnboardingContainer>
   )
 }

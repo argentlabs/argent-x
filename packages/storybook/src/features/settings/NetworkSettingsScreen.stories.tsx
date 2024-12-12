@@ -1,4 +1,4 @@
-import { NetworkSettingsScreen } from "@argent-x/extension/src/ui/features/settings/developerSettings/manageNetworks/NetworkSettingsScreen"
+import { NetworkSettingsScreen } from "@argent-x/extension/src/ui/features/settings/advanced/manageNetworks/NetworkSettingsScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 

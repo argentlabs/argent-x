@@ -1,28 +1,29 @@
 import browser from "webextension-polyfill"
 import { messageClient } from "../trpc"
-import { IAccountMessagingService } from "./IAccountMessagingService"
-import {
+import type { IAccountMessagingService } from "./IAccountMessagingService"
+import type {
+  AccountId,
   BaseWalletAccount,
   CreateAccountType,
   SignerType,
-  baseWalletAccountSchema,
 } from "../../../shared/wallet.model"
+import { baseWalletAccountSchema } from "../../../shared/wallet.model"
 import { decryptFromBackground, generateEncryptedSecret } from "../crypto"
 import { resetDevice } from "../../../shared/smartAccount/jwt"
 import { clientRecoveryService } from "../recovery"
-import { IRecoveryStorage } from "../../../shared/recovery/types"
-import { IObjectStore } from "../../../shared/storage/__new/interface"
+import type { IRecoveryStorage } from "../../../shared/recovery/types"
+import type { IObjectStore } from "../../../shared/storage/__new/interface"
 import { recoveredAtKeyValueStore } from "../../../shared/recovery/storage"
 import { ampli } from "../../../shared/analytics"
 
 export class AccountMessagingService implements IAccountMessagingService {
   constructor(private recoveryStore: IObjectStore<IRecoveryStorage>) {}
-  async getPrivateKey(account: BaseWalletAccount) {
+  async getPrivateKey(accountId: AccountId) {
     const { secret, encryptedSecret } = await generateEncryptedSecret()
 
     const encryptedPrivateKey =
       await messageClient.accountMessaging.getEncryptedPrivateKey.mutate({
-        account,
+        accountId,
         encryptedSecret,
       })
 
@@ -74,17 +75,8 @@ export class AccountMessagingService implements IAccountMessagingService {
   }
 
   // Can be cached
-  async getPublicKey(account?: BaseWalletAccount) {
-    let parsedAccount = account
-
-    // account is optional, if we don't pass it, we will use selected account
-    if (parsedAccount) {
-      parsedAccount = baseWalletAccountSchema.parse(account)
-    }
-
-    return messageClient.accountMessaging.getPublicKey.query({
-      account: parsedAccount,
-    })
+  async getPublicKey(accountId?: string) {
+    return messageClient.accountMessaging.getPublicKey.query({ accountId })
   }
 
   // Cannot be cached as it is network dependent
@@ -134,7 +126,7 @@ export class AccountMessagingService implements IAccountMessagingService {
       await clientRecoveryService.bySeedPhrase(seedPhrase, password)
       await this.recoveryStore.set({ isClearingStorage: false })
       void recoveredAtKeyValueStore.set("lastRecoveredAt", Date.now())
-    } catch (e) {
+    } catch {
       await this.recoveryStore.set({ isClearingStorage: false })
     }
   }

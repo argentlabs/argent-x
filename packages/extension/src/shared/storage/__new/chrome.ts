@@ -11,7 +11,7 @@ import type {
   StorageChange,
   UpsertResult,
 } from "./interface"
-import { DeepPick } from "../../types/deepPick"
+import type { DeepPick } from "../../types/deepPick"
 
 interface ChromeRepositoryOptions {
   areaName: chrome.storage.AreaName

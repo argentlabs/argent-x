@@ -1,9 +1,10 @@
-import { H5, KnownDappButton, P4 } from "@argent/x-ui"
-import { Center, CenterProps, Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { H4, KnownDappButton, P3 } from "@argent/x-ui"
+import type { CenterProps } from "@chakra-ui/react"
+import { Center, Flex } from "@chakra-ui/react"
+import type { FC } from "react"
 
 import { DappIcon } from "./DappIcon"
-import { DappDisplayAttributes } from "./useDappDisplayAttributes"
+import type { DappDisplayAttributes } from "../../../services/knownDapps/types"
 
 export interface DappActionHeaderProps extends CenterProps {
   host: string
@@ -22,11 +23,11 @@ export const DappActionHeader: FC<DappActionHeaderProps> = ({
   return (
     <Center flexDirection={"column"} textAlign={"center"} gap={1} {...rest}>
       <DappIcon dappDisplayAttributes={dappDisplayAttributes} />
-      <H5 mt={4}>{title}</H5>
+      <H4 mt={4}>{title}</H4>
       <Flex gap="1" align="flex-end">
-        <P4 fontWeight="bold" color={"neutrals.300"}>
+        <P3 fontWeight="bold" color={"neutrals.300"}>
           {hostName}
-        </P4>
+        </P3>
         {dappDisplayAttributes?.verified && (
           <KnownDappButton dapplandUrl={dappDisplayAttributes.dapplandUrl} />
         )}

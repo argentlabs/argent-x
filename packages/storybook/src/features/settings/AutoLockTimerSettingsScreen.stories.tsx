@@ -1,4 +1,4 @@
-import { AutoLockTimerSettingsScreen } from "@argent-x/extension/src/ui/features/settings/securityAndPrivacy/AutoLockTimerSettingsScreen"
+import { AutoLockTimerSettingsScreen } from "@argent-x/extension/src/ui/features/settings/securityAndRecovery/AutoLockTimerSettingsScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 

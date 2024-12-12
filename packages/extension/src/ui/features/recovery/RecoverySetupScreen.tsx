@@ -1,20 +1,21 @@
 import {
   BarCloseButton,
+  CellStack,
+  H1,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
+  P2,
 } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
-import { Option } from "../../components/Options"
-import { PageWrapper, Paragraph, Title } from "../../components/Page"
+import { Option } from "../../components/Option"
 import { useReturnTo } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import { CircleIconContainer } from "./ui/CircleIconContainer"
 import { ComingSoonIcon } from "./ui/ComingSoonIcon"
-import { Grid } from "@chakra-ui/react"
 
-const { RestoreIcon } = iconsDeprecated
+const { ResetPrimaryIcon } = icons
 
 export const RecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
@@ -27,31 +28,29 @@ export const RecoverySetupScreen: FC = () => {
         />
       }
     >
-      <PageWrapper>
-        <Title>Set up account recovery</Title>
-        <Paragraph>
+      <CellStack>
+        <H1>Set up account recovery</H1>
+        <P2>
           Choose one or more of the methods below to ensure you can access your
           accounts.
-        </Paragraph>
-        <Grid templateColumns="1fr" gap={4}>
-          <Option
-            title="With Argent guardian"
-            description="Coming soon"
-            disabled
-            icon={<ComingSoonIcon />}
-          />
-          <Link to={routes.setupSeedRecovery(returnTo)}>
-            <Option
-              title="Save the recovery phrase"
-              icon={
-                <CircleIconContainer>
-                  <RestoreIcon />
-                </CircleIconContainer>
-              }
-            />
-          </Link>
-        </Grid>
-      </PageWrapper>
+        </P2>
+        <Option
+          title="With Argent guardian"
+          description="Coming soon"
+          disabled
+          icon={<ComingSoonIcon />}
+        />
+        <Option
+          as={Link}
+          to={routes.setupSeedRecovery(returnTo)}
+          title="Save the recovery phrase"
+          icon={
+            <CircleIconContainer>
+              <ResetPrimaryIcon />
+            </CircleIconContainer>
+          }
+        />
+      </CellStack>
     </NavigationContainer>
   )
 }

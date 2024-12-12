@@ -1,16 +1,9 @@
 import { AlertDialog, useToast } from "@argent/x-ui"
 import { useAtom } from "jotai"
 import { isArray } from "lodash-es"
-import {
-  FC,
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
-import { Call } from "starknet"
+import type { FC, PropsWithChildren, ReactNode } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { Call } from "starknet"
 
 import { resetDevice } from "../../../shared/smartAccount/jwt"
 import { getVerifiedEmailIsExpiredForRemoval } from "../../../shared/smartAccount/verifiedEmail"
@@ -47,25 +40,16 @@ enum SmartAccountVerifiedState {
  * If the current account has a Guardian, check and handle the email / otp verification flow using local state
  */
 
-interface PropsWithTransactions extends PropsWithChildren {
+interface WithSmartAccountVerifiedProps extends PropsWithChildren {
   /** if provided transactions, check if it is remove guardian as this also affects expiry check  */
   transactions?: Call | Call[]
+  fallback?: ReactNode
 }
 
-export const WithSmartAccountVerified: FC<PropsWithTransactions> = ({
+export const WithSmartAccountVerified: FC<WithSmartAccountVerifiedProps> = ({
   children,
   transactions,
-}) => {
-  return (
-    <WithSmartAccountVerifiedScreen transactions={transactions}>
-      {children}
-    </WithSmartAccountVerifiedScreen>
-  )
-}
-
-const WithSmartAccountVerifiedScreen: FC<PropsWithTransactions> = ({
-  children,
-  transactions,
+  fallback = <ScreenSkeleton list />,
 }) => {
   // TODO: refactor all this logic into service and pass only clean state into React
   // this flag prevents the expiry flow re-triggering on internal state change
@@ -207,7 +191,9 @@ const WithSmartAccountVerifiedScreen: FC<PropsWithTransactions> = ({
               onEmailRequested(_unverifiedEmail)
             } catch (error) {
               // user can navigate back to re-enter their email
-              IS_DEV && console.warn(coerceErrorToString(error))
+              if (IS_DEV) {
+                console.warn(coerceErrorToString(error))
+              }
               toast({
                 title: "Unable to verify email",
                 status: "error",
@@ -237,7 +223,7 @@ const WithSmartAccountVerifiedScreen: FC<PropsWithTransactions> = ({
 
   switch (state) {
     case SmartAccountVerifiedState.INITIALISING:
-      return <ScreenSkeleton list />
+      return fallback
     case SmartAccountVerifiedState.VERIFY_EMAIL:
       return (
         <>

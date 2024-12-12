@@ -7,6 +7,7 @@ import { addressSchema } from "@argent/x-shared"
 import { estimatedFeeSchema } from "@argent/x-shared/simulation"
 import { AccountError } from "../../../../shared/errors/account"
 import { getErrorObject } from "../../../../shared/utils/error"
+import { walletAccountToArgentAccount } from "../../../../shared/utils/isExternalAccount"
 
 const estimateRequestSchema = z.object({
   account: baseWalletAccountSchema.optional(),
@@ -25,7 +26,7 @@ export const estimateAccountDeployProcedure = extensionOnlyProcedure
       },
     }) => {
       const account = providedAccount
-        ? await wallet.getAccount(providedAccount)
+        ? await wallet.getAccount(providedAccount.id)
         : await wallet.getSelectedAccount()
 
       if (!account) {
@@ -33,7 +34,10 @@ export const estimateAccountDeployProcedure = extensionOnlyProcedure
       }
 
       try {
-        return await wallet.getAccountDeploymentFee(account, feeTokenAddress)
+        return await wallet.getAccountDeploymentFee(
+          walletAccountToArgentAccount(account),
+          feeTokenAddress,
+        )
       } catch (error) {
         console.error("estimateAccountDeployProcedure", error)
         throw new AccountError({

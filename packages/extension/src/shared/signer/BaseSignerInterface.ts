@@ -1,4 +1,5 @@
-import { Signature, SignerInterface } from "starknet"
+import type { Signature } from "starknet"
+import { SignerInterface } from "starknet"
 
 export abstract class BaseSignerInterface extends SignerInterface {
   abstract signerType: string

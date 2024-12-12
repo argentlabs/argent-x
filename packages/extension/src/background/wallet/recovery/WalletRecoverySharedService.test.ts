@@ -4,25 +4,25 @@ import { generateMnemonic, mnemonicToSeedSync } from "@scure/bip39"
 import { wordlist } from "@scure/bip39/wordlists/english"
 import { grindKey } from "micro-starknet"
 import { encode } from "starknet"
-import { Mock } from "vitest"
+import type { Mock } from "vitest"
 
 import { defaultNetworks } from "../../../shared/network"
-import {
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { WalletSession } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletSession } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import { WalletRecoverySharedService } from "./WalletRecoverySharedService"
+import type { WalletRecoveryStarknetService } from "./WalletRecoveryStarknetService"
+import { WalletError } from "../../../shared/errors/wallet"
+import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 import {
   emitterMock,
   getSessionStoreMock,
   getStoreMock,
   getWalletStoreMock,
-} from "../test.utils"
-import { WalletRecoverySharedService } from "./WalletRecoverySharedService"
-import { WalletRecoveryStarknetService } from "./WalletRecoveryStarknetService"
-import { WalletError } from "../../../shared/errors/wallet"
-import { WalletStorageProps } from "../../../shared/wallet/walletStore"
+} from "../../../shared/test.utils"
 
 describe("WalletRecoverySharedService", () => {
   let service: WalletRecoverySharedService

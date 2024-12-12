@@ -3,7 +3,7 @@ import type {
   NetworkChangeEventHandler,
   WalletEvents,
 } from "@starknet-io/types-js"
-import type { BackwardsCompatibleStarknetWindowObject } from "starknetkit/window"
+import type { BackwardsCompatibleStarknetWindowObject } from "@argent/x-window"
 
 import { assertNever } from "../shared/utils/assertNever"
 import { sendMessage, waitForMessage } from "./messageActions"

@@ -1,7 +1,3 @@
-import { Call } from "starknet"
-
-import { ArgentAccountType } from "../../../../shared/wallet.model"
-
 export enum ApproveScreenType {
   TRANSACTION,
   DECLARE,
@@ -16,29 +12,3 @@ export enum ApproveScreenType {
   ADD_GUARDIAN,
   REMOVE_GUARDIAN,
 }
-
-export type TransactionActionsType =
-  | {
-      type: "INVOKE_FUNCTION"
-      payload: Call[]
-    }
-  | {
-      type: "DEPLOY_ACCOUNT"
-      payload: {
-        accountAddress: string
-        classHash?: string
-        type: ArgentAccountType
-      }
-    }
-  | {
-      type: "ADD_GUARDIAN"
-      payload: {
-        accountAddress: string
-      }
-    }
-  | {
-      type: "REMOVE_GUARDIAN"
-      payload: {
-        accountAddress: string
-      }
-    }

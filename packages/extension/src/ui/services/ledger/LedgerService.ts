@@ -1,7 +1,7 @@
-import { ILedgerService } from "./ILedgerService"
+import type { ILedgerService } from "./ILedgerService"
 import { messageClient } from "../trpc"
-import { Address } from "@argent/x-shared"
-import { ImportedLedgerAccount } from "../../../shared/wallet.model"
+import type { Address } from "@argent/x-shared"
+import type { ImportedLedgerAccount } from "../../../shared/wallet.model"
 
 export class LedgerService implements ILedgerService {
   constructor(private trpcMessageClient: typeof messageClient) {}

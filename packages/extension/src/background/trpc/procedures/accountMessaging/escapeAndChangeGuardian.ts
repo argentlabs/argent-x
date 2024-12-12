@@ -31,7 +31,7 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
          * 2. changeGuardian to ZERO, signed twice by same signer key (like 2/2 multisig with same key)
          */
 
-        const selectedAccount = await wallet.getAccount(account)
+        const selectedAccount = await wallet.getAccount(account.id)
         const starknetAccount = await wallet.getSelectedStarknetAccount()
 
         if (!selectedAccount) {
@@ -40,7 +40,7 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
           })
         }
 
-        const { publicKey } = await wallet.getPublicKey(account)
+        const { publicKey } = await wallet.getPublicKey(account.id)
 
         if (
           selectedAccount.guardian &&
@@ -69,7 +69,7 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
                 isChangeGuardian: true,
                 title: "Remove guardian (1/2)",
                 type: "INVOKE",
-                icon: "SmartAccountInactiveIcon",
+                icon: "NoShieldSecondaryIcon",
                 ampliProperties: {
                   "is deployment": false,
                   "transaction type": "remove guardian",
@@ -109,7 +109,7 @@ export const escapeAndChangeGuardianProcedure = extensionOnlyProcedure
                 isChangeGuardian: true,
                 title: "Remove guardian (2/2)",
                 type: "INVOKE",
-                icon: "SmartAccountInactiveIcon",
+                icon: "NoShieldSecondaryIcon",
                 ampliProperties: {
                   "is deployment": false,
                   "transaction type": "remove guardian",

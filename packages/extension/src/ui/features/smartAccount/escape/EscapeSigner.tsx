@@ -1,6 +1,6 @@
-import { Button, FlowHeader, P4, iconsDeprecated } from "@argent/x-ui"
+import { Button, FlowHeader, icons, P3 } from "@argent/x-ui"
 import { Flex, VStack } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/escape.model"
 
@@ -9,10 +9,10 @@ import {
   ESCAPE_GUARDIAN_LINK,
   SmartAccountExternalLinkButton,
 } from "../ui/SmartAccountExternalLinkButton"
-import { getEscapeDisplayAttributes } from "./EscapeBanner"
-import { LiveAccountEscapeProps } from "./useAccountEscape"
+import { getEscapeDisplayAttributes } from "./getEscapeDisplayAttributes"
+import type { LiveAccountEscapeProps } from "./useAccountEscape"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
 
 interface EscapeSignerProps {
   liveAccountEscape: LiveAccountEscapeProps
@@ -30,20 +30,20 @@ export const EscapeSigner: FC<EscapeSignerProps> = ({
   return (
     <Flex flexDirection={"column"} flex={1} px={4} pt={8} pb={4}>
       <FlowHeader
-        icon={AlertIcon}
+        icon={WarningCircleSecondaryIcon}
         title={title}
         subtitle={`In ${activeFromNowPretty} this account will be controlled by another key.`}
         variant={colorScheme}
       />
-      <P4 color="neutrals.400">
+      <P3 color="neutrals.400">
         If you don’t recognize this action,{" "}
         <strong>please contact Argent Support</strong>.
-      </P4>
-      <P4 color="neutrals.400" mt={4}>
+      </P3>
+      <P3 color="neutrals.400" mt={4}>
         If you can’t reach Argent support within {activeFromNowPretty}, we
         recommend you start Argent Guardian removal process. This will take{" "}
         {ESCAPE_SECURITY_PERIOD_DAYS} days. Check detailed instructions here:
-      </P4>
+      </P3>
       <SmartAccountExternalLinkButton
         onClick={() => undefined}
         href={ESCAPE_GUARDIAN_LINK}

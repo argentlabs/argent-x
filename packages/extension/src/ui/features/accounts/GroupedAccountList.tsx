@@ -1,11 +1,11 @@
-import { H6 } from "@argent/x-ui"
+import { H5 } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
-import { FC, Suspense } from "react"
+import type { FC } from "react"
 
-import { PendingMultisig } from "../../../shared/multisig/types"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { Account } from "./Account"
+import type { PendingMultisig } from "../../../shared/multisig/types"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { Account } from "./Account"
 import { AccountListScreenItemContainer } from "./AccountListScreenItemContainer"
 import { MultisigListScreenItemContainer } from "../multisig/MultisigListScreenItemContainer"
 
@@ -15,7 +15,7 @@ export interface GroupedAccountListProps {
   icon: React.ReactNode
   selectedAccount?: BaseWalletAccount
   returnTo?: string
-  type: "standard" | "multisig"
+  type: "standard" | "multisig" | "imported"
   pendingMultisigs?: PendingMultisig[]
   showTitle?: boolean
 }
@@ -35,9 +35,11 @@ export const GroupedAccountList: FC<GroupedAccountListProps> = ({
   return !isEmpty(groupedAccounts) ? (
     <Flex direction="column" gap={3} alignItems="flex-start">
       {showTitle && (
-        <Flex gap={2} align="center" color="neutrals.300" px={2}>
+        <Flex gap={2} align="center" color="text-secondary" px={2}>
           {icon}
-          <H6>{title}</H6>
+          <H5 data-testid={`${title.toLocaleLowerCase().replace(" ", "-")}`}>
+            {title}
+          </H5>
         </Flex>
       )}
       {/** Render standard account list items for standard accounts */}
@@ -60,6 +62,16 @@ export const GroupedAccountList: FC<GroupedAccountListProps> = ({
           returnTo={returnTo}
         />
       )}
+      {type === "imported" &&
+        accounts.map((account) => (
+          <Box key={account.address} w="full">
+            <AccountListScreenItemContainer
+              account={account}
+              selectedAccount={selectedAccount}
+              returnTo={returnTo}
+            />
+          </Box>
+        ))}
     </Flex>
   ) : (
     <></>

@@ -1,4 +1,4 @@
-import { iconsDeprecated } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import {
   Accordion,
   AccordionButton,
@@ -6,11 +6,12 @@ import {
   AccordionPanel,
   Flex,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-import { FeeEstimationText, FeeEstimationTextProps } from "./FeeEstimationText"
+import type { FeeEstimationTextProps } from "./FeeEstimationText"
+import { FeeEstimationText } from "./FeeEstimationText"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
 
 export const InsufficientFundsAccordion: FC<FeeEstimationTextProps> = (
   props,
@@ -28,7 +29,11 @@ export const InsufficientFundsAccordion: FC<FeeEstimationTextProps> = (
       <AccordionItem>
         <AccordionButton sx={{ pointerEvents: "none" }}>
           <Flex mr="auto" textAlign="left" alignItems={"center"}>
-            <AlertIcon display={"inline-block"} fontSize={"base"} mr={1} />
+            <WarningCircleSecondaryIcon
+              display={"inline-block"}
+              fontSize={"base"}
+              mr={1}
+            />
             Insufficient funds to pay network fee
           </Flex>
         </AccordionButton>

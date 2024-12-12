@@ -1,15 +1,16 @@
 import { uniqWith } from "lodash-es"
 
-import { IHttpService } from "@argent/x-shared"
+import type { IHttpService } from "@argent/x-shared"
 import urlJoin from "url-join"
 import { ARGENT_NETWORK_STATUS } from "../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../shared/api/headers"
 import { NetworkError } from "../../../shared/errors/network"
-import { ColorStatus, Network } from "../../../shared/network"
+import type { ColorStatus, Network } from "../../../shared/network"
 import { colorStatusSchema } from "../../../shared/network/schema"
-import { INetworkWithStatusRepo } from "../../../shared/network/statusStore"
-import { INetworkRepo, networksEqual } from "../../../shared/network/store"
-import { IBackgroundNetworkService } from "./IBackgroundNetworkService"
+import type { INetworkWithStatusRepo } from "../../../shared/network/statusStore"
+import type { INetworkRepo } from "../../../shared/network/store"
+import { networksEqual } from "../../../shared/network/store"
+import type { IBackgroundNetworkService } from "./IBackgroundNetworkService"
 
 export default class BackgroundNetworkService
   implements IBackgroundNetworkService
@@ -55,7 +56,7 @@ export default class BackgroundNetworkService
             status: colorStatusSchema.parse(response.state),
             id: network.id,
           }
-        } catch (error) {
+        } catch {
           return {
             id: network.id,
             status: "unknown" as ColorStatus,

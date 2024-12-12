@@ -1,16 +1,18 @@
-import { CairoVersion, shortString } from "starknet"
-import { Network, getProvider } from "../network"
+import type { CairoVersion } from "starknet"
+import { shortString } from "starknet"
+import type { Network } from "../network"
+import { getProvider } from "../network"
 import semver from "semver"
-import { ArgentAccountType } from "../wallet.model"
+import type { WalletAccountType } from "../wallet.model"
 import { getMulticallForNetwork } from "../multicall"
 
 export async function getAccountCairoVersion(
   accountAddress: string,
   network: Network,
-  type: ArgentAccountType = "standard",
+  type: WalletAccountType = "standard",
 ): Promise<CairoVersion | undefined> {
   try {
-    if (type === "multisig" || type === "smart") {
+    if (type === "multisig" || type === "smart" || type === "imported") {
       return "1" // Only Cairo version 1 is supported for multisig and smart accounts
     }
 
@@ -42,7 +44,7 @@ export async function getAccountCairoVersion(
     }
 
     return "0"
-  } catch (e) {
+  } catch {
     return undefined
   }
 }

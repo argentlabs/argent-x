@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 
 export enum ADDRESS_BOOK_ERROR_MESSAGES {
   ADD_CONTACT_FAILED = "Could not add contact",

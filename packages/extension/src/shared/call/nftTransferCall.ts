@@ -1,5 +1,6 @@
 import { normalizeAddress } from "@argent/x-shared"
-import { Call, CallData, num, uint256, validateAndParseAddress } from "starknet"
+import type { Call } from "starknet"
+import { CallData, num, uint256, validateAndParseAddress } from "starknet"
 
 const { uint256ToBN } = uint256
 
@@ -40,7 +41,7 @@ export const isNftTransferCall = (call: Call): call is NftTransferCall => {
       })
       return tokenId !== undefined
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

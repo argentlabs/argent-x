@@ -1,15 +1,16 @@
-import { Address } from "@argent/x-shared"
-import { SwapOrderResponse } from "../../../shared/swap/model/order.model"
-import { SwapQuoteResponse } from "../../../shared/swap/model/quote.model"
-import { Trade } from "../../../shared/swap/model/trade.model"
-import { Call } from "starknet"
+import type { Address } from "@argent/x-shared"
+import type { SwapOrderResponse } from "../../../shared/swap/model/order.model"
+import type { SwapQuoteResponse } from "../../../shared/swap/model/quote.model"
+import type { Trade } from "../../../shared/swap/model/trade.model"
+import type { Call } from "starknet"
 
 export interface ISwapService {
   getSwapQuoteForPay: (
     payTokenAddress: Address,
     receiveTokenAddress: Address,
-    payAmount: string,
     accountAddress: Address,
+    sellAmount?: string,
+    buyAmount?: string,
   ) => Promise<SwapQuoteResponse>
   getSwapTradeFromQuote: (
     quote: SwapQuoteResponse,

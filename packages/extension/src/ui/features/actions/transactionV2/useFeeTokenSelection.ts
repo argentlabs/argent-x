@@ -1,16 +1,16 @@
+import type { TokenWithBalance } from "@argent/x-shared"
 import {
   classHashSupportsTxV3,
   ETH_TOKEN_ADDRESS,
   isEqualAddress,
-  TokenWithBalance,
 } from "@argent/x-shared"
-import { EstimatedFee, EstimatedFees } from "@argent/x-shared/simulation"
+import type { EstimatedFee, EstimatedFees } from "@argent/x-shared/simulation"
 import { useEffect, useState } from "react"
 import { num } from "starknet"
 import { equalToken } from "../../../../shared/token/__new/utils"
-import { WalletAccount } from "../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../shared/wallet.model"
 import { hasFeeTokenEnoughBalance } from "./utils/hasFeeTokenEnoughBalance"
-import { TokenWithBalance as TokenWithStringBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import type { TokenWithBalance as TokenWithStringBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
 
 interface FeeTokenSelectionProps {
   isFeeTokenSelectionReady: boolean
@@ -61,11 +61,12 @@ export const useFeeTokenSelection = ({
       const ethToken = uncheckedFeeTokens.find((token) =>
         isEqualAddress(token.address, ETH_TOKEN_ADDRESS),
       )
-      ethToken &&
+      if (ethToken) {
         setFeeToken({
           ...ethToken,
           balance: num.toBigInt(ethToken.balance ?? 0),
         })
+      }
       setIsFeeTokenSelectionReady(true)
     } else if (feeToken && fee) {
       const feeTokenNeedsUpdate = !hasFeeTokenEnoughBalance(feeToken, fee)

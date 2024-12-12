@@ -1,10 +1,10 @@
-import { iconsDeprecated } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import { icons } from "@argent/x-ui"
+import type { FC, ReactEventHandler } from "react"
 
 import { AccountListItem } from "./AccountListItem"
 import type { AccountListItemProps } from "./accountListItem.model"
 
-const { ChevronRightIcon } = iconsDeprecated
+const { ChevronRightSecondaryIcon } = icons
 
 interface AccountListScreenItemProps extends AccountListItemProps {
   clickNavigateSettings?: boolean
@@ -29,7 +29,7 @@ export const AccountListScreenItem: FC<AccountListScreenItemProps> = ({
       }}
       {...rest}
     >
-      {clickNavigateSettings && <ChevronRightIcon opacity={0.6} />}
+      {clickNavigateSettings && <ChevronRightSecondaryIcon opacity={0.6} />}
     </AccountListItem>
   )
 }

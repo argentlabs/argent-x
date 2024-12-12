@@ -1,45 +1,44 @@
+import type { Address, Hex, Implementation } from "@argent/x-shared"
 import {
-  Address,
-  Implementation,
+  AddSmartAcountRequestSchema,
   addressSchema,
+  estimatedFeeToMaxResourceBounds,
   findImplementationForAccount,
   getAccountDeploymentPayload,
+  getTxVersionFromFeeToken,
+  hexSchema,
   isContractDeployed,
   isEqualAddress,
-  getTxVersionFromFeeToken,
-  estimatedFeeToMaxResourceBounds,
-  AddSmartAcountRequestSchema,
 } from "@argent/x-shared"
-import {
-  CallData,
+import type {
   DeployAccountContractTransaction,
   EstimateFeeDetails,
-  hash,
-  stark,
 } from "starknet"
-import { PendingMultisig } from "../../../shared/multisig/types"
+import { CallData, hash, stark, TransactionType } from "starknet"
 import { getMultisigAccountFromBaseWallet } from "../../../shared/multisig/utils/baseMultisig"
 import { getProvider } from "../../../shared/network/provider"
-import { INetworkService } from "../../../shared/network/service/INetworkService"
-import {
+import type { INetworkService } from "../../../shared/network/service/INetworkService"
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import {
+import type {
+  ArgentWalletAccount,
   BaseMultisigWalletAccount,
   CreateAccountType,
   CreateWalletAccount,
   MultisigData,
-  SignerType,
   WalletAccount,
 } from "../../../shared/wallet.model"
+import { SignerType } from "../../../shared/wallet.model"
 
-import { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import type { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
 
 import { stringToBytes } from "@scure/base"
 import { keccak, pedersen } from "micro-starknet"
-import { BigNumberish, constants, num } from "starknet"
-import { AnalyticsService } from "../../../shared/analytics/AnalyticsService"
+import type { BigNumberish } from "starknet"
+import { constants, num } from "starknet"
+import type { AnalyticsService } from "../../../shared/analytics/AnalyticsService"
 import { AccountError } from "../../../shared/errors/account"
 import { SessionError } from "../../../shared/errors/session"
 import { WalletError } from "../../../shared/errors/wallet"
@@ -48,27 +47,29 @@ import {
   STRK_TOKEN_ADDRESS,
 } from "../../../shared/network/constants"
 import { addBackendAccount } from "../../../shared/smartAccount/backend/account"
-import {
-  getIndexForPath,
-  getPathForIndex,
-} from "../../../shared/utils/derivationPath"
-import { getNonce, increaseStoredNonce } from "../../nonce"
-import { WalletAccountStarknetService } from "../account/WalletAccountStarknetService"
-import { WalletBackupService } from "../backup/WalletBackupService"
-import { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
-import { IReferralService } from "../../services/referral/IReferralService"
-import { WalletSessionService } from "../session/WalletSessionService"
+import { getPathForIndex } from "../../../shared/utils/derivationPath"
+import type { IReferralService } from "../../services/referral/IReferralService"
+import type { WalletAccountStarknetService } from "../account/WalletAccountStarknetService"
+import type { WalletBackupService } from "../backup/WalletBackupService"
+import type { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
+import type { WalletSessionService } from "../session/WalletSessionService"
 import type { WalletSession } from "../session/walletSession.model"
-import {
+import type {
   DeployAccountContractPayload,
   IWalletDeploymentService,
 } from "./IWalletDeploymentService"
 
-import { EstimatedFee } from "@argent/x-shared/simulation"
+import type { EstimatedFee } from "@argent/x-shared/simulation"
+import type { BaseSignerInterface } from "../../../shared/signer/BaseSignerInterface"
 import { getBaseDerivationPath } from "../../../shared/signer/utils"
-import { BaseSignerInterface } from "../../../shared/signer/BaseSignerInterface"
 import { sanitizeAccountType } from "../../../shared/utils/sanitizeAccountType"
 import { sanitizeSignerType } from "../../../shared/utils/sanitizeSignerType"
+import {
+  deserializeAccountIdentifier,
+  getAccountIdentifier,
+} from "../../../shared/utils/accountIdentifier"
+import { ArgentSigner } from "../../../shared/signer"
+import { addEstimatedFee } from "../../../shared/transactionSimulation/fees/estimatedFeesRepository"
 
 const { calculateContractAddressFromHash } = hash
 
@@ -94,7 +95,6 @@ export class WalletDeploymentStarknetService
   constructor(
     private readonly walletStore: IRepository<WalletAccount>,
     private readonly multisigStore: IRepository<BaseMultisigWalletAccount>,
-    private readonly pendingMultisigStore: IRepository<PendingMultisig>,
     private readonly sessionService: WalletSessionService,
     public readonly sessionStore: IObjectStore<WalletSession | null>,
     private readonly accountSharedService: WalletAccountSharedService,
@@ -107,64 +107,42 @@ export class WalletDeploymentStarknetService
   ) {}
 
   public async deployAccount(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
     transactionDetails?: EstimateFeeDetails | undefined,
   ): Promise<{ account: WalletAccount; txHash: string }> {
-    const starknetAccount =
-      await this.accountStarknetService.getStarknetAccount(walletAccount)
-
-    if (!starknetAccount) {
-      throw new AccountError({ code: "NOT_FOUND" })
-    }
-
-    if (!("deployAccount" in starknetAccount)) {
-      throw new AccountError({ code: "CANNOT_DEPLOY_OLD_ACCOUNTS" })
-    }
-
-    const deployAccountPayload =
-      await this.getAccountOrMultisigDeploymentPayload(walletAccount)
-
-    const estimatedFees = estimatedFeeToMaxResourceBounds(
-      await this.getAccountDeploymentFee(
-        walletAccount,
-        mapVersionToFeeToken(transactionDetails?.version ?? "0x1"),
-      ),
+    const { payload, details, account } = await this.buildDeploymentPayload(
+      walletAccount,
+      transactionDetails,
     )
+    const { transaction_hash } = await account.deployAccount(payload, details)
 
-    const maxFeeOrBounds =
-      transactionDetails?.maxFee || transactionDetails?.resourceBounds
-        ? {
-            maxFee: transactionDetails?.maxFee,
-            resourceBounds: transactionDetails?.resourceBounds,
-          }
-        : estimatedFees
+    const { signer } = deserializeAccountIdentifier(walletAccount.id)
 
-    const { transaction_hash } = await starknetAccount.deployAccount(
-      deployAccountPayload,
-      {
-        ...transactionDetails,
-        ...maxFeeOrBounds,
-      },
-    )
-    const baseDerivationPath = getBaseDerivationPath(
-      walletAccount.type !== "multisig" ? "standard" : "multisig",
-      walletAccount.signer.type,
-    )
     this.ampli.accountDeployed({
-      "account index": getIndexForPath(
-        walletAccount.signer.derivationPath,
-        baseDerivationPath,
-      ),
+      "account index": signer.index,
       "account type": sanitizeAccountType(walletAccount.type),
       "wallet platform": "browser extension",
     })
-    await this.accountSharedService.selectAccount(walletAccount)
+    await this.accountSharedService.selectAccount(walletAccount.id)
 
     return { account: walletAccount, txHash: transaction_hash }
   }
 
+  public async getDeployAccountTransactionHash(
+    walletAccount: ArgentWalletAccount,
+    transactionDetails?: EstimateFeeDetails | undefined,
+  ): Promise<Hex> {
+    const { account, payload, details } = await this.buildDeploymentPayload(
+      walletAccount,
+      transactionDetails,
+    )
+
+    const hash = await account.getAccountDeployTransactionHash(payload, details)
+    return hexSchema.parse(hash)
+  }
+
   public async getAccountOrMultisigDeploymentPayload(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
   ) {
     if (walletAccount.type === "multisig") {
       return this.getMultisigDeploymentPayload(walletAccount)
@@ -173,11 +151,11 @@ export class WalletDeploymentStarknetService
   }
 
   public async getAccountDeploymentFee(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
     feeTokenAddress: Address,
   ): Promise<EstimatedFee> {
     const starknetAccount =
-      await this.accountStarknetService.getStarknetAccount(walletAccount)
+      await this.accountStarknetService.getStarknetAccount(walletAccount.id)
 
     if (!("deployAccount" in starknetAccount)) {
       throw new AccountError({ code: "CANNOT_ESTIMATE_DEPLOY_OLD_ACCOUNTS" })
@@ -200,47 +178,31 @@ export class WalletDeploymentStarknetService
       })
     }
 
-    return {
+    const fees = {
       feeTokenAddress,
       amount: gas_consumed,
       pricePerUnit: gas_price,
       dataGasConsumed: data_gas_consumed,
       dataGasPrice: data_gas_price,
     }
-  }
 
-  public async redeployAccount(account: WalletAccount) {
-    if (!(await this.sessionService.isSessionOpen())) {
-      throw new SessionError({ code: "NO_OPEN_SESSION" })
-    }
-    const starknetAccount =
-      await this.accountStarknetService.getStarknetAccount({
-        address: account.address,
-        networkId: account.networkId,
-      })
-    const nonce = await getNonce(account, starknetAccount)
-
-    const deployTransaction = await this.deployAccount(account, { nonce })
-
-    await increaseStoredNonce(account)
-
-    return { account, txHash: deployTransaction.txHash }
+    await addEstimatedFee(
+      { transactions: fees },
+      { type: TransactionType.DEPLOY_ACCOUNT, payload: deployAccountPayload },
+    )
+    return fees
   }
 
   /** Get the Account Deployment Payload
    * Use it in the deployAccount and getAccountDeploymentFee methods
-   * @param  {WalletAccount} walletAccount
+   * @param  {ArgentWalletAccount} walletAccount
    */
   public async getAccountDeploymentPayload(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
   ): Promise<Required<DeployAccountContractPayload>> {
-    const { address, network, signer, type, guardian, salt } = walletAccount
+    const { id, address, network, type, guardian, salt } = walletAccount
 
-    const publicKey =
-      await this.cryptoStarknetService.getPubKeyByDerivationPathForSigner(
-        signer.type,
-        signer.derivationPath,
-      )
+    const { publicKey } = await this.cryptoStarknetService.getPublicKey(id)
 
     // If no class hash is provided by the account, we want to add the network implementation to check
     const networkImplementation: Implementation = {
@@ -274,7 +236,7 @@ export class WalletDeploymentStarknetService
   }
 
   public async getMultisigDeploymentPayload(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
   ): Promise<Required<DeployAccountContractPayload>> {
     const multisigAccount =
       await getMultisigAccountFromBaseWallet(walletAccount)
@@ -283,13 +245,27 @@ export class WalletDeploymentStarknetService
       throw new AccountError({ code: "MULTISIG_NOT_FOUND" })
     }
 
-    const { address, network, signer, threshold, signers } = multisigAccount
+    const { id, address, network, threshold, signers } = multisigAccount
 
-    const starkPub =
-      await this.cryptoStarknetService.getPubKeyByDerivationPathForSigner(
-        signer.type,
-        signer.derivationPath,
-      )
+    const { publicKey } = await this.cryptoStarknetService.getPublicKey(id)
+    let addressSalt = publicKey
+
+    // cIndex refers to corrupted index
+    // This should be removed in future asap
+    if (
+      "cIndex" in multisigAccount &&
+      typeof multisigAccount.cIndex === "number"
+    ) {
+      const corruptDerivationPath =
+        multisigAccount.signer.derivationPath.slice(0, -1) +
+        multisigAccount.cIndex
+
+      addressSalt =
+        await this.cryptoStarknetService.getPubKeyByDerivationPathForSigner(
+          multisigAccount.signer.type,
+          corruptDerivationPath,
+        )
+    }
 
     const accountClassHash =
       multisigAccount.classHash ??
@@ -305,7 +281,7 @@ export class WalletDeploymentStarknetService
         threshold, // Initial threshold
         signers, // Initial signers
       }),
-      addressSalt: starkPub,
+      addressSalt,
     }
 
     // Mostly we don't need to calculate the address,
@@ -394,15 +370,13 @@ export class WalletDeploymentStarknetService
   public async getDeployContractPayloadForMultisig({
     signers,
     threshold,
-    index,
     networkId,
-    signerType,
+    publicKey,
   }: {
     threshold: number
     signers: string[]
-    index: number
     networkId: string
-    signerType: SignerType
+    publicKey: string
   }): Promise<Omit<Required<DeployAccountContractTransaction>, "signature">> {
     const hasSession = await this.sessionService.isSessionOpen()
     const initialised = await this.backupService.isInitialized()
@@ -415,15 +389,6 @@ export class WalletDeploymentStarknetService
     }
 
     const network = await this.networkService.getById(networkId)
-    const path = getPathForIndex(
-      index,
-      getBaseDerivationPath("multisig", signerType),
-    )
-    const pubKey =
-      await this.cryptoStarknetService.getPubKeyByDerivationPathForSigner(
-        signerType,
-        path,
-      )
 
     const accountClassHash =
       await this.cryptoStarknetService.getAccountClassHashForNetwork(
@@ -437,7 +402,7 @@ export class WalletDeploymentStarknetService
         threshold, // Initial threshold
         signers, // Initial signers
       }),
-      addressSalt: pubKey,
+      addressSalt: publicKey,
     }
 
     return payload
@@ -454,8 +419,6 @@ export class WalletDeploymentStarknetService
 
     if (type === "multisig" && multisigPayload) {
       payload = await this.getDeployContractPayloadForMultisig({
-        index,
-        signerType,
         networkId,
         ...multisigPayload,
       })
@@ -481,14 +444,33 @@ export class WalletDeploymentStarknetService
     signerType: SignerType = SignerType.LOCAL_SECRET,
     multisigPayload?: MultisigData,
   ): Promise<CreateWalletAccount> {
+    const session = await this.sessionStore.get()
+    if (!session?.secret) {
+      throw new SessionError({ code: "NO_OPEN_SESSION" })
+    }
     const network = await this.networkService.getById(networkId)
 
-    const { index, derivationPath, publicKey } =
-      await this.cryptoStarknetService.getNextPublicKey(
+    let index, derivationPath, publicKey
+
+    if (
+      multisigPayload &&
+      multisigPayload.index !== undefined &&
+      multisigPayload.derivationPath !== undefined &&
+      multisigPayload.publicKey !== undefined
+    ) {
+      index = multisigPayload.index
+      derivationPath = multisigPayload.derivationPath
+      publicKey = multisigPayload.publicKey
+    } else {
+      const nextSigner = await this.cryptoStarknetService.getNextPublicKey(
         accountType,
         signerType,
         networkId,
       )
+      index = nextSigner.index
+      derivationPath = nextSigner.derivationPath
+      publicKey = nextSigner.publicKey
+    }
 
     const payload = await this.getNewAccountDeploymentPayload(
       accountType,
@@ -498,17 +480,13 @@ export class WalletDeploymentStarknetService
       multisigPayload,
     )
 
-    const signer = await this.cryptoStarknetService.getSigner({
-      type: signerType,
-      derivationPath,
-    })
-
     let accountAddress: string
     let guardianAddress: string | undefined
     let salt: string | undefined
 
     if (accountType === "smart") {
-      const signature = await signer.signRawMsgHash(
+      const _signer = new ArgentSigner(session.secret, derivationPath) // used temporarily to sign the account creation
+      const signature = await _signer.signRawMsgHash(
         pedersen(keccak(stringToBytes("utf8", "starknet")), publicKey),
       )
 
@@ -553,15 +531,20 @@ export class WalletDeploymentStarknetService
       accountAddress,
     )
 
+    const signer = {
+      type: signerType,
+      derivationPath,
+    }
+
+    const accountId = getAccountIdentifier(accountAddress, networkId, signer)
+
     const account: CreateWalletAccount = {
+      id: accountId,
       name: defaultAccountName,
       network,
       networkId: network.id,
       address: accountAddress,
-      signer: {
-        type: signerType,
-        derivationPath,
-      },
+      signer,
       type: accountType,
       classHash: addressSchema.parse(payload.classHash), // This is only true for new Cairo 1 accounts. For Cairo 0, this is the proxy contract class hash
       cairoVersion: accountType === "standardCairo0" ? "0" : "1",
@@ -575,6 +558,7 @@ export class WalletDeploymentStarknetService
 
     if (accountType === "multisig" && multisigPayload) {
       await this.multisigStore.upsert({
+        id: account.id,
         address: account.address,
         networkId: account.networkId,
         signers: multisigPayload.signers,
@@ -586,7 +570,7 @@ export class WalletDeploymentStarknetService
       })
     }
 
-    await this.accountSharedService.selectAccount(account)
+    await this.accountSharedService.selectAccount(account.id)
     this.ampli.accountCreated({
       "account index": index,
       "account type": sanitizeAccountType(accountType),
@@ -601,17 +585,70 @@ export class WalletDeploymentStarknetService
     }
 
     // TODO: check if also want it for ledger
-    if (signerType === "local_secret") {
+    if (signerType === SignerType.LOCAL_SECRET) {
+      const signer = await this.cryptoStarknetService.getSigner(
+        account.id,
+        account.type,
+      )
       await this.trackReferral(account, signer)
     }
     return account
+  }
+
+  private async buildDeploymentPayload(
+    walletAccount: ArgentWalletAccount,
+    transactionDetails?: EstimateFeeDetails | undefined,
+  ) {
+    const starknetAccount =
+      await this.accountStarknetService.getStarknetAccount(walletAccount.id)
+
+    if (!starknetAccount) {
+      throw new AccountError({ code: "NOT_FOUND" })
+    }
+
+    if (!("deployAccount" in starknetAccount)) {
+      throw new AccountError({ code: "CANNOT_DEPLOY_OLD_ACCOUNTS" })
+    }
+
+    const deployAccountPayload =
+      await this.getAccountOrMultisigDeploymentPayload(walletAccount)
+
+    let maxFeeOrBounds = {}
+
+    if (transactionDetails?.maxFee || transactionDetails?.resourceBounds) {
+      maxFeeOrBounds = {
+        maxFee: transactionDetails.maxFee,
+        resourceBounds: transactionDetails.resourceBounds,
+      }
+    } else {
+      const estimatedFees = estimatedFeeToMaxResourceBounds(
+        await this.getAccountDeploymentFee(
+          walletAccount,
+          mapVersionToFeeToken(transactionDetails?.version ?? "0x1"),
+        ),
+      )
+      maxFeeOrBounds = estimatedFees
+    }
+
+    const details = {
+      ...transactionDetails,
+      ...maxFeeOrBounds,
+    }
+
+    return {
+      account: starknetAccount,
+      payload: deployAccountPayload,
+      details,
+    }
   }
 
   private async trackReferral(
     account: WalletAccount,
     signer: BaseSignerInterface,
   ) {
-    const { publicKey } = await this.cryptoStarknetService.getPublicKey(account)
+    const { publicKey } = await this.cryptoStarknetService.getPublicKey(
+      account.id,
+    )
     const hash = pedersen(keccak(stringToBytes("utf8", "referral")), publicKey)
     const signature = await signer.signRawMsgHash(hash)
     return this.referralService.trackReferral({

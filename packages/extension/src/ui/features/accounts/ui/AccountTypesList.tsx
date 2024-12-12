@@ -1,17 +1,28 @@
-import { CellStack, H6, P4 } from "@argent/x-ui"
-import { Center, Flex, Spinner } from "@chakra-ui/react"
-import { FC } from "react"
-import styled from "styled-components"
+import { CellStack, H5, P3Bold, P4Bold } from "@argent/x-ui"
+import type { BoxProps } from "@chakra-ui/react"
+import { Box, Center, Flex, Spinner } from "@chakra-ui/react"
+import type { FC } from "react"
+
 import { CustomButtonCell } from "../../../components/CustomButtonCell"
 import { useExtensionIsInTab } from "../../browser/tabs"
-import { AccountType, AccountTypeId } from "../AddNewAccountScreen"
-import { useShowSmartAccountButtonVariant } from "../../../services/onboarding/useOnboardingExperiment"
+import type { AccountType, AccountTypeId } from "../AddNewAccountScreen"
 
-const DetailedDescriptionContainer = styled.div<{ isSelected: boolean }>`
-  svg {
-    color: ${({ isSelected, theme }) => (isSelected ? theme.primary : "white")};
-  }
-`
+function DetailedDescriptionContainer({
+  isSelected,
+  ...rest
+}: BoxProps & { isSelected: boolean }) {
+  return (
+    <Box
+      {...rest}
+      sx={{
+        svg: {
+          color: isSelected ? "var(--chakra-colors-text-brand)" : "inherit",
+        },
+      }}
+    />
+  )
+}
+
 interface AccountTypesListProps {
   accountTypes: AccountType[]
   isAccountTypeLoading: (id: AccountTypeId) => boolean
@@ -28,7 +39,6 @@ export const AccountTypesList: FC<AccountTypesListProps> = ({
   isAccountTypeDisabled,
 }) => {
   const extensionIsInTab = useExtensionIsInTab()
-  const { showSmartAccountButtonVariant } = useShowSmartAccountButtonVariant()
   return (
     <CellStack p={0} w={"full"}>
       {accountTypes.map(
@@ -52,16 +62,16 @@ export const AccountTypesList: FC<AccountTypesListProps> = ({
             onClick={() => setSelectedAccountTypeId(id)}
             _hover={selectedAccountTypeId !== id ? undefined : {}}
             isDisabled={isAccountTypeDisabled?.(id)}
+            border="1px solid"
+            sx={{ textWrap: "wrap" }}
             {...(selectedAccountTypeId === id
               ? {
-                  backgroundColor: showSmartAccountButtonVariant
-                    ? "surface-elevated-web"
-                    : "primary.orange.1000",
-                  border: "1px",
-                  borderColor: "primary.500",
-                  boxSizing: "border-box",
+                  backgroundColor: "surface-elevated-web",
+                  borderColor: "stroke-brand",
                 }
-              : {})}
+              : {
+                  borderColor: "transparent",
+                })}
           >
             <Flex direction="column">
               <Flex gap={3} alignItems="center" justify="start">
@@ -71,11 +81,13 @@ export const AccountTypesList: FC<AccountTypesListProps> = ({
                   height={12}
                   backgroundColor={
                     selectedAccountTypeId === id
-                      ? "primary.500"
-                      : "neutrals.700"
+                      ? "icon-background-brand"
+                      : "surface-elevated-hover"
                   }
                   color={
-                    selectedAccountTypeId === id ? "neutrals.700" : "white"
+                    selectedAccountTypeId === id
+                      ? "surface-default"
+                      : "text-primary"
                   }
                   className="account-type-avatar"
                   alignSelf={extensionIsInTab ? "start" : "center"}
@@ -84,47 +96,40 @@ export const AccountTypesList: FC<AccountTypesListProps> = ({
                 </Center>
                 <Flex direction="column">
                   <Flex
-                    direction={["column", null, "row"]}
-                    alignItems={["left", null, "center"]}
+                    alignItems={"baseline"}
+                    direction={{ base: "column", sm: "row" }}
+                    gap={{ base: 0, sm: 1 }}
                   >
-                    <H6>{title}</H6>
+                    <H5>{title}</H5>
                     {label && (
-                      <P4
-                        fontWeight="extrabold"
-                        color="neutrals.400"
-                        border="1px"
-                        borderRadius="4px"
+                      <P4Bold
+                        color="text-secondary"
+                        border="1px solid"
+                        borderColor="stroke-focused"
+                        rounded="base"
                         width="fit-content"
-                        p={"3px"}
-                        pt={"2px"}
-                        mt={[1, null, 0]}
-                        ml={[null, null, 2]}
+                        px={1}
+                        py={0.5}
+                        mt={{ base: 1, sm: 0 }}
+                        ml={{ sm: 1 }}
                       >
                         {label}
-                      </P4>
+                      </P4Bold>
                     )}
                   </Flex>
-                  <P4 fontWeight="bold" color="neutrals.300">
+                  <P3Bold color="text-secondary">
                     {isAccountTypeDisabled?.(id) && disabledText
                       ? disabledText
                       : subtitle}
-                  </P4>
-                  {extensionIsInTab && (
-                    <DetailedDescriptionContainer
-                      isSelected={selectedAccountTypeId === id}
-                    >
-                      {detailedDescription}
-                    </DetailedDescriptionContainer>
-                  )}
+                  </P3Bold>
                 </Flex>
               </Flex>
-              {!extensionIsInTab && (
-                <DetailedDescriptionContainer
-                  isSelected={selectedAccountTypeId === id}
-                >
-                  {detailedDescription}
-                </DetailedDescriptionContainer>
-              )}
+              <DetailedDescriptionContainer
+                ml={{ base: 0, sm: 15 }}
+                isSelected={selectedAccountTypeId === id}
+              >
+                {detailedDescription}
+              </DetailedDescriptionContainer>
             </Flex>
             {selectedAccountTypeId === id &&
               isAccountTypeLoading(selectedAccountTypeId) && (

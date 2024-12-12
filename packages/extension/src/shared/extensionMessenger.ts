@@ -1,5 +1,5 @@
-import { Listener, Message, Messenger } from "../messages"
-import browser from "webextension-polyfill"
+import type { Listener, Message, Messenger } from "../messages"
+import type browser from "webextension-polyfill"
 
 export class ExtensionMessenger implements Messenger {
   private listeners = new Map<

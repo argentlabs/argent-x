@@ -1,11 +1,12 @@
-import { PendingMultisig } from "../../../shared/multisig/types"
+import type { PendingMultisig } from "../../../shared/multisig/types"
 import { networkService } from "../../../shared/network/service"
-import {
+import type {
   BaseMultisigWalletAccount,
   MultisigData,
 } from "../../../shared/wallet.model"
 import { multisigService } from "../../services/multisig"
-import { Account, AccountConstructorProps } from "../accounts/Account"
+import type { AccountConstructorProps } from "../accounts/Account"
+import { Account } from "../accounts/Account"
 import { ZERO_MULTISIG } from "./constants"
 
 export interface MultisigConstructorProps extends AccountConstructorProps {
@@ -74,6 +75,7 @@ export class Multisig extends Account {
     }
 
     return new Multisig({
+      id: result.account.id,
       name: result.account.name,
       address: result.account.address,
       network,
@@ -90,12 +92,13 @@ export class Multisig extends Account {
   }
 
   public toBaseMultisigAccount(): BaseMultisigWalletAccount {
-    const { networkId, address, signers, threshold, publicKey, updatedAt } =
+    const { networkId, address, signers, threshold, publicKey, updatedAt, id } =
       this
 
     return {
-      networkId,
+      id,
       address,
+      networkId,
       signers,
       threshold,
       publicKey,

@@ -1,4 +1,4 @@
-import { SignerType } from "../../../../shared/wallet.model"
+import type { SignerType } from "../../../../shared/wallet.model"
 import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { useCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { MultisigFirstStep } from "./MultisigFirstStep"
@@ -25,9 +25,9 @@ export const MultisigCreationForm = ({
   totalSteps = 3,
 }: MultisigCreationFormProps) => {
   const [currentStep, setStep] = useState(initialStep)
-  const creatorSignerKey = useNextSignerKey("multisig", signerType, networkId)
+  const creator = useNextSignerKey("multisig", signerType, networkId)
 
-  const methods = useCreateMultisigForm(creatorSignerKey)
+  const methods = useCreateMultisigForm(creator.pubKey)
   const goBack = () => setStep((step) => step - 1)
   const goNext = () => setStep((step) => step + 1)
 
@@ -37,7 +37,7 @@ export const MultisigCreationForm = ({
         <MultisigFirstStep
           goNext={goNext}
           index={FIRST_STEP}
-          creatorSignerKey={creatorSignerKey}
+          creatorSignerKey={creator.pubKey}
           totalSteps={totalSteps}
         />
       )}
@@ -46,7 +46,7 @@ export const MultisigCreationForm = ({
           goNext={goNext}
           index={SECOND_STEP}
           goBack={goBack}
-          creatorSignerKey={creatorSignerKey}
+          creator={creator}
           networkId={networkId}
           creatorType={signerType}
           totalSteps={totalSteps}

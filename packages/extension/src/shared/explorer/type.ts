@@ -1,4 +1,4 @@
-import { ExecutionStatus, ExtendedFinalityStatus } from "../transactions"
+import type { ExecutionStatus, ExtendedFinalityStatus } from "../transactions"
 import { z } from "zod"
 
 export interface IExplorerTransactionParameters {

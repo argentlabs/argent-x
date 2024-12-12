@@ -1,14 +1,15 @@
-import { FC } from "react"
+import type { FC } from "react"
 
-import { Account } from "../accounts/Account"
-import { TokenListItem, TokenListItemProps } from "./TokenListItem"
+import type { Account } from "../accounts/Account"
+import type { TokenListItemProps } from "./TokenListItem"
+import { TokenListItem } from "./TokenListItem"
 import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
-import { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
+import type { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
 
 export interface TokenListItemContainerProps
   extends Omit<TokenListItemProps, "currencyValue" | "token"> {
   token: TokenWithBalanceAndPrice
-  account: Pick<Account, "network" | "address" | "networkId">
+  account: Pick<Account, "id" | "network" | "address" | "networkId">
 }
 
 /**
@@ -27,8 +28,9 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
 
   const shouldShow =
     token.showAlways ||
-    token.custom ||
-    (tokenWithBalance?.balance && tokenWithBalance.balance > 0n)
+    (!token.hidden &&
+      (token.custom ||
+        (tokenWithBalance?.balance && tokenWithBalance.balance > 0n)))
   if (!shouldShow || tokenWithBalance === undefined) {
     return null
   }

@@ -1,14 +1,13 @@
-import { L1, TabBarTab, TabBar, iconsDeprecated } from "@argent/x-ui"
+import { icons, L1Bold, TabBar, TabBarTab } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
-import { ComponentProps, FC } from "react"
+import type { ComponentProps, FC } from "react"
 import { NavLink } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
 import { LegalAgreementsBannerContainer } from "../legal/LegalAgreementsBannerContainer"
 import { ampli } from "../../../shared/analytics"
 
-const { WalletIcon, NftIcon, ActivityIcon, SwapIcon, FlameIcon } =
-  iconsDeprecated
+const { WalletPrimaryIcon, ActivityPrimaryIcon, HotPrimaryIcon } = icons
 
 interface RootTabsProps {
   activityBadgeLabel: ComponentProps<typeof TabBarTab>["badgeLabel"]
@@ -33,13 +32,13 @@ export const RootTabs: FC<RootTabsProps> = ({
     <>
       {showMultisigBanner ? (
         <Center backgroundColor="warning.500" width="full" p="13px 10px">
-          <L1 color="neutrals.700">
+          <L1Bold color="neutrals.700">
             {showActivateBanner ? (
               <>Add {activateAccountTokens} and activate</>
             ) : (
               <>You were removed from this multisig</>
             )}
-          </L1>
+          </L1Bold>
         </Center>
       ) : showTabs ? (
         <>
@@ -54,33 +53,14 @@ export const RootTabs: FC<RootTabsProps> = ({
                 })
               }
               replace
-              icon={<WalletIcon />}
+              icon={<WalletPrimaryIcon />}
               label="Tokens"
-            />
-            <TabBarTab
-              as={NavLink}
-              to={routes.accountCollections()}
-              replace
-              icon={<NftIcon />}
-              label="NFTs"
-            />
-            <TabBarTab
-              as={NavLink}
-              to={routes.swap()}
-              replace
-              icon={<SwapIcon />}
-              onClick={() =>
-                void ampli.swapTabClicked({
-                  "wallet platform": "browser extension",
-                })
-              }
-              label="Swap"
             />
             <TabBarTab
               as={NavLink}
               to={routes.accountActivity()}
               replace
-              icon={<ActivityIcon />}
+              icon={<ActivityPrimaryIcon />}
               badgeLabel={activityBadgeLabel}
               onClick={() =>
                 void ampli.activityTabClicked({
@@ -94,7 +74,7 @@ export const RootTabs: FC<RootTabsProps> = ({
               as={NavLink}
               to={routes.accountDiscover()}
               replace
-              icon={<FlameIcon />}
+              icon={<HotPrimaryIcon />}
               badgeLabel={discoverBadgeLabel}
               onClick={() =>
                 void ampli.discoverTabClicked({

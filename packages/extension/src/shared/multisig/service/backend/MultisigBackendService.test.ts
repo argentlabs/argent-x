@@ -1,7 +1,7 @@
 import { constants, stark } from "starknet"
-import { MockedFunction } from "vitest"
+import type { MockedFunction } from "vitest"
 import { getMockNetwork } from "../../../../../test/network.mock"
-import {
+import type {
   ApiMultisigAccountData,
   ApiMultisigDataForSigner,
   ApiMultisigGetTransactionRequests,
@@ -9,9 +9,13 @@ import {
 } from "../../multisig.model"
 import { MultisigBackendService } from "./MultisigBackendService"
 import { getMultisigAccountFromBaseWallet } from "../../utils/baseMultisig"
-import { getMockAccount } from "../../../../../test/account.mock"
+import { getMockAccount, getMockSigner } from "../../../../../test/account.mock"
 import { chainIdToStarknetNetwork } from "../../../utils/starknetNetwork"
 import { addressSchema } from "@argent/x-shared"
+import {
+  getAccountIdentifier,
+  getRandomAccountIdentifier,
+} from "../../../utils/accountIdentifier"
 
 vi.mock("../../utils/baseMultisig")
 vi.mock("../../pendingTransactionsStore")
@@ -25,6 +29,8 @@ const mockGetMultisigAccountFromBaseWallet =
 
 const address = addressSchema.parse(stark.randomAddress())
 const creator = addressSchema.parse(stark.randomAddress())
+
+const id = getAccountIdentifier(address, getMockNetwork().id, getMockSigner())
 
 describe("MultisigBackendService", () => {
   const mockFetcher = vi.fn()
@@ -137,6 +143,7 @@ describe("MultisigBackendService", () => {
       )
 
       const response = await service.fetchMultisigAccountData({
+        id,
         address,
         networkId: getMockNetwork().id,
       })
@@ -173,6 +180,7 @@ describe("MultisigBackendService", () => {
 
       await expect(
         service.fetchMultisigAccountData({
+          id,
           address,
           networkId: getMockNetwork().id,
         }),
@@ -211,6 +219,7 @@ describe("MultisigBackendService", () => {
       )
 
       const response = await service.fetchMultisigTransactionRequests({
+        id,
         address: address,
         networkId: getMockNetwork().id,
       })
@@ -241,6 +250,7 @@ describe("MultisigBackendService", () => {
 
       await expect(
         service.fetchMultisigTransactionRequests({
+          id,
           address,
           networkId: getMockNetwork().id,
         }),
@@ -265,6 +275,7 @@ describe("MultisigBackendService", () => {
         signers: ["0x123"],
         publicKey: "0x123",
         updatedAt: 123,
+        type: "multisig",
       })
       const payload = {
         creator,
@@ -311,6 +322,7 @@ describe("MultisigBackendService", () => {
       )
 
       const returnValue = await service.createTransactionRequest({
+        accountId: id,
         address: address,
         signature: [
           BigInt(creator).toString(),
@@ -362,14 +374,18 @@ describe("MultisigBackendService", () => {
       const creator =
         "0x03ae16dac8ab10a29cb58a96051ba6b3b10d66afc327887105fd90c05486c24b"
 
+      const id = getRandomAccountIdentifier(address)
+
       mockGetMultisigAccountFromBaseWallet.mockResolvedValueOnce({
         ...getMockAccount({
+          id,
           address,
         }),
         threshold: 2,
         signers: ["0x123"],
         publicKey: "0x123",
         updatedAt: 123,
+        type: "multisig",
       })
       const payload = {
         creator,
@@ -417,6 +433,7 @@ describe("MultisigBackendService", () => {
       )
 
       const returnValue = await service.createTransactionRequest({
+        accountId: id,
         address: address,
         signature: [
           BigInt(creator).toString(),
@@ -463,6 +480,7 @@ describe("MultisigBackendService", () => {
       expect(addToMultisigPendingTransactionsSpy).toHaveBeenCalledTimes(1)
       expect(addToMultisigPendingTransactionsSpy).toHaveBeenCalledWith({
         account: {
+          id,
           address,
           networkId: "sepolia-alpha",
         },
@@ -491,16 +509,21 @@ describe("MultisigBackendService", () => {
 
   describe("addRequestSignature", () => {
     it("should call the correct endpoint with the correct payload and return the correct hash", async () => {
-      const address = "0x1"
+      const address =
+        "0x0590374e464c0e1d8078ee2f1556d99e46d28e0f90788305f4e2b34df53950b8"
+
+      const id = getRandomAccountIdentifier(address)
 
       mockGetMultisigAccountFromBaseWallet.mockResolvedValueOnce({
         ...getMockAccount({
+          id,
           address,
         }),
         threshold: 2,
         signers: ["0x123"],
         publicKey: "0x123",
         updatedAt: 123,
+        type: "multisig",
       })
 
       const expectedRes = {
@@ -534,6 +557,7 @@ describe("MultisigBackendService", () => {
       const requestId = "0x6969"
       await service.addTransactionSignature({
         address: address,
+        accountId: id,
         signature: [
           BigInt(45602318).toString(),
           BigInt(12354654).toString(),
@@ -542,7 +566,9 @@ describe("MultisigBackendService", () => {
         ],
         transactionToSign: {
           account: {
-            address: "0x1",
+            id,
+            address:
+              "0x0590374e464c0e1d8078ee2f1556d99e46d28e0f90788305f4e2b34df53950b8",
             networkId: "sepolia-alpha",
           },
           approvedSigners: ["0x123"],
@@ -584,7 +610,9 @@ describe("MultisigBackendService", () => {
       expect(addToMultisigPendingTransactionsSpy).toHaveBeenCalledTimes(1)
       expect(addToMultisigPendingTransactionsSpy).toHaveBeenCalledWith({
         account: {
-          address: "0x1",
+          id,
+          address:
+            "0x0590374e464c0e1d8078ee2f1556d99e46d28e0f90788305f4e2b34df53950b8",
           networkId: "sepolia-alpha",
         },
         approvedSigners: ["0x123"],
@@ -617,6 +645,7 @@ describe("MultisigBackendService", () => {
         signers: ["0x123"],
         publicKey: "0x123",
         updatedAt: 123,
+        type: "multisig",
       })
 
       const expectedRes = {
@@ -650,6 +679,7 @@ describe("MultisigBackendService", () => {
       )
       const requestId = "0x6969"
       await service.addTransactionSignature({
+        accountId: id,
         address: address,
         signature: [
           BigInt(45602318).toString(),
@@ -659,6 +689,7 @@ describe("MultisigBackendService", () => {
         ],
         transactionToSign: {
           account: {
+            id,
             address: "0x1",
             networkId: "sepolia-alpha",
           },

@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash-es"
 import { tokenService } from "../../../shared/token/__new/service"
-import { Token } from "../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../shared/token/__new/types/token.model"
 import {
   equalToken,
   parsedDefaultTokens,

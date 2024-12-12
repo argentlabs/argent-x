@@ -1,12 +1,13 @@
-import { NftItem, getNftPicture } from "@argent/x-shared"
+import type { NftItem } from "@argent/x-shared"
+import { getNftPicture } from "@argent/x-shared"
 import {
   BarCloseButton,
   Button,
   CellStack,
-  H5,
+  H4,
+  icons,
   NavigationContainer,
-  P4,
-  iconsDeprecated,
+  P3,
 } from "@argent/x-ui"
 import {
   Accordion,
@@ -17,12 +18,12 @@ import {
   Box,
   SimpleGrid,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { NftImage } from "./NftImage"
 
-const { SendIcon, ViewIcon } = iconsDeprecated
+const { SendSecondaryIcon, ShowSecondaryIcon } = icons
 
 interface NftScreenProps {
   nft: NftItem
@@ -42,9 +43,7 @@ export const NftScreen: FC<NftScreenProps> = ({
       <NavigationContainer
         isAbsolute
         leftButton={<BarCloseButton />}
-        rightButton={
-          <TokenMenu tokenAddress={nft.contract_address} canHideToken={false} />
-        }
+        rightButton={<TokenMenu tokenAddress={nft.contract_address} />}
       >
         <>
           <Box
@@ -69,9 +68,9 @@ export const NftScreen: FC<NftScreenProps> = ({
             />
             <NftImage nft={nft} />
           </Box>
-          <H5 py="6" textAlign="center" mx={4}>
+          <H4 py="6" textAlign="center" mx={4}>
             {nft.name}
-          </H5>
+          </H4>
         </>
 
         {hasDescription && (
@@ -79,7 +78,7 @@ export const NftScreen: FC<NftScreenProps> = ({
             <Accordion allowToggle>
               <AccordionItem>
                 <AccordionButton justifyContent="space-between">
-                  <P4 color="neutrals.300">Description</P4> <AccordionIcon />
+                  <P3 color="neutrals.300">Description</P3> <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel>{nft.description}</AccordionPanel>
               </AccordionItem>
@@ -103,16 +102,16 @@ export const NftScreen: FC<NftScreenProps> = ({
           <Button
             w="100%"
             size="sm"
-            onClick={onViewNft}
-            leftIcon={<ViewIcon />}
+            onClick={() => void onViewNft()}
+            leftIcon={<ShowSecondaryIcon />}
           >
             View
           </Button>
           <Button
             w="100%"
             size="sm"
-            onClick={onSendNft}
-            leftIcon={<SendIcon />}
+            onClick={() => void onSendNft()}
+            leftIcon={<SendSecondaryIcon />}
           >
             Send
           </Button>

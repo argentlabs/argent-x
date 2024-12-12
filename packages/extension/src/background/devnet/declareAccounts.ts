@@ -1,10 +1,11 @@
-import { memoize } from "lodash-es"
-import { Account, AccountInterface, CairoAssembly, hash } from "starknet"
+import memoize from "memoizee"
+import type { AccountInterface, CairoAssembly } from "starknet"
+import { Account, hash } from "starknet"
 import urlJoin from "url-join"
 
-import { Network, getProvider } from "../../shared/network"
-import { LoadContracts } from "../wallet/loadContracts"
-import { cairoAssemblySchema } from "@argent/x-shared"
+import type { Network } from "../../shared/network"
+import { getProvider } from "../../shared/network"
+import type { LoadContracts } from "../wallet/loadContracts"
 
 interface PreDeployedAccount {
   address: string
@@ -33,7 +34,7 @@ export const getPreDeployedAccount = async (
       provider,
       preDeployedAccount.address,
       preDeployedAccount.private_key,
-      "0", // Devnet is currently supporting only cairo 0
+      "1",
     )
   } catch (e) {
     console.warn(`Failed to get pre-deployed account: ${e}`)
@@ -77,7 +78,10 @@ export const declareContracts = memoize(
 
     return accountClassHash ?? computedAccountClassHash
   },
-  (network) => `${network.rpcUrl}`,
+  {
+    promise: true,
+    normalizer: ([network]) => `${network.rpcUrl}`,
+  },
 )
 
 export const checkIfClassIsDeclared = async (
@@ -89,7 +93,7 @@ export const checkIfClassIsDeclared = async (
 
     console.log("Contract already declared", classHash)
     return Boolean(contract)
-  } catch (error) {
+  } catch {
     console.warn("Contract not declared", classHash)
     return false
   }

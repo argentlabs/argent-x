@@ -1,4 +1,5 @@
-import { BlockNumber, CallData, num } from "starknet"
+import type { BlockNumber, num } from "starknet"
+import { CallData } from "starknet"
 import type { BaseWalletAccount, WalletAccount } from "../shared/wallet.model"
 import type { Wallet } from "./wallet"
 import type { IBackgroundActionService } from "./services/action/IBackgroundActionService"
@@ -16,7 +17,7 @@ export const addDeployAccountAction = async ({
   actionService,
   wallet,
 }: IDeployAccount) => {
-  const walletAccount = await wallet.getAccount(account)
+  const walletAccount = await wallet.getArgentAccount(account.id)
   if (!walletAccount) {
     throw new Error("Account not found")
   }
@@ -44,7 +45,7 @@ export const addDeployAccountAction = async ({
     {
       title: "Activate account",
       shortTitle: "Account activation",
-      icon: "DeployIcon",
+      icon: "RocketSecondaryIcon",
     },
   )
 }

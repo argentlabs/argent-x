@@ -5,19 +5,19 @@ import {
 } from "./TransactionTrackerWorker"
 import { mockChainService } from "../../../../shared/chain/service/__test__/mock"
 import { MockFnRepository } from "../../../../shared/storage/__new/__test__/mockFunctionImplementation"
-import {
+import type {
   ExecutionStatus,
   ExtendedFinalityStatus,
   Transaction,
 } from "../../../../shared/transactions"
 import { createScheduleServiceMock } from "../../../../shared/schedule/mock"
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
-import { IBackgroundUIService } from "../../ui/IBackgroundUIService"
-import { IDebounceService } from "../../../../shared/debounce"
-import { emitterMock } from "../../../wallet/test.utils"
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
+import type { IDebounceService } from "../../../../shared/debounce"
 import { getMockDebounceService } from "../../../../shared/debounce/mock"
 import { delay } from "../../../../shared/utils/delay"
 import { getTransactionStatus } from "../../../../shared/transactions/utils"
+import { emitterMock } from "../../../../shared/test.utils"
 
 vi.mock("../../../../shared/utils/delay")
 vi.mock("../../../../shared/transactions/utils")
@@ -41,6 +41,7 @@ describe("TransactionTrackerWorker", () => {
       closePopup: vi.fn(),
       openUi: vi.fn(),
       showNotification: vi.fn(),
+      openUiAsFloatingWindow: vi.fn(),
     }
     mockDebounceService = getMockDebounceService()
 
@@ -223,7 +224,7 @@ describe("TransactionTrackerWorker", () => {
       })
 
       expect(transactionTracker.syncTransactionRepo).toHaveBeenCalled()
-      expect(delay).toHaveBeenCalledWith(3000) // First delay
+      expect(delay).toHaveBeenCalledWith(1000) // First delay
     })
 
     it("should not trigger sync for non-RECEIVED transactions", async () => {
@@ -289,8 +290,8 @@ describe("TransactionTrackerWorker", () => {
       // Wait for all promises in the microtask queue to resolve
       await new Promise(process.nextTick)
 
-      expect(transactionTracker.syncTransactionRepo).toHaveBeenCalledTimes(6) // Once for each delay
-      expect(delay).toHaveBeenCalledTimes(6)
+      expect(transactionTracker.syncTransactionRepo).toHaveBeenCalledTimes(10) // Once for each delay
+      expect(delay).toHaveBeenCalledTimes(10)
       expect(transactionTracker.emitter.emit).not.toHaveBeenCalled()
     })
 

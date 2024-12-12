@@ -1,20 +1,20 @@
+import type { Address } from "@argent/x-shared"
 import {
-  Address,
   classHashSupportsTxV3,
   feeTokenNeedsTxV3Support,
 } from "@argent/x-shared"
-import { IAccountService } from "../../account/service/accountService/IAccountService"
-import { INetworkService } from "../../network/service/INetworkService"
-import { IObjectStore } from "../../storage/__new/interface"
-import { ITokenService } from "../../token/__new/service/ITokenService"
-import { TokenWithBalance } from "../../token/__new/types/tokenBalance.model"
+import type { IAccountService } from "../../account/service/accountService/IAccountService"
+import type { INetworkService } from "../../network/service/INetworkService"
+import type { IObjectStore } from "../../storage/__new/interface"
+import type { ITokenService } from "../../token/__new/service/ITokenService"
+import type { TokenWithBalance } from "../../token/__new/types/tokenBalance.model"
 import { equalToken } from "../../token/__new/utils"
 import { accountsEqual } from "../../utils/accountsEqual"
-import { BaseWalletAccount, WalletAccount } from "../../wallet.model"
+import type { BaseWalletAccount, WalletAccount } from "../../wallet.model"
 import { FEE_TOKEN_PREFERENCE_BY_SYMBOL } from "../constants"
-import { FeeTokenPreference } from "../types/preference.model"
+import type { FeeTokenPreference } from "../types/preference.model"
 import { pickBestFeeToken } from "../utils"
-import { IFeeTokenService } from "./IFeeTokenService"
+import type { IFeeTokenService } from "./IFeeTokenService"
 
 export class FeeTokenService implements IFeeTokenService {
   constructor(
@@ -46,10 +46,11 @@ export class FeeTokenService implements IFeeTokenService {
       }
       return true
     })
-    const feeTokenBalances = await this.tokenService.getTokenBalancesForAccount(
-      account,
-      accountFeeTokens,
-    )
+    const feeTokenBalances =
+      await this.tokenService.getAllTokenBalancesForAccount(
+        account,
+        accountFeeTokens,
+      )
     const feeTokensWithBalances: TokenWithBalance[] = accountFeeTokens.map(
       (token) => {
         const tokenBalance = feeTokenBalances.find((tb) =>
@@ -61,6 +62,7 @@ export class FeeTokenService implements IFeeTokenService {
             ...token,
             ...tokenBalance,
             account: {
+              id: account.id,
               address: tokenBalance.account,
               networkId: tokenBalance.networkId,
             },
@@ -71,7 +73,11 @@ export class FeeTokenService implements IFeeTokenService {
           ...token,
           ...{
             balance: "0",
-            account: { address: account.address, networkId: account.networkId },
+            account: {
+              id: account.id,
+              address: account.address,
+              networkId: account.networkId,
+            },
           },
         }
       },

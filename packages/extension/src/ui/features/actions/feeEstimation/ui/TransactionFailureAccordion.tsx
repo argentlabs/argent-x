@@ -1,4 +1,4 @@
-import { AccordionIcon, P4, iconsDeprecated } from "@argent/x-ui"
+import { AccordionIcon, icons, P3 } from "@argent/x-ui"
 import {
   Accordion,
   AccordionButton,
@@ -6,12 +6,12 @@ import {
   AccordionPanel,
   Flex,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-import { FeeEstimationProps } from "../feeEstimation.model"
+import type { FeeEstimationProps } from "../feeEstimation.model"
 import { CopyErrorIcon } from "./CopyErrorIcon"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
 
 export const TransactionFailureAccordion: FC<
   Pick<FeeEstimationProps, "parsedFeeEstimationError">
@@ -33,7 +33,11 @@ export const TransactionFailureAccordion: FC<
       <AccordionItem>
         <AccordionButton>
           <Flex flex="auto" textAlign="left" alignItems={"center"}>
-            <AlertIcon display={"inline-block"} fontSize={"base"} mr={1} />
+            <WarningCircleSecondaryIcon
+              display={"inline-block"}
+              fontSize={"base"}
+              mr={1}
+            />
             {title || "Transaction failure predicted"}
           </Flex>
           <Flex ml={1} gap={3}>
@@ -47,9 +51,9 @@ export const TransactionFailureAccordion: FC<
             overflow: "auto",
           }}
         >
-          <P4 color="text-danger" whiteSpace="pre-wrap">
+          <P3 color="text-danger" whiteSpace="pre-wrap">
             {message}
-          </P4>
+          </P3>
         </AccordionPanel>
       </AccordionItem>
     </Accordion>

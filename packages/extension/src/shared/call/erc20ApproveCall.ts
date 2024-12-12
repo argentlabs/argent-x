@@ -1,6 +1,7 @@
-import { Call } from "starknet"
+import type { Call } from "starknet"
 
-import { Erc20Call, parseErc20Call, validateERC20Call } from "./erc20Call"
+import type { Erc20Call } from "./erc20Call"
+import { parseErc20Call, validateERC20Call } from "./erc20Call"
 
 export interface Erc20ApproveCall extends Erc20Call {
   entrypoint: "approve"
@@ -22,7 +23,7 @@ export const isErc20ApproveCall = (call: Call): call is Erc20ApproveCall => {
     ) {
       return validateERC20Call(call as Erc20ApproveCall)
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

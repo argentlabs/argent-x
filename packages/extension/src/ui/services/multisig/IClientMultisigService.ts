@@ -1,5 +1,5 @@
-import { IMultisigService } from "../../../shared/multisig/service/messaging/IMultisigService"
-import { SignerMetadata } from "../../../shared/multisig/types"
+import type { IMultisigService } from "../../../shared/multisig/service/messaging/IMultisigService"
+import type { SignerMetadata } from "../../../shared/multisig/types"
 
 export interface IClientMultisigService extends IMultisigService {
   updateSignerMetadata(

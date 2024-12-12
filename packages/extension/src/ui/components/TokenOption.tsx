@@ -1,6 +1,6 @@
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 
-import { Button, H6, L2, P4 } from "@argent/x-ui"
+import { Button, H5, L2Bold, P3 } from "@argent/x-ui"
 import { Flex, Img, Spinner } from "@chakra-ui/react"
 
 interface TokenOptionProps {
@@ -55,30 +55,30 @@ export const TokenOption: FC<TokenOptionProps> = ({
       />
       <Flex justifyContent="space-between" w="full" align="center">
         <Flex grow={1} flexWrap="nowrap" direction="column">
-          <H6 whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+          <H5 whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
             {name === "Ether" ? "Ethereum" : name}
-          </H6>
-          <P4
+          </H5>
+          <P3
             data-testid={`fee-token-${symbol}`}
             fontWeight="bold"
             color="neutrals.300"
           >
             {symbol}
-          </P4>
+          </P3>
         </Flex>
         <Flex direction="column" textAlign="right">
           {!requiresTxV3Upgrade ? (
             <>
-              <H6 data-testid={`fee-token-${symbol}-balance`}>{balance}</H6>
+              <H5 data-testid={`fee-token-${symbol}-balance`}>{balance}</H5>
               {disabled ? (
-                <L2 color="error.400" whiteSpace="nowrap">
+                <L2Bold color="error.400" whiteSpace="nowrap">
                   {errorText}
-                </L2>
+                </L2Bold>
               ) : (
                 ccyBalance && (
-                  <P4 fontWeight="bold" color="neutrals.300">
+                  <P3 fontWeight="bold" color="neutrals.300">
                     {ccyBalance}
-                  </P4>
+                  </P3>
                 )
               )}
             </>

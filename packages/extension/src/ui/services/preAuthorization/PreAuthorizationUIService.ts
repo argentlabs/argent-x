@@ -1,7 +1,7 @@
-import { messageClient } from "../trpc"
-import { IPreAuthorizationService } from "../../../shared/preAuthorization/IPreAuthorizationService"
-import { PreAuthorization } from "../../../shared/preAuthorization/schema"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { messageClient } from "../trpc"
+import type { IPreAuthorizationService } from "../../../shared/preAuthorization/IPreAuthorizationService"
+import type { PreAuthorization } from "../../../shared/preAuthorization/schema"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 
 export class PreAuthorizationUIService
   implements Partial<IPreAuthorizationService>

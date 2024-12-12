@@ -1,5 +1,5 @@
 import { useAtom } from "jotai"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { LegalAgreementsBanner } from "./LegalAgreementsBanner"
 import { lastLegalAgreementTimestampAtom } from "./legalStorage"

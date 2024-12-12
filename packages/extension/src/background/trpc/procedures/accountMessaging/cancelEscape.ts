@@ -50,7 +50,7 @@ export const cancelEscapeProcedure = extensionOnlyProcedure
           },
           {
             title: "Keep guardian",
-            icon: "SmartAccountActiveIcon",
+            icon: "ShieldSecondaryIcon",
           },
         )
       } catch (error) {

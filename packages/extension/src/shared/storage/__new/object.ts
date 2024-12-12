@@ -1,5 +1,5 @@
-import { IObjectStore } from "./interface"
-import { IObjectStorage } from ".."
+import type { IObjectStore } from "./interface"
+import type { IObjectStorage } from ".."
 
 export function adaptObjectStorage<T>(
   storage: IObjectStorage<T>,
@@ -17,7 +17,7 @@ export function adaptObjectStorage<T>(
     subscribe(callback) {
       // this is never fired, need to investigate and fix
       return storage.subscribe((_value, changeSet) => {
-        callback(changeSet)
+        void callback(changeSet)
       })
     },
   }

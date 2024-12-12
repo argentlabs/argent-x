@@ -1,4 +1,4 @@
-import { Button, H5, Input } from "@argent/x-ui"
+import { Button, H4, Input } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,
@@ -7,7 +7,8 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react"
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 
 interface MultisigOwnerNameProps {
   isOpen: boolean
@@ -27,9 +28,9 @@ export const MultisigOwnerNameModal: FC<MultisigOwnerNameProps> = ({
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
       <ModalContent background="neutrals.700">
         <ModalHeader>
-          <H5 fontWeight="600" textAlign="center">
+          <H4 fontWeight="600" textAlign="center">
             Add owner name
-          </H5>
+          </H4>
         </ModalHeader>
         <ModalBody>
           <Input

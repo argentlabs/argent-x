@@ -1,15 +1,16 @@
-import {
+import type {
   Call,
   EstimateFeeBulk,
   Invocations,
   ProviderInterface,
-  TransactionType,
 } from "starknet"
+import { TransactionType } from "starknet"
 import { isAccountDeployed } from "../../../accountDeploy"
 import type { EstimatedFees } from "@argent/x-shared/simulation"
 import type { WalletAccount } from "../../../../shared/wallet.model"
 import type { Wallet } from "../../../wallet"
 import type { Address } from "@argent/x-shared"
+import { walletAccountToArgentAccount } from "../../../../shared/utils/isExternalAccount"
 
 type Invocation = Invocations[number]
 
@@ -99,9 +100,11 @@ export async function extendInvocationsByAccountDeploy(
     return invocations
   }
 
+  const argentAccount = walletAccountToArgentAccount(walletAccount)
+
   const deployAccountInvocation: Invocations[number] = {
     type: TransactionType.DEPLOY_ACCOUNT,
-    payload: await wallet.getAccountDeploymentPayload(walletAccount),
+    payload: await wallet.getAccountDeploymentPayload(argentAccount),
   }
 
   return [deployAccountInvocation, ...invocations]

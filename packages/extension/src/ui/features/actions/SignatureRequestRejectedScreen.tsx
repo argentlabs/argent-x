@@ -1,11 +1,12 @@
-import React, { FC } from "react"
+import type { FC } from "react"
+import React from "react"
 
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { Circle, Flex } from "@chakra-ui/react"
-import { H5, P4, iconsDeprecated } from "@argent/x-ui"
-import { WalletAccount } from "../../../shared/wallet.model"
+import { H4, icons, P3 } from "@argent/x-ui"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
-const { AlertFillIcon, SignIcon } = iconsDeprecated
+const { WarningCirclePrimaryIcon, SignIcon } = icons
 
 interface SignatureRequestRejectedScreenProps {
   selectedAccount?: WalletAccount
@@ -41,8 +42,8 @@ export const SignatureRequestRejectedScreen: FC<
             alignItems="center"
             justifyContent="center"
           >
-            <H5>Signature request</H5>
-            <P4 color="neutrals.300">A dapp is requesting to sign a message</P4>
+            <H4>Signature request</H4>
+            <P3 color="neutrals.300">A dapp is requesting to sign a message</P3>
           </Flex>
         </Flex>
         <Flex
@@ -51,10 +52,10 @@ export const SignatureRequestRejectedScreen: FC<
           borderRadius={12}
           gap={2}
         >
-          <AlertFillIcon width={5} height={5} color="text-danger" />
-          <P4 fontWeight="bold" color="text-danger">
+          <WarningCirclePrimaryIcon width={5} height={5} color="text-danger" />
+          <P3 fontWeight="bold" color="text-danger">
             {error}
-          </P4>
+          </P3>
         </Flex>
       </>
     </ConfirmScreen>

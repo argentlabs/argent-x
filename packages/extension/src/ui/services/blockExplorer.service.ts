@@ -2,7 +2,7 @@ import { addAddressPadding, constants, shortString } from "starknet"
 import urlJoin from "url-join"
 
 import { isArgentNetworkId } from "@argent/x-shared"
-import { Network } from "../../shared/network"
+import type { Network } from "../../shared/network"
 import { networkService } from "../../shared/network/service"
 import { getNetworkIdFromChainId } from "../../shared/network/utils"
 import { settingsStore } from "../../shared/settings"

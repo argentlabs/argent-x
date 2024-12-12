@@ -1,16 +1,19 @@
-import { DeployAccountContractTransaction } from "starknet"
-import {
+import type { DeployAccountContractTransaction } from "starknet"
+import type {
+  AccountId,
   ArgentAccountType,
   BaseWalletAccount,
   CreateAccountType,
   MultisigData,
+  NetworkOnlyPlaceholderAccount,
   SignerType,
   WalletAccount,
 } from "../../../shared/wallet.model"
+import type { AccountDeployTransaction } from "../../../shared/transactionReview/transactionAction.model"
 
 export interface IClientAccountService {
   // selected account
-  select(baseAccount: BaseWalletAccount): Promise<void>
+  select(baseAccount: AccountId | NetworkOnlyPlaceholderAccount): Promise<void>
 
   // account methods
   create(
@@ -32,4 +35,12 @@ export interface IClientAccountService {
   getLastUsedAccountOnNetwork(
     networkId: string,
   ): Promise<BaseWalletAccount | undefined>
+
+  autoSelectAccountOnNetwork(
+    networkId: string,
+  ): Promise<BaseWalletAccount | null>
+
+  getAccountDeployTransaction(
+    baseAccount: BaseWalletAccount,
+  ): Promise<AccountDeployTransaction>
 }

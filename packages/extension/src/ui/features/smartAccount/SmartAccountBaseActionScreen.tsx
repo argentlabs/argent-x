@@ -2,14 +2,14 @@ import {
   BarBackButton,
   Button,
   FlowHeader,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
-const { SmartAccountActiveIcon, WalletIcon } = iconsDeprecated
+const { WalletSecondaryIcon, ShieldSecondaryIcon } = icons
 
 export interface SmartAccountBaseActionScreenProps {
   guardian?: string
@@ -28,7 +28,7 @@ export const SmartAccountBaseActionScreen: FC<
     >
       <Flex flexDirection={"column"} flex={1} px={4} pb={4}>
         <FlowHeader
-          icon={guardian ? WalletIcon : SmartAccountActiveIcon}
+          icon={guardian ? WalletSecondaryIcon : ShieldSecondaryIcon}
           title={`${guardian ? "Change to Standard Account" : "Upgrade to Smart Account"}`}
           subtitle={
             guardian ? (

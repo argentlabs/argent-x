@@ -1,15 +1,9 @@
-import {
-  Button,
-  H5,
-  L2,
-  P3,
-  iconsDeprecated,
-  logosDeprecated,
-} from "@argent/x-ui"
+import { Button, Empty, icons, L2Bold, logosDeprecated, P2 } from "@argent/x-ui"
+import type { FlexProps } from "@chakra-ui/react"
 import { Box, Flex, Text } from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 
-const { NftIcon } = iconsDeprecated
+const { NftIcon } = icons
 const { UnframedLogo, ElementLogo } = logosDeprecated
 
 const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
@@ -30,43 +24,24 @@ const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
     >
       <Text fontSize="3xl">{icon}</Text>
     </Button>
-    <L2>{title}</L2>
+    <L2Bold>{title}</L2Bold>
   </Box>
 )
 
-const EmptyCollections: FC<{ networkId: string }> = () => (
+const EmptyCollections: FC<FlexProps> = (props) => (
   <Flex
     direction="column"
     flex={1}
     textAlign="center"
     justifyContent="center"
     m={0}
+    {...props}
   >
-    <Flex
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      flex={1}
-    >
-      <Flex
-        bg="black"
-        w="80px"
-        h="80px"
-        mb="4"
-        alignItems="center"
-        justifyContent="center"
-        borderRadius="full"
-      >
-        <Text fontSize="4xl">
-          <NftIcon />
-        </Text>
-      </Flex>
-      <H5 color="neutrals.400">No NFTs</H5>
-    </Flex>
+    <Empty icon={<NftIcon />} title={`No NFTs`} />
     <Flex direction="column" flex={1} bg="black" p="-4" alignItems="center">
-      <P3 color="neutrals.400" mt="12">
+      <P2 color="neutrals.400" mt="12">
         Discover NFTs on Starknet
-      </P3>
+      </P2>
       <Flex gap="2" mt={6}>
         <ButtonLink
           title="Unframed"

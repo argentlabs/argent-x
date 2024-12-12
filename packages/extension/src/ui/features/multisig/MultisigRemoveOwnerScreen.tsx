@@ -1,21 +1,20 @@
-import { FC, useMemo } from "react"
+import type { FC } from "react"
+import { useMemo } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
 import { useRouteSignerToRemove } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
-import {
-  FieldValuesThresholdForm,
-  useUpdateThresholdForm,
-} from "./hooks/useUpdateThreshold"
+import type { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
+import { useUpdateThresholdForm } from "./hooks/useUpdateThreshold"
 import { multisigView } from "./multisig.state"
 import { BaseMultisigConfirmations } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { multisigService } from "../../services/multisig"
 import { decodeBase58 } from "@argent/x-shared"
 import { useView } from "../../views/implementation/react"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigRemoveOwnersScreen: FC = () => {
   const account = useRouteWalletAccount()

@@ -1,4 +1,4 @@
-import { IDebounceService } from "."
+import type { IDebounceService } from "."
 
 export const getMockDebounceService = (): IDebounceService => {
   const isRunning: Record<string, boolean> = {}

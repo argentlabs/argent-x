@@ -5,10 +5,10 @@ import {
 } from "@argent/x-shared"
 import {
   BarIconButton,
-  H6,
-  L2,
+  H5,
+  icons,
+  L2Bold,
   P4,
-  iconsDeprecated,
   typographyStyles,
 } from "@argent/x-ui"
 import {
@@ -20,25 +20,24 @@ import {
   Tooltip,
   chakra,
 } from "@chakra-ui/react"
-import { FC, useMemo, useState } from "react"
+import type { FC } from "react"
+import { useMemo, useState } from "react"
 
-import {
-  CustomButtonCell,
-  CustomButtonCellProps,
-} from "../../components/CustomButtonCell"
+import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { TransactionStatusIndicator } from "../../components/StatusIndicator"
 import { AccountAvatar } from "./AccountAvatar"
 import { AccountLabel } from "./AccountLabel"
 import { AccountListItemWarningBadge } from "./AccountListItemDeprecatedBadge"
 import { AccountListItemSmartAccountBadgeContainer } from "./AccountListItemSmartAccountBadgeContainer"
 import { AccountListItemUpgradeBadge } from "./AccountListItemUpgradeBadge"
-import { AccountListItemProps } from "./accountListItem.model"
+import type { AccountListItemProps } from "./accountListItem.model"
 import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useWalletAccount } from "./accounts.state"
 import { useOnSettingsAccountNavigate } from "./useOnSettingsAccountNavigate"
 import { AccountListItemLedgerBadge } from "./AccountListItemLedgerBadge"
 
-const { LinkIcon, MoreIcon } = iconsDeprecated
+const { LinkPrimaryIcon, MoreSecondaryIcon } = icons
 
 const NetworkStatusWrapper = chakra(Flex, {
   baseStyle: {
@@ -47,7 +46,7 @@ const NetworkStatusWrapper = chakra(Flex, {
     gap: 1,
     ml: 1,
     pointerEvents: "none",
-    ...typographyStyles.L1,
+    ...typographyStyles.L1Bold,
   },
 })
 
@@ -64,18 +63,8 @@ const notClickableProps: CustomButtonCellProps = {
 
 const AccountListRightElements: FC<
   AccountListItemProps & { isHovering: boolean }
-> = ({
-  accountAddress,
-  networkId,
-  deploying,
-  prettyAccountBalance,
-  isHovering,
-  hidden,
-}) => {
-  const account = useWalletAccount({
-    address: accountAddress,
-    networkId: networkId,
-  })
+> = ({ accountId, deploying, prettyAccountBalance, isHovering, hidden }) => {
+  const account = useWalletAccount(accountId)
   const onSettingsClick = useOnSettingsAccountNavigate(account)
 
   const handleButtonClick = (
@@ -94,7 +83,7 @@ const AccountListRightElements: FC<
   }
 
   if (typeof hidden === "boolean") {
-    return <Switch size={"lg"} isChecked={hidden} />
+    return <Switch size={"lg"} isChecked={hidden} mr={1} />
   } else {
     return (
       <Flex alignItems="center" gap={3} data-testid="connected-dapp">
@@ -105,10 +94,14 @@ const AccountListRightElements: FC<
             onClick={handleButtonClick}
             backgroundColor="neutrals.900"
           >
-            <MoreIcon />
+            <MoreSecondaryIcon />
           </BarIconButton>
         ) : (
-          <>{prettyAccountBalance && <H6>{prettyAccountBalance}</H6>}</>
+          <>
+            {prettyAccountBalance && (
+              <H5 data-testid="token-value">{prettyAccountBalance}</H5>
+            )}
+          </>
         )}
       </Flex>
     )
@@ -118,6 +111,7 @@ const AccountListRightElements: FC<
 export const AccountListItem: FC<AccountListItemProps> = ({
   accountName,
   accountDescription,
+  accountId,
   accountAddress,
   networkId,
   networkName,
@@ -160,12 +154,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
       return <AccountListItemLedgerBadge />
     }
     if (isSmartAccount) {
-      return (
-        <AccountListItemSmartAccountBadgeContainer
-          accountAddress={accountAddress}
-          networkId={networkId}
-        />
-      )
+      return <AccountListItemSmartAccountBadgeContainer accountId={accountId} />
     }
     return null
   }
@@ -189,6 +178,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   const additionalProps = isClickable ? {} : notClickableProps
   return (
     <CustomButtonCell
+      role="group"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...additionalProps}
@@ -209,8 +199,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
           size={avatarSize}
           src={getNetworkAccountImageUrl({
             accountName,
-            accountAddress,
-            networkId,
+            accountId,
           })}
         >
           {getAvatarBadge()}
@@ -226,14 +215,13 @@ export const AccountListItem: FC<AccountListItemProps> = ({
         <Flex direction={"column"} overflow={"hidden"}>
           <Flex gap={2} alignItems={"center"}>
             {accountName && (
-              <H6
+              <H5
                 data-testid="account-name"
                 overflow={"hidden"}
                 textOverflow={"ellipsis"}
-                pointerEvents="auto"
               >
                 {accountName}
-              </H6>
+              </H5>
             )}
             {accountExtraInfo && (
               <Flex
@@ -246,21 +234,14 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 borderRadius={4}
                 data-testid="confirmations"
               >
-                <L2 fontWeight={700} color="neutrals.300">
-                  {accountExtraInfo}
-                </L2>
+                <L2Bold color="text-secondary">{accountExtraInfo}</L2Bold>
               </Flex>
             )}
             {accountType && <AccountLabel accountType={accountType} />}
           </Flex>
           {description && (
-            <Flex gap={2} color={"neutrals.300"}>
-              <P4
-                data-testid="description"
-                fontWeight={"semibold"}
-                w="full"
-                sx={{ textWrap: "wrap" }}
-              >
+            <Flex gap={2} color={"text-secondary"}>
+              <P4 data-testid="description" w="full" sx={{ textWrap: "wrap" }}>
                 {description}
               </P4>
             </Flex>
@@ -281,7 +262,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
                 mt={0.5}
                 {...typographyStyles.L3}
               >
-                <LinkIcon display={"inline-block"} /> Connected
+                <LinkPrimaryIcon display={"inline-block"} /> Connected
               </Flex>
             </Tooltip>
           )}
@@ -289,6 +270,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
         <Flex direction="column" {...rightElementFlexProps}>
           {(showRightElements || deploying) && (
             <AccountListRightElements
+              accountId={accountId}
               accountAddress={accountAddress}
               accountName={accountName}
               networkId={networkId}

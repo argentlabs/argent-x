@@ -3,14 +3,10 @@
  */
 import useSWR from "swr"
 
-import {
-  generateAvatarImage,
-  id,
-  stripAddressZeroPadding,
-} from "@argent/x-shared"
+import { generateAvatarImage, id } from "@argent/x-shared"
 import { updateAccountDetails } from "../../../shared/account/update"
 import { RefreshIntervalInSeconds } from "../../../shared/config"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { AccountId, BaseWalletAccount } from "../../../shared/wallet.model"
 import { withPolling } from "../../services/swr.service"
 import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
@@ -38,25 +34,39 @@ export const getAccountImageUrl = (
 ) => {
   return getNetworkAccountImageUrl({
     accountName,
-    networkId: account.networkId,
-    accountAddress: account.address,
+    accountId: account.id,
   })
+}
+
+interface GetNetworkAccountImageUrlProps {
+  accountName: string
+  accountId: AccountId
+  backgroundColor?: string
 }
 
 export const getNetworkAccountImageUrl = ({
   accountName,
-  networkId,
-  accountAddress,
+  accountId,
   backgroundColor,
-}: {
+}: GetNetworkAccountImageUrlProps) => {
+  const background = backgroundColor || getColor(accountId)
+  return generateAvatarImage(accountName, { background })
+}
+
+interface GetNetworkOwnerImageUrlProps {
   accountName: string
+  publicKey: string
   networkId: string
-  accountAddress: string
   backgroundColor?: string
-}) => {
-  const unpaddedAddress = stripAddressZeroPadding(accountAddress)
-  const accountIdentifier = `${networkId}::${unpaddedAddress}`
-  const background = backgroundColor || getColor(accountIdentifier)
+}
+
+export const getNetworkOwnerImageUrl = ({
+  accountName,
+  publicKey,
+  networkId,
+  backgroundColor,
+}: GetNetworkOwnerImageUrlProps) => {
+  const background = backgroundColor || getColor(`${publicKey}::${networkId}`)
   return generateAvatarImage(accountName, { background })
 }
 

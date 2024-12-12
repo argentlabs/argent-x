@@ -1,7 +1,8 @@
-import { MinimalActionBrowser, getBrowserAction } from "../browser"
-import { DeepPick } from "../types/deepPick"
+import type { MinimalActionBrowser } from "../browser"
+import { getBrowserAction } from "../browser"
+import type { DeepPick } from "../types/deepPick"
 import { UI_SERVICE_CONNECT_ID } from "./constants"
-import { IUIService } from "./IUIService"
+import type { IUIService } from "./IUIService"
 
 type MinimalBrowser = DeepPick<
   typeof chrome,

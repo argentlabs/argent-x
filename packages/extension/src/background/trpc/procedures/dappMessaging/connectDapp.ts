@@ -3,7 +3,7 @@ import type { IUIService } from "../../../../shared/ui/IUIService"
 import type { IBackgroundActionService } from "../../../services/action/IBackgroundActionService"
 import { Opened } from "../../../services/ui"
 import type { IBackgroundUIService } from "../../../services/ui/IBackgroundUIService"
-import { Wallet } from "../../../wallet"
+import type { Wallet } from "../../../wallet"
 import type { ConnectDappInput } from "./schema"
 
 export const connectDapp = async ({

@@ -1,5 +1,6 @@
 import { BarBackButton, NavigationContainer } from "@argent/x-ui"
-import { FC, PropsWithChildren, ReactNode, useCallback } from "react"
+import type { FC, PropsWithChildren, ReactNode } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"

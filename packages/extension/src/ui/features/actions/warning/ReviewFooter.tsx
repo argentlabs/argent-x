@@ -1,4 +1,4 @@
-import { P4 } from "@argent/x-ui"
+import { P3 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 
 export const ReviewFooter = () => {
@@ -10,9 +10,9 @@ export const ReviewFooter = () => {
       gap={2}
       justifyContent="center"
     >
-      <P4 data-testid="review-footer" textAlign="center" color="text-danger">
+      <P3 data-testid="review-footer" textAlign="center" color="text-danger">
         Please review warnings before continuing
-      </P4>
+      </P3>
     </Flex>
   )
 }

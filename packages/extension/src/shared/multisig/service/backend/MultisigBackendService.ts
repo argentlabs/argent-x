@@ -1,19 +1,12 @@
-import {
-  AllowArray,
-  InvokeFunctionResponse,
-  Signature,
-  num,
-  stark,
-  transaction,
-  v2hash,
-} from "starknet"
+import type { AllowArray, InvokeFunctionResponse, Signature } from "starknet"
+import { num, stark, transaction, v2hash } from "starknet"
 import urlJoin from "url-join"
 import { ARGENT_MULTISIG_DISCOVERY_URL } from "../../../api/constants"
 import { fetcher } from "../../../api/fetcher"
 import { argentXHeaders } from "../../../api/headers"
 import { MultisigError } from "../../../errors/multisig"
 import { RecoveryError } from "../../../errors/recovery"
-import { Network } from "../../../network"
+import type { Network } from "../../../network"
 import {
   chainIdToStarknetNetwork,
   networkIdToStarknetNetwork,
@@ -21,22 +14,27 @@ import {
   starknetNetworkToNetworkId,
 } from "../../../utils/starknetNetwork"
 import { urlWithQuery } from "../../../utils/url"
-import { BaseWalletAccount, MultisigWalletAccount } from "../../../wallet.model"
-import {
+import type {
+  BaseWalletAccount,
+  MultisigWalletAccount,
+} from "../../../wallet.model"
+import type {
   ApiMultisigAccountData,
-  ApiMultisigAccountDataSchema,
-  ApiMultisigAddRequestSignatureSchema,
   ApiMultisigDataForSigner,
-  ApiMultisigDataForSignerSchema,
   ApiMultisigGetSignatureRequestById,
   ApiMultisigGetSignatureRequests,
   ApiMultisigGetTransactionRequests,
-  ApiMultisigGetTransactionRequestsSchema,
   ApiMultisigPostRequestTxn,
-  ApiMultisigPostRequestTxnSchema,
-  ApiMultisigTransactionResponseSchema,
   ApiMultisigTransactionState,
   MultisigSignerSignaturesWithId,
+} from "../../multisig.model"
+import {
+  ApiMultisigAccountDataSchema,
+  ApiMultisigAddRequestSignatureSchema,
+  ApiMultisigDataForSignerSchema,
+  ApiMultisigGetTransactionRequestsSchema,
+  ApiMultisigPostRequestTxnSchema,
+  ApiMultisigTransactionResponseSchema,
   apiMultisigCancelOffchainSignatureRequestSchema,
   apiMultisigGetSignatureRequestByIdSchema,
   apiMultisigGetSignatureRequestsSchema,
@@ -44,19 +42,19 @@ import {
   createOffchainSignatureResponseSchema,
   multisigSignerSignatureSchema,
 } from "../../multisig.model"
+import type { MultisigPendingOffchainSignature } from "../../pendingOffchainSignaturesStore"
 import {
-  MultisigPendingOffchainSignature,
   addMultisigPendingOffchainSignatures,
   removeMultisigPendingOffchainSignature,
 } from "../../pendingOffchainSignaturesStore"
+import type { MultisigPendingTransaction } from "../../pendingTransactionsStore"
 import {
-  MultisigPendingTransaction,
   addToMultisigPendingTransactions,
   multisigPendingTransactionToTransaction,
 } from "../../pendingTransactionsStore"
 import { getMultisigAccountFromBaseWallet } from "../../utils/baseMultisig"
-import { IMultisigBackendService } from "./IMultisigBackendService"
-import {
+import type { IMultisigBackendService } from "./IMultisigBackendService"
+import type {
   IAddOffchainSignature,
   IAddRequestSignature,
   ICancelOffchainSignature,
@@ -215,11 +213,12 @@ export class MultisigBackendService implements IMultisigBackendService {
   private mapTransactionDetails({
     transactionDetails,
     address,
+    accountId,
   }: IMapTransactionDetails): MappedTransactionDetails {
     const { nonce, version, chainId, cairoVersion } = transactionDetails
     const starknetNetwork = chainIdToStarknetNetwork(chainId)
     const networkId = starknetNetworkToNetworkId(starknetNetwork)
-    const account: BaseWalletAccount = { address, networkId }
+    const account: BaseWalletAccount = { address, networkId, id: accountId }
     const maxFee =
       "maxFee" in transactionDetails ? transactionDetails.maxFee : 0 // not exists in V3InvocationsSignerDetails
     const resourceBounds =
@@ -301,6 +300,7 @@ export class MultisigBackendService implements IMultisigBackendService {
 
   async createTransactionRequest({
     address,
+    accountId,
     signature,
     calls,
     transactionDetails,
@@ -314,7 +314,7 @@ export class MultisigBackendService implements IMultisigBackendService {
       account,
       starknetNetwork,
       resourceBounds,
-    } = this.mapTransactionDetails({ transactionDetails, address })
+    } = this.mapTransactionDetails({ transactionDetails, address, accountId })
 
     const multisig = await this.fetchMultisigAccount(account)
     const request = await this.prepareTransaction({
@@ -400,10 +400,12 @@ export class MultisigBackendService implements IMultisigBackendService {
     transactionToSign,
     chainId,
     signature,
+    accountId,
   }: IAddRequestSignature): Promise<InvokeFunctionResponse> {
     const starknetNetwork = chainIdToStarknetNetwork(chainId)
     const networkId = starknetNetworkToNetworkId(starknetNetwork)
     const multisig = await this.fetchMultisigAccount({
+      id: accountId,
       address,
       networkId,
     })
@@ -440,10 +442,12 @@ export class MultisigBackendService implements IMultisigBackendService {
     data,
     signature,
     chainId,
+    accountId,
   }: ICreateOffchainSignatureRequest): Promise<MultisigSignerSignaturesWithId> {
     const starknetNetwork = chainIdToStarknetNetwork(chainId)
     const networkId = starknetNetworkToNetworkId(starknetNetwork)
     const multisig = await this.fetchMultisigAccount({
+      id: accountId,
       address,
       networkId,
     })
@@ -496,6 +500,7 @@ export class MultisigBackendService implements IMultisigBackendService {
     const starknetNetwork = chainIdToStarknetNetwork(chainId)
     const networkId = starknetNetworkToNetworkId(starknetNetwork)
     const multisig = await this.fetchMultisigAccount({
+      id: payload.accountId,
       address,
       networkId,
     })

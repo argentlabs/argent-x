@@ -1,14 +1,14 @@
-import { WalletAccount } from "../../wallet.model"
+import type { ArgentWalletAccount } from "../../wallet.model"
 import { getEscapeForAccount } from "./getEscape"
 
 export type AccountEscapeFromChain = Pick<
-  WalletAccount,
-  "address" | "networkId" | "escape"
+  ArgentWalletAccount,
+  "id" | "address" | "networkId" | "escape"
 >
 
 /** updates the accounts with current escape status */
 export async function getAccountEscapeFromChain(
-  accounts: WalletAccount[],
+  accounts: ArgentWalletAccount[],
 ): Promise<AccountEscapeFromChain[]> {
   const escapeResults = await Promise.allSettled(
     accounts.map((account) => {
@@ -20,8 +20,9 @@ export async function getAccountEscapeFromChain(
     const escapeResult = escapeResults[index]
     const escape =
       escapeResult.status === "fulfilled" ? escapeResult.value : undefined
-    const { address, networkId } = account
+    const { address, networkId, id } = account
     return {
+      id,
       address,
       networkId,
       escape,

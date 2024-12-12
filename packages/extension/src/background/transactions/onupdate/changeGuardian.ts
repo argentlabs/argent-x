@@ -1,5 +1,5 @@
 import { updateAccountDetails } from "../../../shared/account/update"
-import { TransactionUpdateListener } from "./type"
+import type { TransactionUpdateListener } from "./type"
 
 export const handleChangeGuardianTransaction: TransactionUpdateListener =
   async (transactions) => {

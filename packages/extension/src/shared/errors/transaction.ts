@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 
 export enum TRANSACTION_ERROR_MESSAGE {
   NO_TRANSACTION_HASH = "Transaction hash is not available",

@@ -1,4 +1,4 @@
-import browser from "webextension-polyfill"
+import type browser from "webextension-polyfill"
 
 export type AllowPromise<T> = T | Promise<T>
 export type AllowArray<T> = T | T[]

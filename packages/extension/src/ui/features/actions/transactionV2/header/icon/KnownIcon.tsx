@@ -1,15 +1,15 @@
-import { BoxProps } from "@chakra-ui/react"
+import type { BoxProps } from "@chakra-ui/react"
 import { IconWrapper } from "./IconWrapper"
-import { iconsDeprecated } from "@argent/x-ui"
+import type { IconKeys } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 
 export const KnownIcon = ({
   iconKey,
   ...rest
-}: BoxProps & { iconKey: keyof typeof iconsDeprecated }) => {
-  const IconComponent = iconsDeprecated[iconKey]
-
+}: BoxProps & { iconKey: IconKeys }) => {
+  const IconComponent = icons[iconKey]
   return (
-    <IconWrapper borderRadius="full" {...rest}>
+    <IconWrapper rounded="2xl" {...rest}>
       <IconComponent fontSize={"xl"} color="neutrals.900" />
     </IconWrapper>
   )

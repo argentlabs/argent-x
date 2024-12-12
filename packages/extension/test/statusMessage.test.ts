@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { IStatusMessage } from "../src/shared/statusMessage/types"
+import type { IStatusMessage } from "../src/shared/statusMessage/types"
 import {
   getMessageToShow,
   getShouldShowMessage,

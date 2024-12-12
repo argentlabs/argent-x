@@ -1,4 +1,5 @@
-import { BackendAccount, BaseError } from "@argent/x-shared"
+import type { BackendAccount } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 import { describe, expect, test } from "vitest"
 
 import {
@@ -7,7 +8,7 @@ import {
   SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
   SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_3,
 } from "../../errors/argentAccount"
-import { WalletAccount } from "../../wallet.model"
+import type { WalletAccount } from "../../wallet.model"
 import {
   getLocalAccountsMatchBackendAccounts,
   getSmartAccountValidationErrorFromBackendError,

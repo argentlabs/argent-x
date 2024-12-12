@@ -1,12 +1,13 @@
-import { AspectRatio, Button, ButtonProps, Flex, Image } from "@chakra-ui/react"
-import { NewsItem } from "../../../../shared/discover/schema"
-import { FC } from "react"
-import { H6, L2, P4 } from "@argent/x-ui"
+import type { ButtonProps } from "@chakra-ui/react"
+import { AspectRatio, Button, Flex, Image } from "@chakra-ui/react"
+import type { NewsItem } from "../../../../shared/discover/schema"
+import type { FC } from "react"
+import { H5, L2Bold, P3 } from "@argent/x-ui"
 import { isEmpty } from "lodash-es"
 import { ampli } from "../../../../shared/analytics"
 import { useView } from "../../../views/implementation/react"
 import { selectedAccountView } from "../../../views/account"
-import { FeedPostClickedProperties } from "../../../../ampli"
+import type { FeedPostClickedProperties } from "../../../../ampli"
 
 interface NewsItemCardProps extends ButtonProps {
   newsItem: NewsItem
@@ -76,13 +77,13 @@ export const NewsItemCard: FC<NewsItemCardProps> = ({ newsItem, ...rest }) => {
             py={0.5}
             px={1}
           >
-            <L2>{badgeText}</L2>
+            <L2Bold>{badgeText}</L2Bold>
           </Flex>
         )}
       </Flex>
       <Flex direction={"column"} px={1} mt={4} w={"full"} gap={0.5}>
-        <H6>{title}</H6>
-        {description && <P4 fontWeight={"normal"}>{description}</P4>}
+        <H5>{title}</H5>
+        {description && <P3 fontWeight={"normal"}>{description}</P3>}
       </Flex>
     </Button>
   )

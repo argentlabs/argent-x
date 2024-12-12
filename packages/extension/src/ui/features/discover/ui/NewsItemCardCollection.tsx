@@ -1,8 +1,8 @@
 import { SimpleGrid } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import { pluralise, daysBetween } from "@argent/x-shared"
 
-import { NewsItem } from "../../../../shared/discover/schema"
+import type { NewsItem } from "../../../../shared/discover/schema"
 import { NewsItemCard } from "./NewsItemCard"
 
 interface NewsItemCardCollectionProps {

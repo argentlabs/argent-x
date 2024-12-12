@@ -34,12 +34,12 @@ export const estimateTransactionProcedure = extensionOnlyProcedure
         services: { wallet },
       },
     }) => {
-      const walletAccount = await wallet.getAccount(account)
+      const walletAccount = await wallet.getAccount(account.id)
       if (!walletAccount) {
         throw new AccountError({ code: "NOT_FOUND" })
       }
 
-      const snAccount = await wallet.getStarknetAccount(account)
+      const snAccount = await wallet.getStarknetAccount(account.id)
 
       if (!("estimateFeeBulk" in snAccount)) {
         throw new AccountError({ code: "MISSING_METHOD" })

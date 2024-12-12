@@ -1,16 +1,17 @@
 import { lowerCase, uniq, upperFirst } from "lodash-es"
-import { Call, TransactionType, num } from "starknet"
-import { SPEC } from "@starknet-io/types-js"
+import type { Call, TransactionType } from "starknet"
+import { num } from "starknet"
+import type { SPEC } from "@starknet-io/types-js"
 
-import { WalletAccount } from "./wallet.model"
+import type { WalletAccount } from "./wallet.model"
 import {
   MultisigEntryPointType,
   MultisigTransactionType,
 } from "./multisig/types"
 import { getTransactionStatus } from "./transactions/utils"
-import { Address } from "@argent/x-shared"
-import { ActionQueueItemMeta } from "./actionQueue/schema"
-import { TransactionSubmittedProperties } from "../ampli"
+import type { Address } from "@argent/x-shared"
+import type { ActionQueueItemMeta } from "./actionQueue/schema"
+import type { TransactionSubmittedProperties } from "../ampli"
 
 export type FinaliyStatus = SPEC.TXN_STATUS
 export type ExecutionStatus = SPEC.TXN_EXECUTION_STATUS

@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest"
-
-import { getActiveFromNow } from "./useAccountEscape"
+import { getActiveFromNow } from "../../../../shared/utils/getActiveFromNow"
 
 const getDaysFromNow = (days = 0) => {
   const now = new Date()
@@ -29,6 +28,9 @@ describe("getActiveFromNow", () => {
       expect(
         getActiveFromNow(getDaysFromNow(7).getTime() / 1000),
       ).toHaveProperty("activeFromNowPretty", "7 days")
+      expect(
+        getActiveFromNow(getDaysFromNow(21).getTime() / 1000),
+      ).toHaveProperty("activeFromNowPretty", "21 days")
       expect(
         getActiveFromNow(getHoursFromNow(24 * 6.5).getTime() / 1000),
       ).toHaveProperty("activeFromNowPretty", "7 days")

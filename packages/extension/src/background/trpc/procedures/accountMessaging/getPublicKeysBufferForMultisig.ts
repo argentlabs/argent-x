@@ -24,7 +24,7 @@ export const getPublicKeysBufferForMultisigProcedure = extensionOnlyProcedure
           buffer,
         )
         return pubKeys
-      } catch (error) {
+      } catch {
         throw new PubKeyError({
           code: "FAILED_BUFFER_GENERATION",
         })

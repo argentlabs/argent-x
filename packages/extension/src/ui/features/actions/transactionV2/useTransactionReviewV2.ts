@@ -1,39 +1,36 @@
-import { useCallback } from "react"
+import { useCallback, useMemo, useRef } from "react"
 import useSWRImmutable from "swr/immutable"
 
-import { TransactionReviewTransactions } from "../../../../shared/transactionReview/interface"
 import { clientTransactionReviewService } from "../../../services/transactionReview"
-import { Call, TypedData } from "starknet"
-import { isArray, isEmpty } from "lodash-es"
+import type { TypedData } from "starknet"
+import { TransactionType } from "starknet"
+import { isEmpty } from "lodash-es"
 import { clientAccountService } from "../../../services/account"
-import { Address } from "@argent/x-shared"
+import type { Address, TransactionAction } from "@argent/x-shared"
 import { accountService } from "../../../../shared/account/service"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { outsideSignatureSchema } from "../../../../shared/signatureReview/schema"
 import { signatureReviewService } from "../../../services/signatureReview"
 import { clientTokenService } from "../../../services/tokens"
-import { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
 
 export interface IUseTransactionReviewV2 {
   feeTokenAddress?: Address
-  calls: Call | Call[]
+  transaction: TransactionAction
   actionHash: string
   selectedAccount: BaseWalletAccount | undefined
   appDomain?: string
+  maxSendEstimate?: boolean
 }
 
 export const getReviewForTransactions = async ({
   feeTokenAddress,
-  calls,
+  transaction,
   selectedAccount,
   appDomain,
+  maxSendEstimate,
 }: Omit<IUseTransactionReviewV2, "actionHash">) => {
-  const invokeTransactions: TransactionReviewTransactions = {
-    type: "INVOKE",
-    calls: isArray(calls) ? calls : [calls],
-  }
-
   const accountList = await accountService.get((account) =>
     accountsEqual(account, selectedAccount),
   )
@@ -45,34 +42,41 @@ export const getReviewForTransactions = async ({
   const currentAccount = accountList[0]
 
   const accountDeployTransaction = currentAccount?.needsDeploy
-    ? await clientAccountService.getAccountDeploymentPayload(currentAccount)
-    : null
-
-  const transactions = accountDeployTransaction
-    ? [accountDeployTransaction, invokeTransactions]
-    : [invokeTransactions]
+    ? await clientAccountService.getAccountDeployTransaction(currentAccount)
+    : undefined
 
   const result = await clientTransactionReviewService.simulateAndReview({
-    transactions,
+    transaction,
+    accountDeployTransaction,
     feeTokenAddress,
     appDomain,
+    maxSendEstimate,
   })
   return { result, currentAccount }
 }
+
 export const useTransactionReviewV2 = ({
   feeTokenAddress,
-  calls,
+  transaction,
   actionHash,
   selectedAccount,
   appDomain,
 }: IUseTransactionReviewV2) => {
+  const cacheBust = useRef(Date.now())
+
+  const useCacheBust = useMemo(
+    () => transaction.type !== TransactionType.INVOKE,
+    [transaction.type],
+  )
+
   const transactionReviewFetcher = useCallback(async () => {
     const response = await getReviewForTransactions({
       feeTokenAddress,
-      calls,
+      transaction,
       selectedAccount,
       appDomain,
     })
+
     if (
       !response ||
       !response.result ||
@@ -87,7 +91,7 @@ export const useTransactionReviewV2 = ({
       response.currentAccount,
     )
     return { ...response.result, isSendingMoreThanBalanceAndGas }
-  }, [appDomain, calls, feeTokenAddress, selectedAccount])
+  }, [appDomain, transaction, feeTokenAddress, selectedAccount])
 
   /** only fetch a tx simulate and review one time since e.g. a swap may expire */
   return useSWRImmutable(
@@ -97,6 +101,7 @@ export const useTransactionReviewV2 = ({
           "useTransactionReviewV2",
           "simulateAndReview",
           feeTokenAddress,
+          useCacheBust ? cacheBust.current : undefined,
         ]
       : null,
     transactionReviewFetcher,
@@ -149,7 +154,7 @@ export const checkGasFeeBalance = async (
   currentAccount: BaseWalletAccount,
 ) => {
   let isSendingMoreThanBalanceAndGas = false
-  const sendTransaction = result.transactions.find((t) =>
+  const sendTransaction = result.transactions?.find((t) =>
     t?.simulation?.summary?.find((s) => s.sent),
   )
   if (!sendTransaction || !sendTransaction.simulation?.summary) {
@@ -187,11 +192,24 @@ export const checkGasFeeBalance = async (
     return isSendingMoreThanBalanceAndGas
   }
 
-  const feeTokenBalance = await clientTokenService.fetchTokenBalance(
+  // optimistically use balance from storage
+  const feeTokenBalance = await clientTokenService.getTokenBalance(
     feeTokenAddress,
     currentAccount.address as Address,
     currentAccount.networkId,
   )
+
+  // fetching on-chain typically adds 500ms+ overhead
+  // const feeTokenBalance = await clientTokenService.fetchTokenBalance(
+  //   feeTokenAddress,
+  //   currentAccount.address as Address,
+  //   currentAccount.networkId,
+  // )
+
+  if (!feeTokenBalance) {
+    return isSendingMoreThanBalanceAndGas
+  }
+
   const hasEnoughToPayGas =
     BigInt(feeTokenBalance) > feeAmount + BigInt(sentAmount)
   if (!hasEnoughToPayGas) {

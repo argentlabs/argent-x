@@ -1,14 +1,12 @@
 import { ArrayStorage } from "../../../../shared/storage"
-import { WalletAccount } from "../../../../shared/wallet.model"
-import { getAccountIdentifier } from "../../../../shared/wallet.service"
+import type { WalletAccount } from "../../../../shared/wallet.model"
 
 export const getEscapeWarningStoreKey = (account: WalletAccount) => {
-  const accountIdentifier = getAccountIdentifier(account)
   if (!account.escape) {
-    return accountIdentifier
+    return account.id
   }
   const { activeAt, type } = account.escape
-  return `${accountIdentifier}::${activeAt}::${type}`
+  return `${account.id}::${activeAt}::${type}`
 }
 
 /** keep a record of all the account escapes we notified the user about */

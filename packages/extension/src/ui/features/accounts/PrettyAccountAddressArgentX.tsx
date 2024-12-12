@@ -1,11 +1,13 @@
-import { PrettyAccountAddress, PrettyAccountAddressProps } from "@argent/x-ui"
-import { FC, useMemo } from "react"
+import type { PrettyAccountAddressProps } from "@argent/x-ui"
+import { PrettyAccountAddress } from "@argent/x-ui"
+import type { FC } from "react"
+import { useMemo } from "react"
 
 import type { AddressBookContact } from "../../../shared/addressBook/type"
 import { useAddressBook } from "../../hooks/useAddressBook"
-import { accountFindFamily } from "../../views/account"
-import { useView } from "../../views/implementation/react"
 import { isEqualAddress } from "@argent/x-shared"
+import type { AccountId } from "../../../shared/wallet.model"
+import { useWalletAccount } from "./accounts.state"
 
 const getContactNameForAddress = (
   accountAddress: string,
@@ -27,6 +29,7 @@ const getContactNameForAddress = (
 
 export interface PrettyAccountAddressArgentXProps
   extends PrettyAccountAddressProps {
+  accountId: AccountId // TODO: move to x-shared
   contacts?: AddressBookContact[]
 }
 
@@ -36,13 +39,8 @@ export interface PrettyAccountAddressArgentXProps
 
 export const PrettyAccountAddressArgentX: FC<
   PrettyAccountAddressArgentXProps
-> = ({ accountAddress, networkId, contacts, ...rest }) => {
-  const account = useView(
-    accountFindFamily({
-      networkId,
-      address: accountAddress,
-    }),
-  )
+> = ({ accountId, accountAddress, networkId, contacts, ...rest }) => {
+  const account = useWalletAccount(accountId)
 
   const { contacts: defaultContacts } = useAddressBook()
   if (!contacts) {

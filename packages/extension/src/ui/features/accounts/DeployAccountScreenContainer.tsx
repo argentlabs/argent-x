@@ -1,9 +1,10 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { DeployAccountScreen } from "./DeployAccountScreen"
-import { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
+import type { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
 import { clientAccountService } from "../../services/account"
 import { useActionScreen } from "../actions/hooks/useActionScreen"
 
@@ -24,5 +25,5 @@ export const DeployAccountScreenContainer: FC<
     return null
   }
 
-  return <DeployAccountScreen onActivate={onActivate} {...props} />
+  return <DeployAccountScreen onActivate={() => void onActivate()} {...props} />
 }

@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import {
@@ -23,13 +23,15 @@ export const useOnSettingsNavigate = (
 
   const onSettings = useCallback(async () => {
     if (account && selectedAccount?.address !== account.address) {
-      await clientAccountService.select(account)
+      await clientAccountService.select(account.id)
     }
     if (multisig && !signerIsInMultisig) {
-      navigate(routes.multisigRemovedSettings(multisig.address, returnTo))
+      navigate(routes.multisigRemovedSettings(multisig.id, returnTo))
     } else {
       if (settingsAccount) {
-        navigate(routes.settingsAccount(account?.address, returnTo))
+        if (account) {
+          navigate(routes.settingsAccount(account.id, returnTo))
+        }
       } else {
         navigate(routes.settings(returnTo))
       }

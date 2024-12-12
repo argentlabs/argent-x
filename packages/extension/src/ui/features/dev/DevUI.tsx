@@ -1,57 +1,51 @@
-import { TabBarHeight } from "@argent/x-ui"
-import { CheckIcon, ChevronDownIcon } from "@chakra-ui/icons"
+import { TabBarHeight, icons } from "@argent/x-ui"
 import {
   Button,
   Flex,
   Menu,
   MenuButton,
+  MenuGroup,
   MenuItem,
   MenuList,
 } from "@chakra-ui/react"
-import { useAtom } from "jotai"
 import { DevTools, useAtomsDebugValue } from "jotai-devtools"
-import { atomWithStorage } from "jotai/utils"
-import { FC } from "react"
+import type { FC } from "react"
 
-import {
-  useHardReload,
-  useResetCache,
-  useSoftReload,
-} from "../../services/resetAndReload"
-import { useDevStorageUI } from "./useDevStorageUI"
+import { devStore } from "../../../shared/dev/store"
+import { useGetSetKeyValueStorage } from "../../hooks/useStorage"
+import { useHardReload, useSoftReload } from "../../services/resetAndReload"
+import { useOpenExtensionInTab } from "../browser/tabs"
 
 import "jotai-devtools/styles.css"
 
-const atomsDevToolsEnabledAtom = atomWithStorage("atomsDevToolsEnabled", false)
-
-const atomsDebugValueEnabledAtom = atomWithStorage(
-  "atomsDebugValueEnabled",
-  false,
-)
+const {
+  DropdownDownIcon,
+  SettingsSecondaryIcon,
+  RefreshPrimaryIcon,
+  CheckmarkSecondaryIcon,
+} = icons
 
 function UseAtomsDebugValue() {
   useAtomsDebugValue()
   return null
 }
 
+const UncheckedIcon = () => <>{"\u2003"}</>
+
 export const DevUI: FC = () => {
-  const resetCache = useResetCache()
   const softReload = useSoftReload()
   const hardReload = useHardReload()
-  const {
-    incrementStorage1Mb,
-    setStorage4Mb,
-    pruneStorage,
-    prettyStorageUsed,
-    updateStorageUsed,
-  } = useDevStorageUI()
+  const openExtensionInTab = useOpenExtensionInTab()
 
-  const [atomsDevToolsEnabled, setAtomsDevToolsEnabled] = useAtom(
-    atomsDevToolsEnabledAtom,
+  const [openInExtendedView, setOpenInExtendedView] = useGetSetKeyValueStorage(
+    devStore,
+    "openInExtendedView",
   )
-  const [atomsDebugValueEnabled, setAtomsDebugValueEnabled] = useAtom(
-    atomsDebugValueEnabledAtom,
-  )
+
+  const [atomsDevToolsEnabled, setAtomsDevToolsEnabled] =
+    useGetSetKeyValueStorage(devStore, "atomsDevToolsEnabled")
+  const [atomsDebugValueEnabled, setAtomsDebugValueEnabled] =
+    useGetSetKeyValueStorage(devStore, "atomsDebugValueEnabled")
 
   return (
     <>
@@ -74,43 +68,76 @@ export const DevUI: FC = () => {
         }}
       >
         <Menu size={"2xs"}>
-          <MenuButton as={Button} size="2xs" rightIcon={<ChevronDownIcon />}>
-            Reload
+          <MenuButton
+            as={Button}
+            size="2xs"
+            leftIcon={<SettingsSecondaryIcon />}
+            rightIcon={<DropdownDownIcon />}
+          >
+            Dev
           </MenuButton>
           <MenuList>
-            <MenuItem onClick={softReload}>Reload UI</MenuItem>
-            <MenuItem onClick={hardReload}>Reload HTML</MenuItem>
-          </MenuList>
-        </Menu>
-        <Menu size={"2xs"} closeOnSelect={false}>
-          <MenuButton as={Button} size="2xs" rightIcon={<ChevronDownIcon />}>
-            Storage
-          </MenuButton>
-          <MenuList>
-            <MenuItem onClick={updateStorageUsed}>{prettyStorageUsed}</MenuItem>
-            <MenuItem onClick={resetCache}>Reset cache</MenuItem>
-            <MenuItem onClick={pruneStorage}>Prune</MenuItem>
-            <MenuItem onClick={incrementStorage1Mb}>A: Increment 1Mb</MenuItem>
-            <MenuItem onClick={setStorage4Mb}>B: Set 4Mb</MenuItem>
+            <MenuGroup title="Development">
+              <MenuItem
+                icon={
+                  openInExtendedView ? (
+                    <CheckmarkSecondaryIcon />
+                  ) : (
+                    <UncheckedIcon />
+                  )
+                }
+                onClick={() => {
+                  setOpenInExtendedView(!openInExtendedView)
+                  if (!openInExtendedView) {
+                    void openExtensionInTab()
+                  }
+                }}
+              >
+                Open in Extended View
+              </MenuItem>
+            </MenuGroup>
+            <MenuGroup title="Jotai">
+              <MenuItem
+                icon={
+                  atomsDevToolsEnabled ? (
+                    <CheckmarkSecondaryIcon />
+                  ) : (
+                    <UncheckedIcon />
+                  )
+                }
+                onClick={() => setAtomsDevToolsEnabled(!atomsDevToolsEnabled)}
+              >
+                Atoms Dev Tools
+              </MenuItem>
+              <MenuItem
+                icon={
+                  atomsDebugValueEnabled ? (
+                    <CheckmarkSecondaryIcon />
+                  ) : (
+                    <UncheckedIcon />
+                  )
+                }
+                onClick={() =>
+                  setAtomsDebugValueEnabled(!atomsDebugValueEnabled)
+                }
+              >
+                Debug Atom Values (slow)
+              </MenuItem>
+            </MenuGroup>
           </MenuList>
         </Menu>
         <Menu size={"2xs"}>
-          <MenuButton as={Button} size="2xs" rightIcon={<ChevronDownIcon />}>
-            Atoms
+          <MenuButton
+            as={Button}
+            size="2xs"
+            leftIcon={<RefreshPrimaryIcon />}
+            rightIcon={<DropdownDownIcon />}
+          >
+            Reload
           </MenuButton>
           <MenuList>
-            <MenuItem
-              icon={atomsDevToolsEnabled ? <CheckIcon /> : undefined}
-              onClick={() => setAtomsDevToolsEnabled(!atomsDevToolsEnabled)}
-            >
-              Atoms Dev Tools
-            </MenuItem>
-            <MenuItem
-              icon={atomsDebugValueEnabled ? <CheckIcon /> : undefined}
-              onClick={() => setAtomsDebugValueEnabled(!atomsDebugValueEnabled)}
-            >
-              Debug Atom Values (slow)
-            </MenuItem>
+            <MenuItem onClick={hardReload}>Reload HTML</MenuItem>
+            <MenuItem onClick={softReload}>Reload React UI</MenuItem>
           </MenuList>
         </Menu>
       </Flex>

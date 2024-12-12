@@ -1,19 +1,14 @@
-import {
-  AlertDialog,
-  ButtonCell,
-  P4,
-  SpacerCell,
-  iconsDeprecated,
-} from "@argent/x-ui"
+import { AlertDialog, ButtonCell, icons, P3, SpacerCell } from "@argent/x-ui"
 
 import { Flex, useDisclosure } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
-import { FC } from "react"
+import type { FC } from "react"
 import { accountService } from "../../../../../shared/account/service"
 import { routes } from "../../../../../shared/ui/routes"
-import { WalletAccount } from "../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../shared/wallet.model"
+import { clientAccountService } from "../../../../services/account"
 
-const { BinIcon, InfoIcon } = iconsDeprecated
+const { BinSecondaryIcon, InfoCircleSecondaryIcon } = icons
 
 export const AccountEditButtonsLedger: FC<{
   account: WalletAccount | undefined
@@ -28,7 +23,8 @@ export const AccountEditButtonsLedger: FC<{
 
   const onUserConfirmRemove = async () => {
     if (account) {
-      await accountService.remove(account)
+      await accountService.removeById(account.id)
+      await clientAccountService.autoSelectAccountOnNetwork(account.networkId)
       onAlertDialogClose()
       navigate(routes.accounts())
     }
@@ -41,13 +37,13 @@ export const AccountEditButtonsLedger: FC<{
         title={"Are you sure?"}
         message={"This will remove the account from Argent X"}
         destroyTitle={"Remove account"}
-        onDestroy={onUserConfirmRemove}
+        onDestroy={() => void onUserConfirmRemove()}
         onCancel={onAlertDialogClose}
       />
       <ButtonCell
         colorScheme={"neutrals-danger"}
         onClick={onAlertDialogOpen}
-        rightIcon={<BinIcon />}
+        rightIcon={<BinSecondaryIcon />}
       >
         Remove account
       </ButtonCell>
@@ -61,11 +57,11 @@ export const AccountEditButtonsLedger: FC<{
         rounded="lg"
         shadow="border-stroke-focused"
       >
-        <InfoIcon fontSize="base" flexShrink={0} />
-        <P4>
+        <InfoCircleSecondaryIcon fontSize="base" flexShrink={0} />
+        <P3>
           Ledger accounts aren’t recoverable from an Argent X seed phrase. You
           need to add them again
-        </P4>
+        </P3>
       </Flex>
     </>
   )

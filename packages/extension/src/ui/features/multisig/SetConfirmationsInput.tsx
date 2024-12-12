@@ -1,11 +1,10 @@
-import { FieldError, H1 } from "@argent/x-ui"
-import { iconsDeprecated } from "@argent/x-ui"
+import { FieldError, icons, MassiveTitle } from "@argent/x-ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
-import { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
+import type { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
 
-const { AddIcon, RemoveIcon } = iconsDeprecated
+const { PlusSecondaryIcon, MinusPrimaryIcon } = icons
 
 export const SetConfirmationsInput = ({
   existingThreshold,
@@ -46,11 +45,14 @@ export const SetConfirmationsInput = ({
                     }
                     px="1em"
                   >
-                    <RemoveIcon />
+                    <MinusPrimaryIcon />
                   </Button>
-                  <H1 data-testid="threshold" defaultValue={existingThreshold}>
+                  <MassiveTitle
+                    data-testid="threshold"
+                    defaultValue={existingThreshold}
+                  >
                     {field.value}
-                  </H1>
+                  </MassiveTitle>
                   <Button
                     data-testid="increase-threshold"
                     backgroundColor="surface-default"
@@ -63,7 +65,7 @@ export const SetConfirmationsInput = ({
                     }
                     px="1em"
                   >
-                    <AddIcon />
+                    <PlusSecondaryIcon />
                   </Button>
                 </Flex>
                 <Center>out of {totalSigners} owners</Center>

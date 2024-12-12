@@ -1,7 +1,8 @@
 import { BarCloseButton, NavigationContainer } from "@argent/x-ui"
-import { FC, ReactEventHandler, useState } from "react"
+import type { FC, ReactEventHandler } from "react"
+import { useState } from "react"
 
-import { CreateAccountType } from "../../../shared/wallet.model"
+import type { WalletAccountType } from "../../../shared/wallet.model"
 import { AccountTypesList } from "./ui/AccountTypesList"
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { IS_DEV } from "../../../shared/utils/dev"
@@ -12,11 +13,12 @@ export enum AccountTypeId {
   STANDARD_CAIRO_0,
   SMART_ACCOUNT,
   LEDGER,
+  IMPORTED,
 }
 
 export interface AccountType {
   id: AccountTypeId
-  type: CreateAccountType
+  type: WalletAccountType
   title: string
   subtitle?: string | React.ReactNode
   label?: string

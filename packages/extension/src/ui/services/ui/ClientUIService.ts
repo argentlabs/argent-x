@@ -82,4 +82,8 @@ export default class ClientUIService implements IClientUIService {
   async onNotificationClicked(notificationId: string) {
     await messageClient.notifications.notificationClicked.mutate(notificationId)
   }
+
+  async openUiAsPopup(): Promise<void> {
+    await messageClient.ui.openUiAsPopup.query()
+  }
 }

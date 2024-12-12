@@ -1,7 +1,7 @@
 import { isEqualAddress } from "@argent/x-shared"
-import { Call } from "starknet"
+import type { Call } from "starknet"
 import { MultisigEntryPointType, MultisigTransactionType } from "../types"
-import {
+import type {
   ApiMultisigRequest,
   ApiMultisigTransactionState,
 } from "../multisig.model"

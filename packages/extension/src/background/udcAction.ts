@@ -1,17 +1,13 @@
-import {
-  CallData,
+import type {
   DeclareContractPayload,
-  TransactionType,
   UniversalDeployerContractPayload,
-  constants,
-  num,
 } from "starknet"
+import { CallData, TransactionType, constants, num } from "starknet"
 
-import { ExtQueueItem } from "../shared/actionQueue/types"
+import type { ExtQueueItem } from "../shared/actionQueue/types"
 import { isAccountDeployed } from "./accountDeploy"
-import { getNonce, increaseStoredNonce } from "./nonce"
 import { addTransaction } from "../shared/transactions/store"
-import { Wallet } from "./wallet"
+import type { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
 import { WalletError } from "../shared/errors/wallet"
 import { UdcError } from "../shared/errors/udc"
@@ -24,6 +20,9 @@ import {
   estimatedFeeToMaxResourceBounds,
 } from "@argent/x-shared"
 import { sanitizeAccountType } from "../shared/utils/sanitizeAccountType"
+import { isArgentAccount } from "../shared/utils/isExternalAccount"
+import { nonceManagementService } from "./nonceManagement"
+import { addTransactionHash } from "../shared/transactions/transactionHashes/transactionHashesRepository"
 
 const { UDC } = constants
 
@@ -43,7 +42,7 @@ export enum UdcTransactionType {
 }
 
 export const udcDeclareContract = async (
-  { payload }: DeclareContractAction,
+  { payload, meta }: DeclareContractAction,
   wallet: Wallet,
 ) => {
   if (!(await wallet.isSessionOpen())) {
@@ -54,10 +53,7 @@ export const udcDeclareContract = async (
     throw new AccountError({ code: "NOT_SELECTED" })
   }
 
-  const starknetAccount = await wallet.getStarknetAccount({
-    address: selectedAccount.address,
-    networkId: selectedAccount.networkId,
-  })
+  const starknetAccount = await wallet.getStarknetAccount(selectedAccount.id)
 
   const preComputedFees = await getEstimatedFees({
     type: TransactionType.DECLARE,
@@ -80,17 +76,29 @@ export const udcDeclareContract = async (
 
   const declareNonce = accountNeedsDeploy
     ? num.toHex(1)
-    : await getNonce(selectedAccount, starknetAccount)
+    : await nonceManagementService.getNonce(selectedAccount.id)
 
-  if (accountNeedsDeploy && preComputedFees.deployment) {
-    const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
+  if (
+    isArgentAccount(selectedAccount) &&
+    accountNeedsDeploy &&
+    preComputedFees.deployment
+  ) {
+    const deployDetails = {
+      version,
+      ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
+    }
+
+    const deployTxHash = await wallet.getDeployAccountTransactionHash(
       selectedAccount,
-      {
-        version,
-        ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
-      },
+      deployDetails,
     )
 
+    await addTransactionHash(meta.hash, deployTxHash)
+
+    const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
+      selectedAccount,
+      deployDetails,
+    )
     if (!checkTransactionHash(accountDeployTxHash)) {
       throw new UdcError({ code: "DEPLOY_TX_NOT_ADDED" })
     }
@@ -125,7 +133,7 @@ export const udcDeclareContract = async (
       throw new UdcError({ code: "CONTRACT_ALREADY_DECLARED" })
     }
 
-    await increaseStoredNonce(selectedAccount)
+    await nonceManagementService.increaseLocalNonce(selectedAccount.id)
 
     await addTransaction({
       hash: declareTxHash,
@@ -154,7 +162,7 @@ export const udcDeclareContract = async (
 }
 
 export const udcDeployContract = async (
-  { payload }: DeployContractAction,
+  { payload, meta }: DeployContractAction,
   wallet: Wallet,
 ) => {
   if (!(await wallet.isSessionOpen())) {
@@ -166,10 +174,7 @@ export const udcDeployContract = async (
     throw new AccountError({ code: "NOT_SELECTED" })
   }
 
-  const starknetAccount = await wallet.getStarknetAccount({
-    address: selectedAccount.address,
-    networkId: selectedAccount.networkId,
-  })
+  const starknetAccount = await wallet.getStarknetAccount(selectedAccount.id)
 
   const preComputedFees = await getEstimatedFees({
     type: TransactionType.DEPLOY,
@@ -191,15 +196,28 @@ export const udcDeployContract = async (
 
   const deployNonce = accountNeedsDeploy
     ? num.toHex(num.toBigInt(1))
-    : await getNonce(selectedAccount, starknetAccount)
+    : await nonceManagementService.getNonce(selectedAccount.id)
 
-  if (accountNeedsDeploy && preComputedFees.deployment) {
+  if (
+    isArgentAccount(selectedAccount) &&
+    accountNeedsDeploy &&
+    preComputedFees.deployment
+  ) {
+    const deployDetails = {
+      version,
+      ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
+    }
+
+    const deployTxHash = await wallet.getDeployAccountTransactionHash(
+      selectedAccount,
+      deployDetails,
+    )
+
+    await addTransactionHash(meta.hash, deployTxHash)
+
     const { account, txHash: accountDeployTxHash } = await wallet.deployAccount(
       selectedAccount,
-      {
-        version,
-        ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
-      },
+      deployDetails,
     )
 
     if (!checkTransactionHash(accountDeployTxHash)) {
@@ -274,7 +292,7 @@ export const udcDeployContract = async (
     })
 
     // transaction added, lets increase the local nonce, so we can queue transactions if needed
-    await increaseStoredNonce(selectedAccount)
+    await nonceManagementService.increaseLocalNonce(selectedAccount.id)
 
     return { txHash: deployTxHash, contractAddress }
   }

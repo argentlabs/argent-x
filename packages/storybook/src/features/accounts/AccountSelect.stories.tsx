@@ -1,5 +1,5 @@
 import { AccountSelect } from "@argent-x/extension/src/ui/features/accounts/AccountSelect"
-import { P3 } from "@argent/x-ui"
+import { P2 } from "@argent/x-ui"
 import { ComponentProps } from "react"
 
 export default {
@@ -8,7 +8,7 @@ export default {
     return (
       <>
         <AccountSelect {...props} />
-        <P3 mt={4}>Lorem ipsum dolor sit amet</P3>
+        <P2 mt={4}>Lorem ipsum dolor sit amet</P2>
       </>
     )
   },

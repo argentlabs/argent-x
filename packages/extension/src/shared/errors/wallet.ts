@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 export enum WALLET_ERROR_MESSAGES {
   ALREADY_INITIALIZED = "Wallet already initialized",
   NOT_INITIALIZED = "Wallet not initialized",

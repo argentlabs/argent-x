@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { renderHook } from "@testing-library/react"
 import { useDappFromKnownDappsByHost } from "."
-import { KnownDapp } from "@argent/x-shared"
+import type { KnownDapp } from "@argent/x-shared"
 import { useKnownDapps } from "./knownDapps"
 
 // Mock the useKnownDapps hook

@@ -1,5 +1,6 @@
 import { useNavigateBack } from "@argent/x-ui"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 
 import { routes } from "../../../shared/ui/routes"
 // import { useTimeSpentWithSuccessTracking } from "../../services/analytics"
@@ -23,7 +24,7 @@ export const OnboardingRestoreSeedScreenContainer: FC = () => {
   )
 
   const onUseBackup = useCallback(() => {
-    customNavigate(routes.onboardingRestoreBackup())
+    void customNavigate(routes.onboardingRestoreBackup())
   }, [customNavigate])
 
   return (

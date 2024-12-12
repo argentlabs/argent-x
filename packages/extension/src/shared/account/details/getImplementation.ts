@@ -1,12 +1,13 @@
-import { Call, num } from "starknet"
+import type { Call } from "starknet"
+import { num } from "starknet"
 import { accountsEqual } from "../../utils/accountsEqual"
 
 import { TXV1_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import { getMulticallForNetwork } from "../../multicall"
 import { getProvider } from "../../network"
 import { networkService } from "../../network/service"
-import { BaseWalletAccount } from "../../wallet.model"
-import { IAccountService } from "../service/accountService/IAccountService"
+import type { BaseWalletAccount } from "../../wallet.model"
+import type { IAccountService } from "../service/accountService/IAccountService"
 
 /**
  * Get implementation class hash of account

@@ -1,4 +1,4 @@
-import { B3, H6, iconsDeprecated } from "@argent/x-ui"
+import { H5, icons } from "@argent/x-ui"
 import {
   Modal,
   ModalContent,
@@ -21,7 +21,7 @@ import { useCallback, useState } from "react"
 import { isAllowedNumericInputValue } from "@argent/x-shared"
 import { isNumber } from "lodash-es"
 
-const { AddIcon, RemoveIcon, TickIcon } = iconsDeprecated
+const { PlusSecondaryIcon, MinusPrimaryIcon, CheckmarkSecondaryIcon } = icons
 
 const MAX_SLIPPAGE = 10000
 
@@ -63,7 +63,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
       <ModalContent background="surface-elevated" borderRadius="2xl">
         <ModalHeader>
           <Flex justifyContent="space-between" alignItems="center" px="1">
-            <H6 color="color">Edit max slippage</H6>
+            <H5 color="color">Edit max slippage</H5>
             <ModalCloseButton onClick={onClose} />
           </Flex>
         </ModalHeader>
@@ -85,7 +85,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
                 const updatedValue = localSlippage - 10
                 localSlippageHandler(Math.max(updatedValue, 0))
               }}
-              icon={<RemoveIcon />}
+              icon={<MinusPrimaryIcon />}
             />
             <InputGroup
               flexGrow="1"
@@ -146,7 +146,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
                 const updatedValue = validLocalSlippage + 10
                 localSlippageHandler(Math.min(updatedValue, MAX_SLIPPAGE))
               }}
-              icon={<AddIcon />}
+              icon={<PlusSecondaryIcon />}
             />
           </Flex>
         </ModalBody>
@@ -157,7 +157,7 @@ export const SlippageModal = ({ isOpen, onClose }: SlippageModalProps) => {
               colorScheme="secondary"
               onClick={onSave}
               isDisabled={isNaN(localSlippage)}
-              leftIcon={<TickIcon />}
+              leftIcon={<CheckmarkSecondaryIcon />}
               size="sm"
             >
               Save

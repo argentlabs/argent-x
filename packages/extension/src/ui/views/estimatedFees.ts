@@ -6,7 +6,7 @@ import { atomFromRepo } from "./implementation/atomFromRepo"
 import { atomFamily } from "jotai/utils"
 import { atom } from "jotai"
 import { objectHash } from "../../shared/objectHash"
-import { TransactionAction } from "@argent/x-shared"
+import type { TransactionAction } from "@argent/x-shared"
 
 export const allEstimatedFeesAtom = atomFromRepo(estimatedFeesRepo)
 

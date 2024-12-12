@@ -1,7 +1,8 @@
 import { render, waitFor } from "@testing-library/react"
-import { Atom, useAtomValue } from "jotai"
-import { FC } from "react"
-import { act } from "react-dom/test-utils"
+import type { Atom } from "jotai"
+import { useAtomValue } from "jotai"
+import type { FC } from "react"
+import { act } from "react"
 import { describe, it } from "vitest"
 
 import { InMemoryKeyValueStore } from "../../../../shared/storage/__new/__test__/inmemoryImplementations"

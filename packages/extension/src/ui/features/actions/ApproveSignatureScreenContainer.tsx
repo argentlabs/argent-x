@@ -1,6 +1,6 @@
-import { FC } from "react"
+import type { FC } from "react"
 
-import { TypedData } from "@starknet-io/types-js"
+import type { TypedData } from "@starknet-io/types-js"
 import { DeployAccountScreenContainer } from "../accounts/DeployAccountScreenContainer"
 import { useIsAccountDeploying } from "../accountTokens/useIsAccountDeploying"
 import {
@@ -10,7 +10,7 @@ import {
 import { RemovedMultisigWarningScreen } from "../multisig/RemovedMultisigWarningScreen"
 import { ApproveSignatureScreen } from "./ApproveSignatureScreen"
 import { ExecuteFromOutsideScreen } from "./ExecuteFromOutsideScreen"
-import { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import type { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
 import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { useView } from "../../views/implementation/react"
 import useValidateOutsideExecution from "./transaction/executeFromOutside/useValidateOutsideExecution"

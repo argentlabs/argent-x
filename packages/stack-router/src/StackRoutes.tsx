@@ -1,6 +1,7 @@
 import { Flex } from "@chakra-ui/react"
 import { AnimatePresence } from "framer-motion"
-import { ComponentProps, FC, useMemo } from "react"
+import type { ComponentProps, FC } from "react"
+import { useMemo } from "react"
 import { Routes, useLocation } from "react-router-dom"
 
 import { getWrappedChildrenAndPresentation } from "./presentation/getWrappedChildrenAndPresentation"

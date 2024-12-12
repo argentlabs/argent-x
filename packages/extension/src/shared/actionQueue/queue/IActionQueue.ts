@@ -1,5 +1,5 @@
-import { ActionQueueItemMeta } from "../schema"
-import { ExtQueueItem } from "../types"
+import type { ActionQueueItemMeta } from "../schema"
+import type { ExtQueueItem } from "../types"
 
 export interface IActionQueue<T> {
   get: (hash: string) => Promise<ExtQueueItem<T> | null>

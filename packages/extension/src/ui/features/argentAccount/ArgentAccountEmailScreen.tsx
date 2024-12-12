@@ -1,9 +1,10 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import {
   useReturnTo,
-  useRouteAccountAddress,
+  useRouteAccountId,
   useRouteFlow,
 } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
@@ -11,7 +12,7 @@ import { ArgentAccountBaseEmailScreen } from "../argentAccount/ArgentAccountBase
 
 export const ArgentAccountEmailScreen: FC = () => {
   const flow = useRouteFlow()
-  const accountAddress = useRouteAccountAddress()
+  const accountId = useRouteAccountId()
   const navigate = useNavigate()
   const returnTo = useReturnTo()
 
@@ -21,11 +22,11 @@ export const ArgentAccountEmailScreen: FC = () => {
 
   const onEmailRequested = useCallback(
     (email: string) => {
-      if (accountAddress) {
-        navigate(routes.smartAccountOTP(accountAddress, email, flow))
+      if (accountId) {
+        navigate(routes.smartAccountOTP(accountId, email, flow))
       }
     },
-    [accountAddress, navigate, flow],
+    [accountId, navigate, flow],
   )
 
   return (

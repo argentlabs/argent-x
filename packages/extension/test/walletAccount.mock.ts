@@ -1,11 +1,12 @@
-import { Network } from "../src/shared/network"
+import type { Network } from "../src/shared/network"
 import { ETH_TOKEN_ADDRESS } from "../src/shared/network/constants"
-import {
+import type {
   ArgentAccountType,
-  SignerType,
+  ArgentWalletAccount,
   WalletAccount,
   WalletAccountSigner,
 } from "../src/shared/wallet.model"
+import { SignerType } from "../src/shared/wallet.model"
 
 const defaultNetwork: Network = {
   id: "localhost",
@@ -16,13 +17,16 @@ const defaultNetwork: Network = {
 }
 const defaultSigner: WalletAccountSigner = {
   type: SignerType.LOCAL_SECRET,
-  derivationPath: "derivationPath",
+  derivationPath: "m/44'/9004'/0'/0/0",
 }
 const defaultName = "Account 1"
 const defaultAccountType: ArgentAccountType = "standard"
 const defaultAddress = "0x0"
 
+const defaultId = `${defaultAddress}-${defaultNetwork.id}-${defaultSigner.type}`
+
 const defaultWalletAccount: WalletAccount = {
+  id: defaultId,
   name: defaultName,
   address: defaultAddress,
   network: defaultNetwork,
@@ -38,5 +42,13 @@ const defaultWalletAccount: WalletAccount = {
 
 export const getMockWalletAccount = (overrides?: Partial<WalletAccount>) => ({
   ...defaultWalletAccount,
+  ...(overrides ?? {}),
+})
+
+export const getMockArgentWalletAccount = (
+  overrides?: Partial<ArgentWalletAccount>,
+): ArgentWalletAccount => ({
+  ...defaultWalletAccount,
+  type: "standard",
   ...(overrides ?? {}),
 })

@@ -7,7 +7,7 @@ import type {
   ApproveActionInput,
   IActionService,
 } from "../../../shared/actionQueue/service/IActionService"
-import { messageClient } from "../trpc"
+import type { messageClient } from "../trpc"
 
 export class ClientActionService implements IActionService {
   constructor(private readonly trpcClient: typeof messageClient) {}

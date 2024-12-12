@@ -1,5 +1,5 @@
 import { networkView } from "./network"
-import { argentDb } from "../../shared/idb/db"
+import { argentDb } from "../../shared/idb/argentDb"
 import { atomFamily } from "jotai/utils"
 import { atom } from "jotai"
 import { atomFromQuery } from "./implementation/atomFromQuery"

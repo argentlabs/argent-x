@@ -1,12 +1,12 @@
-import { B3, H2, L2 } from "@argent/x-ui"
+import { B3, L2Bold, MassiveTitle, typographyStyles } from "@argent/x-ui"
 import { Box, Center, Skeleton, Tooltip, VStack } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { StarknetIdOrAddressCopyButton } from "../../components/StarknetIdOrAddressCopyButton"
-import { LedgerStatusText } from "../actions/transactionV2/header"
-import { Multisig } from "../multisig/Multisig"
-import { PrettyAccountBalanceOrName } from "./PrettyAccountBalance"
+import type { Multisig } from "../multisig/Multisig"
+import { PrettyBalanceOrNameForAccount } from "./PrettyBalance"
+import { LedgerStatusTextWithReconnect } from "../navigation/LedgerStatusText"
 
 interface AccountTokensBalanceProps {
   account: WalletAccount
@@ -19,10 +19,10 @@ export const AccountTokensBalanceSkeleton: FC = () => {
   return (
     <VStack spacing={0.5}>
       <Box py={1}>
-        <Skeleton rounded="full" h={8} w={24} />
+        <Skeleton rounded="full" h={"54px"} w={24} />
       </Box>
       <Box py={0.5}>
-        <Skeleton rounded="full" h={4} w={32} />
+        <Skeleton rounded="full" h={"16px"} w={32} />
       </Box>
     </VStack>
   )
@@ -51,14 +51,26 @@ export const AccountTokensBalance: FC<AccountTokensBalanceProps> = ({
         </Center>
       )}
       {usesLedgerSigner && (
-        <LedgerStatusText as={L2} isConnected={isLedgerConnected} mb="1.5" />
+        <LedgerStatusTextWithReconnect
+          as={L2Bold}
+          isConnected={isLedgerConnected}
+          mb="1.5"
+          position={"relative"}
+          accountType={account.type}
+          networkId={account.networkId}
+        />
       )}
       <Tooltip label={account.name}>
-        <H2>
-          <PrettyAccountBalanceOrName account={account} />
-        </H2>
+        <MassiveTitle>
+          <PrettyBalanceOrNameForAccount account={account} />
+        </MassiveTitle>
       </Tooltip>
-      <StarknetIdOrAddressCopyButton account={account} pb={1} pt={0.5} />
+      <StarknetIdOrAddressCopyButton
+        account={account}
+        pb={1}
+        pt={0.5}
+        {...typographyStyles.B2}
+      />
     </VStack>
   )
 }

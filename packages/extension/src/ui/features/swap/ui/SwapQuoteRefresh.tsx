@@ -1,9 +1,9 @@
 import { Flex, Spinner, Text } from "@chakra-ui/react"
-import { Trade } from "../../../../shared/swap/model/trade.model"
-import { P4, iconsDeprecated } from "@argent/x-ui"
-import { SwapInputError } from "../hooks/useSwapInfo"
+import type { Trade } from "../../../../shared/swap/model/trade.model"
+import { icons, P3 } from "@argent/x-ui"
+import type { SwapInputError } from "../hooks/useSwapInfo"
 
-const { ApproveIcon } = iconsDeprecated
+const { ApproveIcon } = icons
 
 interface SwapQuoteRefreshProps {
   trade?: Trade
@@ -24,9 +24,9 @@ export const SwapQuoteRefresh = ({
       alignItems="center"
       justifyContent="space-between"
     >
-      <P4 color="neutrals.300">
+      <P3 color="neutrals.300">
         Quote {tradeLoading ? "updating" : "up-to date"}
-      </P4>
+      </P3>
       <Text color="primary.500">
         {tradeLoading ? <Spinner size={"xs"} /> : <ApproveIcon />}
       </Text>

@@ -1,0 +1,5363 @@
+{
+  "PRIVATE_KEY": "{\"alg\":\"ECDH-ES\",\"crv\":\"P-256\",\"d\":\"q7zl3beo3waEehTIfywDI6HKoUGtzPbVPTxjHVTcVZo\",\"kty\":\"EC\",\"x\":\"WVDeNMWCy-H1-uIzpaMVaDbM7yBtUzBInSUvZhwx_zY\",\"y\":\"ca2McsMJeNUAKTKBuHKIay80diHffGBNxjkyzNMWZd8\"}",
+  "PUBLIC_KEY": "{\"alg\":\"ECDH-ES\",\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"WVDeNMWCy-H1-uIzpaMVaDbM7yBtUzBInSUvZhwx_zY\",\"y\":\"ca2McsMJeNUAKTKBuHKIay80diHffGBNxjkyzNMWZd8\"}",
+  "core:accounts:inner": [
+    {
+      "address": "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+      "cairoVersion": "1",
+      "classHash": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+      "id": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0::sepolia-alpha::local_secret::0",
+      "index": 0,
+      "name": "Account 1",
+      "needsDeploy": true,
+      "networkId": "sepolia-alpha",
+      "signer": {
+        "derivationPath": "m/44'/9004'/0'/0/0",
+        "type": "local_secret"
+      },
+      "type": "standard"
+    },
+    {
+      "address": "0x51cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+      "cairoVersion": "1",
+      "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+      "id": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43",
+      "index": 0,
+      "name": "Multisig 1",
+      "needsDeploy": false,
+      "networkId": "sepolia-alpha",
+      "signer": {
+        "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/43",
+        "type": "ledger"
+      },
+      "type": "multisig"
+    },
+    {
+      "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+      "cairoVersion": "1",
+      "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+      "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+      "index": 1,
+      "name": "Multisig 2",
+      "needsDeploy": false,
+      "networkId": "sepolia-alpha",
+      "signer": {
+        "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/44",
+        "type": "ledger"
+      },
+      "type": "multisig"
+    }
+  ],
+  "core:actionQueue:inner": [],
+  "core:debounce:debounce@20s:ActivityService.updateSelectedAccountActivities": 1725359200756,
+  "core:debounce:debounce@20s:MultisigWorker.updateAll": 1725359200838,
+  "core:debounce:debounce@20s:TransactionTrackerWorker.trackTransactionsUpdates": 1725359200756,
+  "core:debounce:debounce@300s:KnownDappsWorker.update": 1725358914006,
+  "core:debounce:debounce@60s:DiscoverService.updateDiscover": 1725359151598,
+  "core:debounce:debounce@60s:NetworkWorker.updateNetworkStatuses": 1725359151598,
+  "core:debounce:debounce@60s:NftsWorker.updateNfts": 1725359151598,
+  "core:debounce:debounce@60s:TokenWorker.fetchAndUpdateTokenPricesFromBackend": 1725359151598,
+  "core:debounce:debounce@60s:TokenWorker.onOpenAndUnlocked": 1725359151598,
+  "core:debounce:debounce@60s:TokenWorker.updateCustomNetworksTokenBalances": 1725359151598,
+  "core:debounce:debounce@60s:TransactionReviewWorker.runUpdates": 1725359151597,
+  "core:multisig:pendingTransactions:inner": [
+    {
+      "account": {
+        "address": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+        "id": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43",
+        "networkId": "sepolia-alpha"
+      },
+      "approvedSigners": [
+        "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84"
+      ],
+      "creator": "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84",
+      "id": "ad9d6060-ca7c-4e13-b906-7a773c07a493",
+      "meta": {
+        "icon": "SendIcon",
+        "subtitle": "To: 0x0229...1BC0",
+        "title": "Send",
+        "transactionReview": {
+          "transactions": [
+            {
+              "reviewOfTransaction": {
+                "assessment": "warn",
+                "reviews": [
+                  {
+                    "action": {
+                      "defaultProperties": [
+                        {
+                          "label": "default_contract",
+                          "token": {
+                            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                            "decimals": 18,
+                            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                            "name": "Ether",
+                            "symbol": "ETH",
+                            "type": "ERC20",
+                            "unknown": false
+                          },
+                          "type": "token_address"
+                        },
+                        {
+                          "calldata": [
+                            "977312601197437022110323227435224271452751151768572207166894820017262369728",
+                            "30000000000000",
+                            "0"
+                          ],
+                          "entrypoint": "transfer",
+                          "label": "default_call",
+                          "type": "calldata"
+                        }
+                      ],
+                      "name": "ERC20_transfer",
+                      "properties": [
+                        {
+                          "amount": "30000000000000",
+                          "editable": false,
+                          "label": "ERC20_transfer_amount",
+                          "token": {
+                            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                            "decimals": 18,
+                            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                            "name": "Ether",
+                            "symbol": "ETH",
+                            "type": "ERC20",
+                            "unknown": false
+                          },
+                          "type": "amount",
+                          "usd": "0.08"
+                        },
+                        {
+                          "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                          "label": "ERC20_transfer_recipient",
+                          "type": "address",
+                          "verified": false
+                        }
+                      ]
+                    },
+                    "assessment": "warn",
+                    "warnings": [
+                      {
+                        "details": {},
+                        "reason": "undeployed_account",
+                        "severity": "caution"
+                      }
+                    ]
+                  }
+                ],
+                "warnings": [
+                  {
+                    "details": {},
+                    "reason": "undeployed_account",
+                    "severity": "caution"
+                  }
+                ]
+              },
+              "simulation": {
+                "approvals": [],
+                "calculatedNonce": "0x1",
+                "feeEstimation": {
+                  "gasPrice": 55007630780,
+                  "gasUsage": 2773,
+                  "maxFee": 457608456839219,
+                  "overallFee": 152536160152940,
+                  "unit": "WEI"
+                },
+                "summary": [
+                  {
+                    "label": "simulation_summary_send",
+                    "sent": true,
+                    "token": {
+                      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      "decimals": 18,
+                      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      "name": "Ether",
+                      "symbol": "ETH",
+                      "type": "ERC20",
+                      "unknown": false
+                    },
+                    "type": "transfer",
+                    "usdValue": "0.08",
+                    "value": "30000000000000"
+                  }
+                ],
+                "transfers": [
+                  {
+                    "details": {
+                      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      "decimals": 18,
+                      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      "name": "Ether",
+                      "symbol": "ETH",
+                      "type": "ERC20",
+                      "unknown": false
+                    },
+                    "from": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+                    "to": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                    "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "value": "30000000000000"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "multisigAddress": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+      "nonApprovedSigners": [
+        "0x01fbb2e03e41d28b0d572d48c2ef4bb1d2686f37f702e26f179c5101e0587048",
+        "0x00826a255157914857abb3619d8930a8f43c88923dface0583c81c7289f52b31"
+      ],
+      "nonce": 4,
+      "notify": false,
+      "requestId": "ad9d6060-ca7c-4e13-b906-7a773c07a493",
+      "state": "AWAITING_SIGNATURES",
+      "timestamp": 1725357493163,
+      "transaction": {
+        "calls": [
+          {
+            "calldata": [
+              "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "0x00000000000000000000000000000000000000000000000000001b48eb57e000",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "entrypoint": "transfer"
+          }
+        ],
+        "maxFee": "0x0000000000000000000000000000000000000000000000000001a03145842033",
+        "nonce": "0x0000000000000000000000000000000000000000000000000000000000000004",
+        "version": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      "transactionHash": "0x0459a8de687af7f8bfbf860dbf238ac3201edc62bb4e71506fa4a37dc4a5c631",
+      "type": "INVOKE"
+    },
+    {
+      "account": {
+        "address": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+        "networkId": "sepolia-alpha"
+      },
+      "approvedSigners": [
+        "0x04f7808289a0cec299263ffa85d2c929b823d8849db6994173865f7208a907cd",
+        "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3"
+      ],
+      "creator": "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+      "id": "7cb88aa3-68c8-4ab0-8064-793eb59314ef",
+      "meta": {
+        "icon": "SendIcon",
+        "subtitle": "To: 0x0229...1BC0",
+        "title": "Send",
+        "transactionReview": {
+          "transactions": [
+            {
+              "reviewOfTransaction": {
+                "assessment": "warn",
+                "reviews": [
+                  {
+                    "action": {
+                      "defaultProperties": [
+                        {
+                          "label": "default_contract",
+                          "token": {
+                            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                            "decimals": 18,
+                            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                            "name": "Ether",
+                            "symbol": "ETH",
+                            "type": "ERC20",
+                            "unknown": false
+                          },
+                          "type": "token_address"
+                        },
+                        {
+                          "calldata": [
+                            "977312601197437022110323227435224271452751151768572207166894820017262369728",
+                            "20000000000000",
+                            "0"
+                          ],
+                          "entrypoint": "transfer",
+                          "label": "default_call",
+                          "type": "calldata"
+                        }
+                      ],
+                      "name": "ERC20_transfer",
+                      "properties": [
+                        {
+                          "amount": "20000000000000",
+                          "editable": false,
+                          "label": "ERC20_transfer_amount",
+                          "token": {
+                            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                            "decimals": 18,
+                            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                            "name": "Ether",
+                            "symbol": "ETH",
+                            "type": "ERC20",
+                            "unknown": false
+                          },
+                          "type": "amount",
+                          "usd": "0.05"
+                        },
+                        {
+                          "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                          "label": "ERC20_transfer_recipient",
+                          "type": "address",
+                          "verified": false
+                        }
+                      ]
+                    },
+                    "assessment": "warn",
+                    "warnings": [
+                      {
+                        "details": {},
+                        "reason": "undeployed_account",
+                        "severity": "caution"
+                      }
+                    ]
+                  }
+                ],
+                "warnings": [
+                  {
+                    "details": {},
+                    "reason": "undeployed_account",
+                    "severity": "caution"
+                  }
+                ]
+              },
+              "simulation": {
+                "approvals": [],
+                "calculatedNonce": "0x1",
+                "feeEstimation": {
+                  "gasPrice": 48488786143,
+                  "gasUsage": 2773,
+                  "maxFee": 403378203923823,
+                  "overallFee": 134459403974539,
+                  "unit": "WEI"
+                },
+                "summary": [
+                  {
+                    "label": "simulation_summary_send",
+                    "sent": true,
+                    "token": {
+                      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      "decimals": 18,
+                      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      "name": "Ether",
+                      "symbol": "ETH",
+                      "type": "ERC20",
+                      "unknown": false
+                    },
+                    "type": "transfer",
+                    "usdValue": "0.05",
+                    "value": "20000000000000"
+                  }
+                ],
+                "transfers": [
+                  {
+                    "details": {
+                      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      "decimals": 18,
+                      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      "name": "Ether",
+                      "symbol": "ETH",
+                      "type": "ERC20",
+                      "unknown": false
+                    },
+                    "from": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+                    "to": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                    "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "value": "20000000000000"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "multisigAddress": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+      "nonApprovedSigners": [],
+      "nonce": 2,
+      "notify": false,
+      "requestId": "7cb88aa3-68c8-4ab0-8064-793eb59314ef",
+      "state": "AWAITING_SIGNATURES",
+      "timestamp": 1725359023723,
+      "transaction": {
+        "calls": [
+          {
+            "calldata": [
+              "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "0x000000000000000000000000000000000000000000000000000012309ce54000",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "entrypoint": "transfer"
+          }
+        ],
+        "maxFee": "0x00000000000000000000000000000000000000000000000000016edece8e156f",
+        "nonce": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "version": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      "transactionHash": "0x04aecd6afbc6c8676f2232486d63c74d63bb92210f9b804650fbdcc54bcacfde",
+      "type": "INVOKE"
+    },
+    {
+      "account": {
+        "address": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+        "networkId": "sepolia-alpha"
+      },
+      "approvedSigners": [
+        "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3"
+      ],
+      "creator": "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+      "id": "9a93267c-f0f9-4e9f-ac2a-75ea01d62d23",
+      "meta": {
+        "icon": "SendIcon",
+        "subtitle": "To: 0x0229...1BC0",
+        "title": "Send",
+        "transactionReview": {
+          "transactions": [
+            {
+              "reviewOfTransaction": {
+                "assessment": "warn",
+                "reviews": [
+                  {
+                    "action": {
+                      "defaultProperties": [
+                        {
+                          "label": "default_contract",
+                          "token": {
+                            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                            "decimals": 18,
+                            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                            "name": "Ether",
+                            "symbol": "ETH",
+                            "type": "ERC20",
+                            "unknown": false
+                          },
+                          "type": "token_address"
+                        },
+                        {
+                          "calldata": [
+                            "977312601197437022110323227435224271452751151768572207166894820017262369728",
+                            "300000000000000",
+                            "0"
+                          ],
+                          "entrypoint": "transfer",
+                          "label": "default_call",
+                          "type": "calldata"
+                        }
+                      ],
+                      "name": "ERC20_transfer",
+                      "properties": [
+                        {
+                          "amount": "300000000000000",
+                          "editable": false,
+                          "label": "ERC20_transfer_amount",
+                          "token": {
+                            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                            "decimals": 18,
+                            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                            "name": "Ether",
+                            "symbol": "ETH",
+                            "type": "ERC20",
+                            "unknown": false
+                          },
+                          "type": "amount",
+                          "usd": "0.75"
+                        },
+                        {
+                          "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                          "label": "ERC20_transfer_recipient",
+                          "type": "address",
+                          "verified": false
+                        }
+                      ]
+                    },
+                    "assessment": "warn",
+                    "warnings": [
+                      {
+                        "details": {},
+                        "reason": "undeployed_account",
+                        "severity": "caution"
+                      }
+                    ]
+                  }
+                ],
+                "warnings": [
+                  {
+                    "details": {},
+                    "reason": "undeployed_account",
+                    "severity": "caution"
+                  }
+                ]
+              },
+              "simulation": {
+                "approvals": [],
+                "calculatedNonce": "0x1",
+                "feeEstimation": {
+                  "gasPrice": 47977936419,
+                  "gasUsage": 2773,
+                  "maxFee": 399128427185761,
+                  "overallFee": 133042817689887,
+                  "unit": "WEI"
+                },
+                "summary": [
+                  {
+                    "label": "simulation_summary_send",
+                    "sent": true,
+                    "token": {
+                      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      "decimals": 18,
+                      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      "name": "Ether",
+                      "symbol": "ETH",
+                      "type": "ERC20",
+                      "unknown": false
+                    },
+                    "type": "transfer",
+                    "usdValue": "0.75",
+                    "value": "300000000000000"
+                  }
+                ],
+                "transfers": [
+                  {
+                    "details": {
+                      "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                      "decimals": 18,
+                      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                      "name": "Ether",
+                      "symbol": "ETH",
+                      "type": "ERC20",
+                      "unknown": false
+                    },
+                    "from": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+                    "to": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                    "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "value": "300000000000000"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "multisigAddress": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+      "nonApprovedSigners": [
+        "0x04f7808289a0cec299263ffa85d2c929b823d8849db6994173865f7208a907cd",
+        "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf"
+      ],
+      "nonce": 4,
+      "notify": false,
+      "requestId": "9a93267c-f0f9-4e9f-ac2a-75ea01d62d23",
+      "state": "AWAITING_SIGNATURES",
+      "timestamp": 1725359080510,
+      "transaction": {
+        "calls": [
+          {
+            "calldata": [
+              "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "0x000000000000000000000000000000000000000000000000000110d9316ec000",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "entrypoint": "transfer"
+          }
+        ],
+        "maxFee": "0x00000000000000000000000000000000000000000000000000016b01541f4661",
+        "nonce": "0x0000000000000000000000000000000000000000000000000000000000000004",
+        "version": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      },
+      "transactionHash": "0x059357ccffcf3860b5d55465e8241c0b7e82647f72d4f4382b7da6131b219a38",
+      "type": "INVOKE"
+    }
+  ],
+  "core:transactionReview:labels:labels": [
+    {
+      "key": "default_contract",
+      "value": "Contract"
+    },
+    {
+      "key": "default_call",
+      "value": "Call"
+    },
+    {
+      "key": "account_upgrade",
+      "value": "Upgrade account"
+    },
+    {
+      "key": "ERC20_approve",
+      "value": "Approve spending limit"
+    },
+    {
+      "key": "ERC20_approve_amount",
+      "value": "Amount"
+    },
+    {
+      "key": "ERC20_approve_to",
+      "value": "Approve to"
+    },
+    {
+      "key": "ERC20_transfer",
+      "value": "Send"
+    },
+    {
+      "key": "ERC20_transfer_amount",
+      "value": "Amount"
+    },
+    {
+      "key": "ERC20_transfer_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "Jediswap_swap",
+      "value": "Swap tokens"
+    },
+    {
+      "key": "Jediswap_swap_pay_token",
+      "value": "Pay token"
+    },
+    {
+      "key": "Jediswap_swap_receive_token",
+      "value": "Receive token"
+    },
+    {
+      "key": "Jediswap_swap_deadline",
+      "value": "Deadline"
+    },
+    {
+      "key": "Jediswap_swap_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "Jediswap_add_liquidity",
+      "value": "Add liquidity to pool"
+    },
+    {
+      "key": "Jediswap_add_liquidity_token_a",
+      "value": "Token 1"
+    },
+    {
+      "key": "Jediswap_add_liquidity_token_b",
+      "value": "Token 2"
+    },
+    {
+      "key": "Jediswap_add_liquidity_deadline",
+      "value": "Deadline"
+    },
+    {
+      "key": "Jediswap_add_liquidity_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "Jediswap_remove_liquidity",
+      "value": "Remove liquidity of pool"
+    },
+    {
+      "key": "Jediswap_remove_liquidity_token_a",
+      "value": "Token 1"
+    },
+    {
+      "key": "Jediswap_remove_liquidity_token_b",
+      "value": "Token 2"
+    },
+    {
+      "key": "Jediswap_remove_liquidity_deadline",
+      "value": "Deadline"
+    },
+    {
+      "key": "Jediswap_remove_liquidity_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "ERC721_transferFrom",
+      "value": "Send"
+    },
+    {
+      "key": "ERC721_transferFrom_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "ERC721_transferFrom_token_id",
+      "value": "Token Id"
+    },
+    {
+      "key": "account_change_guardian_address",
+      "value": "New Guardian"
+    },
+    {
+      "key": "account_multisig_change_threshold",
+      "value": "Set confirmations"
+    },
+    {
+      "key": "account_multisig_set_threshold",
+      "value": "Set confirmations"
+    },
+    {
+      "key": "account_multisig_add_signers",
+      "value": "Add owners and set confirmations"
+    },
+    {
+      "key": "account_multisig_signer",
+      "value": "Owner"
+    },
+    {
+      "key": "account_multisig_number_of_signers",
+      "value": "Number of owners"
+    },
+    {
+      "key": "account_multisig_remove_signers",
+      "value": "Remove owners and set confirmations"
+    },
+    {
+      "key": "simulation_summary_send",
+      "value": "Send"
+    },
+    {
+      "key": "simulation_summary_receive",
+      "value": "Receive"
+    },
+    {
+      "key": "Avnu_swap",
+      "value": "Swap tokens"
+    },
+    {
+      "key": "Avnu_swap_pay_token",
+      "value": "Pay token"
+    },
+    {
+      "key": "Avnu_swap_receive_token",
+      "value": "Receive token"
+    },
+    {
+      "key": "Avnu_swap_receive_min_token",
+      "value": "Receive token (at least)"
+    },
+    {
+      "key": "Avnu_swap_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "MySwap_swap",
+      "value": "Swap tokens"
+    },
+    {
+      "key": "MySwap_swap_pay_token",
+      "value": "Pay token"
+    },
+    {
+      "key": "MySwap_swap_receive_min_token",
+      "value": "Receive token (at least)"
+    },
+    {
+      "key": "MySwap_swap_pool_id",
+      "value": "Pool ID"
+    },
+    {
+      "key": "TenKSwap_add_liquidity",
+      "value": "Add liquidity to pool"
+    },
+    {
+      "key": "TenKSwap_add_liquidity_token_a",
+      "value": "Token 1"
+    },
+    {
+      "key": "TenKSwap_add_liquidity_token_b",
+      "value": "Token 2"
+    },
+    {
+      "key": "TenKSwap_add_liquidity_deadline",
+      "value": "Deadline"
+    },
+    {
+      "key": "TenKSwap_add_liquidity_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "TenKSwap_remove_liquidity",
+      "value": "Remove liquidity of pool"
+    },
+    {
+      "key": "TenKSwap_remove_liquidity_token_a",
+      "value": "Token 1"
+    },
+    {
+      "key": "TenKSwap_remove_liquidity_token_b",
+      "value": "Token 2"
+    },
+    {
+      "key": "TenKSwap_remove_liquidity_deadline",
+      "value": "Deadline"
+    },
+    {
+      "key": "TenKSwap_remove_liquidity_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "TenKSwap_swap",
+      "value": "Swap tokens"
+    },
+    {
+      "key": "TenKSwap_swap_pay_token",
+      "value": "Pay token"
+    },
+    {
+      "key": "TenKSwap_swap_receive_token",
+      "value": "Receive token"
+    },
+    {
+      "key": "TenKSwap_swap_deadline",
+      "value": "Deadline"
+    },
+    {
+      "key": "TenKSwap_swap_recipient",
+      "value": "Recipient"
+    },
+    {
+      "key": "MySwap_swap_receive_token",
+      "value": "Receive token"
+    },
+    {
+      "key": "MySwap_swap_pool_key",
+      "value": "Pool KEY"
+    },
+    {
+      "key": "transaction_failure_predicted",
+      "value": "Transaction failure predicted"
+    },
+    {
+      "key": "invalid_transaction_nonce",
+      "value": "Invalid transaction nonce"
+    },
+    {
+      "key": "transaction_unknown_error",
+      "value": "Transaction error"
+    },
+    {
+      "key": "ERC721_setApprovalForAll",
+      "value": "Approve NFT collection"
+    },
+    {
+      "key": "ERC721_setApprovalForAll_collection",
+      "value": "Approve collection"
+    },
+    {
+      "key": "ERC721_setApprovalForAll_to",
+      "value": "Approve to"
+    },
+    {
+      "key": "ERC1155_setApprovalForAll",
+      "value": "Approve NFT collection"
+    },
+    {
+      "key": "ERC1155_setApprovalForAll_collection",
+      "value": "Approve collection"
+    },
+    {
+      "key": "ERC1155_setApprovalForAll_to",
+      "value": "Approve to"
+    },
+    {
+      "key": "ERC20_increaseAllowance",
+      "value": "Increase spending limit"
+    },
+    {
+      "key": "ERC20_increaseAllowance_amount",
+      "value": "Amount"
+    },
+    {
+      "key": "ERC20_increaseAllowance_to",
+      "value": "Increase to"
+    },
+    {
+      "key": "ERC20_decreaseAllowance",
+      "value": "Decrease spending limit"
+    },
+    {
+      "key": "ERC20_decreaseAllowance_amount",
+      "value": "Amount"
+    },
+    {
+      "key": "ERC20_decreaseAllowance_to",
+      "value": "Decrease to"
+    },
+    {
+      "key": "account_upgrade_to_unknown_implementation_title",
+      "value": "Loss of funds due to invalid update"
+    },
+    {
+      "key": "account_upgrade_to_unknown_implementation_description",
+      "value": "You're about to execute an update of your Argent Account which is not verified by us. This is a dangerous operation and might lead to loss of your funds. We strongly advise you to not move forward."
+    },
+    {
+      "key": "approval_too_high_title",
+      "value": "Approval of spending limit is too high"
+    },
+    {
+      "key": "approval_too_high_description",
+      "value": "You're approving one or more addresses to spend more tokens than you're using in this transaction. These funds will not be spent but you should not proceed if you don’t trust this app."
+    },
+    {
+      "key": "account_state_change_title",
+      "value": "Loss of funds due to ownership change"
+    },
+    {
+      "key": "account_change_guardian_add",
+      "value": "Add Guardian"
+    },
+    {
+      "key": "account_change_guardian_remove",
+      "value": "Remove Guardian"
+    },
+    {
+      "key": "account_cancel_escape",
+      "value": "Keep Guardian"
+    },
+    {
+      "key": "account_state_change_description",
+      "value": "You're about to change the owner of your account. If you proceed with the transaction, you lose access to your funds. We strongly recommend that you reject the transaction."
+    },
+    {
+      "key": "contract_is_black_listed_title",
+      "value": "Smart contract on unsafe list"
+    },
+    {
+      "key": "contract_is_black_listed_description",
+      "value": "You are using a smart contract that is on our unsafe list for the following reason: ${reason}. We recommend that you reject the transaction."
+    },
+    {
+      "key": "similar_to_existing_dapp_url_title",
+      "value": "Similar to an existing dapp"
+    },
+    {
+      "key": "similar_to_existing_dapp_url_description",
+      "value": "You are currently on an unsafe domain. Be aware of the risks."
+    },
+    {
+      "key": "domain_is_black_listed_title",
+      "value": "Use of a blacklisted domain"
+    },
+    {
+      "key": "domain_is_black_listed_description",
+      "value": "You are currently on an unsafe domain. Be aware of the risks."
+    },
+    {
+      "key": "amount_mismatch_too_low_title",
+      "value": "Poor trade/swap of tokens"
+    },
+    {
+      "key": "amount_mismatch_too_low_description",
+      "value": "You are swapping two tokens at a poor exchange rate (more than 5%). Make sure that there aren't other options with better rates."
+    },
+    {
+      "key": "amount_mismatch_too_high_title",
+      "value": "Uncommon trade/swap of tokens"
+    },
+    {
+      "key": "amount_mismatch_too_high_description",
+      "value": "You are swapping two tokens at a rate that is much better than current market rates. You receive more than you invest.  Double check if everything is correct."
+    },
+    {
+      "key": "dst_token_black_listed_title",
+      "value": "You are buying an unsafe token."
+    },
+    {
+      "key": "dst_token_black_listed_description",
+      "value": "You are buying an unsafe token. Be aware of the risks."
+    },
+    {
+      "key": "internal_service_issue_title",
+      "value": "Internal issue"
+    },
+    {
+      "key": "internal_service_issue_description",
+      "value": "An internal issue occurred. Please try again later. If the issue persists, please contact support."
+    },
+    {
+      "key": "multi_calls_on_account_title",
+      "value": "TBD"
+    },
+    {
+      "key": "multi_calls_on_account_description",
+      "value": "TBD"
+    },
+    {
+      "key": "recipient_is_not_current_account_title",
+      "value": "Sender address of token swap is different to receiver address"
+    },
+    {
+      "key": "recipient_is_not_current_account_description",
+      "value": "You are sending tokens for swap, but you won't receive them. If this is not your intention, we strongly recommend to reject the transaction."
+    },
+    {
+      "key": "recipient_is_token_address_title",
+      "value": "Unintentional burn of assets"
+    },
+    {
+      "key": "recipient_is_token_address_description",
+      "value": "You're sending assets to a smart contract that defines a token. This will likely burn your assets (forever). Please double check if this is really your intent."
+    },
+    {
+      "key": "recipient_is_black_listed_title",
+      "value": "Recipient on unsafe list"
+    },
+    {
+      "key": "recipient_is_black_listed_description",
+      "value": "You are sending to an unsafe contract that is blacklisted for the the following reason: ${reason}."
+    },
+    {
+      "key": "spender_is_black_listed_title",
+      "value": "Spender on unsafe list"
+    },
+    {
+      "key": "spender_is_black_listed_description",
+      "value": "You are allowing an unsafe contract to access your funds. We deem this contract unsafe for the following reason: ${reason}."
+    },
+    {
+      "key": "operator_is_black_listed_title",
+      "value": "Spender on unsafe list"
+    },
+    {
+      "key": "operator_is_black_listed_description",
+      "value": "You are allowing an unsafe contract to access your funds. We deem this contract unsafe for the following reason: ${reason}."
+    },
+    {
+      "key": "src_token_black_listed_title",
+      "value": "Trade of an unsafe token"
+    },
+    {
+      "key": "src_token_black_listed_description",
+      "value": "You are selling an unsafe token. Be aware of the risks."
+    },
+    {
+      "key": "token_a_black_listed_title",
+      "value": "Use of an unsafe token"
+    },
+    {
+      "key": "token_a_black_listed_description",
+      "value": "You are using an unsafe token. Be aware of the risks."
+    },
+    {
+      "key": "token_b_black_listed_title",
+      "value": "Use of an unsafe token"
+    },
+    {
+      "key": "token_b_black_listed_description",
+      "value": "You are using an unsafe token. Be aware of the risks."
+    },
+    {
+      "key": "unknown_token_title",
+      "value": "Unknown token"
+    },
+    {
+      "key": "unknown_token_description",
+      "value": "You're interacting with a token smart contract that is not known to our registries. Make sure that you trust the application and it is the correct token."
+    },
+    {
+      "key": "contract_is_not_verified_title",
+      "value": "Unverified smart contracts"
+    },
+    {
+      "key": "contract_is_not_verified_description",
+      "value": "The dapp you're using has not opened its source code on the block explorers Starkscan or Voyager. This means that no one can check what the smart contract actually does. Make sure you trust the app before you proceed."
+    },
+    {
+      "key": "undeployed_account_title",
+      "value": "Sending to the correct account?"
+    },
+    {
+      "key": "undeployed_account_description",
+      "value": "The account you are sending to hasn't done any transactions, please double check the address"
+    },
+    {
+      "key": "activity_title_trade",
+      "value": "Swap"
+    },
+    {
+      "key": "activity_title_deploy",
+      "value": "Account activation"
+    },
+    {
+      "key": "activity_title_approval_revoke",
+      "value": "Revoke"
+    },
+    {
+      "key": "activity_title_approval_approve",
+      "value": "Approve"
+    },
+    {
+      "key": "activity_title_security_change_guardian",
+      "value": "Change guardian"
+    },
+    {
+      "key": "activity_title_security_account_upgrade",
+      "value": "Account upgrade"
+    },
+    {
+      "key": "activity_title_multisend",
+      "value": "Send to many"
+    },
+    {
+      "key": "activity_title_payment_outbound",
+      "value": "Send"
+    },
+    {
+      "key": "activity_title_payment_inbound_provision_airdrop",
+      "value": "Receive airdrop"
+    },
+    {
+      "key": "activity_title_payment_inbound_onramp",
+      "value": "Buy %s"
+    },
+    {
+      "key": "activity_title_payment_inbound_mint_spok",
+      "value": "Minted SPOK"
+    },
+    {
+      "key": "activity_title_payment_inbound_mint_other",
+      "value": "Minted collectible"
+    },
+    {
+      "key": "activity_title_payment_inbound",
+      "value": "Receive"
+    },
+    {
+      "key": "Insufficient tokens received",
+      "value": "Insufficient tokens received. Adjust slippage."
+    },
+    {
+      "key": "approval_too_high_soft_title",
+      "value": "Approval of spending limit is too high"
+    },
+    {
+      "key": "approval_too_high_soft_description",
+      "value": "You're approving one or more addresses to spend more tokens than you're using in this transaction. These funds will not be spent but you should not proceed if you don’t trust this app."
+    },
+    {
+      "key": "account_multisig_replace_signer",
+      "value": "Replace owner"
+    },
+    {
+      "key": "account_multisig_replace_signer_removed_signer",
+      "value": "Owner to be removed"
+    },
+    {
+      "key": "account_multisig_replace_signer_added_signer",
+      "value": "Owner to be added"
+    },
+    {
+      "key": "StarknetBridge_withdraw",
+      "value": "Withdraw"
+    },
+    {
+      "key": "StarknetBridge_withdraw_amount",
+      "value": "Amount"
+    },
+    {
+      "key": "StarknetBridge_withdraw_l1_recipient",
+      "value": "L1 Recipient"
+    }
+  ],
+  "core:transactionReview:labels:updatedAt": 1725357313556,
+  "core:transactionReview:warnings:updatedAt": 1725357313741,
+  "core:transactionReview:warnings:warnings": [
+    {
+      "description": "You're about to execute an update of your Argent Account which is not verified by us. This is a dangerous operation and might lead to loss of your funds. We strongly advise you to not move forward.",
+      "reason": "account_upgrade_to_unknown_implementation",
+      "severity": "caution",
+      "title": "Loss of funds due to invalid update"
+    },
+    {
+      "description": "You're approving one or more addresses to spend more tokens than you're using in this transaction. These funds will not be spent but you should not proceed if you don’t trust this app.",
+      "reason": "approval_too_high",
+      "severity": "caution",
+      "title": "Approval of spending limit is too high"
+    },
+    {
+      "description": "You're approving one or more addresses to spend more tokens than you're using in this transaction. These funds will not be spent but you should not proceed if you don’t trust this app.",
+      "reason": "approval_too_high_soft",
+      "severity": "caution",
+      "title": "Approval of spending limit is too high"
+    },
+    {
+      "description": "You're about to change the owner of your account. If you proceed with the transaction, you lose access to your funds. We strongly recommend that you reject the transaction.",
+      "reason": "account_state_change",
+      "severity": "caution",
+      "title": "Loss of funds due to ownership change"
+    },
+    {
+      "description": "You are using a smart contract that is on our unsafe list for the following reason: ${reason}. We recommend that you reject the transaction.",
+      "reason": "contract_is_black_listed",
+      "severity": "caution",
+      "title": "Smart contract on unsafe list"
+    },
+    {
+      "description": "You are currently on an unsafe domain. Be aware of the risks.",
+      "reason": "similar_to_existing_dapp_url",
+      "severity": "critical",
+      "title": "Similar to an existing dapp"
+    },
+    {
+      "description": "You are currently on an unsafe domain. Be aware of the risks.",
+      "reason": "domain_is_black_listed",
+      "severity": "critical",
+      "title": "Use of a blacklisted domain"
+    },
+    {
+      "description": "You are swapping two tokens at a poor exchange rate (more than 5%). Make sure that there aren't other options with better rates.",
+      "reason": "amount_mismatch_too_low",
+      "severity": "caution",
+      "title": "Poor trade/swap of tokens"
+    },
+    {
+      "description": "You are swapping two tokens at a rate that is much better than current market rates. You receive more than you invest.  Double check if everything is correct.",
+      "reason": "amount_mismatch_too_high",
+      "severity": "caution",
+      "title": "Uncommon trade/swap of tokens"
+    },
+    {
+      "description": "You are buying an unsafe token. Be aware of the risks.",
+      "reason": "dst_token_black_listed",
+      "severity": "caution",
+      "title": "You are buying an unsafe token."
+    },
+    {
+      "description": "An internal issue occurred. Please try again later. If the issue persists, please contact support.",
+      "reason": "internal_service_issue",
+      "severity": "caution",
+      "title": "Internal issue"
+    },
+    {
+      "description": "TBD",
+      "reason": "multi_calls_on_account",
+      "severity": "caution",
+      "title": "TBD"
+    },
+    {
+      "description": "You are sending tokens for swap, but you won't receive them. If this is not your intention, we strongly recommend to reject the transaction.",
+      "reason": "recipient_is_not_current_account",
+      "severity": "caution",
+      "title": "Sender address of token swap is different to receiver address"
+    },
+    {
+      "description": "You're sending assets to a smart contract that defines a token. This will likely burn your assets (forever). Please double check if this is really your intent.",
+      "reason": "recipient_is_token_address",
+      "severity": "caution",
+      "title": "Unintentional burn of assets"
+    },
+    {
+      "description": "You are sending to an unsafe contract that is blacklisted for the the following reason: ${reason}.",
+      "reason": "recipient_is_black_listed",
+      "severity": "caution",
+      "title": "Recipient on unsafe list"
+    },
+    {
+      "description": "You are allowing an unsafe contract to access your funds. We deem this contract unsafe for the following reason: ${reason}.",
+      "reason": "spender_is_black_listed",
+      "severity": "caution",
+      "title": "Spender on unsafe list"
+    },
+    {
+      "description": "You are allowing an unsafe contract to access your funds. We deem this contract unsafe for the following reason: ${reason}.",
+      "reason": "operator_is_black_listed",
+      "severity": "caution",
+      "title": "Spender on unsafe list"
+    },
+    {
+      "description": "You are selling an unsafe token. Be aware of the risks.",
+      "reason": "src_token_black_listed",
+      "severity": "caution",
+      "title": "Trade of an unsafe token"
+    },
+    {
+      "description": "You are using an unsafe token. Be aware of the risks.",
+      "reason": "token_a_black_listed",
+      "severity": "caution",
+      "title": "Use of an unsafe token"
+    },
+    {
+      "description": "You are using an unsafe token. Be aware of the risks.",
+      "reason": "token_b_black_listed",
+      "severity": "caution",
+      "title": "Use of an unsafe token"
+    },
+    {
+      "description": "You're interacting with a token smart contract that is not known to our registries. Make sure that you trust the application and it is the correct token.",
+      "reason": "unknown_token",
+      "severity": "caution",
+      "title": "Unknown token"
+    },
+    {
+      "description": "The dapp you're using has not opened its source code on the block explorers Starkscan or Voyager. This means that no one can check what the smart contract actually does. Make sure you trust the app before you proceed.",
+      "reason": "contract_is_not_verified",
+      "severity": "caution",
+      "title": "Unverified smart contracts"
+    },
+    {
+      "description": "The account you are sending to hasn't done any transactions, please double check the address",
+      "reason": "undeployed_account",
+      "severity": "caution",
+      "title": "Sending to the correct account?"
+    }
+  ],
+  "core:transactions:inner": [
+    {
+      "account": {
+        "address": "0x51cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "id": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43",
+        "index": 0,
+        "name": "Multisig 1",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "signer": {
+          "derivationPath": "m/44'/9004'/1'/0/0",
+          "type": "local_secret"
+        },
+        "type": "multisig"
+      },
+      "hash": "0x0459a8de687af7f8bfbf860dbf238ac3201edc62bb4e71506fa4a37dc4a5c631",
+      "meta": {
+        "ampliProperties": {
+          "account index": 0,
+          "account type": "multisig",
+          "is deployment": false,
+          "token addresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+          ],
+          "transaction type": "inapp send",
+          "wallet platform": "browser extension"
+        },
+        "isMaxSend": false,
+        "title": "Transfer",
+        "transactions": {
+          "calldata": [
+            "977312601197437022110323227435224271452751151768572207166894820017262369728",
+            "30000000000000",
+            "0"
+          ],
+          "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "entrypoint": "transfer"
+        },
+        "type": "INVOKE"
+      },
+      "status": {
+        "finality_status": "NOT_RECEIVED"
+      },
+      "timestamp": 1725357493
+    },
+    {
+      "account": {
+        "address": "0x51cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "id": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43",
+        "index": 0,
+        "name": "Multisig 1",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "signer": {
+          "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/43",
+          "type": "ledger"
+        },
+        "type": "multisig"
+      },
+      "hash": "0x5b89ba4120fab620dfbc33cfef3a0f1235d55e8b5afe3cafd8fb28aa1eca8fe",
+      "status": {},
+      "timestamp": 1725357497
+    },
+    {
+      "account": {
+        "address": "0x51cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "id": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43",
+        "index": 0,
+        "name": "Multisig 1",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "signer": {
+          "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/43",
+          "type": "ledger"
+        },
+        "type": "multisig"
+      },
+      "hash": "0x535bbf8e2eef80c0544769250578b2d4ae834ba39945e04bc7928f14080fe24",
+      "status": {},
+      "timestamp": 1725357497
+    },
+    {
+      "account": {
+        "address": "0x51cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "id": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43",
+        "index": 0,
+        "name": "Multisig 1",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "signer": {
+          "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/43",
+          "type": "ledger"
+        },
+        "type": "multisig"
+      },
+      "hash": "0x49924a6583e6524c95e0b38ab3ef3757899b62ef26c8c70dfffb847e2ddaa37",
+      "status": {},
+      "timestamp": 1725357497
+    },
+    {
+      "account": {
+        "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "creator": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+        "index": 1,
+        "name": "Multisig 2",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "pendingSigner": {
+          "pubKey": "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf",
+          "signer": {
+            "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/44",
+            "type": "ledger"
+          }
+        },
+        "publicKey": "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+        "signer": {
+          "derivationPath": "m/44'/9004'/1'/0/1",
+          "type": "local_secret"
+        },
+        "signers": [
+          "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+          "0x04f7808289a0cec299263ffa85d2c929b823d8849db6994173865f7208a907cd"
+        ],
+        "threshold": 2,
+        "type": "multisig",
+        "updatedAt": 1725359181005
+      },
+      "hash": "0x0758e1cf3753b1fa5fdaf82c7355c5c651a6153fb131864f7be0d35ee901d1d8",
+      "meta": {
+        "transactions": [
+          {
+            "calldata": [
+              "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "0x000000000000000000000000000000000000000000000000000009184e72a000",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "entrypoint": "transfer"
+          }
+        ],
+        "type": "INVOKE"
+      },
+      "status": {
+        "finality_status": "ACCEPTED_ON_L2"
+      },
+      "timestamp": 1725359181
+    },
+    {
+      "account": {
+        "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+        "index": 1,
+        "name": "Multisig 2",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "signer": {
+          "derivationPath": "m/44'/9004'/1'/0/1",
+          "type": "local_secret"
+        },
+        "type": "multisig"
+      },
+      "hash": "0x04aecd6afbc6c8676f2232486d63c74d63bb92210f9b804650fbdcc54bcacfde",
+      "meta": {
+        "ampliProperties": {
+          "account index": 1,
+          "account type": "multisig",
+          "is deployment": false,
+          "token addresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+          ],
+          "transaction type": "inapp send",
+          "wallet platform": "browser extension"
+        },
+        "isMaxSend": false,
+        "title": "Transfer",
+        "transactions": {
+          "calldata": [
+            "977312601197437022110323227435224271452751151768572207166894820017262369728",
+            "20000000000000",
+            "0"
+          ],
+          "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "entrypoint": "transfer"
+        },
+        "type": "INVOKE"
+      },
+      "status": {
+        "finality_status": "NOT_RECEIVED"
+      },
+      "timestamp": 1725359023
+    },
+    {
+      "account": {
+        "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "creator": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+        "index": 1,
+        "name": "Multisig 2",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "pendingSigner": {
+          "pubKey": "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf",
+          "signer": {
+            "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/44",
+            "type": "ledger"
+          }
+        },
+        "publicKey": "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+        "signer": {
+          "derivationPath": "m/44'/9004'/1'/0/1",
+          "type": "local_secret"
+        },
+        "signers": [
+          "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+          "0x04f7808289a0cec299263ffa85d2c929b823d8849db6994173865f7208a907cd"
+        ],
+        "threshold": 2,
+        "type": "multisig",
+        "updatedAt": 1725359181005
+      },
+      "hash": "0x064c06998e11dd59098f580a588f75ec0387ea7e971511f6721cfd46b526b27b",
+      "meta": {
+        "transactions": [
+          {
+            "calldata": [
+              "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+              "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf"
+            ],
+            "contractAddress": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+            "entrypoint": "replace_signer"
+          }
+        ],
+        "type": "INVOKE"
+      },
+      "status": {
+        "finality_status": "ACCEPTED_ON_L2"
+      },
+      "timestamp": 1725359200
+    },
+    {
+      "account": {
+        "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+        "cairoVersion": "1",
+        "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+        "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+        "index": 1,
+        "name": "Multisig 2",
+        "needsDeploy": false,
+        "network": {
+          "accountClassHash": {
+            "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+            "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+            "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+          },
+          "chainId": "SN_SEPOLIA",
+          "explorerUrl": "https://sepolia.voyager.online",
+          "id": "sepolia-alpha",
+          "l1ExplorerUrl": "https://sepolia.etherscan.io",
+          "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+          "name": "Sepolia",
+          "possibleFeeTokenAddresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+          ],
+          "readonly": true,
+          "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+        },
+        "networkId": "sepolia-alpha",
+        "signer": {
+          "derivationPath": "m/44'/9004'/1'/0/1",
+          "type": "local_secret"
+        },
+        "type": "multisig"
+      },
+      "hash": "0x059357ccffcf3860b5d55465e8241c0b7e82647f72d4f4382b7da6131b219a38",
+      "meta": {
+        "ampliProperties": {
+          "account index": 1,
+          "account type": "multisig",
+          "is deployment": false,
+          "token addresses": [
+            "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+          ],
+          "transaction type": "inapp send",
+          "wallet platform": "browser extension"
+        },
+        "isMaxSend": false,
+        "title": "Transfer",
+        "transactions": {
+          "calldata": [
+            "977312601197437022110323227435224271452751151768572207166894820017262369728",
+            "300000000000000",
+            "0"
+          ],
+          "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "entrypoint": "transfer"
+        },
+        "type": "INVOKE"
+      },
+      "status": {
+        "finality_status": "NOT_RECEIVED"
+      },
+      "timestamp": 1725359080
+    }
+  ],
+  "core:wallet:backup": "{\"address\":\"472cad6bbd47afd1cdfded81171112a452b4d441\",\"id\":\"260b5db4-5be9-4701-9858-49fdc7d38a8a\",\"version\":3,\"Crypto\":{\"cipher\":\"aes-128-ctr\",\"cipherparams\":{\"iv\":\"0868ff43445abd3a945bb68c6e542f43\"},\"ciphertext\":\"4dde4103451f98d60ec5a02aef004dc2a59a9f4ea8b70e7dbd0945260895ab56\",\"kdf\":\"scrypt\",\"kdfparams\":{\"salt\":\"392f267ee89f6581536a60823ff9c0c98721dbf8919a4682b8014df4f58c3f3d\",\"n\":64,\"dklen\":32,\"p\":1,\"r\":8},\"mac\":\"173ff105a9e7d950476b5f48d3f5f7a3884018c7972532141ab0ff0ecf5942b8\"},\"x-ethers\":{\"client\":\"ethers/6.13.2\",\"gethFilename\":\"UTC--2024-09-03T09-54-21.0Z--472cad6bbd47afd1cdfded81171112a452b4d441\",\"path\":\"m/44'/60'/0'/0/0\",\"locale\":\"en\",\"mnemonicCounter\":\"f9fcea424818dce89624a99d506dc6c4\",\"mnemonicCiphertext\":\"628b20780fcfebe9a6118630d92e52cb\",\"version\":\"0.1\"}}",
+  "core:wallet:discoveredOnce": true,
+  "core:wallet:lastUsedAccountByNetwork": {
+    "sepolia-alpha": {
+      "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+      "cairoVersion": "1",
+      "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+      "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+      "index": 1,
+      "name": "Multisig 2",
+      "needsDeploy": false,
+      "network": {
+        "accountClassHash": {
+          "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+          "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+          "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+          "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+        },
+        "chainId": "SN_SEPOLIA",
+        "explorerUrl": "https://sepolia.voyager.online",
+        "id": "sepolia-alpha",
+        "l1ExplorerUrl": "https://sepolia.etherscan.io",
+        "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+        "name": "Sepolia",
+        "possibleFeeTokenAddresses": [
+          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "readonly": true,
+        "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+      },
+      "networkId": "sepolia-alpha",
+      "signer": {
+        "derivationPath": "m/2645'/1195502025'/1148870696'/1'/0'/44",
+        "type": "ledger"
+      },
+      "type": "multisig"
+    }
+  },
+  "core:wallet:selected": {
+    "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+    "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+    "networkId": "sepolia-alpha"
+  },
+  "repository:allNetworksWithStatus": [
+    {
+      "id": "mainnet-alpha",
+      "status": "green"
+    },
+    {
+      "id": "sepolia-alpha",
+      "status": "green"
+    },
+    {
+      "id": "localhost",
+      "status": "unknown"
+    },
+    {
+      "id": "integration",
+      "status": "unknown"
+    }
+  ],
+  "repository:core:multisig:baseWalletAccounts": [
+    {
+      "address": "0x51cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+      "creator": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+      "id": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43",
+      "index": 0,
+      "networkId": "sepolia-alpha",
+      "publicKey": "0x00826a255157914857abb3619d8930a8f43c88923dface0583c81c7289f52b31",
+      "signers": [
+        "0x01fbb2e03e41d28b0d572d48c2ef4bb1d2686f37f702e26f179c5101e0587048",
+        "0x00826a255157914857abb3619d8930a8f43c88923dface0583c81c7289f52b31"
+      ],
+      "threshold": 2,
+      "updatedAt": 1725359181004
+    },
+    {
+      "address": "0x1060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+      "cairoVersion": "1",
+      "classHash": "0x06e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+      "creator": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+      "id": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1",
+      "index": 1,
+      "name": "Multisig 2",
+      "needsDeploy": false,
+      "network": {
+        "accountClassHash": {
+          "multisig": "0x6e150953b26271a740bf2b6e9bca17cc52c68d765f761295de51ceb8526ee72",
+          "smart": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+          "standard": "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f",
+          "standardCairo0": "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
+        },
+        "chainId": "SN_SEPOLIA",
+        "explorerUrl": "https://sepolia.voyager.online",
+        "id": "sepolia-alpha",
+        "l1ExplorerUrl": "https://sepolia.etherscan.io",
+        "multicallAddress": "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
+        "name": "Sepolia",
+        "possibleFeeTokenAddresses": [
+          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "readonly": true,
+        "rpcUrl": "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7"
+      },
+      "networkId": "sepolia-alpha",
+      "publicKey": "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf",
+      "signer": {
+        "derivationPath": "m/44'/9004'/1'/0/1",
+        "type": "local_secret"
+      },
+      "signers": [
+        "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf",
+        "0x04f7808289a0cec299263ffa85d2c929b823d8849db6994173865f7208a907cd"
+      ],
+      "threshold": 2,
+      "type": "multisig",
+      "updatedAt": 1725359181005
+    }
+  ],
+  "repository:core:multisig:signerNames": [
+    {
+      "multisigPublicKey": "0x00826a255157914857abb3619d8930a8f43c88923dface0583c81c7289f52b31",
+      "signers": []
+    },
+    {
+      "multisigPublicKey": "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf",
+      "signers": []
+    }
+  ],
+  "repository:knownDapps_v1": [
+    {
+      "argentVerified": true,
+      "brandColor": "#2AAAFD",
+      "categories": ["DeFi"],
+      "contracts": [
+        {
+          "address": "0x02bcc885342ebbcbcd170ae6cafa8a4bed22bb993479f49806e72d96af94c965",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "b39c1e1c-f4be-4344-afae-3792ccdc3977",
+      "dappUrl": "https://app.testnet.jediswap.xyz/#/swap",
+      "description": "A community-led fully permissionless and composable AMM on Starknet.",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://jediswap.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/jediswap"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/jediswap"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/jediswap/dapp-icon-jediswap.png",
+      "name": "JediSwap",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": true,
+      "categories": [],
+      "contracts": [],
+      "dappId": "b13b2bf5-84a2-4bd5-963d-993f37571204",
+      "dappUrl": "https://argent.xyz",
+      "description": "Argent smartwallet on Mobile, Browser and Web. ",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "twitter",
+          "position": 1,
+          "url": "https://twitter.com/argent_hq"
+        },
+        {
+          "name": "website",
+          "position": 2,
+          "url": "https://argent.xyz"
+        }
+      ],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/b13b2bf5-84a2-4bd5-963d-993f37571204.png",
+      "name": "Argent",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": true,
+      "categories": ["NFTs"],
+      "contracts": [
+        {
+          "address": "0x006fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "7b2395c1-6427-4ab2-b918-5817e34622f1",
+      "dappUrl": "https://testnet.aspect.co/",
+      "description": "An NFT marketplace",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/7b2395c1-6427-4ab2-b918-5817e34622f1.webp",
+      "name": "Aspect",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": ["NFTs"],
+      "contracts": [],
+      "dappId": "17999edd-ae8b-48b1-9fbe-f76f1d316035",
+      "dappUrl": "https://mintsquare.io/starknet-testnet",
+      "description": "Mint Square is an NFT Marketplace on Ethereum L2 ZK Rollups",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": true,
+      "links": [],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/17999edd-ae8b-48b1-9fbe-f76f1d316035.webp",
+      "name": "Mint Square",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Games"],
+      "contracts": [],
+      "dappId": "30e29907-b467-46f1-8aef-c372053bbb07",
+      "description": "Decentralized strategy game",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://eykar.org/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/AgeOfEykar"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/rpksM5uCk5"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/ageofeykar/dapp-icon-age-of-eykar.png",
+      "name": "Age of Eykar"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["NFTs"],
+      "contracts": [
+        {
+          "address": "0x07d4dc2bf13ede97b9e458dc401d4ff6dd386a02049de879ebe637af8299f91d",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "bf9ddb84-9ced-4fd0-b947-8da9c42ef3c5",
+      "description": "Pick a market, pick a date, and mint a day in crypto",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.almanacnft.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/almanacNFT"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/almanacnft/almanacnft-logo.png",
+      "name": "AlmanacNFT"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi"],
+      "contracts": [],
+      "dappId": "cfe00a6c-82b1-4636-af28-18889ca2f63a",
+      "description": "Autonomous and dynamic synthetic issuance platform",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.auraprotocol.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/AuraProtocol"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/aura/aura-logo.png",
+      "name": "Aura"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Onramps", "DeFi", "Bridges"],
+      "contracts": [],
+      "dappId": "a438c763-3c6a-4b0f-9a8a-997d0798aee8",
+      "description": "The leading global on & off-ramp solution",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.banxa.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/BanxaOfficial"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/banxa/dapp-icon-banxa.png",
+      "name": "Banxa"
+    },
+    {
+      "argentVerified": false,
+      "brandColor": "#3BC6A5",
+      "categories": ["DeFi", "Infrastructure"],
+      "contracts": [
+        {
+          "address": "0x07a6f98c03379b9513ca84cca1373ff452a7462a3b61598f0af5bb27ad7f76d1",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x01c0a36e26a8f822e0d81f20a5a562b16a8f8a3dfd99801367dd2aea8f1a87a2",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0231adde42526bad434ca2eb983efdd64472638702f87f97e6e3c084f264e06f",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x00975910cd99bc56bd289eaaa5cee6cd557f0ddafdb2ce6ebea15b158eb2c664",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "d1a13a03-4402-412e-a10c-a618f5e0e0b2",
+      "dappUrl": "https://10kswap.com",
+      "description": "A Layer2 AMM protocol",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://10kswap.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/10KSwap"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/T77yphUPB6"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/10kswap/dapp-icon-10kswap.png",
+      "name": "10KSwap",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": ["NFTs", "Games"],
+      "contracts": [
+        {
+          "address": "0x01435498bf393da86b4733b9264a86b58a42b31f8d8b8ba309593e5c17847672",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x01e1f972637ad02e0eed03b69304344c4253804e528e1a5dd5c26bb2f23a8139",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x05faa82e2aec811d3a3b14c1f32e9bbb6c9b4fd0cd6b29a823c98c7360019aa4",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "51fb3de4-a3b8-4fa5-b293-6e8a48c0e81e",
+      "dappUrl": "https://briq.construction/",
+      "description": "The NFT building protocol",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://briq.construction/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/briqNFT"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/kpvbDCw5pr"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/briq/dapp-icon-briq.png",
+      "name": "briq",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi", "NFTs"],
+      "contracts": [
+        {
+          "address": "0x061bcc33b0469cd072ad47813a1efd250fd36a28425d774c31c8f33c87306e8e",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x04047810e4f759336f941a16b6de9d8d2f934e976b9a9431a2964646df9025c6",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x00ebf4bbab9c934fa0212c9358331d4a9543ad66a7e0007d4a720cfa6b56061e",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "64412379-c884-4f0a-ac93-8f32635381cf",
+      "description": "Invest in decarbonization",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://carbonable.io/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/Carbonable_io"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/Huspzn4teW"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/carbonable/carbonable-icon.png",
+      "name": "Carbonable"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi"],
+      "contracts": [
+        {
+          "address": "0x076dbabc4293db346b0a56b29b6ea9fe18e93742c73f12348c8747ecfc1050aa",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x001405ab78ab6ec90fba09e6116f373cda53b0ba557789a4578d8c1ec374ba0f",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "43cadb59-b2f6-4681-b51c-d5bf61bae7a9",
+      "description": "DeFi Options",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://carmine.finance/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/CarmineOptions"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/6J6NpPxmp6"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/carminefinance/carmine-logo.webp",
+      "name": "Carmine Options AMM"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Games"],
+      "contracts": [],
+      "dappId": "04397d52-ed91-41e3-812f-528a2823c268",
+      "description": "Starknet Gaming Console",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://cartridge.gg/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/cartridge_gg"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/cartridge"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/cartridge/logo.jpeg",
+      "name": "Cartridge"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "a1b9afec-d5cd-4580-b422-c980cf4a2e5a",
+      "description": "From events to Api",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://checkpoint.fyi"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/checkpointfyi"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/QJupGWJbge"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/checkpoint/dapp-icon-checkpoint.png",
+      "name": "Checkpoint"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "5f752fba-a4e2-47ce-8297-5aa4b2c598f1",
+      "description": "Ganache for Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://shard-labs.github.io/starknet-devnet/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/0xSpaceShard"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/spaceshard/320x320-devnet.png",
+      "name": "Starknet Devnet"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DAOs", "DeFi"],
+      "contracts": [],
+      "dappId": "e1af90cc-f4b0-4d17-8f33-f45c2484dc8f",
+      "description": "DAO Based Ecosystem Catalyst for projects built on Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://dolvenlabs.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/dolvenlabs"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/invite/UG5tkPa3xn"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/dolvenlabs/dapp-icon-dolven.png",
+      "name": "Dolven Labs"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "fbcf0e9e-7fda-497e-a291-ea8a4c6c8964",
+      "description": "Your multi-chain web3 auth platform",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.dynamic.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/dynamic_xyz"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/dynamic/dapp-logo.jpg",
+      "name": "Dynamic"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi"],
+      "contracts": [
+        {
+          "address": "0x00dc1138a03d241b87a2f940db070e47f937930e2a0337f6e6ee1a97883009e7",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "0e966831-4120-470e-8031-022e77e1fa12",
+      "description": "Gathers all AMMs of Starknet at one place.",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://fibrous.finance/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/FibrousFinance"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/fibrousfinance/dapp-icon-fibrous.png",
+      "name": "Fibrous Finance"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["NFTs", "Games"],
+      "contracts": [],
+      "dappId": "f74d6f2e-f222-4b53-a9af-6035cf30982e",
+      "description": "World builder game to create your dream community",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.frenslands.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/FrensLands"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/gehYZU9Trf"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/frenslands/Press_Logo_TrueScale.png",
+      "name": "Frens Lands"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Games"],
+      "contracts": [
+        {
+          "address": "0x06a05844a03bb9e744479e3298f54705a35966ab04140d3d8dd797c1f6dc49d0",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "dbb4647b-f6ac-4bc4-b718-20c7b114775c",
+      "description": "Experiment in Layer 2 gaming",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.gol2.io/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/GoL2io"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/gol2/dapp-icon-gol2.png",
+      "name": "GoL2"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "886a788b-23b4-4bfc-a743-81c7fbcacd18",
+      "description": "Use Hardhat on Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.spaceshard.io"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/0xSpaceShard"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/spaceshard/320x320-hh.png",
+      "name": "Starknet Hardhat Plugin"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi"],
+      "contracts": [],
+      "dappId": "56d0b254-c6e7-4bc2-986b-abf4dce7950b",
+      "description": "Permissionless undercollateralized loans",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://hashstack.finance/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/0xHashstack"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/hashstack-community-907151419650482217"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/hashstack/hashstack-logo.png",
+      "name": "Hashstack"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "5c799100-ea4b-415c-9f74-066fa8eb753f",
+      "description": "Storage Proofs API",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://herodotus.dev/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/HerodotusDev"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/t6p4qs4PBw"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/herodotus/herodotus-logo.png",
+      "name": "Herodotus"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Games", "NFTs"],
+      "contracts": [],
+      "dappId": "4a6f0f47-4d2d-4551-b240-2f6e2d67a2e5",
+      "description": "A Conquer and Earn NFT game",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://imperiumwars.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/ImperiumWars"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/VqXSJaeFK4"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/imperiumwars/4mQEWxX8_400x400.jpg",
+      "name": "Imperium Wars"
+    },
+    {
+      "argentVerified": false,
+      "categories": [],
+      "contracts": [],
+      "dappId": "784725ea-dd35-40db-b2b3-1b2fbf30438d",
+      "dappUrl": "http://www.google.com",
+      "description": "Test telegram dapp",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.google.com"
+        }
+      ],
+      "name": "Chinese Dice Test Dapp",
+      "sessionConfig": {
+        "allowList": [
+          {
+            "contractAddress": "0x04416913d018f639e58fd54d9344ea020534692a9cbe1c2eba191c8b2d2682e5",
+            "methods": ["propose_game"]
+          }
+        ],
+        "maxExpiryDays": 31
+      },
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Onramps", "Bridges"],
+      "contracts": [],
+      "dappId": "8d23e708-ee10-423e-bd9a-07141ddbb3c6",
+      "description": "CEX <> L2 Gateway",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://layerswap.io/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/layerswap"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/RUQDbPGTFb"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/layerswap/dapp-icon-layerswap.png",
+      "name": "Layerswap"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DAOs"],
+      "contracts": [],
+      "dappId": "76823afb-6ede-46da-bf45-b5ec5fe74a3d",
+      "description": "DAO to ignite and fuel fully on-chain games",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://matchboxdao.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/matchbox_dao"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/g3GRRngN"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/matchboxdao/dapp-icon-matchbox.png",
+      "name": "MatchBoxDAO"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi", "Infrastructure", "Tool"],
+      "contracts": [],
+      "dappId": "247cf3e4-0d70-474b-9f48-74b3de9c363a",
+      "description": "Boost your DeFi journey",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://morphinefi.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/MorphineFi"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/hJupqTrK4G"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/morphinefi/dapp-icon-morphinefi.jpeg",
+      "name": "MorphineFi"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Social"],
+      "contracts": [],
+      "dappId": "d3cdb69b-2eac-416f-8665-ba06ae329349",
+      "description": "Contribute to the best projects on Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.onlydust.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/OnlyDust_xyz"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/onlydust/dapp-icon-onlydust.png",
+      "name": "Only Dust"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Bridges"],
+      "contracts": [],
+      "dappId": "bbe887dc-65a7-45ef-9c18-f12dc5e16fb3",
+      "description": "Decentralized cross-rollup bridge",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.orbiter.finance/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/Orbiter_Finance"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/hJJvXP7C73"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/orbiterfinance/dapp-icon-orbiter.png",
+      "name": "Orbiter.Finance"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [
+        {
+          "address": "0x04746485fa57b49dc992c35d7f12054b5a7d24b0e187021cd8f40bc2517700bc",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0346c57f094d641ad94e43468628d8e9c574dcb2803ec372576ccc60a40be2c4",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "5f3804be-884a-4207-bdc3-cac88290ea62",
+      "description": "Decentralized & composable data infrastructure",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://pragmaoracle.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/PragmaOracle"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/N7sM7VzfJB"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/pragma/dapp-icon-pragma.png",
+      "name": "Pragma"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Games", "NFTs"],
+      "contracts": [
+        {
+          "address": "0x07f87b400e9cc3f56a3eb26a924a46a053ebae4eea9ba85f58c17f7a09331aa1",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0035345c560052c8d14dcbde85114c123fc3c65b7b5fab2d045fb3a7e57df453",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "c9cc6ab2-b693-479a-89a8-07c4eaa55cac",
+      "description": "Collaborative artworks",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://pxls.wtf/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/PxlsWtf"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/ufafywMTQh"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/pxls/dapp-icon-pxls.png",
+      "name": "Pxls"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi"],
+      "contracts": [],
+      "dappId": "143d6933-8da1-4242-97db-50a817a91797",
+      "description": "Perpetuals Trading.",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://rabbitx.io/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/rabbitx_io"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/rabbitx"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/rabbitx/dapp-icon-rabbitx.png",
+      "name": "RabbitX"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Onramps"],
+      "contracts": [],
+      "dappId": "05b55732-ecd8-46b6-a835-cefb507bd383",
+      "description": "Safe and easy way to buy crypto",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://ramp.network/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/RampNetwork"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/vTwqTcsq"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/ramp/dapp-icon-ramp.png",
+      "name": "Ramp"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Bridges", "DeFi", "Infrastructure"],
+      "contracts": [],
+      "dappId": "c9a919ed-2f9c-4498-9da9-7cc6334dca1a",
+      "description": "MultiChain Aggregator",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://app.rango.exchange"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/RangoExchange"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/VmdCgxyKhr"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/rango/rango-logo.jpg",
+      "name": "Rango"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Games", "NFTs", "DAOs"],
+      "contracts": [
+        {
+          "address": "0x0000000000000000000000007afe30cb3e53dba6801aa0ea647a0ecea7cbe18d",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "40996777-91a5-46b4-926a-eedc7cde84a5",
+      "description": "Massive multiplayer on-chain game of economics and chivalry",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://realmseternum.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/LootRealms"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/RnC9VNRzZH"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/realms/dapp-icon-realms.jpeg",
+      "name": "Realms"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Social", "DAOs", "Infrastructure"],
+      "contracts": [],
+      "dappId": "f4f244b3-26a1-4714-bee0-181b9ec0778e",
+      "description": "Analytics Data Hub",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://starkboard.io/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/starkboard"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/starkboard"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starkboard/dapp-icon-starkboard.png",
+      "name": "StarkBoard"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi"],
+      "contracts": [],
+      "dappId": "f927f1da-b5ba-488d-ac82-6f645f407246",
+      "description": "The Portal to Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.starkdefi.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/StarkDefi"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/starkdefi"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starkdefi/dapp-icon-starkdefi.png",
+      "name": "StarkDefi"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi", "Tool", "Infrastructure"],
+      "contracts": [],
+      "dappId": "b600070d-2572-41bd-a7a8-d696eba60a32",
+      "description": "Portfolio-Yield Tracker",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://starkendefi.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/StarkenDefi"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/hJupqTrK4G"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starkenfi/dapp-icon-starkenfi.jpeg",
+      "name": "StarkenFi"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["NFTs", "Social"],
+      "contracts": [
+        {
+          "address": "0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x06ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x02383504fa1365cf31921c1411e14ea45b6376e9a0da8890d51359fd05575f48",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "cd7cbb12-86cc-4e76-92c2-e140bd6a2167",
+      "description": "All in one identity service on starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://starknet.id/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/starknet_id"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/8uS2Mgcsza"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starknetid/logo.svg",
+      "name": "Starknet.id"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Social", "NFTs"],
+      "contracts": [],
+      "dappId": "c5987ed2-65bd-41e6-bc05-75768424b25f",
+      "description": "Social Network Protocol on Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://starknet.social/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/StarknetSocial"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/invite/UG5tkPa3xn"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starknetsocial/dapp-logo-sns.png",
+      "name": "Starknet Social"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "e6466695-8dfd-49c8-a926-aa1a8df7997d",
+      "description": "Starknet block explorer",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://starkscan.co/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/StarkscanCo"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/Pdt4Wr6gx7"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starkscan/dapp-icon-starkscan.png",
+      "name": "STARKSCAN"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi", "Infrastructure"],
+      "contracts": [
+        {
+          "address": "0x028850a764600d53b2009b17428ae9eb980a4c4ea930a69ed8668048ef082a04",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x076a028b19d27310f5e9f941041ae4a3a52c0e0024d593ddcb0d34e1dcd24af1",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x071d48483dcfa86718a717f57cf99a72ff8198b4538a6edccd955312fe624747",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x04acd4b2a59eae7196f6a5c26ead8cb5f9d7ad3d911096418a23357bb2eac075",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0419772c05f2db85b8c2b2f92e04ef4f66884270f4eb97718c8693f3b33492f5",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0501c3c89faeecdd0f09d9d1c162caa401165f17dee32a224c6f6188fc16b7b1",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x00f3be869afa2abb57ab452c2659a2239cb4c83594902fd7f4d07d91316e9894",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "6fd49987-9613-4ce8-a4df-e7b74651d8e2",
+      "description": "The web3 spreadsheet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.starksheet.xyz/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/starksheet"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/BtuD5HguDX"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starksheet/dapp-icon-starksheet.png",
+      "name": "Starksheet"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Games"],
+      "contracts": [],
+      "dappId": "7e4d78d7-6979-469a-94b1-c7750688995f",
+      "description": "Truly fun, secure and crypto-native games",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://ninth.gg/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/ninth_gg"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/mJeFBtdabx"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/theninth/dapp-icon-theninth.png",
+      "name": "The Ninth"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "a4ca61bd-ed9a-4ecb-9a3c-06e8367e4357",
+      "description": "Starknet Block Explorer",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://v2.viewblock.io/starknet"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/ViewBlock"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/viewblock/logo.png",
+      "name": "ViewBlock"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Infrastructure"],
+      "contracts": [],
+      "dappId": "2b7a2355-0db0-4aea-afdb-43ae952c39d0",
+      "description": "Starknet block explorer",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://voyager.online/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/0xvoyageronline"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/pkKQmuEw"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/voyager/dapp-icon-voyager.png",
+      "name": "Voyager"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi", "Infrastructure"],
+      "dappId": "b9119c15-c264-485f-871c-123aedccb458",
+      "description": "The Starknet Yield Aggregator",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.yagi.finance"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/yagi_fi"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/49TYpjfkUn"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/yagi/dapp-icon-yagi.png",
+      "name": "Yagi Finance"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi", "DAOs"],
+      "contracts": [],
+      "dappId": "ab5ae474-b36f-4d64-9693-2a293e28082e",
+      "description": "The first perpetual futures exchange on Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://zkx.fi"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/zkxprotocol"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/7YrNHdwNyu"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/zkx/zkx-icon.png",
+      "name": "ZKX"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Social", "NFTs", "DAOs"],
+      "contracts": [
+        {
+          "address": "0x0708e824e3b83b1e9b644b52b9b9281f949acca5516f65a5df37f19bdc846a5b",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "1143a83d-2ea0-4dcf-82a3-ae0982eb7383",
+      "dappUrl": "https://earlystarkers.io",
+      "description": "1234 Star NFTs on the sky-map enable unique utilities and prove you are an Early Adopter on Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://earlystarkers.io"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/earlystarkers"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/earlystarkers/dapp-logo-earlystarkers.png",
+      "name": "Early Starkers",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": ["Bridges"],
+      "contracts": [],
+      "dappId": "d717dc5d-a104-47ee-9ca2-55e4f9c0275a",
+      "dappUrl": "https://starkgate.starknet.io/",
+      "description": "Ethereum <> Starknet Bridge",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://starkgate.starknet.io/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/Starknet_Intern"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/qypnmzkhbc"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/starkgate/dapp-icon-starkgate.png",
+      "name": "StarkGate",
+      "sessionConfig": {
+        "allowList": [
+          {
+            "contractAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+            "methods": ["transfer"]
+          }
+        ],
+        "maxExpiryDays": 7
+      },
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "brandColor": "#1B2395",
+      "categories": ["DeFi"],
+      "contracts": [],
+      "dappId": "d5a32e2e-1c14-4308-ac5d-1aaeb8d40868",
+      "description": "Money-market protocol",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://zklend.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/zkLend"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/3v7RhwtJ8S"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/zklend/zklend-logo.png",
+      "name": "zkLend"
+    },
+    {
+      "argentVerified": true,
+      "categories": [],
+      "contracts": [
+        {
+          "address": "0x0563cd683faa47e7d5fc1639958e6e8ec139d1911af65e97b4fdf1913e66fbbd",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "e9998c6c-6d99-446b-9f48-fd0cec819298",
+      "dappUrl": "https://spok.hydrogen.argent47.net/",
+      "description": "Complete tasks, collect SPOKs and gain kudos in the Starknet community! Built by Argent.",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": true,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://spok.hydrogen.argent47.net"
+        }
+      ],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/e9998c6c-6d99-446b-9f48-fd0cec819298.png",
+      "name": "Spok",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": true,
+      "categories": [],
+      "contracts": [],
+      "dappId": "90be09e5-e782-4b70-9bde-03e212389c4c",
+      "dappUrl": "https://provisions.starknet.io/",
+      "description": "Allocating STRK Tokens to the Community",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": true,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://provisions.starknet.io/"
+        }
+      ],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/90be09e5-e782-4b70-9bde-03e212389c4c.png",
+      "name": "Starknet Provisions",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": ["DeFi", "Infrastructure"],
+      "contracts": [
+        {
+          "address": "0x06d8cd321dcbbf54512eab67c8a6849faf920077a3996f40bb4761adc4f021d2",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x07e36202ace0ab52bf438bd8a8b64b3731c48d09f0d8879f5b006384c2f35032",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "d030723c-e9e9-435b-bb72-e1df16ea9d2b",
+      "dappUrl": "https://app.avnu.fi/",
+      "description": "Best execution on Starknet. No fluff.",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": true,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://avnu.fi"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/avnu_fi"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/invite/avnu-fi"
+        }
+      ],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/d030723c-e9e9-435b-bb72-e1df16ea9d2b.jpg",
+      "name": "AVNU",
+      "sessionConfig": {},
+      "supportedApps": []
+    },
+    {
+      "argentVerified": true,
+      "contracts": [],
+      "dappId": "49007844-7a78-4185-be2f-b06bf6fc26a5",
+      "dappUrl": "https://stake.lido.fi/",
+      "description": "Empowering and securing Ethereum since 2020",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://lido.fi/"
+        }
+      ],
+      "logoUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/protocols/eth2.png",
+      "name": "Lido"
+    },
+    {
+      "argentVerified": false,
+      "brandColor": "#B51012",
+      "categories": ["DeFi"],
+      "contracts": [],
+      "dappId": "f839e37a-b68d-422d-ad79-8c2c1d16b49e",
+      "description": "Powerful Stableswap and AMM Aggregator on Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://sithswap.com/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/SithSwap"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/gAD2wuzeNf"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/sithswap/HCaScPSz_400x400.jpg",
+      "name": "SithSwap"
+    },
+    {
+      "argentVerified": false,
+      "brandColor": "#FF4140",
+      "categories": ["DeFi"],
+      "contracts": [],
+      "dappId": "e72933f0-0485-4369-87d7-356e08e2dbb5",
+      "description": "Liquidity at your fingertips",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://nostra.finance/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/nostrafinance"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/Eqp53YafYP"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/nostra/dapp-icon-nostra.png",
+      "name": "Nostra"
+    },
+    {
+      "argentVerified": true,
+      "brandColor": "#6B46C1",
+      "categories": ["DeFi", "Infrastructure"],
+      "contracts": [
+        {
+          "address": "0x031e8a7ab6a6a556548ac85cbb8b5f56e8905696e9f13e9a858142b8ee0cc221",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x073fa8432bf59f8ed535f29acfd89a7020758bda7be509e00dfed8a9fde12ddc",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x01090e3cfd9990c396f246cd1d5c7fb091905cba9f99739653db1f2960a3311f",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0384211022228b84eda3a07336b68e83618ee658ad92ff7b176a9e4958b1ae51",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x04c95177eb2aee798d901c34d825715136d5dd33c5cbeff1930e52f8b74ce3c3",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0205b51a3ca54e718dac5f8424c7e67b6d169af5255316ff65be388f0a7e2eaf",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x037d4ba7ea2cd87993f2c0e38080ed442c740c536ae2861a61ac6ff8228964aa",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x050d4da9f66589eadaa1d5e31cf73b08ac1a67c8b4dcd88e6fd4fe501c628af2",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "b513a7c1-eb8a-4201-876c-becd8d445e15",
+      "dappUrl": "https://app.ekubo.org/",
+      "description": "Next-generation AMM built for Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": true,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://ekubo.org"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/EkuboProtocol"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/RFbSXxtqUG"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/ekubo/ekubo-logo.png",
+      "name": "Ekubo",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "brandColor": "#188EB3",
+      "categories": [],
+      "contracts": [
+        {
+          "address": "0x018a439bcbb1b3535a6145c1dc9bc6366267d923f60a84bd0c7618f33c81d334",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x0436924c4ed166d3c283d516adc424976cfccba108e3a0e3f3fc1ef319e23aa7",
+          "chain": "starknet"
+        },
+        {
+          "address": "0x052d99ab5835a0c295567dcdd40e9e281378d26d02ecca7b31e33dea99bc02ea",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "9bd46d82-3c05-4faa-ae17-72eef3d146fa",
+      "dappUrl": "https://www.myswap.xyz/",
+      "description": "the first AMM released on #Starknet",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/9bd46d82-3c05-4faa-ae17-72eef3d146fa.png",
+      "name": "mySwap",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": true,
+      "brandColor": "#2AAAFD",
+      "categories": [],
+      "contracts": [],
+      "dappId": "a562b4f6-446e-4f80-9b3a-4d617806a758",
+      "dappUrl": "https://dapp-ruby.vercel.app/",
+      "description": "Argent Test dapp including latest StarknetKit version",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": true,
+      "links": [],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/a562b4f6-446e-4f80-9b3a-4d617806a758.png",
+      "name": "StarknetKit Test Dapp",
+      "supportedApps": []
+    },
+    {
+      "argentVerified": true,
+      "brandColor": "#000000",
+      "categories": ["DeFi"],
+      "contracts": [
+        {
+          "address": "0x0570ad94639051fc46261a4b8570d399a88bd8835f5714372095ca01bb6f4c12",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "02d43d9d-b82e-44fb-aaa1-69753adc2f14",
+      "dappUrl": "https://vesu-git-sepolia-vesu.vercel.app",
+      "description": "Vesu is a public lending protocol allowing everyone to earn, borrow and build freely and securely.",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [],
+      "logoUrl": "https://www.dappland.com/dapps/vesu/vesu-logo.png",
+      "name": "Vesu"
+    },
+    {
+      "argentVerified": false,
+      "categories": ["NFTs", "Games", "DAOs"],
+      "contracts": [
+        {
+          "address": "0x075a180e18e56da1b1cae181c92a288f586f5fe22c18df21cf97886f1e4b316c",
+          "chain": "starknet"
+        }
+      ],
+      "dappId": "b7458fe1-a290-44c0-898f-4157961f1ad9",
+      "dappUrl": "https://game-prerelease.influenceth.io",
+      "description": "A grand strategy space MMO",
+      "executeFromOutsideAllowed": true,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.influenceth.io/"
+        },
+        {
+          "name": "twitter",
+          "position": 2,
+          "url": "https://twitter.com/influenceth"
+        },
+        {
+          "name": "discord",
+          "position": 3,
+          "url": "https://discord.gg/UHMqbznhJS"
+        }
+      ],
+      "logoUrl": "https://www.dappland.com/dapps/influence/WEG3UrcU_400x400.jpg",
+      "name": "Influence",
+      "sessionConfig": {
+        "allowList": [
+          {
+            "contractAddress": "0x0517567ac7026ce129c950e6e113e437aa3c83716cd61481c6bb8c5057e6923e",
+            "methods": ["run_system"]
+          },
+          {
+            "contractAddress": "0x0030058f19ed447208015f6430f0102e8ab82d6c291566d7e73fe8e613c3d2ed",
+            "methods": ["transfer_with_confirmation", "transfer"]
+          },
+          {
+            "contractAddress": "0x04541d894b5c0476d620e62c3a9be4719ba2dc652df84148be382a89619864e2",
+            "methods": ["withdraw", "deposit"]
+          }
+        ],
+        "maxExpiryDays": 7
+      },
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": [],
+      "contracts": [],
+      "dappId": "b6bfb979-05c3-4963-873b-99775663b0a6",
+      "dappUrl": "https://www.kulipa.xyz",
+      "description": "Argent Card Partner",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/b6bfb979-05c3-4963-873b-99775663b0a6.jpg",
+      "name": "Kulipa",
+      "sessionConfig": {
+        "allowList": [
+          {
+            "contractAddress": "0x053b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
+            "methods": ["transfer"]
+          }
+        ],
+        "maxExpiryDays": 7
+      },
+      "supportedApps": []
+    },
+    {
+      "argentVerified": false,
+      "categories": [],
+      "contracts": [],
+      "dappId": "d27415ac-30e4-4865-a316-bf04ce4510ac",
+      "dappUrl": "http://www.google.com",
+      "description": "Used for testing purposes",
+      "executeFromOutsideAllowed": false,
+      "inAppBrowserCompatible": false,
+      "links": [
+        {
+          "name": "website",
+          "position": 1,
+          "url": "https://www.google.com"
+        }
+      ],
+      "logoUrl": "https://static.hydrogen.argent47.net/dapp/logos/b13b2bf5-84a2-4bd5-963d-993f37571204.png",
+      "name": "Test Increment Counter",
+      "sessionConfig": {
+        "allowList": [
+          {
+            "contractAddress": "0x036133c88c1954413150db74c26243e2af77170a4032934b275708d84ec5452f",
+            "methods": ["increment"]
+          }
+        ],
+        "maxExpiryDays": 31
+      },
+      "supportedApps": []
+    }
+  ],
+  "repository:nftsContracts_v2": [],
+  "repository:nfts_v2": [],
+  "service:activityCache:cache": {
+    "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001::sepolia-alpha::local_secret::1": {
+      "activities": [
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "token_address"
+                },
+                {
+                  "calldata": [
+                    "977312601197437022110323227435224271452751151768572207166894820017262369728",
+                    "10000000000000",
+                    "0"
+                  ],
+                  "entrypoint": "transfer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "amount": "10000000000000",
+                  "editable": false,
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "amount",
+                  "usd": "0.03"
+                },
+                {
+                  "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                  "label": "ERC20_transfer_recipient",
+                  "type": "address",
+                  "verified": false
+                }
+              ]
+            }
+          ],
+          "lastModified": 1725359181031,
+          "meta": {
+            "icon": "SendIcon",
+            "subtitle": "To: 0x0229...1BC0",
+            "title": "Send"
+          },
+          "status": "success",
+          "submitted": 1725359181000,
+          "transaction": {
+            "hash": "0x0758e1cf3753b1fa5fdaf82c7355c5c651a6153fb131864f7be0d35ee901d1d8"
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "10000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": "0.03"
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": true
+            }
+          ],
+          "type": "native"
+        },
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "address": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+                  "label": "default_contract",
+                  "type": "address",
+                  "verified": false
+                },
+                {
+                  "calldata": [
+                    "0x2e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+                    "0x674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf"
+                  ],
+                  "entrypoint": "replace_signer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "account_multisig_replace_signer",
+              "properties": [
+                {
+                  "address": "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3",
+                  "label": "account_multisig_replace_signer_removed_signer",
+                  "type": "address"
+                },
+                {
+                  "address": "0x0674870dedc85ff355200bab2d00c145f42d7d67d790b0f479dbdd2a42d55fbf",
+                  "label": "account_multisig_replace_signer_added_signer",
+                  "type": "address"
+                }
+              ]
+            }
+          ],
+          "compositeId": "90e74e3200f829992278b83dcb2e14335fafaf008c0a59b6ccb96a5cf25edb11",
+          "details": {
+            "action": "multisigConfigurationUpdated",
+            "type": "security"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "235623746046612",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.5901
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "security",
+          "id": "33d5644e-95ce-4b4c-84f0-3ee7869ea922",
+          "lastModified": 1725359192692,
+          "multisigDetails": {
+            "signers": [
+              "0x04f7808289a0cec299263ffa85d2c929b823d8849db6994173865f7208a907cd",
+              "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3"
+            ]
+          },
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725359167013,
+          "tags": [],
+          "transaction": {
+            "hash": "0x064c06998e11dd59098f580a588f75ec0387ea7e971511f6721cfd46b526b27b",
+            "network": "starknet",
+            "status": "pending",
+            "transactionIndex": 13
+          },
+          "transferSummary": [],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "235623746046612",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.5901
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+          "type": "security",
+          "wallet": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001"
+        },
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "token_address"
+                },
+                {
+                  "calldata": [
+                    "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                    "0x12309ce54000",
+                    "0x0"
+                  ],
+                  "entrypoint": "transfer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "amount": "20000000000000",
+                  "editable": false,
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "amount",
+                  "usd": "0.05"
+                },
+                {
+                  "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                  "label": "ERC20_transfer_recipient",
+                  "type": "address",
+                  "verified": false
+                }
+              ]
+            }
+          ],
+          "compositeId": "ca93351a8db6724912212765707ba611ad05823568cf74ae49ddc157937f0aba",
+          "details": {
+            "asset": {
+              "amount": "20000000000000",
+              "fiatAmount": {
+                "currency": "USD",
+                "currencyAmount": 0.0501
+              },
+              "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "type": "token"
+            },
+            "counterparty": "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+            "counterpartyNetwork": "starknet",
+            "leg": "debit",
+            "type": "payment"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "131416451784618",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3291
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "finance",
+          "id": "0c85e5c0-4ce6-4e9d-8901-bfffb43f8606",
+          "lastModified": 1725359181266,
+          "multisigDetails": {
+            "signers": [
+              "0x04f7808289a0cec299263ffa85d2c929b823d8849db6994173865f7208a907cd",
+              "0x02e3bbad3710ff3dc235c0d9b165346b863e58a4459a81ee2bfdc2299e3ea2e3"
+            ]
+          },
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [
+            {
+              "address": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "network": "starknet",
+              "type": "token"
+            }
+          ],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725359167008,
+          "tags": [],
+          "title": "Send",
+          "transaction": {
+            "hash": "0x04aecd6afbc6c8676f2232486d63c74d63bb92210f9b804650fbdcc54bcacfde",
+            "network": "starknet",
+            "status": "pending",
+            "transactionIndex": 8
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "20000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.0501
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": true
+            }
+          ],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "20000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.0501
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "payment"
+            },
+            {
+              "asset": {
+                "amount": "131416451784618",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3291
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+          "type": "payment",
+          "wallet": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001"
+        },
+        {
+          "compositeId": "15ae7bcd918e26b4c450e73960363d5ede5fd55e7f98d90a91944dcd0d512097",
+          "details": {
+            "action": "multisigConfigurationUpdated",
+            "type": "security"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "271196639467336",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.6792
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "security",
+          "id": "44e7ba41-07b0-4459-b666-73ae5bcfab7f",
+          "lastModified": 1725358988350,
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725358955008,
+          "tags": [],
+          "transaction": {
+            "blockNumber": 157030,
+            "hash": "0x04560a055fcedc24a374e553a7e9946a2231ccb997a9130758c0a6235a9aa4d3",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 8
+          },
+          "transferSummary": [],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "271196639467336",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.6792
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+          "type": "security",
+          "wallet": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001"
+        },
+        {
+          "compositeId": "440ee683e13f38509c3d9ef111f04a344096a5cecf4874c72816c3ecedcdc5a5",
+          "details": {
+            "asset": {
+              "amount": "25000000000000000",
+              "fiatAmount": {
+                "currency": "USD",
+                "currencyAmount": 62.6101
+              },
+              "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "type": "token"
+            },
+            "counterparty": "0x324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+            "counterpartyNetwork": "starknet",
+            "leg": "credit",
+            "type": "payment"
+          },
+          "fees": [],
+          "group": "finance",
+          "id": "1c4b9a91-840a-4152-896d-46733316d179",
+          "lastModified": 1725358988407,
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [
+            {
+              "address": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x0324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "network": "starknet",
+              "type": "token"
+            }
+          ],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725358955001,
+          "tags": [],
+          "title": "Receive",
+          "transaction": {
+            "blockNumber": 157030,
+            "hash": "0x07180fa03db355ce6b231ce98548bae6a482ce643816c4533f4d79aca930e0bb",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 1
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "25000000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 62.6101
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": false
+            }
+          ],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "25000000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 62.6101
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+              "counterpartyNetwork": "starknet",
+              "leg": "credit",
+              "type": "payment"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x0324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+          "type": "payment",
+          "wallet": "0x01060ea20f2778571e616a803bb54f8546af4a067d9fcd44c9e9543b418d1001"
+        }
+      ],
+      "updatedAt": 1725359180894
+    },
+    "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::ledger::43": {
+      "activities": [
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "token_address"
+                },
+                {
+                  "calldata": [
+                    "977312601197437022110323227435224271452751151768572207166894820017262369728",
+                    "200000000000000",
+                    "0"
+                  ],
+                  "entrypoint": "transfer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "amount": "200000000000000",
+                  "editable": false,
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "amount",
+                  "usd": "0.50"
+                },
+                {
+                  "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                  "label": "ERC20_transfer_recipient",
+                  "type": "address",
+                  "verified": false
+                }
+              ]
+            }
+          ],
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "151984448452486",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3804
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "lastModified": 1725357553661,
+          "meta": {
+            "icon": "SendIcon",
+            "subtitle": "To: 0x0229...1BC0",
+            "title": "Send"
+          },
+          "multisigDetails": {
+            "signers": [
+              "0x01fbb2e03e41d28b0d572d48c2ef4bb1d2686f37f702e26f179c5101e0587048",
+              "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84"
+            ]
+          },
+          "status": "success",
+          "submitted": 1725357553000,
+          "transaction": {
+            "hash": "0x049924a6583e6524c95e0b38ab3ef3757899b62ef26c8c70dfffb847e2ddaa37"
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "200000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.5006
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": true
+            }
+          ],
+          "type": "native"
+        },
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "address": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+                  "label": "default_contract",
+                  "type": "address",
+                  "verified": false
+                },
+                {
+                  "calldata": [
+                    "0x40b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84",
+                    "0x826a255157914857abb3619d8930a8f43c88923dface0583c81c7289f52b31"
+                  ],
+                  "entrypoint": "replace_signer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "account_multisig_replace_signer",
+              "properties": [
+                {
+                  "address": "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84",
+                  "label": "account_multisig_replace_signer_removed_signer",
+                  "type": "address"
+                },
+                {
+                  "address": "0x00826a255157914857abb3619d8930a8f43c88923dface0583c81c7289f52b31",
+                  "label": "account_multisig_replace_signer_added_signer",
+                  "type": "address"
+                }
+              ]
+            }
+          ],
+          "compositeId": "3c209a9a11d9875fef2b11fc6e88cfaff0f32c54c24890507a3e437f823c6528",
+          "details": {
+            "action": "multisigConfigurationUpdated",
+            "type": "security"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "272501232523724",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.6821
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "security",
+          "id": "87a6a459-f709-4be0-88f4-ffeb29bdc859",
+          "lastModified": 1725357530434,
+          "multisigDetails": {
+            "signers": [
+              "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84",
+              "0x01fbb2e03e41d28b0d572d48c2ef4bb1d2686f37f702e26f179c5101e0587048"
+            ]
+          },
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725357497008,
+          "tags": [],
+          "transaction": {
+            "blockNumber": 156992,
+            "hash": "0x05b89ba4120fab620dfbc33cfef3a0f1235d55e8b5afe3cafd8fb28aa1eca8fe",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 8
+          },
+          "transferSummary": [],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "272501232523724",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.6821
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+          "type": "security",
+          "wallet": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47"
+        },
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "token_address"
+                },
+                {
+                  "calldata": [
+                    "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                    "0x9184e72a000",
+                    "0x0"
+                  ],
+                  "entrypoint": "transfer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "amount": "10000000000000",
+                  "editable": false,
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "amount",
+                  "usd": "0.03"
+                },
+                {
+                  "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                  "label": "ERC20_transfer_recipient",
+                  "type": "address",
+                  "verified": false
+                }
+              ]
+            }
+          ],
+          "compositeId": "944a788e490eb038397116f04252686e92722c15dd4b0949f2afc89928e8f47d",
+          "details": {
+            "asset": {
+              "amount": "10000000000000",
+              "fiatAmount": {
+                "currency": "USD",
+                "currencyAmount": 0.025
+              },
+              "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "type": "token"
+            },
+            "counterparty": "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+            "counterpartyNetwork": "starknet",
+            "leg": "debit",
+            "type": "payment"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "151984448452486",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3804
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "finance",
+          "id": "d07e96b5-41d5-4a23-88c9-228cc1de9b17",
+          "lastModified": 1725357530483,
+          "multisigDetails": {
+            "signers": [
+              "0x01fbb2e03e41d28b0d572d48c2ef4bb1d2686f37f702e26f179c5101e0587048",
+              "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84"
+            ]
+          },
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [
+            {
+              "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "network": "starknet",
+              "type": "token"
+            }
+          ],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725357497001,
+          "tags": [],
+          "title": "Send",
+          "transaction": {
+            "blockNumber": 156992,
+            "hash": "0x0535bbf8e2eef80c0544769250578b2d4ae834ba39945e04bc7928f14080fe24",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 1
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "10000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.025
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": true
+            }
+          ],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "10000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.025
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "payment"
+            },
+            {
+              "asset": {
+                "amount": "151984448452486",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3804
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+          "type": "payment",
+          "wallet": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47"
+        },
+        {
+          "compositeId": "a3d8e120bd6b64add0286d58ba94cf88ace5e8b3e93a720d88deb3e4af7f9313",
+          "details": {
+            "action": "multisigConfigurationUpdated",
+            "type": "security"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "308672584770216",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.7726
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "security",
+          "id": "3e3267d2-f6e7-4bc8-839f-6e4ce916435f",
+          "lastModified": 1725357392952,
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725357358001,
+          "tags": [],
+          "transaction": {
+            "blockNumber": 156988,
+            "hash": "0x07a5b0a67676a83dfe4155af7ef5f373521c0d2c4b476a591b7229b3add1a592",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 1
+          },
+          "transferSummary": [],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "308672584770216",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.7726
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+          "type": "security",
+          "wallet": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47"
+        },
+        {
+          "compositeId": "da75bd7e60db11a57d33f2547e8ebb7db9d1da4efb1cdf97f4e7db5a0a365d81",
+          "details": {
+            "asset": {
+              "amount": "25000000000000000",
+              "fiatAmount": {
+                "currency": "USD",
+                "currencyAmount": 62.5761
+              },
+              "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "type": "token"
+            },
+            "counterparty": "0x324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+            "counterpartyNetwork": "starknet",
+            "leg": "credit",
+            "type": "payment"
+          },
+          "fees": [],
+          "group": "finance",
+          "id": "d5f77738-fef0-4ba1-893e-09fb88959606",
+          "lastModified": 1725357358781,
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [
+            {
+              "address": "0x0324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "network": "starknet",
+              "type": "token"
+            },
+            {
+              "address": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+              "network": "starknet",
+              "type": "wallet"
+            }
+          ],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725357327002,
+          "tags": [],
+          "title": "Receive",
+          "transaction": {
+            "blockNumber": 156987,
+            "hash": "0x06d4650284cc43b2ee0a6bc62455676e86b574779bd07cbc50396743bf6abcfc",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 2
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "25000000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 62.5761
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": false
+            }
+          ],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "25000000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 62.5761
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+              "counterpartyNetwork": "starknet",
+              "leg": "credit",
+              "type": "payment"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x0324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+          "type": "payment",
+          "wallet": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47"
+        }
+      ]
+    },
+    "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47::sepolia-alpha::local_secret::0": {
+      "activities": [
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "address": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+                  "label": "default_contract",
+                  "type": "address",
+                  "verified": false
+                },
+                {
+                  "calldata": [
+                    "1829538593773354249444540255815518873368041500203918684000932786719437721220",
+                    "230422709618295256573259470771118736654803513281277606618280875439387126577"
+                  ],
+                  "entrypoint": "replace_signer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "account_multisig_replace_signer",
+              "properties": [
+                {
+                  "address": "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84",
+                  "label": "account_multisig_replace_signer_removed_signer",
+                  "type": "address"
+                },
+                {
+                  "address": "0x00826a255157914857abb3619d8930a8f43c88923dface0583c81c7289f52b31",
+                  "label": "account_multisig_replace_signer_added_signer",
+                  "type": "address"
+                }
+              ]
+            }
+          ],
+          "lastModified": 1725357533659,
+          "meta": {
+            "icon": "MultisigReplaceIcon",
+            "title": "Replace signer"
+          },
+          "status": "success",
+          "submitted": 1725357533000,
+          "transaction": {
+            "hash": "0x05b89ba4120fab620dfbc33cfef3a0f1235d55e8b5afe3cafd8fb28aa1eca8fe"
+          },
+          "transferSummary": [],
+          "type": "native"
+        },
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "token_address"
+                },
+                {
+                  "calldata": [
+                    "977312601197437022110323227435224271452751151768572207166894820017262369728",
+                    "10000000000000",
+                    "0"
+                  ],
+                  "entrypoint": "transfer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "amount": "10000000000000",
+                  "editable": false,
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "amount",
+                  "usd": "0.03"
+                },
+                {
+                  "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                  "label": "ERC20_transfer_recipient",
+                  "type": "address",
+                  "verified": false
+                }
+              ]
+            }
+          ],
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "151984448452486",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3804
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "lastModified": 1725357513666,
+          "meta": {
+            "icon": "SendIcon",
+            "subtitle": "To: 0x0229...1BC0",
+            "title": "Send"
+          },
+          "multisigDetails": {
+            "signers": [
+              "0x01fbb2e03e41d28b0d572d48c2ef4bb1d2686f37f702e26f179c5101e0587048",
+              "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84"
+            ]
+          },
+          "status": "success",
+          "submitted": 1725357513000,
+          "transaction": {
+            "hash": "0x0535bbf8e2eef80c0544769250578b2d4ae834ba39945e04bc7928f14080fe24"
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "10000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.025
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": true
+            }
+          ],
+          "type": "native"
+        },
+        {
+          "actions": [
+            {
+              "defaultProperties": [
+                {
+                  "label": "default_contract",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "token_address"
+                },
+                {
+                  "calldata": [
+                    "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                    "0xb5e620f48000",
+                    "0x0"
+                  ],
+                  "entrypoint": "transfer",
+                  "label": "default_call",
+                  "type": "calldata"
+                }
+              ],
+              "name": "ERC20_transfer",
+              "properties": [
+                {
+                  "amount": "200000000000000",
+                  "editable": false,
+                  "label": "ERC20_transfer_amount",
+                  "token": {
+                    "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                    "decimals": 18,
+                    "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+                    "name": "Ether",
+                    "symbol": "ETH",
+                    "type": "ERC20",
+                    "unknown": false
+                  },
+                  "type": "amount",
+                  "usd": "0.50"
+                },
+                {
+                  "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+                  "label": "ERC20_transfer_recipient",
+                  "type": "address",
+                  "verified": false
+                }
+              ]
+            }
+          ],
+          "compositeId": "43529e4ccdf445bbfb919b3a279df54fdd71fb45260bac23a62a30a851e6634a",
+          "details": {
+            "asset": {
+              "amount": "200000000000000",
+              "fiatAmount": {
+                "currency": "USD",
+                "currencyAmount": 0.5006
+              },
+              "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "type": "token"
+            },
+            "counterparty": "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+            "counterpartyNetwork": "starknet",
+            "leg": "debit",
+            "type": "payment"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "151984448452486",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3804
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "finance",
+          "id": "86e19b4c-7800-4c3d-9545-11d85e46e443",
+          "lastModified": 1725357530387,
+          "multisigDetails": {
+            "signers": [
+              "0x01fbb2e03e41d28b0d572d48c2ef4bb1d2686f37f702e26f179c5101e0587048",
+              "0x040b7b6e0ca831417a7f6f2938850e8d91d95373eaafac012c95614d68c98e84"
+            ]
+          },
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [
+            {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "network": "starknet",
+              "type": "token"
+            },
+            {
+              "address": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x022923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "network": "starknet",
+              "type": "wallet"
+            }
+          ],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725357497005,
+          "tags": [],
+          "title": "Send",
+          "transaction": {
+            "blockNumber": 156992,
+            "hash": "0x049924a6583e6524c95e0b38ab3ef3757899b62ef26c8c70dfffb847e2ddaa37",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 5
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "200000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.5006
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": true
+            }
+          ],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "200000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.5006
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x22923ab1d747a5f534a27c9ff7fd9ba3d7cd2d7142c46f7821dd07b9d0d1bc0",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "payment"
+            },
+            {
+              "asset": {
+                "amount": "151984448452486",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.3804
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+          "type": "payment",
+          "wallet": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47"
+        },
+        {
+          "compositeId": "a3d8e120bd6b64add0286d58ba94cf88ace5e8b3e93a720d88deb3e4af7f9313",
+          "details": {
+            "action": "multisigConfigurationUpdated",
+            "type": "security"
+          },
+          "fees": [
+            {
+              "actualFee": {
+                "amount": "308672584770216",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.7726
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "type": "gas"
+            }
+          ],
+          "group": "security",
+          "id": "3e3267d2-f6e7-4bc8-839f-6e4ce916435f",
+          "lastModified": 1725357392952,
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725357358001,
+          "tags": [],
+          "transaction": {
+            "blockNumber": 156988,
+            "hash": "0x07a5b0a67676a83dfe4155af7ef5f373521c0d2c4b476a591b7229b3add1a592",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 1
+          },
+          "transferSummary": [],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "308672584770216",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 0.7726
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+              "counterpartyNetwork": "starknet",
+              "leg": "debit",
+              "type": "gasFee"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+          "type": "security",
+          "wallet": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47"
+        },
+        {
+          "compositeId": "da75bd7e60db11a57d33f2547e8ebb7db9d1da4efb1cdf97f4e7db5a0a365d81",
+          "details": {
+            "asset": {
+              "amount": "25000000000000000",
+              "fiatAmount": {
+                "currency": "USD",
+                "currencyAmount": 62.5761
+              },
+              "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "type": "token"
+            },
+            "counterparty": "0x324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+            "counterpartyNetwork": "starknet",
+            "leg": "credit",
+            "type": "payment"
+          },
+          "fees": [],
+          "group": "finance",
+          "id": "d5f77738-fef0-4ba1-893e-09fb88959606",
+          "lastModified": 1725357358781,
+          "network": "starknet",
+          "networkDetails": {
+            "chainId": "SEPOLIA",
+            "ethereumNetwork": "sepolia"
+          },
+          "relatedAddresses": [
+            {
+              "address": "0x0324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+              "network": "starknet",
+              "type": "wallet"
+            },
+            {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "network": "starknet",
+              "type": "token"
+            },
+            {
+              "address": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47",
+              "network": "starknet",
+              "type": "wallet"
+            }
+          ],
+          "source": "transaction-monitor",
+          "status": "success",
+          "submitted": 1725357327002,
+          "tags": [],
+          "title": "Receive",
+          "transaction": {
+            "blockNumber": 156987,
+            "hash": "0x06d4650284cc43b2ee0a6bc62455676e86b574779bd07cbc50396743bf6abcfc",
+            "network": "starknet",
+            "status": "success",
+            "transactionIndex": 2
+          },
+          "transferSummary": [
+            {
+              "asset": {
+                "amount": "25000000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 62.5761
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "sent": false
+            }
+          ],
+          "transfers": [
+            {
+              "asset": {
+                "amount": "25000000000000000",
+                "fiatAmount": {
+                  "currency": "USD",
+                  "currencyAmount": 62.5761
+                },
+                "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "type": "token"
+              },
+              "counterparty": "0x324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+              "counterpartyNetwork": "starknet",
+              "leg": "credit",
+              "type": "payment"
+            }
+          ],
+          "triggeredBalanceUpdate": false,
+          "txSender": "0x0324b04e5a4270605007334372ce455c47581e51cdd091559df2739d1c4e2677",
+          "type": "payment",
+          "wallet": "0x051cda0876cb58b05d9a6d9da52b00b8d04733028def56668867e3bffd9fac47"
+        }
+      ]
+    }
+  }
+}

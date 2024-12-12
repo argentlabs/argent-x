@@ -1,13 +1,14 @@
-import { SwapOrderResponse } from "../model/order.model"
-import { SwapQuoteResponse } from "../model/quote.model"
-import { Trade } from "../model/trade.model"
+import type { SwapOrderResponse } from "../model/order.model"
+import type { SwapQuoteResponse } from "../model/quote.model"
+import type { Trade } from "../model/trade.model"
 
 export interface ISharedSwapService {
   getSwapQuoteForPay: (
     payTokenAddress: string,
     receiveTokenAddress: string,
-    payAmount: string,
     accountAddress: string,
+    sellAmount?: string,
+    buyAmount?: string,
   ) => Promise<SwapQuoteResponse>
   getSwapTradeFromQuote: (
     quote: SwapQuoteResponse,

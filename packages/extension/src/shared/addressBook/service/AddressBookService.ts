@@ -5,7 +5,8 @@ import {
   addressBookContactNoIdSchema,
   addressBookContactSchema,
 } from "../schema"
-import { IAddressBookRepo, compareAddressBookContacts } from "../store"
+import type { IAddressBookRepo } from "../store"
+import { compareAddressBookContacts } from "../store"
 import type { AddressBookContact, AddressBookContactNoId } from "../type"
 import type { IAddressBookService } from "./IAddressBookService"
 import { AddressBookError } from "../../errors/addressBook"

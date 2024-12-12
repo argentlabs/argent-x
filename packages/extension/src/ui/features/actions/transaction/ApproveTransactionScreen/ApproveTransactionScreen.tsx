@@ -1,17 +1,17 @@
-import { FC, Suspense, useEffect, useMemo, useState } from "react"
+import type { FC } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 
 import {
-  ReviewOfTransaction,
   getHighestSeverity,
   isNotTransactionSimulationError,
   warningSchema,
 } from "@argent/x-shared/simulation"
-import { IconDeprecatedKeys, P4 } from "@argent/x-ui"
+import type { IconKeys } from "@argent/x-ui"
+import { P3 } from "@argent/x-ui"
 import {
   TransactionReviewActions,
   TransactionReviewSimulation,
 } from "@argent/x-ui/simulation"
-import { Center, Collapse } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { z } from "zod"
 import { useCurrentNetwork } from "../../../networks/hooks/useCurrentNetwork"
@@ -19,21 +19,22 @@ import { useActionScreen } from "../../hooks/useActionScreen"
 import { TransactionHeader } from "../../transactionV2/header"
 import { WarningBanner } from "../../warning/WarningBanner"
 
+import { getReviewOfTransaction } from "../../../../../shared/transactionReview.service"
+import { useView } from "../../../../views/implementation/react"
+import { transactionHashFindAtom } from "../../../../views/transactionHashes"
 import { MultisigConfirmationsBanner } from "../MultisigConfirmationsBanner"
 import { AirGapReviewButtonContainer } from "../airgap/AirGapReviewButton"
 import { ConfirmScreen } from "./ConfirmScreen"
-import { DappHeaderArgentX } from "./DappHeader/DappHeaderArgentX"
-import { TransactionActions } from "./TransactionActions"
-import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
+import type { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
+import { getTransactionIcon } from "../getTransactionIcon"
+import { getTransactionTitle } from "../getTransactionTitle"
 import { LedgerActionModal } from "./ledger/LedgerActionModal"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   actionHash,
   actionIsApproving,
-  aggregatedData,
   disableConfirm,
   isMainnet,
-  isSimulationLoading,
   onSubmit,
   selectedAccount,
   multisig,
@@ -42,9 +43,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   approveScreenType,
   hasPendingMultisigTransactions,
   onReject,
-  hasBalanceChange,
-  showTransactionActions,
-  transactionActionsType,
   showTxDetails,
   setShowTxDetails,
   confirmButtonText = "Confirm",
@@ -64,16 +62,10 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   const [isHighRisk, setIsHighRisk] = useState(false)
   const networkId = useCurrentNetwork().id
 
-  const reviewOfTransaction: ReviewOfTransaction = useMemo(() => {
-    if (transactionReview && transactionReview.transactions[0]) {
-      return transactionReview.transactions[0].reviewOfTransaction
-    }
-  }, [transactionReview])
-
   const transactionReviewActions = useMemo(() => {
     if (isRejectOnChain) {
       return (
-        <P4
+        <P3
           background={"neutrals.800"}
           borderRadius={"md"}
           fontWeight={"semibold"}
@@ -82,10 +74,10 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           p={3}
         >
           On-chain rejection
-        </P4>
+        </P3>
       )
     }
-    return transactionReview?.transactions.map((transaction, index) => {
+    return transactionReview?.transactions?.map((transaction, index) => {
       return (
         <TransactionReviewActions
           key={`review-${index}`}
@@ -99,7 +91,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
   const warnings = useMemo(
     () =>
-      transactionReview?.transactions.flatMap((transaction) => {
+      transactionReview?.transactions?.flatMap((transaction) => {
         return transaction.reviewOfTransaction?.warnings
       }),
     [transactionReview],
@@ -153,7 +145,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
       return null
     }
     return (
-      <P4
+      <P3
         background={"black"}
         border={"1px solid"}
         borderColor={"neutrals.600"}
@@ -164,7 +156,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         On-chain rejections don’t send any funds. Executing this on-chain
         rejection will allow the next queued transaction to move to the front of
         the queue
-      </P4>
+      </P3>
     )
   }, [isRejectOnChain])
 
@@ -178,7 +170,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     if (!transactionReview) {
       return null
     }
-    const txSimulations = transactionReview.transactions.flatMap(
+    const txSimulations = transactionReview.transactions?.flatMap(
       (transaction) =>
         isNotTransactionSimulationError(transaction)
           ? transaction.simulation
@@ -192,7 +184,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
 
     // don't show 'no balance change' when there is a critical warning as the two messages conflict from a user perspective
     const hasNoBalanceChange = isEmpty(lastSimulation.summary)
-    const hasCriticalWarning = transactionReview.transactions.some(
+    const hasCriticalWarning = transactionReview.transactions?.some(
       (transaction) =>
         transaction.reviewOfTransaction?.warnings?.some(
           (warning) => warning.severity === "critical",
@@ -215,13 +207,13 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     if (isRejectOnChain) {
       return {
         title: "On-chain rejection",
-        iconKey: "CloseIcon" as IconDeprecatedKeys,
+        iconKey: "CrossSecondaryIcon" as IconKeys,
       }
     }
     if (isUpgradeAccount) {
       return {
         title: "Upgrade account",
-        iconKey: "UpgradeIcon" as IconDeprecatedKeys,
+        iconKey: "UpgradeSecondaryIcon" as IconKeys,
       }
     }
     if (action) {
@@ -229,19 +221,34 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         title: action.meta?.title,
         subtitle: action.meta?.subtitle ?? action.meta.origin,
         dappLogoUrl:
-          transactionReview?.transactions[0]?.reviewOfTransaction?.targetedDapp
-            ?.logoUrl,
+          transactionReview?.transactions?.[0]?.reviewOfTransaction
+            ?.targetedDapp?.logoUrl,
         dappHost: action.meta.origin,
-        iconKey: action.meta?.icon as IconDeprecatedKeys,
+        iconKey: action.meta?.icon,
       }
     }
-    return {}
+    // Default case: extract data from transactionReview
+    const reviewOfTransaction = getReviewOfTransaction(transactionReview)
+    const targetedDappWebsite = reviewOfTransaction?.targetedDapp?.links.find(
+      (l) => l.name === "website",
+    )
+
+    return {
+      title: getTransactionTitle(approveScreenType, transactionReview),
+      subtitle: targetedDappWebsite?.url,
+      dappLogoUrl: reviewOfTransaction?.targetedDapp?.logoUrl,
+      dappHost: targetedDappWebsite?.url,
+      iconKey: getTransactionIcon(approveScreenType, transactionReview),
+    }
   }, [
     action,
+    approveScreenType,
     isRejectOnChain,
     isUpgradeAccount,
-    transactionReview?.transactions,
+    transactionReview,
   ])
+
+  const txHash = useView(transactionHashFindAtom(actionHash))
 
   return (
     <Suspense fallback={null}>
@@ -261,46 +268,20 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         onReject={onReject}
         {...rest}
       >
-        {/** Use Transaction Review to get DappHeader */}
-        {!isRejectOnChain && !isUpgradeAccount && (
-          <DappHeaderArgentX
-            transactions={transactions}
-            transactionReview={reviewOfTransaction}
-            aggregatedData={aggregatedData}
-            approveScreenType={approveScreenType}
-          />
-        )}
-        {(action || isRejectOnChain || isUpgradeAccount) && (
-          <TransactionHeader
-            px={0}
-            title={title}
-            dappLogoUrl={dappLogoUrl}
-            subtitle={subtitle}
-            dappHost={dappHost}
-            iconKey={iconKey}
-          />
-        )}
+        <TransactionHeader
+          px={0}
+          title={title}
+          dappLogoUrl={dappLogoUrl}
+          subtitle={subtitle}
+          dappHost={dappHost}
+          iconKey={iconKey}
+        />
         {rejectOnChainBanner}
         {multisigBannerProps && (
           <MultisigConfirmationsBanner {...multisigBannerProps} />
         )}
         {transactionReviewWarnings}
-        {!isRejectOnChain && (
-          <>
-            {transactionReviewSimulation}
-            <Collapse
-              in={showTransactionActions && !transactionReview}
-              animateOpacity
-            >
-              {transactionActionsType && (
-                <TransactionActions
-                  action={transactionActionsType}
-                  networkId={networkId}
-                />
-              )}
-            </Collapse>
-          </>
-        )}
+        {!isRejectOnChain && <>{transactionReviewSimulation}</>}
         {transactionReviewActions}
         <AirGapReviewButtonContainer
           transactions={transactions}
@@ -311,25 +292,12 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         {ledgerActionModalDisclosure?.isOpen && (
           <LedgerActionModal
             isOpen={ledgerActionModalDisclosure.isOpen}
-            transactions={transactions}
-            estimatedFees={transactionReview?.enrichedFeeEstimation}
-            nonce={nonce}
             onClose={ledgerActionModalDisclosure.onClose}
             onSubmit={onConfirm}
             errorMessage={ledgerErrorMessage}
             account={selectedAccount}
+            txHash={txHash}
           />
-        )}
-        {hasBalanceChange && !transactionReview && (
-          <Center mb="3" mt="2">
-            <P4
-              fontWeight="bold"
-              _hover={{ textDecoration: "underline", cursor: "pointer" }}
-              onClick={() => setShowTxDetails(!showTxDetails)}
-            >
-              {showTxDetails ? "Hide" : "View more"} details
-            </P4>
-          </Center>
         )}
       </ConfirmScreen>
     </Suspense>

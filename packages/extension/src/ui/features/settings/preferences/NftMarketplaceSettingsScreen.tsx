@@ -1,13 +1,11 @@
 import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
 import { SettingsMenuItem } from "../ui/SettingsMenuItem"
 import { SettingsMenuItemLogo } from "../ui/SettingsMenuItemLogo"
 import { SettingsRadioIcon } from "../ui/SettingsRadioIcon"
-import {
-  NftMarketplaceKey,
-  defaultNftMarketplaces,
-} from "../../../../shared/nft/marketplaces"
+import type { NftMarketplaceKey } from "../../../../shared/nft/marketplaces"
+import { defaultNftMarketplaces } from "../../../../shared/nft/marketplaces"
 
 interface NftMarketplaceSettingsScreenProps {
   onBack: ReactEventHandler

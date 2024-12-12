@@ -1,9 +1,9 @@
-import {
+import type {
   DappContext,
   IRiskAssessmentService,
 } from "../../../shared/riskAssessment/IRiskAssessmentService"
 
-import { messageClient } from "../trpc"
+import type { messageClient } from "../trpc"
 
 export class ClientRiskAssessmentService implements IRiskAssessmentService {
   constructor(private readonly trpcClient: typeof messageClient) {}

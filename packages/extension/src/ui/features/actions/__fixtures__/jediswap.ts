@@ -1,76 +1,6 @@
-import { TransactionActionFixture } from "./types"
+import type { TransactionActionFixture } from "./types"
 
 export const jediswap: TransactionActionFixture = {
-  aggregatedData: [
-    {
-      token: {
-        address:
-          "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
-        name: "USD Coin",
-        symbol: "USDC",
-        decimals: 6,
-        iconUrl: "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
-        networkId: "mainnet-alpha",
-        type: "erc20",
-      },
-      approvals: [],
-      amount: 14764n,
-      usdValue: "0.014737",
-      recipients: [
-        {
-          address:
-            "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-          amount: 14764n,
-          usdValue: "0.014737",
-        },
-      ],
-      safe: true,
-    },
-    {
-      token: {
-        address:
-          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-        name: "Ether",
-        symbol: "ETH",
-        decimals: 18,
-        iconUrl: "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-        showAlways: true,
-        networkId: "localhost",
-        type: "erc20",
-      },
-      approvals: [
-        {
-          token: {
-            address:
-              "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-            name: "Ether",
-            symbol: "ETH",
-            decimals: 18,
-            iconUrl: "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-            showAlways: true,
-            networkId: "localhost",
-          },
-          owner:
-            "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-          spender:
-            "0x41fd22b238fa21cfcf5dd45a8548974d8263b3a531a60388411c5e230f97023",
-          amount: 8812345773212n,
-          usdValue: "0.014761",
-        },
-      ],
-      amount: -8812345773212n,
-      usdValue: "-0.014761",
-      recipients: [
-        {
-          address:
-            "0x4d0390b777b424e43839cd1e744799f3de6c176c7e32c1812a41dbd9c19db6a",
-          amount: -8812345773212n,
-          usdValue: "0.014761",
-        },
-      ],
-      safe: true,
-    },
-  ],
   transactionReview: {
     transactions: [
       {
@@ -484,8 +414,4 @@ export const jediswap: TransactionActionFixture = {
 
 export const jediswapUnsafe: TransactionActionFixture = {
   ...jediswap,
-  aggregatedData: jediswap.aggregatedData.map((data) => ({
-    ...data,
-    safe: false,
-  })),
 }

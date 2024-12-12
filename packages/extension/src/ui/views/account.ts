@@ -1,17 +1,16 @@
 import { ensureArray } from "@argent/x-shared"
-import { Atom, atom } from "jotai"
+import type { Atom } from "jotai"
+import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 
 import { accountRepo } from "../../shared/account/store"
-import {
-  BaseWalletAccount,
-  isNetworkOnlyPlaceholderAccount,
-  WalletAccount,
-} from "../../shared/wallet.model"
+import type { AccountId, WalletAccount } from "../../shared/wallet.model"
+import { isNetworkOnlyPlaceholderAccount } from "../../shared/wallet.model"
 import { isAccountHidden } from "../../shared/wallet.service"
 import {
   accountsEqual,
-  atomFamilyAccountsEqual,
+  isEqualAccountIds,
+  atomFamilyIsEqualAccountIds,
 } from "./../../shared/utils/accountsEqual"
 import { walletStore } from "../../shared/wallet/walletStore"
 import { accountHasEscape } from "../features/smartAccount/escape/accountHasEscape"
@@ -90,12 +89,14 @@ export const hiddenAccountsOnNetworkFamily =
   accountsOnNetworkFamilyFactory(hiddenAccountsView)
 
 export const accountFindFamily = atomFamily(
-  (baseAccount?: BaseWalletAccount) =>
+  (accountId?: AccountId) =>
     atom(async (get) => {
       const accounts = await get(allAccountsView)
-      return accounts.find((account) => accountsEqual(account, baseAccount))
+      return accounts.find((account) =>
+        isEqualAccountIds(account.id, accountId),
+      )
     }),
-  atomFamilyAccountsEqual,
+  atomFamilyIsEqualAccountIds,
 )
 
 // Account store views (selected etc)
@@ -127,9 +128,10 @@ export const selectedAccountView = atom(async (get) => {
   )
 })
 
-export const hasSavedRecoverySeedPhraseView = atom(async (get) => {
-  const hasSavedRecoverySeedphrase = get(hasSavedRecoverySeedphraseAtom)
-  return hasSavedRecoverySeedphrase
+export const needsToSaveRecoverySeedphraseView = atom(async (get) => {
+  const account = await get(selectedAccountView)
+  const hasSavedRecoverySeedphrase = await get(hasSavedRecoverySeedphraseAtom)
+  return account?.signer?.type !== "ledger" && !hasSavedRecoverySeedphrase
 })
 
 export const noUpgradeBannerAccountsView = atom(async (get) => {

@@ -1,10 +1,16 @@
-import { getTxVersionFromFeeToken } from "@argent/x-shared"
-import { ExtensionActionItemOfType } from "../shared/actionQueue/types"
+import {
+  estimatedFeeToMaxResourceBounds,
+  getTxVersionFromFeeToken,
+} from "@argent/x-shared"
+import type { ExtensionActionItemOfType } from "../shared/actionQueue/types"
 import { addTransaction } from "../shared/transactions/store"
 import { checkTransactionHash } from "../shared/transactions/utils"
-import { Wallet } from "./wallet"
+import type { Wallet } from "./wallet"
 import { sanitizeAccountType } from "../shared/utils/sanitizeAccountType"
-import { DeployActionExtra } from "../shared/actionQueue/schema"
+import type { DeployActionExtra } from "../shared/actionQueue/schema"
+import { getEstimatedFees } from "../shared/transactionSimulation/fees/estimatedFeesRepository"
+import { TransactionType } from "starknet"
+import { TransactionError } from "../shared/errors/transaction"
 
 export const accountDeployAction = async (
   action: ExtensionActionItemOfType<"DEPLOY_ACCOUNT">,
@@ -21,7 +27,7 @@ export const accountDeployAction = async (
   }
 
   const { feeTokenAddress } = extra
-  const selectedAccount = await wallet.getAccount(baseAccount)
+  const selectedAccount = await wallet.getArgentAccount(baseAccount.id)
 
   const accountNeedsDeploy = selectedAccount?.needsDeploy
 
@@ -29,11 +35,29 @@ export const accountDeployAction = async (
     throw Error("Account already deployed")
   }
 
+  const accountDeployPayload =
+    await wallet.getAccountDeploymentPayload(selectedAccount)
+
+  const preComputedFees = await getEstimatedFees({
+    type: TransactionType.DEPLOY_ACCOUNT,
+    payload: accountDeployPayload,
+  })
+
+  if (!preComputedFees) {
+    throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
+  }
+
   const version = getTxVersionFromFeeToken(feeTokenAddress)
 
-  const { account, txHash } = await wallet.deployAccount(selectedAccount, {
+  const deployDetails = {
     version,
-  })
+    ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),
+  }
+
+  const { account, txHash } = await wallet.deployAccount(
+    selectedAccount,
+    deployDetails,
+  )
 
   if (!checkTransactionHash(txHash)) {
     throw Error(

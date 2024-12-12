@@ -1,5 +1,5 @@
-import { Network } from "../../../shared/network"
-import {
+import type { Network } from "../../../shared/network"
+import type {
   BaseWalletAccount,
   RecoveredLedgerMultisig,
   WalletAccount,

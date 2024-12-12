@@ -1,0 +1,163 @@
+[
+  {
+    "contractAddress": "0x07b696af58c967c1b14c9dde0ace001720635a660a8e90c565ea459345318b30",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5FUDwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "Ekubo Position",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x04a3621276a83251b557a8140e915599ae8e7b6207b067ea701635c0d509801e",
+    "description": "Mint Square Shared NFT Storefront.",
+    "imageUri": "https://static.argent.net/unframed/images/0x04a3621276a83251b557a8140e915599ae8e7b6207b067ea701635c0d509801e_image.jpg",
+    "name": "Mint Square Storefront",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x01435498bf393da86b4733b9264a86b58a42b31f8d8b8ba309593e5c17847672",
+    "description": "Sets are NFTs assembled with briqs! Use them in a metaverse near you, or disassemble them to get the briqs back and build something new!",
+    "imageUri": "https://static.argent.net/unframed/images/0x01435498bf393da86b4733b9264a86b58a42b31f8d8b8ba309593e5c17847672_image.png",
+    "name": "briq Sets",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x07606cac9053e9b8b573a4b0a0ce608880f64869e24b8a605210d7a85bb6e5f1",
+    "description": "Complete tasks, collect SPOKs and gain kudos in the Starknet community! Built by Argent.",
+    "imageUri": "https://static.argent.net/unframed/images/0x07606cac9053e9b8b573a4b0a0ce608880f64869e24b8a605210d7a85bb6e5f1_image.png",
+    "name": "Spok",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x047b4582d70ca72b0eb02e390b0868ef8209ad6e837dc5928f3040f60b0fb5a4",
+    "description": "Claim your STARK reward from Starkware! Visit https://rwdstrk.com to verify and receive your reward. Limited time offer!",
+    "imageUri": "https://res.cloudinary.com/dfromkbsy/image/upload/v1726321201/rwdstrkcom_0914_cl9jdz.jpg",
+    "name": "STARK Reward",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x058949fa2955b10b3a82521934e8b0505dc0b7ba929c3049622ae91d2c52e194",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5ERDwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "Dungeon Ducks",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x009835b97a6756aca76edfd603aacb386d81fc5c34148912a306e9c22a61b748",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5DVDwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "CanvasNFTs",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x000aa84534f0e0510618ad6a16f24e9a64fe0277b1f1ca799f0bddfec300d870",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5ERTwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "DEFISPRING",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x04fa864a706e3403fd17ac8df307f22eafa21b778b73353abf69a622e47a2003",
+    "description": "Ducks Everywhere is an NFT collection of handcrafted ducks made from briqs. Each duck is uniquely created and selected by the community, sold through auctions. Three new ducks are minted and auctioned weekly.",
+    "imageUri": "https://static.argent.net/unframed/images/0x04fa864a706e3403fd17ac8df307f22eafa21b778b73353abf69a622e47a2003_image.png",
+    "name": "Ducks Everywhere",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x03311cdef78f70c1b13568e6dabda043c5e9d2736c0c02a35aa906d91d69836b",
+    "description": "Ducks Everywhere Passports are NFTs used to build and mint official ducks from the Ducks Frens collection. When a duck is disassembled, you get its passport back.",
+    "imageUri": "https://static.argent.net/unframed/images/0x03311cdef78f70c1b13568e6dabda043c5e9d2736c0c02a35aa906d91d69836b_image.png",
+    "name": "Ducks Everywhere Passport",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x0241b9c4ce12c06f49fee2ec7c16337386fa5185168f538a7631aacecdf3df74",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5JQzwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "Influence Crewmates",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x07280a807c8b79379bec87919433b7b836b93a92e6d71b24ee99f4ffe33dd337",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5JQzwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "Influence Crews",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x05e09c980466bfcaa1ce0abdf2883a95984730614984b3ec9f18cabd97d2e037",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5RTDwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "Quantum Leap",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x048e95d3d7b12348819fa28dc43bcdf50f9774dabd4f5b622c4a25a0b7c30c45",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5DSDwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "Cheops",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x061ccf82a5628c0dbe3d0cc10e904882f1e9bc8adbb9456bdba155341bf430e5",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj4wNTwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "0x061c...30e5",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x06f10e1524d583b2c894512670c4fb7359d7d9287e29f86421d68a10a8ee11f4",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5BUTwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "AQM",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x0780d39329e45514e1719f71067cd1d825641a5ef852a05caf524ed574b92edb",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5OWDwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "NotX",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x046145018634e29304cfff42b61c4225c8ca9900642ac350181b8be97f453ddd",
+    "description": "",
+    "imageUri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij4KICAgIDxyZWN0IHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzE1MTkyQSIgLz4KICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTQlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE2IiBmb250LWZhbWlseT0iQmFybG93LCBIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmaWxsPSIjZmZmZmZmIj5TUzwvdGV4dD4KICA8L3N2Zz4=",
+    "name": "Starknet Social",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x07f87b400e9cc3f56a3eb26a924a46a053ebae4eea9ba85f58c17f7a09331aa1",
+    "description": "Four hundred pxls, one unique collaborative rtwrk every day",
+    "imageUri": "https://pxls.wtf/collection_logo.jpg",
+    "name": "Pxls",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x060582df2cd4ad2c988b11fdede5c43f56a432e895df255ccd1af129160044b8",
+    "description": "unleash your creativity, show your passion.",
+    "imageUri": "https://static.argent.net/unframed/images/0x060582df2cd4ad2c988b11fdede5c43f56a432e895df255ccd1af129160044b8_image.png",
+    "name": "StarkVerse Gallery",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x076503062d78f4481be03c9145022d6a4a71ec0719aa07756f79a2384dc7ef16",
+    "description": "Starknet Quest - The Collection of your Starknet achievements",
+    "imageUri": "https://starknet.quest/visuals/starknetquest.webp",
+    "name": "Starknet Quest",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af",
+    "description": "Identity and naming service for StarkNet. Mint your identity and choose your .stark domain now.",
+    "imageUri": "https://static.argent.net/unframed/images/0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af_image.jpg",
+    "name": "Starknet.id",
+    "networkId": "mainnet-alpha"
+  },
+  {
+    "contractAddress": "0x01b22f7a9d18754c994ae0ee9adb4628d414232e3ebd748c386ac286f86c3066",
+    "description": "Explore the world of Starknet, collect your Xplorer NFT’s and document your progress as you go! Built by Argent.",
+    "imageUri": "https://static.argent.net/unframed/images/0x01b22f7a9d18754c994ae0ee9adb4628d414232e3ebd748c386ac286f86c3066_image.png",
+    "name": "Xplorer",
+    "networkId": "mainnet-alpha"
+  }
+]

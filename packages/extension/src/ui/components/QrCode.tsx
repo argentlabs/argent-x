@@ -1,9 +1,12 @@
-import { Box, Center, CenterProps, Circle } from "@chakra-ui/react"
-import QRCodeStyling, { Options } from "qr-code-styling"
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { iconsDeprecated, useOnClickOutside } from "@argent/x-ui"
+import type { CenterProps } from "@chakra-ui/react"
+import { Box, Center, Circle } from "@chakra-ui/react"
+import type { Options } from "qr-code-styling"
+import QRCodeStyling from "qr-code-styling"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { icons, useOnClickOutside } from "@argent/x-ui"
 
-const { MaximizeIcon } = iconsDeprecated
+const { MaximizeIcon } = icons
 
 interface QrCodeProps extends CenterProps {
   size: number

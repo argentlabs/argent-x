@@ -1,6 +1,6 @@
-import { TokenWithBalance } from "../../token/__new/types/tokenBalance.model"
-import { BaseWalletAccount, WalletAccount } from "../../wallet.model"
-import { FeeTokenPreference } from "../types/preference.model"
+import type { TokenWithBalance } from "../../token/__new/types/tokenBalance.model"
+import type { BaseWalletAccount, WalletAccount } from "../../wallet.model"
+import type { FeeTokenPreference } from "../types/preference.model"
 
 export interface IFeeTokenService {
   getFeeTokens(

@@ -1,7 +1,9 @@
 import { getChainIdFromNetworkId } from "@argent/x-shared"
-import { BlockIdentifier, Call, Provider, ProviderInterface } from "starknet"
+import type { BlockIdentifier, Call, ProviderInterface } from "starknet"
+import { Provider } from "starknet"
 
-import { Network, getProvider } from "../shared/network"
+import type { Network } from "../shared/network"
+import { getProvider } from "../shared/network"
 import { FallbackRpcProvider } from "../shared/network/FallbackRpcProvider"
 import { getPublicRPCNodeUrls, isArgentNetwork } from "../shared/network/utils"
 

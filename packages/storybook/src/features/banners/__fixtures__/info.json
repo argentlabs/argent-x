@@ -1,0 +1,13 @@
+{
+  "id": "310e899a-8f19-43c1-990d-95d87acaecf3",
+  "updatedAt": "2022-07-19T10:39:30.288Z",
+  "minVersion": null,
+  "maxVersion": "14.1.0",
+  "level": "info",
+  "dismissable": true,
+  "fullScreen": false,
+  "summary": "New version available",
+  "message": "A new version of Argent X is available and is a recommended upgrade",
+  "linkTitle": "Upgrade now",
+  "linkUrl": "https://argent.xyz/announcements/034"
+}

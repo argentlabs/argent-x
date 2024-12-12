@@ -1,6 +1,6 @@
-import { TokenWithBalance } from "@argent/x-shared"
-import { EstimatedFees } from "@argent/x-shared/simulation"
-import { ParsedFeeError } from "./feeError"
+import type { TokenWithBalance } from "@argent/x-shared"
+import type { EstimatedFees } from "@argent/x-shared/simulation"
+import type { ParsedFeeError } from "./feeError"
 
 export interface FeeEstimationProps {
   amountCurrencyValue?: string

@@ -1,6 +1,7 @@
 import { logosDeprecated } from "@argent/x-ui"
-import { Circle, SquareProps, Tooltip } from "@chakra-ui/react"
-import { FC } from "react"
+import type { SquareProps } from "@chakra-ui/react"
+import { Circle, Tooltip } from "@chakra-ui/react"
+import type { FC } from "react"
 
 const { LedgerLogo } = logosDeprecated
 

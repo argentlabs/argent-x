@@ -1,10 +1,13 @@
 import { useMemo } from "react"
 
-import { Token } from "../../../shared/token/__new/types/token.model"
-import { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
+import type { Token } from "../../../shared/token/__new/types/token.model"
+import type { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
 import { equalToken } from "../../../shared/token/__new/utils"
-import { Account } from "../accounts/Account"
-import { tokenBalancesForAccountViewFamily } from "../../views/tokenBalances"
+import type { Account } from "../accounts/Account"
+import {
+  tokenBalancesForAccountAndTokenView,
+  tokenBalancesForAccountViewFamily,
+} from "../../views/tokenBalances"
 import { ethTokenOnNetworkView } from "../../views/token"
 import { useView } from "../../views/implementation/react"
 
@@ -13,7 +16,7 @@ import { useView } from "../../views/implementation/react"
  */
 interface UseTokenBalanceForAccountArgs {
   token?: Token
-  account?: Pick<Account, "network" | "address" | "networkId">
+  account?: Pick<Account, "id" | "network" | "address" | "networkId">
 }
 
 /**
@@ -25,20 +28,14 @@ export function useTokenBalanceForAccount({
   token,
   account,
 }: UseTokenBalanceForAccountArgs): TokenWithOptionalBigIntBalance | undefined {
-  const tokenBalancesForAccount = useView(
-    tokenBalancesForAccountViewFamily(account),
-  )
   const ethToken = useView(ethTokenOnNetworkView(account?.networkId))
-
+  const tokenBalance = useView(
+    tokenBalancesForAccountAndTokenView({ account, token }),
+  )
   return useMemo(() => {
     if (!token || !account) {
       return undefined
     }
-
-    // Find the token balance for the account
-    const tokenBalance = tokenBalancesForAccount?.find((t) =>
-      equalToken(t, token),
-    )
 
     // If token balance is not found and token is ETH, return token with balance 0
     // Required for the UI to show the balance of ETH
@@ -56,5 +53,5 @@ export function useTokenBalanceForAccount({
           balance: BigInt(tokenBalance.balance),
         }
       : undefined
-  }, [account, ethToken, token, tokenBalancesForAccount])
+  }, [account, ethToken, token, tokenBalance])
 }

@@ -2247,5 +2247,106 @@
       "counterpartyNetwork": "starknet"
     },
     "network": "starknet"
+  },
+  {
+    "compositeId": "56cad3b8e6d02ca98e15a85e847cb3f930fdb7f43ba5993fa802432599f59619",
+    "id": "df74ecd9-59b9-4150-846f-2a46047e2b06",
+    "status": "success",
+    "wallet": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "txSender": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+    "source": "transaction-monitor",
+    "type": "security",
+    "group": "security",
+    "submitted": 1697464096000,
+    "lastModified": 1697487786473,
+    "transaction": {
+      "network": "starknet",
+      "hash": "0x0581432e61701a0529962584274ae624361141a592a6bab065dd7ec681524133",
+      "status": "pending",
+      "transactionIndex": 2
+    },
+    "transferSummary": [],
+    "transfers": [
+      {
+        "type": "gasFee",
+        "leg": "debit",
+        "counterparty": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "asset": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "76195966985502",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.198
+          }
+        },
+        "counterpartyNetwork": "starknet"
+      }
+    ],
+    "fees": [
+      {
+        "type": "gas",
+        "to": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "actualFee": {
+          "type": "token",
+          "tokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "amount": "76195966985502",
+          "fiatAmount": {
+            "currency": "USD",
+            "currencyAmount": 0.198
+          }
+        }
+      }
+    ],
+    "relatedAddresses": [],
+    "networkDetails": {
+      "ethereumNetwork": "sepolia",
+      "chainId": "SEPOLIA"
+    },
+    "multisigDetails": {
+      "signers": [
+        "0x07de7b34da32652e524fffe0ed5713b1642524aeea6cb1c2305ff699bf04329f"
+      ]
+    },
+    "actions": [
+      {
+        "name": "account_multisig_replace_signer",
+        "properties": [
+          {
+            "type": "address",
+            "label": "account_multisig_replace_signer_removed_signer",
+            "address": "0x07de7b34da32652e524fffe0ed5713b1642524aeea6cb1c2305ff699bf04329f"
+          },
+          {
+            "type": "address",
+            "label": "account_multisig_replace_signer_added_signer",
+            "address": "0x04062f88b6079d78d8ccba69c2e8dc32df7adecdc93ff73b196fc9fc26f04993"
+          }
+        ],
+        "defaultProperties": [
+          {
+            "type": "address",
+            "label": "default_contract",
+            "address": "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+            "verified": false
+          },
+          {
+            "type": "calldata",
+            "label": "default_call",
+            "entrypoint": "replace_signer",
+            "calldata": [
+              "0x7de7b34da32652e524fffe0ed5713b1642524aeea6cb1c2305ff699bf04329f",
+              "0x4062f88b6079d78d8ccba69c2e8dc32df7adecdc93ff73b196fc9fc26f04993"
+            ]
+          }
+        ]
+      }
+    ],
+    "details": {
+      "action": "multisigConfigurationUpdated",
+      "type": "security"
+    },
+    "triggeredBalanceUpdate": false,
+    "network": "starknet"
   }
 ]

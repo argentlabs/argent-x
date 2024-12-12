@@ -1,7 +1,7 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import { settingsStore } from "../../../../shared/settings"
-import { BlockExplorerKey } from "../../../../shared/settings/defaultBlockExplorers"
+import type { BlockExplorerKey } from "../../../../shared/settings/defaultBlockExplorers"
 import { useKeyValueStorage } from "../../../hooks/useStorage"
 import { BlockExplorerSettingsScreen } from "./BlockExplorerSettingsScreen"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"

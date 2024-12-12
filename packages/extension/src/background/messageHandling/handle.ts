@@ -1,15 +1,12 @@
-import { MessageType } from "../../shared/messages"
+import type { MessageType } from "../../shared/messages"
 import { preAuthorizationService } from "../../shared/preAuthorization"
 import { migrateWallet } from "../migrations/wallet/storeMigration"
 import { backgroundActionService } from "../services/action"
 import { handleAccountMessage } from "../accountMessaging"
 import { handleActionMessage } from "../actionMessaging"
 import { addTab, hasTab, sendMessageToActiveTabs } from "../activeTabs"
-import {
-  BackgroundService,
-  HandleMessage,
-  UnhandledMessage,
-} from "../background"
+import type { BackgroundService, HandleMessage } from "../background"
+import { UnhandledMessage } from "../background"
 import { getMessagingKeys } from "../keys/messagingKeys"
 import { handleMiscellaneousMessage } from "../miscellaneousMessaging"
 import { handleNetworkMessage } from "../networkMessaging"
@@ -22,7 +19,7 @@ import { handleTransactionMessage } from "../transactions/transactionMessaging"
 import { handleUdcMessaging } from "../udcMessaging"
 import { walletSingleton } from "../walletSingleton"
 import { safeMessages, safeIfPreauthorizedMessages } from "./messages"
-import browser from "webextension-polyfill"
+import type browser from "webextension-polyfill"
 import { feeTokenService } from "../../shared/feeToken/service"
 import { z } from "zod"
 import { getOriginFromSender } from "../../shared/messages/getOriginFromSender"

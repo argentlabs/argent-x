@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 
-import { Multisig } from "./Multisig"
+import type { Multisig } from "./Multisig"
 import { getMockMultisig } from "./multisig.mock"
 import { RemovedMultisigSettingsScreen } from "./RemovedMultisigSettingsScreen"
 

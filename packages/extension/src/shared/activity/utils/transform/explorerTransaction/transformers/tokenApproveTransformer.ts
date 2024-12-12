@@ -1,6 +1,6 @@
-import { TokenApproveTransaction } from "../../type"
+import type { TokenApproveTransaction } from "../../type"
 import { getParameter } from "../getParameter"
-import { IExplorerTransactionTransformer } from "./type"
+import type { IExplorerTransactionTransformer } from "./type"
 
 /** adds erc20 token approve data */
 

@@ -1,4 +1,4 @@
 export * from "./exchange/bidirectional"
 export * from "./exchange/relayer"
-export * from "./messenger"
+export type * from "./messenger"
 export * from "./messenger/window"

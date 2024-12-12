@@ -1,7 +1,7 @@
-import { Target } from "framer-motion"
+import type { Target } from "framer-motion"
 import { merge } from "lodash-es"
 
-import { Presentation, PresentationVariant } from "../types"
+import type { Presentation, PresentationVariant } from "../types"
 
 export const variantForPresentation = (
   presentation: Presentation,

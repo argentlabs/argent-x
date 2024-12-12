@@ -1,23 +1,23 @@
 import { isObject, isString } from "lodash-es"
 
-import { IActionQueue } from "../../../shared/actionQueue/queue/IActionQueue"
+import type { IActionQueue } from "../../../shared/actionQueue/queue/IActionQueue"
 import type {
   ActionHash,
   ActionItemExtra,
   ActionQueueItemMeta,
 } from "../../../shared/actionQueue/schema"
-import {
+import type {
   ActionItem,
   ExtensionActionItem,
   ExtQueueItem,
 } from "../../../shared/actionQueue/types"
-import { MessageType } from "../../../shared/messages"
+import type { MessageType } from "../../../shared/messages"
 import {
   handleActionApproval,
   handleActionRejection,
 } from "../../actionHandlers"
 import type { Respond, RespondToHost } from "../../respond"
-import { Wallet } from "../../wallet"
+import type { Wallet } from "../../wallet"
 import {
   TransactionCreatedForAction,
   type Events,

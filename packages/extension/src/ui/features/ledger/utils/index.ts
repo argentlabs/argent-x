@@ -1,8 +1,12 @@
 import { UAParser } from "ua-parser-js"
 import { LEDGER_VENDOR_ID } from "../../../../shared/ledger/constants"
-import { SignerType, WalletAccount } from "../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../shared/wallet.model"
+import { SignerType } from "../../../../shared/wallet.model"
 
 export async function hasConnectedLedgerDevice() {
+  if (!navigator.hid) {
+    return false
+  }
   const uaParser = new UAParser()
   const browser = uaParser.getBrowser()
   if (browser.name === "Firefox") {

@@ -1,8 +1,9 @@
-import { BoxProps, Button, Center, HStack } from "@chakra-ui/react"
-import { FC } from "react"
-import { P4, iconsDeprecated } from "@argent/x-ui"
+import type { BoxProps } from "@chakra-ui/react"
+import { Button, Center, HStack } from "@chakra-ui/react"
+import type { FC } from "react"
+import { icons, P3 } from "@argent/x-ui"
 
-const { ChevronLeftIcon, ChevronRightIcon } = iconsDeprecated
+const { ChevronLeftSecondaryIcon, ChevronRightSecondaryIcon } = icons
 
 interface PaginationProps extends BoxProps {
   goToPage: (page: number) => void
@@ -33,7 +34,7 @@ export const Pagination: FC<PaginationProps> = ({
           minW={0}
           onClick={prevPage}
         >
-          <ChevronLeftIcon h={3} w={3} />
+          <ChevronLeftSecondaryIcon h={3} w={3} />
         </Button>
         {Array.from({ length: NUM_PAGES }).map((_, index) => (
           <Button
@@ -50,12 +51,12 @@ export const Pagination: FC<PaginationProps> = ({
             w={6}
             onClick={() => goToPage(index)}
           >
-            <P4
+            <P3
               fontWeight="bold"
               color={currentPageIndex === index ? "white" : "text-subtle"}
             >
               {index + 1}
-            </P4>
+            </P3>
           </Button>
         ))}
         <Button
@@ -68,7 +69,7 @@ export const Pagination: FC<PaginationProps> = ({
           w={8}
           onClick={nextPage}
         >
-          <ChevronRightIcon h={3} w={3} />
+          <ChevronRightSecondaryIcon h={3} w={3} />
         </Button>
       </HStack>
     </Center>

@@ -1,4 +1,4 @@
-import { CopyTooltip, H6, iconsDeprecated, P4 } from "@argent/x-ui"
+import { CopyTooltip, H5, icons, P3 } from "@argent/x-ui"
 import {
   Flex,
   IconButton,
@@ -10,16 +10,19 @@ import {
 } from "@chakra-ui/react"
 
 import { MultisigOwnerNameModal } from "./MultisigOwnerNameModal"
-import { FC, PropsWithChildren, useMemo } from "react"
+import type { FC, PropsWithChildren } from "react"
+import { useMemo } from "react"
 import { noop } from "lodash-es"
 import { encodeBase58, formatTruncatedSignerKey } from "@argent/x-shared"
-import { SignerMetadata } from "../../../shared/multisig/types"
+import type { SignerMetadata } from "../../../shared/multisig/types"
 import { MultisigRemoveOwnerModal } from "./MultisigRemoveOwnerModal"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import { useOnLedgerStart } from "../ledger/hooks/useOnLedgerStart"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
-const { SettingsIcon, EditIcon, TickIcon } = iconsDeprecated
+const { SettingsSecondaryIcon, EditPrimaryIcon, CheckmarkSecondaryIcon } = icons
 
 interface MultisigOwnerProps {
   owner: string
@@ -30,6 +33,7 @@ interface MultisigOwnerProps {
   hasCopy?: boolean
   onUpdate?: (name: string) => void
   approved?: boolean
+  ownerIsSelf?: boolean
 }
 
 interface SignerWrapperProps extends PropsWithChildren {
@@ -61,6 +65,7 @@ export const MultisigOwner: FC<MultisigOwnerProps> = ({
   hasCopy = false,
   onUpdate = noop,
   approved = false,
+  ownerIsSelf = false,
 }) => {
   const encodedSignerKey = useMemo(() => encodeBase58(owner), [owner])
   const {
@@ -75,17 +80,25 @@ export const MultisigOwner: FC<MultisigOwnerProps> = ({
   } = useDisclosure()
   const navigate = useNavigate()
 
+  const network = useCurrentNetwork()
+
+  const onLedgerStart = useOnLedgerStart("multisig")
+
   const truncatedSignerKey =
     encodedSignerKey && formatTruncatedSignerKey(encodedSignerKey)
 
   const readOnly = !hasEdit && !hasUpdate
 
   const handleRemoveOwnerClick = () => {
-    navigate(routes.multisigRemoveOwners(account?.address, encodedSignerKey))
+    navigate(routes.multisigRemoveOwners(account?.id, encodedSignerKey))
   }
 
   const handleReplaceOwnerClick = () => {
-    navigate(routes.multisigReplaceOwner(account?.address, encodedSignerKey))
+    if (ownerIsSelf) {
+      onLedgerStart("replace", network.id, encodedSignerKey)
+    } else {
+      navigate(routes.multisigReplaceOwner(account?.id, encodedSignerKey))
+    }
   }
 
   return (
@@ -100,18 +113,18 @@ export const MultisigOwner: FC<MultisigOwnerProps> = ({
       {signerMetadata ? (
         <SignerWrapper hasCopy={hasCopy} encodedSignerKey={encodedSignerKey}>
           <Flex flexDirection="column">
-            <H6 color="white">{signerMetadata.name}</H6>
-            <P4 color="neutrals.300">{truncatedSignerKey}</P4>
+            <H5 color="white">{signerMetadata.name}</H5>
+            <P3 color="neutrals.300">{truncatedSignerKey}</P3>
           </Flex>
         </SignerWrapper>
       ) : (
         <SignerWrapper hasCopy={hasCopy} encodedSignerKey={encodedSignerKey}>
-          <H6 color="white">{truncatedSignerKey}</H6>
+          <H5 color="white">{truncatedSignerKey}</H5>
         </SignerWrapper>
       )}
       {approved && (
         <Flex alignItems="center" marginLeft="auto">
-          <TickIcon color="primary.500" h={4} w={4} />
+          <CheckmarkSecondaryIcon color="primary.500" h={4} w={4} />
         </Flex>
       )}
       {!readOnly && (
@@ -121,7 +134,7 @@ export const MultisigOwner: FC<MultisigOwnerProps> = ({
               backgroundColor="neutrals.900"
               onClick={onOpenEditModal}
               aria-label="Edit owner name"
-              icon={<EditIcon />}
+              icon={<EditPrimaryIcon />}
               h="auto"
               minH={0}
               minW={0}
@@ -147,20 +160,22 @@ export const MultisigOwner: FC<MultisigOwnerProps> = ({
                   backgroundColor: "neutrals.700",
                 }}
               >
-                <SettingsIcon w={4} h={4} />
+                <SettingsSecondaryIcon w={4} h={4} />
               </MenuButton>
               <MenuList backgroundColor="neutrals.900">
-                <MenuItem
-                  backgroundColor="neutrals.900"
-                  onClick={onOpenRemoveModal}
-                >
-                  Remove owner
-                </MenuItem>
+                {!ownerIsSelf && (
+                  <MenuItem
+                    backgroundColor="neutrals.900"
+                    onClick={onOpenRemoveModal}
+                  >
+                    Remove owner
+                  </MenuItem>
+                )}
                 <MenuItem
                   backgroundColor="neutrals.900"
                   onClick={handleReplaceOwnerClick}
                 >
-                  Replace owner
+                  {ownerIsSelf ? "Replace with Ledger" : "Replace owner"}
                 </MenuItem>
               </MenuList>
             </Menu>

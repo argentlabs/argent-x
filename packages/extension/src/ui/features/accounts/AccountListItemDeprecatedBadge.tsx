@@ -1,8 +1,8 @@
-import { iconsDeprecated } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import { Circle, Tooltip } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
 
 export const AccountListItemWarningBadge: FC = () => (
   <Tooltip label="This account can no longer be used">
@@ -17,7 +17,7 @@ export const AccountListItemWarningBadge: FC = () => (
       color="neutrals.800"
       fontSize="2xs"
     >
-      <AlertIcon />
+      <WarningCircleSecondaryIcon />
     </Circle>
   </Tooltip>
 )

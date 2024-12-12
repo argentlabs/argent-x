@@ -17,7 +17,7 @@ export class TransactionsWorker {
 
       /** transactions which already existed in the store, and have now changed status */
       if (addedOrUpdatedTransactions.length > 0) {
-        runAddedOrUpdatedHandlers(addedOrUpdatedTransactions)
+        void runAddedOrUpdatedHandlers(addedOrUpdatedTransactions)
       }
     })
   }

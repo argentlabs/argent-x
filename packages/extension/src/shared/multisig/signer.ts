@@ -1,14 +1,12 @@
-import {
+import type {
   Call,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
-  Signer,
   TypedData,
-  stark,
-  hash,
 } from "starknet"
-import { ApiMultisigOffchainSignatureState } from "./multisig.model"
+import { Signer, stark, hash } from "starknet"
+import type { ApiMultisigOffchainSignatureState } from "./multisig.model"
 
 export class MultisigSigner extends Signer {
   constructor(pk: Uint8Array | string) {

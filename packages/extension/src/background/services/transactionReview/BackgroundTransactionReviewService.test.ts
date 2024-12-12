@@ -1,12 +1,13 @@
-import { Address, IHttpService } from "@argent/x-shared"
-import { Account, EstimateFee } from "starknet"
-import { Mocked, describe, expect, test, vi } from "vitest"
+import type { Address, IHttpService, TransactionAction } from "@argent/x-shared"
+import type { Account, EstimateFee } from "starknet"
+import { TransactionType } from "starknet"
+import type { Mocked } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 
 import type { KeyValueStorage } from "../../../shared/storage"
 import type {
   ITransactionReviewLabelsStore,
   ITransactionReviewWarningsStore,
-  TransactionReviewTransactions,
 } from "../../../shared/transactionReview/interface"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import type { Wallet } from "../../wallet"
@@ -15,12 +16,16 @@ import type { ITransactionReviewWorker } from "./worker/ITransactionReviewWorker
 
 import sendFixture from "../../../shared/transactionReview/__fixtures__/send.json"
 import simulationErrorUnexpectedFixture from "../../../shared/transactionReview/__fixtures__/simulation-error-unexpected.json"
+import { getRandomAccountIdentifier } from "../../../shared/utils/accountIdentifier"
+import type { BaseStarknetAccount } from "../../../shared/starknetAccount/base"
+import type { INonceManagementService } from "../../nonceManagement/INonceManagementService"
 
 describe("BackgroundTransactionReviewService", () => {
   const makeService = () => {
     const walletSingleton = {
       getSelectedAccount: vi.fn(),
       getSelectedStarknetAccount: vi.fn(),
+      getStarknetAccount: vi.fn(),
     } as unknown as Mocked<Wallet>
 
     const httpService = {
@@ -40,6 +45,10 @@ describe("BackgroundTransactionReviewService", () => {
       subscribe: vi.fn(),
     } as unknown as Mocked<KeyValueStorage<ITransactionReviewWarningsStore>>
 
+    const nonceManagementService = {
+      getNonce: vi.fn(),
+    } as unknown as Mocked<INonceManagementService>
+
     const transactionReviewWorker = {
       maybeUpdateLabels: vi.fn(),
     } as unknown as Mocked<ITransactionReviewWorker>
@@ -48,6 +57,7 @@ describe("BackgroundTransactionReviewService", () => {
       new BackgroundTransactionReviewService(
         walletSingleton,
         httpService,
+        nonceManagementService,
         transactionReviewLabelsStore,
         transactionReviewWarningsStore,
         transactionReviewWorker,
@@ -56,6 +66,7 @@ describe("BackgroundTransactionReviewService", () => {
     const networkId = "sepolia-alpha"
 
     walletSingleton.getSelectedAccount.mockResolvedValue({
+      id: getRandomAccountIdentifier("0x123"),
       address: "0x123",
       networkId,
       network: {
@@ -67,17 +78,28 @@ describe("BackgroundTransactionReviewService", () => {
       cairoVersion: "1",
       getNonce: vi.fn(),
       getChainId: vi.fn(),
-      estimateFee: vi.fn(),
+      estimateInvokeFee: vi.fn(),
     } as unknown as Mocked<Account>
 
-    starknetAccount.estimateFee.mockResolvedValue({
+    const estimateFee = {
       gas_consumed: 123n,
       gas_price: 456n,
-    } as EstimateFee)
+    } as EstimateFee
+
+    starknetAccount.estimateInvokeFee.mockResolvedValue(estimateFee)
 
     walletSingleton.getSelectedStarknetAccount.mockResolvedValue(
       starknetAccount,
     )
+
+    const baseStarknetAccount = {
+      ...starknetAccount,
+      estimateFeeBulk: vi.fn(),
+    } as unknown as Mocked<BaseStarknetAccount>
+
+    baseStarknetAccount.estimateInvokeFee.mockResolvedValue(estimateFee)
+
+    walletSingleton.getStarknetAccount.mockResolvedValue(baseStarknetAccount)
 
     const feeTokenAddress: Address = "0x123456"
 
@@ -85,10 +107,12 @@ describe("BackgroundTransactionReviewService", () => {
       backgroundTransactionReviewService,
       walletSingleton,
       httpService,
+      nonceManagementService,
       transactionReviewLabelsStore,
       transactionReviewWorker,
       feeTokenAddress,
       starknetAccount,
+      baseStarknetAccount,
     }
   }
   describe("simulateAndReview", () => {
@@ -99,23 +123,21 @@ describe("BackgroundTransactionReviewService", () => {
             backgroundTransactionReviewService,
             httpService,
             feeTokenAddress,
+            nonceManagementService,
           } = makeService()
 
-          const transactions: TransactionReviewTransactions[] = [
-            {
-              type: "INVOKE",
-              calls: [],
-            },
-          ]
+          const transaction: TransactionAction = {
+            type: TransactionType.INVOKE,
+            payload: [],
+          }
 
           httpService.post.mockResolvedValueOnce(sendFixture)
-
+          nonceManagementService.getNonce.mockResolvedValueOnce("0x2")
           const result =
             await backgroundTransactionReviewService.simulateAndReview({
-              transactions,
+              transaction,
               feeTokenAddress,
             })
-
           expect(result).toMatchObject(sendFixture)
 
           expect(result.enrichedFeeEstimation).toMatchInlineSnapshot(`
@@ -142,33 +164,32 @@ describe("BackgroundTransactionReviewService", () => {
             httpService,
             feeTokenAddress,
             starknetAccount,
+            nonceManagementService,
           } = makeService()
 
-          const transactions: TransactionReviewTransactions[] = [
-            {
-              type: "INVOKE",
-              calls: [],
-            },
-          ]
+          const transaction = {
+            type: TransactionType.INVOKE as const,
+            payload: [],
+          }
 
           httpService.post.mockResolvedValueOnce(
             simulationErrorUnexpectedFixture,
           )
 
-          const fallbackToOnchainFeeEstimationSpy = vi.spyOn(
+          const getEnrichedFeeEstimationSpy = vi.spyOn(
             backgroundTransactionReviewService,
-            "fallbackToOnchainFeeEstimation",
+            "getEnrichedFeeEstimation",
           )
 
-          const result =
-            await backgroundTransactionReviewService.simulateAndReview({
-              transactions,
-              feeTokenAddress,
-            })
+          nonceManagementService.getNonce.mockResolvedValueOnce("0x2")
+          await backgroundTransactionReviewService.simulateAndReview({
+            transaction,
+            feeTokenAddress,
+          })
 
-          expect(fallbackToOnchainFeeEstimationSpy).not.toHaveBeenCalledOnce()
+          expect(getEnrichedFeeEstimationSpy).not.toHaveBeenCalledOnce()
 
-          expect(starknetAccount.estimateFee).not.toHaveBeenCalledOnce()
+          expect(starknetAccount.estimateInvokeFee).not.toHaveBeenCalledOnce()
         })
       })
       describe("when backend fails with error", () => {
@@ -177,15 +198,16 @@ describe("BackgroundTransactionReviewService", () => {
             backgroundTransactionReviewService,
             httpService,
             feeTokenAddress,
-            starknetAccount,
+            baseStarknetAccount,
+            nonceManagementService,
           } = makeService()
 
-          const transactions: TransactionReviewTransactions[] = [
-            {
-              type: "INVOKE",
-              calls: [],
-            },
-          ]
+          const transaction = {
+            type: TransactionType.INVOKE as const,
+            payload: [],
+          }
+
+          nonceManagementService.getNonce.mockResolvedValueOnce("0x2")
 
           httpService.post.mockRejectedValueOnce(new Error())
 
@@ -196,13 +218,13 @@ describe("BackgroundTransactionReviewService", () => {
 
           const result =
             await backgroundTransactionReviewService.simulateAndReview({
-              transactions,
+              transaction,
               feeTokenAddress,
             })
 
           expect(fallbackToOnchainFeeEstimationSpy).toHaveBeenCalledOnce()
 
-          expect(starknetAccount.estimateFee).toHaveBeenCalledOnce()
+          expect(baseStarknetAccount.estimateInvokeFee).toHaveBeenCalledOnce()
 
           expect(result).toMatchObject({
             isBackendDown: true,

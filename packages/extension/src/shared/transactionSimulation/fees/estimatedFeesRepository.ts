@@ -1,16 +1,17 @@
 import browser from "webextension-polyfill"
-import { TransactionAction, ensureArray } from "@argent/x-shared"
+import type { TransactionAction } from "@argent/x-shared"
+import { ensureArray } from "@argent/x-shared"
 import { deserialize, serialize } from "superjson"
 import { TransactionType } from "starknet"
 
 import { ChromeRepository } from "../../storage/__new/chrome"
-import {
+import type {
   EstimatedFees,
   EstimatedFeesEnriched,
 } from "@argent/x-shared/simulation"
 import { objectHash } from "../../objectHash"
 import { assertNever } from "../../utils/assertNever"
-import { IEstimatedFeesRepository } from "./fees.model"
+import type { IEstimatedFeesRepository } from "./fees.model"
 
 export const estimatedFeesRepo: IEstimatedFeesRepository =
   new ChromeRepository<EstimatedFeesEnriched>(browser, {

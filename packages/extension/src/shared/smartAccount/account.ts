@@ -1,4 +1,4 @@
-import {
+import type {
   Abi,
   AccountInterface,
   AllowArray,
@@ -10,24 +10,22 @@ import {
   DeployContractResponse,
   ProviderInterface,
   Signature,
-  TransactionType,
   TypedData,
   UniversalDetails,
+} from "starknet"
+import {
+  TransactionType,
   constants,
   isSierra,
   provider,
   stark,
   transaction,
 } from "starknet"
-import { BaseSignerInterface } from "../signer/BaseSignerInterface"
-import {
-  Address,
-  addressSchema,
-  isEqualAddress,
-  txVersionSchema,
-} from "@argent/x-shared"
+import type { BaseSignerInterface } from "../signer/BaseSignerInterface"
+import type { Address } from "@argent/x-shared"
+import { addressSchema, isEqualAddress } from "@argent/x-shared"
 import { ArgentSigner, GuardianSignerV2 } from "../signer"
-import { Cosigner } from "@argent/x-guardian"
+import type { Cosigner } from "@argent/x-guardian"
 import { BaseStarknetAccount } from "../starknetAccount/base"
 import { isEmpty } from "lodash-es"
 
@@ -104,7 +102,7 @@ export class SmartAccount extends BaseStarknetAccount {
         ? transactionsDetail
         : abiOrDetails
     const transactions = Array.isArray(calls) ? calls : [calls]
-    const version = txVersionSchema.parse(details.version)
+    const version = this.getTxVersion(details)
     const signerDetails =
       await this.buildInvocationSignerDetailsPayload(details)
 
@@ -149,7 +147,7 @@ export class SmartAccount extends BaseStarknetAccount {
     payload: DeployAccountContractPayload,
     details: UniversalDetails = {},
   ): Promise<DeployContractResponse> {
-    const version = txVersionSchema.parse(details.version)
+    const version = this.getTxVersion(details)
     const signerDetails = await this.buildAccountDeploySignerDetailsPayload(
       payload,
       details,
@@ -191,7 +189,7 @@ export class SmartAccount extends BaseStarknetAccount {
     details: UniversalDetails = {},
   ): Promise<DeclareContractResponse> {
     const version = !isSierra(payload.contract)
-      ? txVersionSchema.parse(details.version)
+      ? this.getTxVersion(details)
       : constants.TRANSACTION_VERSION.V1
 
     const signerDetails = await this.buildDeclareSignerDetailsPayload(

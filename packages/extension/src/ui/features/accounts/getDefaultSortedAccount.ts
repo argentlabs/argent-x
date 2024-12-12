@@ -1,4 +1,4 @@
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 export const getDefaultSortedAccounts = (accounts: WalletAccount[]) => {
   return accounts.sort((a, b) => {

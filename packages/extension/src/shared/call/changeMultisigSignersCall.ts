@@ -1,4 +1,7 @@
-import { Call, validateAndParseAddress } from "starknet"
+import type { Address } from "@argent/x-shared"
+import { addressSchema, isEqualAddress } from "@argent/x-shared"
+import type { Call } from "starknet"
+import { CallData, num, validateAndParseAddress } from "starknet"
 import { MultisigEntryPointType } from "../multisig/types"
 
 export interface AddMultisigSignersCall extends Call {
@@ -16,7 +19,7 @@ export const isAddMultisigSignersCall = (
       validateAndParseAddress(call.contractAddress)
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false
@@ -37,7 +40,7 @@ export const isRemoveMultisigSignersCall = (
       validateAndParseAddress(call.contractAddress)
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false
@@ -49,7 +52,7 @@ export interface ReplaceMultisigSignerCall extends Call {
 
 export const isReplaceMultisigSignerCall = (
   call: Call,
-): call is RemoveMultisigSignersCall => {
+): call is ReplaceMultisigSignerCall => {
   try {
     if (
       call.contractAddress &&
@@ -58,8 +61,41 @@ export const isReplaceMultisigSignerCall = (
       validateAndParseAddress(call.contractAddress)
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false
+}
+
+export const isReplaceSelfAsSignerInMultisigCall = (
+  call: Call,
+  selfPubKey: string,
+): call is ReplaceMultisigSignerCall => {
+  try {
+    if (
+      call.contractAddress &&
+      call.entrypoint === MultisigEntryPointType.REPLACE_SIGNER
+    ) {
+      const calldata = CallData.toCalldata(call.calldata)
+      const replacedPubKey = addressSchema.parse(num.toHex(calldata[0]))
+      return calldata.length === 2 && isEqualAddress(replacedPubKey, selfPubKey)
+    }
+  } catch {
+    // failure implies invalid
+  }
+  return false
+}
+
+export const getNewSignerInReplaceMultisigSignerCall = (
+  call: ReplaceMultisigSignerCall,
+): Address | undefined => {
+  if (!isReplaceMultisigSignerCall(call)) {
+    return
+  }
+  const calldata = CallData.toCalldata(call.calldata)
+  if (calldata.length !== 2) {
+    return
+  }
+  const newPubKey = addressSchema.parse(num.toHex(calldata[1]))
+  return newPubKey
 }

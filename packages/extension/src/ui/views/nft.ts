@@ -1,20 +1,16 @@
-import { Atom, atom } from "jotai"
+import type { Atom } from "jotai"
+import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
+import type { ContractAddress } from "../../shared/nft/store"
 import {
   nftsRepository,
   nftsCollectionsRepository,
   nftsContractsRepository,
-  ContractAddress,
 } from "../../shared/nft/store"
 
 import { atomFromRepo } from "./implementation/atomFromRepo"
-import {
-  Address,
-  Collection,
-  NftItem,
-  isEqualAddress,
-  ensureArray,
-} from "@argent/x-shared"
+import type { Address, Collection, NftItem } from "@argent/x-shared"
+import { isEqualAddress, ensureArray } from "@argent/x-shared"
 
 const allNftsAtom = atomFromRepo(nftsRepository)
 

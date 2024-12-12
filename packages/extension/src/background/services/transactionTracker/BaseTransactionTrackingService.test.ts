@@ -1,4 +1,4 @@
-import { BaseTransaction } from "../../../shared/transactions/interface"
+import type { BaseTransaction } from "../../../shared/transactions/interface"
 import { BaseTransactionTrackingService } from "./BaseTransactionTrackingService"
 
 class TestTransactionService extends BaseTransactionTrackingService<

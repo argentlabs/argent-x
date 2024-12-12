@@ -1,12 +1,12 @@
-import { H1, P2, logosDeprecated } from "@argent/x-ui"
+import { icons, logosDeprecated, MassiveTitle, P1 } from "@argent/x-ui"
 import { Box, Button } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
-import { FC, PropsWithChildren, ReactNode } from "react"
+import type { FC, PropsWithChildren, ReactNode } from "react"
 
 import { ContentWrapper } from "../../../components/FullScreenPage"
-import { ArrowBackIcon } from "../../../components/Icons/MuiIcons"
 import { StepIndicator } from "../../../components/StepIndicator"
 
+const { ArrowLeftPrimaryIcon } = icons
 const { ArgentXLogo } = logosDeprecated
 
 export interface CreateMultisigScreen extends PropsWithChildren {
@@ -76,19 +76,13 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
     <PageWrapper>
       {back && goBack && (
         <Button
-          position="absolute"
+          size={"lg"}
+          position={"absolute"}
           left={8}
           top={8}
-          width="unset"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          px={4}
-          py={6}
-          backgroundColor="neutrals.800"
           onClick={goBack}
         >
-          <ArrowBackIcon />
+          <ArrowLeftPrimaryIcon fontSize={"2xl"} />
         </Button>
       )}
       <Panel>
@@ -102,14 +96,14 @@ export const ScreenLayout: FC<CreateMultisigScreen> = ({
           )}
           <Box my={8} mx={0}>
             {title && typeof title === "string" ? (
-              <H1 marginBottom="0">{title}</H1>
+              <MassiveTitle marginBottom="0">{title}</MassiveTitle>
             ) : (
               <>{title}</>
             )}
             {subtitle && (
-              <P2 mt={2} color="neutrals.100">
+              <P1 mt={2} color="neutrals.100">
                 {subtitle}
-              </P2>
+              </P1>
             )}
           </Box>
           {children}

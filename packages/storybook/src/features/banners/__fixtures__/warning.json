@@ -1,0 +1,9 @@
+{
+  "id": "310e899a-8f19-43c1-990d-95d87acaecf3",
+  "updatedAt": "2022-07-19T10:39:30.288Z",
+  "level": "warning",
+  "dismissable": true,
+  "fullScreen": false,
+  "summary": "Network errors are high",
+  "message": "We are detecting unusually high rates of network errors. If your see a failed transaction, please wait and try again in a few minutes."
+}

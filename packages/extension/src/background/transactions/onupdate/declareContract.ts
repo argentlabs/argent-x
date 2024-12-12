@@ -1,6 +1,6 @@
 import { declaredTransactionsStore } from "../../../shared/udc/store"
 import { UdcTransactionType } from "../../udcAction"
-import { TransactionUpdateListener } from "./type"
+import type { TransactionUpdateListener } from "./type"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 export const handleDeclareContractTransaction: TransactionUpdateListener =

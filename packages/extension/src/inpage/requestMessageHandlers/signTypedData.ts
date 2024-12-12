@@ -1,4 +1,4 @@
-import { TypedData } from "@starknet-io/types-js"
+import type { TypedData } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
 import { inpageMessageClient } from "../trpcClient"
 import { WalletRPCError, WalletRPCErrorCodes } from "./errors"

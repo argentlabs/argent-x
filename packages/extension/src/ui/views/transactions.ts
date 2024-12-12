@@ -3,7 +3,7 @@ import { transactionsRepo } from "../../shared/transactions/store"
 import { atomFromRepo } from "./implementation/atomFromRepo"
 import { getTransactionStatus } from "../../shared/transactions/utils"
 import { atomFamily } from "jotai/utils"
-import { BaseWalletAccount } from "../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../shared/wallet.model"
 import {
   accountsEqual,
   atomFamilyAccountsEqual,

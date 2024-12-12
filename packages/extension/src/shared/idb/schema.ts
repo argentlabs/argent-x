@@ -1,45 +1,11 @@
-import type { Dexie, Transaction } from "dexie"
-import { parsedDefaultTokens } from "../token/__new/utils"
 import { stripAddressZeroPadding } from "@argent/x-shared"
-import { BaseTokenWithBalance } from "../token/__new/types/tokenBalance.model"
-import { sanitizeRecord } from "./addressNormalizerMiddleware"
+import type { Dexie, Transaction } from "dexie"
+import type { Token } from "../token/__new/types/token.model"
+import type { BaseTokenWithBalance } from "../token/__new/types/tokenBalance.model"
+import { parsedDefaultTokens } from "../token/__new/utils"
+import { deduplicateTable } from "./utils/deduplicateTable"
+import { mergeTokensWithDefaults } from "../token/__new/repository/mergeTokens"
 
-export const deduplicateTable = async <T>(
-  table: Dexie.Table,
-  getPrimaryKey: (item: T) => string,
-) => {
-  const allItems = await table.toArray()
-  const uniqueItems = new Map()
-
-  allItems.forEach((item) => {
-    const primaryKey = getPrimaryKey(item)
-    const existingItem = uniqueItems.get(primaryKey)
-    if (
-      !existingItem ||
-      (item.updatedAt && item.updatedAt > existingItem.updatedAt)
-    ) {
-      uniqueItems.set(primaryKey, item)
-    }
-  })
-  // Clear the table
-  await table.clear()
-  // Add back the unique items one by one
-  for (const item of uniqueItems.values()) {
-    try {
-      await table.add(sanitizeRecord(item))
-    } catch (error) {
-      console.error(`Failed to add item: ${JSON.stringify(item)}`, error)
-      try {
-        await table.update(getPrimaryKey(item), item)
-      } catch (updateError) {
-        console.error(
-          `Failed to update item: ${JSON.stringify(item)}`,
-          updateError,
-        )
-      }
-    }
-  }
-}
 export interface DexieSchema {
   schema: Record<string, string>
   upgrade?: (transaction: Transaction, database?: Dexie) => Promise<void>
@@ -54,9 +20,13 @@ export class StorageSchema {
       TOKEN_BALANCES: "token_balances",
       TOKENS_INFO: "tokens_info",
       TOKEN_PRICES: "token_prices",
+
+      INVESTMENTS: "investments",
     } as const
   }
 
+  // DEV NOTE: Don’t declare all columns like in SQL. You only declare properties you want to index, that is properties you want to use in a where(…) query.
+  // (See https://dexie.org/docs/API-Reference#quick-reference)
   static get schema(): DexieSchema[] {
     return [
       {
@@ -126,6 +96,73 @@ export class StorageSchema {
           )
         },
         version: 3,
+      },
+      {
+        schema: {
+          [StorageSchema.OBJECT_STORE.TOKENS]:
+            "[address+networkId], id, iconUrl, showAlways, popular, custom, pricingId, tradable, address, networkId, name, symbol, decimals, *tags, hidden",
+        },
+        upgrade: async (transaction: Transaction) => {
+          const table = transaction.table(StorageSchema.OBJECT_STORE.TOKENS)
+          const tokensList: Token[] = await table.toArray()
+          const updatedTokens = tokensList
+            .filter((token) => token.tags?.includes("scam"))
+            .map((token) => ({
+              ...token,
+              hidden: true,
+            }))
+
+          await table.bulkPut(updatedTokens)
+        },
+        version: 4,
+      },
+      {
+        schema: {
+          [StorageSchema.OBJECT_STORE.TOKEN_PRICES]:
+            "[address+networkId], address, networkId, pricingId, ethValue, ccyValue, ethDayChange, ccyDayChange",
+        },
+        upgrade: async (transaction: Transaction) => {
+          const tokenPrices = transaction.table(
+            StorageSchema.OBJECT_STORE.TOKEN_PRICES,
+          )
+          await deduplicateTable(
+            tokenPrices,
+            (item: BaseTokenWithBalance) =>
+              `${stripAddressZeroPadding(item.address)}-${item.networkId}`,
+          )
+
+          const tokensInfo = transaction.table(
+            StorageSchema.OBJECT_STORE.TOKENS_INFO,
+          )
+          await deduplicateTable(
+            tokensInfo,
+            (item: BaseTokenWithBalance) =>
+              `${stripAddressZeroPadding(item.address)}-${item.networkId}`,
+          )
+        },
+        version: 5,
+      },
+      {
+        schema: {
+          [StorageSchema.OBJECT_STORE.TOKENS]:
+            "[address+networkId], id, iconUrl, showAlways, popular, custom, pricingId, tradable, address, networkId, name, symbol, decimals, *tags, hidden",
+        },
+        upgrade: async (transaction: Transaction) => {
+          const tokens = transaction.table(StorageSchema.OBJECT_STORE.TOKENS)
+
+          const mergedWithNewDefaultTokens = mergeTokensWithDefaults(
+            await tokens.toArray(),
+          )
+
+          await tokens.bulkPut(mergedWithNewDefaultTokens)
+        },
+        version: 6,
+      },
+      {
+        schema: {
+          [StorageSchema.OBJECT_STORE.INVESTMENTS]: "[address+networkId]",
+        },
+        version: 7,
       },
     ]
   }

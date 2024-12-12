@@ -1,19 +1,28 @@
-import { Dexie, Table } from "dexie"
+import type { Table } from "dexie"
+import { Dexie } from "dexie"
 import type { Token } from "../token/__new/types/token.model"
 import type { BaseTokenWithBalance } from "../token/__new/types/tokenBalance.model"
-import { DbTokensInfoResponse } from "../token/__new/types/tokenInfo.model"
-import { TokenPriceDetails } from "../token/__new/types/tokenPrice.model"
-import { DexieSchema, StorageSchema } from "./schema"
+import type { DbTokensInfoResponse } from "../token/__new/types/tokenInfo.model"
+import type { TokenPriceDetails } from "../token/__new/types/tokenPrice.model"
+import type { DexieSchema } from "./schema"
+import { StorageSchema } from "./schema"
 import { noop } from "lodash-es"
 import { equalToken, parsedDefaultTokens } from "../token/__new/utils"
 import { mergeTokens } from "../token/__new/repository/mergeTokens"
 import logger from "dexie-logger"
 import { isFeatureEnabled } from "@argent/x-shared"
-import addressNormalizerMiddleware from "./addressNormalizerMiddleware"
+import addressNormalizerMiddleware from "./middleware/addressNormalizerMiddleware"
+import hideSpamTokensMiddleware from "./middleware/hideSpamTokensMiddleware"
+import type {
+  AccountInvestmentsKey,
+  AccountInvestments,
+} from "../investments/types"
 
 interface ArgentDatabaseConfig {
+  name?: string
   version?: number
   skipAddressNormalizer?: boolean
+  skipHideScamTokens?: boolean
 }
 
 export class ArgentDatabase extends Dexie {
@@ -21,10 +30,12 @@ export class ArgentDatabase extends Dexie {
   tokenBalances: Table<BaseTokenWithBalance, string>
   tokensInfo: Table<DbTokensInfoResponse, number>
   tokenPrices: Table<TokenPriceDetails, [string, string]>
+
+  investments!: Table<AccountInvestments, AccountInvestmentsKey>
   _config?: ArgentDatabaseConfig
 
   constructor(config?: ArgentDatabaseConfig) {
-    super("Argent")
+    super(config?.name ?? "Argent")
     this._config = config
     this.initialiseDatabase()
 
@@ -32,6 +43,12 @@ export class ArgentDatabase extends Dexie {
     this.tokenBalances = this.table(StorageSchema.OBJECT_STORE.TOKEN_BALANCES)
     this.tokensInfo = this.table(StorageSchema.OBJECT_STORE.TOKENS_INFO)
     this.tokenPrices = this.table(StorageSchema.OBJECT_STORE.TOKEN_PRICES)
+
+    if (
+      this.tables.some((t) => t.name === StorageSchema.OBJECT_STORE.INVESTMENTS)
+    ) {
+      this.investments = this.table(StorageSchema.OBJECT_STORE.INVESTMENTS)
+    }
 
     this.registerHooks()
   }
@@ -71,6 +88,10 @@ export class ArgentDatabase extends Dexie {
     if (!this._config?.skipAddressNormalizer) {
       this.use(addressNormalizerMiddleware())
     }
+
+    if (!this._config?.skipHideScamTokens) {
+      this.use(hideSpamTokensMiddleware())
+    }
   }
 
   public async clear() {
@@ -78,5 +99,3 @@ export class ArgentDatabase extends Dexie {
     await this.open()
   }
 }
-
-export const argentDb = new ArgentDatabase()

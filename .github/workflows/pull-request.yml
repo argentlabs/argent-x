@@ -5,13 +5,19 @@ on:
       - develop
   pull_request:
 
+env:
+  PNPM_VERSION: 9
+  NODE_VERSION: 18.x
+
 jobs:
-  build-all-artifacts:
+  build-alpha:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
     strategy:
       matrix:
-        env: [prod, staging, hydrogen, dev]
-        extension_type: [chrome, firefox]
+        env: [hydrogen]
+        extension_type: [chrome]
 
     environment: ${{ matrix.env }}
 
@@ -23,26 +29,25 @@ jobs:
       FEATURE_BANXA: "true"
       FEATURE_LAYERSWAP: "true"
       FEATURE_ORBITER: "true"
-      FEATURE_VERIFIED_DAPPS: "true"
       FEATURE_MULTISIG: "true"
-      FEATURE_ACTIVITY_V2: "true"
+      ENABLE_TOKEN_DETAILS: "true"
+      FEATURE_DEFI_DECOMPOSITION: "true"
 
       # API URLs
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
       ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
-      ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
-      ARGENT_HEALTHCHECK_BASE_URL: ${{ vars.ARGENT_HEALTHCHECK_BASE_URL }}
       # API ENVIRONMENT
       ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
 
       # Sentry
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
       SENTRY_ENVIRONMENT: "staging"
 
       # Misc
-      SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
       RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
       SAFE_ENV_VARS: false
       MULTICALL_MAX_BATCH_SIZE: 20
@@ -53,6 +58,7 @@ jobs:
       MEDIUM: 60 # 60s
       SLOW: 60 * 5 # 5m
       VERY_SLOW: 24 * 60 * 60 # 1d
+      MIN_LEDGER_APP_VERSION: 2.2.1
 
       #For testing only
       FEE_OVERHEAD: 2
@@ -65,12 +71,12 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
       - name: Get pnpm store directory
@@ -87,19 +93,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Set Sentry Release name (rc)
+        run: |
+          PACKAGE_VERSION=$(grep -m1 '"version":' ./packages/extension/package.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+          echo "SENTRY_RELEASE=${PACKAGE_VERSION}-rc__${GITHUB_SHA}" >> $GITHUB_ENV
+
       - name: Setup project
         run: pnpm run setup
 
       - name: Build extension for ${{ matrix.extension_type }}
         run: |
-          if [[ "${{ matrix.extension_type }}" == "firefox" ]]; then
-            MANIFEST_VERSION=v2 pnpm run build:extension
+          if [ "${{ matrix.extension_type }}" = "firefox" ]; then
+            echo "Building extension using manifest v2"
+            MANIFEST_VERSION=v2 pnpm run build:extension:alpha
           else
-            MANIFEST_VERSION=v3 pnpm run build:extension
+            echo "Building extension using manifest v3"
+            MANIFEST_VERSION=v3 pnpm run build:extension:alpha
           fi
 
-      - name: Check bundlesize for ${{ matrix.extension_type }}
-        run: pnpm bundlewatch
+      - name: Check bundle size for ${{ matrix.extension_type }}
+        run: pnpm check-bundle-size
 
       - name: Use Cache
         uses: actions/cache@v4
@@ -109,6 +122,261 @@ jobs:
 
       - name: Set filename prefix
         run: echo "FILENAME_PREFIX=$(echo argent-x-${{ matrix.env }}-${{ github.ref_name }} | tr / -)" >> $GITHUB_ENV
+
+      - name: Install zip
+        run: apt-get update && apt-get install -y zip
+
+      - name: Create ${{ matrix.extension_type }} zip
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}-alpha" .)
+
+      - name: Upload ${{ matrix.extension_type }} extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}-alpha
+          path: "*-${{ matrix.extension_type }}-alpha.zip"
+          retention-days: 3
+
+  build-beta:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+    strategy:
+      matrix:
+        env: [prod]
+        extension_type: [chrome]
+
+    environment: ${{ matrix.env }}
+
+    env:
+      # FEATURE flags
+      FEATURE_PRIVACY_SETTINGS: "true"
+      FEATURE_EXPERIMENTAL_SETTINGS: "false"
+      FEATURE_BETA_FEATURES: "false"
+      FEATURE_BANXA: "true"
+      FEATURE_LAYERSWAP: "true"
+      FEATURE_ORBITER: "true"
+      FEATURE_MULTISIG: "true"
+      ENABLE_TOKEN_DETAILS: "true"
+      FEATURE_DEFI_DECOMPOSITION: "true"
+
+      # API URLs
+      ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
+      # API ENVIRONMENT
+      ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
+
+      # Sentry
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_ENVIRONMENT: "staging"
+
+      # Misc
+      RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
+      SAFE_ENV_VARS: false
+      MULTICALL_MAX_BATCH_SIZE: 20
+      NEW_CAIRO_0_ENABLED: false
+      TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
+      # Refresh intervals
+      FAST: 20 # 20s
+      MEDIUM: 60 # 60s
+      SLOW: 60 * 5 # 5m
+      VERY_SLOW: 24 * 60 * 60 # 1d
+      MIN_LEDGER_APP_VERSION: 2.2.1
+
+      #For testing only
+      FEE_OVERHEAD: 2
+
+    steps:
+      # Setup Project
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Set Sentry Release name (rc)
+        run: |
+          PACKAGE_VERSION=$(grep -m1 '"version":' ./packages/extension/package.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+          echo "SENTRY_RELEASE=${PACKAGE_VERSION}-rc__${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Setup project
+        run: pnpm run setup
+
+      - name: Build extension for ${{ matrix.extension_type }}
+        run: |
+          if [ "${{ matrix.extension_type }}" = "firefox" ]; then
+            echo "Building extension using manifest v2"
+            MANIFEST_VERSION=v2 pnpm run build:extension:beta
+          else
+            echo "Building extension using manifest v3"
+            MANIFEST_VERSION=v3 pnpm run build:extension:beta
+          fi
+
+      - name: Check bundle size for ${{ matrix.extension_type }}
+        run: pnpm check-bundle-size
+
+      - name: Use Cache
+        uses: actions/cache@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
+
+      - name: Set filename prefix
+        run: echo "FILENAME_PREFIX=$(echo argent-x-${{ matrix.env }}-${{ github.ref_name }} | tr / -)" >> $GITHUB_ENV
+
+      - name: Install zip
+        run: apt-get update && apt-get install -y zip
+
+      - name: Create ${{ matrix.extension_type }} zip
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}-beta" .)
+
+      - name: Upload ${{ matrix.extension_type }} extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}-beta
+          path: "*-${{ matrix.extension_type }}-beta.zip"
+          retention-days: 3
+
+  build-all-artifacts:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+    strategy:
+      matrix:
+        env: [prod, staging, hydrogen, dev]
+        extension_type: [chrome, firefox]
+
+    environment: ${{ matrix.env }}
+
+    env:
+      # FEATURE flags
+      FEATURE_PRIVACY_SETTINGS: "true"
+      FEATURE_EXPERIMENTAL_SETTINGS: "false"
+      FEATURE_BETA_FEATURES: "false"
+      FEATURE_BANXA: "true"
+      FEATURE_LAYERSWAP: "true"
+      FEATURE_ORBITER: "true"
+      FEATURE_MULTISIG: "true"
+      ENABLE_TOKEN_DETAILS: "true"
+      FEATURE_DEFI_DECOMPOSITION: "true"
+
+      # API URLs
+      ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
+      # API ENVIRONMENT
+      ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
+
+      # Sentry
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_ENVIRONMENT: "staging"
+
+      # Misc
+      RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
+      SAFE_ENV_VARS: false
+      MULTICALL_MAX_BATCH_SIZE: 20
+      NEW_CAIRO_0_ENABLED: false
+      TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
+      # Refresh intervals
+      FAST: 20 # 20s
+      MEDIUM: 60 # 60s
+      SLOW: 60 * 5 # 5m
+      VERY_SLOW: 24 * 60 * 60 # 1d
+      MIN_LEDGER_APP_VERSION: 2.2.1
+
+      #For testing only
+      FEE_OVERHEAD: 2
+
+    steps:
+      # Setup Project
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Set Sentry Release name (rc)
+        run: |
+          PACKAGE_VERSION=$(grep -m1 '"version":' ./packages/extension/package.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+          echo "SENTRY_RELEASE=${PACKAGE_VERSION}-rc__${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Setup project
+        run: pnpm run setup
+
+      - name: Build extension for ${{ matrix.extension_type }}
+        run: |
+          if [ "${{ matrix.extension_type }}" = "firefox" ]; then
+            echo "Building extension using manifest v2"
+            MANIFEST_VERSION=v2 pnpm run build:extension
+          else
+            echo "Building extension using manifest v3"
+            MANIFEST_VERSION=v3 pnpm run build:extension
+          fi
+
+      - name: Check bundle size for ${{ matrix.extension_type }}
+        run: pnpm check-bundle-size
+
+      - name: Use Cache
+        uses: actions/cache@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
+
+      - name: Set filename prefix
+        run: echo "FILENAME_PREFIX=$(echo argent-x-${{ matrix.env }}-${{ github.ref_name }} | tr / -)" >> $GITHUB_ENV
+
+      - name: Install zip
+        run: apt-get update && apt-get install -y zip
 
       - name: Create ${{ matrix.extension_type }} zip
         run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}" .)
@@ -122,17 +390,18 @@ jobs:
 
   test-unit:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
     needs: [build-all-artifacts]
     environment: "hydrogen" # test-unit is always run against hydrogen
 
     env:
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
-      ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
-      ARGENT_HEALTHCHECK_BASE_URL: ${{ vars.ARGENT_HEALTHCHECK_BASE_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
       ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
       ARGENT_X_ENVIRONMENT: "hydrogen"
       FEATURE_MULTISIG: "true"
+      DEVNET_HOST: devnet
 
     services:
       devnet:
@@ -149,16 +418,16 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -166,7 +435,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-hydrogen # test-unit is always run against chrome-hydrogen build
@@ -178,7 +447,7 @@ jobs:
         run: pnpm run test:ci
       - name: SonarCloud Scan
         # TODO replace with master as soon as sonarcloud fixes the issue with action https://community.sonarsource.com/t/sonarsource-sonarcloud-github-action-failing-with-node-js-12-error/89664/2
-        uses: SonarSource/sonarcloud-github-action@v2.3.0
+        uses: SonarSource/sonarcloud-github-action@v3.1.0
         with:
           projectBaseDir: ./packages/extension
         env:
@@ -187,6 +456,8 @@ jobs:
 
   test-e2e:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
     needs: [build-all-artifacts]
     strategy:
       matrix:
@@ -202,9 +473,6 @@ jobs:
       E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
       E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
       ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
-      ##slack config
-      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
 
       E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
       E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
@@ -220,9 +488,16 @@ jobs:
       E2E_SKIP_TX_TESTS: ${{ secrets.E2E_SKIP_TX_TESTS}}
       E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
       E2E_GUARDIAN_EMAIL: ${{ secrets.E2E_GUARDIAN_EMAIL }}
+      E2E_MIG_ACCOUNT_ADDRESS: ${{ secrets.E2E_MIG_ACCOUNT_ADDRESS }}
+      E2E_ACCOUNT_TO_IMPORT_AND_TX: ${{ secrets.E2E_ACCOUNT_TO_IMPORT_AND_TX }}
+      E2E_ACCOUNTS_TO_IMPORT: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT }}
+      E2E_QA_UTILS_AUTH_TOKEN: ${{ secrets.E2E_QA_UTILS_AUTH_TOKEN }}
+      E2E_QA_UTILS_URL: ${{ secrets.E2E_QA_UTILS_URL }}
+      E2E_MIG_VERSIONS: ${{ secrets.E2E_MIG_VERSIONS }}
+      E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
       # Refresh intervals
-      REFRESH_INTERVAL_FAST: 1 # 1s
-      REFRESH_INTERVAL_MEDIUM: 5 # 5s
+      REFRESH_INTERVAL_FAST: 20 # 1s
+      REFRESH_INTERVAL_MEDIUM: 20 # 5s
       REFRESH_INTERVAL_SLOW: 20 # 20s
       REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
@@ -233,16 +508,16 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -250,16 +525,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }} # test-e2e is always run against chrome-hydrogen build
 
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
       - name: Run e2e tests
-        run: xvfb-run --auto-servernum pnpm test:e2e:extension --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: xvfb-run --auto-servernum pnpm test:e2e --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -281,6 +553,8 @@ jobs:
 
   test-e2e-prod:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
     needs: [build-all-artifacts]
     strategy:
       matrix:
@@ -295,16 +569,14 @@ jobs:
       E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
       ARGENT_MAINNET_RPC_URL: ${{ secrets.ARGENT_MAINNET_RPC_URL }}
       ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
-      ##slack config
-      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
 
       E2E_MAINNET_SEED1: ${{ secrets.E2E_MAINNET_SEED1 }}
       ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
       E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
+      E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
       # Refresh intervals
-      REFRESH_INTERVAL_FAST: 1 # 1s
-      REFRESH_INTERVAL_MEDIUM: 5 # 5s
+      REFRESH_INTERVAL_FAST: 20 # 20s
+      REFRESH_INTERVAL_MEDIUM: 20 # 20s
       REFRESH_INTERVAL_SLOW: 20 # 20s
       REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
@@ -316,16 +588,16 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -333,16 +605,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }}
 
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
       - name: Run e2e prod tests
-        run: xvfb-run --auto-servernum pnpm test:e2e:extension:prod --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: xvfb-run --auto-servernum pnpm test:e2e:mainnet --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -364,6 +633,8 @@ jobs:
 
   test-e2e-tx:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
     needs: [build-all-artifacts]
     strategy:
       matrix:
@@ -379,9 +650,6 @@ jobs:
       E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
       E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
       ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
-      ##slack config
-      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
 
       E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
       E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
@@ -397,9 +665,17 @@ jobs:
       E2E_SKIP_TX_TESTS: ${{ secrets.E2E_SKIP_TX_TESTS}}
       E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
       E2E_GUARDIAN_EMAIL: ${{ secrets.E2E_GUARDIAN_EMAIL }}
+      E2E_MIG_ACCOUNT_ADDRESS: ${{ secrets.E2E_MIG_ACCOUNT_ADDRESS }}
+      E2E_ACCOUNT_TO_IMPORT_AND_TX: ${{ secrets.E2E_ACCOUNT_TO_IMPORT_AND_TX }}
+      E2E_ACCOUNTS_TO_IMPORT: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT }}
+      E2E_QA_UTILS_AUTH_TOKEN: ${{ secrets.E2E_QA_UTILS_AUTH_TOKEN }}
+      E2E_QA_UTILS_URL: ${{ secrets.E2E_QA_UTILS_URL }}
+      INITIAL_BALANCE_MULTIPLIER: ${{ secrets.INITIAL_BALANCE_MULTIPLIER }}
+      E2E_MIG_VERSIONS: ${{ secrets.E2E_MIG_VERSIONS }}
+      E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
       # Refresh intervals
-      REFRESH_INTERVAL_FAST: 1 # 1s
-      REFRESH_INTERVAL_MEDIUM: 5 # 5s
+      REFRESH_INTERVAL_FAST: 20 # 1s
+      REFRESH_INTERVAL_MEDIUM: 20 # 5s
       REFRESH_INTERVAL_SLOW: 20 # 20s
       REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
     steps:
@@ -409,32 +685,29 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - name: Restore cached build
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }}
 
-      - name: Install Playwright Browsers
-        run: npx playwright install chromium
-
       - name: Run e2e tx tests
-        run: xvfb-run --auto-servernum pnpm test:e2e:extension:tx --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: xvfb-run --auto-servernum pnpm test:e2e:tx --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -453,61 +726,31 @@ jobs:
           name: all-blob-reports-tx-${{ matrix.shardIndex }}
           path: packages/e2e/blob-report/
           retention-days: 5
-
   test-notify-low-balance:
     runs-on: ubuntu-latest
     if: always()
     needs: [build-all-artifacts, test-e2e, test-e2e-prod]
     env:
-      ARGENT_X_ENVIRONMENT: "hydrogen"
-      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
-
-      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
-      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
-      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
-      ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
-
-      ##slack config
-      SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-      SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+      E2E_QA_UTILS_AUTH_TOKEN: ${{ secrets.E2E_QA_UTILS_AUTH_TOKEN }}
+      E2E_QA_UTILS_URL: ${{ secrets.E2E_QA_UTILS_URL }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 9
-          run_install: false
-
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
-          cache: "pnpm"
-
-      - name: Restore pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Restore cached build
-        uses: actions/cache@v4
-        with:
-          path: ./*
-          key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }} # test-e2e is always run against chrome-hydrogen build
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Slack notifications
-        run: pnpm run test:e2e:slack-notifications
+        run: node packages/e2e/src/utils/slackNotif.js
 
   merge-reports:
-    needs: [test-e2e, test-e2e-prod]
+    needs: [test-e2e, test-e2e-prod, test-e2e-tx]
     if: always()
 
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
     steps:
       - uses: actions/checkout@v4
 
@@ -515,16 +758,16 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -550,97 +793,15 @@ jobs:
 
   add_pr_comments:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'}} # Run only for pull requests and if not triggered by dependabot
+    if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
     needs: [build-all-artifacts, test-unit, test-e2e, test-e2e-prod]
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 9
-          run_install: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "18.x"
-          cache: "pnpm"
-
-      - name: Restore pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Set GHA_BRANCH
-        run: echo "GHA_BRANCH=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
-
       - name: Comment PR
-        continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ env.GHA_BRANCH }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-
-  create_sentry_release:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'}} # Run only for pull requests and if not triggered by dependabot
-    needs: [build-all-artifacts, test-unit, test-e2e, test-e2e-prod]
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 9
-          run_install: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "18.x"
-          cache: "pnpm"
-
-      - name: Restore cached build
-        uses: actions/cache@v4
-        with:
-          path: ./*
-          key: ${{ github.sha }}-chrome-hydrogen
-
-      - name: Get Extension version
-        id: package-version
-        run: |
-          PACKAGE_VERSION=$(cat ./packages/extension/package.json | jq -r '.version')
-          echo "current-version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Check sourcemaps
-        run: |
-          ls -l ./packages/extension
-          if [ ! -d "./packages/extension/sourcemaps" ]; then
-            echo "No sourcemaps found"
-            exit 0
-          fi
-
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-          SENTRY_LOG_LEVEL: debug
-        with:
-          environment: ${{ env.SENTRY_ENVIRONMENT  }}
-          sourcemaps: "./packages/extension/dist ./packages/extension/sourcemaps"
-          url_prefix: "~/"
-          version: ${{ steps.package-version.outputs.current-version }}-rc__${{ github.sha }}
-          ignore_missing: true
+          gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
 
   slack_notif:
     runs-on: ubuntu-latest

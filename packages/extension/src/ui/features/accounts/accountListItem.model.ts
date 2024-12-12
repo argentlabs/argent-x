@@ -1,16 +1,17 @@
-import { FlexProps } from "@chakra-ui/react"
-import { ReactNode } from "react"
+import type { FlexProps } from "@chakra-ui/react"
+import type { ReactNode } from "react"
 
-import { ArgentAccountType } from "../../../shared/wallet.model"
-import { CustomButtonCellProps } from "../../components/CustomButtonCell"
+import type { AccountId, WalletAccountType } from "../../../shared/wallet.model"
+import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
 
 export interface AccountListItemProps extends CustomButtonCellProps {
   accountName: string
   accountDescription?: string
+  accountId: AccountId
   accountAddress: string
   networkId: string
   networkName?: string
-  accountType?: ArgentAccountType
+  accountType?: WalletAccountType
   deploying?: boolean
   upgrade?: boolean
   connectedHost?: string

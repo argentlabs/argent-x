@@ -1,5 +1,5 @@
 import type Emittery from "emittery"
-import {
+import type {
   ActionHash,
   ActionQueueItemMeta,
 } from "../../../shared/actionQueue/schema"

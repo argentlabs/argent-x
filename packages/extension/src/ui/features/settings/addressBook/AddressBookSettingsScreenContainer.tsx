@@ -1,7 +1,8 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { AddressBookContact } from "../../../../shared/addressBook/type"
+import type { AddressBookContact } from "../../../../shared/addressBook/type"
 import { routes } from "../../../../shared/ui/routes"
 import { allAddressBookContactsView } from "../../../views/addressBook"
 import { useView } from "../../../views/implementation/react"

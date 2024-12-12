@@ -1,10 +1,10 @@
 import { useLedgerDeviceConnection } from "./useLedgerDeviceConnection"
 import { isLedgerSigner } from "../utils"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { AccountId } from "../../../../shared/wallet.model"
 import { useWalletAccount } from "../../accounts/accounts.state"
 
-export function useLedgerStatus(baseAccount?: BaseWalletAccount) {
+export function useLedgerStatus(accountId?: AccountId) {
   const isLedgerConnected = useLedgerDeviceConnection()
-  const account = useWalletAccount(baseAccount)
+  const account = useWalletAccount(accountId)
   return account && isLedgerSigner(account) && isLedgerConnected
 }

@@ -1,12 +1,15 @@
 import { isEmpty } from "lodash-es"
 import { num } from "starknet"
 import { isUpgradeTransaction } from "../../../shared/activity/utils/transform/is"
+import type { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
 import {
-  MultisigPendingTransaction,
   multisigPendingTransactionsAccountView,
   multisigPendingTxToTransformedTx,
 } from "../../../shared/multisig/pendingTransactionsStore"
-import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { useView } from "../../views/implementation/react"
 import { multisigView } from "./multisig.state"
 import { useMemo } from "react"

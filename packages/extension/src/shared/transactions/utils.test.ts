@@ -3,8 +3,8 @@ import {
   getTransactionStatus,
   identifierToBaseTransaction,
 } from "./utils"
-import { ExecutionStatus, ExtendedFinalityStatus } from "../transactions"
-import { WalletAccount } from "../wallet.model"
+import type { ExecutionStatus, ExtendedFinalityStatus } from "../transactions"
+import type { WalletAccount } from "../wallet.model"
 import { describe, test, expect } from "vitest"
 
 describe("Make sure encode and decode to identifier return to the same value", () => {

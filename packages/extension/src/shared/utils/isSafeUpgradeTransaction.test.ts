@@ -1,14 +1,26 @@
 // Import the method and any other dependencies
 import { describe, it, expect } from "vitest"
 import { isSafeUpgradeTransaction } from "./isSafeUpgradeTransaction"
-import { ExtendedTransactionType, Transaction } from "../transactions"
+import type { ExtendedTransactionType, Transaction } from "../transactions"
 import { SignerType } from "../wallet.model"
-import { Address } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
+import { getAccountIdentifier } from "./accountIdentifier"
+
+const address =
+  "0x07059f14f63fe428f802520078965ead76fbe8693d1f7bd88de74a887cccf418"
+const networkId = "sepolia-alpha"
+
+const mockSigner = {
+  type: SignerType.LOCAL_SECRET,
+  derivationPath: "m/44'/60'/0'/0/0",
+}
+
+const accountId = getAccountIdentifier(address, networkId, mockSigner)
 
 const transactionWithMeta: Transaction = {
   account: {
-    address:
-      "0x07059f14f63fe428f802520078965ead76fbe8693d1f7bd88de74a887cccf418",
+    id: accountId,
+    address,
     cairoVersion: "1",
     classHash:
       "0x0737ee2f87ce571a58c6c8da558ec18a07ceb64a6172d5ec46171fbc80077a48",
@@ -27,7 +39,7 @@ const transactionWithMeta: Transaction = {
       },
       chainId: "SN_SEPOLIA",
       explorerUrl: "https://sepolia.voyager.online",
-      id: "sepolia-alpha",
+      id: networkId,
       l1ExplorerUrl: "https://sepolia.etherscan.io",
       multicallAddress:
         "0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4",
@@ -40,10 +52,7 @@ const transactionWithMeta: Transaction = {
       rpcUrl: "https://api.hydrogen.argent47.net/v1/starknet/sepolia/rpc/v0.7",
     },
     networkId: "sepolia-alpha",
-    signer: {
-      derivationPath: "m/44'/9004'/1'/0/8",
-      type: SignerType.LOCAL_SECRET,
-    },
+    signer: mockSigner,
     type: "multisig",
   },
   hash: "0x07b1cd0fa0ebf7421a967e435e55d0195d0c89db1bca7acc0ed551d76d320534",

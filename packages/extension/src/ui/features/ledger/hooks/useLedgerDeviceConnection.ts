@@ -31,19 +31,26 @@ export function useLedgerDeviceConnection() {
 
   useEffect(() => {
     // Set the initial state
-    if (!isFirefox) {
+    if (!isFirefox && navigator.hid) {
       void detectLedgerDevice()
       navigator.hid.addEventListener("connect", onConnect)
       navigator.hid.addEventListener("disconnect", onDisconnect)
-      browser.windows.onFocusChanged.addListener(detectLedgerDevice)
+      browser.windows.onFocusChanged.addListener(
+        () => void detectLedgerDevice(),
+      )
 
       return () => {
+        if (!navigator.hid) {
+          return
+        }
         navigator.hid.removeEventListener("connect", onConnect)
         navigator.hid.removeEventListener("disconnect", onDisconnect)
-        browser.windows.onFocusChanged.removeListener(detectLedgerDevice)
+        browser.windows.onFocusChanged.removeListener(
+          () => void detectLedgerDevice(),
+        )
       }
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return ledgerDeviceConnected
 }

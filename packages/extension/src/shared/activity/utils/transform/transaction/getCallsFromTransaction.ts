@@ -1,5 +1,5 @@
-import { Transaction } from "../../../../transactions"
-import { ActivityTransaction } from "../type"
+import type { Transaction } from "../../../../transactions"
+import type { ActivityTransaction } from "../type"
 
 /**
  * Return an array of calls from transaction

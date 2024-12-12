@@ -1,30 +1,32 @@
 import {
+  B3,
   BarBackButton,
   CellStack,
-  L2,
+  icons,
+  L2Bold,
   NavigationContainer,
-  P3,
-  iconsDeprecated,
-  B3,
+  P2,
 } from "@argent/x-ui"
-import { FC, ReactEventHandler, useState } from "react"
+import type { FC, ReactEventHandler } from "react"
+import { useState } from "react"
 import { Button, Center, Flex } from "@chakra-ui/react"
 import copy from "copy-to-clipboard"
 
-import { useRouteAccountAddress } from "../../../hooks/useRoute"
+import { useRouteAccountId } from "../../../hooks/useRoute"
 import { usePrivateKey } from "../../accountTokens/usePrivateKey"
-import { PasswordFormProps } from "../../lock/PasswordForm"
-import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
+import type { PasswordFormProps } from "../../lock/PasswordForm"
 import { QrCode } from "../../../components/QrCode"
 import { PasswordWarningForm } from "../ui/PasswordWarningForm"
+import { upperFirst } from "lodash-es"
 
-const { AlertFillIcon, HideIcon } = iconsDeprecated
+const { WarningCirclePrimaryIcon, HideSecondaryIcon } = icons
 
 export interface ExportPrivateKeyScreenProps
   extends Pick<PasswordFormProps, "verifyPassword"> {
   onBack: ReactEventHandler
   passwordIsValid: boolean
   privateKey?: string
+  type?: "export" | "reveal"
 }
 
 export const ExportPrivateKeyScreen: FC<ExportPrivateKeyScreenProps> = ({
@@ -32,11 +34,12 @@ export const ExportPrivateKeyScreen: FC<ExportPrivateKeyScreenProps> = ({
   passwordIsValid,
   verifyPassword,
   privateKey,
+  type,
 }) => {
   return (
     <NavigationContainer
       leftButton={<BarBackButton onClick={onBack} />}
-      title={"Export private key"}
+      title={`${upperFirst(type)} private key`}
     >
       {passwordIsValid ? (
         <ExportPrivateKey privateKey={privateKey} />
@@ -65,9 +68,8 @@ function ExportPrivateKey({
     setIsBlurred(!isBlurred)
   }
   const [privateKeyCopied, setPrivateKeyCopied] = useState(false)
-  const accountAddress = useRouteAccountAddress()
-  const network = useCurrentNetwork()
-  const privateKey = usePrivateKey(accountAddress, network.id) || privateKeyProp
+  const accountId = useRouteAccountId()
+  const privateKey = usePrivateKey(accountId) || privateKeyProp
   if (!privateKey) {
     return null
   }
@@ -89,10 +91,10 @@ function ExportPrivateKey({
         bg={"warn.900"}
         mb={4}
       >
-        <L2>
+        <L2Bold>
           WARNING! Never disclose this key. Anyone with your private key can
           steal any assets held in your account
-        </L2>
+        </L2Bold>
       </Flex>
       <Center
         onClick={handleClick}
@@ -103,14 +105,14 @@ function ExportPrivateKey({
         px={6}
       >
         <QrCode size={208} data={privateKey} data-key={privateKey} />
-        <P3
+        <P2
           aria-label="Private key"
           textAlign={"center"}
           fontWeight={"semibold"}
           w={"full"}
         >
           {privateKey}
-        </P3>
+        </P2>
       </Center>
       {isBlurred && (
         <Center
@@ -126,7 +128,7 @@ function ExportPrivateKey({
           cursor="pointer"
           flexDirection="column"
         >
-          <HideIcon fontSize="2xl" mb={2} />
+          <HideSecondaryIcon fontSize="2xl" mb={2} />
           <B3 fontWeight="bold">Click to reveal private key</B3>
         </Center>
       )}
@@ -134,7 +136,7 @@ function ExportPrivateKey({
         mt={3}
         colorScheme={privateKeyCopied ? "inverted" : undefined}
         size={"sm"}
-        leftIcon={<AlertFillIcon color="warn.500" />}
+        leftIcon={<WarningCirclePrimaryIcon color="warn.500" />}
         mx={"auto"}
         onClick={onCopy}
       >

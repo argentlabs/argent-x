@@ -1,35 +1,40 @@
-import { Flex, FlexProps } from "@chakra-ui/react"
+import type { FlexProps } from "@chakra-ui/react"
+import { Flex } from "@chakra-ui/react"
 import { TransactionIcon } from "./icon/TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
-import { FC } from "react"
-import { useDappDisplayAttributes } from "../../connectDapp/useDappDisplayAttributes"
-import { IconDeprecatedKeys } from "@argent/x-ui"
+import type { FC } from "react"
+import type { IconKeys } from "@argent/x-ui"
+import { useDappDisplayAttributes } from "../../../../services/knownDapps/useDappDisplayAttributes"
 
 export interface SessionKeyHeaderProps extends FlexProps {
   title?: string
   dappLogoUrl?: string
   subtitle?: string
-  iconKey?: IconDeprecatedKeys
+  iconKey?: IconKeys
   dappHost?: string
+  isInfluence: boolean
 }
 
 export const SessionKeyHeader: FC<SessionKeyHeaderProps> = ({
   title,
   dappLogoUrl,
   subtitle,
-  iconKey = "NetworkIcon",
+  iconKey = "NetworkSecondaryIcon",
   dappHost,
+  isInfluence,
   ...rest
 }) => {
   return (
     <Flex
       alignItems={"center"}
       px={4}
-      pt={30}
+      pt={isInfluence ? 30 : 4}
       pb={3}
       gap={4}
       background={
-        'linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000000 100%), url("../../../assets/influence.png")'
+        isInfluence
+          ? 'linear-gradient(to bottom, rgba(0,0,0,0) 50%, #000000 100%), url("../../../assets/influence.png")'
+          : ""
       }
       backgroundSize="cover"
       backgroundPosition="bottom"

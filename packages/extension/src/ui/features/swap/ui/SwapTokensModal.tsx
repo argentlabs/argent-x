@@ -1,4 +1,4 @@
-import { CellStack, H5, SearchInput } from "@argent/x-ui"
+import { CellStack, H4, SearchInput } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,
@@ -6,12 +6,13 @@ import {
   ModalContent,
   ModalHeader,
 } from "@chakra-ui/react"
-import { FC, Fragment, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { Fragment, useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 
 import { OwnedToken } from "./OwnedToken"
 import { TokenPrice } from "./TokenPrice"
-import { Token } from "../../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
 import { useTradableTokensInCurrentNetwork } from "../../accountTokens/tokens.state"
 import { sortSwapTokens } from "../utils"
 
@@ -66,9 +67,9 @@ const SwapTokensModal: FC<SwapTokensModalProps> = ({
       <Modal isOpen={isOpen} onClose={onClose} size="full" motionPreset="none">
         <ModalContent bg="surface-default">
           <ModalHeader>
-            <H5 fontWeight="600" textAlign="center">
+            <H4 fontWeight="600" textAlign="center">
               {isPay ? "Pay with" : "Receive "}
-            </H5>
+            </H4>
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody flexDirection="column">

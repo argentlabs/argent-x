@@ -1,10 +1,7 @@
-import { ChakraComponent, chakra, shouldForwardProp } from "@chakra-ui/react"
-import {
-  ForwardRefComponent,
-  HTMLMotionProps,
-  isValidMotionProp,
-  motion,
-} from "framer-motion"
+import type { ChakraComponent } from "@chakra-ui/react"
+import { chakra, shouldForwardProp } from "@chakra-ui/react"
+import type { ForwardRefComponent, HTMLMotionProps } from "framer-motion"
+import { isValidMotionProp, motion } from "framer-motion"
 
 export const StackScreenMotionContainer: ChakraComponent<
   ForwardRefComponent<HTMLDivElement, HTMLMotionProps<"div">>,

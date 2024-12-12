@@ -5,7 +5,8 @@ import {
   SpacerCell,
 } from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
-import React, { FC, useCallback, useState } from "react"
+import type { FC } from "react"
+import React, { useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import {
@@ -17,25 +18,23 @@ import { useReturnTo } from "../../../hooks/useRoute"
 import { AccountAvatar } from "../../accounts/AccountAvatar"
 import { AccountListItemLedgerBadge } from "../../accounts/AccountListItemLedgerBadge"
 import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
-import { UpgradeBannerContainer } from "../../accountTokens/UpgradeBannerContainer"
+import {
+  UpgradeBannerContainer,
+  useShowUpgradeBanner,
+} from "../../banners/UpgradeBannerContainer"
 import { useIsLedgerSigner } from "../../ledger/hooks/useIsLedgerSigner"
-import { multisigView } from "../../multisig/multisig.state"
-import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 import { useRouteWalletAccount } from "../../smartAccount/useRouteWalletAccount"
 import { AccountEditButtonsContainer } from "./AccountEditButtons/AccountEditButtonsContainer"
 import { AccountEditName } from "./AccountEditName"
-import { useView } from "../../../views/implementation/react"
 
 export const AccountSettingsScreen: FC = () => {
-  const currentNetwork = useCurrentNetwork()
   const account = useRouteWalletAccount()
-  const accountAddress = account?.address ?? ""
   const navigate = useNavigate()
   const returnTo = useReturnTo()
   const accountName = account ? account.name : "Not found"
+  const showUpgradeBanner = useShowUpgradeBanner(account)
 
-  const isLedger = useIsLedgerSigner(account)
-  const multisig = useView(multisigView(account))
+  const isLedger = useIsLedgerSigner(account?.id)
 
   const [liveEditingAccountName, setLiveEditingAccountName] =
     useState(accountName)
@@ -57,7 +56,7 @@ export const AccountSettingsScreen: FC = () => {
       return
     }
 
-    void accountService.setName(liveEditingAccountName, account)
+    void accountService.setName(liveEditingAccountName, account.id)
     if (account.type === "smart") {
       void accountSharedService.sendAccountNameToBackend({
         address: account.address,
@@ -74,20 +73,21 @@ export const AccountSettingsScreen: FC = () => {
     return <></>
   }
 
+  const testId = `account-settings-${liveEditingAccountName?.replaceAll(/ /g, "") ?? "unknown"}`
+
   return (
     <>
       <NavigationContainer
         leftButton={<BarBackButton onClick={onClose} />}
         title={liveEditingAccountName}
-        data-testid={`account-settings-${liveEditingAccountName.replaceAll(/ /g, "")}`}
+        data-testid={testId}
       >
         <Center p={4}>
           <AccountAvatar
             size={20}
             src={getNetworkAccountImageUrl({
               accountName: liveEditingAccountName,
-              accountAddress,
-              networkId: currentNetwork.id,
+              accountId: account.id,
               backgroundColor: account?.hidden ? "333332" : undefined,
             })}
           >
@@ -104,7 +104,7 @@ export const AccountSettingsScreen: FC = () => {
           </AccountAvatar>
         </Center>
         <CellStack>
-          <Flex direction={"column"}>
+          <Flex direction={"column"} boxShadow={"menu"}>
             <AccountEditName
               value={liveEditingAccountName}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -119,15 +119,15 @@ export const AccountSettingsScreen: FC = () => {
               border={"1px solid"}
               borderColor={"border"}
               borderTop={"none"}
-              borderBottomLeftRadius="lg"
-              borderBottomRightRadius="lg"
+              borderBottomRadius="lg"
+              bg="surface-elevated"
               p={2}
             >
               <StarknetIdOrAddressCopyButton account={account} />
             </Center>
           </Flex>
           <SpacerCell />
-          <UpgradeBannerContainer account={account} multisig={multisig} />
+          {showUpgradeBanner && <UpgradeBannerContainer account={account} />}
           <AccountEditButtonsContainer account={account} />
         </CellStack>
       </NavigationContainer>

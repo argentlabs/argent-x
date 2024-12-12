@@ -1,4 +1,4 @@
-import { IObjectStore } from "../interface"
+import type { IObjectStore } from "../interface"
 import { adaptObjectStorage } from "../object"
 import { ObjectStorage } from "../../object"
 

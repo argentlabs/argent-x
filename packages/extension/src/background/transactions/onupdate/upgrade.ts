@@ -2,12 +2,12 @@ import { optimisticImplUpdate } from "../../../shared/account/optimisticImplUpda
 import { accountService } from "../../../shared/account/service"
 import { transformTransaction } from "../../../shared/activity/utils/transform"
 import { isUpgradeTransaction } from "../../../shared/activity/utils/transform/is"
-import { Transaction } from "../../../shared/transactions"
+import type { Transaction } from "../../../shared/transactions"
 import { isSuccessfulTransaction } from "../../../shared/transactions/utils"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
 import { isSafeUpgradeTransaction } from "../../../shared/utils/isSafeUpgradeTransaction"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { TransactionUpdateListener } from "./type"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import type { TransactionUpdateListener } from "./type"
 
 export const handleUpgradeTransaction: TransactionUpdateListener = async (
   transactions,

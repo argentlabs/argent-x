@@ -1,8 +1,8 @@
 import { addressSchema } from "@argent/x-shared"
-import { TransactionActionPayload } from "../actionQueue/types"
+import type { TransactionActionPayload } from "../actionQueue/types"
 import { transformTransaction } from "../activity/utils/transform"
 import { isUpgradeTransaction } from "../activity/utils/transform/is"
-import { Transaction } from "../transactions"
+import type { Transaction } from "../transactions"
 
 // This function checks if a transaction is a safe upgrade transaction
 // with backwards compatibility for old upgrade transactions

@@ -1,5 +1,10 @@
-import { isArgentNetworkId, isEqualAddress } from "@argent/x-shared"
-import { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
+import {
+  includesAddress,
+  isArgentNetworkId,
+  isEqualAddress,
+} from "@argent/x-shared"
+import type { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
+import { AccountAddedEvent } from "../../../../shared/account/service/accountService/IAccountService"
 import { RefreshIntervalInSeconds } from "../../../../shared/config"
 import type { IDebounceService } from "../../../../shared/debounce"
 import { defaultNetwork } from "../../../../shared/network"
@@ -17,17 +22,17 @@ import type { Token } from "../../../../shared/token/__new/types/token.model"
 import type { Transaction } from "../../../../shared/transactions"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { getSuccessfulTransactions } from "../../../../shared/utils/transactionSucceeded"
-import {
+import type {
   BaseWalletAccount,
-  isNetworkOnlyPlaceholderAccount,
   NetworkOnlyPlaceholderAccount,
 } from "../../../../shared/wallet.model"
+import { isNetworkOnlyPlaceholderAccount } from "../../../../shared/wallet.model"
 import type { WalletStorageProps } from "../../../../shared/wallet/walletStore"
 import { Recovered } from "../../../wallet/recovery/IWalletRecoveryService"
-import { WalletRecoverySharedService } from "../../../wallet/recovery/WalletRecoverySharedService"
+import type { WalletRecoverySharedService } from "../../../wallet/recovery/WalletRecoverySharedService"
+import type { NewTokenActivityPayload } from "../../activity/IActivityService"
 import {
   NewTokenActivity,
-  NewTokenActivityPayload,
   TokenActivity,
   type IActivityService,
   type TokenActivityPayload,
@@ -77,6 +82,12 @@ export class TokenWorker {
     this.activityService.emitter.on(
       NewTokenActivity,
       this.onNewTokensDiscovered.bind(this),
+    )
+
+    // Listen for new account added event
+    this.accountService.emitter.on(
+      AccountAddedEvent,
+      this.runUpdatesForAccount.bind(this),
     )
   }
 
@@ -146,6 +157,7 @@ export class TokenWorker {
   async runUpdatesForAccount(account: BaseWalletAccount) {
     void this.maybeUpdateTokensFromBackendForAccount(account)
     void this.updateTokenBalancesFromOnChain(account)
+    void this.discoverTokensFromBackendForAccount(account)
   }
 
   async onTransactionRepoChange(changeSet: StorageChange<Transaction[]>) {
@@ -340,5 +352,50 @@ export class TokenWorker {
       allAccounts,
       discoveredTokensInfo,
     )
+  }
+
+  async discoverTokensFromBackendForAccount(account: BaseWalletAccount) {
+    const accountTokenBalancesFromBackend =
+      await this.tokenService.fetchAccountTokenBalancesFromBackend(account)
+
+    const tokensOnNetwork = await this.tokenService.getTokens(
+      (token) => account.networkId === token.networkId,
+    )
+
+    const knownTokenAddresses = tokensOnNetwork.map((token) => token.address)
+
+    const discoveredTokens = accountTokenBalancesFromBackend.filter(
+      (accountTokenBalance) => {
+        return !includesAddress(
+          accountTokenBalance.address,
+          knownTokenAddresses,
+        )
+      },
+    )
+    if (!discoveredTokens.length) {
+      return
+    }
+
+    const tokensInfoOnNetwork =
+      await this.tokenService.getTokensInfoFromBackendForNetwork(
+        account.networkId,
+      )
+    if (!tokensInfoOnNetwork) {
+      return
+    }
+    /** both sets of tokens are already on the same network */
+    const discoveredTokensInfo: Token[] = []
+    discoveredTokens.forEach((discoveredToken) => {
+      const tokenInfo = tokensInfoOnNetwork.find((tokenInfo) =>
+        isEqualAddress(discoveredToken.address, tokenInfo.address),
+      )
+      if (tokenInfo) {
+        discoveredTokensInfo.push({
+          ...tokenInfo,
+          networkId: account.networkId,
+        })
+      }
+    })
+    await this.tokenService.addToken(discoveredTokensInfo)
   }
 }

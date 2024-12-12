@@ -1,26 +1,23 @@
-import {
-  EnrichedSimulateAndReview,
-  isNotTransactionSimulationError,
-} from "@argent/x-shared/simulation"
+import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import { isNotTransactionSimulationError } from "@argent/x-shared/simulation"
 import {
   TransactionReviewActions,
   TransactionReviewSignAction,
   TransactionReviewSimulation,
 } from "@argent/x-ui/simulation"
-import { Divider } from "@chakra-ui/react"
-import { FC, ReactNode, useMemo } from "react"
-import { TypedData } from "@starknet-io/types-js"
+import type { FC, ReactNode } from "react"
+import { useMemo } from "react"
+import type { TypedData } from "@starknet-io/types-js"
 
 import { ListSkeleton } from "../../../components/ScreenSkeleton"
-import {
-  ConfirmScreen,
-  ConfirmScreenProps,
-} from "../transaction/ApproveTransactionScreen/ConfirmScreen"
+import type { ConfirmScreenProps } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
+import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
 import { SessionKeyReview } from "./SessionKeyReview"
 import { TransactionHeader } from "./header"
-import { NavigationBarAccountDetailsContainer } from "./header/NavigationBarAccountDetailsContainer"
+import { AccountDetailsNavigationBarContainer } from "../../navigation/AccountDetailsNavigationBarContainer"
 import { SessionKeyHeader } from "./header/SessionKeyHeader"
 import { isSessionKeyTypedData } from "../../../../shared/sessionKeys/schema"
+import { useIsInfluenceDapp } from "../connectDapp/useIsInfluenceDapp"
 
 interface SignActionScreenV2Props extends ConfirmScreenProps {
   dataToSign: TypedData
@@ -48,13 +45,15 @@ export const SignActionScreenV2: FC<SignActionScreenV2Props> = ({
   error,
   ...rest
 }) => {
+  const isInfluence = useIsInfluenceDapp(dappHost)
+
   const isSessionKey = isSessionKeyTypedData(dataToSign)
 
   const signatureReviewSimulation = useMemo(() => {
     if (!review) {
       return null
     }
-    const txSimulations = review.transactions.flatMap((transaction) =>
+    const txSimulations = review.transactions?.flatMap((transaction) =>
       isNotTransactionSimulationError(transaction)
         ? transaction.simulation
         : false,
@@ -73,7 +72,7 @@ export const SignActionScreenV2: FC<SignActionScreenV2Props> = ({
     )
   }, [review, networkId])
   const signatureReviewActions = useMemo(() => {
-    return review?.transactions.map((transaction, index) => {
+    return review?.transactions?.map((transaction, index) => {
       return (
         <TransactionReviewActions
           key={`review-${index}`}
@@ -85,12 +84,7 @@ export const SignActionScreenV2: FC<SignActionScreenV2Props> = ({
     })
   }, [networkId, review?.transactions])
 
-  const navigationBar = (
-    <>
-      <NavigationBarAccountDetailsContainer />
-      <Divider color="neutrals.700" />
-    </>
-  )
+  const navigationBar = <AccountDetailsNavigationBarContainer />
 
   const transactionHeader = isSessionKey ? null : (
     <TransactionHeader
@@ -108,6 +102,7 @@ export const SignActionScreenV2: FC<SignActionScreenV2Props> = ({
       dappLogoUrl={dappLogoUrl}
       subtitle={subtitle}
       dappHost={dappHost}
+      isInfluence={isInfluence}
     />
   ) : null
 

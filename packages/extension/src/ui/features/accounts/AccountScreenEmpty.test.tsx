@@ -6,18 +6,18 @@ import { AccountScreenEmpty } from "./AccountScreenEmpty"
 
 describe("AccountScreenEmpty", () => {
   it("Calls expected methods when buttons are clicked", async () => {
-    const onCreate = vi.fn()
-
+    const onAddAccount = vi.fn()
+    const onHiddenAccounts = vi.fn()
     renderWithLegacyProviders(
       <AccountScreenEmpty
         hasHiddenAccounts={false}
         currentNetworkName={"Foo bar network"}
-        onCreate={onCreate}
+        onHiddenAccounts={onHiddenAccounts}
+        onAddAccount={onAddAccount}
       />,
     )
-
-    await screen.findByText("Create account")
-    fireEvent.click(screen.getByText("Create account"))
-    expect(onCreate).toHaveBeenCalled()
+    await screen.findByText("Add account")
+    fireEvent.click(screen.getByText("Add account"))
+    expect(onAddAccount).toHaveBeenCalled()
   })
 })

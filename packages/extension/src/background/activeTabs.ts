@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill"
 
-import { MessageType, sendMessage } from "../shared/messages"
+import type { MessageType } from "../shared/messages"
+import { sendMessage } from "../shared/messages"
 import { UniqueSet } from "./utils/uniqueSet"
 
 interface Tab {

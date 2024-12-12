@@ -7,8 +7,8 @@ import { starknetWindowObject, userEventHandlers } from "./starknetWindowObject"
 import { shortString } from "starknet"
 import { isArgentNetwork } from "../shared/network/utils"
 import { inpageMessageClient } from "./trpcClient"
-import { WalletAccount } from "../shared/wallet.model"
-import { BackwardsCompatibleStarknetWindowObject } from "starknetkit/window"
+import type { WalletAccount } from "../shared/wallet.model"
+import type { BackwardsCompatibleStarknetWindowObject } from "@argent/x-window"
 
 const INJECT_NAMES = ["starknet", "starknet_argentX"]
 
@@ -17,7 +17,7 @@ function attach() {
     // we need 2 different try catch blocks because we want to execute both even if one of them fails
     try {
       delete (window as any)[name]
-    } catch (e) {
+    } catch {
       // ignore
     }
     try {

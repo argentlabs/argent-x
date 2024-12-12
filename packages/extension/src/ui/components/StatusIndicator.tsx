@@ -1,7 +1,9 @@
+import type { BoxProps } from "@chakra-ui/react"
 import { Box, Tooltip, keyframes } from "@chakra-ui/react"
 
-import { ColorStatus } from "../../shared/network"
+import type { ColorStatus } from "../../shared/network"
 import { upperFirst } from "lodash-es"
+import type { FC } from "react"
 
 export type StatusIndicatorColor =
   | "green"
@@ -20,7 +22,7 @@ export const networkStatusMapping: { [key in ColorStatus]: StatusResponse } = {
   red: { color: "red", hexColor: "#FF675C", label: "Very busy" },
   amber: { color: "orange", hexColor: "#FFBF3D", label: "Busy" },
   green: { color: "green", hexColor: "#08A681", label: "Live" },
-  unknown: { color: "hidden", hexColor: "#BFBFBF" },
+  unknown: { color: "hidden", hexColor: "icon-secondary" },
 }
 
 export const transactionStatusMapping: {
@@ -48,7 +50,14 @@ function mapTransactionStatus(status: ColorStatus): StatusResponse {
   return response
 }
 
-export const StatusIndicator = ({ status }: { status: ColorStatus }) => {
+export interface StatusIndicatorProps extends BoxProps {
+  status: ColorStatus
+}
+
+export const StatusIndicator: FC<StatusIndicatorProps> = ({
+  status,
+  ...rest
+}) => {
   const { color, label, hexColor } = mapNetworkStatus(status)
 
   return (
@@ -59,6 +68,7 @@ export const StatusIndicator = ({ status }: { status: ColorStatus }) => {
         borderRadius={8}
         data-testid={`status-indicator-${color}`}
         backgroundColor={hexColor}
+        {...rest}
       />
     </Tooltip>
   )

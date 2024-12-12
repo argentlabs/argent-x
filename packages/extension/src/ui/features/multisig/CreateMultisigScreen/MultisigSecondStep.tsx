@@ -5,16 +5,16 @@ import { useFormContext } from "react-hook-form"
 import { isEmptyValue } from "../../../../shared/utils/object"
 import { useAction } from "../../../hooks/useAction"
 import { useDecodedSignerKey } from "../../accounts/usePublicKey"
-import { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
+import type { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { SetConfirmationsInput } from "../SetConfirmationsInput"
 import { ScreenLayout } from "./ScreenLayout"
 import { getErrorData } from "../../../../shared/errors/errorData"
 import { clientAccountService } from "../../../services/account"
 import { multisigService } from "../../../services/multisig"
 import { decodeBase58 } from "@argent/x-shared"
-import { SignerMetadata } from "../../../../shared/multisig/types"
+import type { SignerMetadata } from "../../../../shared/multisig/types"
 import { isEmpty } from "lodash-es"
-import { SignerType } from "../../../../shared/wallet.model"
+import type { SignerType } from "../../../../shared/wallet.model"
 import { useState } from "react"
 import { ActionButton } from "../../../components/FullScreenPage"
 
@@ -23,7 +23,11 @@ type MultisigSecondStepProps = {
   goBack: () => void
   goNext: () => void
   networkId: string
-  creatorSignerKey: string | undefined
+  creator: {
+    pubKey: string | undefined
+    derivationPath: string | undefined
+    index: number | undefined
+  }
   creatorType: SignerType
   totalSteps?: number
   filledIndicator?: boolean
@@ -34,12 +38,12 @@ export const MultisigSecondStep = ({
   goBack,
   goNext,
   networkId,
-  creatorSignerKey,
+  creator,
   creatorType,
   totalSteps,
   filledIndicator,
 }: MultisigSecondStepProps) => {
-  const creatorPubKey = useDecodedSignerKey(creatorSignerKey)
+  const creatorPubKey = useDecodedSignerKey(creator.pubKey)
   const [loading, setLoading] = useState(false)
   const { action: createAccount, error } = useAction(
     clientAccountService.create.bind(clientAccountService),
@@ -55,14 +59,16 @@ export const MultisigSecondStep = ({
     try {
       setLoading(true)
       await trigger()
-      if (isEmptyValue(errors) && creatorPubKey && creatorSignerKey) {
+      if (isEmptyValue(errors) && creatorPubKey && creator.pubKey) {
         const signerKeys = getValues("signerKeys")
-        const signers = [creatorSignerKey].concat(signerKeys.map((i) => i.key))
+        const signers = [creator.pubKey].concat(signerKeys.map((i) => i.key))
 
         const threshold = getValues("confirmations")
 
         const result = await createAccount("multisig", creatorType, networkId, {
           creator: creatorPubKey,
+          index: creator.index,
+          derivationPath: creator.derivationPath,
           signers,
           threshold,
           publicKey: creatorPubKey,
@@ -107,7 +113,11 @@ export const MultisigSecondStep = ({
         totalSigners={getValues("signerKeys").length + 1}
         existingThreshold={getValues("confirmations") ?? 1}
       />
-      <ActionButton onClick={handleCreateMultisig} mt="3" isLoading={loading}>
+      <ActionButton
+        onClick={() => void handleCreateMultisig()}
+        mt="3"
+        isLoading={loading}
+      >
         Create multisig
       </ActionButton>
       {error && (

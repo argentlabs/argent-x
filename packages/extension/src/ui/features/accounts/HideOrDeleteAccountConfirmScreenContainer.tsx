@@ -1,62 +1,58 @@
 import { useNavigateBack } from "@argent/x-ui"
-import { FC, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import type { FC } from "react"
+import { useCallback } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
 import { routes } from "../../../shared/ui/routes"
 import { HideOrDeleteAccountConfirmScreen } from "./HideOrDeleteAccountConfirmScreen"
-import { autoSelectAccountOnNetwork } from "./switchAccount"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
-import { HideOrDeleteAccountConfirmScreenContainerProps } from "./hideOrDeleteAccountConfirmScreen.model"
 import { selectedNetworkIdView } from "../../views/network"
 import { useView } from "../../views/implementation/react"
+import { clientAccountService } from "../../services/account"
 
-export const HideOrDeleteAccountConfirmScreenContainer: FC<
-  HideOrDeleteAccountConfirmScreenContainerProps
-> = ({ mode }) => {
+export const HideOrDeleteAccountConfirmScreenContainer: FC = () => {
   const navigate = useNavigate()
   const selectedNetworkId = useView(selectedNetworkIdView)
 
-  const account = useRouteWalletAccount()
-  const accountAddress = account?.address ?? ""
+  const routeAccount = useRouteWalletAccount()
+
+  const { mode } = useParams<{ mode: "hide" | "delete" | "remove" }>()
 
   const handleSubmit = useCallback(async () => {
+    if (!routeAccount) return
+
     if (mode === "hide") {
-      await accountService.setHide(true, {
-        address: accountAddress,
-        networkId: selectedNetworkId,
-      })
-    }
-    if (mode === "delete") {
-      await accountService.remove({
-        address: accountAddress,
-        networkId: selectedNetworkId,
-      })
+      await accountService.setHide(true, routeAccount.id)
+    } else {
+      await accountService.removeById(routeAccount.id)
     }
 
-    const account = await autoSelectAccountOnNetwork(selectedNetworkId)
+    const account =
+      await clientAccountService.autoSelectAccountOnNetwork(selectedNetworkId)
     if (account) {
       navigate(routes.accounts())
     } else {
       /** no accounts, return to empty account screen */
       navigate(routes.accountTokens())
     }
-  }, [accountAddress, mode, navigate, selectedNetworkId])
+  }, [mode, navigate, routeAccount, selectedNetworkId])
 
   const onReject = useNavigateBack()
 
-  if (!account) {
+  if (!routeAccount || !mode) {
     return null
   }
 
   return (
     <HideOrDeleteAccountConfirmScreen
       mode={mode}
-      onSubmit={handleSubmit}
+      onSubmit={() => void handleSubmit()}
       onReject={onReject}
-      accountName={account.name}
-      accountAddress={account.address}
-      networkId={account.networkId}
+      accountName={routeAccount.name}
+      accountAddress={routeAccount.address}
+      accountType={routeAccount.type}
+      networkId={routeAccount.networkId}
     />
   )
 }

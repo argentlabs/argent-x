@@ -1,4 +1,5 @@
-import { BoxProps, Image } from "@chakra-ui/react"
+import type { BoxProps } from "@chakra-ui/react"
+import { Image } from "@chakra-ui/react"
 import { UnknownDappIcon } from "./UnknownDappIcon"
 
 export const DappIcon = ({

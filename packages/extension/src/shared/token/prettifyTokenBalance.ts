@@ -1,5 +1,6 @@
+import type { IPrettifyNumberConfig } from "@argent/x-shared"
 import { prettifyTokenAmount } from "@argent/x-shared"
-import { TokenWithOptionalBigIntBalance } from "./__new/types/tokenBalance.model"
+import type { TokenWithOptionalBigIntBalance } from "./__new/types/tokenBalance.model"
 
 /**
  * Returns a string of token balance with symbol if available e.g.
@@ -8,6 +9,7 @@ import { TokenWithOptionalBigIntBalance } from "./__new/types/tokenBalance.model
 export const prettifyTokenBalance = (
   token: TokenWithOptionalBigIntBalance,
   withSymbol = true,
+  overrides?: Partial<IPrettifyNumberConfig>,
 ) => {
   const { balance, decimals, symbol } = token
   if (balance === undefined || decimals === undefined) {
@@ -17,5 +19,6 @@ export const prettifyTokenBalance = (
     amount: balance,
     decimals,
     symbol: withSymbol ? symbol : "",
+    prettyConfigOverrides: overrides,
   })
 }

@@ -3,9 +3,11 @@ import {
   ScrollContainer,
   useScrollRestoration,
 } from "@argent/x-ui"
-import { FC, PropsWithChildren, Suspense } from "react"
+import type { FC, PropsWithChildren } from "react"
+import { Suspense } from "react"
+import { Flex } from "@chakra-ui/react"
 
-import { AccountNavigationBarContainer } from "../accounts/AccountNavigationBarContainer"
+import { AccountNavigationBarContainer } from "../navigation/AccountNavigationBarContainer"
 import { RootTabsContainer } from "./RootTabsContainer"
 
 interface RootTabsScreeenProps extends PropsWithChildren {
@@ -22,7 +24,7 @@ export const RootTabsScreeen: FC<RootTabsScreeenProps> = ({
       <Suspense fallback={<NavigationBarSkeleton />}>
         <AccountNavigationBarContainer scroll={scroll} />
       </Suspense>
-      <Suspense>
+      <Suspense fallback={<Flex flex={1} />}>
         <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
       </Suspense>
       <Suspense>

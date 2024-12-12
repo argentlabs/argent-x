@@ -1,7 +1,7 @@
 import { normalizeAddress, formatTruncatedAddress } from "@argent/x-shared"
 import { Button, CopyTooltip } from "@argent/x-ui"
-import { ButtonProps } from "@chakra-ui/react"
-import { FC } from "react"
+import type { ButtonProps } from "@chakra-ui/react"
+import type { FC } from "react"
 
 export interface StarknetIdCopyButtonProps extends ButtonProps {
   starknetId: string

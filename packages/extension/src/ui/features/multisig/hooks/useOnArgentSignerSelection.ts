@@ -1,18 +1,25 @@
-import { useCallback } from "react"
-import { urlWithQuery } from "../../../../shared/utils/url"
-import { routes } from "../../../../shared/ui/routes"
-import { useCreatePendingMultisig } from "./useCreatePendingMultisig"
-import { useNavigate } from "react-router-dom"
 import { noop } from "lodash-es"
+import { useCallback } from "react"
+import { useNavigate } from "react-router-dom"
+import { routes } from "../../../../shared/ui/routes"
+import { urlWithQuery } from "../../../../shared/utils/url"
 import { SignerType } from "../../../../shared/wallet.model"
 import { clientUIService } from "../../../services/ui"
+import { selectedAccountView } from "../../../views/account"
+import { useView } from "../../../views/implementation/react"
+import { useCreatePendingMultisig } from "./useCreatePendingMultisig"
 
 export function useOnArgentSignerSelection() {
   const navigate = useNavigate()
+  const selectedAccount = useView(selectedAccountView)
   const { createPendingMultisig } = useCreatePendingMultisig()
 
   return useCallback(
-    async (ctx: "create" | "join", networkId: string) => {
+    async (
+      ctx: "create" | "join" | "replace",
+      networkId: string,
+      signerToReplace?: string,
+    ) => {
       switch (ctx) {
         case "create": {
           const url = urlWithQuery("index.html", {
@@ -38,10 +45,17 @@ export function useOnArgentSignerSelection() {
           }
           return navigate(routes.multisigJoin(pendingMultisig.publicKey))
         }
+
+        case "replace": {
+          return navigate(
+            routes.multisigReplaceOwner(selectedAccount?.id, signerToReplace),
+          )
+        }
+
         default:
           return noop
       }
     },
-    [createPendingMultisig, navigate],
+    [createPendingMultisig, navigate, selectedAccount?.id],
   )
 }

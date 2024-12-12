@@ -1,6 +1,7 @@
 import { Button } from "@argent/x-ui"
+import type { ButtonProps } from "@chakra-ui/react"
 import { Center, chakra } from "@chakra-ui/react"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
 const Container = chakra(Center, {
   baseStyle: {
@@ -12,25 +13,25 @@ const Container = chakra(Center, {
   },
 })
 
-export interface AccountListFooterProps {
+export interface AccountListFooterProps extends ButtonProps {
   onClick: ReactEventHandler
   icon: React.JSX.Element
   text: string
 }
 
 export const AccountListFooter: FC<AccountListFooterProps> = ({
-  onClick,
   icon,
   text,
+  ...rest
 }) => {
   return (
     <Container>
       <Button
-        onClick={onClick}
         leftIcon={icon}
         size="sm"
         colorScheme="transparent"
         color="text-secondary"
+        {...rest}
       >
         {text}
       </Button>

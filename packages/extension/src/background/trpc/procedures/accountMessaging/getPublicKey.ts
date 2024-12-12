@@ -1,11 +1,10 @@
 import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"
-import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 
 const getPublicKeySchema = z.object({
-  account: z.optional(baseWalletAccountSchema),
+  accountId: z.string().optional(),
 })
 
 export const getPublicKeyProcedure = extensionOnlyProcedure
@@ -13,13 +12,13 @@ export const getPublicKeyProcedure = extensionOnlyProcedure
   .output(z.string())
   .query(
     async ({
-      input: { account },
+      input: { accountId },
       ctx: {
         services: { wallet },
       },
     }) => {
       try {
-        const { publicKey } = await wallet.getPublicKey(account)
+        const { publicKey } = await wallet.getPublicKey(accountId)
         return publicKey
       } catch (error) {
         throw new AccountMessagingError({

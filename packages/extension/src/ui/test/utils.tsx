@@ -1,32 +1,22 @@
-import { EventEmitterProvider } from "@argent/x-shared"
-import { ThemeProvider as ArgentTheme } from "@argent/x-ui"
-import { ThemeProvider as MuiThemeProvider } from "@mui/material"
-import { RenderOptions, render } from "@testing-library/react"
+import {
+  EventEmitterProvider,
+  ThemeProvider as ArgentTheme,
+} from "@argent/x-ui"
+import type { RenderOptions } from "@testing-library/react"
+import { render } from "@testing-library/react"
 import Emittery from "emittery"
-import { FC, PropsWithChildren, ReactElement } from "react"
+import type { FC, PropsWithChildren, ReactElement } from "react"
 import { MemoryRouter } from "react-router-dom"
-
-import { ThemeProvider, muiTheme } from "../theme"
-
-/**
- * TODO: remove after refactor: this provides a convenience for testing components that still use Mui etc.
- *
- * @see https://testing-library.com/docs/react-testing-library/setup/
- */
 
 const emitter = new Emittery()
 
 const Wrapper: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <MuiThemeProvider theme={muiTheme}>
-      <ThemeProvider>
-        <ArgentTheme>
-          <EventEmitterProvider emitter={emitter}>
-            <MemoryRouter initialEntries={["/"]}>{children}</MemoryRouter>
-          </EventEmitterProvider>
-        </ArgentTheme>
-      </ThemeProvider>
-    </MuiThemeProvider>
+    <ArgentTheme>
+      <EventEmitterProvider emitter={emitter}>
+        <MemoryRouter initialEntries={["/"]}>{children}</MemoryRouter>
+      </EventEmitterProvider>
+    </ArgentTheme>
   )
 }
 

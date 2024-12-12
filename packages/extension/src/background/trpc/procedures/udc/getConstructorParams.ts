@@ -4,10 +4,10 @@ import { getProvider } from "../../../../shared/network"
 import { networkService } from "../../../../shared/network/service"
 import { extensionOnlyProcedure } from "../permissions"
 import { UdcError } from "../../../../shared/errors/udc"
+import type { BasicContractClass } from "../../../../shared/udc/schema"
 import {
   getConstructorParamsSchema,
   basicContractClassSchema,
-  BasicContractClass,
 } from "../../../../shared/udc/schema"
 
 export const getConstructorParamsProcedure = extensionOnlyProcedure

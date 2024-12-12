@@ -1,11 +1,10 @@
+import type { Address, StarknetDomainName } from "@argent/x-shared"
 import {
-  Address,
-  StarknetDomainName,
   isStarknetDomainName,
   isValidAddress,
-  useDebouncedValue,
   trpcErrorSchema,
 } from "@argent/x-shared"
+import { useDebouncedValue } from "@argent/x-ui"
 import useSWR from "swr"
 
 import { clientStarknetAddressService } from "../../services/address"

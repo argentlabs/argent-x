@@ -1,11 +1,11 @@
-import { iconsDeprecated } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import { Circle, Tooltip } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-import { getEscapeDisplayAttributes } from "../smartAccount/escape/EscapeBanner"
-import { LiveAccountEscapeProps } from "../smartAccount/escape/useAccountEscape"
+import { getEscapeDisplayAttributes } from "../smartAccount/escape/getEscapeDisplayAttributes"
+import type { LiveAccountEscapeProps } from "../smartAccount/escape/useAccountEscape"
 
-const { SmartAccountActiveIcon } = iconsDeprecated
+const { ShieldSecondaryIcon } = icons
 
 interface AccountListItemSmartAccountBadgeProps {
   liveAccountEscape?: LiveAccountEscapeProps
@@ -29,7 +29,7 @@ export const AccountListItemSmartAccountBadge: FC<
           color={"neutrals.900"}
           fontSize={"2xs"}
         >
-          <SmartAccountActiveIcon />
+          <ShieldSecondaryIcon />
         </Circle>
       </Tooltip>
     )
@@ -46,7 +46,7 @@ export const AccountListItemSmartAccountBadge: FC<
         fontSize={"2xs"}
         data-testid="smart-account-on-settings"
       >
-        <SmartAccountActiveIcon />
+        <ShieldSecondaryIcon />
       </Circle>
     </Tooltip>
   )

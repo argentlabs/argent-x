@@ -1,11 +1,14 @@
-import { BaseToken, Token } from "../src/shared/token/__new/types/token.model"
-import { ApiTokensInfoResponse, ApiTokenInfo } from "@argent/x-shared"
-import {
+import type {
+  BaseToken,
+  Token,
+} from "../src/shared/token/__new/types/token.model"
+import type { ApiTokensInfoResponse, ApiTokenInfo } from "@argent/x-shared"
+import type {
   BaseTokenWithBalance,
   TokenWithBalance,
   TokenWithOptionalBigIntBalance,
 } from "../src/shared/token/__new/types/tokenBalance.model"
-import {
+import type {
   TokenPriceDetails,
   TokenWithPrice,
 } from "../src/shared/token/__new/types/tokenPrice.model"

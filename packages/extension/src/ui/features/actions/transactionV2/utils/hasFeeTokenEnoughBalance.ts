@@ -1,11 +1,10 @@
+import type { TokenWithBalance } from "@argent/x-shared"
 import {
   estimatedFeesToMaxFeeTotal,
   estimatedFeeToMaxFeeTotal,
-  TokenWithBalance,
 } from "@argent/x-shared"
+import type { EstimatedFee, EstimatedFees } from "@argent/x-shared/simulation"
 import {
-  EstimatedFee,
-  EstimatedFees,
   estimatedFeeSchema,
   estimatedFeesSchema,
 } from "@argent/x-shared/simulation"

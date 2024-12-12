@@ -1,17 +1,22 @@
-import { Address, ensureDecimals } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
+import { ensureDecimals } from "@argent/x-shared"
 
-import { TokenView } from "../../features/accountTokens/tokens.service"
-import { messageClient } from "../trpc"
-import { IClientTokenService } from "./IClientTokenService"
+import type { TokenView } from "../../features/accountTokens/tokens.service"
+import type { messageClient } from "../trpc"
+import type { IClientTokenService } from "./IClientTokenService"
 import { formatTokenBalance } from "./utils"
-import { CallData, RawArgs } from "starknet"
-import { BalancesMap, PricesMap } from "./types"
-import {
+import type { RawArgs } from "starknet"
+import { CallData } from "starknet"
+import type { BalancesMap, PricesMap } from "./types"
+import type {
   BaseTokenWithBalance,
   TokenWithOptionalBigIntBalance,
 } from "../../../shared/token/__new/types/tokenBalance.model"
-import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type {
+  BaseToken,
+  Token,
+} from "../../../shared/token/__new/types/token.model"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 
 export const DEFAULT_TOKEN_LENGTH = 9
 
@@ -25,6 +30,20 @@ export class ClientTokenService implements IClientTokenService {
 
   async removeToken(baseToken: BaseToken) {
     return await this.trpcMessageClient.tokens.removeToken.mutate(baseToken)
+  }
+
+  async toggleHideToken(token: BaseToken, hidden: boolean) {
+    return await this.trpcMessageClient.tokens.toggleHideToken.mutate({
+      token,
+      hidden,
+    })
+  }
+
+  async reportSpamToken(token: BaseToken, account: BaseWalletAccount) {
+    return await this.trpcMessageClient.tokens.reportSpamToken.mutate({
+      token,
+      account,
+    })
   }
 
   async fetchDetails(address?: Address, networkId?: string) {
@@ -45,16 +64,11 @@ export class ClientTokenService implements IClientTokenService {
     return mergedDetails
   }
 
-  async fetchTokenBalance(
-    tokenAddress: Address,
-    accountAddress: Address,
-    networkId: string,
-  ) {
+  async fetchTokenBalance(tokenAddress: Address, account: BaseWalletAccount) {
     const balance =
       await this.trpcMessageClient.tokens.fetchTokenBalance.mutate({
         tokenAddress,
-        accountAddress,
-        networkId,
+        account,
       })
     return balance
   }
@@ -104,6 +118,20 @@ export class ClientTokenService implements IClientTokenService {
       acc[tokenBalance.address] = tokenBalance.balance
       return acc
     }, {})
+  }
+
+  async getTokenBalance(
+    tokenAddress: Address,
+    accountAddress: Address,
+    networkId: string,
+  ) {
+    const tokenBalance =
+      await this.trpcMessageClient.tokens.getTokenBalance.query({
+        tokenAddress,
+        accountAddress,
+        networkId,
+      })
+    return tokenBalance?.balance
   }
 
   async getTokenPricesForTokenBalances(

@@ -1,7 +1,7 @@
 import { getProvider } from "../../../shared/network"
+import type { Transaction } from "../../../shared/transactions"
 import {
   SUCCESS_STATUSES,
-  Transaction,
   getInFlightTransactions,
 } from "../../../shared/transactions"
 import { getTransactionStatus } from "../../../shared/transactions/utils"

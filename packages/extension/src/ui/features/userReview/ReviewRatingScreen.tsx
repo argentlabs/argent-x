@@ -1,44 +1,21 @@
-import { Rating } from "@mui/material"
-import { FC, SyntheticEvent } from "react"
+import { BarIconButton, H1, H5, icons } from "@argent/x-ui"
+import { Center } from "@chakra-ui/react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
 
+import { routes } from "../../../shared/ui/routes"
 import {
   resetTransactionsBeforeReview,
   toggleUserHasReviewed,
 } from "../../../shared/userReview"
-import { ColumnCenter } from "../../components/Column"
-import { IconBar } from "../../components/IconBar"
-import { StarRounded } from "../../components/Icons/MuiIcons"
-import { routes } from "../../../shared/ui/routes"
-import { H2 } from "../../theme/Typography"
+import { StarRating } from "./StarRating"
 
-const Container = styled(ColumnCenter)`
-  padding-top: 112px;
-  width: 100%;
-`
-
-const RateText = styled.div`
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 21px;
-`
-
-const StyledRating = styled(Rating)`
-  margin-top: 48px;
-`
-
-const RatingContainer = styled.div`
-  font-size: 24px;
-`
+const { CrossSecondaryIcon } = icons
 
 export const ReviewRatingScreen: FC = () => {
   const navigate = useNavigate()
 
-  const onRating = async (
-    _: SyntheticEvent<Element, Event>,
-    value: number | null,
-  ) => {
+  const onRating = async (value: number) => {
     if (value) {
       await toggleUserHasReviewed()
       navigate(routes.userReviewFeedback(), {
@@ -50,26 +27,25 @@ export const ReviewRatingScreen: FC = () => {
   }
 
   return (
-    <>
-      <IconBar
-        close
-        onClick={async () => {
-          await resetTransactionsBeforeReview()
+    <Center flex={1} flexDirection="column" position="relative">
+      <BarIconButton
+        onClick={() => {
+          void resetTransactionsBeforeReview()
         }}
+        bgColor="surface-elevated"
+        position="absolute"
+        right={4.5}
+        top={4.5}
+      >
+        <CrossSecondaryIcon />
+      </BarIconButton>
+      <H1>Enjoying Argent X?</H1>
+      <H5 mt={2}>How would you rate your experience</H5>
+      <StarRating
+        mt={12}
+        fontSize="36px"
+        onChange={(value) => void onRating(value)}
       />
-      <Container>
-        <H2>Enjoying Argent X?</H2>
-        <RateText>How would you rate your experience</RateText>
-        <RatingContainer>
-          <StyledRating
-            emptyIcon={
-              <StarRounded htmlColor="#5C5B59" sx={{ fontSize: "36px" }} />
-            }
-            icon={<StarRounded htmlColor="#FFFFFF" sx={{ fontSize: "36px" }} />}
-            onChange={onRating}
-          />
-        </RatingContainer>
-      </Container>
-    </>
+    </Center>
   )
 }

@@ -1,6 +1,6 @@
 import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
 import { getParsedFeeError } from "../feeError"
-import { FeeEstimationProps } from "../feeEstimation.model"
+import type { FeeEstimationProps } from "../feeEstimation.model"
 import { feeTokenWithBalance } from "./feeToken"
 
 const parsedFeeEstimationError1 = getParsedFeeError(

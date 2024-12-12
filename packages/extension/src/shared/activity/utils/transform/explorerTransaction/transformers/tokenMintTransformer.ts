@@ -1,6 +1,6 @@
-import { TokenMintTransaction } from "../../type"
+import type { TokenMintTransaction } from "../../type"
 import { getParameter } from "../getParameter"
-import { IExplorerTransactionTransformer } from "./type"
+import type { IExplorerTransactionTransformer } from "./type"
 
 /** adds erc20 token mint data */
 

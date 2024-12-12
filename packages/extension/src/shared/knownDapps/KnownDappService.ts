@@ -28,6 +28,14 @@ export class KnownDappService implements IKnownDappService {
     return dapp ?? null
   }
 
+  async getDappById(dappId: string): Promise<KnownDapp | null> {
+    const knownDapps = await this.knownDappsRepository.get()
+
+    const dapp = knownDapps?.find((knownDapp) => knownDapp.dappId === dappId)
+
+    return dapp ?? null
+  }
+
   async getDappByContractAddress(
     contractAddress: string,
   ): Promise<KnownDapp | null> {

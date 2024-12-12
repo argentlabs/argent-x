@@ -1,7 +1,7 @@
-import { Address } from "@argent/x-shared"
-import { PublicKeyWithIndex } from "../../signer/types"
-import { LedgerSigner } from "../../signer"
-import { CreateAccountType } from "../../wallet.model"
+import type { Address } from "@argent/x-shared"
+import type { PublicKeyWithIndex } from "../../signer/types"
+import type { LedgerSigner } from "../../signer"
+import type { CreateAccountType } from "../../wallet.model"
 
 export interface ILedgerSharedService {
   connect: () => Promise<Address>

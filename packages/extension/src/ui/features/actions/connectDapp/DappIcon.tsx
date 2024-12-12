@@ -1,7 +1,8 @@
-import { Box, BoxProps } from "@chakra-ui/react"
-import { FC } from "react"
+import type { BoxProps } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
+import type { FC } from "react"
 
-import { DappDisplayAttributes } from "./useDappDisplayAttributes"
+import type { DappDisplayAttributes } from "../../../services/knownDapps/types"
 import { UnknownDappIcon } from "../transactionV2/header/icon"
 
 interface DappIconProps extends BoxProps {

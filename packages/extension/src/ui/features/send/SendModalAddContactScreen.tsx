@@ -1,12 +1,11 @@
 import { BarCloseButton } from "@argent/x-ui"
-import { DrawerProps } from "@chakra-ui/react"
-import { FC, Suspense } from "react"
+import type { DrawerProps } from "@chakra-ui/react"
+import type { FC } from "react"
+import { Suspense } from "react"
 
 import { ModalSheet } from "../../components/ModalSheet"
-import {
-  AddressBookAddOrEditScreenContainer,
-  AddressBookAddOrEditScreenContainerProps,
-} from "../settings/addressBook/AddressBookAddOrEditScreenContainer"
+import type { AddressBookAddOrEditScreenContainerProps } from "../settings/addressBook/AddressBookAddOrEditScreenContainer"
+import { AddressBookAddOrEditScreenContainer } from "../settings/addressBook/AddressBookAddOrEditScreenContainer"
 
 interface SendModalAddContactScreenProps
   extends Omit<DrawerProps, "children">,

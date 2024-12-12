@@ -1,4 +1,5 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { defaultNftMarketplaces } from "../../../../shared/nft/marketplaces"
 import { settingsStore } from "../../../../shared/settings"
 import { defaultBlockExplorers } from "../../../../shared/settings/defaultBlockExplorers"
@@ -16,15 +17,12 @@ export const PreferencesSettingsContainer: FC = () => {
     settingsStore,
     "nftMarketplaceKey",
   )
+  const selectedIdProvider = useKeyValueStorage(settingsStore, "idProvider")
   const nftMarketplace = defaultNftMarketplaces[nftMarketplaceKey]
   const disableAnimation = useKeyValueStorage(settingsStore, "disableAnimation")
   const onDisableAnimationClick = useCallback(() => {
     void settingsStore.set("disableAnimation", !disableAnimation)
   }, [disableAnimation])
-  const hideSpamTokens = useKeyValueStorage(settingsStore, "hideSpamTokens")
-  const onHideSpamTokensClick = useCallback(() => {
-    void settingsStore.set("hideSpamTokens", !hideSpamTokens)
-  }, [hideSpamTokens])
   const airGapEnabled = useKeyValueStorage(settingsStore, "airGapEnabled")
   const onEnableAirGapClick = useCallback(() => {
     void settingsStore.set("airGapEnabled", !airGapEnabled)
@@ -38,10 +36,9 @@ export const PreferencesSettingsContainer: FC = () => {
       nftMarketplace={nftMarketplace}
       disableAnimation={disableAnimation}
       onDisableAnimationClick={onDisableAnimationClick}
-      hideSpamTokens={hideSpamTokens}
-      onHideSpamTokensClick={onHideSpamTokensClick}
       airGapEnabled={airGapEnabled}
       onEnableAirGapClick={onEnableAirGapClick}
+      selectedIdProvider={selectedIdProvider}
     />
   )
 }

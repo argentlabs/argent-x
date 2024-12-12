@@ -1,23 +1,19 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { accountMessagingService } from "../../services/accountMessaging"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { AccountId } from "../../../shared/wallet.model"
 
-export const usePrivateKey = (
-  address: string | undefined,
-  networkId: string | undefined,
-) => {
+export const usePrivateKey = (accountId?: string) => {
   const [privateKey, setPrivateKey] = useState<string>()
 
   const getPrivateKeyCallback = useCallback(
-    (account: BaseWalletAccount) =>
-      accountMessagingService.getPrivateKey(account),
+    (accountId: AccountId) => accountMessagingService.getPrivateKey(accountId),
     [],
   )
 
   useEffect(() => {
-    if (address && networkId) {
-      getPrivateKeyCallback({ address, networkId }).then(setPrivateKey)
+    if (accountId) {
+      void getPrivateKeyCallback(accountId).then(setPrivateKey)
     }
     // on mount
   }, []) // eslint-disable-line react-hooks/exhaustive-deps

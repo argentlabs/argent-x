@@ -4,19 +4,19 @@ import { EsbuildPlugin } from "esbuild-loader"
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin"
 import HtmlWebPackPlugin from "html-webpack-plugin"
 import path from "path"
-import webpack, {
-  DefinePlugin,
-  ProvidePlugin,
-  SourceMapDevToolPlugin,
-} from "webpack"
+import type webpack from "webpack"
+import { DefinePlugin, ProvidePlugin } from "webpack"
+import { sentryWebpackPlugin } from "@sentry/webpack-plugin"
+import svgo from "svgo"
 
 import rootPkg from "../../package.json"
 import manifestV2 from "./manifest/v2.json"
 import manifestV3 from "./manifest/v3.json"
 
+import { InlineStylePlugin } from "./build/htmlWebpackInlineStylePlugin"
+
 import {
   isProd,
-  isDev,
   safeEnvVars,
   useManifestV2,
   useReactDevTools,
@@ -31,6 +31,7 @@ const releaseTrack = getReleaseTrack()
 const { hasLinkedPackageOverrides, sourcemapResourcePaths } =
   getLocalDevelopmentAttributes(rootPkg) || {}
 const commitHash = getSafeGetCommitHash()
+const appVersion = !useManifestV2 ? manifestV3.version : manifestV2.version
 
 if (safeEnvVars) {
   console.log("Safe env vars enabled")
@@ -38,6 +39,7 @@ if (safeEnvVars) {
 
 const htmlPlugin = new HtmlWebPackPlugin({
   title: "Argent X",
+  version: appVersion,
   head: useReactDevTools
     ? `<script src="http://localhost:8097"></script>`
     : undefined,
@@ -131,6 +133,7 @@ const config: webpack.Configuration = {
   },
   plugins: [
     htmlPlugin,
+    new InlineStylePlugin(),
     new CopyPlugin({
       patterns: [
         {
@@ -141,6 +144,15 @@ const config: webpack.Configuration = {
         {
           from: "./src/assets",
           to: "assets",
+          transform: (content, path) => {
+            if (path.endsWith(".svg")) {
+              const result = svgo.optimize(content.toString(), {
+                multipass: true,
+              })
+              return result.data
+            }
+            return content
+          },
         },
         {
           from: `./src/ui/appicon/appicon-${releaseTrack}.png`,
@@ -153,9 +165,7 @@ const config: webpack.Configuration = {
       ],
     }),
     new DefinePlugin({
-      "process.env.VERSION": JSON.stringify(
-        !useManifestV2 ? manifestV3.version : manifestV2.version, // doesn't matter much, but why not
-      ),
+      "process.env.VERSION": JSON.stringify(appVersion),
       "process.env.COMMIT_HASH": JSON.stringify(commitHash),
     }),
     new ProvidePlugin({
@@ -163,20 +173,28 @@ const config: webpack.Configuration = {
       Buffer: ["buffer", "Buffer"],
     }),
 
-    isProd &&
-      new SourceMapDevToolPlugin({
-        filename: "../sourcemaps/[file].map",
-        append: `\n//# sourceMappingURL=[file].map`,
-      }), // For development, we use the devtool option instead
-
     new ForkTsCheckerWebpackPlugin(), // does the type checking in a separate process (non-blocking in dev) as esbuild is skipping type checking
 
     new DotenvWebPack({
       systemvars: true,
       safe: safeEnvVars,
     }),
+
+    /** Source code and source maps are modified to include debug id by Sentry, but stripped from zip in CI */
+    isProd &&
+      sentryWebpackPlugin({
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        org: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+        debug: true,
+        sourcemaps: {
+          filesToDeleteAfterUpload: "dist/**/*.map",
+        },
+      }),
   ],
-  devtool: isProd ? false : "inline-cheap-module-source-map",
+  devtool: isProd
+    ? "source-map" /** Files for Sentry */
+    : "inline-cheap-module-source-map",
   resolve: {
     // for linked local `@argent/...` package overrides, prioritise local node_modules
     // otherwise their peerDependencies will be loaded from linked packages,
@@ -187,7 +205,8 @@ const config: webpack.Configuration = {
     extensions: [".tsx", ".ts", ".js"],
     fallback: { buffer: require.resolve("buffer/") },
     alias: {
-      "@mui/styled-engine": "@mui/styled-engine-sc",
+      // save ~300kb by omitting unnecessary fetch polyfills from starknet.js
+      "fetch-cookie": false,
       ...(showDevUi
         ? {
             // allow DevUI import
@@ -208,9 +227,8 @@ const config: webpack.Configuration = {
           }),
         ],
         splitChunks: {
-          chunks(chunk) {
-            return chunk.name === "main"
-          },
+          chunks: /main/, // only main can be chunked
+          maxSize: 4 * 1024 * 1024, // max 4MB in bytes for Firefox
         },
       }
     : undefined,

@@ -30,6 +30,11 @@ export interface IClientUIService {
   closePopup(): void
 
   onNotificationClicked(notificationId: string): Promise<void>
+
+  /**
+   * Opens ui as a popup, regardles of whether it's already opened in a tab,
+   */
+  openUiAsPopup(): Promise<void>
 }
 
 export const Navigate = Symbol("Navigate")

@@ -1,11 +1,12 @@
-import {
+import type {
+  AccountId,
   BaseWalletAccount,
   CreateAccountType,
   SignerType,
 } from "../../../shared/wallet.model"
 
 export interface IAccountMessagingService {
-  getPrivateKey: (account: BaseWalletAccount) => Promise<string>
+  getPrivateKey: (accountId: AccountId) => Promise<string>
   getSeedPhrase: () => Promise<string>
   changeGuardian: (
     account: BaseWalletAccount,
@@ -14,12 +15,12 @@ export interface IAccountMessagingService {
   cancelEscape: (account: BaseWalletAccount) => Promise<void>
   triggerEscapeGuardian: (account: BaseWalletAccount) => Promise<void>
   escapeAndChangeGuardian: (account: BaseWalletAccount) => Promise<void>
-  getPublicKey: (account?: BaseWalletAccount) => Promise<string>
+  getPublicKey: (accountId?: string) => Promise<string>
   getNextPublicKey: (
     accountType: CreateAccountType,
     signerType: SignerType,
     networkId: string,
-  ) => Promise<string>
+  ) => Promise<{ index: number; derivationPath: string; publicKey: string }>
   getPublicKeysBufferForMultisig(
     start: number,
     buffer: number,

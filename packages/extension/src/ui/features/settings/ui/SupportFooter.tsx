@@ -1,100 +1,86 @@
-import {
-  Button,
-  L2,
-  P3,
-  P4,
-  iconsDeprecated,
-  logosDeprecated,
-} from "@argent/x-ui"
-import { SimpleGrid, VStack, StackProps, Link, Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import { Button, icons, L2, logosDeprecated, P3 } from "@argent/x-ui"
+import type { ButtonProps, StackProps } from "@chakra-ui/react"
+import { Flex, forwardRef, Link, SimpleGrid, VStack } from "@chakra-ui/react"
+import type { FC } from "react"
 
 import {
   ARGENT_X_LEGAL_PRIVACY_POLICY_URL,
   ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL,
 } from "../../../../shared/api/constants"
 
-const { SupportIcon } = iconsDeprecated
+const { HelpIcon } = icons
 const { DiscordLogo, GithubLogo, XLogo } = logosDeprecated
 
 interface SupportFooterProps extends StackProps {
   privacyStatement?: boolean
 }
 
-const SupportFooter: FC<SupportFooterProps> = ({
+const SupportButton = forwardRef<ButtonProps, "button">((props, ref) => (
+  <Button ref={ref} rounded={"xl"} size="sm" minHeight={12} {...props} />
+))
+
+export const SupportFooter: FC<SupportFooterProps> = ({
   privacyStatement = true,
   ...rest
 }) => (
   <VStack
-    mt={4}
-    gap={2}
     borderTop="solid 1px"
-    borderTopColor="border"
+    borderTopColor="stroke-default"
+    p={4}
+    gap={4}
     {...rest}
   >
-    <P3 color="neutrals.400" pt="6">
-      Help, support &amp; suggestions:
-    </P3>
-    <SimpleGrid columns={2} gap="2" w="100%" py={4}>
-      <Button
+    <P3 color="text-secondary">Help, support &amp; suggestions:</P3>
+    <SimpleGrid columns={{ base: 2, md: 4 }} gap={2} w="full">
+      <SupportButton
         as={"a"}
-        size="sm"
-        rounded={"lg"}
-        leftIcon={<SupportIcon />}
+        target="_blank"
+        leftIcon={<HelpIcon />}
         href="https://support.argent.xyz/hc/en-us/categories/5767453283473-Argent-X"
         title="Get Argent X Support"
-        target="_blank"
       >
         Help
-      </Button>
-      <Button
+      </SupportButton>
+      <SupportButton
         as={"a"}
-        size="sm"
-        rounded={"lg"}
+        target="_blank"
         leftIcon={<DiscordLogo />}
         href="https://discord.gg/T4PDFHxm6T"
         title="Ask a question on the argent-x-support channel on Discord"
-        target="_blank"
       >
         Discord
-      </Button>
-      <Button
+      </SupportButton>
+      <SupportButton
         as="a"
-        size="sm"
-        rounded={"lg"}
+        target="_blank"
         leftIcon={<GithubLogo />}
         href="https://github.com/argentlabs/argent-x/issues"
         title="Post an issue on Argent X GitHub"
-        target="_blank"
       >
         GitHub
-      </Button>
-      <Button
+      </SupportButton>
+      <SupportButton
         as="a"
-        size="sm"
-        rounded={"lg"}
+        target="_blank"
         leftIcon={<XLogo />}
         href="https://twitter.com/argenthq"
         title="Follow Argent on X"
-        target="_blank"
       />
     </SimpleGrid>
     {privacyStatement && (
       <Flex color="text-secondary" gap={2}>
-        <P4
+        <L2
           as={Link}
           href={ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL}
           target="_blank"
         >
           Terms of Service
-        </P4>
-        <P4 as={Link} href={ARGENT_X_LEGAL_PRIVACY_POLICY_URL} target="_blank">
+        </L2>
+        <L2 as={Link} href={ARGENT_X_LEGAL_PRIVACY_POLICY_URL} target="_blank">
           Privacy Policy
-        </P4>
+        </L2>
       </Flex>
     )}
-    <L2 color="neutrals.500">Version: v{process.env.VERSION}</L2>
+    <L2 color="text-secondary">Version: v{process.env.VERSION}</L2>
   </VStack>
 )
-
-export { SupportFooter }

@@ -4,18 +4,18 @@ import {
   Button,
   CellStack,
   HeaderCell,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 
 import { AccountAddressListItem } from "../accounts/AccountAddressListItem"
-import { SendQuery } from "../../../shared/send/schema"
+import type { SendQuery } from "../../../shared/send/schema"
 import { SendModalAddContactScreen } from "./SendModalAddContactScreen"
-import { AddressBookContact } from "../../../shared/addressBook/type"
+import type { AddressBookContact } from "../../../shared/addressBook/type"
 
-const { AddressBookIcon } = iconsDeprecated
+const { AddressBookIcon } = icons
 
 export interface SendAmountAndAssetScreenProps extends SendQuery {
   input?: ReactNode

@@ -17,7 +17,12 @@ describe("OnboardingWorker", () => {
     } as unknown as KeyValueStorage<WalletStorageProps>
     const browser = {
       runtime: {
-        getManifest: vi.fn(() => ({ manifest_version: 3 }) as any),
+        getManifest: vi.fn(
+          () =>
+            ({
+              manifest_version: 3,
+            }) as any,
+        ),
         onInstalled: {
           addListener: vi.fn(),
         },

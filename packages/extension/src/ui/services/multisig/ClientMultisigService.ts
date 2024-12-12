@@ -1,6 +1,6 @@
-import { messageClient } from "../trpc"
-import { AddAccountResponse } from "../../../shared/multisig/service/messaging/IMultisigService"
-import {
+import type { messageClient } from "../trpc"
+import type { AddAccountResponse } from "../../../shared/multisig/service/messaging/IMultisigService"
+import type {
   AddAccountPayload,
   AddOwnerMultisigPayload,
   MultisigSignerSignatures,
@@ -8,13 +8,16 @@ import {
   ReplaceOwnerMultisigPayload,
   UpdateMultisigThresholdPayload,
 } from "../../../shared/multisig/multisig.model"
-import {
+import type {
   BaseWalletAccount,
   SignerType,
-  baseWalletAccountSchema,
 } from "../../../shared/wallet.model"
-import { PendingMultisig, SignerMetadata } from "../../../shared/multisig/types"
-import { IClientMultisigService } from "./IClientMultisigService"
+import { baseWalletAccountSchema } from "../../../shared/wallet.model"
+import type {
+  PendingMultisig,
+  SignerMetadata,
+} from "../../../shared/multisig/types"
+import type { IClientMultisigService } from "./IClientMultisigService"
 import { multisigMetadataRepo } from "../../../shared/multisig/repository"
 import {
   isEqualAddress,

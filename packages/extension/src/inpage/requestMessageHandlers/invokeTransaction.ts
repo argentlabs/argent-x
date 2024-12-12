@@ -1,8 +1,8 @@
-import {
+import type {
   AddInvokeTransactionParameters,
   AddInvokeTransactionResult,
 } from "@starknet-io/types-js"
-import { RpcCallsArraySchema } from "starknetkit/window"
+import { RpcCallsArraySchema } from "@argent/x-window"
 import { sendMessage, waitForMessage } from "../messageActions"
 import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 

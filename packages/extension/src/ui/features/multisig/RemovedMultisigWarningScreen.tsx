@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import { WarningScreen } from "../accounts/WarningScreen"
 import { useNavigate } from "react-router-dom"

@@ -1,19 +1,13 @@
-import {
-  Button,
-  H5,
-  NavigationContainer,
-  P3,
-  iconsDeprecated,
-} from "@argent/x-ui"
-import { Box, Flex, Spinner, useClipboard } from "@chakra-ui/react"
-import { FC, useEffect } from "react"
+import { Button, H4, icons, NavigationContainer, P2 } from "@argent/x-ui"
+import { Box, Center, Flex, Spinner, useClipboard } from "@chakra-ui/react"
+import type { FC } from "react"
+import { useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
-import { useEncodedPublicKey } from "../accounts/usePublicKey"
-import { IconWrapper } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/IconWrapper"
 import { routes } from "../../../shared/ui/routes"
+import { useEncodedPublicKey } from "../accounts/usePublicKey"
 
-const { CopyIcon, ShareIcon } = iconsDeprecated
+const { CopyPrimaryIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
@@ -46,10 +40,16 @@ export const JoinMultisigScreen: FC = () => {
         px={4}
         gap={4}
       >
-        <IconWrapper borderRadius="90">
+        <Center
+          w="14"
+          h="14"
+          background="neutrals.700"
+          boxShadow="menu"
+          borderRadius="90"
+        >
           <ShareIcon height="7" width="7" />
-        </IconWrapper>
-        <H5>Share your signer pubkey with the multisig creator</H5>
+        </Center>
+        <H4>Share your signer pubkey with the multisig creator</H4>
         <Box
           borderRadius="xl"
           bg="neutrals.800"
@@ -59,9 +59,9 @@ export const JoinMultisigScreen: FC = () => {
           w="full"
         >
           {signerKey ? (
-            <P3 fontWeight="bold" color="white.50">
+            <P2 fontWeight="bold" color="white.50">
               {signerKey}
-            </P3>
+            </P2>
           ) : (
             <Spinner w={6} h={6} />
           )}
@@ -74,13 +74,12 @@ export const JoinMultisigScreen: FC = () => {
             colorScheme="transparent"
             size="sm"
             color="text-secondary"
-            leftIcon={<CopyIcon />}
+            leftIcon={<CopyPrimaryIcon />}
           >
             {hasCopied ? "Copied" : "Copy"}
           </Button>
         )}
       </Flex>
-
       <Box position="absolute" w="full" bottom={6} px={4}>
         <Button
           data-testid="button-done"

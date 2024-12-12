@@ -1,5 +1,6 @@
-import { Address, isEqualAddress } from "@argent/x-shared"
-import { FeeTokenPreferenceOption } from "./types/preference.model"
+import type { Address } from "@argent/x-shared"
+import { isEqualAddress } from "@argent/x-shared"
+import type { FeeTokenPreferenceOption } from "./types/preference.model"
 import { num } from "starknet"
 import { arrayOrderWith } from "../utils/arrayOrderWith"
 import { FEE_TOKEN_PREFERENCE_BY_ADDRESS } from "./constants"

@@ -1,13 +1,13 @@
-import { ButtonCell, iconsDeprecated } from "@argent/x-ui"
-import { FC } from "react"
+import { ButtonCell, icons } from "@argent/x-ui"
+import type { FC } from "react"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
 } from "../../../../../services/blockExplorer.service"
 import { useCurrentNetwork } from "../../../../networks/hooks/useCurrentNetwork"
-import { WalletAccount } from "../../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../../shared/wallet.model"
 
-const { ExpandIcon } = iconsDeprecated
+const { ExpandIcon } = icons
 
 export const ViewOnExplorerButtonContainer: FC<{ account: WalletAccount }> = ({
   account,

@@ -1,4 +1,5 @@
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 import { ImportLedgerAccounts } from "./ImportLedgerAccounts"
 import { ImportedLedgerAccountsSuccess } from "./ImportLedgerAccountsSuccess"
 
@@ -9,7 +10,13 @@ export const ImportLedgerAccountsContainer: FC<{
   currentStep: number
   networkId: string
   userAccountHelpLink: string
-}> = ({ currentStep: initialCurrentStep, networkId, userAccountHelpLink }) => {
+  totalSteps: number
+}> = ({
+  currentStep: initialCurrentStep,
+  networkId,
+  userAccountHelpLink,
+  totalSteps,
+}) => {
   const [step, setStep] = useState(initialCurrentStep)
   const goNext = () => setStep((step) => step + 1)
 
@@ -19,7 +26,7 @@ export const ImportLedgerAccountsContainer: FC<{
         <ImportLedgerAccounts
           goNext={goNext}
           currentStep={FIRST_STEP}
-          totalSteps={3}
+          totalSteps={totalSteps}
           networkId={networkId}
           helpLink={userAccountHelpLink}
           filledIndicator
@@ -28,7 +35,7 @@ export const ImportLedgerAccountsContainer: FC<{
       {step === SECOND_STEP && (
         <ImportedLedgerAccountsSuccess
           index={SECOND_STEP}
-          totalSteps={3}
+          totalSteps={totalSteps}
           helpLink={userAccountHelpLink}
           filledIndicator
         />

@@ -1,9 +1,9 @@
-import { IHttpService } from "@argent/x-shared"
-import {
+import type { IHttpService } from "@argent/x-shared"
+import type {
   DappContext,
   IRiskAssessmentService,
 } from "../../../shared/riskAssessment/IRiskAssessmentService"
-import { RiskAssessment } from "../../../shared/riskAssessment/schema"
+import type { RiskAssessment } from "../../../shared/riskAssessment/schema"
 import { ARGENT_TRANSACTION_REVIEW_API_BASE_URL } from "../../../shared/api/constants"
 import urlJoin from "url-join"
 import { argentApiNetworkForNetwork } from "../../../shared/api/headers"
@@ -38,7 +38,7 @@ export default class BackgroundRiskAssessmentService
         riskAssessmentEndpoint,
       )
       return result
-    } catch (e) {
+    } catch {
       throw new RiskAssessmentError({ code: "ERROR_FETCHING" })
     }
   }

@@ -1,12 +1,9 @@
-import { getAccountIdentifier } from "@argent/x-shared"
 import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 import { groupBy } from "lodash-es"
 
-import {
-  PreAuthorization,
-  isEqualPreAuthorization,
-} from "../../shared/preAuthorization/schema"
+import type { PreAuthorization } from "../../shared/preAuthorization/schema"
+import { isEqualPreAuthorization } from "../../shared/preAuthorization/schema"
 import { preAuthorizationRepo } from "../../shared/preAuthorization/store"
 import {
   accountsEqual,
@@ -29,9 +26,7 @@ export const preAuthorizationsGroupedByAccountIdentifierForNetworkId =
   atomFamily((networkId: string) => {
     return atom(async (get) => {
       const all = await get(preAuthorizationsForNetworkId(networkId))
-      const grouped = groupBy(all, (preAuthorization) =>
-        getAccountIdentifier(preAuthorization.account),
-      )
+      const grouped = groupBy(all, ({ account }) => account.id)
       return grouped
     })
   })
@@ -69,5 +64,5 @@ export const isPreauthorized = atomFamily(
       return result
     })
   },
-  (a, b) => isEqualPreAuthorization(a, b),
+  isEqualPreAuthorization,
 )

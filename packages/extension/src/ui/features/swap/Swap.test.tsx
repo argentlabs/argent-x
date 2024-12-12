@@ -12,6 +12,8 @@ import {
 } from "../../../../test/token.mock"
 import { getMockTrade } from "../../../../test/trade.mock"
 import { Suspense } from "react"
+import { MemoryRouter } from "react-router-dom"
+import { Field } from "./state/fields"
 
 // Mocking modules
 vi.mock("./hooks/useSwapInfo")
@@ -41,7 +43,6 @@ describe("Swap Component Tests", () => {
     swapState = {},
     actionHandlers = {},
     userState = {},
-    appState = {},
     swapCallback = vi.fn(),
   ) => {
     const swapInfo: useSwapInfoModule.SwapInfo = {
@@ -68,8 +69,21 @@ describe("Swap Component Tests", () => {
       userSlippageTolerance: 10,
     }
 
+    vi.spyOn(useSwapStateModule, "createInitialState").mockReturnValue({
+      independentField: Field.PAY,
+      typedValue: "",
+      PAY: {
+        tokenAddress:
+          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+      },
+      RECEIVE: {
+        tokenAddress:
+          "0x053b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
+      },
+    })
+
     const defaultSwapState = {
-      ...useSwapStateModule.initialState,
+      ...useSwapStateModule.createInitialState(),
       ...swapState,
       resetTypedValue: vi.fn(),
     }
@@ -97,9 +111,11 @@ describe("Swap Component Tests", () => {
       swapCallback,
     )
     const rendered = render(
-      <Suspense fallback="Loading">
-        <Swap />
-      </Suspense>,
+      <MemoryRouter>
+        <Suspense fallback="Loading">
+          <Swap />
+        </Suspense>
+      </MemoryRouter>,
     )
 
     return rendered
@@ -128,7 +144,7 @@ describe("Swap Component Tests", () => {
     expect(onSwitchTokensMock).toHaveBeenCalled()
   })
 
-  it("handles input selection", async () => {
+  it("handles pay input selection", async () => {
     const onTokenSelectionMock = vi.fn()
     const onUserInputMock = vi.fn()
     await act(async () => {
@@ -149,6 +165,29 @@ describe("Swap Component Tests", () => {
       await new Promise((r) => setTimeout(r, 500))
     })
     expect(onUserInputMock).toHaveBeenCalledWith("PAY", "100")
+  })
+
+  it("handles receive input selection", async () => {
+    const onTokenSelectionMock = vi.fn()
+    const onUserInputMock = vi.fn()
+    await act(async () => {
+      return setup(
+        {},
+        {},
+        {
+          onTokenSelection: onTokenSelectionMock,
+          onUserInput: onUserInputMock,
+        },
+      )
+    })
+
+    fireEvent.change(await screen.findByTestId("swap-input-receive-panel"), {
+      target: { value: "100" },
+    })
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 500))
+    })
+    expect(onUserInputMock).toHaveBeenCalledWith("RECEIVE", "100")
   })
 
   it("handles max input", async () => {
@@ -183,7 +222,6 @@ describe("Swap Component Tests", () => {
         },
         {},
         { onUserInput: onUserInputMock },
-        {},
         {},
         swapCallbackMock,
       )

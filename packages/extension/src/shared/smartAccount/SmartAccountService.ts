@@ -1,14 +1,11 @@
 import { liveQuery } from "dexie"
 import type { Device } from "@argent/x-guardian"
-import Emittery from "emittery"
+import type Emittery from "emittery"
 
-import { StoreDexie } from "./idb"
+import type { StoreDexie } from "./idb"
 import { isTokenExpired } from "./backend/account"
-import {
-  Events,
-  IsSignedIn,
-  type ISmartAccountService,
-} from "./ISmartAccountService"
+import type { Events } from "./ISmartAccountService"
+import { IsSignedIn, type ISmartAccountService } from "./ISmartAccountService"
 
 export default class SmartAccountService implements ISmartAccountService {
   private _isSignedIn: boolean | null = null

@@ -1,8 +1,8 @@
-import { CopyTooltip, iconsDeprecated } from "@argent/x-ui"
+import { CopyTooltip, icons } from "@argent/x-ui"
 import { Box, Fade, useAccordionItemState } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-const { CopyIcon } = iconsDeprecated
+const { CopyPrimaryIcon } = icons
 
 interface CopyErrorIconProps {
   copyValue?: string
@@ -22,7 +22,7 @@ export const CopyErrorIcon: FC<CopyErrorIconProps> = ({ copyValue }) => {
             e.preventDefault()
           }}
         >
-          <CopyIcon />
+          <CopyPrimaryIcon />
         </Box>
       </CopyTooltip>
     </Fade>

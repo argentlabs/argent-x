@@ -3,7 +3,6 @@ import { mintDevnetEthToAccount } from "@argent-x/extension/e2e/apis/sendDevnetE
 import { validateAndParseAddress } from "starknet"
 
 import prompt from "./utils/prompt"
-
 ;(async () => {
   console.log("Declaring upgrade contract...")
 

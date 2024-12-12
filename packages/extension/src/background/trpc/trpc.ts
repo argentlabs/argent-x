@@ -22,8 +22,11 @@ import type { IBackgroundMultisigService } from "../services/multisig/IBackgroun
 import type { IOnboardingService } from "../../shared/onboarding/IOnboardingService"
 import type { IBackgroundUIService } from "../services/ui/IBackgroundUIService"
 import type { Wallet } from "../wallet"
-import { IOnRampService } from "../../shared/onRamp/IOnRampService"
-import { INotificationService } from "../../shared/notifications/INotificationService"
+import type { IAccountImportSharedService } from "../../shared/accountImport/service/IAccountImportSharedService"
+import type { IOnRampService } from "../../shared/onRamp/IOnRampService"
+import type { INotificationService } from "../../shared/notifications/INotificationService"
+import type { IStakingService } from "../../shared/staking/IStakingService"
+import type { IInvestmentService } from "../../shared/investments/IInvestmentService"
 
 interface Context {
   sender?: chrome.runtime.MessageSender
@@ -48,8 +51,11 @@ interface Context {
     backgroundUIService: IBackgroundUIService
     uiService: IUIService
     onboardingService: IOnboardingService
+    importAccountService: IAccountImportSharedService
     onRampService: IOnRampService
     notificationService: INotificationService
+    stakingService: IStakingService
+    investmentService: IInvestmentService
   }
 }
 

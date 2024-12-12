@@ -1,7 +1,8 @@
 import { z } from "zod"
 
 import { ArrayStorage } from "../../storage"
-import { BaseToken, BaseTokenSchema, Token } from "./type"
+import type { BaseToken, Token } from "./type"
+import { BaseTokenSchema } from "./type"
 import { equalToken, parsedDeprecatedTokens } from "./utils"
 
 export const tokenStore = new ArrayStorage(parsedDeprecatedTokens, {

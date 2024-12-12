@@ -1,20 +1,21 @@
 import { isContractDeployed } from "@argent/x-shared"
 import { getProvider } from "../../network"
-import { WalletAccount } from "../../wallet.model"
+import type { ArgentWalletAccount } from "../../wallet.model"
 
 export type AccountDeployStatusFromChain = Pick<
-  WalletAccount,
-  "address" | "networkId" | "needsDeploy"
+  ArgentWalletAccount,
+  "id" | "address" | "networkId" | "needsDeploy"
 >
 
 export async function getAccountDeployStatusFromChain(
-  accounts: WalletAccount[],
+  accounts: ArgentWalletAccount[],
 ): Promise<AccountDeployStatusFromChain[]> {
   return Promise.all(
-    accounts.map(async ({ address, networkId, network }) => {
+    accounts.map(async ({ address, networkId, network, id }) => {
       const isDeployed = await isContractDeployed(getProvider(network), address)
 
       return {
+        id,
         address,
         networkId,
         needsDeploy: !isDeployed,

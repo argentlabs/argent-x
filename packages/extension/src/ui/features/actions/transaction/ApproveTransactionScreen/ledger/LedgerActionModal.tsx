@@ -1,23 +1,18 @@
-import { FC, useCallback, useEffect, useState } from "react"
+import type { FC } from "react"
+import { useCallback, useEffect, useState } from "react"
+import type { LedgerModalBottomDialogProps } from "./LedgerModalBottomDialog"
 import {
   LedgerModalBottomDialog,
-  LedgerModalBottomDialogProps,
   LedgerModalBottomDialogState,
 } from "./LedgerModalBottomDialog"
 import { AX_LEDGER_ERROR_MESSAGES } from "../../../../../../shared/errors/ledger"
 import { useLedgerStatus } from "../../../../ledger/hooks/useLedgerStatus"
-import { BaseWalletAccount } from "../../../../../../shared/wallet.model"
-import { BigNumberish, Call } from "starknet"
-import { useTransactionHash } from "../../../transactionV2/useTransactionHash"
-import { EstimatedFees } from "@argent/x-shared/simulation"
+import type { BaseWalletAccount } from "../../../../../../shared/wallet.model"
 
 type LedgerActionModalProps = Omit<LedgerModalBottomDialogProps, "state"> & {
   onSubmit: () => void | Promise<void>
   errorMessage?: string
   account?: BaseWalletAccount
-  transactions?: Call | Call[]
-  estimatedFees?: EstimatedFees
-  nonce?: BigNumberish
 }
 
 export const LedgerActionModal: FC<LedgerActionModalProps> = ({
@@ -27,22 +22,14 @@ export const LedgerActionModal: FC<LedgerActionModalProps> = ({
   errorMessage,
   account,
   actionType = "transaction",
-  transactions,
-  estimatedFees,
-  nonce,
+  txHash,
+  deployTxHash,
 }) => {
   const [modalState, setModalState] = useState<LedgerModalBottomDialogState>(
     LedgerModalBottomDialogState.CONFIRM,
   )
 
-  const isLedgerConnected = useLedgerStatus(account)
-
-  const { data: txHash } = useTransactionHash(
-    account,
-    transactions,
-    estimatedFees,
-    nonce,
-  )
+  const isLedgerConnected = useLedgerStatus(account?.id)
 
   const ledgerErrorMessageToModalState = useCallback(
     (ledgerErrorMsg: string) => {
@@ -62,6 +49,9 @@ export const LedgerActionModal: FC<LedgerActionModalProps> = ({
 
         case AX_LEDGER_ERROR_MESSAGES.USER_REJECTED:
           return LedgerModalBottomDialogState.ERROR_REJECTED
+
+        case AX_LEDGER_ERROR_MESSAGES.UNSUPPORTED_APP_VERSION:
+          return LedgerModalBottomDialogState.UNSUPPORTED_APP_VERSION
 
         default:
           return LedgerModalBottomDialogState.ERROR
@@ -94,6 +84,7 @@ export const LedgerActionModal: FC<LedgerActionModalProps> = ({
       onRetry={onRetry}
       actionType={actionType}
       txHash={txHash}
+      deployTxHash={deployTxHash}
     />
   )
 }

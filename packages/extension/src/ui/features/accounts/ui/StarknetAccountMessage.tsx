@@ -1,11 +1,11 @@
 import {
   BarCloseButton,
-  H3,
+  H2,
   NavigationContainer,
   typographyStyles,
 } from "@argent/x-ui"
 import { Box, Circle, Flex, Link } from "@chakra-ui/react"
-import { FC, PropsWithChildren, ReactEventHandler, ReactNode } from "react"
+import type { FC, PropsWithChildren, ReactEventHandler, ReactNode } from "react"
 
 interface StarknetAccountMessageProps extends PropsWithChildren {
   onClose?: ReactEventHandler
@@ -58,7 +58,7 @@ export const StarknetAccountMessage: FC<StarknetAccountMessageProps> = ({
         {icon}
       </Circle>
       <Flex flexDirection={"column"} flex={1} px={8} pt={18} pb={8} gap={4}>
-        {title && <H3>{title}</H3>}
+        {title && <H2>{title}</H2>}
         {children}
         {learnMoreLink && (
           <Link
@@ -66,7 +66,7 @@ export const StarknetAccountMessage: FC<StarknetAccountMessageProps> = ({
             href={learnMoreLink}
             target="_blank"
             rel="noreferrer"
-            {...typographyStyles.L1}
+            {...typographyStyles.L1Bold}
           >
             Learn more about this change
           </Link>

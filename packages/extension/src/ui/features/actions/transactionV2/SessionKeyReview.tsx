@@ -4,26 +4,27 @@ import {
   prettifyTokenAmount,
 } from "@argent/x-shared"
 import {
-  L2,
+  formatDateTime,
+  L2Bold,
   ModalDialogData,
-  P4,
+  P3,
   TokenIcon,
   UnknownTokenIcon,
-  formatDateTime,
 } from "@argent/x-ui"
-import { Button, Flex, FlexProps, useDisclosure } from "@chakra-ui/react"
-import { FC } from "react"
-import { TypedData } from "@starknet-io/types-js"
+import type { FlexProps } from "@chakra-ui/react"
+import { Button, Flex, useDisclosure } from "@chakra-ui/react"
+import type { FC } from "react"
+import type { TypedData } from "@starknet-io/types-js"
 
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { useToken } from "../../accountTokens/tokens.state"
-import { getActiveFromNow } from "../../smartAccount/escape/useAccountEscape"
+import type { SessionKeyMetadataTxFee } from "../../../../shared/sessionKeys/schema"
 import {
-  SessionKeyMetadataTxFee,
   isSessionKeyMessage,
   isSessionKeyTypedData,
   sessionKeyMessageSchema,
 } from "../../../../shared/sessionKeys/schema"
+import { getActiveFromNow } from "../../../../shared/utils/getActiveFromNow"
 
 interface SessionKeyReviewProps {
   dataToSign: TypedData
@@ -65,10 +66,10 @@ export const SessionKeyReview: FC<SessionKeyReviewProps> = ({
           borderColor="stroke-focused"
           bgColor="surface-match-mode"
         >
-          <P4 color="text-secondary">
+          <P3 color="text-secondary">
             A session allows a dapp to perform actions without asking for your
             permission each time
-          </P4>
+          </P3>
         </Flex>
         {parsedDataToSign.Metadata.txFees.map(
           ({ tokenAddress, maxAmount }, index) => {
@@ -83,17 +84,19 @@ export const SessionKeyReview: FC<SessionKeyReviewProps> = ({
           },
         )}
         <ReviewCell>
-          <P4>Expires</P4>
+          <P3>Expires</P3>
           <Flex
             direction="column"
             gap={0.5}
             justifyContent="flex-end"
             textAlign="right"
           >
-            <P4 fontWeight="semibold" color="text-primary">
+            <P3 fontWeight="semibold" color="text-primary">
               In {activeFromNowPretty}
-            </P4>
-            <L2>{formatDateTime(parsedDataToSign["Expires At"] * 1000)}</L2>
+            </P3>
+            <L2Bold>
+              {formatDateTime(parsedDataToSign["Expires At"] * 1000)}
+            </L2Bold>
           </Flex>
         </ReviewCell>
         <Button
@@ -145,8 +148,8 @@ function TxFeeCell({
   return (
     <ReviewCell>
       <Flex direction="column" gap={0.5}>
-        <P4 fontWeight="semibold">Max allowed spending</P4>
-        <L2>*only applies to transaction fees</L2>
+        <P3 fontWeight="semibold">Max allowed spending</P3>
+        <L2Bold>*only applies to transaction fees</L2Bold>
       </Flex>
       <Flex
         direction="column"
@@ -160,11 +163,11 @@ function TxFeeCell({
           ) : (
             <UnknownTokenIcon size={4} />
           )}
-          <P4 fontWeight="semibold" color="text-primary">
+          <P3 fontWeight="semibold" color="text-primary">
             {displayAmount}
-          </P4>
+          </P3>
         </Flex>
-        <L2>{prettifyCurrencyValue(currencyValue)}</L2>
+        <L2Bold>{prettifyCurrencyValue(currencyValue)}</L2Bold>
       </Flex>
     </ReviewCell>
   )

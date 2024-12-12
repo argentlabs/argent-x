@@ -1,10 +1,10 @@
-import { Address } from "@argent/x-shared"
-import { messageClient } from "../trpc"
-import { ISwapService } from "./ISwapService"
-import { SwapQuoteResponse } from "../../../shared/swap/model/quote.model"
-import { Trade } from "../../../shared/swap/model/trade.model"
-import { SwapOrderResponse } from "../../../shared/swap/model/order.model"
-import { Call } from "starknet"
+import type { Address } from "@argent/x-shared"
+import type { messageClient } from "../trpc"
+import type { ISwapService } from "./ISwapService"
+import type { SwapQuoteResponse } from "../../../shared/swap/model/quote.model"
+import type { Trade } from "../../../shared/swap/model/trade.model"
+import type { SwapOrderResponse } from "../../../shared/swap/model/order.model"
+import type { Call } from "starknet"
 
 export class SwapService implements ISwapService {
   constructor(private trpcMessageClient: typeof messageClient) {}
@@ -12,14 +12,16 @@ export class SwapService implements ISwapService {
   async getSwapQuoteForPay(
     payTokenAddress: Address,
     receiveTokenAddress: Address,
-    payAmount: string,
     accountAddress: Address,
+    sellAmount?: string,
+    buyAmount?: string,
   ): Promise<SwapQuoteResponse> {
     return this.trpcMessageClient.swap.getSwapQuoteForPay.query({
       payTokenAddress,
       receiveTokenAddress,
-      payAmount,
       accountAddress,
+      sellAmount,
+      buyAmount,
     })
   }
 

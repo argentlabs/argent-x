@@ -1,6 +1,7 @@
-import { FC, PropsWithChildren, createContext, useContext } from "react"
+import type { FC, PropsWithChildren } from "react"
+import { createContext, useContext } from "react"
 
-import { Presentation } from "./types"
+import type { Presentation } from "./types"
 
 interface StackRoutesConfigProps {
   defaultPresentation: Presentation

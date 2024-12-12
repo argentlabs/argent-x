@@ -1,14 +1,19 @@
-import {
-  BlockExplorerProvider,
-  AddressNameProvider,
-  LabelsProvider,
+import type {
   UseAddressName,
-  UseLabel,
   UseBlockExplorer,
+  UseDappId,
+  UseLabel,
   UseToken,
+} from "@argent/x-ui"
+import {
+  AddressNameProvider,
+  BlockExplorerProvider,
+  DappProvider,
+  ImageOptimizationProvider,
+  LabelsProvider,
   TokenProvider,
 } from "@argent/x-ui"
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 
 import { useView } from "../views/implementation/react"
 import { labelsFindFamily } from "../views/transactionReviews"
@@ -18,7 +23,8 @@ import {
   useBlockExplorerTitle,
 } from "../services/blockExplorer.service"
 import { useAccountOrContactOnNetworkId } from "../features/accounts/useAccountOrContact"
-import { useTokenInfo } from "../features/accountTokens/tokens.state"
+import { useToken } from "../features/accountTokens/tokens.state"
+import { knownDappWithId } from "../views/knownDapps"
 
 const useAddressName: UseAddressName = ({ address, networkId }) => {
   const { account, contact } = useAccountOrContactOnNetworkId({
@@ -41,15 +47,27 @@ const useBlockExplorer: UseBlockExplorer = () => {
   }
 }
 
+const useDappId: UseDappId = (dappId) => {
+  return useView(knownDappWithId(dappId))
+}
+
+const imageOptimizationUrl = process.env.ARGENT_OPTIMIZER_URL
+
 export const ArgentUIProviders: FC<PropsWithChildren> = ({ children }) => {
   return (
     <LabelsProvider useLabel={useLabel}>
       <BlockExplorerProvider useBlockExplorer={useBlockExplorer}>
-        <AddressNameProvider useAddressName={useAddressName}>
-          <TokenProvider useToken={useTokenInfo as UseToken}>
-            {children}
-          </TokenProvider>
-        </AddressNameProvider>
+        <DappProvider useDappId={useDappId}>
+          <AddressNameProvider useAddressName={useAddressName}>
+            <TokenProvider useToken={useToken as UseToken}>
+              <ImageOptimizationProvider
+                imageOptimizationUrl={imageOptimizationUrl}
+              >
+                {children}
+              </ImageOptimizationProvider>
+            </TokenProvider>
+          </AddressNameProvider>
+        </DappProvider>
       </BlockExplorerProvider>
     </LabelsProvider>
   )

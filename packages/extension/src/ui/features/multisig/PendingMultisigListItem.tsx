@@ -1,22 +1,22 @@
-import { H6, P4, iconsDeprecated, typographyStyles } from "@argent/x-ui"
+import { H5, icons, P3, typographyStyles } from "@argent/x-ui"
 import { Circle, Flex, Text, chakra } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-import {
-  CustomButtonCell,
-  CustomButtonCellProps,
-} from "../../components/CustomButtonCell"
+import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { AccountAvatar } from "../accounts/AccountAvatar"
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
 import { formatTruncatedAddress } from "@argent/x-shared"
 import { AccountListItemLedgerBadge } from "../accounts/AccountListItemLedgerBadge"
+import type { AccountId } from "../../../shared/wallet.model"
 
-const { ViewIcon } = iconsDeprecated
+const { ShowSecondaryIcon } = icons
 
 export interface PendingMultisigListItemProps extends CustomButtonCellProps {
   accountName: string
   publicKey: string
   networkId: string
+  accountId: AccountId
   networkName?: string
   hidden?: boolean
   avatarOutlined?: boolean
@@ -30,7 +30,7 @@ export const NetworkStatusWrapper = chakra(Flex, {
     gap: 1,
     ml: 1,
     pointerEvents: "none",
-    ...typographyStyles.L1,
+    ...typographyStyles.L1Bold,
   },
 })
 
@@ -39,6 +39,7 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
   publicKey,
   networkId,
   networkName,
+  accountId,
   hidden,
   avatarOutlined,
   isLedger,
@@ -57,8 +58,7 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
         outlined={avatarOutlined}
         src={getNetworkAccountImageUrl({
           accountName,
-          accountAddress: publicKey, // Use publicKey instead of accountAddress
-          networkId,
+          accountId,
           backgroundColor: hidden ? "#333332" : undefined,
         })}
       >
@@ -72,19 +72,19 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
       >
         <Flex direction={"column"} overflow={"hidden"}>
           <Flex gap={1} alignItems={"center"}>
-            <H6 overflow={"hidden"} textOverflow={"ellipsis"}>
+            <H5 overflow={"hidden"} textOverflow={"ellipsis"}>
               {accountName}
-            </H6>
+            </H5>
           </Flex>
           <Flex gap={2} color={"neutrals.300"}>
             {hidden ? (
-              <P4 fontWeight={"semibold"}>
+              <P3 fontWeight={"semibold"}>
                 {formatTruncatedAddress(publicKey)}
-              </P4>
+              </P3>
             ) : (
               <>
-                <P4 fontWeight={"semibold"}>Awaiting owner to finish setup</P4>
-                {networkName && <P4 noOfLines={1}>{networkName}</P4>}
+                <P3 fontWeight={"semibold"}>Awaiting owner to finish setup</P3>
+                {networkName && <P3 noOfLines={1}>{networkName}</P3>}
               </>
             )}
           </Flex>
@@ -93,7 +93,7 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
           {hidden && (
             <Circle size={10} bg={"neutrals.600"}>
               <Text fontSize={"2xl"}>
-                <ViewIcon />
+                <ShowSecondaryIcon />
               </Text>
             </Circle>
           )}

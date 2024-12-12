@@ -1,15 +1,15 @@
 import { ButtonCell } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../../../../shared/ui/routes"
-import { WalletAccount } from "../../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../../shared/wallet.model"
 
 export const ConnectedDappButtonContainer: FC<{ account: WalletAccount }> = ({
   account,
 }) => {
   const navigate = useNavigate()
   const onClick = () => {
-    navigate(routes.settingsDappConnectionsAccount(account?.address))
+    navigate(routes.settingsDappConnectionsAccount(account?.id))
   }
 
   return <ConnectedDappsButton onClick={onClick} />

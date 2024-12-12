@@ -10,11 +10,8 @@ import { renderWithLegacyProviders } from "../../test/utils"
 import { CreateSmartAccountEmailScreen } from "../smartAccount/CreateSmartAccountEmailScreen"
 import { CreateSmartAccountOTPScreen } from "../smartAccount/CreateSmartAccountOTPScreen"
 import * as useSmartAccountVerifiedEmail from "../smartAccount/useSmartAccountVerifiedEmail"
-import {
-  AccountType,
-  AccountTypeId,
-  AddNewAccountScreen,
-} from "./AddNewAccountScreen"
+import type { AccountType } from "./AddNewAccountScreen"
+import { AccountTypeId, AddNewAccountScreen } from "./AddNewAccountScreen"
 import { AddNewAccountScreenContainer } from "./AddNewAccountScreenContainer"
 import * as useAccountTypesForNetwork from "./useAccountTypesForNetwork"
 
@@ -85,7 +82,7 @@ describe("AddNewAccountScreen", () => {
     fireEvent.click(screen.getByText("Standard Account"))
     screen.getByRole("button", { name: "Continue" }).click()
     expect(onAccountTypeConfirm).toHaveBeenCalledWith(AccountTypeId.STANDARD)
-    expect(isAccountTypeLoading).toHaveBeenCalledTimes(2)
+    expect(isAccountTypeLoading).toHaveBeenCalledTimes(1)
   })
 
   it("Should call create smart account", async () => {
@@ -114,7 +111,7 @@ describe("AddNewAccountScreen", () => {
     expect(onAccountTypeConfirm).toHaveBeenCalledWith(
       AccountTypeId.SMART_ACCOUNT,
     )
-    expect(isAccountTypeLoading).toHaveBeenCalledTimes(3)
+    expect(isAccountTypeLoading).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -146,7 +143,8 @@ describe("AddNewAccountScreenContainer", () => {
         </MemoryRouter>,
       )
     })
-    expect(screen.getByText("Standard Account")).toBeInTheDocument()
+
+    expect(await screen.findByText("Standard Account")).toBeInTheDocument()
     expect(screen.getByText("Multisig Account")).toBeInTheDocument()
     expect(screen.getByText("Smart Account")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument()

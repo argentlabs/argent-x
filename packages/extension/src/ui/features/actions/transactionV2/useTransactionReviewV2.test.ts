@@ -1,17 +1,22 @@
-import { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import * as tokenServices from "../../../services/tokens"
 import { checkGasFeeBalance } from "./useTransactionReviewV2"
-import { vi, describe, it, beforeEach, expect } from "vitest"
 
 vi.mock("../../../services/tokens", () => ({
   clientTokenService: {
     fetchTokenBalance: vi.fn(),
+    getTokenBalance: vi.fn(),
   },
 }))
 
 describe("checkGasFeeBalance", () => {
   const feeTokenAddress = "0xTokenAddress"
-  const currentAccount = { address: "0xAccountAddress", networkId: "networkid" }
+  const currentAccount = {
+    address: "0xAccountAddress",
+    networkId: "networkid",
+    id: "id",
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -74,7 +79,7 @@ describe("checkGasFeeBalance", () => {
       },
     } as unknown as EnrichedSimulateAndReview
     vi.mocked(
-      tokenServices.clientTokenService.fetchTokenBalance,
+      tokenServices.clientTokenService.getTokenBalance,
     ).mockResolvedValue("2000")
 
     const hasEnoughBalance = await checkGasFeeBalance(

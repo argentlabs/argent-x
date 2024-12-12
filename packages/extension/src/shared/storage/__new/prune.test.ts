@@ -1,8 +1,7 @@
 import { describe, expect, vi } from "vitest"
 
+import type { IMinimalStorage, Pattern } from "./prune"
 import {
-  IMinimalStorage,
-  Pattern,
   copyObjectToStorage,
   copyStorageToObject,
   pruneStorageData,

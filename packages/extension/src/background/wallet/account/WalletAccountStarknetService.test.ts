@@ -1,14 +1,12 @@
-import { WalletAccountStarknetService } from "./WalletAccountStarknetService"
-import { WalletSessionService } from "../session/WalletSessionService"
-import { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
-import { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
+import type { WalletAccountStarknetService } from "./WalletAccountStarknetService"
+import type { WalletSessionService } from "../session/WalletSessionService"
+import type { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import type { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
 import { MultisigAccount } from "../../../shared/multisig/account"
 import {
-  accountSharedServiceMock,
   accountStarknetServiceMock,
   cryptoStarknetServiceMock,
   sessionServiceMock,
-  ledgerServiceMock,
 } from "../test.utils"
 import { Account, stark } from "starknet"
 import {
@@ -22,6 +20,11 @@ import { cosignerSign } from "../../../shared/smartAccount/backend/account"
 import { addressSchema } from "@argent/x-shared"
 import { getBaseDerivationPath } from "../../../shared/signer/utils"
 import { SignerType } from "../../../shared/wallet.model"
+import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
+import {
+  accountSharedServiceMock,
+  ledgerServiceMock,
+} from "../../../shared/test.utils"
 
 // Mock dependencies
 vi.mock("../session/session.service")
@@ -29,6 +32,13 @@ vi.mock("./shared.service")
 vi.mock("../crypto/starknet.service")
 
 const testAddress = addressSchema.parse(stark.randomAddress())
+
+const mockSigner = {
+  type: SignerType.LOCAL_SECRET,
+  derivationPath: "m/44'/60'/0'/0/0",
+}
+
+const testId = getAccountIdentifier(testAddress, "net1", mockSigner)
 
 describe("AccountStarknetService", () => {
   let accountStarknetService: WalletAccountStarknetService
@@ -48,10 +58,7 @@ describe("AccountStarknetService", () => {
       vi.spyOn(sessionService, "isSessionOpen").mockResolvedValue(false)
 
       await expect(
-        accountStarknetService.getStarknetAccount({
-          address: testAddress,
-          networkId: "net1",
-        }),
+        accountStarknetService.getStarknetAccount(testId),
       ).rejects.toThrow("no open session")
     })
 
@@ -60,10 +67,7 @@ describe("AccountStarknetService", () => {
       vi.spyOn(accountSharedService, "getAccount").mockResolvedValue(null)
 
       await expect(
-        accountStarknetService.getStarknetAccount({
-          address: testAddress,
-          networkId: "net1",
-        }),
+        accountStarknetService.getStarknetAccount(testId),
       ).rejects.toThrow("Account not found")
     })
   })

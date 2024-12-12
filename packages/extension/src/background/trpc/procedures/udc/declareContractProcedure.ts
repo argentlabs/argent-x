@@ -9,16 +9,13 @@ export const declareContractProcedure = extensionOnlyProcedure
   .output(z.string())
   .mutation(
     async ({
-      input: { address, networkId, ...rest },
+      input: { accountId, ...rest },
       ctx: {
         services: { actionService, wallet },
       },
     }) => {
-      if (address && networkId) {
-        await wallet.selectAccount({
-          address,
-          networkId,
-        })
+      if (accountId) {
+        await wallet.selectAccount(accountId)
       }
       try {
         const action = await actionService.add(
@@ -33,7 +30,7 @@ export const declareContractProcedure = extensionOnlyProcedure
           },
         )
         return action.meta.hash
-      } catch (e) {
+      } catch {
         throw new UdcError({ code: "NO_DEPLOY_CONTRACT" })
       }
     },

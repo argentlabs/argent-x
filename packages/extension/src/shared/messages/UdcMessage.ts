@@ -1,4 +1,4 @@
-import { DeclareContract } from "../udc/schema"
+import type { DeclareContract } from "../udc/schema"
 
 export type UdcMessage =
   | {

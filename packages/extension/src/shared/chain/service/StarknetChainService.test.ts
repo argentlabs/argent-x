@@ -1,9 +1,9 @@
 import { describe, expect, test, vi } from "vitest"
 
-import { INetworkService } from "../../network/service/INetworkService"
-import { Network } from "../../network"
+import type { INetworkService } from "../../network/service/INetworkService"
+import type { Network } from "../../network"
 import { StarknetChainService } from "./StarknetChainService"
-import { Hex } from "@argent/x-shared"
+import type { Hex } from "@argent/x-shared"
 
 const mocks = vi.hoisted(() => {
   return {

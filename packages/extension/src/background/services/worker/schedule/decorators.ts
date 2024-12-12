@@ -1,10 +1,11 @@
-import { IDebounceService } from "../../../../shared/debounce"
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import type { IDebounceService } from "../../../../shared/debounce"
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
 import { Locked } from "../../../wallet/session/interface"
-import { WalletSessionService } from "../../../wallet/session/WalletSessionService"
-import { IKeyValueStorage } from "../../../../shared/storage"
-import { WalletStorageProps } from "../../../wallet/backup/WalletBackupService"
-import { IBackgroundUIService, Opened } from "../../ui/IBackgroundUIService"
+import type { WalletSessionService } from "../../../wallet/session/WalletSessionService"
+import type { IKeyValueStorage } from "../../../../shared/storage"
+import type { WalletStorageProps } from "../../../wallet/backup/WalletBackupService"
+import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
+import { Opened } from "../../ui/IBackgroundUIService"
 import { pipe } from "./pipe"
 
 type Fn = (...args: unknown[]) => Promise<void>
@@ -115,7 +116,9 @@ export const onOpenSmoothed =
     let timeout: ReturnType<typeof setTimeout>
     const delay = 300 + Math.random() * 1000
     backgroundUIService.emitter.on(Opened, async (open) => {
-      timeout && clearTimeout(timeout)
+      if (timeout) {
+        clearTimeout(timeout)
+      }
       if (open) {
         timeout = setTimeout(() => {
           void fn()

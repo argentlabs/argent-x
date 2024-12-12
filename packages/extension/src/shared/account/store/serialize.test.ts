@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
 
-import { Network } from "../../network"
+import type { Network } from "../../network"
 import { defaultNetworks } from "../../network/defaults"
 import {
   SignerType,
@@ -8,8 +8,11 @@ import {
   type WalletAccount,
 } from "../../wallet.model"
 import { deserializeFactory, migrateAccount, serialize } from "./serialize"
+import { getRandomAccountIdentifier } from "../../utils/accountIdentifier"
 
 const defaultNetwork = defaultNetworks[1]
+
+const accountId = getRandomAccountIdentifier("0x1", defaultNetwork.id)
 
 // Mock getNetwork function
 const getNetwork = vi.fn(async (networkId): Promise<Network> => {
@@ -23,6 +26,7 @@ const deserialize = deserializeFactory(getNetwork)
 
 const mockAccounts: WalletAccount[] = [
   {
+    id: accountId,
     name: "Account1",
     type: "standard",
     address: "0x1",
@@ -34,6 +38,7 @@ const mockAccounts: WalletAccount[] = [
 
 const mockStoredAccounts: StoredWalletAccount[] = [
   {
+    id: accountId,
     name: "Account1",
     type: "standard",
     address: "0x1",
@@ -57,6 +62,7 @@ describe("Wallet Account Serialization and Deserialization", () => {
     const invalidStoredAccounts: StoredWalletAccount[] = [
       ...mockStoredAccounts,
       {
+        id: accountId,
         name: "Account2",
         type: "standard",
         address: "0x2",

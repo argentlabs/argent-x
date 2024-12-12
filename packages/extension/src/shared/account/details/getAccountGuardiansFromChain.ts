@@ -1,14 +1,14 @@
-import { WalletAccount } from "../../wallet.model"
+import type { ArgentWalletAccount, WalletAccount } from "../../wallet.model"
 import { getGuardianForAccount } from "./getGuardian"
 
 export type AccountGuardiansFromChain = Pick<
-  WalletAccount,
-  "address" | "networkId" | "guardian"
+  ArgentWalletAccount,
+  "id" | "address" | "networkId" | "guardian"
 >
 
 /** updates the accounts with current guardian status */
 export async function getAccountGuardiansFromChain(
-  accounts: WalletAccount[],
+  accounts: ArgentWalletAccount[],
 ): Promise<AccountGuardiansFromChain[]> {
   const guardianResults = await Promise.allSettled(
     accounts.map((account) => {
@@ -26,8 +26,9 @@ export async function getAccountGuardiansFromChain(
       : account.type === "multisig"
         ? "multisig"
         : "standard"
-    const { address, networkId } = account
+    const { address, networkId, id } = account
     return {
+      id,
       address,
       networkId,
       guardian,

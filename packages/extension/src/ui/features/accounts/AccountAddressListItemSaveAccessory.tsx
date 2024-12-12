@@ -1,8 +1,8 @@
-import { Button, iconsDeprecated } from "@argent/x-ui"
-import { ButtonProps } from "@chakra-ui/react"
-import { FC } from "react"
+import { Button, icons } from "@argent/x-ui"
+import type { ButtonProps } from "@chakra-ui/react"
+import type { FC } from "react"
 
-const { AddressBookIcon } = iconsDeprecated
+const { AddressBookIcon } = icons
 
 export const AccountAddressListItemSaveAccessory: FC<ButtonProps> = ({
   onClick,
@@ -20,7 +20,9 @@ export const AccountAddressListItemSaveAccessory: FC<ButtonProps> = ({
       leftIcon={<AddressBookIcon />}
       onClick={(e) => {
         e.stopPropagation() /** prevent click on containing button */
-        onClick && onClick(e)
+        if (onClick) {
+          onClick(e)
+        }
       }}
       {...rest}
     >

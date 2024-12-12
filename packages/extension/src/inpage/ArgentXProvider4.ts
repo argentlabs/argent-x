@@ -1,7 +1,8 @@
-import { Call, Provider, ProviderInterface } from "starknet4"
-import { Network } from "../shared/network"
+import type { Call, ProviderInterface } from "starknet4"
+import { Provider } from "starknet4"
+import type { Network } from "../shared/network"
 import { getRandomPublicRPCNode } from "../shared/network/utils"
-import { getProviderv4 } from "../shared/network/provider"
+import { getProviderv4 } from "./provider"
 import { argentApiNetworkForNetwork } from "../shared/api/headers"
 
 export class ArgentXProviderV4 extends Provider implements ProviderInterface {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { IExplorerTransaction } from "../../../../explorer/type"
+import type { IExplorerTransaction } from "../../../../explorer/type"
 import { nftContractAddresses } from "../__fixtures__/nftContractAddresses"
 import { tokensByNetwork } from "../__fixtures__/tokensByNetwork"
 import { transformExplorerTransaction } from "./transformExplorerTransaction"
@@ -54,7 +54,7 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "id": 1,
-            "name": "Ether",
+            "name": "Ethereum",
             "network": "sepolia-alpha",
             "networkId": "sepolia-alpha",
             "showAlways": true,
@@ -87,7 +87,7 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "id": 1,
-            "name": "Ether",
+            "name": "Ethereum",
             "network": "sepolia-alpha",
             "networkId": "sepolia-alpha",
             "showAlways": true,
@@ -120,7 +120,7 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "id": 1,
-            "name": "Ether",
+            "name": "Ethereum",
             "network": "sepolia-alpha",
             "networkId": "sepolia-alpha",
             "showAlways": true,
@@ -153,7 +153,7 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "id": 1,
-            "name": "Ether",
+            "name": "Ethereum",
             "network": "sepolia-alpha",
             "networkId": "sepolia-alpha",
             "showAlways": true,
@@ -185,7 +185,7 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "id": 1,
-            "name": "Ether",
+            "name": "Ethereum",
             "network": "mainnet-alpha",
             "networkId": "mainnet-alpha",
             "showAlways": true,
@@ -224,16 +224,6 @@ describe("transformExplorerTransaction", () => {
           "action": "APPROVE",
           "actualFee": "78640023328647",
           "amount": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
-          "dapp": {
-            "hosts": [
-              "aspect.co",
-              "testnet.aspect.co",
-            ],
-            "icon": "https://aspect.co/img/company/logo512.png",
-            "id": "aspect-co",
-            "title": "Aspect",
-          },
-          "dappContractAddress": "0x2a92f0f860bf7c63fb9ef42cff4137006b309e0e6e1484e42d0b5511959414d",
           "date": "2022-09-07T08:56:31.000Z",
           "displayName": "Approve",
           "entity": "TOKEN",
@@ -244,7 +234,7 @@ describe("transformExplorerTransaction", () => {
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "id": 1,
-            "name": "Ether",
+            "name": "Ethereum",
             "network": "mainnet-alpha",
             "networkId": "mainnet-alpha",
             "showAlways": true,
@@ -440,35 +430,12 @@ describe("transformExplorerTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "SWAP",
+          "action": "UNKNOWN",
           "actualFee": "49915215635677",
-          "dapp": {
-            "hosts": [
-              "testnet.app.alpharoad.fi",
-            ],
-            "id": "alpharoad-fi",
-            "title": "Alpha Road",
-          },
-          "dappContractAddress": "0x4aec73f0611a9be0524e7ef21ab1679bdf9c97dc7d72614f15373d431226b6a",
           "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Sold ETH for unknown",
-          "entity": "TOKEN",
-          "fromAmount": "211522156930263",
-          "fromToken": {
-            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-            "decimals": 18,
-            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-            "id": 1,
-            "name": "Ether",
-            "network": "sepolia-alpha",
-            "networkId": "sepolia-alpha",
-            "showAlways": true,
-            "symbol": "ETH",
-          },
-          "fromTokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "displayName": "Approve and swap exact tokens for tokens",
+          "entity": "UNKNOWN",
           "maxFee": "70744313503497",
-          "toAmount": "55785188096947612154",
-          "toTokenAddress": "0x72df4dc5b6c4df72e4288857317caf2ce9da166ab8719ab8306516a2fddfff7",
         }
       `)
       expect(
@@ -479,35 +446,12 @@ describe("transformExplorerTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "SWAP",
+          "action": "UNKNOWN",
           "actualFee": "36750992760053",
-          "dapp": {
-            "hosts": [
-              "app.testnet.jediswap.xyz",
-            ],
-            "id": "jediswap-xyz",
-            "title": "JediSwap",
-          },
-          "dappContractAddress": "0x12b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
           "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Sold ETH for unknown",
-          "entity": "TOKEN",
-          "fromAmount": "1000000000000000",
-          "fromToken": {
-            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-            "decimals": 18,
-            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-            "id": 1,
-            "name": "Ether",
-            "network": "sepolia-alpha",
-            "networkId": "sepolia-alpha",
-            "showAlways": true,
-            "symbol": "ETH",
-          },
-          "fromTokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "displayName": "Approve and swap exact tokens for tokens",
+          "entity": "UNKNOWN",
           "maxFee": "55126489140079",
-          "toAmount": "9883",
-          "toTokenAddress": "0x5a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
         }
       `)
       expect(
@@ -518,36 +462,12 @@ describe("transformExplorerTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "SWAP",
+          "action": "UNKNOWN",
           "actualFee": "35172000035172",
-          "dapp": {
-            "hosts": [
-              "www.myswap.xyz",
-            ],
-            "icon": "https://www.myswap.xyz/favicon.ico",
-            "id": "myswap-xyz",
-            "title": "mySwap",
-          },
-          "dappContractAddress": "0x18a439bcbb1b3535a6145c1dc9bc6366267d923f60a84bd0c7618f33c81d334",
           "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Sold ETH for unknown",
-          "entity": "TOKEN",
-          "fromAmount": "100000000000000",
-          "fromToken": {
-            "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-            "decimals": 18,
-            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-            "id": 1,
-            "name": "Ether",
-            "network": "sepolia-alpha",
-            "networkId": "sepolia-alpha",
-            "showAlways": true,
-            "symbol": "ETH",
-          },
-          "fromTokenAddress": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          "displayName": "Approve",
+          "entity": "UNKNOWN",
           "maxFee": "52758000052758",
-          "toAmount": "29852496290917474",
-          "toTokenAddress": "0x005a643907b9a4bc6a55e9069c4fd5fd1f5c79a22470690f75556c4736e34426",
         }
       `)
 
@@ -560,23 +480,15 @@ describe("transformExplorerTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "BUY",
+          "action": "TRANSFER",
           "actualFee": "18270500000000",
           "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
-          "dapp": {
-            "hosts": [
-              "aspect.co",
-              "testnet.aspect.co",
-            ],
-            "icon": "https://aspect.co/img/company/logo512.png",
-            "id": "aspect-co",
-            "title": "Aspect",
-          },
-          "dappContractAddress": "0x6fcf30a53fdc33c85ab428d6c481c5d241f1de403009c4e5b66aeaf3edc890",
           "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Buy NFT",
+          "displayName": "Transfer NFT",
           "entity": "NFT",
+          "fromAddress": "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
           "maxFee": "27405750000000",
+          "toAddress": "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
           "tokenId": "3462",
         }
       `)
@@ -588,21 +500,15 @@ describe("transformExplorerTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "BUY",
+          "action": "TRANSFER",
           "actualFee": "17222000000000",
           "contractAddress": "0x3090623ea32d932ca1236595076b00702e7d860696faf300ca9eb13bfe0a78c",
-          "dapp": {
-            "hosts": [
-              "mintsquare.io",
-            ],
-            "id": "mintsquare-io",
-            "title": "Mint Square",
-          },
-          "dappContractAddress": "0x5bc8cc601c5098e20e9d9d74e86cfb0ec737f6f3ac571914dbe4f74aa249786",
           "date": "2022-08-18T11:50:28.000Z",
-          "displayName": "Buy NFT",
+          "displayName": "Transfer NFT",
           "entity": "NFT",
+          "fromAddress": "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
           "maxFee": "25832999948334",
+          "toAddress": "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
           "tokenId": "3462",
         }
       `)
@@ -615,23 +521,12 @@ describe("transformExplorerTransaction", () => {
         }),
       ).toMatchInlineSnapshot(`
         {
-          "action": "BUY",
+          "action": "UNKNOWN",
           "actualFee": "4557033777702",
-          "contractAddress": "0x41c4e86a03480313547a04e13fc4d43d7fb7bcb5244fd0cb93f793f304f6124",
-          "dapp": {
-            "hosts": [
-              "game-goerli.influenceth.io",
-            ],
-            "icon": "https://uploads-ssl.webflow.com/60c209ffee9cc9e89d505549/60c8fea5c9d9a170d2f9b5e0_logo-256.png",
-            "id": "influenceth-io",
-            "title": "Influence",
-          },
-          "dappContractAddress": "0x4a472fe795cc40e9dc838fe4f1608cb91bf027854d016675ec81e172a2e3599",
           "date": "2022-08-31T10:55:59.000Z",
-          "displayName": "Buy NFT",
-          "entity": "NFT",
+          "displayName": "Approve",
+          "entity": "UNKNOWN",
           "maxFee": "7742757880620",
-          "tokenId": "9099",
         }
       `)
 
@@ -646,17 +541,9 @@ describe("transformExplorerTransaction", () => {
         {
           "action": "UNKNOWN",
           "actualFee": "13666550163999",
-          "dapp": {
-            "hosts": [
-              "nogamev0-1.netlify.app",
-            ],
-            "id": "nogame-app",
-            "title": "NoGame",
-          },
-          "dappContractAddress": "0x35401b96dc690eda2716068d3b03732d7c18af7c0327787660179108789d84f",
           "date": "2022-08-18T11:50:28.000Z",
           "displayName": "Crystal upgrade complete",
-          "entity": "DAPP",
+          "entity": "UNKNOWN",
           "maxFee": "20499825245998",
         }
       `)
@@ -670,17 +557,9 @@ describe("transformExplorerTransaction", () => {
         {
           "action": "UNKNOWN",
           "actualFee": "17607000123249",
-          "dapp": {
-            "hosts": [
-              "briq.construction",
-            ],
-            "id": "briq-construction",
-            "title": "briq",
-          },
-          "dappContractAddress": "0x1317354276941f7f799574c73fd8fe53fa3f251084b4c04d88cf601b6bd915e",
           "date": "2022-08-18T11:50:28.000Z",
           "displayName": "Assemble",
-          "entity": "DAPP",
+          "entity": "UNKNOWN",
           "maxFee": "26410500211284",
         }
       `)

@@ -9,7 +9,7 @@ export function getSafeGetCommitHash() {
   try {
     const hash = execSync("git rev-parse HEAD")
     return hash.toString().trim()
-  } catch (e) {
+  } catch {
     return "unknown"
   }
 }

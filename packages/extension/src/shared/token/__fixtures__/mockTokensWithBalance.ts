@@ -1,4 +1,4 @@
-import { Address } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
 
 import mockTokensWithBalanceRaw from "../../../../test/__fixtures__/tokens-with-balance.mock.json"
 import type { TokenWithOptionalBigIntBalance } from "../__new/types/tokenBalance.model"

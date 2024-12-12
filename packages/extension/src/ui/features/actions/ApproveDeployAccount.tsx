@@ -1,23 +1,16 @@
-import { FC, useState } from "react"
+import type { FC } from "react"
 import { Navigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
-import { DeployAccountFeeEstimation } from "./feeEstimation/DeployAccountFeeEstimation"
-import {
-  ConfirmPageProps,
-  ConfirmScreen,
-} from "./transaction/ApproveTransactionScreen/ConfirmScreen"
-import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
-import { NavigationBarAccountDetailsContainer } from "./transactionV2/header/NavigationBarAccountDetailsContainer"
-import { Divider } from "@chakra-ui/react"
-import {
-  TransactionHeader,
-  TransactionHeaderProps,
-} from "./transactionV2/header"
+import type { ConfirmPageProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import { ConfirmScreen } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import { AccountDetailsNavigationBarContainer } from "../navigation/AccountDetailsNavigationBarContainer"
+import type { TransactionHeaderProps } from "./transactionV2/header"
+import { TransactionHeader } from "./transactionV2/header"
 import { TransactionReviewActions } from "@argent/x-ui/simulation"
-import { ReviewOfTransaction } from "@argent/x-shared/simulation"
+import type { ReviewOfTransaction } from "@argent/x-shared/simulation"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { TokenWithBalance } from "@argent/x-shared"
+import type { TokenWithBalance } from "@argent/x-shared"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit">,
@@ -29,7 +22,8 @@ export interface ApproveDeployAccountScreenProps
   isLedger?: boolean
   disableLedgerApproval?: boolean
   feeToken: TokenWithBalance
-  setFeeToken: (token: TokenWithBalance) => void
+  footer?: React.ReactNode
+  disableConfirm?: boolean
 }
 
 export const ApproveDeployAccountScreen: FC<
@@ -43,22 +37,17 @@ export const ApproveDeployAccountScreen: FC<
   iconKey,
   isLedger,
   disableLedgerApproval,
-  setFeeToken,
   feeToken,
+  footer,
+  disableConfirm,
   ...rest
 }) => {
-  const [disableConfirm, setDisableConfirm] = useState(false)
   const networkId = useCurrentNetwork().id
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />
   }
-  const navigationBar = (
-    <>
-      <NavigationBarAccountDetailsContainer />
-      <Divider color="neutrals.700" />
-    </>
-  )
+  const navigationBar = <AccountDetailsNavigationBarContainer />
 
   /** Show mock tx review to the end user */
 
@@ -103,19 +92,7 @@ export const ApproveDeployAccountScreen: FC<
       confirmButtonDisabled={
         disableConfirm || actionIsApproving || disableLedgerApproval
       }
-      footer={
-        <WithActionScreenErrorFooter isTransaction>
-          <DeployAccountFeeEstimation
-            onErrorChange={setDisableConfirm}
-            accountAddress={selectedAccount.address}
-            networkId={selectedAccount.networkId}
-            actionHash={actionHash}
-            transactionSimulationLoading={false}
-            feeToken={feeToken}
-            setFeeToken={setFeeToken}
-          />
-        </WithActionScreenErrorFooter>
-      }
+      footer={footer}
       navigationBar={navigationBar}
       isLedger={isLedger}
       {...rest}

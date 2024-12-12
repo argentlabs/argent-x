@@ -1,16 +1,15 @@
-import { Address, addressSchema, getNftPicture } from "@argent/x-shared"
-import { H6, P4, iconsDeprecated } from "@argent/x-ui"
-import { Circle, Flex, Image } from "@chakra-ui/react"
-import { FC } from "react"
+import type { Address } from "@argent/x-shared"
+import { addressSchema, getNftPicture } from "@argent/x-shared"
+import { H5, icons, ImageOptimized, P3 } from "@argent/x-ui"
+import { Circle, Flex } from "@chakra-ui/react"
+import type { FC } from "react"
 
-import {
-  CustomButtonCell,
-  CustomButtonCellProps,
-} from "../../components/CustomButtonCell"
+import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
+import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { useNft } from "../accountNfts/nfts.state"
 import { useRemoteNft } from "../accountNfts/useRemoteNft"
 
-const { ChevronDownIcon } = iconsDeprecated
+const { ChevronDownSecondaryIcon } = icons
 
 interface NftInputProps extends CustomButtonCellProps {
   contractAddress?: Address
@@ -37,21 +36,22 @@ export const NftInput: FC<NftInputProps> = ({
 
   return (
     <CustomButtonCell {...rest}>
-      <Image
+      <ImageOptimized
         borderColor="transparent"
         borderRadius="lg"
         alt={displayNft.name ?? "NFT"}
         src={getNftPicture(displayNft)}
+        format="png"
         w={14}
         h={14}
         fit={"cover"}
       />
       <Flex direction={"column"} gap={1} flex={1} overflow={"hidden"}>
-        <H6 whiteSpace="initial">{title}</H6>
-        <P4 color={"neutrals.400"}>{subtitle}</P4>
+        <H5 whiteSpace="initial">{title}</H5>
+        <P3 color={"neutrals.400"}>{subtitle}</P3>
       </Flex>
       <Circle size={7} bg="surface-default">
-        <ChevronDownIcon fontSize={"2xs"} />
+        <ChevronDownSecondaryIcon fontSize={"2xs"} />
       </Circle>
     </CustomButtonCell>
   )

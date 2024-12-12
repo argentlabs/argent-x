@@ -1,10 +1,10 @@
-import { Button, FlowHeader, P3, iconsDeprecated } from "@argent/x-ui"
+import { Button, FlowHeader, icons, P2 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/escape.model"
 
-const { SmartAccountInactiveIcon } = iconsDeprecated
+const { NoShieldSecondaryIcon } = icons
 
 interface EscapeGuardianReadyProps {
   accountGuardianIsSelf: boolean | null
@@ -24,14 +24,14 @@ export const EscapeGuardianReady: FC<EscapeGuardianReadyProps> = ({
   return (
     <Flex flexDirection={"column"} flex={1} px={4} pt={8} pb={4}>
       <FlowHeader
-        icon={SmartAccountInactiveIcon}
+        icon={NoShieldSecondaryIcon}
         title={title}
         subtitle={`The ${ESCAPE_SECURITY_PERIOD_DAYS}-day security period is over. You can now remove Argent as a guardian`}
         variant={"warning"}
       />
-      <P3 color="neutrals.100" textAlign={"center"}>
+      <P2 color="neutrals.100" textAlign={"center"}>
         <strong>{description}</strong>
-      </P3>
+      </P2>
       <Flex flex={1} />
       <Button colorScheme={"primary"} onClick={onRemove}>
         Remove Argent as a guardian

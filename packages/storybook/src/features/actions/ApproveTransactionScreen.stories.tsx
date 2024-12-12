@@ -5,7 +5,7 @@ import {
   transfer,
 } from "@argent-x/extension/src/ui/features/actions/__fixtures__"
 import { ApproveTransactionScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ApproveTransactionScreen"
-import { P4 } from "@argent/x-ui"
+import { P3 } from "@argent/x-ui"
 import { Center } from "@chakra-ui/layout"
 
 import { account } from "../../account"
@@ -18,7 +18,7 @@ export default {
 
 const footer = (
   <Center bg={"neutrals.500"} rounded={"base"} px={1} py={2}>
-    <P4>Placeholder footer</P4>
+    <P3>Placeholder footer</P3>
   </Center>
 )
 

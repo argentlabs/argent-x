@@ -11,8 +11,8 @@ export interface ISettingsStorage {
   nftMarketplaceKey: NftMarketplaceKey
   autoLockTimeMinutes: number
   disableAnimation: boolean
-  hideSpamTokens: boolean
   airGapEnabled: boolean
+  idProvider: "starknetid" | "brotherid"
 }
 
 export type SettingsStorageKey = keyof ISettingsStorage

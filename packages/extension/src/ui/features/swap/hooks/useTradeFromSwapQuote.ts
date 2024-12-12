@@ -1,9 +1,9 @@
 import { useTokenOnCurrentNetworkByAddress } from "../../accountTokens/tokens.state"
 import { useMemo } from "react"
 import { Field, useSwapState } from "../state/fields"
-import { SwapQuoteResponse } from "../../../../shared/swap/model/quote.model"
+import type { SwapQuoteResponse } from "../../../../shared/swap/model/quote.model"
+import type { Trade } from "../../../../shared/swap/model/trade.model"
 import {
-  Trade,
   TradeSchema,
   TradeType,
 } from "../../../../shared/swap/model/trade.model"

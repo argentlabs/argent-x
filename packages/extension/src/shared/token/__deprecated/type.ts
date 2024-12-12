@@ -27,6 +27,7 @@ const RequestTokenSchema = z.object({
   decimals: z.coerce.number().optional(),
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TokenSchema = RequestTokenSchema.required().extend({
   image: z.string().optional(),
   showAlways: z.boolean().optional(),

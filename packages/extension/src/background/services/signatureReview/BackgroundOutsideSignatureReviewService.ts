@@ -1,22 +1,21 @@
+import { TransactionType } from "starknet"
 import type {
   ISignatureReviewService,
   SimulateAndReviewPayload,
 } from "../../../shared/signatureReview/ISignatureReviewService"
+import type { OutsideSignature } from "../../../shared/signatureReview/schema"
 import {
   outsideExecutionMessageSchema,
   outsideExecutionMessageSchemaV2,
-  OutsideSignature,
 } from "../../../shared/signatureReview/schema"
-import type {
-  ITransactionReviewService,
-  TransactionReviewTransactions,
-} from "../../../shared/transactionReview/interface"
+import type { ITransactionReviewService } from "../../../shared/transactionReview/interface"
+import type { InvokeTransaction } from "../../../shared/transactionReview/transactionAction.model"
 
 export default class BackgroundOutsideSignatureReviewService
   implements ISignatureReviewService
 {
   constructor(private transactionReviewService: ITransactionReviewService) {}
-  adaptSignature(signature: OutsideSignature): TransactionReviewTransactions[] {
+  adaptSignature(signature: OutsideSignature): InvokeTransaction {
     const executeFromOutsideMessageV2 =
       outsideExecutionMessageSchemaV2.safeParse(signature.message)
 
@@ -28,7 +27,7 @@ export default class BackgroundOutsideSignatureReviewService
           calldata: call.Calldata,
         }
       })
-      return [{ calls: calls, type: "INVOKE" }]
+      return { payload: calls, type: TransactionType.INVOKE }
     }
 
     // Not really needed, we know at this point that it's a safe message v1 schema, but typescript is not smart enough to pick this up
@@ -37,7 +36,7 @@ export default class BackgroundOutsideSignatureReviewService
     )
 
     if (!executeFromOutsideMessageV1.success) {
-      return [{ calls: [], type: "INVOKE" }]
+      return { payload: [], type: TransactionType.INVOKE }
     }
 
     const calls = executeFromOutsideMessageV1.data.calls?.map((call) => {
@@ -47,17 +46,17 @@ export default class BackgroundOutsideSignatureReviewService
         calldata: call.calldata,
       }
     })
-
-    return [{ calls: calls, type: "INVOKE" }]
+    return { payload: calls, type: TransactionType.INVOKE }
   }
+
   simulateAndReview({
     signature,
     feeTokenAddress,
     appDomain,
   }: SimulateAndReviewPayload) {
-    const transactions = this.adaptSignature(signature)
+    const transaction = this.adaptSignature(signature)
     return this.transactionReviewService.simulateAndReview({
-      transactions,
+      transaction,
       feeTokenAddress,
       appDomain,
     })

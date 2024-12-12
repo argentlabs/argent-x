@@ -1,4 +1,4 @@
-import { Button, H5, P3 } from "@argent/x-ui"
+import { Button, H4, P2 } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,
@@ -7,7 +7,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 interface MultisigRemoveOwnerProps {
   isOpen: boolean
@@ -26,14 +26,14 @@ export const MultisigRemoveOwnerModal: FC<MultisigRemoveOwnerProps> = ({
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
       <ModalContent background="neutrals.700">
         <ModalHeader>
-          <H5 fontWeight="600" textAlign="center">
+          <H4 fontWeight="600" textAlign="center">
             Remove owner?
-          </H5>
+          </H4>
         </ModalHeader>
         <ModalBody>
-          <P3 textAlign="center">
+          <P2 textAlign="center">
             Are you sure you want to remove this multisig owner?
-          </P3>
+          </P2>
         </ModalBody>
 
         <ModalFooter flexDirection="column" gap="3">

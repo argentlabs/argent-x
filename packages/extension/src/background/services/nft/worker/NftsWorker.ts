@@ -1,21 +1,21 @@
 import { addressSchema, isArgentNetworkId } from "@argent/x-shared"
 import { uniq } from "lodash-es"
 
-import { IBackgroundUIService } from "../../ui/IBackgroundUIService"
-import { Wallet } from "../../../wallet"
-import { WalletSessionService } from "../../../wallet/session/WalletSessionService"
+import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
+import type { Wallet } from "../../../wallet"
+import type { WalletSessionService } from "../../../wallet/session/WalletSessionService"
 import { RefreshIntervalInSeconds } from "../../../../shared/config"
-import { INFTService } from "../../../../shared/nft/INFTService"
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
-import { WalletStorageProps } from "../../../../shared/wallet/walletStore"
-import { ArrayStorage, KeyValueStorage } from "../../../../shared/storage"
-import { Transaction } from "../../../../shared/transactions"
-import { hasSuccessfulTransaction } from "../../../../shared/utils/transactionSucceeded"
+import type { INFTService } from "../../../../shared/nft/INFTService"
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import type { WalletStorageProps } from "../../../../shared/wallet/walletStore"
+import type { KeyValueStorage } from "../../../../shared/storage"
 import { everyWhenOpen } from "../../worker/schedule/decorators"
 import { pipe } from "../../worker/schedule/pipe"
-import { IDebounceService } from "../../../../shared/debounce"
+import type { IDebounceService } from "../../../../shared/debounce"
 import { Recovered } from "../../../wallet/recovery/IWalletRecoveryService"
-import { WalletRecoverySharedService } from "../../../wallet/recovery/WalletRecoverySharedService"
+import type { WalletRecoverySharedService } from "../../../wallet/recovery/WalletRecoverySharedService"
+import type { IActivityService } from "../../activity/IActivityService"
+import { NftActivity } from "../../activity/IActivityService"
 
 export class NftsWorker {
   constructor(
@@ -23,7 +23,7 @@ export class NftsWorker {
     private readonly scheduleService: IScheduleService,
     private readonly walletSingleton: Wallet,
     private walletStore: KeyValueStorage<WalletStorageProps>,
-    private readonly transactionsStore: ArrayStorage<Transaction>,
+    private readonly activityService: IActivityService,
     public readonly sessionService: WalletSessionService,
     private readonly backgroundUIService: IBackgroundUIService,
     private readonly debounceService: IDebounceService,
@@ -38,21 +38,11 @@ export class NftsWorker {
       this.updateNftsCallback.bind(this),
     )
 
-    /** update when a transaction succeeds (could be nft-related) */
-    this.transactionsStore.subscribe((_, changeSet) => {
-      if (!changeSet?.newValue) {
-        return
-      }
-      const hasSuccessTx = hasSuccessfulTransaction(
-        changeSet.newValue,
-        changeSet?.oldValue,
-      )
-      if (hasSuccessTx) {
-        setTimeout(
-          () => void this.updateNftsCallback(),
-          RefreshIntervalInSeconds.FAST * 1000,
-        ) // Add a delay so the backend has time to index the nft
-      }
+    this.activityService.emitter.on(NftActivity, () => {
+      setTimeout(
+        () => void this.updateNftsCallback(),
+        RefreshIntervalInSeconds.FAST * 1000,
+      ) // Add a delay so the backend has time to index the nft
     })
   }
 
@@ -66,17 +56,15 @@ export class NftsWorker {
     }
 
     try {
+      const accountAddress = addressSchema.parse(account.address)
+
       const nfts = await this.nftsService.getAssets(
         "starknet",
         account.networkId,
-        addressSchema.parse(account.address),
+        accountAddress,
       )
 
-      await this.nftsService.upsert(
-        nfts,
-        addressSchema.parse(account.address),
-        account.networkId,
-      )
+      await this.nftsService.upsert(nfts, accountAddress, account.networkId)
 
       const contractsAddresses = uniq(
         nfts.map((nft) => ({
@@ -89,7 +77,7 @@ export class NftsWorker {
         "starknet",
         account.networkId,
         contractsAddresses,
-        addressSchema.parse(account.address),
+        accountAddress,
       )
     } catch (e) {
       console.error(e)
@@ -101,7 +89,7 @@ export class NftsWorker {
       this.backgroundUIService,
       this.scheduleService,
       this.debounceService,
-      RefreshIntervalInSeconds.SLOW,
+      RefreshIntervalInSeconds.MEDIUM,
       "NftsWorker.updateNfts",
     ),
   )(async () => {

@@ -1,6 +1,6 @@
-import { BaseScheduledTask } from "../schedule/IScheduleService"
-import { IKeyValueStorage } from "../storage"
-import {
+import type { BaseScheduledTask } from "../schedule/IScheduleService"
+import type { IKeyValueStorage } from "../storage"
+import type {
   DebouncedImplementedScheduledTask,
   IDebounceService,
 } from "./IDebounceService"

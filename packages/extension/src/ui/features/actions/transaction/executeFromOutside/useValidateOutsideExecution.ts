@@ -1,5 +1,5 @@
-import { TypedData } from "@starknet-io/types-js"
-import { Network } from "../../../../../shared/network"
+import type { TypedData } from "@starknet-io/types-js"
+import type { Network } from "../../../../../shared/network"
 import { encodeChainId } from "../../../../../shared/utils/encodeChainId"
 import { constants } from "starknet"
 import { isValidOutsideExecutionMessage } from "./utils"

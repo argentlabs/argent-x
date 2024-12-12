@@ -3,7 +3,7 @@ import type { Address } from "@argent/x-shared"
 // eslint-disable-next-line @argent/local/code-import-patterns
 import type { LogoDeprecatedKeys } from "@argent/x-ui"
 
-import { defaultNftMarketplaces } from "./defaultNftMarketplaces"
+import type { defaultNftMarketplaces } from "./defaultNftMarketplaces"
 
 export type NftMarketplaceKey = keyof typeof defaultNftMarketplaces
 

@@ -1,5 +1,5 @@
-import { Network } from "../network"
-import { WalletAccount } from "../wallet.model"
+import type { Network } from "../network"
+import type { WalletAccount } from "../wallet.model"
 
 export type NetworkMessage =
   | { type: "REQUEST_SELECTED_NETWORK" }

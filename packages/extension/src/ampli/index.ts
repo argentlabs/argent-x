@@ -8,7 +8,7 @@
  * To update run 'ampli pull argent-x'
  *
  * Required dependencies: @amplitude/analytics-browser@^1.3.0
- * Tracking Plan Version: 41
+ * Tracking Plan Version: 61
  * Build: 1.0.0
  * Runtime: browser:typescript-ampli-v2
  *
@@ -30,10 +30,10 @@ export const ApiKey: Record<Environment, string> = {
  */
 export const DefaultConfiguration: BrowserOptions = {
   plan: {
-    version: "41",
+    version: "61",
     branch: "main",
     source: "argent-x",
-    versionId: "b19d7e07-65a0-450d-9b22-cc8811e6f0a4",
+    versionId: "73703ce7-e97a-4b27-84da-d72d0085c68e",
   },
   ...{
     ingestionMetadata: {
@@ -65,6 +65,51 @@ export type LoadOptions =
   | LoadOptionsWithClientInstance
 
 export interface IdentifyProperties {
+  /**
+   * Count the number of ledger user accounts for the user
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | integer |
+   * | Min Value | 0 |
+   */
+  "ArgentX Ledger Accounts Count"?: number
+  /**
+   * Count the number of multisig accounts for the user
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | integer |
+   * | Min Value | 0 |
+   */
+  "ArgentX Multisig Accounts Count"?: number
+  /**
+   * Count the number of smart accounts for the user
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | integer |
+   * | Min Value | 0 |
+   */
+  "ArgentX Smart Accounts Count"?: number
+  /**
+   * Count the number of standard accounts for the user
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | integer |
+   * | Min Value | 0 |
+   */
+  "ArgentX Standard Accounts Count"?: number
+  /**
+   * Count the number of testnet accounts for the user
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | integer |
+   * | Min Value | 0 |
+   */
+  "ArgentX Testnet Accounts Count"?: number
   /**
    * | Rule | Value |
    * |---|---|
@@ -132,22 +177,12 @@ export interface AccountCreatedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface AccountDeployedProperties {
-  /**
-   * Used for Argent Mobile only to handle some legacy regarding multiple blockchain networks/chains.
-   *
-   *  Do not use this to indicate testnet.
-   *
-   * | Rule | Value |
-   * |---|---|
-   * | Enum Values | ethereum, zksync lite, zksync era, starknet |
-   */
-  "account chain"?: "ethereum" | "zksync lite" | "zksync era" | "starknet"
   /**
    * Account index refers to how each account is indexed on the wallet from a technical perspective.
    *
@@ -158,14 +193,6 @@ export interface AccountDeployedProperties {
    * | Type | number |
    */
   "account index"?: number
-  /**
-   * Used by Argent Mobile to indicate AX Import status of the account.
-   *
-   * | Rule | Value |
-   * |---|---|
-   * | Enum Values | no_key, has_key |
-   */
-  "account key status"?: "no_key" | "has_key"
   /**
    * Used to categorise into the 3 account types we offer today: Standard, Smart, Multisig.
    *
@@ -187,9 +214,9 @@ export interface AccountDeployedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface ActivityTabClickedProperties {
@@ -202,9 +229,9 @@ export interface ActivityTabClickedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface ApplicationOpenedProperties {
@@ -217,13 +244,13 @@ export interface ApplicationOpenedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface BlockerExplorerChangedProperties {
-  provider: string
+  provider?: string
   /**
    * This is a REQUIRED property, and it must be fired for ALL events on this project.
    *
@@ -233,9 +260,9 @@ export interface BlockerExplorerChangedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface CustomTokenAddedProperties {
@@ -248,13 +275,22 @@ export interface CustomTokenAddedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface DappPreauthorizedProperties {
+  /**
+   * Describes host part of an URL e.g. app.ekubo.org for <https://app.ekubo.org/positions/0x1/0x1/123>
+   */
   host?: string
+  /**
+   * **Mobile:**
+   *
+   * Describes if the dapp preauthorisation includes starknet as one of the requested chains. Required since WC can request reauthorization for multiple chains, not only Starknet. Always true for in-app browser.
+   */
+  "preauthorisation has starknet"?: boolean
   /**
    * | Rule | Value |
    * |---|---|
@@ -276,9 +312,9 @@ export interface DappPreauthorizedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface DiscoverTabClickedProperties {
@@ -291,9 +327,9 @@ export interface DiscoverTabClickedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface FeedPostClickedProperties {
@@ -322,9 +358,9 @@ export interface FeedPostClickedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface HomeTabClickedProperties {
@@ -337,9 +373,9 @@ export interface HomeTabClickedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface LedgerUserAccountAddedProperties {
@@ -363,13 +399,16 @@ export interface LedgerUserAccountAddedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface MessageSignedProperties {
   "from outside"?: boolean
+  /**
+   * Describes host part of an URL e.g. app.ekubo.org for <https://app.ekubo.org/positions/0x1/0x1/123>
+   */
   host?: string
   /**
    * This is a REQUIRED property, and it must be fired for ALL events on this project.
@@ -380,9 +419,9 @@ export interface MessageSignedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface NftMarketplaceChangedProperties {
@@ -396,9 +435,9 @@ export interface NftMarketplaceChangedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingAccountTypeSelectedProperties {
@@ -432,9 +471,9 @@ export interface OnboardingAccountTypeSelectedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingAnalyticsDecidedProperties {
@@ -457,9 +496,9 @@ export interface OnboardingAnalyticsDecidedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingCompletedProperties {
@@ -493,9 +532,9 @@ export interface OnboardingCompletedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingEmailEnteredProperties {
@@ -517,9 +556,9 @@ export interface OnboardingEmailEnteredProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingEmailFlowAbortedProperties {
@@ -541,9 +580,9 @@ export interface OnboardingEmailFlowAbortedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingPasswordSetProperties {
@@ -565,9 +604,9 @@ export interface OnboardingPasswordSetProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingStartedProperties {
@@ -589,9 +628,9 @@ export interface OnboardingStartedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingVerificationCodeAcceptedProperties {
@@ -613,9 +652,9 @@ export interface OnboardingVerificationCodeAcceptedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingVerificationCodeRejectedProperties {
@@ -637,9 +676,9 @@ export interface OnboardingVerificationCodeRejectedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface OnboardingVerificationCodeResentProperties {
@@ -661,9 +700,9 @@ export interface OnboardingVerificationCodeResentProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface SwapQuoteFailedProperties {
@@ -688,9 +727,9 @@ export interface SwapQuoteFailedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface SwapTabClickedProperties {
@@ -703,12 +742,44 @@ export interface SwapTabClickedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
+}
+
+export interface TestnetAccountImportCompletedProperties {
+  /**
+   * This can be used to determine whether the account is Braavos, Argent, Metamask, OpenZeplin etc.
+   */
+  "imported account class hash"?: string
+}
+
+export interface TestnetAccountImportFailedProperties {
+  /**
+   * This can be used to determine whether the account is Braavos, Argent, Metamask, OpenZeplin etc.
+   */
+  "imported account class hash"?: string
+  /**
+   * Used for Argent Mobile (AX import)
+   *  Used for Argent X (PK import)
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | invalid_key, invalid_key_format, failed_to_save, account_not_found, has_guardian, is_multisig |
+   */
+  "key import error"?:
+    | "invalid_key"
+    | "invalid_key_format"
+    | "failed_to_save"
+    | "account_not_found"
+    | "has_guardian"
+    | "is_multisig"
 }
 
 export interface TransactionReviewedProperties {
+  /**
+   * Describes host part of an URL e.g. app.ekubo.org for <https://app.ekubo.org/positions/0x1/0x1/123>
+   */
   host?: string
   /**
    * References the "Key" e.g. **insufficient token received**
@@ -720,9 +791,14 @@ export interface TransactionReviewedProperties {
   "simulation error message"?: string
   "simulation succeeded"?: boolean
   /**
+   * Used for Staking related transaction type only.
+   *  Staking providers are \[argent, nethermind, ...\]
+   */
+  "staking provider"?: string
+  /**
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain |
+   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain, stake, claim staked rewards, initialise withdraw, finalise withdraw |
    */
   "transaction type"?:
     | "inapp swap"
@@ -744,6 +820,10 @@ export interface TransactionReviewedProperties {
     | "remove guardian"
     | "add guardian"
     | "reject onchain"
+    | "stake"
+    | "claim staked rewards"
+    | "initialise withdraw"
+    | "finalise withdraw"
   /**
    * This is a REQUIRED property, and it must be fired for ALL events on this project.
    *
@@ -753,9 +833,9 @@ export interface TransactionReviewedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface TransactionSubmittedProperties {
@@ -781,8 +861,16 @@ export interface TransactionSubmittedProperties {
    * | Enum Values | standard, smart, multisig |
    */
   "account type": "standard" | "smart" | "multisig"
+  /**
+   * Describes host part of an URL e.g. app.ekubo.org for <https://app.ekubo.org/positions/0x1/0x1/123>
+   */
   host?: string
   "is deployment"?: boolean
+  /**
+   * Used for Staking related transaction type only.
+   *  Staking providers are \[argent, nethermind, ...\]
+   */
+  "staking provider"?: string
   /**
    * | Rule | Value |
    * |---|---|
@@ -792,7 +880,7 @@ export interface TransactionSubmittedProperties {
   /**
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain |
+   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain, stake, claim staked rewards, initialise withdraw, finalise withdraw |
    */
   "transaction type"?:
     | "inapp swap"
@@ -814,6 +902,10 @@ export interface TransactionSubmittedProperties {
     | "remove guardian"
     | "add guardian"
     | "reject onchain"
+    | "stake"
+    | "claim staked rewards"
+    | "initialise withdraw"
+    | "finalise withdraw"
   /**
    * This is a REQUIRED property, and it must be fired for ALL events on this project.
    *
@@ -823,9 +915,9 @@ export interface TransactionSubmittedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
   /**
    * | Rule | Value |
    * |---|---|
@@ -844,9 +936,9 @@ export interface WalletLocalStorageClearedProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export interface WalletRestoredProperties {
@@ -859,9 +951,9 @@ export interface WalletRestoredProperties {
    *
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | browser extension, mobile, web |
+   * | Enum Values | browser extension, mobile, web, telegram |
    */
-  "wallet platform": "browser extension" | "mobile" | "web"
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
 export class Identify implements BaseEvent {
@@ -1064,6 +1156,10 @@ export class OnboardingVerificationCodeResent implements BaseEvent {
   }
 }
 
+export class StakingEditButtonClicked implements BaseEvent {
+  event_type = "Staking Edit Button Clicked"
+}
+
 export class SwapQuoteFailed implements BaseEvent {
   event_type = "Swap Quote Failed"
 
@@ -1076,6 +1172,24 @@ export class SwapTabClicked implements BaseEvent {
   event_type = "Swap Tab Clicked"
 
   constructor(public event_properties: SwapTabClickedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class TestnetAccountImportCompleted implements BaseEvent {
+  event_type = "Testnet Account Import Completed"
+
+  constructor(
+    public event_properties?: TestnetAccountImportCompletedProperties,
+  ) {
+    this.event_properties = event_properties
+  }
+}
+
+export class TestnetAccountImportFailed implements BaseEvent {
+  event_type = "Testnet Account Import Failed"
+
+  constructor(public event_properties?: TestnetAccountImportFailedProperties) {
     this.event_properties = event_properties
   }
 }
@@ -1254,6 +1368,8 @@ export class Ampli {
    * Regarding properties: account index: 0 
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. account index)
    * @param options Amplitude event options.
    */
@@ -1275,7 +1391,9 @@ export class Ampli {
    *
    *
    *
-   * @param properties The event's properties (e.g. account chain)
+   * Owner: Ko Sakuma
+   *
+   * @param properties The event's properties (e.g. account index)
    * @param options Amplitude event options.
    */
   accountDeployed(
@@ -1300,6 +1418,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
@@ -1321,6 +1441,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
@@ -1340,10 +1462,12 @@ export class Ampli {
    *
    * Relevant properties: "provider" which defines the options of the explorer
    *
-   * Other comments: n/a 
+   * Other comments: n/a It defaults to Voyager since 5.18
    *
-   *  Screenshots: 
+   * Screenshots: 
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. provider)
    * @param options Amplitude event options.
@@ -1368,6 +1492,8 @@ export class Ampli {
    *  Screenshots: 
    *
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
@@ -1403,6 +1529,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. host)
    * @param options Amplitude event options.
    */
@@ -1429,6 +1557,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
@@ -1453,6 +1583,8 @@ export class Ampli {
    * Screenshots: 
    *
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. account type)
    * @param options Amplitude event options.
@@ -1481,6 +1613,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
@@ -1506,6 +1640,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. accounts added)
    * @param options Amplitude event options.
    */
@@ -1527,6 +1663,8 @@ export class Ampli {
    *
    * Other comments: This does not include Session Key Singing. See Seesion Key Signed for such event. 
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. from outside)
    * @param options Amplitude event options.
@@ -1553,6 +1691,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. provider)
    * @param options Amplitude event options.
    */
@@ -1570,6 +1710,8 @@ export class Ampli {
    *
    *
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. account type)
    * @param options Amplitude event options.
@@ -1593,6 +1735,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. analytics activated)
    * @param options Amplitude event options.
    */
@@ -1615,6 +1759,8 @@ export class Ampli {
    *
    *
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. account type)
    * @param options Amplitude event options.
@@ -1641,6 +1787,8 @@ export class Ampli {
    * **Mobile:** 
    *  This is fired when: the user taps CTA, and before the terms get accepted.
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
    */
@@ -1665,6 +1813,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
    */
@@ -1687,6 +1837,8 @@ export class Ampli {
    * Other comments: 
    *  Screenshots: 
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
@@ -1714,6 +1866,8 @@ export class Ampli {
    *
    * ![](https://com-amplitude-orbit-media-prod-eu.s3.eu-central-1.amazonaws.com/100001676/dcd721f9-0ca3-4d06-a221-b37287bda59b.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAS6JMKSBO6OET5WMY%2F20240726%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20240726T093407Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEPf%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDGV1LWNlbnRyYWwtMSJHMEUCIQDuGcmhQU%2BT4Lw1dcPqFIFszZ42kwer8BYxZtoCwVX0aQIgERIxJFRc0a1ssKc8mDs6NSdO4lnvxyTM9GfsfAnqs4gqzQUI0P%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARADGgwyMDI0OTMzMDA4MjkiDMPxxl%2FKeojrdBx2ACqhBY%2FTYFuu%2BmDylyOlOQZQkz2dR2Lgqa1QYrBrMylxwK3QWotiv2poLthwp2yVwS6dbImvvRTSwQQtkgYI%2FMkBTsiEn7rPeS%2BboUxXl2Ki2%2Fjtv3s0lqaHRKLUgbmG9sOAWtELS2KtJnNTJkbcoD1P0ZpCvKPjd9lRR2yrWMXRfiO6N0epTXL%2BBoDg3de%2FV77YQnLIA8ZQEHXchnq43IvZgO9pDrgH5AO%2Bd%2FdVDvyqLeCPyrO9VQWNGC1%2BAbZy3LcNxk7kA%2FN%2BoZP7SiGaTiCwKk4MOPhJ0Cz9B%2BM1hBYy%2FJ5HVeMW1S3W%2FcfxgQO6g%2FZ5UhveVWgW7h6S2xacfn3DBCuPtLzW9k9H5x65jbB9jtnYbZqrVJ4uutKH9G3MuJeiBfnsFr4L47PmVIxf2I9xKlx5Hak28%2BPv%2FYau2jmKhWCi4YUlmKD5AgZ2AWK%2B8MEee%2BeCr94DKd%2F2TT0cXzAdvSqMDBm9Oe%2FL8wHcG63eW49QfIgkPKbvIyGsjn%2FCzcQwzo4FluhGKr99RR%2BRYJNnDlQ7G3g4GmYOLlmmLztdfVkoKWjhT6piS9Yc00yB%2FDvHeWIypVyv%2Bu4IS6jwD53X8e32oOhnyj70fLowZOAX6t%2FfhSbJXnQKcS%2FZLVOomIHYqH%2Bmlz1wnF38Ty7kbUf4rkdPyorTH037kUneIrzMchipKDMbjNbxGxs1qIdGFOmZ%2BvkeZCesfmyROcoUfcTh106s7kTZHrb3tHefRaDzyrMse%2BK6Bn73GlM7V%2FJqCiQCyZ%2BXmi3oDIvlSp3MfqANlS%2BD5eJdML1yM3w7%2Bjo1hmFTOFMyOYas2pDfVSqdqa6mJhqP2Ue4mFjDEvIsIeR%2FoXyDScZiCPA3fXK5Y3tM4lWqCbOK2CEYDJADs0ctdPPKd68w%2FoWNtQY6sQFJbj8OHAmoD%2F8ISKkA8XMRm9oYpQh4ZDNbVFRxUZ18mfp5d2tDKjU79Tnd35xhrrolylB2eUiStM6ouQYCRSHxCa7u0IPYLarkYzaYVUtM7qET70z%2F4qq1y95%2BTcFTRCIlzNvsF3qSaGsNfVM%2FmnWMg4DFFNWS9TDfBk%2FiFIbLguP1%2Bpfx7KGKstgaMbNgSc22Qame3eATULR3UW4w6t0ufS8bEi9GskIxIZheKdxmAME%3D&X-Amz-Signature=675fcc9125dc72fca0687b83b950bb139fb664fe9a1e7e2a2ba2f8b0f71a3986&X-Amz-SignedHeaders=host&x-id=GetObject)
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
    */
@@ -1729,7 +1883,7 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Verification%20Code%20Accepted)
    *
-   * Event has no description in tracking plan.
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
@@ -1746,7 +1900,7 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Verification%20Code%20Rejected)
    *
-   * Event has no description in tracking plan.
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
@@ -1763,7 +1917,7 @@ export class Ampli {
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Onboarding%20Verification%20Code%20Resent)
    *
-   * Event has no description in tracking plan.
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. onboarding experiment)
    * @param options Amplitude event options.
@@ -1773,6 +1927,25 @@ export class Ampli {
     options?: EventOptions,
   ) {
     return this.track(new OnboardingVerificationCodeResent(properties), options);
+  }
+
+  /**
+   * Staking Edit Button Clicked
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Staking%20Edit%20Button%20Clicked)
+   *
+   * AX: This event is fired when: the user clicks the Edit button on the Stake STRK screen 
+   *  Other notes: This is meant to track how much users are interested in exploring "other options" 
+   *
+   *
+   *
+   *
+   * @param options Amplitude event options.
+   */
+  stakingEditButtonClicked(
+    options?: EventOptions,
+  ) {
+    return this.track(new StakingEditButtonClicked(), options);
   }
 
   /**
@@ -1788,6 +1961,8 @@ export class Ampli {
    *
    * Screenshots: 
    *  (@dev, pls can you include an example of swap quote failure)
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. error type)
    * @param options Amplitude event options.
@@ -1815,6 +1990,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
    */
@@ -1823,6 +2000,40 @@ export class Ampli {
     options?: EventOptions,
   ) {
     return this.track(new SwapTabClicked(properties), options);
+  }
+
+  /**
+   * Testnet Account Import Completed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Testnet%20Account%20Import%20Completed)
+   *
+   * This event is fired when the user tries to import an account on Sepolia, and succeeded
+   *
+   * @param properties The event's properties (e.g. imported account class hash)
+   * @param options Amplitude event options.
+   */
+  testnetAccountImportCompleted(
+    properties?: TestnetAccountImportCompletedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new TestnetAccountImportCompleted(properties), options);
+  }
+
+  /**
+   * Testnet Account Import Failed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Testnet%20Account%20Import%20Failed)
+   *
+   * This event is fired when the user tries to import an account on Sepolia, and failed
+   *
+   * @param properties The event's properties (e.g. imported account class hash)
+   * @param options Amplitude event options.
+   */
+  testnetAccountImportFailed(
+    properties?: TestnetAccountImportFailedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new TestnetAccountImportFailed(properties), options);
   }
 
   /**
@@ -1839,6 +2050,8 @@ export class Ampli {
    * Screenshots: 
    *
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. host)
    * @param options Amplitude event options.
@@ -1864,6 +2077,8 @@ export class Ampli {
    *
    *
    *
+   * Owner: Ko Sakuma
+   *
    * @param properties The event's properties (e.g. account index)
    * @param options Amplitude event options.
    */
@@ -1885,6 +2100,8 @@ export class Ampli {
    *
    *
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.
@@ -1912,6 +2129,8 @@ export class Ampli {
    *
    *  This event is fired when the user succesufully enters his password for the first time in a new browser  (and therefore managed to restore the wallet) 
    *
+   *
+   * Owner: Ko Sakuma
    *
    * @param properties The event's properties (e.g. wallet platform)
    * @param options Amplitude event options.

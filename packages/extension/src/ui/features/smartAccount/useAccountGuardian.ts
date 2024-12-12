@@ -2,8 +2,7 @@ import { useMemo, useRef } from "react"
 import useSWR from "swr"
 
 import { withGuardianSelector } from "../../../shared/account/selectors"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { getAccountIdentifier } from "../../../shared/wallet.service"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { withPolling } from "../../services/swr.service"
 import { allAccountsView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
@@ -24,13 +23,15 @@ export const useAccountsWithGuardian = () => {
 export const useAccountGuardianIsSelf = (account?: WalletAccount) => {
   const publicKey = useRef<string>()
   const { data: accountGuardianIsSelf = null } = useSWR(
-    account ? [getAccountIdentifier(account), "accountGuardianIsSelf"] : null,
+    account ? [account.id, "accountGuardianIsSelf"] : null,
     async () => {
       if (!account?.guardian) {
         return false
       }
       if (!publicKey.current) {
-        publicKey.current = await accountMessagingService.getPublicKey(account)
+        publicKey.current = await accountMessagingService.getPublicKey(
+          account.id,
+        )
       }
       const accountGuardianIsSelf = isEqualAddress(
         account.guardian,

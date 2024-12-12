@@ -1,4 +1,5 @@
-import { EncryptJWT, KeyLike, compactDecrypt, importJWK } from "jose"
+import type { KeyLike } from "jose"
+import { EncryptJWT, compactDecrypt, importJWK } from "jose"
 
 import { bytesToUft8 } from "../shared/utils/encode"
 

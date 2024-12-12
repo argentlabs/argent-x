@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
 import { userReviewStore } from "../../../shared/userReview"
 import { useKeyValueStorage } from "../../hooks/useStorage"
+import { isPlaywright } from "../../../shared/api/constants"
 
 export const usePromptUserReview = () => {
   const navigate = useNavigate()
@@ -15,11 +16,7 @@ export const usePromptUserReview = () => {
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
-    if (
-      !userHasReviewed &&
-      transactionsBeforeReview === 0 &&
-      !(window as any).PLAYWRIGHT
-    ) {
+    if (!userHasReviewed && transactionsBeforeReview === 0 && !isPlaywright) {
       timeoutId = setTimeout(() => navigate(routes.userReview()), 1000)
     }
     return () => timeoutId && clearTimeout(timeoutId)

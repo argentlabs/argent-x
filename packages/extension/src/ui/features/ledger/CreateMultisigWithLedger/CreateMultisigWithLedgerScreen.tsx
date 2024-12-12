@@ -1,4 +1,5 @@
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 import { SignerType } from "../../../../shared/wallet.model"
 import { useNextSignerKey } from "../../accounts/usePublicKey"
 import { MultisigFirstStep } from "../../multisig/CreateMultisigScreen/MultisigFirstStep"
@@ -12,6 +13,7 @@ interface CreateMultisigWithLedgerScreenProps {
   currentStep: number
   networkId: string
   helpLink?: string
+  totalSteps: number
 }
 
 const FIRST_STEP = 1
@@ -20,15 +22,11 @@ const THIRD_STEP = 3
 
 export const CreateMultisigWithLedger: FC<
   CreateMultisigWithLedgerScreenProps
-> = ({ networkId, currentStep: initialCurrentStep, helpLink }) => {
+> = ({ networkId, currentStep: initialCurrentStep, helpLink, totalSteps }) => {
   const [currentStep, setStep] = useState(initialCurrentStep)
-  const creatorSignerKey = useNextSignerKey(
-    "multisig",
-    SignerType.LEDGER,
-    networkId,
-  )
+  const creator = useNextSignerKey("multisig", SignerType.LEDGER, networkId)
 
-  const methods = useCreateMultisigForm(creatorSignerKey)
+  const methods = useCreateMultisigForm(creator.pubKey)
   const goBack = () => setStep((step) => step - 1)
   const goNext = () => setStep((step) => step + 1)
 
@@ -38,8 +36,8 @@ export const CreateMultisigWithLedger: FC<
         <MultisigFirstStep
           goNext={goNext}
           index={FIRST_STEP}
-          creatorSignerKey={creatorSignerKey}
-          totalSteps={4}
+          creatorSignerKey={creator.pubKey}
+          totalSteps={totalSteps}
           filledIndicator
         />
       )}
@@ -48,10 +46,10 @@ export const CreateMultisigWithLedger: FC<
           goNext={goNext}
           index={SECOND_STEP}
           goBack={goBack}
-          creatorSignerKey={creatorSignerKey}
+          creator={creator}
           networkId={networkId}
           creatorType={SignerType.LEDGER}
-          totalSteps={4}
+          totalSteps={totalSteps}
           filledIndicator
         />
       )}
@@ -59,7 +57,7 @@ export const CreateMultisigWithLedger: FC<
         <MultisigThirdStep
           goBack={goBack}
           index={THIRD_STEP}
-          totalSteps={4}
+          totalSteps={totalSteps}
           creatorType={SignerType.LEDGER}
           filledIndicator
         />

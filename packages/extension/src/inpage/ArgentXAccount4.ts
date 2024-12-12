@@ -1,19 +1,17 @@
-import {
+import type {
   Abi,
   Call,
   InvocationsDetails,
   ProviderInterface,
   Signature,
-  defaultProvider,
-  ec,
-  Account,
   AccountInterface,
 } from "starknet4"
+import { defaultProvider, ec, Account } from "starknet4"
 
 import { sendMessage, waitForMessage } from "./messageActions"
-import { TypedData } from "starknet"
-import { StarknetMethodArgumentsSchemas } from "starknetkit/window"
-import { SignMessageOptions } from "../shared/messages/ActionMessage"
+import type { TypedData } from "starknet"
+import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import type { SignMessageOptions } from "../shared/messages/ActionMessage"
 import { signTypedDataHandler } from "./requestMessageHandlers/signTypedData"
 
 /**

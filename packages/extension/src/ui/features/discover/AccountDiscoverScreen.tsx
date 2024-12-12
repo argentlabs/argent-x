@@ -1,12 +1,12 @@
-import { CellStack, Empty, H4, SpacerCell, iconsDeprecated } from "@argent/x-ui"
+import { CellStack, Empty, H3, icons, SpacerCell } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
-import { FC } from "react"
+import type { FC } from "react"
 
-import { NewsItem } from "../../../shared/discover/schema"
+import type { NewsItem } from "../../../shared/discover/schema"
 import { NewsItemCardCollection } from "./ui/NewsItemCardCollection"
 
-const { NetworkIcon } = iconsDeprecated
+const { NetworkSecondaryIcon } = icons
 
 interface AccountDiscoverScreenProps {
   newsItems?: NewsItem[]
@@ -17,16 +17,16 @@ export const AccountDiscoverScreen: FC<AccountDiscoverScreenProps> = ({
 }) => {
   const hasNewsItems = newsItems && !isEmpty(newsItems)
   return (
-    <CellStack flex={1}>
+    <CellStack flex={1} pt={2}>
       <Center>
-        <H4>Discover</H4>
+        <H3>Discover</H3>
       </Center>
       <SpacerCell />
       {hasNewsItems ? (
         <NewsItemCardCollection newsItems={newsItems} />
       ) : (
         <Empty
-          icon={<NetworkIcon />}
+          icon={<NetworkSecondaryIcon />}
           title={
             <>
               No updates.

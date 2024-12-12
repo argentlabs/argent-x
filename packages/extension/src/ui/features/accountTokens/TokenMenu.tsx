@@ -1,11 +1,8 @@
-import { iconsDeprecated } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
-import { useNavigate } from "react-router-dom"
 
-import { VisibilityOff } from "../../components/Icons/MuiIcons"
-import { routes } from "../../../shared/ui/routes"
 import {
   openBlockExplorerAddress,
   useBlockExplorerTitle,
@@ -13,18 +10,13 @@ import {
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { normalizeAddress } from "@argent/x-shared"
 
-const { MoreIcon } = iconsDeprecated
+const { MoreSecondaryIcon } = icons
 
 export interface TokenMenuProps {
   tokenAddress: string
-  canHideToken?: boolean
 }
 
-export const TokenMenu: FC<TokenMenuProps> = ({
-  tokenAddress,
-  canHideToken = true,
-}) => {
-  const navigate = useNavigate()
+export const TokenMenu: FC<TokenMenuProps> = ({ tokenAddress }) => {
   const currentNetwork = useCurrentNetwork()
   const blockExplorerTitle = useBlockExplorerTitle()
 
@@ -41,7 +33,7 @@ export const TokenMenu: FC<TokenMenuProps> = ({
           rounded="full"
           as={Button}
         >
-          <MoreIcon />
+          <MoreSecondaryIcon />
         </MenuButton>
         <MenuList>
           <CopyToClipboard text={normalizeAddress(tokenAddress)}>
@@ -54,16 +46,6 @@ export const TokenMenu: FC<TokenMenuProps> = ({
           >
             View on {blockExplorerTitle}
           </MenuItem>
-          {canHideToken && (
-            <>
-              <MenuItem
-                onClick={() => navigate(routes.hideToken(tokenAddress))}
-                icon={<VisibilityOff fontSize="inherit" htmlColor="white" />}
-              >
-                Hide this token
-              </MenuItem>
-            </>
-          )}
         </MenuList>
       </Menu>
     </>

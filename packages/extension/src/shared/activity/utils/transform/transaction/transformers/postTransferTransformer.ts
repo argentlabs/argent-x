@@ -1,6 +1,6 @@
 import { getTokenForContractAddress } from "../../getTokenForContractAddress"
 import { isTokenMintTransaction, isTokenTransferTransaction } from "../../is"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 /** adds token transfer */
 

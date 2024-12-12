@@ -1,8 +1,9 @@
-import { FC, useMemo } from "react"
+import type { FC } from "react"
+import { useMemo } from "react"
 import { ScreenLayout } from "../layout/ScreenLayout"
 import { Box } from "@chakra-ui/react"
 import { RestoreMultisigSidePanel } from "./RestoreMultisigSidePanel"
-import { P2 } from "@argent/x-ui"
+import { P1 } from "@argent/x-ui"
 import { Text } from "@chakra-ui/react"
 import { ActionButton } from "../../../components/FullScreenPage"
 
@@ -13,7 +14,7 @@ export const RestoreNotFound: FC<{
 }> = ({ currentStep, totalSteps, helpLink }) => {
   const subtitle = useMemo(() => {
     return (
-      <P2 color="neutrals.200">
+      <P1 color="neutrals.200">
         If you think this is a mistake, contact{" "}
         <Text as="span" color="primary.500">
           <a
@@ -23,7 +24,7 @@ export const RestoreNotFound: FC<{
             support@argent.xyz
           </a>
         </Text>
-      </P2>
+      </P1>
     )
   }, [])
 

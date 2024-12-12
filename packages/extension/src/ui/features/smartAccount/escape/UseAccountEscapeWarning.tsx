@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import { useUpdateAccountsOnChainEscapeState } from "../../accounts/accounts.service"
 import { useAccountEscapeWarning } from "./useAccountEscape"

@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import useValidateOutsideExecution from "./useValidateOutsideExecution"
-import { TypedData } from "@starknet-io/types-js"
-import { Network } from "../../../../../shared/network"
+import type { TypedData } from "@starknet-io/types-js"
+import type { Network } from "../../../../../shared/network"
 import { constants, stark } from "starknet"
 import * as knownDappsService from "../../../../services/knownDapps"
-import { KnownDapp } from "@argent/x-shared"
+import type { KnownDapp } from "@argent/x-shared"
 
 vi.mock("../../../../services/knownDapps", () => ({
   useDappFromKnownDappsByHost: vi.fn(),

@@ -11,7 +11,7 @@ import {
   ARGENT_API_TOKENS_INFO_URL,
   ARGENT_API_TOKENS_PRICES_URL,
 } from "../../../shared/api/constants"
-import {
+import type {
   ApiPriceDataResponse,
   ApiTokenDataResponse,
 } from "../../../shared/token/types"
@@ -22,16 +22,14 @@ import {
   withPolling,
 } from "../../services/swr.service"
 import { useIsDefaultNetwork } from "../networks/hooks/useIsDefaultNetwork"
-import { BigNumberish } from "starknet"
+import type { BigNumberish } from "starknet"
 import { RefreshIntervalInSeconds } from "../../../shared/config"
-import {
+import type {
   TokenWithBalance,
   TokenWithOptionalBigIntBalance,
 } from "../../../shared/token/__new/types/tokenBalance.model"
-import {
-  BaseTokenSchema,
-  Token,
-} from "../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../shared/token/__new/types/token.model"
+import { BaseTokenSchema } from "../../../shared/token/__new/types/token.model"
 import { allTokensView, allTokenPricesView } from "../../views/token"
 import { useView } from "../../views/implementation/react"
 import { useArgentApiFetcher } from "../../../shared/api/fetcher"

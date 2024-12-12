@@ -1,5 +1,5 @@
 import { Box, Text } from "@chakra-ui/layout"
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 
 export const WarningText: FC<PropsWithChildren> = ({ children }) => {
   return (

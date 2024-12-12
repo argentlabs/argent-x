@@ -1,4 +1,4 @@
-import { ExtendedTransactionStatus } from "../../../transactions"
+import type { ExtendedTransactionStatus } from "../../../transactions"
 
 export type ActivityTransactionFailureReason =
   | "REVERTED"

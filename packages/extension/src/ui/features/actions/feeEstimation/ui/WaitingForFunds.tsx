@@ -1,5 +1,5 @@
 import { Center, Spinner, Text } from "@chakra-ui/react"
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 
 export const WaitingForFunds: FC<PropsWithChildren> = (props) => {
   return (

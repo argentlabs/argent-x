@@ -1,20 +1,17 @@
 import "fake-indexeddb/auto"
-import { IRepository } from "../../../../shared/storage/__new/interface"
-import { Mocked } from "vitest"
-import { INetworkService } from "../../../../shared/network/service/INetworkService"
-import { ITokenService } from "../../../../shared/token/__new/service/ITokenService"
+import type { IRepository } from "../../../../shared/storage/__new/interface"
+import type { Mocked } from "vitest"
+import type { INetworkService } from "../../../../shared/network/service/INetworkService"
+import type { ITokenService } from "../../../../shared/token/__new/service/ITokenService"
 import { TokenWorker } from "./TokenWorker"
 import { MockFnRepository } from "../../../../shared/storage/__new/__test__/mockFunctionImplementation"
-import { WalletStorageProps } from "../../../../shared/wallet/walletStore"
-import { KeyValueStorage } from "../../../../shared/storage"
-import { Transaction } from "../../../../shared/transactions"
-import { Token } from "../../../../shared/token/__new/types/token.model"
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
-import {
-  emitterMock,
-  recoverySharedServiceMock,
-} from "../../../wallet/test.utils"
-import { IBackgroundUIService } from "../../ui/IBackgroundUIService"
+import type { WalletStorageProps } from "../../../../shared/wallet/walletStore"
+import type { KeyValueStorage } from "../../../../shared/storage"
+import type { Transaction } from "../../../../shared/transactions"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import { recoverySharedServiceMock } from "../../../wallet/test.utils"
+import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
 import { getMockNetwork } from "../../../../../test/network.mock"
 import {
   getMockApiTokenDetails,
@@ -24,19 +21,33 @@ import {
 } from "../../../../../test/token.mock"
 import { addressSchema } from "@argent/x-shared"
 import { stark } from "starknet"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { BaseTokenWithBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
-import { TokenPriceDetails } from "../../../../shared/token/__new/types/tokenPrice.model"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
+import { SignerType } from "../../../../shared/wallet.model"
+import type { BaseTokenWithBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import type { TokenPriceDetails } from "../../../../shared/token/__new/types/tokenPrice.model"
 import { defaultNetwork } from "../../../../shared/network"
-import { IDebounceService } from "../../../../shared/debounce"
+import type { IDebounceService } from "../../../../shared/debounce"
 import { getMockDebounceService } from "../../../../shared/debounce/mock"
 import { createScheduleServiceMock } from "../../../../shared/schedule/mock"
-import { IActivityService } from "../../activity/IActivityService"
-import { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
+import type { IActivityService } from "../../activity/IActivityService"
+import { getAccountIdentifier } from "../../../../shared/utils/accountIdentifier"
+import type { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
+import { emitterMock } from "../../../../shared/test.utils"
 
 const accountAddress1 = addressSchema.parse(stark.randomAddress())
 const tokenAddress1 = addressSchema.parse(stark.randomAddress())
 const tokenAddress2 = addressSchema.parse(stark.randomAddress())
+
+const mockSigner = {
+  type: SignerType.LOCAL_SECRET,
+  derivationPath: "m/44'/60'/0'/0/0",
+}
+
+const accountId1 = getAccountIdentifier(
+  accountAddress1,
+  "sepolia-alpha",
+  mockSigner,
+)
 
 describe("TokenWorker", () => {
   let tokenWorker: TokenWorker
@@ -61,7 +72,8 @@ describe("TokenWorker", () => {
       fetchTokenPricesFromBackend: vi.fn(),
       getCurrencyValueForTokens: vi.fn(),
       getToken: vi.fn(),
-      getTokenBalancesForAccount: vi.fn(),
+      getAllTokenBalancesForAccount: vi.fn(),
+      getTokenBalanceForAccount: vi.fn(),
       getTokens: vi.fn(),
       getTotalCurrencyBalanceForAccounts: vi.fn(),
       updateTokenBalances: vi.fn(),
@@ -72,10 +84,13 @@ describe("TokenWorker", () => {
       getTokensInfoFromBackendForNetwork: vi.fn(),
       preferFeeToken: vi.fn(),
       getFeeTokenPreference: vi.fn(),
+      getTokenInfo: vi.fn(),
     } as Mocked<ITokenService>
 
     mockAccountService = {
       get: vi.fn(),
+      getArgentWalletAccounts: vi.fn(),
+      emitter: emitterMock,
     } as unknown as Mocked<IAccountService>
 
     mockNetworkService = {
@@ -106,6 +121,7 @@ describe("TokenWorker", () => {
       closePopup: vi.fn(),
       openUi: vi.fn(),
       showNotification: vi.fn(),
+      openUiAsFloatingWindow: vi.fn(),
     }
 
     const [, _mockScheduleService] = createScheduleServiceMock()
@@ -194,6 +210,7 @@ describe("TokenWorker", () => {
     it("should fetch token balances for the provided account and update the token service", async () => {
       // Arrange
       const mockAccount: BaseWalletAccount = {
+        id: accountId1,
         address: accountAddress1,
         networkId: "1" /* other properties */,
       }
@@ -225,6 +242,7 @@ describe("TokenWorker", () => {
 
     it("should fetch token balances for all accounts on the current network and update the token service when no account is provided", async () => {
       const mockSelectedAccount: BaseWalletAccount = {
+        id: accountId1,
         address: accountAddress1,
         networkId: "sepolia-alpha",
       }
@@ -251,6 +269,7 @@ describe("TokenWorker", () => {
 
   it("should not fetch token balances from the backend if the selected network isnt support by backend", async () => {
     const mockSelectedAccount: BaseWalletAccount = {
+      id: accountId1,
       address: accountAddress1,
       networkId: "insupportable",
     }

@@ -2,7 +2,7 @@ import { selectedBaseAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { swapService } from "../../../services/swap"
 import { addressSchema } from "@argent/x-shared"
-import { Trade } from "../../../../shared/swap/model/trade.model"
+import type { Trade } from "../../../../shared/swap/model/trade.model"
 import { isUndefined } from "lodash-es"
 
 export function useSwapCallback(trade?: Trade, userSlippageTolerance?: number) {

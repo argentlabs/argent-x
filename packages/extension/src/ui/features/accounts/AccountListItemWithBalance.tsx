@@ -1,7 +1,7 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import type { BaseWalletAccount } from "../../../shared/wallet.model"
-import { usePrettyAccountBalance } from "../accountTokens/usePrettyAccountBalance"
+import { usePrettyBalanceForAccount } from "../accountTokens/usePrettyBalance"
 import { AccountListItem } from "./AccountListItem"
 import type { AccountListItemProps } from "./accountListItem.model"
 
@@ -12,6 +12,6 @@ interface AccountListItemWithBalanceProps extends AccountListItemProps {
 export const AccountListItemWithBalance: FC<
   AccountListItemWithBalanceProps
 > = ({ account, ...rest }) => {
-  const prettyAccountBalance = usePrettyAccountBalance(account)
+  const prettyAccountBalance = usePrettyBalanceForAccount(account)
   return <AccountListItem accountDescription={prettyAccountBalance} {...rest} />
 }

@@ -2,7 +2,7 @@ import {} from "vitest"
 import { makeSafeNetworks } from "./makeSafeNetworks"
 
 import { defaultNetworks } from "./defaults"
-import { Network } from "."
+import type { Network } from "."
 import { ETH_TOKEN_ADDRESS } from "./constants"
 
 const legacyNetwork = {

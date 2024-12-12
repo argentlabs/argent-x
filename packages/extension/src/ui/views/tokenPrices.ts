@@ -1,22 +1,22 @@
+import type { Address, Token } from "@argent/x-shared"
 import {
-  Token,
   bigDecimal,
   convertTokenAmountToCurrencyValue,
   isEqualAddress,
 } from "@argent/x-shared"
 import { TokenError } from "../../shared/errors/token"
-import { BaseTokenWithBalance } from "../../shared/token/__new/types/tokenBalance.model"
-import {
+import type { BaseTokenWithBalance } from "../../shared/token/__new/types/tokenBalance.model"
+import type {
   TokenPriceDetails,
   TokenWithBalanceAndPrice,
 } from "../../shared/token/__new/types/tokenPrice.model"
 import { equalToken, parsedDefaultTokens } from "../../shared/token/__new/utils"
-import { BaseWalletAccount } from "../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../shared/wallet.model"
 import { atomFamily } from "jotai/utils"
 import { atomFamilyAccountsEqual } from "../../shared/utils/accountsEqual"
 import { useView } from "./implementation/react"
 import { atom } from "jotai"
-import { useTokensWithSpamFilter } from "../features/accountTokens/tokens.state"
+import { useTokensWithHiddenFilter } from "../features/accountTokens/tokens.state"
 import { useMemo } from "react"
 import {
   allTokenBalancesView,
@@ -96,9 +96,30 @@ export const useSortedTokensWithBalances = (account?: BaseWalletAccount) => {
   const tokensWithBalanceAndPrices = useView(
     tokenBalancesAndOptionalPricesViewFamily(account),
   )
-  const tokens = useTokensWithSpamFilter(tokensWithBalanceAndPrices)
+  const tokens = useTokensWithHiddenFilter(tokensWithBalanceAndPrices)
   const sortedTokens = useMemo(() => sortTokensWithPrices(tokens), [tokens])
   return sortedTokens
+}
+
+export const useAllTokensWithBalances = (account?: BaseWalletAccount) => {
+  const tokensWithBalanceAndPrices = useView(
+    tokenBalancesAndOptionalPricesViewFamily(account),
+  )
+  return tokensWithBalanceAndPrices
+}
+
+export const useTokenWithBalanceAndUsdValue = (
+  networkId?: string,
+  tokenAddress?: Address,
+  account?: BaseWalletAccount,
+) => {
+  const tokensWithBalanceAndPrices = useSortedTokensWithBalances(account)
+  if (!tokenAddress || !networkId || !account) {
+    return undefined
+  }
+  return tokensWithBalanceAndPrices.find((token) =>
+    equalToken(token, { address: tokenAddress, networkId }),
+  )
 }
 
 export const sortTokensWithPrices = (
@@ -118,10 +139,13 @@ export const sortTokensWithPrices = (
     }
   })
 
-  return [...getArraySorted(defaultTokens), ...getArraySorted(otherTokens)]
+  return [
+    ...sortTokensByPrice(defaultTokens),
+    ...sortTokensByPrice(otherTokens),
+  ]
 }
 
-const getArraySorted = (array: TokenWithBalanceAndPrice[]) => {
+export const sortTokensByPrice = (array: TokenWithBalanceAndPrice[]) => {
   array.sort((a, b) => {
     const currencyValueA = bigDecimal.parseCurrency(a.usdValue || "0").value
     const currencyValueB = bigDecimal.parseCurrency(b.usdValue || "0").value

@@ -1,4 +1,4 @@
-export type IStatusMessageLevel = "info" | "warn" | "danger" | undefined
+export type IStatusMessageLevel = "info" | "warning" | "danger"
 
 export interface IStatusMessage {
   /** the unique ID of this message */

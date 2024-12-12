@@ -26,7 +26,7 @@ describe("useKeyValueStorage()", () => {
           <p>{data}</p>
           <button
             onClick={() => {
-              store.set("message", "Bye World!")
+              void store.set("message", "Bye World!")
             }}
           >
             change value
@@ -53,7 +53,7 @@ describe("useObjectStorage()", () => {
           <p>{data}</p>
           <button
             onClick={() => {
-              store.set("Bye World!")
+              void store.set("Bye World!")
             }}
           >
             change value
@@ -80,7 +80,7 @@ describe("useArrayStorage()", () => {
           <p>{data.join(" ")}</p>
           <button
             onClick={() => {
-              store.push("See you tomorrow!")
+              void store.push("See you tomorrow!")
             }}
           >
             change value

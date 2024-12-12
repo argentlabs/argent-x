@@ -1,6 +1,6 @@
-import { InvokeFunctionResponse } from "starknet"
-import { BaseWalletAccount } from "../../../wallet.model"
-import {
+import type { InvokeFunctionResponse } from "starknet"
+import type { BaseWalletAccount } from "../../../wallet.model"
+import type {
   ApiMultisigAccountData,
   ApiMultisigDataForSigner,
   ApiMultisigGetSignatureRequestById,
@@ -8,7 +8,7 @@ import {
   ApiMultisigGetTransactionRequests,
   MultisigSignerSignaturesWithId,
 } from "../../multisig.model"
-import {
+import type {
   ICreateTransactionRequest,
   IAddRequestSignature,
   IFetchMultisigDataForSigner,
@@ -17,7 +17,7 @@ import {
   IFetchMultisigOffchainSignatureRequestById,
   ICancelOffchainSignature,
 } from "./types"
-import { Network } from "../../../network"
+import type { Network } from "../../../network"
 
 export interface IMultisigBackendService {
   fetchMultisigDataForSigner(

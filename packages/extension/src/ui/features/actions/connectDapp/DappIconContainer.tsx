@@ -1,5 +1,5 @@
 import { DappIcon } from "./DappIcon"
-import { useDappDisplayAttributes } from "./useDappDisplayAttributes"
+import { useDappDisplayAttributes } from "../../../services/knownDapps/useDappDisplayAttributes"
 
 export const DappIconContainer = ({ host }: { host: string }) => {
   const dappDisplayAttributes = useDappDisplayAttributes(host)

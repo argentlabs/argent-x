@@ -1,10 +1,10 @@
 import { Box, Circle } from "@chakra-ui/react"
 
-import { FC } from "react"
+import type { FC } from "react"
 import { Panel } from "../layout/Panel"
-import { iconsDeprecated } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 
-const { TickIcon } = iconsDeprecated
+const { CheckmarkSecondaryIcon } = icons
 
 export const RestoreMultisigSidePanel: FC<{ found?: boolean }> = ({
   found = false,
@@ -23,7 +23,7 @@ export const RestoreMultisigSidePanel: FC<{ found?: boolean }> = ({
       {found && (
         <Panel>
           <Circle size="24" bg="success.900">
-            <TickIcon w="12" h="12" color="success.500" />
+            <CheckmarkSecondaryIcon w="12" h="12" color="success.500" />
           </Circle>
         </Panel>
       )}

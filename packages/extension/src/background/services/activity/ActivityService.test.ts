@@ -1,7 +1,8 @@
-import { Mocked, describe, expect, test, vi } from "vitest"
+import type { Mocked } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 
-import { IHttpService, Token } from "@argent/x-shared"
-import Emittery from "emittery"
+import type { IHttpService, Token } from "@argent/x-shared"
+import type Emittery from "emittery"
 
 import type { IAccountService } from "../../../shared/account/service/accountService/IAccountService"
 import type { IActivityStorage } from "../../../shared/activity/types"
@@ -22,6 +23,7 @@ import type { IBackgroundUIService } from "../ui/IBackgroundUIService"
 import { ActivityService } from "./ActivityService"
 import {
   GuardianChangedActivity,
+  MultisigConfigurationUpdatedActivity,
   NewTokenActivity,
   NftActivity,
   type Events,
@@ -29,7 +31,8 @@ import {
 
 import activities from "../../../shared/activity/__fixtures__/activities.json"
 import state from "../../../shared/activity/__fixtures__/state.json"
-import { WalletStorageProps } from "../../wallet/backup/WalletBackupService"
+import type { WalletStorageProps } from "../../wallet/backup/WalletBackupService"
+import { getRandomAccountIdentifier } from "../../../shared/utils/accountIdentifier"
 
 describe("ActivityService", () => {
   const makeService = () => {
@@ -121,9 +124,12 @@ describe("ActivityService", () => {
 
     const networkId = "sepolia-alpha"
 
+    const address =
+      "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+
     walletSingleton.getSelectedAccount.mockResolvedValue({
-      address:
-        "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+      id: getRandomAccountIdentifier(address),
+      address,
       networkId,
     } as WalletAccount)
 
@@ -208,9 +214,20 @@ describe("ActivityService", () => {
       },
     ])
 
+    expect(emitter.emit).toHaveBeenCalledWith(
+      MultisigConfigurationUpdatedActivity,
+      [
+        {
+          address:
+            "0x5f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+          networkId: "sepolia-alpha",
+        },
+      ],
+    )
+
     expect(activityStoreSetSpy).toHaveBeenLastCalledWith({
       modifiedAfter: {
-        "sepolia-alpha::0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25": 1701964096841,
+        "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25::sepolia-alpha::local_secret::0": 1701964096841,
       },
     })
 

@@ -1,4 +1,4 @@
-import { Button, H5, P3 } from "@argent/x-ui"
+import { Button, H4, P2 } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,
@@ -7,7 +7,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react"
-import { FC, MouseEvent } from "react"
+import type { FC, MouseEvent } from "react"
 
 interface MultisigHideModalProps {
   isOpen: boolean
@@ -27,12 +27,12 @@ export const MultisigHideModal: FC<MultisigHideModalProps> = ({
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
       <ModalContent background="neutrals.700" borderRadius="2xl">
         <ModalHeader>
-          <H5 fontWeight="600" textAlign="center">
+          <H4 fontWeight="600" textAlign="center">
             Are you sure?
-          </H5>
+          </H4>
         </ModalHeader>
         <ModalBody>
-          <P3 fontWeight="400" textAlign="center">
+          <P2 fontWeight="400" textAlign="center">
             {multisigType === "pending" && (
               <>
                 The multisig owner can still add you to the multisig if you
@@ -45,11 +45,19 @@ export const MultisigHideModal: FC<MultisigHideModalProps> = ({
                 always unhide this account from the account list screen.
               </>
             )}
-          </P3>
+          </P2>
         </ModalBody>
 
         <ModalFooter flexDirection="column" gap="3">
-          <Button w="100%" colorScheme="primary" onClick={onHide}>
+          <Button
+            w="100%"
+            colorScheme="primary"
+            onClick={(e) => {
+              if (onHide) {
+                void onHide(e)
+              }
+            }}
+          >
             Hide
           </Button>
           <Button w="100%" backgroundColor="neutrals.600" onClick={onClose}>

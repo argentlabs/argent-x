@@ -1,6 +1,7 @@
-import { Field, useSwapState } from "../state/fields"
+import type { Field } from "../state/fields"
+import { useSwapState } from "../state/fields"
 import { useCallback } from "react"
-import { BaseToken } from "../../../../shared/token/__new/types/token.model"
+import type { BaseToken } from "../../../../shared/token/__new/types/token.model"
 
 export function useSwapActionHandlers(): {
   onTokenSelection: (field: Field, token: BaseToken) => void

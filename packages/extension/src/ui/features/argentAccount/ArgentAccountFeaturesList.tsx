@@ -1,8 +1,8 @@
-import { H6, iconsDeprecated } from "@argent/x-ui"
+import { H5, icons } from "@argent/x-ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-const { SmartAccountActiveIcon } = iconsDeprecated
+const { ShieldSecondaryIcon } = icons
 
 type ArgentAccountFeaturesListProps = {
   isLoggedIn: boolean
@@ -21,9 +21,9 @@ export const ArgentAccountFeaturesList: FC<ArgentAccountFeaturesListProps> = ({
       mb={1}
     >
       <Flex alignItems="start">
-        <SmartAccountActiveIcon fontSize={20} mr={2} />
+        <ShieldSecondaryIcon fontSize={20} mr={2} />
         <Flex direction="column">
-          <H6 lineHeight={4}>Smart Account</H6>
+          <H5 lineHeight={4}>Smart Account</H5>
           <Text mt={1} fontSize={13} color="neutrals.300" lineHeight={4}>
             Protect your account with two-factor authentication (2FA)
           </Text>

@@ -1,13 +1,14 @@
 import {
   BarBackButton,
   BarCloseButton,
-  H6,
-  NavigationContainer,
-  P4,
-  iconsDeprecated,
+  H5,
+  icons,
   logosDeprecated,
+  NavigationContainer,
+  P3,
 } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
+import { useMemo } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
 import { Circle, Flex } from "@chakra-ui/react"
@@ -18,7 +19,7 @@ import { useIsFirefox } from "../../hooks/useUserAgent"
 import { selectedNetworkIdView } from "../../views/network"
 import { useView } from "../../views/implementation/react"
 
-const { PasswordIcon } = iconsDeprecated
+const { PasscodePrimaryIcon } = icons
 const { LedgerLogo } = logosDeprecated
 
 type SignerSelectionOptionType = "argent" | "ledger"
@@ -55,26 +56,51 @@ const joinSignerSelectionOptions: SignerSelectionOption[] = [
   },
 ]
 
+const replaceSignerSelectionOptions: SignerSelectionOption[] = [
+  {
+    title: "Replace with Argent",
+    subtitle: "Use a signer pubkey",
+    type: "argent",
+  },
+  {
+    title: "Replace with Ledger",
+    subtitle: "Approve transactions with your Ledger",
+    type: "ledger",
+  },
+]
+
 export const MultisigSignerSelectionScreen: FC = () => {
   const navigate = useNavigate()
   const selectedNetworkId = useView(selectedNetworkIdView)
-  const { ctx } = useParams<{ ctx: "create" | "join" }>()
+
+  const { ctx, signerToReplace } = useParams<{
+    ctx: "create" | "join" | "replace"
+    signerToReplace: string
+  }>()
+
   const onLedgerStart = useOnLedgerStart("multisig")
   const onArgentSignerSelection = useOnArgentSignerSelection()
   const isFirefox = useIsFirefox()
+
+  const options = useMemo(() => {
+    if (ctx === "create") {
+      return createSignerSelectionOptions
+    }
+    if (ctx === "join") {
+      return joinSignerSelectionOptions
+    }
+    return replaceSignerSelectionOptions
+  }, [ctx])
 
   if (!ctx) {
     return <></>
   }
 
-  const options =
-    ctx === "create" ? createSignerSelectionOptions : joinSignerSelectionOptions
-
   const onClick = (type: SignerSelectionOptionType) => {
     if (type === "argent") {
-      return onArgentSignerSelection(ctx, selectedNetworkId)
+      return onArgentSignerSelection(ctx, selectedNetworkId, signerToReplace)
     }
-    return onLedgerStart(ctx, selectedNetworkId)
+    return onLedgerStart(ctx, selectedNetworkId, signerToReplace)
   }
 
   const isDisabledOnFirefox = (type: SignerSelectionOptionType) => {
@@ -115,17 +141,19 @@ export const MultisigSignerSelectionScreen: FC = () => {
                 backgroundColor="neutrals.700"
                 className="icon-wrapper"
               >
-                {option.type === "argent" && <PasswordIcon h={6} w={6} />}
+                {option.type === "argent" && (
+                  <PasscodePrimaryIcon h={6} w={6} />
+                )}
                 {option.type === "ledger" && <LedgerLogo h={6} w={6} />}
               </Circle>
               <Flex direction="column" minW={0} whiteSpace="wrap" gap="1">
-                <H6>{option.title}</H6>
+                <H5>{option.title}</H5>
                 {option.subtitle && (
-                  <P4 fontWeight="bold" color="neutrals.300" w="full">
+                  <P3 fontWeight="bold" color="neutrals.300" w="full">
                     {isDisabledOnFirefox(option.type)
                       ? "Not supported on Firefox"
                       : option.subtitle}
-                  </P4>
+                  </P3>
                 )}
               </Flex>
             </Flex>

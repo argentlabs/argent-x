@@ -1,73 +1,60 @@
 import urlJoin from "url-join"
 
+import type { Address, TransactionAction } from "@argent/x-shared"
 import {
-  Address,
   ensureArray,
   estimatedFeeToMaxResourceBounds,
   getEstimatedFeeFromSimulationAndRespectWatermarkFee,
-  getPayloadFromTransaction,
   getTxVersionFromFeeToken,
   hexSchema,
   type IHttpService,
 } from "@argent/x-shared"
-import {
-  Account,
-  BigNumberish,
-  CairoVersion,
-  Call,
-  Calldata,
-  Invocations,
-  json,
-  num,
-  TransactionType,
-} from "starknet"
+import type { Account, BigNumberish, Call, Invocations } from "starknet"
+import { json, num, TransactionType } from "starknet"
 import { base64 } from "@scure/base"
 
-import {
+import type {
   EnrichedSimulateAndReview,
   EstimatedFees,
+  SimulateAndReview,
+} from "@argent/x-shared/simulation"
+import {
   getErrorMessageAndLabelFromSimulation,
   isTransactionSimulationError,
-  SimulateAndReview,
   simulateAndReviewSchema,
 } from "@argent/x-shared/simulation"
 import { ARGENT_TRANSACTION_REVIEW_API_BASE_URL } from "../../../shared/api/constants"
 import { AccountError } from "../../../shared/errors/account"
 import { ReviewError } from "../../../shared/errors/review"
 import { isArgentNetwork } from "../../../shared/network/utils"
-import { KeyValueStorage } from "../../../shared/storage"
+import type { KeyValueStorage } from "../../../shared/storage"
 import type {
   ITransactionReviewLabelsStore,
   ITransactionReviewService,
   ITransactionReviewWarningsStore,
-  TransactionReviewTransactions,
 } from "../../../shared/transactionReview/interface"
-import type { StarknetTransactionTypes } from "../../../shared/transactions"
 import {
   addEstimatedFee,
   getEstimatedFees,
 } from "../../../shared/transactionSimulation/fees/estimatedFeesRepository"
-import { getNonce } from "../../nonce"
-import { Wallet } from "../../wallet"
-import { ITransactionReviewWorker } from "./worker/ITransactionReviewWorker"
-import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import type { Wallet } from "../../wallet"
+import type { ITransactionReviewWorker } from "./worker/ITransactionReviewWorker"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { base64url } from "@scure/base"
 import { deflateSync } from "fflate"
 import { browserExtensionSentryWithScope } from "../../../shared/sentry/scope"
+import { walletAccountToArgentAccount } from "../../../shared/utils/isExternalAccount"
 import { urlWithQuery } from "../../../shared/utils/url"
-
-interface ApiTransactionReviewV2RequestBody {
-  transactions: Array<{
-    type: StarknetTransactionTypes
-    chainId: string
-    cairoVersion: CairoVersion
-    nonce: string
-    version: string
-    account: string
-    calls?: Call[]
-    calldata?: Calldata
-  }>
-}
+import type { INonceManagementService } from "../../nonceManagement/INonceManagementService"
+import type {
+  AccountDeployTransaction,
+  InvokeTransaction,
+} from "../../../shared/transactionReview/transactionAction.model"
+import { assertNever } from "../../../shared/utils/assertNever"
+import type { ApiTransaction } from "./types"
 
 const simulateAndReviewEndpoint = urlJoin(
   ARGENT_TRANSACTION_REVIEW_API_BASE_URL || "",
@@ -80,6 +67,7 @@ export default class BackgroundTransactionReviewService
   constructor(
     private wallet: Wallet,
     private httpService: IHttpService,
+    private nonceManagementService: INonceManagementService,
     private readonly labelsStore: KeyValueStorage<ITransactionReviewLabelsStore>,
     private readonly warningsStore: KeyValueStorage<ITransactionReviewWarningsStore>,
     private worker: ITransactionReviewWorker,
@@ -87,12 +75,12 @@ export default class BackgroundTransactionReviewService
 
   private async fetchFeesOnchain({
     starknetAccount,
-    calls,
+    action,
     isDeployed,
     feeTokenAddress,
   }: {
     starknetAccount: Account
-    calls: Call[]
+    action: TransactionAction
     isDeployed: boolean
     feeTokenAddress: Address
   }) {
@@ -120,13 +108,11 @@ export default class BackgroundTransactionReviewService
           const bulkTransactions: Invocations = [
             {
               type: TransactionType.DEPLOY_ACCOUNT,
-              payload:
-                await this.wallet.getAccountDeploymentPayload(selectedAccount),
+              payload: await this.wallet.getAccountDeploymentPayload(
+                walletAccountToArgentAccount(selectedAccount),
+              ),
             },
-            {
-              type: TransactionType.INVOKE,
-              payload: calls,
-            },
+            action,
           ]
           const [deployEstimate, txEstimate] = await starknetAccount
             .estimateFeeBulk(bulkTransactions, {
@@ -165,10 +151,7 @@ export default class BackgroundTransactionReviewService
         }
       } else {
         const { gas_consumed, gas_price, data_gas_consumed, data_gas_price } =
-          await starknetAccount.estimateFee(calls, {
-            skipValidate: true,
-            version,
-          })
+          await this.getEstimateFromAction(action, starknetAccount)
 
         if (!gas_consumed || !gas_price) {
           throw new ReviewError({
@@ -186,10 +169,7 @@ export default class BackgroundTransactionReviewService
         }
       }
 
-      await addEstimatedFee(fees, {
-        type: TransactionType.INVOKE,
-        payload: calls,
-      })
+      await addEstimatedFee(fees, action)
 
       return fees
     } catch (error) {
@@ -200,70 +180,91 @@ export default class BackgroundTransactionReviewService
     }
   }
 
-  private getCallsFromTx(tx: TransactionReviewTransactions) {
-    let calls
-    if (tx.calls) {
-      calls = ensureArray(tx.calls)
+  private getEstimateFromAction(action: TransactionAction, account: Account) {
+    switch (action.type) {
+      case TransactionType.INVOKE:
+        return account.estimateInvokeFee(action.payload)
+      case TransactionType.DEPLOY:
+        return account.estimateDeployFee(action.payload)
+      case TransactionType.DECLARE:
+        return account.estimateDeclareFee(action.payload)
+      case TransactionType.DEPLOY_ACCOUNT:
+        return account.estimateAccountDeployFee(action.payload)
+      default:
+        assertNever(action)
+        throw new ReviewError({ code: "INVALID_TRANSACTION_ACTION" })
+    }
+  }
+
+  private getCallsFromTx(tx: InvokeTransaction) {
+    let calls: Call[] = []
+    if (tx.payload) {
+      calls = ensureArray(tx.payload)
     }
     return calls
   }
 
-  private async getEnrichedFeeEstimation(
-    initialTransactions: TransactionReviewTransactions[],
+  async getEnrichedFeeEstimation(
+    txAction: TransactionAction,
     simulateAndReviewResult: SimulateAndReview,
-    isDeploymentTransaction: boolean,
   ): Promise<EstimatedFees> {
     const fee = getEstimatedFeeFromSimulationAndRespectWatermarkFee(
       simulateAndReviewResult,
     )
 
-    await addEstimatedFee(fee, {
-      type: TransactionType.INVOKE,
-      payload: initialTransactions[isDeploymentTransaction ? 1 : 0].calls ?? [],
-    })
+    await addEstimatedFee(fee, txAction)
 
     return fee
   }
 
   async simulateAndReview({
-    transactions,
+    transaction,
+    accountDeployTransaction,
     feeTokenAddress,
     appDomain,
+    maxSendEstimate,
   }: {
-    transactions: TransactionReviewTransactions[]
+    transaction: TransactionAction
     feeTokenAddress: Address
+    accountDeployTransaction?: AccountDeployTransaction
     appDomain?: string
+    maxSendEstimate?: boolean
   }): Promise<EnrichedSimulateAndReview> {
     const selectedAccount = await this.wallet.getSelectedAccount()
-    const account = await this.wallet.getSelectedStarknetAccount()
-    const isDeploymentTransaction = transactions.some(
-      (tx) => tx.type === "DEPLOY_ACCOUNT",
-    )
-
     if (!selectedAccount) {
       throw new AccountError({ code: "NOT_SELECTED" })
     }
+    const account = await this.wallet.getStarknetAccount(selectedAccount.id)
+
+    // save some ms by starting the nonce check early
+    const noncePromise = this.nonceManagementService.getNonce(
+      selectedAccount.id,
+    )
+
+    const isDeploymentTransaction = Boolean(accountDeployTransaction)
 
     let isDelayedTransaction = false
     try {
-      const multisig = await this.wallet.getMultisigAccount(selectedAccount)
+      const multisig = await this.wallet.getMultisigAccount(selectedAccount.id)
       isDelayedTransaction =
         selectedAccount.type === "multisig" &&
         multisig &&
         multisig.threshold > 1
-    } catch (e) {
+    } catch {
       // do nothing
     }
 
     try {
-      if (!isArgentNetwork(selectedAccount?.network)) {
-        // If it's not an argent network we fallback to onchain fee estimation
+      if (
+        !isArgentNetwork(selectedAccount?.network) || // If it's not an argent network we fallback to onchain fee estimation
+        !this.isInvokeTransaction(transaction) // or if it's not an invoke transaction, because backend only supports invoke transactions
+      ) {
         console.warn(
           `Falling back to onchain fee estimation as ${selectedAccount?.network.id} is not an argent network`,
         )
         return this.fallbackToOnchainFeeEstimation({
           account,
-          transactions,
+          transaction,
           isDeploymentTransaction,
           feeTokenAddress,
         })
@@ -271,9 +272,9 @@ export default class BackgroundTransactionReviewService
 
       const version = getTxVersionFromFeeToken(feeTokenAddress)
 
-      const nonce = isDeploymentTransaction
-        ? "0x0"
-        : await getNonce(selectedAccount, account)
+      const transactionNonce = isDeploymentTransaction
+        ? "0x1"
+        : await noncePromise
 
       if (!("getChainId" in account)) {
         throw new AccountError({
@@ -288,24 +289,30 @@ export default class BackgroundTransactionReviewService
       }
       const chainId = await account.getChainId()
 
-      const body: ApiTransactionReviewV2RequestBody = {
-        transactions: transactions.map((transaction) =>
-          getPayloadFromTransaction({
-            transaction,
-            nonce,
-            version,
-            chainId,
-            appDomain,
-            isDeploymentTransaction,
-            cairoVersion: account.cairoVersion,
-            address: account.address,
-          }),
-        ),
+      const transactions = this.getPayloadFromInvokeTransaction({
+        transaction,
+        accountDeployTransaction,
+        account,
+        nonce: transactionNonce,
+        version,
+        chainId,
+        appDomain,
+      })
+
+      const queryParams: Record<string, boolean> = {}
+
+      if (isDelayedTransaction) {
+        queryParams.delayedTransactions = true
       }
 
-      const endpointWithParams = isDelayedTransaction
-        ? urlWithQuery(simulateAndReviewEndpoint, { delayedTransactions: true })
-        : simulateAndReviewEndpoint
+      if (maxSendEstimate) {
+        queryParams.maxSendEstimate = true
+      }
+
+      const endpointWithParams = urlWithQuery(
+        simulateAndReviewEndpoint,
+        queryParams,
+      )
 
       const result = await this.httpService.post<SimulateAndReview>(
         endpointWithParams,
@@ -314,7 +321,7 @@ export default class BackgroundTransactionReviewService
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify({ transactions }),
         },
         simulateAndReviewSchema,
       )
@@ -322,7 +329,7 @@ export default class BackgroundTransactionReviewService
       // if there is a simulation error then there is also no actual simulation
       // or fee information, and no way to proceed with fee estimation
       // returning the result will surface the error to the user in the ui
-      const hasSimulationError = result.transactions.some((transaction) =>
+      const hasSimulationError = result.transactions?.some((transaction) =>
         isTransactionSimulationError(transaction),
       )
       if (hasSimulationError) {
@@ -363,9 +370,8 @@ export default class BackgroundTransactionReviewService
       }
 
       const enrichedFeeEstimation = await this.getEnrichedFeeEstimation(
-        transactions,
+        transaction,
         result,
-        isDeploymentTransaction,
       )
       return {
         ...result,
@@ -374,7 +380,7 @@ export default class BackgroundTransactionReviewService
     } catch (e) {
       console.error(e)
       return this.fallbackToOnchainFeeEstimation({
-        transactions,
+        transaction,
         account,
         isDeploymentTransaction,
         feeTokenAddress,
@@ -382,31 +388,80 @@ export default class BackgroundTransactionReviewService
     }
   }
 
+  private getPayloadFromInvokeTransaction({
+    transaction,
+    accountDeployTransaction,
+    account,
+    nonce,
+    version,
+    chainId,
+    appDomain,
+  }: {
+    transaction: InvokeTransaction
+    accountDeployTransaction?: AccountDeployTransaction
+    account: Account
+    nonce: string
+    version: string
+    chainId: string
+    appDomain?: string
+  }) {
+    const transactions: ApiTransaction[] = []
+
+    if (accountDeployTransaction) {
+      const { constructorCalldata, addressSalt, classHash } =
+        accountDeployTransaction.payload
+      transactions.push({
+        type: TransactionType.DEPLOY_ACCOUNT,
+        chainId,
+        account: account.address,
+        nonce: "0x0",
+        version,
+        cairoVersion: account.cairoVersion,
+        calldata: constructorCalldata,
+        salt: hexSchema.parse(addressSalt),
+        classHash: hexSchema.parse(classHash),
+        appDomain,
+      })
+    }
+
+    const calls = ensureArray(transaction.payload)
+    transactions.push({
+      type: transaction.type,
+      calls,
+      account: account.address,
+      nonce,
+      version,
+      chainId,
+      cairoVersion: account.cairoVersion,
+      appDomain,
+      // appDomain: "https://starknetkit-blacked-listed.vercel.app", // to simulate blacklisted domain
+    })
+
+    return transactions
+  }
+
+  isInvokeTransaction(
+    transaction: TransactionAction,
+  ): transaction is InvokeTransaction {
+    return transaction.type === TransactionType.INVOKE
+  }
+
   async fallbackToOnchainFeeEstimation({
-    transactions,
+    transaction,
     account,
     isDeploymentTransaction,
     feeTokenAddress,
   }: {
-    transactions: TransactionReviewTransactions[]
+    transaction: TransactionAction
     account: Account
     isDeploymentTransaction: boolean
     feeTokenAddress: Address
   }) {
     try {
-      const invokeCalls = isDeploymentTransaction
-        ? this.getCallsFromTx(transactions[1])
-        : this.getCallsFromTx(transactions[0])
-
-      if (!invokeCalls) {
-        throw new ReviewError({
-          code: "NO_CALLS_FOUND",
-        })
-      }
       // Backend is failing we use the fallback method to estimate fees
       const enrichedFeeEstimation = await this.fetchFeesOnchain({
         starknetAccount: account,
-        calls: invokeCalls,
+        action: transaction,
         isDeployed: !isDeploymentTransaction,
         feeTokenAddress,
       })
@@ -424,24 +479,24 @@ export default class BackgroundTransactionReviewService
     }
   }
 
-  async getTransactionHash(
+  async buildInvokeTransactionPayload(
     baseAccount: BaseWalletAccount,
     calls: Call | Call[],
     estimatedFee?: EstimatedFees,
     providedNonce?: BigNumberish,
   ) {
     const transactions = ensureArray(calls)
-    const account = await this.wallet.getAccount(baseAccount)
+    const account = await this.wallet.getAccount(baseAccount.id)
 
     if (!account) {
       throw new AccountError({ code: "NOT_FOUND" })
     }
 
-    const starknetAccount = await this.wallet.getStarknetAccount(account)
+    const starknetAccount = await this.wallet.getStarknetAccount(account.id)
 
     const details = await this.buildTransactionDetails(
       account,
-      transactions,
+      { type: TransactionType.INVOKE, payload: transactions },
       estimatedFee,
       providedNonce,
     )
@@ -450,56 +505,11 @@ export default class BackgroundTransactionReviewService
       return null
     }
 
-    const { nonce, resourceBounds, maxFee, version } = details
-
-    let txHash
-
-    try {
-      txHash = await starknetAccount.getInvokeTransactionHash(transactions, {
-        nonce,
-        version,
-        maxFee,
-        resourceBounds,
-      })
-    } catch (error) {
-      console.error(error)
-      return null
-    }
-
-    return hexSchema.parse(txHash)
-  }
-
-  async buildTransactionPayload(
-    baseAccount: BaseWalletAccount,
-    calls: Call | Call[],
-    estimatedFee?: EstimatedFees,
-    providedNonce?: BigNumberish,
-  ) {
-    const transactions = ensureArray(calls)
-    const account = await this.wallet.getAccount(baseAccount)
-
-    if (!account) {
-      throw new AccountError({ code: "NOT_FOUND" })
-    }
-
-    const starknetAccount = await this.wallet.getStarknetAccount(account)
-
-    const details = await this.buildTransactionDetails(
-      account,
-      transactions,
-      estimatedFee,
-      providedNonce,
-    )
-
-    if (!details) {
-      return null
-    }
-
-    const { nonce, resourceBounds, maxFee, version } = details
+    const { nonce, transactionFees, version } = details
 
     const tx = await starknetAccount.buildInvokeTransactionPayload(
       transactions,
-      { nonce, version, maxFee, resourceBounds },
+      { nonce, version, ...transactionFees },
     )
 
     return tx
@@ -512,7 +522,7 @@ export default class BackgroundTransactionReviewService
     providedNonce?: BigNumberish,
   ) {
     try {
-      const tx = await this.buildTransactionPayload(
+      const tx = await this.buildInvokeTransactionPayload(
         baseAccount,
         calls,
         estimatedFee,
@@ -539,18 +549,11 @@ export default class BackgroundTransactionReviewService
 
   private async buildTransactionDetails(
     account: WalletAccount,
-    transactions: Call[],
+    transaction: TransactionAction,
     estimatedFee?: EstimatedFees,
     providedNonce?: BigNumberish,
   ) {
-    const starknetAccount = await this.wallet.getStarknetAccount(account)
-
-    const fees =
-      estimatedFee ??
-      (await getEstimatedFees({
-        type: TransactionType.INVOKE,
-        payload: transactions,
-      }))
+    const fees = estimatedFee ?? (await getEstimatedFees(transaction))
     if (!fees) {
       return null
     }
@@ -561,11 +564,19 @@ export default class BackgroundTransactionReviewService
       ? num.toHex(1)
       : providedNonce
         ? num.toHex(providedNonce)
-        : await getNonce(account, starknetAccount)
+        : await this.nonceManagementService.getNonce(account.id)
+
+    const transactionFees = estimatedFeeToMaxResourceBounds(fees.transactions)
+
+    const deploymentFees = fees.deployment
+      ? estimatedFeeToMaxResourceBounds(fees.deployment)
+      : undefined
+
     return {
       nonce,
       version,
-      ...estimatedFeeToMaxResourceBounds(fees.transactions),
+      transactionFees,
+      deploymentFees,
     }
   }
 

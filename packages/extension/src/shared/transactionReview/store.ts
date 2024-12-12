@@ -1,5 +1,5 @@
 import { KeyValueStorage } from "../storage"
-import {
+import type {
   ITransactionReviewLabelsStore,
   ITransactionReviewWarningsStore,
 } from "./interface"

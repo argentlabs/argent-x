@@ -1,12 +1,12 @@
-import { L2, iconsDeprecated } from "@argent/x-ui"
+import { icons, L2Bold } from "@argent/x-ui"
 
 import { Button, Flex, Text } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
 import { useToggleSmartAccountRoute } from "../smartAccount/useToggleSmartAccountRoute"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
-const { SmartAccountActiveIcon } = iconsDeprecated
+const { ShieldSecondaryIcon } = icons
 
 export const ClickableSmartAccountBanner = ({
   account,
@@ -18,7 +18,7 @@ export const ClickableSmartAccountBanner = ({
 
   const onStartSmartAccountFlow = async () => {
     if (!account.guardian) {
-      navigate(routes.smartAccountStart(account.address))
+      navigate(routes.smartAccountStart(account.id))
     } else {
       await startToggleSmartAccountFlow(account)
     }
@@ -37,14 +37,14 @@ export const ClickableSmartAccountBanner = ({
       roundedBottom="lg"
     >
       <Flex alignItems="center" gap={1} color="neutrals.300">
-        <SmartAccountActiveIcon />
-        <L2 data-testid="smart-account-not-activated" as={Text}>
+        <ShieldSecondaryIcon />
+        <L2Bold data-testid="smart-account-not-activated" as={Text}>
           Smart Account is not activated
-        </L2>
+        </L2Bold>
       </Flex>
-      <L2 as={Text} color="neutrals.500">
+      <L2Bold as={Text} color="neutrals.500">
         Click to enable
-      </L2>
+      </L2Bold>
     </Button>
   )
 }

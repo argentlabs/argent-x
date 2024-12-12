@@ -1,12 +1,10 @@
-import { Address } from "@argent/x-shared"
-import {
-  ITransactionReviewService,
-  TransactionReviewTransactions,
-} from "../../../shared/transactionReview/interface"
-import { messageClient } from "../trpc"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { BigNumberish, Call } from "starknet"
-import { EstimatedFees } from "@argent/x-shared/simulation"
+import type { Address, TransactionAction } from "@argent/x-shared"
+import type { ITransactionReviewService } from "../../../shared/transactionReview/interface"
+import type { messageClient } from "../trpc"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { Call } from "starknet"
+import type { EstimatedFees } from "@argent/x-shared/simulation"
+import type { AccountDeployTransaction } from "../../../shared/transactionReview/transactionAction.model"
 
 export class ClientTransactionReviewService
   implements ITransactionReviewService
@@ -14,32 +12,24 @@ export class ClientTransactionReviewService
   constructor(private readonly trpcClient: typeof messageClient) {}
 
   async simulateAndReview({
-    transactions,
+    transaction,
     feeTokenAddress,
+    accountDeployTransaction,
     appDomain,
+    maxSendEstimate,
   }: {
-    transactions: TransactionReviewTransactions[]
+    transaction: TransactionAction
+    accountDeployTransaction?: AccountDeployTransaction
     feeTokenAddress: Address
     appDomain?: string
+    maxSendEstimate?: boolean
   }) {
     return this.trpcClient.transactionReview.simulateAndReview.query({
-      transactions,
+      transaction,
+      accountDeployTransaction,
       feeTokenAddress,
       appDomain,
-    })
-  }
-
-  async getTransactionHash(
-    account: BaseWalletAccount,
-    transactions: Call | Call[],
-    estimatedFees?: EstimatedFees,
-    nonce?: BigNumberish,
-  ) {
-    return this.trpcClient.transactionReview.getTransactionHash.query({
-      account,
-      transactions,
-      estimatedFees,
-      nonce,
+      maxSendEstimate,
     })
   }
 

@@ -1,8 +1,8 @@
-import { iconsDeprecated } from "@argent/x-ui"
+import { icons } from "@argent/x-ui"
 import { Circle, Tooltip } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-const { UpgradeIcon } = iconsDeprecated
+const { UpgradeSecondaryIcon } = icons
 
 export const AccountListItemUpgradeBadge: FC = () => (
   <Tooltip label="There’s an upgrade available for this account">
@@ -17,7 +17,7 @@ export const AccountListItemUpgradeBadge: FC = () => (
       color={"neutrals.800"}
       fontSize={"2xs"}
     >
-      <UpgradeIcon />
+      <UpgradeSecondaryIcon />
     </Circle>
   </Tooltip>
 )

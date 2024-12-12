@@ -1,17 +1,20 @@
 import {
-  storybookDecorator,
-  storybookUIProviderDecorator,
+  makeStorybookDecorator,
   storybookGlobalTypes,
+  storybookUIProviderDecorator,
 } from "@argent/x-ui"
 import { INITIAL_VIEWPORTS } from "@storybook/addon-viewport"
 import { Preview } from "@storybook/react"
 import { merge } from "lodash-es"
 
-import { theme } from "@argent-x/extension/src/ui/AppThemeProvider"
-
-import { depreactedMuiDecorator } from "../src/decorators/depreactedMuiDecorator"
+import {
+  AppThemeProvider,
+  theme,
+} from "@argent-x/extension/src/ui/AppThemeProvider"
 
 import mock from "./webextension-polyfill-mock"
+
+const storybookDecorator = makeStorybookDecorator(AppThemeProvider)
 
 /** FIXME: remove when Storybooks gets BigInt support (v8.0) https://github.com/storybookjs/storybook/issues/22452 */
 BigInt.prototype["toJSON"] = function () {
@@ -71,11 +74,7 @@ const preview: Preview = {
     },
   },
   globalTypes: storybookGlobalTypes,
-  decorators: [
-    depreactedMuiDecorator,
-    storybookDecorator,
-    storybookUIProviderDecorator,
-  ],
+  decorators: [storybookDecorator, storybookUIProviderDecorator],
 }
 
 export default preview

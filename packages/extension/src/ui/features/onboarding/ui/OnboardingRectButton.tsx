@@ -1,5 +1,5 @@
 import { Button } from "@argent/x-ui"
-import { ComponentProps, FC } from "react"
+import type { ComponentProps, FC } from "react"
 
 export const OnboardingRectButton: FC<ComponentProps<typeof Button>> = (
   props,
@@ -13,6 +13,7 @@ export const OnboardingRectButton: FC<ComponentProps<typeof Button>> = (
       gap={2}
       py={9}
       px={4.5}
+      sx={{ textWrap: "wrap" }}
       {...props}
     />
   )

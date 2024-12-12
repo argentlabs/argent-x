@@ -1,7 +1,8 @@
 import { Action as NavigationType } from "history"
-import { Location } from "react-router-dom"
+import type { Location } from "react-router-dom"
 
-import { Presentation, PresentationDirection, ScreenProps } from "../types"
+import type { Presentation, ScreenProps } from "../types"
+import { PresentationDirection } from "../types"
 import { getMatchingPath, isDirectChildOfParentPath } from "../utils/path"
 
 interface UpdateScreenStackProps {

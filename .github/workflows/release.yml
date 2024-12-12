@@ -6,10 +6,15 @@ on:
       - release/*
     tags:
       - "**"
-
+env:
+  PNPM_VERSION: 9
+  NODE_VERSION: 18.x
 jobs:
   build:
-    environment: "prod"
+    strategy:
+      matrix:
+        env: [prod, staging, hydrogen]
+    environment: ${{ matrix.env }}
     env:
       FEATURE_PRIVACY_SETTINGS: "true"
       FEATURE_EXPERIMENTAL_SETTINGS: "false"
@@ -17,31 +22,29 @@ jobs:
       FEATURE_BANXA: "true"
       FEATURE_LAYERSWAP: "true"
       FEATURE_ORBITER: "true"
-      FEATURE_VERIFIED_DAPPS: "true"
-      ARGENT_SHIELD_NETWORK_ID: "mainnet-alpha"
+      ENABLE_TOKEN_DETAILS: "true"
+      FEATURE_DEFI_DECOMPOSITION: "true"
       FEATURE_MULTISIG: "true"
-      FEATURE_ACTIVITY_V2: "true"
-      SENTRY_ENVIRONMENT: "production"
-      NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-      SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
+      SENTRY_ENVIRONMENT: ${{ vars.SENTRY_ENVIRONMENT }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
       RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
       TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
       FILENAME: argent-extension
       SAFE_ENV_VARS: true
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
-      ARGENT_TESTNET_RPC_URL: ${{ vars.ARGENT_TESTNET_RPC_URL }}
-      ARGENT_HEALTHCHECK_BASE_URL: ${{ vars.ARGENT_HEALTHCHECK_BASE_URL }}
       ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
       ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
-      ARGENT_X_ENVIRONMENT: "prod"
+      ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
       MULTICALL_MAX_BATCH_SIZE: 20
       # Refresh intervals
       REFRESH_INTERVAL_FAST: 20
       REFRESH_INTERVAL_MEDIUM: 60
       REFRESH_INTERVAL_SLOW: 300
       REFRESH_INTERVAL_VERY_SLOW: 86400
+      MIN_LEDGER_APP_VERSION: 2.2.1
 
       NEW_CAIRO_0_ENABLED: false
 
@@ -59,37 +62,51 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
-      - run: pnpm run setup
+
+      - name: Set Sentry Release name
+        run: |
+          PACKAGE_VERSION=$(cat ./packages/extension/package.json | jq -r '.version') 
+          echo "SENTRY_RELEASE=${PACKAGE_VERSION}" >> $GITHUB_ENV
+
+      - name: Setup project
+        run: pnpm run setup
 
       - name: Build Chrome version
         run: pnpm build
 
-      - name: Check bundlesize for chrome
-        run: pnpm bundlewatch
+      - name: Check bundle size for chrome
+        run: pnpm check-bundle-size
 
+      - name: Set filename prefix
+        run: |
+          if [ "${{ matrix.env }}" = "prod" ]; then
+            echo "FILENAME_PREFIX=$(echo ${{ env.FILENAME }} | tr / -)" >> $GITHUB_ENV
+          else
+            echo "FILENAME_PREFIX=$(echo ${{ env.FILENAME }}-${{ matrix.env }} | tr / -)" >> $GITHUB_ENV
+          fi
       - name: Create chrome zip
-        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME }}-chrome.zip" .)
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-chrome.zip" . -x "*.map") # -x "*.map" exludes source maps needed for Sentry
 
       - name: Build Firefox version
         run: MANIFEST_VERSION=v2 pnpm --filter @argent-x/extension build
 
       - name: Create firefox zip
-        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME }}-firefox.zip" .)
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-firefox.zip" . -x "*.map") # -x "*.map" exludes source maps needed for Sentry
 
-      - name: Check bundlesize for firefox
-        run: pnpm bundlewatch
+      - name: Check bundle size for firefox
+        run: pnpm check-bundle-size
 
       - name: Upload artifacts for chrome
         uses: actions/upload-artifact@v4
         with:
-          name: chrome
+          name: ${{ matrix.env == 'prod' && 'chrome' || format('{0}-chrome', env.FILENAME_PREFIX) }}
           path: "*-chrome.zip"
           retention-days: 14
           if-no-files-found: error
@@ -97,7 +114,7 @@ jobs:
       - name: Upload artifacts for firefox
         uses: actions/upload-artifact@v4
         with:
-          name: firefox
+          name: ${{ matrix.env == 'prod' && 'firefox' || format('{0}-firefox', env.FILENAME_PREFIX) }}
           path: "*-firefox.zip"
           retention-days: 14
           if-no-files-found: error
@@ -108,41 +125,11 @@ jobs:
           PACKAGE_VERSION=$(cat ./packages/extension/package.json | jq -r '.version')
           echo "current-version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Check sourcemaps
-        run: |
-          ls -l ./packages/extension
-          if [ ! -d "./packages/extension/sourcemaps" ]; then
-            echo "No sourcemaps found"
-            exit 1
-          fi
-
-      - name: Create Sentry release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-          SENTRY_LOG_LEVEL: debug
-        with:
-          environment: ${{ env.SENTRY_ENVIRONMENT }}
-          sourcemaps: "./packages/extension/dist ./packages/extension/sourcemaps"
-          url_prefix: "~/"
-          version: ${{ steps.package-version.outputs.current-version }}
-          ignore_missing: true
-
-      - name: Get product version
-        id: product-version
-        run: |
-          PRODUCT_VERSION=$(cat ./packages/extension/dist/manifest.json | jq -r '.version')
-          echo "current-version=${PRODUCT_VERSION}" >> $GITHUB_OUTPUT
-
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          name: extension@${{ steps.product-version.outputs.current-version }}
+          name: extension@${{ steps.package-version.outputs.current-version }}
           files: |
-            ${{ env.FILENAME }}-chrome.zip
-            ${{ env.FILENAME }}-firefox.zip
+            *.zip

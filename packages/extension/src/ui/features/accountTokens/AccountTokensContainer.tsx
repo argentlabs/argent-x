@@ -1,8 +1,8 @@
-import { FC } from "react"
+import type { FC } from "react"
+import { Suspense } from "react"
 
-import { AccountTokens } from "./AccountTokens"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { usePromptUserReview } from "./usePromptUserReview"
+import { AccountTokens, AccountTokensSkeleton } from "./AccountTokens"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 interface AccountTokensContainerProps {
   account: WalletAccount
@@ -11,6 +11,9 @@ interface AccountTokensContainerProps {
 export const AccountTokensContainer: FC<AccountTokensContainerProps> = ({
   account,
 }) => {
-  usePromptUserReview()
-  return <AccountTokens account={account} />
+  return (
+    <Suspense fallback={<AccountTokensSkeleton />}>
+      <AccountTokens account={account} />
+    </Suspense>
+  )
 }

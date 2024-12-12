@@ -1,0 +1,228 @@
+name: Run upgrade tests
+on:
+  workflow_dispatch:
+
+env:
+  PNPM_VERSION: 9
+  NODE_VERSION: 18.x
+
+jobs:
+  build-all-artifacts:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+    strategy:
+      matrix:
+        env: [hydrogen]
+        extension_type: [chrome]
+
+    environment: ${{ matrix.env }}
+
+    env:
+      # FEATURE flags
+      FEATURE_PRIVACY_SETTINGS: "true"
+      FEATURE_EXPERIMENTAL_SETTINGS: "false"
+      FEATURE_BETA_FEATURES: "false"
+      FEATURE_BANXA: "true"
+      FEATURE_LAYERSWAP: "true"
+      FEATURE_ORBITER: "true"
+      FEATURE_MULTISIG: "true"
+      ENABLE_TOKEN_DETAILS: "true"
+      FEATURE_DEFI_DECOMPOSITION: "true"
+
+      # API URLs
+      ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
+      ARGENT_X_STATUS_URL: ${{ vars.ARGENT_X_STATUS_URL }}
+      ARGENT_X_NEWS_URL: ${{ vars.ARGENT_X_NEWS_URL }}
+      # API ENVIRONMENT
+      ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
+
+      # Sentry
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_ENVIRONMENT: "staging"
+
+      # Misc
+      RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
+      SAFE_ENV_VARS: false
+      MULTICALL_MAX_BATCH_SIZE: 20
+      NEW_CAIRO_0_ENABLED: false
+      TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
+      # Refresh intervals
+      FAST: 20 # 20s
+      MEDIUM: 60 # 60s
+      SLOW: 60 * 5 # 5m
+      VERY_SLOW: 24 * 60 * 60 # 1d
+      MIN_LEDGER_APP_VERSION: 2.2.0
+
+    steps:
+      # Setup Project
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Set Sentry Release name (rc)
+        run: |
+          PACKAGE_VERSION=$(grep -m1 '"version":' ./packages/extension/package.json | awk -F: '{ print $2 }' | sed 's/[", ]//g')
+          echo "SENTRY_RELEASE=${PACKAGE_VERSION}-rc__${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Setup project
+        run: pnpm run setup
+
+      - name: Build extension for ${{ matrix.extension_type }}
+        run: |
+          if [ "${{ matrix.extension_type }}" = "firefox" ]; then
+            echo "Building extension using manifest v2"
+            MANIFEST_VERSION=v2 pnpm run build:extension
+          else
+            echo "Building extension using manifest v3"
+            MANIFEST_VERSION=v3 pnpm run build:extension
+          fi
+
+      - name: Check bundle size for ${{ matrix.extension_type }}
+        run: pnpm check-bundle-size
+
+      - name: Use Cache
+        uses: actions/cache@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
+
+      - name: Set filename prefix
+        run: echo "FILENAME_PREFIX=$(echo argent-x-${{ matrix.env }}-${{ github.ref_name }} | tr / -)" >> $GITHUB_ENV
+
+      - name: Install zip
+        run: apt-get update && apt-get install -y zip
+
+      - name: Create ${{ matrix.extension_type }} zip
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}" .)
+
+      - name: Upload ${{ matrix.extension_type }} extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}
+          path: "*-${{ matrix.extension_type }}.zip"
+          retention-days: 3
+
+  test-e2e-upgrade:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+    needs: [build-all-artifacts]
+    strategy:
+      matrix:
+        project: [ArgentX]
+        shardIndex: [1]
+        shardTotal: [1]
+    env:
+      #default
+      ARGENT_X_ENVIRONMENT: "hydrogen"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
+      ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
+
+      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
+      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
+      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
+      E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
+
+      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
+      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+
+      E2E_USE_STRK_AS_FEE_TOKEN: ${{ secrets.E2E_USE_STRK_AS_FEE_TOKEN }}
+      E2E_SKIP_TX_TESTS: ${{ secrets.E2E_SKIP_TX_TESTS}}
+      E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
+      E2E_GUARDIAN_EMAIL: ${{ secrets.E2E_GUARDIAN_EMAIL }}
+      E2E_MIG_ACCOUNT_ADDRESS: ${{ secrets.E2E_MIG_ACCOUNT_ADDRESS }}
+      E2E_ACCOUNT_TO_IMPORT_AND_TX: ${{ secrets.E2E_ACCOUNT_TO_IMPORT_AND_TX }}
+      E2E_ACCOUNTS_TO_IMPORT: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT }}
+      E2E_QA_UTILS_AUTH_TOKEN: ${{ secrets.E2E_QA_UTILS_AUTH_TOKEN }}
+      E2E_QA_UTILS_URL: ${{ secrets.E2E_QA_UTILS_URL }}
+      E2E_MIG_VERSIONS: ${{ secrets.E2E_MIG_VERSIONS }}
+      # Refresh intervals
+      REFRESH_INTERVAL_FAST: 20 # 1s
+      REFRESH_INTERVAL_MEDIUM: 20 # 5s
+      REFRESH_INTERVAL_SLOW: 20 # 20s
+      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Restore pnpm cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Restore cached build
+        uses: actions/cache/restore@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }} # test-e2e is always run against chrome-hydrogen build
+
+      - name: Run e2e tests
+        run: xvfb-run --auto-servernum pnpm test:e2e:upgrade --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-artifacts-upgrade-${{ matrix.shardIndex }}
+          path: |
+            packages/e2e/artifacts/playwright/
+            !packages/e2e/artifacts/playwright/*.webm
+          retention-days: 5
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-blob-reports-upgrade-${{ matrix.shardIndex }}
+          path: packages/e2e/blob-report/
+          retention-days: 5

@@ -1,6 +1,6 @@
 import { isString } from "lodash-es"
 
-import {
+import type {
   AreaName,
   OnlyOptionalPropertiesOf,
   RequiredPropertiesOf,

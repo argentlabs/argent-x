@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/layout"
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 
 export const CircleIconContainer: FC<PropsWithChildren> = ({
   children,

@@ -1,7 +1,7 @@
 import { formatTruncatedAddress } from "@argent/x-shared"
 
 import type { AllowPromise } from "../../../../storage/types"
-import type { BaseWalletAccount } from "../../../../wallet.model"
+import type { AccountId, BaseWalletAccount } from "../../../../wallet.model"
 import {
   isDeclareContractTransaction,
   isDeployContractTransaction,
@@ -17,15 +17,17 @@ type GetAddressName = (
 export interface GetTransactionSubtitleProps {
   transactionTransformed: TransformedTransaction
   networkId: string
+  accountId: AccountId
   getAddressName?: GetAddressName
 }
 
 export async function getTransactionSubtitle({
   transactionTransformed,
   networkId,
+  accountId,
   getAddressName,
 }: GetTransactionSubtitleProps) {
-  const { action, dapp } = transactionTransformed
+  const { action } = transactionTransformed
   const isNFTTransfer = isNFTTransferTransaction(transactionTransformed)
   const isTransfer = isTokenTransferTransaction(transactionTransformed)
   const isDeclareContract = isDeclareContractTransaction(transactionTransformed)
@@ -41,13 +43,10 @@ export async function getTransactionSubtitle({
       (await getAddressName?.({
         address,
         networkId,
+        id: accountId,
       })) ?? formatTruncatedAddress(address)
     const subtitle = `${titleShowsTo ? "To:" : "From:"} ${accountName}`
     return subtitle
-  }
-
-  if (dapp) {
-    return dapp.title
   }
 
   if (isDeclareContract) {

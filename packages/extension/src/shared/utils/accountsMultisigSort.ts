@@ -1,5 +1,5 @@
-import { getIndexForPath } from "./derivationPath"
-import { PendingMultisig } from "../multisig/types"
+import { getIndexForPath, getIndexForPathUnsafe } from "./derivationPath"
+import type { PendingMultisig } from "../multisig/types"
 import { SignerType } from "../wallet.model"
 import { getBaseDerivationPath } from "../signer/utils"
 
@@ -13,6 +13,7 @@ interface SortableAccount {
 const signerPriority: { [key in SignerType]: number } = {
   [SignerType.LOCAL_SECRET]: 0,
   [SignerType.LEDGER]: 1,
+  [SignerType.PRIVATE_KEY]: 2,
 }
 
 export const sortAccountsByDerivationPath = (
@@ -77,4 +78,20 @@ export const sortMultisigAndPendingMultisigAccounts = <
   return [...pending, ...full]
     .sort(sortMultisigByDerivationPath)
     .sort(sortAccountsBySignerPriority)
+}
+
+export const sortImportedAccountsByIndex = (
+  a: SortableAccount,
+  b: SortableAccount,
+) => {
+  const aIndex = getIndexForPathUnsafe(a.signer.derivationPath)
+  const bIndex = getIndexForPathUnsafe(b.signer.derivationPath)
+
+  return aIndex - bIndex
+}
+
+export const sortImportedAccounts = <T extends SortableAccount>(
+  accounts: T[],
+): T[] => {
+  return [...accounts].sort(sortImportedAccountsByIndex)
 }

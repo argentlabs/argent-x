@@ -1,11 +1,12 @@
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
-import { KnownDappService } from "../../../../shared/knownDapps/KnownDappService"
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import type { KnownDappService } from "../../../../shared/knownDapps/KnownDappService"
 import { RefreshIntervalInSeconds } from "../../../../shared/config"
 import { pipe } from "../../worker/schedule/pipe"
-import { IBackgroundUIService } from "../../ui/IBackgroundUIService"
-import { IDebounceService } from "../../../../shared/debounce"
+import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
+import type { IDebounceService } from "../../../../shared/debounce"
 import { everyWhenOpen } from "../../worker/schedule/decorators"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const id = "knownDappsUpdate"
 
 type Id = typeof id

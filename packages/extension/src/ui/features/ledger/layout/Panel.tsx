@@ -1,4 +1,7 @@
-import { Box, BoxProps } from "@chakra-ui/react"
+import { logosDeprecated } from "@argent/x-ui"
+import type { BoxProps } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
+const { ArgentXLogo } = logosDeprecated
 
 export const Panel = (props: BoxProps) => (
   <Box
@@ -11,3 +14,20 @@ export const Panel = (props: BoxProps) => (
     {...props}
   />
 )
+
+export const SidePanel = () => {
+  return (
+    <Box
+      width={{ md: "31.25%" }}
+      display={{ md: "flex" }}
+      backgroundColor={{ md: "black" }}
+      height={{ md: "100%" }}
+      background={`url('./assets/onboarding-background.jpg') no-repeat center`}
+      backgroundSize="cover"
+    >
+      <Panel>
+        <ArgentXLogo w={20} h={20} />
+      </Panel>
+    </Box>
+  )
+}

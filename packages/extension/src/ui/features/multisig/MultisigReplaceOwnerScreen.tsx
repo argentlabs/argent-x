@@ -1,24 +1,19 @@
-import { FC } from "react"
-import { FormProvider, useFormContext } from "react-hook-form"
+import type { FC } from "react"
+import { FormProvider } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
-import { decodeBase58 } from "@argent/x-shared"
-import { H4, P3, P4 } from "@argent/x-ui"
+import { H3, P2, P3 } from "@argent/x-ui"
 import { Button, Divider, Flex } from "@chakra-ui/react"
 import { useRouteSignerToReplace } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
-import { multisigService } from "../../services/multisig"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { ReplaceOwnerForm } from "./ReplaceOwnerForm"
-import {
-  FieldValuesReplaceOwnerForm,
-  useReplaceOwnerForm,
-} from "./hooks/useReplaceOwnerForm"
+import { useReplaceOwnerForm } from "./hooks/useReplaceOwnerForm"
 import { multisigView } from "./multisig.state"
-import { isEmpty } from "lodash-es"
 import { useView } from "../../views/implementation/react"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import { useReplaceMultisigOwner } from "./hooks/useReplaceMultisigOwner"
 
 export const MultisigReplaceOwnerScreen: FC = () => {
   const account = useRouteWalletAccount()
@@ -68,38 +63,13 @@ const MultisigReplace = ({
   multisigPublicKey?: string
   signerToRemove: string
 }) => {
-  const { trigger, getValues } = useFormContext<FieldValuesReplaceOwnerForm>()
+  const replaceMultisigOwner = useReplaceMultisigOwner()
 
   const navigate = useNavigate()
 
   const handleSubmit = async () => {
-    const signerToAdd = getValues("signerKey")
-    const isValid = await trigger()
-
-    if (isValid && signerToRemove && account?.address) {
-      await multisigService.replaceOwner({
-        signerToRemove,
-        signerToAdd,
-        address: account.address,
-      })
-
-      const name = getValues("name")
-
-      // need to do name && !isEmpty(name) because the compiler doesn't recognize isEmpty as a type guard
-      if (name && !isEmpty(name) && multisigPublicKey) {
-        const signerMetadata = { key: decodeBase58(signerToAdd), name }
-        await multisigService.updateSignerMetadata(
-          multisigPublicKey,
-          signerMetadata,
-        )
-        await multisigService.removeSignerMetadata(
-          multisigPublicKey,
-          decodeBase58(signerToRemove),
-        )
-      }
-
-      navigate(routes.accountActivity())
-    }
+    await replaceMultisigOwner(signerToRemove, account, multisigPublicKey)
+    navigate(routes.accountActivity())
   }
 
   return (
@@ -110,14 +80,14 @@ const MultisigReplace = ({
       height="full"
     >
       <Flex flexDirection="column" gap="1">
-        <H4>Replace owner</H4>
-        <P3 color="neutrals.100" pb={4}>
+        <H3>Replace owner</H3>
+        <P2 color="neutrals.100" pb={4}>
           Set a new owner for this multisig
-        </P3>
-        <P4 color="primary.400" mt="2" fontWeight="bold">
+        </P2>
+        <P3 color="primary.400" mt="2" fontWeight="bold">
           For security reasons each owner should have their own Argent X wallet.
           Never add 2 signer pubkeys from the same Argent X wallet.
-        </P4>
+        </P3>
         <Divider my={4} color="neutrals.800" mt="4" />
 
         <ReplaceOwnerForm signerToRemove={signerToRemove} />

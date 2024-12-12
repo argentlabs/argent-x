@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 
 export enum SWAP_ERROR_MESSAGE {
   NO_SWAP_URL = "Swap base url not provided",

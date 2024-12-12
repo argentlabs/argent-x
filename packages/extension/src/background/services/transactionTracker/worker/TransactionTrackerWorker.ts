@@ -1,11 +1,9 @@
-import {
-  BaseTransactionTrackingService,
-  TransactionTrackingService,
-} from "../BaseTransactionTrackingService"
+import type { TransactionTrackingService } from "../BaseTransactionTrackingService"
+import { BaseTransactionTrackingService } from "../BaseTransactionTrackingService"
 
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
-import { IChainService } from "../../../../shared/chain/service/IChainService"
-import {
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import type { IChainService } from "../../../../shared/chain/service/IChainService"
+import type {
   BaseTransaction,
   TransactionStatus,
 } from "../../../../shared/transactions/interface"
@@ -14,11 +12,9 @@ import {
   getTransactionStatus,
   identifierToBaseTransaction,
 } from "../../../../shared/transactions/utils"
-import { IRepository } from "../../../../shared/storage/__new/interface"
-import {
-  Transaction,
-  getInFlightTransactions,
-} from "../../../../shared/transactions"
+import type { IRepository } from "../../../../shared/storage/__new/interface"
+import type { Transaction } from "../../../../shared/transactions"
+import { getInFlightTransactions } from "../../../../shared/transactions"
 import uniqWith from "lodash-es/uniqWith"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { getTransactionHistory } from "../../../transactions/sources/voyager"
@@ -27,10 +23,10 @@ import { accountService } from "../../../../shared/account/service"
 import { RefreshIntervalInSeconds } from "../../../../shared/config"
 import { pipe } from "../../worker/schedule/pipe"
 import { everyWhenOpen } from "../../worker/schedule/decorators"
-import { IBackgroundUIService } from "../../ui/IBackgroundUIService"
-import { IDebounceService } from "../../../../shared/debounce"
+import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
+import type { IDebounceService } from "../../../../shared/debounce"
 import { delay } from "../../../../shared/utils/delay"
-import Emittery from "emittery"
+import type Emittery from "emittery"
 
 function isFinalStatus(status: TransactionStatus): boolean {
   return status.status === "confirmed" || status.status === "failed"
@@ -42,8 +38,8 @@ export type Events = {
   [TransactionStatusChanged]: { transactions: string[] }
 }
 
-// Initial waiting time is 3s, then we do 2s intervals for 5 times, after that we fallback to the 20s interval
-const DELAYS = [3000, 2000, 2000, 2000, 2000, 2000]
+// Initial waiting time is 1s, then we do 1s intervals for 5 times, 2s intervals for 5 times, after that we fall back to the 20s interval
+const DELAYS = [...Array(5).fill(1000), ...Array(5).fill(2000)]
 
 export class TransactionTrackerWorker
   extends BaseTransactionTrackingService<BaseTransaction, TransactionStatus>
@@ -225,7 +221,7 @@ export class TransactionTrackerWorker
             }
           }
 
-          syncTxRepoWithDelays()
+          void syncTxRepoWithDelays()
         }
       } catch (error) {
         // Silently fail

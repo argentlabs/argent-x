@@ -4,13 +4,13 @@ import {
   ButtonCell,
   CellStack,
   HeaderCell,
+  icons,
   NavigationContainer,
   SpacerCell,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
-const { MoreIcon } = iconsDeprecated
+const { MoreSecondaryIcon } = icons
 
 export function Account() {
   const { id } = useParams()
@@ -21,7 +21,7 @@ export function Account() {
       leftButton={<BarBackButton onClick={() => navigate("/")} />}
       rightButton={
         <BarIconButton as={Link} to={"/accounts"}>
-          <MoreIcon />
+          <MoreSecondaryIcon />
         </BarIconButton>
       }
     >

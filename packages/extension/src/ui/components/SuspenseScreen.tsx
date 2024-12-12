@@ -1,5 +1,7 @@
-import { FC, Suspense } from "react"
-import { ScreenSkeleton, ScreenSkeletonProps } from "./ScreenSkeleton"
+import type { FC } from "react"
+import { Suspense } from "react"
+import type { ScreenSkeletonProps } from "./ScreenSkeleton"
+import { ScreenSkeleton } from "./ScreenSkeleton"
 
 export const SuspenseScreen: FC<ScreenSkeletonProps> = ({
   children,

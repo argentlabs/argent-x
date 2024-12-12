@@ -1,9 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { accountMessagingService } from "../../../services/accountMessaging"
-import { getBaseMultisigAccounts } from "../../../../shared/multisig/utils/baseMultisig"
-import { encodeBase58Array } from "@argent/x-shared"
 import { pubkeySchema } from "../../../../shared/multisig/multisig.model"
 
 export const confirmationsSchema = z
@@ -49,31 +46,6 @@ const getFormSchema = (accountSignerKey?: string, isNewMultisig = true) =>
         ),
       confirmations: confirmationsSchema,
     })
-    .refine(
-      async (data) => {
-        const baseMultisigs = await getBaseMultisigAccounts()
-
-        const bufferedPubKeys =
-          await accountMessagingService.getPublicKeysBufferForMultisig(
-            0,
-            baseMultisigs.length + 10, // We get 10 more to be sure we have enough
-          )
-
-        const encodedBufferedPubKeys = encodeBase58Array(bufferedPubKeys)
-
-        const currentSigners = data.signerKeys.map((signer) => signer.key)
-
-        const signerIsInSameMultisig = currentSigners.some((signer) =>
-          encodedBufferedPubKeys.includes(signer),
-        )
-
-        return !signerIsInSameMultisig
-      },
-      {
-        message: "You cannot add signer pubkeys from the same Argent X wallet",
-        path: ["signerKeys"],
-      },
-    )
     // We increment by 1 to include the owner
     .refine((data) => data.confirmations <= data.signerKeys.length + 1, {
       message: "Confirmations should be less than or equal to signer pubkeys",

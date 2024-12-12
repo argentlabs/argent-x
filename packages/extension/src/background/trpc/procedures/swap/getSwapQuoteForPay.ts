@@ -5,7 +5,8 @@ import { SwapQuoteResponseSchema } from "../../../../shared/swap/model/quote.mod
 const SwapQuoteForPaySchema = z.object({
   payTokenAddress: z.string(),
   receiveTokenAddress: z.string(),
-  payAmount: z.string(),
+  sellAmount: z.string().optional(),
+  buyAmount: z.string().optional(),
   accountAddress: z.string(),
 })
 
@@ -17,7 +18,8 @@ export const getSwapQuoteForPayProcedure = extensionOnlyProcedure
       input: {
         payTokenAddress,
         receiveTokenAddress,
-        payAmount,
+        sellAmount,
+        buyAmount,
         accountAddress,
       },
       ctx: {
@@ -27,8 +29,9 @@ export const getSwapQuoteForPayProcedure = extensionOnlyProcedure
       return swapService.getSwapQuoteForPay(
         payTokenAddress,
         receiveTokenAddress,
-        payAmount,
         accountAddress,
+        sellAmount,
+        buyAmount,
       )
     },
   )

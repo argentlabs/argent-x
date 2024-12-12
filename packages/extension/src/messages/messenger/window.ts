@@ -1,4 +1,4 @@
-import { Listener, Message, Messenger } from "."
+import type { Listener, Message, Messenger } from "."
 
 export class WindowMessenger implements Messenger {
   private readonly listeners: Set<Listener>

@@ -2,14 +2,14 @@ import {
   BarIconButton,
   ButtonCell,
   CellStack,
+  icons,
   NavigationContainer,
   SpacerCell,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { useCallback } from "react"
 import { Link } from "react-router-dom"
 
-const { ExpandIcon, SettingsIcon } = iconsDeprecated
+const { ExpandIcon, SettingsSecondaryIcon } = icons
 
 export function Home() {
   const onOpenWindow = useCallback(() => {
@@ -24,7 +24,7 @@ export function Home() {
       title={"Home"}
       rightButton={
         <BarIconButton as={Link} to={"/settings"}>
-          <SettingsIcon />
+          <SettingsSecondaryIcon />
         </BarIconButton>
       }
     >

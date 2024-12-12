@@ -1,9 +1,12 @@
 import { CallData } from "starknet"
 
 import { networkService } from "../shared/network/service"
-import { ArgentAccountType, BaseWalletAccount } from "../shared/wallet.model"
-import { IBackgroundActionService } from "./services/action/IBackgroundActionService"
-import { Wallet } from "./wallet"
+import type {
+  ArgentAccountType,
+  BaseWalletAccount,
+} from "../shared/wallet.model"
+import type { IBackgroundActionService } from "./services/action/IBackgroundActionService"
+import type { Wallet } from "./wallet"
 import { AccountError } from "../shared/errors/account"
 import { addressSchema, isAccountV5 } from "@argent/x-shared"
 import { sanitizeAccountType } from "../shared/utils/sanitizeAccountType"
@@ -21,11 +24,11 @@ export const upgradeAccount = async ({
   actionService,
   targetImplementationType,
 }: IUpgradeAccount) => {
-  const fullAccount = await wallet.getAccount(account)
+  const fullAccount = await wallet.getAccount(account.id)
   if (!fullAccount) {
     throw new AccountError({ code: "NOT_FOUND" })
   }
-  const starknetAccount = await wallet.getStarknetAccount(account)
+  const starknetAccount = await wallet.getStarknetAccount(account.id)
 
   const accountType = targetImplementationType ?? fullAccount.type
 
@@ -81,7 +84,7 @@ export const upgradeAccount = async ({
     },
     {
       title: "Upgrade account",
-      icon: "UpgradeIcon",
+      icon: "UpgradeSecondaryIcon",
     },
   )
 }

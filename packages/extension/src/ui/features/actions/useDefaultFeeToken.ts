@@ -1,9 +1,9 @@
-import { TokenWithBalance } from "@argent/x-shared"
+import type { TokenWithBalance } from "@argent/x-shared"
 import { num } from "starknet"
 import { AccountError } from "../../../shared/errors/account"
-import { FeeTokenPreferenceOption } from "../../../shared/feeToken/types/preference.model"
+import type { FeeTokenPreferenceOption } from "../../../shared/feeToken/types/preference.model"
 import { pickBestFeeToken } from "../../../shared/feeToken/utils"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useFeeTokenBalances } from "../accountTokens/useFeeTokenBalance"
 import { useFeeTokenPreference } from "./useFeeTokenPreference"
 

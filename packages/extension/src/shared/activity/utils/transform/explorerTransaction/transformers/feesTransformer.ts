@@ -1,6 +1,6 @@
 import { number } from "starknet"
 
-import { IExplorerTransactionTransformer } from "./type"
+import type { IExplorerTransactionTransformer } from "./type"
 import { getActualFee } from "../getActualFee"
 
 /** fees */

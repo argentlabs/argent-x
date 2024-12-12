@@ -1,4 +1,4 @@
-import { Call } from "starknet"
+import type { Call } from "starknet"
 import { ETH_TOKEN_ADDRESS, STRK_TOKEN_ADDRESS } from "../network/constants"
 import { isRejectOnChainCall } from "./rejectOnChainCall"
 

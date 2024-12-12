@@ -1,21 +1,21 @@
-import { AllowArray } from "starknet"
+import type { AllowArray } from "starknet"
 
 import { networkService } from "../../network/service"
-import { SelectorFn } from "../../storage/types"
-import {
+import type { SelectorFn } from "../../storage/types"
+import type {
   BaseMultisigWalletAccount,
   MultisigWalletAccount,
 } from "../../wallet.model"
 import { pendingMultisigRepo } from "../repository"
-import { BasePendingMultisig, PendingMultisig } from "../types"
+import type { BasePendingMultisig, PendingMultisig } from "../types"
 import { addMultisigAccount } from "./baseMultisig"
 import {
   getPendingMultisigSelector,
   pendingMultisigEqual,
   withoutHiddenPendingMultisig,
 } from "./selectors"
+import { getAccountIdentifier } from "../../utils/accountIdentifier"
 import { getAccountClassHashFromChain } from "../../account/details"
-import { isEqualAddress } from "@argent/x-shared"
 import { accountsEqual } from "../../utils/accountsEqual"
 
 export async function getAllPendingMultisigs(
@@ -48,12 +48,8 @@ export async function removePendingMultisig(
     throw new Error("Pending multisig to remove not found")
   }
 
-  return pendingMultisigRepo.remove(
-    // pendingMultisigEqual(pendingMultisig, basePendingMultisig),
-    (multisig) => pendingMultisigEqual(multisig, basePendingMultisig),
-    // multisig.name === pendingMultisig.name &&
-    // multisig.networkId === pendingMultisig.networkId &&
-    // multisig.publicKey === pendingMultisig.publicKey,
+  return pendingMultisigRepo.remove((multisig) =>
+    pendingMultisigEqual(multisig, basePendingMultisig),
   )
 }
 
@@ -69,7 +65,14 @@ export async function pendingMultisigToMultisig(
     throw new Error("Pending multisig to convert to Multisig not found")
   }
 
+  const id = getAccountIdentifier(
+    multisigData.address,
+    multisigData.networkId,
+    pendingMultisig.signer,
+  )
+
   const fullMultisig: MultisigWalletAccount = {
+    id,
     address: multisigData.address,
     name: pendingMultisig.name,
     type: "multisig",

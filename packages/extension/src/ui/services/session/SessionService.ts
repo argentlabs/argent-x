@@ -1,6 +1,6 @@
 import { encryptForBackground } from "../crypto"
-import { messageClient } from "../trpc"
-import { ISessionService } from "./ISessionService"
+import type { messageClient } from "../trpc"
+import type { ISessionService } from "./ISessionService"
 
 export class SessionService implements ISessionService {
   constructor(private trpcMessageClient: typeof messageClient) {}

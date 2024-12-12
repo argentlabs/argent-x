@@ -1,4 +1,4 @@
-import { WalletAccount } from "../wallet.model"
+import type { WalletAccount } from "../wallet.model"
 import { getDefaultSortedAccounts } from "./getDefaultSortedAccount"
 
 describe("getDefaultSortedAccounts", () => {

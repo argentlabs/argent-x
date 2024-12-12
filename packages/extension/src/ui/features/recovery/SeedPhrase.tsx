@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import { LoadingSeedWordBadge } from "./ui/LoadingSeedWordBadge"
 import { SeedPhraseGrid } from "./ui/SeedPhraseGrid"

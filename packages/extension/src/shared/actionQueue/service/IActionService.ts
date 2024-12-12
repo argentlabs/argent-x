@@ -3,7 +3,7 @@ import type { MessageType } from "../../messages"
 import type { ActionHash, ActionItemExtra } from "../schema"
 
 /** Extract the 'data' type of each item in the union if it exists */
-type ExtractDataType<Type> = Type extends { data: any } ? Type["data"] : never
+type ExtractDataType<Type> = Type extends { data?: any } ? Type["data"] : never
 
 /** A union of the 'data' part of each MessageType */
 type MessageDataType = ExtractDataType<MessageType>

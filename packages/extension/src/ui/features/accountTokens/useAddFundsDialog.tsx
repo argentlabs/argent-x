@@ -1,24 +1,20 @@
 import { AlertDialog } from "@argent/x-ui"
 import { useDisclosure } from "@chakra-ui/react"
 import { noop } from "lodash-es"
-import {
-  FC,
-  PropsWithChildren,
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react"
-import { To, useNavigate } from "react-router-dom"
+import type { FC, PropsWithChildren } from "react"
+import { createContext, useCallback, useContext, useMemo } from "react"
+import type { To } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
-import { SendQuery, isSendQuery } from "../../../shared/send/schema"
-import { useTokensWithBalance } from "./tokens.state"
+import type { SendQuery } from "../../../shared/send/schema"
+import { isSendQuery } from "../../../shared/send/schema"
 import { useIsAccountDeploying } from "./useIsAccountDeploying"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import { useHasNonZeroBalance } from "./useHasNonZeroBalance"
 
 interface AddFundsDialogContextProps {
   onSend: (queryOrTo?: SendQuery | To) => void
@@ -45,12 +41,9 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
   const accountIsDeploying = useIsAccountDeploying(account)
   const returnTo = useCurrentPathnameWithQuery()
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const tokenDetails = useTokensWithBalance(account)
   const bestFeeToken = useDefaultFeeToken(account)
 
-  const hasNonZeroBalance = useMemo(() => {
-    return tokenDetails.some(({ balance }) => balance && balance > 0n)
-  }, [tokenDetails])
+  const hasNonZeroBalance = useHasNonZeroBalance(account)
 
   const onAddFunds = useCallback(() => {
     onClose()

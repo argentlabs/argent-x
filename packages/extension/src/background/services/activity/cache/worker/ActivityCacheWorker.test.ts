@@ -1,7 +1,5 @@
-import {
-  AnyActivity,
-  NativeActivityTypeNative,
-} from "@argent/x-shared/simulation"
+import type { AnyActivity } from "@argent/x-shared/simulation"
+import { NativeActivityTypeNative } from "@argent/x-shared/simulation"
 import Emittery from "emittery"
 import { describe, expect, test, vi, type Mocked } from "vitest"
 import { ActivityCacheWorker } from "./ActivityCacheWorker"
@@ -15,7 +13,10 @@ import {
   type Transaction,
 } from "../../../../../shared/transactions"
 import { delay } from "../../../../../shared/utils/delay"
-import type { BaseWalletAccount } from "../../../../../shared/wallet.model"
+import {
+  SignerType,
+  type BaseWalletAccount,
+} from "../../../../../shared/wallet.model"
 import {
   TransactionCreatedForAction,
   type Events as BackgroundActionServiceEvents,
@@ -25,15 +26,27 @@ import type {
   Events as ActivityServiceEvents,
   IActivityService,
 } from "../../IActivityService"
-import { MultisigEmitterEvents } from "../../../../../shared/multisig/emitter"
-import { MultisigPendingTransaction } from "../../../../../shared/multisig/pendingTransactionsStore"
+import type { MultisigEmitterEvents } from "../../../../../shared/multisig/emitter"
+import type { MultisigPendingTransaction } from "../../../../../shared/multisig/pendingTransactionsStore"
 import { ArrayStorage } from "../../../../../shared/storage"
 import type { IAddressService } from "../../../../../shared/address/IAddressService"
+import { getAccountIdentifier } from "../../../../../shared/utils/accountIdentifier"
+import type { IKnownDappService } from "../../../../../shared/knownDapps/IKnownDappService"
 
 const networkId = "sepolia-alpha"
+const address =
+  "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+
+const mockSigner = {
+  type: SignerType.LOCAL_SECRET,
+  derivationPath: "m/44'/60'/0'/0/0",
+}
+
+const id = getAccountIdentifier(address, networkId, mockSigner)
 
 const account: BaseWalletAccount = {
-  address: "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  id,
+  address,
   networkId,
 }
 
@@ -89,6 +102,7 @@ describe("ActivityCacheWorker", () => {
       })
 
     const addressService = {} as unknown as IAddressService
+    const knownDappService = {} as unknown as IKnownDappService
 
     const activityCacheWorker = new ActivityCacheWorker(
       activityService,
@@ -99,6 +113,7 @@ describe("ActivityCacheWorker", () => {
       multisigEmitter,
       multisigPendingTransactionsStore,
       addressService,
+      knownDappService,
     )
     return {
       activityService,
@@ -118,12 +133,7 @@ describe("ActivityCacheWorker", () => {
   describe("When a Transaction is created for an Action", () => {
     test("Creates a new NativeActivity", async () => {
       const {
-        activityService,
-        activityServiceEmitter,
         activityCacheService,
-        transactionsRepo,
-        actionQueue,
-        actionService,
         actionServiceEmitter,
         activityCacheWorker,
       } = makeService()
@@ -162,16 +172,8 @@ describe("ActivityCacheWorker", () => {
 
   describe("When a Transaction is updated", () => {
     test("Updates existing NativeActivity", async () => {
-      const {
-        activityService,
-        activityServiceEmitter,
-        activityCacheService,
-        transactionsRepo,
-        actionQueue,
-        actionService,
-        actionServiceEmitter,
-        activityCacheWorker,
-      } = makeService()
+      const { activityCacheService, transactionsRepo, activityCacheWorker } =
+        makeService()
 
       const onTransactionRepoChangeSpy = vi.spyOn(
         activityCacheWorker,

@@ -32,7 +32,7 @@ export const getErrorObject = (
       })
       return errorObject
     }
-  } catch (e) {
+  } catch {
     // ignore parsing error
   }
 }

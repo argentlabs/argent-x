@@ -1,4 +1,4 @@
-import {
+import type {
   AddSmartAccountRequest,
   AddSmartAccountResponse,
 } from "@argent/x-shared"

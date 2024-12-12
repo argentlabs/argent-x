@@ -1,13 +1,15 @@
 import browser from "webextension-polyfill"
-import { StarknetMethodArgumentsSchemas } from "starknetkit/window"
-import { MessageType } from "../../shared/messages"
+import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import type { MessageType } from "../../shared/messages"
 import { handleMessage } from "./handle"
 import {
   isSessionKeyTypedData,
   sessionKeyMessageSchema,
 } from "../../shared/sessionKeys/schema"
-import { isSessionKeysWhitelistedDomain } from "../../shared/sessionKeys/whitelist"
 import { getOriginFromSender } from "../../shared/messages/getOriginFromSender"
+import { knownDappsService } from "../../shared/knownDapps/index"
+import { isEmpty } from "lodash-es"
+import { isLocalhost } from "../../shared/messages/isLocalhost"
 
 export const addMessageListeners = () => {
   const initialUrls = new Map<number, string>() // tabId -> url
@@ -44,13 +46,20 @@ export const addMessageListeners = () => {
               ])
             /** if it is potentially session key then further validate the message payload and domain */
             if (isSessionKeyTypedData(typedData)) {
-              if (
-                !isSessionKeysWhitelistedDomain(getOriginFromSender(sender))
-              ) {
-                throw new Error(
-                  `The origin is not whitelisted for session keys`,
-                )
+              const host = getOriginFromSender(sender)
+
+              // Always allow localhost session key signing
+              if (!isLocalhost(host)) {
+                const knownDappData =
+                  await knownDappsService.getDappByHost(host)
+
+                if (isEmpty(knownDappData?.sessionConfig)) {
+                  throw new Error(
+                    `The origin is not whitelisted for session keys`,
+                  )
+                }
               }
+
               await sessionKeyMessageSchema.parseAsync(typedData.message)
             }
             return handleMessage(
@@ -69,24 +78,25 @@ export const addMessageListeners = () => {
     })
   })
 
-  // Store the initial URL of the tab, to detect redirects
-  const onBeforeNavigateListener = (details: any) => {
-    // We are saving the URL only if the navigation is happening in the top-level frame of a tab. There can only be navigation within a nested frame inside the webpage, such as an iframe
-    if (details.frameType === "outermost_frame") {
-      initialUrls.set(details.tabId, details.url)
+  if (browser.webNavigation?.onBeforeNavigate) {
+    // Store the initial URL of the tab, to detect redirects
+    const onBeforeNavigateListener = (details: any) => {
+      // We are saving the URL only if the navigation is happening in the top-level frame of a tab. There can only be navigation within a nested frame inside the webpage, such as an iframe
+      if (details.frameType === "outermost_frame") {
+        initialUrls.set(details.tabId, details.url)
+      }
     }
-  }
-
-  if (
-    !browser.webNavigation.onBeforeNavigate.hasListener(
-      onBeforeNavigateListener,
-    )
-  ) {
-    browser.webNavigation.onBeforeNavigate.addListener(
-      onBeforeNavigateListener,
-      {
-        url: [{ urlMatches: ".*" }],
-      },
-    )
+    if (
+      !browser.webNavigation.onBeforeNavigate.hasListener(
+        onBeforeNavigateListener,
+      )
+    ) {
+      browser.webNavigation.onBeforeNavigate.addListener(
+        onBeforeNavigateListener,
+        {
+          url: [{ urlMatches: ".*" }],
+        },
+      )
+    }
   }
 }

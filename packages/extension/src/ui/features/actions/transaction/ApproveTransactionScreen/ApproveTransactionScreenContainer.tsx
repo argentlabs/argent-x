@@ -1,21 +1,21 @@
 import { useAtom } from "jotai"
-import { isEmpty, isFunction } from "lodash-es"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import { isFunction } from "lodash-es"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
-import { Call, TransactionType, isSierra, num } from "starknet"
+import type { Call } from "starknet"
+import { TransactionType, isSierra, num } from "starknet"
 
-import {
+import type {
   Address,
   TokenWithBalance,
   TransactionAction,
-  classHashSupportsTxV3,
-  ensureArray,
 } from "@argent/x-shared"
+import { classHashSupportsTxV3, ensureArray } from "@argent/x-shared"
 import { ETH_TOKEN_ADDRESS } from "../../../../../shared/network/constants"
-import { BaseToken } from "../../../../../shared/token/__new/types/token.model"
+import type { BaseToken } from "../../../../../shared/token/__new/types/token.model"
 import { equalToken } from "../../../../../shared/token/__new/utils"
 import { routes } from "../../../../../shared/ui/routes"
-import { clientActionService } from "../../../../services/action"
 import { feeTokenService } from "../../../../services/feeToken"
 import { userClickedAddFundsAtom } from "../../../../views/actions"
 import { useView } from "../../../../views/implementation/react"
@@ -29,21 +29,14 @@ import {
 import { useMultisigPendingTransactionsByAccount } from "../../../multisig/multisigTransactions.state"
 import { useIsMainnet } from "../../../networks/hooks/useIsMainnet"
 import { FeeTokenPickerModal } from "../../feeEstimation/ui/FeeTokenPickerModal"
-import { useMaxFeeEstimation } from "../../feeEstimation/utils"
 import { useActionScreen } from "../../hooks/useActionScreen"
-import { FeeEstimationContainerV2 } from "../../transactionV2/FeeEstimationContainerV2"
+import { FeeEstimationContainer } from "../../transactionV2/FeeEstimationContainer"
 import { useFeeTokenSelection } from "../../transactionV2/useFeeTokenSelection"
 import { useTransactionReviewV2 } from "../../transactionV2/useTransactionReviewV2"
 import { useDefaultFeeToken } from "../../useDefaultFeeToken"
-import { ApproveScreenType, TransactionActionsType } from "../types"
-import {
-  useAggregatedSimData,
-  useAggregatedTxFeesData,
-} from "../useTransactionSimulatedData"
-import { useTransactionSimulation } from "../useTransactionSimulation"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
 import { WithActionScreenErrorFooter } from "./WithActionScreenErrorFooter"
-import { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
+import type { ApproveTransactionScreenContainerProps } from "./approveTransactionScreen.model"
 
 export const ApproveTransactionScreenContainer: FC<
   ApproveTransactionScreenContainerProps
@@ -65,9 +58,10 @@ export const ApproveTransactionScreenContainer: FC<
   transactionContext = "STANDARD_EXECUTE",
   txNeedsRetry,
   showConfirmButton,
+  disableLedgerApproval: _disableLedgerApproval,
   ...rest
 }) => {
-  const { action } = useActionScreen()
+  const { action, updateTransactionReview } = useActionScreen()
   const [disableConfirm, setDisableConfirm] = useState(true)
   const [hasInsufficientFunds, setHasInsufficientFunds] = useState(false)
   const [showTxDetails, setShowTxDetails] = useState(false)
@@ -99,27 +93,27 @@ export const ApproveTransactionScreenContainer: FC<
   const [isFeeTokenSelectionReady, setIsFeeTokenSelectionReady] =
     useState(false)
 
-  const {
-    data: transactionSimulation,
-    isValidating: isSimulationValidating,
-    error: transactionSimulationError,
-  } = useTransactionSimulation({
-    transactionAction,
-    feeTokenAddress: feeToken?.address,
-    actionHash,
-  })
-  const isSimulationLoading = isSimulationValidating && !transactionSimulation
-
-  const { fee: feeSequencer, error: feeEstimationError } = useMaxFeeEstimation(
-    actionHash,
-    selectedAccount,
-    transactionAction,
-    feeToken?.address,
-    transactionSimulation,
-    isSimulationLoading,
+  const transactionsArray: Call[] = useMemo(
+    () =>
+      transactionAction.type === "INVOKE_FUNCTION"
+        ? ensureArray(transactionAction.payload)
+        : [],
+    [transactionAction.payload, transactionAction.type],
   )
 
-  const { fee } = useAggregatedTxFeesData(transactionSimulation, feeSequencer)
+  const {
+    data: transactionReview,
+    error,
+    isValidating,
+  } = useTransactionReviewV2({
+    transaction: transactionAction,
+    actionHash,
+    feeTokenAddress: feeToken.address,
+    selectedAccount,
+    appDomain: action?.meta.origin,
+  })
+
+  const isSimulationLoading = !transactionReview && isValidating
 
   useFeeTokenSelection({
     isFeeTokenSelectionReady,
@@ -127,12 +121,10 @@ export const ApproveTransactionScreenContainer: FC<
     feeToken,
     setFeeToken,
     account: selectedAccount,
-    fee,
+    fee: transactionReview?.enrichedFeeEstimation,
     defaultFeeToken,
     feeTokens,
   })
-
-  const aggregatedData = useAggregatedSimData(transactionSimulation)
 
   const pendingMultisigTransactions =
     useMultisigPendingTransactionsByAccount(selectedAccount)
@@ -178,77 +170,11 @@ export const ApproveTransactionScreenContainer: FC<
     }
   }
 
-  const transactionsArray: Call[] = useMemo(
-    () =>
-      transactionAction.type === "INVOKE_FUNCTION"
-        ? ensureArray(transactionAction.payload)
-        : [],
-    [transactionAction.payload, transactionAction.type],
-  )
-
-  const { data: transactionReview } = useTransactionReviewV2({
-    calls: transactionsArray,
-    actionHash,
-    feeTokenAddress: feeToken.address,
-    selectedAccount,
-    appDomain: action?.meta.origin,
-  })
-
-  const usesLedgerSigner = useIsLedgerSigner(selectedAccount)
+  const usesLedgerSigner = useIsLedgerSigner(selectedAccount.id)
 
   useEffect(() => {
-    if (!actionHash || !transactionReview) {
-      return
-    }
-    void clientActionService.updateTransactionReview({
-      actionHash,
-      transactionReview,
-    })
-  }, [actionHash, transactionReview])
-
-  const txnHasTransfers = useMemo(
-    () =>
-      ensureArray(transactionSimulation).some((txn) => !isEmpty(txn.transfers)),
-    [transactionSimulation],
-  )
-
-  const txnHasApprovals = useMemo(
-    () =>
-      ensureArray(transactionSimulation).some((txn) => !isEmpty(txn.approvals)),
-    [transactionSimulation],
-  )
-
-  const isUdcAction = useMemo(
-    () =>
-      approveScreenType === ApproveScreenType.DECLARE ||
-      approveScreenType === ApproveScreenType.DEPLOY,
-    [approveScreenType],
-  )
-
-  const transactionActionsType: TransactionActionsType | undefined =
-    useMemo(() => {
-      if (!selectedAccount) {
-        return
-      }
-
-      return {
-        type: "INVOKE_FUNCTION",
-        payload: transactionsArray,
-      }
-    }, [selectedAccount, transactionsArray])
-
-  // Show balance change if there is a transaction simulation and there are approvals or transfers
-  const hasBalanceChange = Boolean(
-    transactionSimulation && (txnHasTransfers || txnHasApprovals),
-  )
-
-  const showTransactionActions = useMemo(
-    // Show actions if there is no balance change or if there is a balance change and the user has expanded the details
-    () =>
-      (!isUdcAction && !hasBalanceChange) ||
-      (showTxDetails && hasBalanceChange),
-    [hasBalanceChange, isUdcAction, showTxDetails],
-  )
+    void updateTransactionReview(transactionReview)
+  }, [transactionReview, updateTransactionReview])
 
   // Disable fee token selection if the transaction is a Cairo0 declare transaction
   const declareSupportTokenSelection = useMemo(
@@ -294,10 +220,8 @@ export const ApproveTransactionScreenContainer: FC<
       <ApproveTransactionScreen
         actionHash={actionHash}
         actionIsApproving={actionIsApproving}
-        aggregatedData={aggregatedData}
         disableConfirm={disableConfirm}
         isMainnet={isMainnet}
-        isSimulationLoading={isSimulationLoading}
         selectedAccount={selectedAccount}
         transactionReview={transactionReview}
         transactions={transactionsArray}
@@ -310,9 +234,6 @@ export const ApproveTransactionScreenContainer: FC<
         onSubmit={onSubmitAction}
         onConfirmAnyway={onConfirmAnyway}
         approveScreenType={approveScreenType}
-        hasBalanceChange={hasBalanceChange}
-        showTransactionActions={showTransactionActions}
-        transactionActionsType={transactionActionsType}
         showTxDetails={showTxDetails}
         setShowTxDetails={setShowTxDetails}
         multisigBannerProps={multisigBannerProps}
@@ -329,19 +250,17 @@ export const ApproveTransactionScreenContainer: FC<
             isTransaction
           >
             {showConfirmButton && (
-              <FeeEstimationContainerV2
-                fee={fee}
+              <FeeEstimationContainer
+                fee={transactionReview?.enrichedFeeEstimation}
                 feeToken={feeToken}
                 onErrorChange={setDisableConfirm}
                 onFeeErrorChange={onShowAddFunds}
-                accountAddress={selectedAccount.address}
-                networkId={selectedAccount.networkId}
-                transactionSimulationFeeError={transactionSimulationError}
+                accountId={selectedAccount.id}
                 transactionSimulationLoading={isSimulationLoading}
                 allowFeeTokenSelection={allowFeeTokenSelection}
                 onOpenFeeTokenPicker={() => setIsFeeTokenPickerOpen(true)}
                 needsDeploy={selectedAccount.needsDeploy}
-                error={feeEstimationError}
+                error={error}
                 isSendingMoreThanBalanceAndGas={
                   transactionReview?.isSendingMoreThanBalanceAndGas
                 }
@@ -355,7 +274,7 @@ export const ApproveTransactionScreenContainer: FC<
         isOpen={allowFeeTokenSelection && isFeeTokenPickerOpen}
         onClose={() => setIsFeeTokenPickerOpen(false)}
         tokens={feeTokens}
-        onFeeTokenSelect={setPreferredFeeToken}
+        onFeeTokenSelect={(token) => void setPreferredFeeToken(token)}
       />
     </>
   )

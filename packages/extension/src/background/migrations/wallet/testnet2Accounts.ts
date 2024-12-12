@@ -33,6 +33,7 @@ export async function migrateTestnet2Accounts(
     await store.set({
       selected: firstValidAccount
         ? {
+            id: firstValidAccount.id,
             address: firstValidAccount.address,
             networkId: firstValidAccount.networkId,
           }

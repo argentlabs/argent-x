@@ -1,8 +1,4 @@
-import {
-  getAccountIdentifier,
-  stripAddressZeroPadding,
-  type IHttpService,
-} from "@argent/x-shared"
+import { stripAddressZeroPadding, type IHttpService } from "@argent/x-shared"
 import {
   type Activity,
   type ActivityResponse,
@@ -42,8 +38,7 @@ export class ActivityCacheService implements IActivityCacheService {
     account: BaseWalletAccount,
   ): Promise<IActivityCacheItem | undefined> {
     const { cache } = await this.activityCacheStore.get()
-    const key = getAccountIdentifier(account)
-    return cache[key]
+    return cache[account.id]
   }
 
   async setActivityCacheItem({
@@ -54,11 +49,10 @@ export class ActivityCacheService implements IActivityCacheService {
     account: BaseWalletAccount
   }): Promise<void> {
     const { cache } = await this.activityCacheStore.get()
-    const key = getAccountIdentifier(account)
     await this.activityCacheStore.set({
       cache: {
         ...cache,
-        [key]: activityCacheItem,
+        [account.id]: activityCacheItem,
       },
     })
   }

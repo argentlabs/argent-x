@@ -1,7 +1,7 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import { SignatureRequestRejectedScreen } from "./SignatureRequestRejectedScreen"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 interface ExecuteFromOutsideScreenProps {
   onReject: () => void

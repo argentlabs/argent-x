@@ -1,18 +1,19 @@
 import {
   BarBackButton,
   FlowHeader,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 
-import { FC, useCallback, useState } from "react"
+import type { FC } from "react"
+import { useCallback, useState } from "react"
 
-import { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
+import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
 import { useRouteFlow } from "../../hooks/useRoute"
 import SmartAccountOTPForm from "./SmartAccountOTPForm"
 import { SmartAccountValidationErrorScreen } from "./SmartAccountValidationErrorScreen"
 
-const { EmailIcon } = iconsDeprecated
+const { MessageSecondaryIcon } = icons
 
 export interface SmartAccountBaseOTPScreenProps {
   onBack: () => void
@@ -49,7 +50,7 @@ export const SmartAccountBaseOTPScreen: FC<SmartAccountBaseOTPScreenProps> = ({
       leftButton={onBack ? <BarBackButton onClick={onBack} /> : null}
     >
       <FlowHeader
-        icon={EmailIcon}
+        icon={MessageSecondaryIcon}
         title={"Check your email"}
         subtitle={`We’ve sent a verification code to ${email}`}
       />

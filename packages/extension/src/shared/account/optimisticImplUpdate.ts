@@ -1,9 +1,6 @@
-import {
-  Address,
-  isEqualAddress,
-  getArgentAccountClassHashes,
-} from "@argent/x-shared"
-import { WalletAccount } from "../wallet.model"
+import type { Address } from "@argent/x-shared"
+import { isEqualAddress, getArgentAccountClassHashes } from "@argent/x-shared"
+import type { WalletAccount } from "../wallet.model"
 
 // Use this with caution, as it might not reflect the onchain state,
 // but just an optimistic update

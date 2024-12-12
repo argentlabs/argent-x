@@ -1,15 +1,16 @@
 import { isEmpty } from "lodash-es"
 import { useMemo } from "react"
 
-import { Transaction } from "../../../shared/transactions"
+import type { Transaction } from "../../../shared/transactions"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
 import { isSafeUpgradeTransaction } from "../../../shared/utils/isSafeUpgradeTransaction"
-import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { useView } from "../../views/implementation/react"
 import { accountTransactionsView } from "../../views/transactions"
 import { useMultisigPendingUpgradeTransactions } from "../multisig/multisigTransactions.state"
-import { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
-import { Account } from "./Account"
 
 type UseAccountTransactions = (account?: BaseWalletAccount) => {
   transactions: Transaction[]

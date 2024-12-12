@@ -1,5 +1,6 @@
 import { isObject } from "lodash-es"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import { TransactionType } from "starknet"
@@ -9,6 +10,12 @@ import { useActionScreen } from "./hooks/useActionScreen"
 import { ApproveTransactionScreenContainer } from "./transaction/ApproveTransactionScreen/ApproveTransactionScreenContainer"
 import { ApproveScreenType } from "./transaction/types"
 
+/**
+ * DeclareContractActionScreenContainer is a functional component that handles the UI and logic
+ * for declaring a smart contract. It uses the useActionScreen hook to get the current action
+ * and other necessary functions and state.
+ * It is only used when the action type is DECLARE_CONTRACT.
+ */
 export const DeclareContractActionScreenContainer: FC = () => {
   const {
     action,
@@ -54,9 +61,10 @@ export const DeclareContractActionScreenContainer: FC = () => {
           payload: action.payload,
         }}
         approveScreenType={ApproveScreenType.DECLARE}
-        onSubmit={onSubmit}
-        onReject={rejectAllActions}
+        onSubmit={() => void onSubmit()}
+        onReject={() => void rejectAllActions()}
         selectedAccount={selectedAccount}
+        showConfirmButton
       />
     </WithSmartAccountVerified>
   )

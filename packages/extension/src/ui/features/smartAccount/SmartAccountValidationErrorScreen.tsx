@@ -3,16 +3,17 @@ import {
   Button,
   CellStack,
   FlowHeader,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 
-import { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
+import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
 import SmartAccountError from "./ui/SmartAccountError"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
 
 export interface SmartAccountValidationErrorScreenProps {
   onBack?: () => void
@@ -34,7 +35,7 @@ export const SmartAccountValidationErrorScreen: FC<
     >
       <CellStack flex={1}>
         <FlowHeader
-          icon={AlertIcon}
+          icon={WarningCircleSecondaryIcon}
           title={"Oops, wrong email"}
           subtitle={<SmartAccountError error={error} />}
         />

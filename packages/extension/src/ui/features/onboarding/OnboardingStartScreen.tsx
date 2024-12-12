@@ -1,6 +1,6 @@
-import { P4, iconsDeprecated } from "@argent/x-ui"
+import { icons, P3 } from "@argent/x-ui"
 import { Circle, Flex, Link, SimpleGrid } from "@chakra-ui/react"
-import { FC, MouseEventHandler } from "react"
+import type { FC, MouseEventHandler } from "react"
 
 import { OnboardingRectButton } from "./ui/OnboardingRectButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
@@ -10,7 +10,7 @@ import {
 } from "../../../shared/api/constants"
 import { IS_DEV } from "../../../shared/utils/dev"
 
-const { WalletIcon, RestoreIcon } = iconsDeprecated
+const { WalletSecondaryIcon, ResetPrimaryIcon } = icons
 
 interface OnboardingStartScreenProps {
   /** Called when user clicks to create a new wallet */
@@ -41,7 +41,7 @@ export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
         rounded={"lg"}
         w={"full"}
       >
-        <P4>
+        <P3>
           By creating or restoring a wallet, you agree to Argent’s{" "}
           <Link
             href={ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL}
@@ -58,25 +58,25 @@ export const OnboardingStartScreen: FC<OnboardingStartScreenProps> = ({
           >
             Privacy Policy
           </Link>
-        </P4>
+        </P3>
       </Flex>
-      <SimpleGrid columns={2} gap={3} w={"full"} mt={8}>
+      <SimpleGrid columns={{ md: 2 }} gap={3} w={"full"} mt={8}>
         <OnboardingRectButton onClick={onCreate}>
           <Circle size={16} bg={"primary.500"}>
-            <WalletIcon fontSize={"2xl"} />
+            <WalletSecondaryIcon fontSize={"2xl"} />
           </Circle>
           Create a new wallet
         </OnboardingRectButton>
         <OnboardingRectButton onClick={onRestore}>
           <Circle size={16} bg={"neutrals.700"}>
-            <RestoreIcon fontSize={"2xl"} />
+            <ResetPrimaryIcon fontSize={"2xl"} />
           </Circle>
           Restore an existing wallet
         </OnboardingRectButton>
         {IS_DEV && (
           <OnboardingRectButton onClick={onRestorePreset}>
             <Circle size={16} bg={"neutrals.700"}>
-              <RestoreIcon fontSize={"2xl"} />
+              <ResetPrimaryIcon fontSize={"2xl"} />
             </Circle>
             Restore from preset seed
           </OnboardingRectButton>

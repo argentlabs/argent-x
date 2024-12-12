@@ -3,13 +3,14 @@ import type { Warning } from "@argent/x-shared/simulation"
 import {
   B3,
   Button,
-  H6,
-  L1,
-  P4,
-  iconsDeprecated,
-  scrollbarStyleThin,
+  H5,
+  icons,
+  L1Bold,
+  P3,
   riskToSemanticTokenMap,
+  scrollbarStyleThin,
 } from "@argent/x-ui"
+import type { ModalProps } from "@chakra-ui/react"
 import {
   Badge,
   Flex,
@@ -19,13 +20,12 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  ModalProps,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { riskToBadgeMap, riskToColorSchemeMap } from "./warningMap"
 
-const { AlertFillIcon } = iconsDeprecated
+const { WarningCirclePrimaryIcon } = icons
 
 export type WarningsByReason = Record<string, ITransactionReviewWarning>
 
@@ -69,10 +69,14 @@ export const WarningModal: FC<WarningModalProps> = ({
           title={title}
           gap={1}
         >
-          <AlertFillIcon color={semanticToken} width={10} height={10} />
-          <H6 fontWeight="bold" textAlign="center">
+          <WarningCirclePrimaryIcon
+            color={semanticToken}
+            width={10}
+            height={10}
+          />
+          <H5 fontWeight="bold" textAlign="center">
             {title}
-          </H6>
+          </H5>
         </ModalHeader>
         <ModalBody
           display="flex"
@@ -92,9 +96,9 @@ export const WarningModal: FC<WarningModalProps> = ({
               backgroundColor={semanticToken}
               mx={4}
             >
-              <L1 color="white.white" textAlign="center">
+              <L1Bold color="white.white" textAlign="center">
                 We strongly recommend you do not proceed with this transaction
-              </L1>
+              </L1Bold>
             </Flex>
           )}
           {warnings.map((warning, index) => (
@@ -115,7 +119,7 @@ export const WarningModal: FC<WarningModalProps> = ({
                 {riskToBadgeMap[warning.severity]}
               </Badge>
               <B3 my={1}>{warningsByReason[warning.reason].title}</B3>
-              <P4 my={1}>{warningsByReason[warning.reason].description}</P4>
+              <P3 my={1}>{warningsByReason[warning.reason].description}</P3>
             </Flex>
           ))}
         </ModalBody>

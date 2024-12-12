@@ -1,5 +1,5 @@
-import { z } from "zod"
-import { severitySchema } from "@argent/x-shared/simulation"
+import type { z } from "zod"
+import type { severitySchema } from "@argent/x-shared/simulation"
 
 export const riskToColorSchemeMap: Record<
   z.infer<typeof severitySchema>,

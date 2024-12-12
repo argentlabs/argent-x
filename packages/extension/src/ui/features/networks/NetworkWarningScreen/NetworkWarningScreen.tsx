@@ -1,8 +1,8 @@
-import { H3, P3, iconsDeprecated } from "@argent/x-ui"
+import { H2, icons, P2 } from "@argent/x-ui"
 import { Button, Center, Circle, Text } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-const { NetworkIcon } = iconsDeprecated
+const { NetworkSecondaryIcon } = icons
 
 type NetworkWarningScreenProps = {
   onClick?: () => void
@@ -19,7 +19,7 @@ export const NetworkWarningScreen: FC<NetworkWarningScreenProps> = ({
           position="relative"
         >
           <Text fontSize={"6xl"}>
-            <NetworkIcon />
+            <NetworkSecondaryIcon />
           </Text>
           <Circle
             position={"absolute"}
@@ -31,13 +31,13 @@ export const NetworkWarningScreen: FC<NetworkWarningScreenProps> = ({
             borderColor="neutrals.900"
           />
         </Circle>
-        <H3 pt={6} pb={3}>
+        <H2 pt={6} pb={3}>
           Network issues
-        </H3>
-        <P3 color="neutrals.100">
+        </H2>
+        <P2 color="neutrals.100">
           Starknet is in Alpha and is experiencing degraded network performance.
           Your transactions may fail.
-        </P3>
+        </P2>
       </Center>
       <Button
         mt={6}

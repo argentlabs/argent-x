@@ -1,8 +1,9 @@
 import { ButtonCell } from "@argent/x-ui"
-import { FC, useMemo } from "react"
+import type { FC } from "react"
+import { useMemo } from "react"
 import { useHasFeeTokenBalance } from "../../../../accountTokens/useFeeTokenBalance"
 import { clientAccountService } from "../../../../../services/account"
-import { WalletAccount } from "../../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../../shared/wallet.model"
 
 export const DeployAccountButtonContainer: FC<{ account: WalletAccount }> = ({
   account,
@@ -18,7 +19,7 @@ export const DeployAccountButtonContainer: FC<{ account: WalletAccount }> = ({
     return null
   }
 
-  return <DeployAccountButton onDeploy={onDeploy} />
+  return <DeployAccountButton onDeploy={() => void onDeploy()} />
 }
 
 interface DeployAccountButtonProps {

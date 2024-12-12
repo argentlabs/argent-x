@@ -1,6 +1,6 @@
 import { constants } from "starknet"
 
-import { Network } from "../network"
+import type { Network } from "../network"
 
 /**
  * NOTE: Sepolia - Currently Multisig only distinguishes between 'testnet' and 'mainnet'

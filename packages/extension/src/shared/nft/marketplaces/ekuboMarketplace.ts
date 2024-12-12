@@ -1,8 +1,9 @@
-import { Address, NftItem, isEqualAddress } from "@argent/x-shared"
+import type { Address, NftItem } from "@argent/x-shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { constants } from "starknet"
 import { z } from "zod"
 
-import { NftMarketplace } from "./types"
+import type { NftMarketplace } from "./types"
 
 export const ekuboNftContract: Address = `0x07b696af58c967c1b14c9dde0ace001720635a660a8e90c565ea459345318b30`
 export const ekuboPositionsContract: Address = `0x02e0af29598b407c8716b17f6d2795eca1b471413fa03fb145a5e33722184067`

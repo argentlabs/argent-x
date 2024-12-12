@@ -1,34 +1,45 @@
-import { getAccountIdentifier } from "@argent/x-shared"
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
-import {
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import type {
   ArgentAccountType,
+  ArgentWalletAccount,
+  BaseWalletAccount,
+  NetworkOnlyPlaceholderAccount,
   WalletAccount,
+  WalletAccountType,
 } from "../../../../shared/wallet.model"
+import { accountIdSchema } from "../../../../shared/wallet.model"
 import { getAccountClassHashFromChain } from "../../../../shared/account/details/getAccountClassHashFromChain"
 import { getAccountCairoVersionFromChain } from "../../../../shared/account/details/getAccountCairoVersionFromChain"
-import { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
+import type { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
 import { keyBy } from "lodash-es"
 import { onInstallAndUpgrade } from "../../worker/schedule/decorators"
 
-import { AllowArray } from "../../../../shared/storage/__new/interface"
+import type { AllowArray } from "../../../../shared/storage/__new/interface"
 import { pipe } from "../../worker/schedule/pipe"
 import { getOwnerForAccount } from "../../../../shared/account/details/getOwner"
-import {
-  GuardianChangedActivity,
-  IActivityService,
+import type {
   AccountActivityPayload,
-  SignerChangedActivity,
+  IActivityService,
+} from "../../activity/IActivityService"
+import {
   AccountDeployActivity,
+  GuardianChangedActivity,
+  SignerChangedActivity,
 } from "../../activity/IActivityService"
 import { getGuardianForAccount } from "../../../../shared/account/details/getGuardian"
+import { getAccountIdentifier } from "../../../../shared/utils/accountIdentifier"
+import type { IWalletStore } from "../../../../shared/wallet/walletStore"
+import { isEqualAddress } from "@argent/x-shared"
+import { filterArgentAccounts } from "../../../../shared/utils/isExternalAccount"
+import type { AnalyticsService } from "../../../../shared/analytics/AnalyticsService"
 
 export enum AccountUpdaterTaskId {
-  UPDATE_DEPLOYED = "accountUpdateDeployed",
   ACCOUNT_UPDATE_ON_STARTUP = "accountUpdateOnStartup",
   ACCOUNT_UPDATE_ON_INSTALL_AND_UPGRADE = "accountUpdateOnInstallAndUpgrade",
 }
 
 enum AccountUpdaterTask {
+  UPDATE_ACCOUNT_ID,
   UPDATE_DEPLOYED,
   UPDATE_ACCOUNT_CLASS_HASH,
   UPDATE_ACCOUNT_CAIRO_VERSION,
@@ -37,9 +48,11 @@ enum AccountUpdaterTask {
 
 export class AccountWorker {
   constructor(
+    private readonly walletStore: IWalletStore,
     private readonly accountService: IAccountService,
     private readonly activityService: IActivityService,
     private readonly scheduleService: IScheduleService<AccountUpdaterTaskId>,
+    private readonly ampli: AnalyticsService,
   ) {
     this.activityService.emitter.on(
       SignerChangedActivity,
@@ -55,15 +68,47 @@ export class AccountWorker {
     )
   }
 
+  async updateAccountUserProperties() {
+    const accounts = await this.accountService.get()
+
+    // count the number of accounts by type
+    const counts = accounts.reduce<{
+      [Key in WalletAccountType | "ledger" | "testnet"]?: number
+    }>(
+      (acc, account) => {
+        if (account.networkId === "sepolia-alpha") {
+          acc.testnet = (acc.testnet || 0) + 1
+        } else if (account.networkId === "mainnet-alpha") {
+          acc[account.type] = (acc[account.type] || 0) + 1
+          if (account.signer.type === "ledger") {
+            acc.ledger = (acc.ledger || 0) + 1
+          }
+        }
+        return acc
+      },
+      { standard: 0, smart: 0, multisig: 0, ledger: 0, testnet: 0 },
+    )
+
+    void this.ampli.identify(undefined, {
+      "ArgentX Standard Accounts Count": counts.standard,
+      "ArgentX Smart Accounts Count": counts.smart,
+      "ArgentX Ledger Accounts Count": counts.ledger,
+      "ArgentX Multisig Accounts Count": counts.multisig,
+      "ArgentX Testnet Accounts Count": counts.testnet,
+    })
+  }
+
   runUpdaterForAllTasks = pipe(
     onInstallAndUpgrade(this.scheduleService), // This will run the function on install and upgrade
   )(async (): Promise<void> => {
     await this.runUpdaterTask([
+      AccountUpdaterTask.UPDATE_ACCOUNT_ID,
       AccountUpdaterTask.UPDATE_DEPLOYED,
       AccountUpdaterTask.UPDATE_ACCOUNT_CLASS_HASH,
       AccountUpdaterTask.UPDATE_ACCOUNT_CAIRO_VERSION,
       AccountUpdaterTask.UPDATE_ACCOUNT_GUARDIAN,
     ])
+    await this.updateAccountUserProperties()
   })
 
   /** @internal just exposed for testing */
@@ -71,6 +116,9 @@ export class AccountWorker {
     const updaterTasks = Array.isArray(tasks) ? tasks : [tasks]
     for (const task of updaterTasks) {
       switch (task) {
+        case AccountUpdaterTask.UPDATE_ACCOUNT_ID:
+          await this.updateAccountId()
+          break
         case AccountUpdaterTask.UPDATE_DEPLOYED:
           await this.updateDeployed()
           break
@@ -116,20 +164,15 @@ export class AccountWorker {
 
   /** @internal just exposed for testing */
   async updateAccountClassHash(): Promise<void> {
-    const accounts = await this.accountService.get()
-
+    const accounts = await this.accountService.getArgentWalletAccounts()
     const accountsWithClassHash = await getAccountClassHashFromChain(accounts)
 
     // Create a map to store accountWithClassHash with key as unique account id.
-    const accountsWithClassHashMap = keyBy(
-      accountsWithClassHash,
-      getAccountIdentifier,
-    )
+    const accountsWithClassHashMap = keyBy(accountsWithClassHash, "id")
 
     const updated = accounts.map((account) => {
-      const id = getAccountIdentifier(account)
-      return accountsWithClassHashMap[id]
-        ? { ...account, ...accountsWithClassHashMap[id] }
+      return accountsWithClassHashMap[account.id]
+        ? { ...account, ...accountsWithClassHashMap[account.id] }
         : account
     })
 
@@ -138,21 +181,17 @@ export class AccountWorker {
 
   /** @internal just exposed for testing */
   async updateAccountCairoVersion(): Promise<void> {
-    const accounts = await this.accountService.get()
+    const accounts = await this.accountService.getArgentWalletAccounts()
 
     const accountsWithCairoVersion =
       await getAccountCairoVersionFromChain(accounts)
 
     // Create a map to store accountWithCairoVersion with key as unique account id.
-    const accountsWithCairoVersionMap = keyBy(
-      accountsWithCairoVersion,
-      getAccountIdentifier,
-    )
+    const accountsWithCairoVersionMap = keyBy(accountsWithCairoVersion, "id")
 
     const updated = accounts.map((account) => {
-      const id = getAccountIdentifier(account)
-      return accountsWithCairoVersionMap[id]
-        ? { ...account, ...accountsWithCairoVersionMap[id] }
+      return accountsWithCairoVersionMap[account.id]
+        ? { ...account, ...accountsWithCairoVersionMap[account.id] }
         : account
     })
 
@@ -160,8 +199,7 @@ export class AccountWorker {
   }
 
   async updateAccountGuardian() {
-    const accounts = await this.accountService.get()
-
+    const accounts = await this.accountService.getArgentWalletAccounts()
     await this.updateGuardianForAccounts(accounts)
   }
 
@@ -187,22 +225,108 @@ export class AccountWorker {
   async onGuardianChanged(payload: AccountActivityPayload) {
     const accounts =
       await this.accountService.getFromBaseWalletAccounts(payload)
-    await this.updateGuardianForAccounts(accounts)
+    await this.updateGuardianForAccounts(filterArgentAccounts(accounts))
   }
 
-  private async updateGuardianForAccounts(accounts: WalletAccount[]) {
+  async updateAccountId() {
+    const accounts = await this.accountService.get()
+
+    const accountsWithoutId = accounts.filter(
+      (account) => !accountIdSchema.safeParse(account.id).success, // This is future-proof as we can change the id format in the future
+    )
+
+    if (accountsWithoutId.length === 0) {
+      await this.updateSelectedAccount()
+      return
+    }
+
+    const updatedAccountsWithoutId = accountsWithoutId.map((acc) => ({
+      ...acc,
+      id: getAccountIdentifier(acc.address, acc.networkId, acc.signer),
+    }))
+
+    await this.accountService.remove(
+      (acc) => !accountIdSchema.safeParse(acc.id).success, // Need to use selector function instead of values to override the default compare function
+    )
+
+    await this.accountService.upsert(updatedAccountsWithoutId)
+    await this.updateSelectedAccount()
+  }
+
+  private async getAccountWithId(
+    account: BaseWalletAccount | NetworkOnlyPlaceholderAccount | null,
+  ) {
+    if (!account || account.id) {
+      return account
+    }
+
+    const accountsOnNetwork = await this.accountService.get(
+      (acc) => acc.networkId === account.networkId,
+    )
+
+    const fullSelectedAccount = accountsOnNetwork.find(
+      (acc) => account.address && isEqualAddress(acc.address, account.address),
+    )
+
+    const { id, address, networkId } =
+      fullSelectedAccount ?? accountsOnNetwork[0]
+
+    return {
+      id,
+      address,
+      networkId,
+    }
+  }
+
+  async updateSelectedAccount() {
+    const { selected, lastUsedAccountByNetwork } = await this.walletStore.get()
+
+    let updatedSelected
+    if (selected && !selected.id) {
+      updatedSelected = await this.getAccountWithId(selected)
+    }
+
+    const updatedLastUsedAccountByNetwork: Record<string, BaseWalletAccount> =
+      {}
+
+    for (const networkId in lastUsedAccountByNetwork) {
+      const account = lastUsedAccountByNetwork[networkId]
+      const accountWithId = await this.getAccountWithId(account)
+
+      if (accountWithId) {
+        updatedLastUsedAccountByNetwork[networkId] = accountWithId
+      }
+    }
+
+    await this.walletStore.set({
+      ...(updatedSelected && { selected: updatedSelected }),
+      lastUsedAccountByNetwork: {
+        ...lastUsedAccountByNetwork,
+        ...updatedLastUsedAccountByNetwork,
+      },
+    })
+  }
+
+  private async updateGuardianForAccounts(accounts: ArgentWalletAccount[]) {
     const results = await Promise.allSettled(
       accounts
         .filter((account) => !account.needsDeploy)
-        .map((account) => {
-          return getGuardianForAccount(account)
-        }),
+        .map(async (account) => ({
+          address: account.address,
+          guardian: await getGuardianForAccount(account),
+        })),
     )
 
-    const updated = accounts.map((account, index) => {
-      const result = results[index]
-      const onChainGuardian =
-        result?.status === "fulfilled" ? result?.value : undefined
+    const updated = accounts.map((account) => {
+      const result = results
+        .filter((r) => r.status === "fulfilled")
+        .find((r) => isEqualAddress(r.value.address, account.address))
+
+      if (!result) {
+        return { ...account }
+      }
+
+      const onChainGuardian = result.value.guardian
       const guardian =
         account.needsDeploy && account.guardian
           ? account.guardian
@@ -222,6 +346,7 @@ export class AccountWorker {
         ...(updatedType ? { type: updatedType } : {}),
       }
     })
+
     await this.accountService.upsert(updated)
   }
 }

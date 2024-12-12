@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { FetcherError } from "../src/shared/api/fetcher"
+import type { FetcherError } from "../src/shared/api/fetcher"
 import {
   UNKNOWN_ERROR_MESSAGE,
   coerceErrorToString,

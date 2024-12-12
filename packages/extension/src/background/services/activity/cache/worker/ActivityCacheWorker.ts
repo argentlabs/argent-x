@@ -1,7 +1,6 @@
 import { isEqualAddress } from "@argent/x-shared"
+import type { AnyActivity, NativeActivity } from "@argent/x-shared/simulation"
 import {
-  AnyActivity,
-  NativeActivity,
   NativeActivityTypeNative,
   createNativeActivity,
 } from "@argent/x-shared/simulation"
@@ -33,13 +32,15 @@ import {
   DAPP_TRANSACTION_TITLE,
   getNativeActivityStatusForTransaction,
 } from "../../../../../shared/transactions/utils"
-import { BaseWalletAccount } from "../../../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../../../shared/wallet.model"
 import {
   TransactionCreatedForAction,
   type IBackgroundActionService,
 } from "../../../action/IBackgroundActionService"
 import { Activities, type IActivityService } from "../../IActivityService"
 import { buildBasicActivitySummary } from "../../../../../shared/activity/utils/transform/activity/buildActivitySummary"
+import type { IKnownDappService } from "../../../../../shared/knownDapps/IKnownDappService"
+import { knownDappToTargetDappSchema } from "../../schema"
 
 export class ActivityCacheWorker {
   constructor(
@@ -51,6 +52,7 @@ export class ActivityCacheWorker {
     private readonly multisigEmitter: Emittery<MultisigEmitterEvents>,
     private readonly multisigPendingTransactionsStore: ArrayStorage<MultisigPendingTransaction>,
     private readonly addressService: IAddressService,
+    private readonly knownDappsService: IKnownDappService,
   ) {
     /** (...args) rather than bind() pattern so we can use spyOn() in tests */
 
@@ -82,6 +84,18 @@ export class ActivityCacheWorker {
       return
     }
     await this.activityCacheService.upsertActivities({ account, activities })
+  }
+
+  async getDappInfoForOrigin(origin: string) {
+    const knownDapp = await this.knownDappsService.getDappByHost(origin)
+
+    if (!knownDapp) {
+      return null
+    }
+
+    const transformedDapp = knownDappToTargetDappSchema.parse(knownDapp)
+
+    return transformedDapp
   }
 
   async transactionCreatedForAction({
@@ -159,10 +173,19 @@ export class ActivityCacheWorker {
         )
         nativeActivity.transferSummary = activitySummary
       }
-      const { address, networkId } = transaction.account
+
+      if (action?.meta?.origin) {
+        const dapp = await this.getDappInfoForOrigin(action.meta.origin)
+        if (dapp) {
+          nativeActivity.dapp = dapp
+        }
+      }
+
+      const { address, networkId, id } = transaction.account
       const account: BaseWalletAccount = {
         address,
         networkId,
+        id,
       }
       await this.activityCacheService.upsertActivities({
         account,
@@ -210,6 +233,7 @@ export class ActivityCacheWorker {
           const subtitle = await getTransactionSubtitle({
             transactionTransformed,
             networkId: transaction.account.networkId,
+            accountId: transaction.account.id,
             getAddressName,
           })
           if (transactionTransformed.displayName) {
@@ -241,10 +265,11 @@ export class ActivityCacheWorker {
         )
         nativeActivity.transferSummary = activitySummary
       }
-      const { address, networkId } = transaction.account
+      const { address, networkId, id } = transaction.account
       const account: BaseWalletAccount = {
         address,
         networkId,
+        id,
       }
       await this.activityCacheService.upsertActivities({
         account,
@@ -278,10 +303,11 @@ export class ActivityCacheWorker {
           status: newStatus,
           lastModified: Date.now(),
         }
-        const { address, networkId } = changedStatusTransaction.account
+        const { address, networkId, id } = changedStatusTransaction.account
         const account: BaseWalletAccount = {
           address,
           networkId,
+          id,
         }
         await this.activityCacheService.upsertActivities({
           account,

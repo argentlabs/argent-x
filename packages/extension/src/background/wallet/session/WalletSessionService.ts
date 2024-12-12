@@ -1,21 +1,18 @@
-import Emittery from "emittery"
-import {
-  ProgressCallback,
-  Wallet,
-  decryptKeystoreJson,
-  encryptKeystoreJson,
-} from "ethers"
+import type Emittery from "emittery"
+import type { ProgressCallback } from "ethers"
+import { Wallet, decryptKeystoreJson, encryptKeystoreJson } from "ethers"
 import { noop, throttle } from "lodash-es"
 
 import { SessionError } from "../../../shared/errors/session"
-import { IObjectStore } from "../../../shared/storage/__new/interface"
-import {
+import type { IObjectStore } from "../../../shared/storage/__new/interface"
+import type {
   WalletBackupService,
   WalletStorageProps,
 } from "../backup/WalletBackupService"
-import { WalletRecoverySharedService } from "../recovery/WalletRecoverySharedService"
+import type { WalletRecoverySharedService } from "../recovery/WalletRecoverySharedService"
 import { walletToKeystore } from "../utils"
-import { Events, Locked } from "./interface"
+import type { Events } from "./interface"
+import { Locked } from "./interface"
 
 export interface WalletSession {
   secret: string

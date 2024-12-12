@@ -1,6 +1,8 @@
 import { useMemo } from "react"
 
-import {
+import { atom } from "jotai"
+import { atomFamily } from "jotai/utils"
+import type {
   BasePendingMultisig,
   PendingMultisig,
 } from "../../../shared/multisig/types"
@@ -9,27 +11,27 @@ import {
   withoutHiddenPendingMultisig,
 } from "../../../shared/multisig/utils/selectors"
 import {
-  BaseMultisigWalletAccount,
-  BaseWalletAccount,
-  isNetworkOnlyPlaceholderAccount,
-  MultisigWalletAccount,
-} from "../../../shared/wallet.model"
-import {
   accountsEqual,
   atomFamilyAccountsEqual,
+  atomFamilyIsEqualAccountIds,
+  isEqualAccountIds,
 } from "../../../shared/utils/accountsEqual"
+import type {
+  AccountId,
+  BaseMultisigWalletAccount,
+  BaseWalletAccount,
+  MultisigWalletAccount,
+} from "../../../shared/wallet.model"
+import { isNetworkOnlyPlaceholderAccount } from "../../../shared/wallet.model"
 import { allAccountsView, selectedBaseAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { Multisig } from "./Multisig"
 import {
   multisigBaseWalletView,
   pendingMultisigsView,
 } from "../../views/multisig"
-import { getAccountIdentifier } from "@argent/x-shared"
-import { atomFamily } from "jotai/utils"
-import { atom } from "jotai"
-import { num } from "starknet"
+import { Multisig } from "./Multisig"
+import { isEqualAddress } from "@argent/x-shared"
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
 export const mapMultisigWalletAccountsToMultisig = (
   walletAccounts: MultisigWalletAccount[],
@@ -37,6 +39,7 @@ export const mapMultisigWalletAccountsToMultisig = (
   return walletAccounts.map(
     (walletAccount) =>
       new Multisig({
+        id: walletAccount.id,
         name: walletAccount.name,
         address: walletAccount.address,
         network: walletAccount.network,
@@ -82,17 +85,17 @@ export function useMultisigAccounts() {
   }, [accounts, baseMultisigAccounts])
 }
 
-export function useMultisigWalletAccount(base?: BaseWalletAccount) {
+export function useMultisigWalletAccount(id?: AccountId) {
   const multisigAccounts = useMultisigAccounts()
 
   return useMemo(() => {
-    if (!base) {
+    if (!id) {
       return
     }
     return multisigAccounts.find((multisigAccount) =>
-      accountsEqual(multisigAccount, base),
+      isEqualAccountIds(multisigAccount.id, id),
     )
-  }, [base, multisigAccounts])
+  }, [id, multisigAccounts])
 }
 
 export const selectedMultisigView = atom(async (get) => {
@@ -129,16 +132,58 @@ export const multisigView = atomFamily(
   atomFamilyAccountsEqual,
 )
 
+export const multisigByIdView = atomFamily(
+  (accountId?: AccountId) =>
+    atom(async (get) => {
+      const accounts = await get(allAccountsView)
+      const baseMultisigAccounts = await get(multisigBaseWalletView)
+
+      const baseMultisigAccount = baseMultisigAccounts.find((multisigAccount) =>
+        isEqualAccountIds(multisigAccount.id, accountId),
+      )
+
+      const walletAccount = accounts.find((walletAccount) =>
+        isEqualAccountIds(walletAccount.id, accountId),
+      )
+
+      if (!walletAccount || !baseMultisigAccount) {
+        return
+      }
+
+      return new Multisig({
+        ...walletAccount,
+        ...baseMultisigAccount,
+      })
+    }),
+  atomFamilyIsEqualAccountIds,
+)
+
+export const baseMultisigView = atomFamily(
+  (account?: BaseWalletAccount) =>
+    atom(async (get) => {
+      const baseMultisigAccounts = await get(multisigBaseWalletView)
+
+      const baseMultisigAccount = baseMultisigAccounts.find((multisigAccount) =>
+        accountsEqual(multisigAccount, account),
+      )
+
+      return baseMultisigAccount
+    }),
+  atomFamilyAccountsEqual,
+)
+
 export const isSignerInMultisigView = atomFamily(
   (account?: BaseWalletAccount) =>
     atom(async (get) => {
-      const multisig = await get(multisigView(account))
+      const multisig = await get(baseMultisigView(account))
       if (!multisig) {
-        return null
+        return false
       }
-      return multisig.signers.some(
-        (signer) => num.toBigInt(signer) === num.toBigInt(multisig.publicKey),
+      const isSigner = multisig.signers.some((signer) =>
+        isEqualAddress(signer, multisig.publicKey),
       )
+      const hasPendingSignerChange = !!multisig.pendingSigner
+      return isSigner || hasPendingSignerChange
     }),
   atomFamilyAccountsEqual,
 )

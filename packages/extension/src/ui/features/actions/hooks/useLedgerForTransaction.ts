@@ -1,7 +1,7 @@
 import { useDisclosure } from "@chakra-ui/react"
 import { useActionScreen } from "./useActionScreen"
 import { useLedgerModalCloseOnError } from "./useLedgerCloseOnError"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { useIsLedgerSigner } from "../../ledger/hooks/useIsLedgerSigner"
 import { useLedgerDeviceConnection } from "../../ledger/hooks/useLedgerDeviceConnection"
 import { useEffect } from "react"
@@ -9,7 +9,7 @@ import { isLedgerError } from "./usePrettyError"
 
 export function useLedgerForTransaction(selectedAccount?: BaseWalletAccount) {
   const { action } = useActionScreen()
-  const isLedgerSigner = useIsLedgerSigner(selectedAccount)
+  const isLedgerSigner = useIsLedgerSigner(selectedAccount?.id)
   const isLedgerConnected = useLedgerDeviceConnection()
   const ledgerErrorMessage =
     action && isLedgerError(action.meta.errorApproving)

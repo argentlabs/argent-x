@@ -1,7 +1,7 @@
 import { isRejectOnChainCall } from "../../../../../call/rejectOnChainCall"
-import { RejectOnChainTransaction } from "../../type"
+import type { RejectOnChainTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 export default function ({
   transaction,

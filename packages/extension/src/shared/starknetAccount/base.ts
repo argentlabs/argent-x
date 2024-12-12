@@ -1,16 +1,18 @@
-import {
-  Account,
+import type {
   ArraySignatureType,
-  CairoCustomEnum,
   CairoVersion,
   Call,
-  CallData,
   DeclareContractPayload,
   DeployAccountContractPayload,
   ProviderInterface,
   Signature,
-  TransactionType,
   UniversalDetails,
+} from "starknet"
+import {
+  Account,
+  CairoCustomEnum,
+  CallData,
+  TransactionType,
   constants,
   extractContractHashes,
   hash,
@@ -18,13 +20,14 @@ import {
   stark,
   transaction,
 } from "starknet"
-import {
+import type {
   DeclareSignerBuilderPayload,
   DeployAccountSignerBuilderPayload,
   InvocationsSignerBuilderPayload,
 } from "./types"
-import { Address, EDAMode } from "@starknet-io/types-js"
-import { BaseSignerInterface } from "../signer/BaseSignerInterface"
+import type { Address } from "@starknet-io/types-js"
+import { EDAMode } from "@starknet-io/types-js"
+import type { BaseSignerInterface } from "../signer/BaseSignerInterface"
 import {
   isEqualAddress,
   getArgentAccountWithMultiSignerClassHashes,
@@ -121,11 +124,60 @@ export class BaseStarknetAccount extends Account {
     }
   }
 
+  public async buildAccountDeployTransactionPayload(
+    contractPayload: DeployAccountContractPayload,
+    details: UniversalDetails,
+  ) {
+    const version = this.getTxVersion(details)
+
+    const payload = await this.buildAccountDeploySignerDetailsPayload(
+      contractPayload,
+      details,
+    )
+
+    const nonceDataAvailabilityMode = payload.nonceDataAvailabilityMode
+      ? stark.intDAM(payload.nonceDataAvailabilityMode)
+      : EDAMode.L1
+
+    const feeDataAvailabilityMode = payload.feeDataAvailabilityMode
+      ? stark.intDAM(payload.feeDataAvailabilityMode)
+      : EDAMode.L1
+
+    const estimate = await this.getUniversalSuggestedFee(
+      version,
+      { type: TransactionType.DEPLOY_ACCOUNT, payload },
+      details,
+    )
+
+    return {
+      ...payload,
+      ...estimate,
+      nonceDataAvailabilityMode,
+      feeDataAvailabilityMode,
+      salt: payload.addressSalt,
+      compiledConstructorCalldata: CallData.compile(
+        payload.constructorCalldata,
+      ),
+      version: version as any, // TS, cast because version is issue in snjs
+    }
+  }
+
+  public async getAccountDeployTransactionHash(
+    payload: DeployAccountContractPayload,
+    details: UniversalDetails = {},
+  ) {
+    const transactionPayload = await this.buildAccountDeployTransactionPayload(
+      payload,
+      details,
+    )
+    return hash.calculateDeployAccountTransactionHash(transactionPayload)
+  }
+
   public async buildInvokeTransactionPayload(
     calls: Call | Call[],
     details: UniversalDetails = {},
   ) {
-    const version = txVersionSchema.parse(details.version)
+    const version = this.getTxVersion(details)
 
     const { cairoVersion, walletAddress, ...payload } =
       await this.buildInvocationSignerDetailsPayload(details)
@@ -192,5 +244,11 @@ export class BaseStarknetAccount extends Account {
     const signatureLength = args.length.toString()
     const compiledSigs = CallData.compile(args)
     return [signatureLength, ...compiledSigs]
+  }
+
+  protected getTxVersion({
+    version,
+  }: Pick<UniversalDetails, "version">): constants.TRANSACTION_VERSION {
+    return txVersionSchema.parse(version) as constants.TRANSACTION_VERSION
   }
 }

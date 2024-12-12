@@ -1,5 +1,8 @@
-import { IRepository } from "../storage/__new/interface"
-import { BaseMultisigWalletAccount, WalletAccountSigner } from "../wallet.model"
+import type { IRepository } from "../storage/__new/interface"
+import type {
+  BaseMultisigWalletAccount,
+  WalletAccountSigner,
+} from "../wallet.model"
 
 export const enum MultisigEntryPointType {
   // read

@@ -1,5 +1,6 @@
-import { TextWithAmount, getTokenIconUrl } from "@argent/x-ui"
-import { FC, useMemo } from "react"
+import { getTokenIconUrl, TextWithAmount } from "@argent/x-ui"
+import type { FC } from "react"
+import { useMemo } from "react"
 
 import { isUndefined } from "lodash-es"
 import {
@@ -16,7 +17,7 @@ import {
 import { FeeEstimationText } from "./ui/FeeEstimationText"
 import { TransactionFailureAccordion } from "./ui/TransactionFailureAccordion"
 import { getTooltipText } from "./utils"
-import { FeeEstimationProps } from "./feeEstimation.model"
+import type { FeeEstimationProps } from "./feeEstimation.model"
 
 export const FeeEstimation: FC<FeeEstimationProps> = ({
   amountCurrencyValue,

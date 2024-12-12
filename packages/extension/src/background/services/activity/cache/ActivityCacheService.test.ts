@@ -13,19 +13,38 @@ import type {
   IActivityCacheItem,
   IActivityCacheStorage,
 } from "../../../../shared/activity/cache/IActivityCacheStorage"
-import type { BaseWalletAccount } from "../../../../shared/wallet.model"
+import {
+  SignerType,
+  type BaseWalletAccount,
+} from "../../../../shared/wallet.model"
 import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
 import { sortActivities } from "./mergeAndSortActivities"
+import { getAccountIdentifier } from "../../../../shared/utils/accountIdentifier"
 
 const networkId = "sepolia-alpha"
+const address1 =
+  "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25"
+
+const address2 =
+  "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a26"
+
+const mockSigner = {
+  type: SignerType.LOCAL_SECRET,
+  derivationPath: "m/44'/60'/0'/0/0",
+}
+
+const id1 = getAccountIdentifier(address1, networkId, mockSigner)
+const id2 = getAccountIdentifier(address2, networkId, mockSigner)
 
 const account: BaseWalletAccount = {
-  address: "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a25",
+  id: id1,
+  address: address1,
   networkId,
 }
 
 const otherAccount: BaseWalletAccount = {
-  address: "0x05f1f0a38429dcab9ffd8a786c0d827e84c1cbd8f60243e6d25d066a13af4a26",
+  id: id2,
+  address: address2,
   networkId,
 }
 

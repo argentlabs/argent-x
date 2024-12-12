@@ -1,12 +1,13 @@
 import {
   BarCloseButton,
   FlowHeader,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
   useToast,
 } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
-import { FC, useCallback, useEffect, useMemo, useRef } from "react"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import { ESCAPE_TYPE_GUARDIAN } from "../../../../shared/account/details/escape.model"
@@ -26,13 +27,15 @@ import {
 } from "./useAccountEscape"
 import { accountMessagingService } from "../../../services/accountMessaging"
 
-const { SmartAccountActiveIcon } = iconsDeprecated
+const { ShieldSecondaryIcon } = icons
 
 export const EscapeWarningScreen: FC = () => {
   const navigate = useNavigate()
   const account = useRouteWalletAccount()
   const onClose = useCallback(async () => {
-    account && (await hideEscapeWarning(account))
+    if (account) {
+      await hideEscapeWarning(account)
+    }
     navigate(routes.accountTokens())
   }, [account, navigate])
   const toast = useToast()
@@ -62,7 +65,9 @@ export const EscapeWarningScreen: FC = () => {
     try {
       await accountMessagingService.cancelEscape(account)
     } catch (error) {
-      IS_DEV && console.warn(coerceErrorToString(error))
+      if (IS_DEV) {
+        console.warn(coerceErrorToString(error))
+      }
       toast({
         title: "Unable to cancel escape",
         status: "error",
@@ -81,7 +86,9 @@ export const EscapeWarningScreen: FC = () => {
     try {
       await accountMessagingService.triggerEscapeGuardian(account)
     } catch (error) {
-      IS_DEV && console.warn(coerceErrorToString(error))
+      if (IS_DEV) {
+        console.warn(coerceErrorToString(error))
+      }
       toast({
         title: "Unable to trigger escape guardian",
         status: "error",
@@ -100,14 +107,16 @@ export const EscapeWarningScreen: FC = () => {
     try {
       await accountMessagingService.escapeAndChangeGuardian(account)
     } catch (error) {
-      IS_DEV && console.warn(coerceErrorToString(error))
+      if (IS_DEV) {
+        console.warn(coerceErrorToString(error))
+      }
       toast({
         title: "Unable to escape and change guardian",
         status: "error",
         duration: 3000,
       })
     }
-  }, [account, accountGuardianIsSelf, toast])
+  }, [account, toast])
 
   const onContinue = useCallback(() => {
     void onClose()
@@ -122,7 +131,7 @@ export const EscapeWarningScreen: FC = () => {
             subtitle={"This account has a pending escape transaction"}
             isLoading
             size={"lg"}
-            icon={SmartAccountActiveIcon}
+            icon={ShieldSecondaryIcon}
           />
         </Center>
       )
@@ -135,7 +144,7 @@ export const EscapeWarningScreen: FC = () => {
             subtitle={"This account has a pending change guardian transaction"}
             isLoading
             size={"lg"}
-            icon={SmartAccountActiveIcon}
+            icon={ShieldSecondaryIcon}
           />
         </Center>
       )
@@ -144,7 +153,7 @@ export const EscapeWarningScreen: FC = () => {
       return (
         <EscapeGuardianReady
           accountGuardianIsSelf={accountGuardianIsSelf}
-          onRemove={onEscapeAndChangeGuardian}
+          onRemove={() => void onEscapeAndChangeGuardian()}
         />
       )
     }
@@ -153,7 +162,7 @@ export const EscapeWarningScreen: FC = () => {
         return (
           <EscapeGuardian
             liveAccountEscape={liveAccountEscape}
-            onKeep={onCancelEscape}
+            onKeep={() => void onCancelEscape()}
             onContinue={onContinue}
           />
         )
@@ -161,8 +170,8 @@ export const EscapeWarningScreen: FC = () => {
         return (
           <EscapeSigner
             liveAccountEscape={liveAccountEscape}
-            onCancel={onCancelEscape}
-            onRemove={onTriggerEscapeGuardian}
+            onCancel={() => void onCancelEscape()}
+            onRemove={() => void onTriggerEscapeGuardian()}
           />
         )
       }
@@ -186,7 +195,7 @@ export const EscapeWarningScreen: FC = () => {
 
   return (
     <NavigationContainer
-      rightButton={<BarCloseButton onClick={onClose} />}
+      rightButton={<BarCloseButton onClick={() => void onClose()} />}
       isAbsolute
     >
       {content}

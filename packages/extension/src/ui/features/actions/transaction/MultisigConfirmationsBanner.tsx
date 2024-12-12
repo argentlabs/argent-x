@@ -1,12 +1,12 @@
-import { P4, SplitProgress, iconsDeprecated } from "@argent/x-ui"
+import { icons, P3, SplitProgress } from "@argent/x-ui"
 import { Box, Flex, Progress } from "@chakra-ui/react"
 
 import { useMemo } from "react"
-import { WalletAccount } from "../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../shared/wallet.model"
 import { useView } from "../../../views/implementation/react"
 import { multisigView } from "../../multisig/multisig.state"
 
-const { MultisigIcon, ChevronRightIcon } = iconsDeprecated
+const { MultisigSecondaryIcon, ChevronRightSecondaryIcon } = icons
 
 export interface MultisigConfirmationsBannerProps {
   confirmations?: number
@@ -42,21 +42,21 @@ export const MultisigConfirmationsBanner = ({
     >
       <Flex justifyContent="space-between">
         <Flex alignItems="center">
-          <MultisigIcon color="white" mr={1} />
-          <P4 color="white" fontWeight="bold">
+          <MultisigSecondaryIcon color="white" mr={1} />
+          <P3 color="white" fontWeight="bold">
             Confirmations: {confirmations}
-          </P4>
+          </P3>
         </Flex>
         <Flex alignItems="center">
           {multisig?.threshold && (
-            <P4 color="neutrals.400">
+            <P3 color="neutrals.400">
               {hasEnoughConfirmations
                 ? "Confirmed"
                 : `${multisig.threshold - confirmations}  more required`}
-            </P4>
+            </P3>
           )}
           {onClick ? (
-            <ChevronRightIcon color="neutrals.400" ml={1} />
+            <ChevronRightSecondaryIcon color="neutrals.400" ml={1} />
           ) : (
             <Box ml={0.5} />
           )}

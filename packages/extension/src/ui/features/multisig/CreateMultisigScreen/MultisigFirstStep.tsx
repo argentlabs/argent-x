@@ -1,9 +1,9 @@
-import { P3 } from "@argent/x-ui"
+import { P2 } from "@argent/x-ui"
 import { Box, Divider, Input, Spinner } from "@chakra-ui/react"
 import { useFormContext } from "react-hook-form"
 
 import { AddOwnersForm } from "../AddOwnerForm"
-import { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
+import type { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { ScreenLayout } from "./ScreenLayout"
 import { ActionButton } from "../../../components/FullScreenPage"
 
@@ -38,13 +38,13 @@ export const MultisigFirstStep = ({
       length={totalSteps}
       filledIndicator={filledIndicator}
     >
-      <P3 color="primary.400">
+      <P2 color="primary.400">
         For security reasons each owner should have their own Argent X wallet.
         Never add 2 signer pubkeys from the same Argent X wallet.
-      </P3>
+      </P2>
       <Divider color="neutrals.700" my="4" />
       <Box my="2" width="100%">
-        <P3 mb="3">Owner 1 (Me)</P3>
+        <P2 mb="3">Owner 1 (Me)</P2>
         <Box position="relative">
           <Input
             placeholder={
@@ -72,7 +72,7 @@ export const MultisigFirstStep = ({
         </Box>
       </Box>
       <AddOwnersForm nextOwnerIndex={2} />
-      <ActionButton onClick={handleNavigationToConfirmationScreen}>
+      <ActionButton onClick={() => void handleNavigationToConfirmationScreen()}>
         Next
       </ActionButton>
     </ScreenLayout>

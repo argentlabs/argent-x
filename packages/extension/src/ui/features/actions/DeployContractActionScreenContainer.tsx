@@ -1,5 +1,6 @@
 import { isObject } from "lodash-es"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
@@ -58,6 +59,7 @@ export const DeployContractActionScreenContainer: FC = () => {
         onSubmit={() => void onSubmit()}
         onReject={() => void rejectAllActions()}
         selectedAccount={selectedAccount}
+        showConfirmButton
       />
     </WithSmartAccountVerified>
   )

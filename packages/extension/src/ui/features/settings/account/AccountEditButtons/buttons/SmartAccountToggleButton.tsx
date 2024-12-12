@@ -1,14 +1,15 @@
-import { FC, useMemo } from "react"
+import type { FC } from "react"
+import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLiveAccountGuardianState } from "../../../../smartAccount/usePendingChangingGuardian"
 import { ChangeGuardian } from "../../../../../../shared/smartAccount/changeGuardianCallDataToType"
 import { useSmartAccountEnabled } from "../../../../../../shared/smartAccount/useSmartAccountEnabled"
 import { useToggleSmartAccountRoute } from "../../../../smartAccount/useToggleSmartAccountRoute"
-import { ButtonCell, P4, iconsDeprecated } from "@argent/x-ui"
+import { ButtonCell, icons, P3 } from "@argent/x-ui"
 import { routes } from "../../../../../../shared/ui/routes"
-import { WalletAccount } from "../../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../../shared/wallet.model"
 
-const { SmartAccountActiveIcon, WalletIcon } = iconsDeprecated
+const { WalletSecondaryIcon, ShieldSecondaryIcon } = icons
 
 export const SmartAccountToggleButtonContainer: FC<{
   account: WalletAccount
@@ -40,9 +41,12 @@ export const SmartAccountToggleButtonContainer: FC<{
   const smartAccountIsLoading = liveAccountGuardianState.status === "PENDING"
 
   const leftIcon = hasGuardian ? (
-    <WalletIcon fontSize={"xl"} opacity={!smartAccountIsLoading ? 1 : 0.6} />
+    <WalletSecondaryIcon
+      fontSize={"xl"}
+      opacity={!smartAccountIsLoading ? 1 : 0.6}
+    />
   ) : (
-    <SmartAccountActiveIcon
+    <ShieldSecondaryIcon
       fontSize={"xl"}
       opacity={!smartAccountIsLoading ? 1 : 0.6}
     />
@@ -54,19 +58,26 @@ export const SmartAccountToggleButtonContainer: FC<{
 
   const onStartSmartAccountFlow = async () => {
     if (!hasGuardian) {
-      navigate(routes.smartAccountStart(account.address))
+      navigate(routes.smartAccountStart(account.id))
     } else {
       await startToggleSmartAccountFlow(account)
     }
   }
 
+  const shouldRenderButton = useMemo(() => {
+    return (
+      isSmartAccountEnabled &&
+      (account.type === "standard" || account.type === "smart")
+    )
+  }, [isSmartAccountEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
-    isSmartAccountEnabled && (
+    shouldRenderButton && (
       <SmartAccountToggleButton
         buttonText={buttonText}
         accountSubtitle={accountSubtitle}
         leftIcon={leftIcon}
-        onClick={onStartSmartAccountFlow}
+        onClick={() => void onStartSmartAccountFlow()}
       />
     )
   )
@@ -92,9 +103,9 @@ export const SmartAccountToggleButton: FC<SmartAccountToggleButtonProps> = ({
       data-testid="smart-account-button"
     >
       {buttonText}
-      <P4 color="neutrals.300" fontWeight={"normal"}>
+      <P3 color="neutrals.300" fontWeight={"normal"}>
         {accountSubtitle}
-      </P4>
+      </P3>
     </ButtonCell>
   )
 }

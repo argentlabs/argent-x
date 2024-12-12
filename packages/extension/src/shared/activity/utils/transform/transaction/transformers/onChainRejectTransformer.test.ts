@@ -1,10 +1,12 @@
-import { Transaction } from "../../../../../transactions"
+import type { Transaction } from "../../../../../transactions"
+import { getRandomAccountIdentifier } from "../../../../../utils/accountIdentifier"
 import { SignerType } from "../../../../../wallet.model"
-import { TransformedTransaction } from "../../type"
+import type { TransformedTransaction } from "../../type"
 import onChainRejectTransformer from "./onChainRejectTransformer"
 
 const mockTransaction: Transaction = {
   account: {
+    id: getRandomAccountIdentifier("0x123", "sepolia-alpha"),
     name: "Account",
     type: "multisig",
     network: {

@@ -1,6 +1,7 @@
 import Emittery from "emittery"
-import { MinimalWalletSessionService } from "./decorators"
-import { Events, Locked } from "../../../wallet/session/interface"
+import type { MinimalWalletSessionService } from "./decorators"
+import type { Events } from "../../../wallet/session/interface"
+import { Locked } from "../../../wallet/session/interface"
 
 interface MockSssionServiceManager {
   setLocked(locked: boolean): Promise<void>

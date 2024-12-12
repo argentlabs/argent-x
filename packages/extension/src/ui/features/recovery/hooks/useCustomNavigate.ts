@@ -1,4 +1,5 @@
-import { NavigateOptions, To, useNavigate } from "react-router-dom"
+import type { NavigateOptions, To } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import browser from "webextension-polyfill"
 
 import { routes } from "../../../../shared/ui/routes"

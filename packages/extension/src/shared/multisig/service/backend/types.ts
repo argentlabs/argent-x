@@ -1,5 +1,5 @@
-import { Address } from "@argent/x-shared"
-import {
+import type { Address } from "@argent/x-shared"
+import type {
   BigNumberish,
   CairoVersion,
   Call,
@@ -7,12 +7,16 @@ import {
   Signature,
   constants,
 } from "starknet"
-import { TypedData } from "@starknet-io/types-js"
-import { Network } from "../../../network"
-import { BaseWalletAccount, MultisigWalletAccount } from "../../../wallet.model"
-import { ApiMultisigResourceBounds } from "../../multisig.model"
-import { MultisigPendingOffchainSignature } from "../../pendingOffchainSignaturesStore"
-import { MultisigPendingTransaction } from "../../pendingTransactionsStore"
+import type { TypedData } from "@starknet-io/types-js"
+import type { Network } from "../../../network"
+import type {
+  AccountId,
+  BaseWalletAccount,
+  MultisigWalletAccount,
+} from "../../../wallet.model"
+import type { ApiMultisigResourceBounds } from "../../multisig.model"
+import type { MultisigPendingOffchainSignature } from "../../pendingOffchainSignaturesStore"
+import type { MultisigPendingTransaction } from "../../pendingTransactionsStore"
 
 export interface IFetchMultisigDataForSigner {
   signer: string
@@ -27,6 +31,7 @@ export interface IFetchMultisigOffchainSignatureRequestById {
 
 export interface ICreateTransactionRequest {
   address: Address
+  accountId: AccountId
   calls: Call[]
   transactionDetails: InvocationsSignerDetails
   signature: Signature
@@ -34,6 +39,7 @@ export interface ICreateTransactionRequest {
 
 export interface ICreateOffchainSignatureRequest {
   address: Address
+  accountId: AccountId
   data: TypedData
   signature: Signature
   chainId: constants.StarknetChainId
@@ -41,6 +47,7 @@ export interface ICreateOffchainSignatureRequest {
 
 export interface IAddOffchainSignature {
   address: Address
+  accountId: AccountId
   signature: Signature
   chainId: constants.StarknetChainId
   pendingOffchainSignature: MultisigPendingOffchainSignature
@@ -55,11 +62,13 @@ export interface ICancelOffchainSignature {
 
 export interface IMapTransactionDetails {
   address: Address
+  accountId: AccountId
   transactionDetails: InvocationsSignerDetails
 }
 
 export interface IAddRequestSignature {
   address: Address
+  accountId: AccountId
   transactionToSign: MultisigPendingTransaction
   chainId: constants.StarknetChainId
   signature: Signature

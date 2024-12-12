@@ -1,6 +1,6 @@
 import { addressSchema } from "@argent/x-shared"
 import { BarBackButton, BarCloseButton } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"

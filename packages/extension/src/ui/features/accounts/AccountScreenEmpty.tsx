@@ -1,34 +1,53 @@
-import { Empty, EmptyButton, iconsDeprecated } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import { Empty, EmptyButton, icons } from "@argent/x-ui"
+import type { FC, ReactEventHandler } from "react"
 
-import { AccountListFooterContainer } from "./AccountListFooterContainer"
+import { AccountListFooter } from "./AccountListFooter"
 
-const { WalletIcon, AddIcon } = iconsDeprecated
+const { WalletSecondaryIcon, PlusSecondaryIcon, HideSecondaryIcon } = icons
 
 interface AccountScreenEmptyProps {
   hasHiddenAccounts: boolean
   currentNetworkName: string
-  onCreate: ReactEventHandler
+  onAddAccount: ReactEventHandler
+  onHiddenAccounts: ReactEventHandler
+  showAddButton?: boolean
+  showHideButton?: boolean
 }
 
 export const AccountScreenEmpty: FC<AccountScreenEmptyProps> = ({
   hasHiddenAccounts,
   currentNetworkName,
-  onCreate,
+  onAddAccount,
+  onHiddenAccounts,
+  showAddButton = true,
+  showHideButton = true,
 }) => {
   return (
     <>
       <Empty
-        icon={<WalletIcon />}
+        icon={<WalletSecondaryIcon />}
         title={`You have no ${
           hasHiddenAccounts ? "visible " : ""
         }accounts on ${currentNetworkName}`}
       >
-        <EmptyButton mt={8} leftIcon={<AddIcon />} onClick={onCreate}>
-          Create account
-        </EmptyButton>
+        {hasHiddenAccounts && showHideButton && (
+          <EmptyButton
+            mt={8}
+            leftIcon={<HideSecondaryIcon />}
+            onClick={onHiddenAccounts}
+          >
+            Hidden accounts
+          </EmptyButton>
+        )}
       </Empty>
-      {hasHiddenAccounts && <AccountListFooterContainer isHiddenAccounts />}
+      {showAddButton && (
+        <AccountListFooter
+          data-testid="create-account-button"
+          onClick={onAddAccount}
+          icon={<PlusSecondaryIcon />}
+          text={"Add account"}
+        />
+      )}
     </>
   )
 }

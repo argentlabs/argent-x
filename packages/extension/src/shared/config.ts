@@ -17,4 +17,6 @@ export const RefreshIntervalInSeconds = Object.freeze({
 })
 
 const isDev = process.env.NODE_ENV === "development"
-isDev && console.log("Refresh intervals in seconds", RefreshIntervalInSeconds)
+if (isDev) {
+  console.log("Refresh intervals in seconds", RefreshIntervalInSeconds)
+}

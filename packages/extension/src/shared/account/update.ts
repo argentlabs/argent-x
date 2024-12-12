@@ -1,14 +1,15 @@
 import { accountsEqual, accountsEqualByChainId } from "../utils/accountsEqual"
-import { BaseMultisigWalletAccount, WalletAccount } from "./../wallet.model"
+import type {
+  BaseMultisigWalletAccount,
+  WalletAccount,
+} from "./../wallet.model"
 import { getMultisigAccounts } from "../multisig/utils/baseMultisig"
-import { BaseWalletAccount } from "../wallet.model"
+import type { BaseWalletAccount } from "../wallet.model"
 import { getAccountEscapeFromChain } from "./details/getAccountEscapeFromChain"
 import { getAccountGuardiansFromChain } from "./details/getAccountGuardiansFromChain"
 import { getAccountClassHashFromChain } from "./details/getAccountClassHashFromChain"
-import {
-  DetailFetchers,
-  getAndMergeAccountDetails,
-} from "./details/getAndMergeAccountDetails"
+import type { DetailFetchers } from "./details/getAndMergeAccountDetails"
+import { getAndMergeAccountDetails } from "./details/getAndMergeAccountDetails"
 import { accountService } from "./service"
 import { multisigBaseWalletRepo } from "../multisig/repository"
 import { getProvider } from "../network"
@@ -16,6 +17,7 @@ import { networkService } from "../network/service"
 import { MultisigEntryPointType } from "../multisig/types"
 import { getAccountCairoVersionFromChain } from "./details/getAccountCairoVersionFromChain"
 import { RpcBatchProvider } from "@argent/x-multicall"
+import { isArgentAccount } from "../utils/isExternalAccount"
 
 type UpdateScope = "all" | "implementation" | "deploy" | "guardian"
 
@@ -51,6 +53,7 @@ export async function updateAccountDetails(
 
   const deployedAccounts = allAccounts
     .concat(newAccounts)
+    .filter(isArgentAccount)
     .filter((acc) => !acc.needsDeploy)
 
   // Only fetch account details for deployed accounts

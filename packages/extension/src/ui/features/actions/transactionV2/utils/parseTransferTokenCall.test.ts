@@ -1,6 +1,7 @@
 import { test } from "vitest"
 import { parseTransferTokenCall } from "./parseTransferTokenCall"
-import { Call, uint256 } from "starknet"
+import type { Call } from "starknet"
+import { uint256 } from "starknet"
 import {
   ETH_TOKEN_ADDRESS,
   STRK_TOKEN_ADDRESS,

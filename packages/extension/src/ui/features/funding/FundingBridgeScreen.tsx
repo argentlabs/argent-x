@@ -1,22 +1,21 @@
 import {
   BarBackButton,
   BarCloseButton,
-  NavigationContainer,
+  CellStack,
   logosDeprecated,
+  NavigationContainer,
 } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import { isDeprecated } from "../../../shared/wallet.service"
-import { Option } from "../../components/Options"
-import { PageWrapper } from "../../components/Page"
-import { A } from "../../components/TrackingLink"
+import { Option } from "../../components/Option"
+import { TrackingLink } from "../../components/TrackingLink"
 import { routes } from "../../../shared/ui/routes"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { isFeatureEnabled } from "@argent/x-shared"
 import { getLayerSwapUrl } from "./utils"
-import { Grid } from "@chakra-ui/react"
 
 const { EthereumLogo, OrbiterLogo, LayerswapLogo, RhinoFiLogo } =
   logosDeprecated
@@ -51,54 +50,53 @@ export const FundingBridgeScreen: FC = () => {
       }
       title="Bridge funds"
     >
-      <PageWrapper>
-        <Grid templateColumns="1fr" gap={4}>
-          {bridgeUrl ? (
-            <A href={bridgeUrl} targetBlank>
-              <Option
-                title="StarkGate"
-                description="Bridge trustlessly from Ethereum"
-                icon={<EthereumLogo width={6} height={6} />}
-              />
-            </A>
-          ) : (
-            <Option
-              title="Bridge from Ethereum"
-              description="Not available for this network"
-              icon={<EthereumLogo width={6} height={6} />}
-              disabled
-            />
-          )}
-          {allowLayerswap && (
-            <A href={getLayerSwapUrl(account.address)} targetBlank>
-              <Option
-                title="Layerswap"
-                description="Bridge from other chains"
-                icon={<LayerswapLogo width={6} height={6} />}
-              />
-            </A>
-          )}
-          {allowOrbiter && (
-            <A
-              href={`https://www.orbiter.finance/?referer=argent&dest=starknet&fixed=1&source=Mainnet`}
-              targetBlank
-            >
-              <Option
-                title="Orbiter.finance"
-                description="Bridge from other chains"
-                icon={<OrbiterLogo width={6} height={6} />}
-              />
-            </A>
-          )}
-          <A href={`https://app.rhino.fi/bridge/?refId=PG_Argent`} targetBlank>
-            <Option
-              title="Rhino.fi"
-              description="Bridge from other chains"
-              icon={<RhinoFiLogo width={6} height={6} />}
-            />
-          </A>
-        </Grid>
-      </PageWrapper>
+      <CellStack>
+        {bridgeUrl ? (
+          <Option
+            as={TrackingLink}
+            href={bridgeUrl}
+            targetBlank
+            title="StarkGate"
+            description="Bridge trustlessly from Ethereum"
+            icon={<EthereumLogo />}
+          />
+        ) : (
+          <Option
+            title="Bridge from Ethereum"
+            description="Not available for this network"
+            icon={<EthereumLogo />}
+            isDisabled
+          />
+        )}
+        {allowLayerswap && (
+          <Option
+            as={TrackingLink}
+            href={getLayerSwapUrl(account.address)}
+            targetBlank
+            title="Layerswap"
+            description="Bridge from other chains"
+            icon={<LayerswapLogo />}
+          />
+        )}
+        {allowOrbiter && (
+          <Option
+            as={TrackingLink}
+            href={`https://www.orbiter.finance/?referer=argent&dest=starknet&fixed=1&source=Mainnet`}
+            targetBlank
+            title="Orbiter.finance"
+            description="Bridge from other chains"
+            icon={<OrbiterLogo />}
+          />
+        )}
+        <Option
+          as={TrackingLink}
+          href={`https://app.rhino.fi/bridge/?refId=PG_Argent`}
+          targetBlank
+          title="Rhino.fi"
+          description="Bridge from other chains"
+          icon={<RhinoFiLogo />}
+        />
+      </CellStack>
     </NavigationContainer>
   )
 }

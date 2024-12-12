@@ -1,16 +1,11 @@
-import {
-  FieldError,
-  P3,
-  iconsDeprecated,
-  scrollbarStyleThin,
-} from "@argent/x-ui"
+import { FieldError, icons, P2, scrollbarStyleThin } from "@argent/x-ui"
 import { Box, Button, Center, Flex, Input, InputGroup } from "@chakra-ui/react"
 import { useCallback, useEffect, useRef } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
-import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
+import type { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 
-const { AddIcon, RemoveIcon } = iconsDeprecated
+const { PlusSecondaryIcon, MinusPrimaryIcon } = icons
 
 interface AddOwnerFormProps {
   nextOwnerIndex: number
@@ -57,7 +52,7 @@ export const AddOwnersForm = ({
               data-testid={`signerContainer.${index}`}
             >
               <Flex justify="space-between" align="center">
-                <P3>Owner {nextOwnerIndex + index}</P3>
+                <P2>Owner {nextOwnerIndex + index}</P2>
                 <Button
                   data-testid={`closeButton.${index}`}
                   onClick={() => {
@@ -71,7 +66,7 @@ export const AddOwnersForm = ({
                   size="auto"
                   colorScheme="transparent"
                 >
-                  <RemoveIcon />
+                  <MinusPrimaryIcon />
                 </Button>
               </Flex>
               <InputGroup display="flex" alignItems="center" mt={3}>
@@ -110,7 +105,7 @@ export const AddOwnersForm = ({
           data-testid="addOwnerButton"
           size={"sm"}
           colorScheme={"transparent"}
-          leftIcon={<AddIcon />}
+          leftIcon={<PlusSecondaryIcon />}
           color="text-secondary"
           onClick={addOwner}
         >

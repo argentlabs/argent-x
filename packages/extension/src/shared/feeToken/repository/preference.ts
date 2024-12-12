@@ -1,7 +1,7 @@
 import { STRK_TOKEN_ADDRESS } from "../../network/constants"
 import { KeyValueStorage } from "../../storage"
 import { adaptKeyValue } from "../../storage/__new/keyvalue"
-import { FeeTokenPreference } from "../types/preference.model"
+import type { FeeTokenPreference } from "../types/preference.model"
 
 export const feeTokenPreferenceKeyValueStore =
   new KeyValueStorage<FeeTokenPreference>(

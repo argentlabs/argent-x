@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSmartAccountEnabled } from "../../../shared/smartAccount/useSmartAccountEnabled"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
@@ -20,33 +20,29 @@ export const SettingsScreenContainer: FC = () => {
   const extensionIsInTab = useExtensionIsInTab()
   const selectedAccount = useView(selectedAccountView)
   const returnTo = useCurrentPathnameWithQuery()
-  const account = useWalletAccount(selectedAccount)
+  const account = useWalletAccount(selectedAccount?.id)
   const navigate = useNavigate()
   const stopSession = useStopSession()
   const verifiedEmail = useSmartAccountVerifiedEmail()
   const isSignedIn = useIsSignedIn()
   const isSmartAccountEnabled = useSmartAccountEnabled()
-  const isLedgerSigner = useIsLedgerSigner(account)
+  const isLedgerSigner = useIsLedgerSigner(account?.id)
 
   const onSignIn = () => {
     navigate(
-      routes.argentAccountEmail(
-        selectedAccount?.address,
-        "argentAccount",
-        returnTo,
-      ),
+      routes.argentAccountEmail(selectedAccount?.id, "argentAccount", returnTo),
     )
   }
 
   const onNavigateToAccount = () => {
-    navigate(routes.argentAccountLoggedIn(selectedAccount?.address))
+    navigate(routes.argentAccountLoggedIn(selectedAccount?.id))
   }
 
   const onLock = () => void stopSession(true)
 
   const shouldDisplayGuardianBanner =
     isSmartAccountEnabled &&
-    account?.type !== "multisig" &&
+    (account?.type === "standard" || account?.type === "smart") &&
     !account?.guardian &&
     !isLedgerSigner
 
@@ -60,7 +56,7 @@ export const SettingsScreenContainer: FC = () => {
       isSignedIn={isSignedIn}
       onSignIn={onSignIn}
       extensionIsInTab={extensionIsInTab}
-      openExtensionInTab={openExtensionInTab}
+      openExtensionInTab={() => void openExtensionInTab()}
       returnTo={returnTo}
       verifiedEmail={verifiedEmail}
     />

@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { usePreAuthorizationsGroupedByAccountIdentifierForNetworkId } from "../../preAuthorizations/hooks"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { DappConnectionsAccountListScreen } from "./DappConnectionsAccountListScreen"

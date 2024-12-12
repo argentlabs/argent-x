@@ -1,17 +1,17 @@
-import { Token } from "../../../../shared/token/__new/types/token.model"
-import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import { bigDecimal } from "@argent/x-shared"
+import { isUndefined } from "lodash-es"
+import type { Trade } from "../../../../shared/swap/model/trade.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
+import type { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
 import { selectedAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { useTokenOnCurrentNetworkByAddress } from "../../accountTokens/tokens.state"
 import { useTokenBalanceForAccount } from "../../accountTokens/useTokenBalanceForAccount"
 import { Field, useSwapState } from "../state/fields"
-import { bigDecimal } from "@argent/x-shared"
-import { useSwapQuoteForPay } from "./useSwapQuoteForPay"
-import { useTradeFromSwapQuote } from "./useTradeFromSwapQuote"
-import { Trade } from "../../../../shared/swap/model/trade.model"
 import { useUserState } from "../state/user"
 import { computeSlippageAdjustedAmounts } from "../utils/prices"
-import { isUndefined } from "lodash-es"
+import { useSwapQuoteForPay } from "./useSwapQuoteForPay"
+import { useTradeFromSwapQuote } from "./useTradeFromSwapQuote"
 
 export enum SwapInputError {
   NO_ACCOUNT = "No account selected",
@@ -38,6 +38,7 @@ export function useSwapInfo(): SwapInfo {
     [Field.PAY]: { tokenAddress: payTokenAddress },
     [Field.RECEIVE]: { tokenAddress: receiveTokenAddress },
   } = useSwapState()
+
   const { userSlippageTolerance } = useUserState()
 
   const payToken = useTokenOnCurrentNetworkByAddress(payTokenAddress)
@@ -53,7 +54,7 @@ export function useSwapInfo(): SwapInfo {
     account: selectedAccount,
   })
 
-  const isExactIn: boolean = independentField === Field.PAY // This will always be true until we add ability to create a trade from Receive field
+  const isExactIn: boolean = independentField === Field.PAY
   const tokenDecimals = isExactIn ? payToken?.decimals : receiveToken?.decimals
 
   const parsedAmount = tokenDecimals
@@ -64,11 +65,12 @@ export function useSwapInfo(): SwapInfo {
     useSwapQuoteForPay({
       payToken,
       receiveToken,
-      payAmount: parsedAmount,
+      sellAmount: isExactIn ? parsedAmount : undefined,
+      buyAmount: isExactIn ? undefined : parsedAmount,
       account: selectedAccount,
     })
 
-  const tradeFromPay = useTradeFromSwapQuote(paySwapQuote)
+  const trade = useTradeFromSwapQuote(paySwapQuote)
 
   const tokenBalances = {
     [Field.PAY]: payTokenBalance,
@@ -92,8 +94,6 @@ export function useSwapInfo(): SwapInfo {
   if (!tokens[Field.PAY] || !tokens[Field.RECEIVE]) {
     inputError = inputError ?? SwapInputError.NO_TOKEN
   }
-
-  const trade = isExactIn ? tradeFromPay : null // null until we add ability to create a trade from Receive field
 
   const slippageAdjustedAmounts =
     trade &&
@@ -121,7 +121,7 @@ export function useSwapInfo(): SwapInfo {
     tokens,
     tokenBalances,
     parsedAmount,
-    trade: tradeFromPay,
+    trade: trade,
     inputError,
     tradeLoading: paySwapQuoteLoading,
   }

@@ -1,6 +1,7 @@
 import { isNumber } from "lodash-es"
 import { useCallback } from "react"
-import { NavigateOptions, To, useNavigate } from "react-router-dom"
+import type { NavigateOptions, To } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 import { useReturnTo } from "./useRoute"
 

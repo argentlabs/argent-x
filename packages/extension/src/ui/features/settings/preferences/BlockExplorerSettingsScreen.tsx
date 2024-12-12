@@ -1,10 +1,8 @@
 import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
-import {
-  BlockExplorerKey,
-  defaultBlockExplorers,
-} from "../../../../shared/settings/defaultBlockExplorers"
+import type { BlockExplorerKey } from "../../../../shared/settings/defaultBlockExplorers"
+import { defaultBlockExplorers } from "../../../../shared/settings/defaultBlockExplorers"
 import { SettingsMenuItem } from "../ui/SettingsMenuItem"
 import { SettingsMenuItemLogo } from "../ui/SettingsMenuItemLogo"
 import { SettingsRadioIcon } from "../ui/SettingsRadioIcon"

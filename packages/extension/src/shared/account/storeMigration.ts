@@ -2,7 +2,8 @@ import { uniqWith } from "lodash-es"
 import browser from "webextension-polyfill"
 
 import { networkService } from "../network/service"
-import { SignerType, WalletAccount } from "../wallet.model"
+import type { WalletAccount } from "../wallet.model"
+import { SignerType } from "../wallet.model"
 import { accountsEqual } from "../utils/accountsEqual"
 import { accountService } from "./service"
 

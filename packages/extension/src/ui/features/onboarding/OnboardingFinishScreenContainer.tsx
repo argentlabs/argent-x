@@ -1,9 +1,13 @@
-import { FC, useCallback, useEffect } from "react"
+import type { FC } from "react"
+import { useEffect } from "react"
 import { OnboardingFinishScreen } from "./OnboardingFinishScreen"
 import { lastLegalAgreementTimestampAtom } from "../legal/legalStorage"
 import { useAtom } from "jotai"
+import { useView } from "../../views/implementation/react"
+import { selectedAccountView } from "../../views/account"
 
 export const OnboardingFinishScreenContainer: FC = () => {
+  const selectedAccount = useView(selectedAccountView)
   const [, setLastLegalAgreementTimestamp] = useAtom(
     lastLegalAgreementTimestampAtom,
   )
@@ -13,10 +17,6 @@ export const OnboardingFinishScreenContainer: FC = () => {
     setLastLegalAgreementTimestamp(Date.now())
   }, [setLastLegalAgreementTimestamp])
 
-  const onFinish = useCallback(() => {
-    // void trackSuccess() // TODO: temporary disabled
-    window.close()
-  }, [])
-
-  return <OnboardingFinishScreen onFinish={onFinish} />
+  const isSmart = selectedAccount?.type === "smart"
+  return <OnboardingFinishScreen isSmart={isSmart} />
 }

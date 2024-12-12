@@ -1,11 +1,18 @@
 import "fake-indexeddb/auto"
 
-import { Mocked } from "vitest"
+import type { Mocked } from "vitest"
 
-import { NetworkService } from "../../../network/service/NetworkService"
-import { INetworkService } from "../../../network/service/INetworkService"
-import { MockFnRepository } from "../../../storage/__new/__test__/mockFunctionImplementation"
-import { TokenService } from "./TokenService"
+import type { IHttpService } from "@argent/x-shared"
+import {
+  addressSchema,
+  ensureArray,
+  stripAddressZeroPadding,
+} from "@argent/x-shared"
+import { GatewayError, stark } from "starknet"
+import {
+  getMockNetwork,
+  getMockNetworkWithoutMulticall,
+} from "../../../../../test/network.mock"
 import {
   getMockApiTokenDetails,
   getMockBaseToken,
@@ -13,25 +20,21 @@ import {
   getMockToken,
   getMockTokenPriceDetails,
 } from "../../../../../test/token.mock"
-import { defaultNetwork } from "../../../network"
-import {
-  getMockNetwork,
-  getMockNetworkWithoutMulticall,
-} from "../../../../../test/network.mock"
-import { INetworkRepo } from "../../../network/store"
-import { GatewayError, shortString, stark } from "starknet"
-import {
-  IHttpService,
-  addressSchema,
-  ensureArray,
-  stripAddressZeroPadding,
-} from "@argent/x-shared"
 import { TokenError } from "../../../errors/token"
 import { ArgentDatabase } from "../../../idb/db"
+import { defaultNetwork } from "../../../network"
+import type { INetworkService } from "../../../network/service/INetworkService"
+import { NetworkService } from "../../../network/service/NetworkService"
+import type { INetworkRepo } from "../../../network/store"
+import { MockFnRepository } from "../../../storage/__new/__test__/mockFunctionImplementation"
 import { equalToken } from "../utils"
+import { TokenService } from "./TokenService"
+import { getMockSigner } from "../../../../../test/account.mock"
+import { getAccountIdentifier } from "../../../utils/accountIdentifier"
 
 const BASE_INFO_ENDPOINT = "https://token.info.argent47.net/v1"
 const BASE_PRICES_ENDPOINT = "https://token.prices.argent47.net/v1"
+const BASE_TOKENS_REPORT_SPAM = "https://token.report-spam.argent47.net/v1"
 
 const randomAddress1 = addressSchema.parse(stark.randomAddress())
 const randomAddress2 = addressSchema.parse(stark.randomAddress())
@@ -53,6 +56,7 @@ describe("TokenService", () => {
 
     mockHttpService = {
       get: vi.fn(),
+      post: vi.fn(),
     } as unknown as Mocked<IHttpService>
 
     db = new ArgentDatabase()
@@ -63,12 +67,13 @@ describe("TokenService", () => {
       mockHttpService,
       BASE_INFO_ENDPOINT,
       BASE_PRICES_ENDPOINT,
+      BASE_TOKENS_REPORT_SPAM,
     )
   })
 
   afterEach(() => {
     vi.clearAllMocks()
-    db.delete()
+    void db.delete()
   })
 
   it("should add a token", async () => {
@@ -112,6 +117,29 @@ describe("TokenService", () => {
       getMockToken(),
       getMockToken({ networkId: "sepolia-alpha" }),
       getMockToken({ address: "0x456" }),
+    ])
+  })
+
+  it("should toggle hidden flag for tokens", async () => {
+    const mockTokens = [
+      getMockToken(),
+      getMockToken({ address: "0x234", hidden: true }),
+      getMockToken({ address: "0x345", hidden: true }),
+    ]
+    await tokenService.addToken(mockTokens)
+
+    await tokenService.toggleHideToken(mockTokens[0], true)
+    await tokenService.toggleHideToken(mockTokens[1], false)
+    await tokenService.toggleHideToken(mockTokens[2], false)
+
+    const tokens = await db.tokens
+      .filter((token) => mockTokens.some((t) => equalToken(token, t)))
+      .toArray()
+
+    expect(tokens).toEqual([
+      getMockToken({ hidden: true }),
+      getMockToken({ address: "0x234", hidden: false }),
+      getMockToken({ address: "0x345", hidden: false }),
     ])
   })
 
@@ -259,6 +287,12 @@ describe("TokenService", () => {
           const result =
             await tokenService.fetchAccountTokenBalancesFromBackend(
               {
+                id: getAccountIdentifier(
+                  "0x123",
+                  networkId,
+                  getMockSigner(),
+                  false,
+                ),
                 address: "0x123",
                 networkId,
               },
@@ -299,6 +333,12 @@ describe("TokenService", () => {
           const result =
             await tokenService.fetchAccountTokenBalancesFromBackend(
               {
+                id: getAccountIdentifier(
+                  "0x123",
+                  networkId,
+                  getMockSigner(),
+                  false,
+                ),
                 address: "0x123",
                 networkId,
               },
@@ -328,6 +368,12 @@ describe("TokenService", () => {
     describe("when not default network", () => {
       it("should return empty array", async () => {
         const result = await tokenService.fetchAccountTokenBalancesFromBackend({
+          id: getAccountIdentifier(
+            "0x123",
+            "invalid-network",
+            getMockSigner(),
+            false,
+          ),
           address: "0x123",
           networkId: "invalid-network",
         })
@@ -351,6 +397,7 @@ describe("TokenService", () => {
         mockHttpService,
         BASE_INFO_ENDPOINT,
         BASE_PRICES_ENDPOINT,
+        BASE_TOKENS_REPORT_SPAM,
       )
 
       const mockNetworkId = defaultNetwork.id
@@ -388,7 +435,11 @@ describe("TokenService", () => {
   describe("fetch onchain token balances", () => {
     it("should fetch token balances from on-chain for same network", async () => {
       const mockNetwork = getMockNetwork()
-      const mockAccount = { address: randomAddress1, networkId: mockNetwork.id }
+      const mockAccount = {
+        address: randomAddress1,
+        networkId: mockNetwork.id,
+        id: "id",
+      }
 
       const mockBaseTokens = [
         getMockBaseToken({ networkId: mockNetwork.id }),
@@ -433,8 +484,8 @@ describe("TokenService", () => {
       const mockNetwork = getMockNetwork()
       const defaultMockNetwork = getMockNetwork({ id: defaultNetwork.id })
       const mockAccounts = [
-        { address: randomAddress1, networkId: mockNetwork.id },
-        { address: randomAddress2, networkId: defaultNetwork.id },
+        { address: randomAddress1, networkId: mockNetwork.id, id: "id" },
+        { address: randomAddress2, networkId: defaultNetwork.id, id: "id" },
       ]
 
       const mockBaseTokens = [
@@ -581,11 +632,7 @@ describe("TokenService", () => {
         .mockResolvedValueOnce(getMockNetwork())
       tokenService.fetchTokenDetailsWithMulticall = vi
         .fn()
-        .mockResolvedValueOnce([
-          shortString.encodeShortString(mockToken.name),
-          shortString.encodeShortString(mockToken.symbol),
-          mockToken.decimals,
-        ])
+        .mockResolvedValueOnce(mockToken)
 
       const result = await tokenService.fetchTokenDetails(mockBaseToken)
 
@@ -602,11 +649,7 @@ describe("TokenService", () => {
         .mockResolvedValueOnce(getMockNetworkWithoutMulticall())
       tokenService.fetchTokenDetailsWithoutMulticall = vi
         .fn()
-        .mockResolvedValueOnce([
-          shortString.encodeShortString(mockToken.name),
-          shortString.encodeShortString(mockToken.symbol),
-          mockToken.decimals,
-        ])
+        .mockResolvedValueOnce(mockToken)
 
       const result = await tokenService.fetchTokenDetails(mockBaseToken)
 
@@ -624,11 +667,10 @@ describe("TokenService", () => {
         .mockResolvedValueOnce(getMockNetworkWithoutMulticall())
       tokenService.fetchTokenDetailsWithoutMulticall = vi
         .fn()
-        .mockResolvedValueOnce([
-          shortString.encodeShortString(mockToken.name),
-          shortString.encodeShortString(mockToken.symbol),
-          Number.MAX_SAFE_INTEGER + 1,
-        ])
+        .mockResolvedValueOnce({
+          ...mockToken,
+          decimals: Number.MAX_SAFE_INTEGER + 1,
+        })
       await expect(
         tokenService.fetchTokenDetails(mockBaseToken),
       ).rejects.toThrowError(
@@ -692,7 +734,7 @@ describe("TokenService", () => {
 
     await db.tokenBalances.bulkPut(mockTokenBalances)
 
-    const result = await tokenService.getTokenBalancesForAccount(
+    const result = await tokenService.getAllTokenBalancesForAccount(
       mockAccount,
       mockTokens,
     )
@@ -816,8 +858,8 @@ describe("TokenService", () => {
   describe("get total currency balance for account", () => {
     it("should get total currency balance for different accounts", async () => {
       const mockAccounts = [
-        { address: randomAddress1, networkId: defaultNetwork.id },
-        { address: randomAddress2, networkId: defaultNetwork.id },
+        { address: randomAddress1, networkId: defaultNetwork.id, id: "id" },
+        { address: randomAddress2, networkId: defaultNetwork.id, id: "id" },
       ]
 
       const mockBaseTokens = [
@@ -857,6 +899,7 @@ describe("TokenService", () => {
       const result = await tokenService.getTotalCurrencyBalanceForAccounts(
         mockAccounts.map((acc) => {
           return {
+            id: acc.id,
             address: stripAddressZeroPadding(acc.address),
             networkId: acc.networkId,
           }
@@ -875,6 +918,7 @@ describe("TokenService", () => {
     const mockAccount = {
       address: stripAddressZeroPadding(randomAddress1),
       networkId: defaultNetwork.id,
+      id: "id",
     }
     const mockBaseTokens = [
       getMockBaseToken({ networkId: defaultNetwork.id }),
@@ -927,6 +971,151 @@ describe("TokenService", () => {
     ])
     expect(result).toEqual({
       [`${mockAccount.address}:${mockAccount.networkId}`]: "2200",
+    })
+  })
+
+  describe("reportSpamToken", () => {
+    const mockToken = getMockBaseToken()
+    const mockAccount = {
+      address: "0x123",
+      networkId: "mainnet-alpha",
+      id: "id",
+    }
+
+    it("should call http post and return void when successful", async () => {
+      mockHttpService.post.mockResolvedValueOnce({})
+
+      const result = await tokenService.reportSpamToken(mockToken, mockAccount)
+
+      expect(mockHttpService.post).toHaveBeenCalledWith(
+        BASE_TOKENS_REPORT_SPAM,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tokenAddress: mockToken.address,
+            reporterAddress: mockAccount.address,
+          }),
+        },
+      )
+      expect(result).toBeUndefined()
+    })
+
+    it("should call http post and return void when address has already reported", async () => {
+      mockHttpService.post.mockResolvedValueOnce({
+        status: "addressHasAlreadyReportedToken",
+      })
+
+      const result = await tokenService.reportSpamToken(mockToken, mockAccount)
+
+      expect(mockHttpService.post).toHaveBeenCalledWith(
+        BASE_TOKENS_REPORT_SPAM,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tokenAddress: mockToken.address,
+            reporterAddress: mockAccount.address,
+          }),
+        },
+      )
+      expect(result).toBeUndefined()
+    })
+
+    it("should log error and return void when http post fails", async () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {})
+      mockHttpService.post.mockRejectedValueOnce(new Error("HTTP error"))
+
+      const result = await tokenService.reportSpamToken(mockToken, mockAccount)
+
+      expect(mockHttpService.post).toHaveBeenCalledWith(
+        BASE_TOKENS_REPORT_SPAM,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tokenAddress: mockToken.address,
+            reporterAddress: mockAccount.address,
+          }),
+        },
+      )
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error while reporting spam token",
+      )
+      expect(result).toBeUndefined()
+
+      consoleErrorSpy.mockRestore()
+    })
+  })
+  describe("getTokenInfo", () => {
+    it("should return token info when it exists", async () => {
+      const mockToken = getMockToken()
+      const mockTokenInfo = {
+        ...mockToken,
+        id: 1,
+        iconUrl: "https://example.com/icon.png",
+        popular: true,
+        tradable: true,
+        sendable: true,
+        refundable: true,
+        listed: true,
+        category: "tokens" as const,
+      }
+      await db.tokensInfo.add(mockTokenInfo)
+
+      const result = await tokenService.getTokenInfo(mockToken)
+
+      expect(result).toEqual(mockTokenInfo)
+    })
+
+    it("should return undefined when token info doesn't exist", async () => {
+      const mockToken = getMockToken()
+
+      const result = await tokenService.getTokenInfo(mockToken)
+
+      expect(result).toBeUndefined()
+    })
+
+    it("should return the correct token info when multiple tokens exist", async () => {
+      const mockToken1 = getMockToken()
+      const mockToken2 = getMockToken({
+        address: "0x456",
+        networkId: "network-2",
+      })
+      const mockTokenInfo1 = {
+        ...mockToken1,
+        id: 1,
+        iconUrl: "https://example.com/icon1.png",
+        popular: true,
+        tradable: true,
+        sendable: true,
+        refundable: true,
+        listed: true,
+        category: "tokens" as const,
+      }
+      const mockTokenInfo2 = {
+        ...mockToken2,
+        id: 2,
+        iconUrl: "https://example.com/icon2.png",
+        popular: false,
+        tradable: false,
+        sendable: true,
+        refundable: true,
+        listed: true,
+        category: "tokens" as const,
+      }
+      await db.tokensInfo.bulkAdd([mockTokenInfo1, mockTokenInfo2])
+
+      const result1 = await tokenService.getTokenInfo(mockToken1)
+      const result2 = await tokenService.getTokenInfo(mockToken2)
+
+      expect(result1).toEqual(mockTokenInfo1)
+      expect(result2).toEqual(mockTokenInfo2)
     })
   })
 })

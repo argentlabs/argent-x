@@ -1,7 +1,8 @@
-import { FC } from "react"
-import { Box, BoxProps } from "@chakra-ui/react"
+import type { FC } from "react"
+import type { FlexProps } from "@chakra-ui/react"
+import { Flex, Circle } from "@chakra-ui/react"
 
-interface StepIndicatorProps extends BoxProps {
+interface StepIndicatorProps extends FlexProps {
   length: number
   currentIndex: number
   filled?: boolean
@@ -11,27 +12,21 @@ export const StepIndicator: FC<StepIndicatorProps> = ({
   currentIndex,
   length,
   filled = false,
-  ...divProps
+  ...rest
 }) => {
   const primaryColorCondition = (i: number) => {
     if (!filled) {
-      return i === currentIndex ? "primary.500" : "surface-elevated"
+      return i === currentIndex ? "primary.500" : "surface-elevated-hover"
     }
 
-    return i <= currentIndex ? "primary.500" : "surface-elevated"
+    return i <= currentIndex ? "primary.500" : "surface-elevated-hover"
   }
 
   return (
-    <Box display="flex" justifyContent="center" gap={2} {...divProps}>
+    <Flex display="flex" gap={2} {...rest}>
       {Array.from({ length }).map((_, i) => (
-        <Box
-          key={i}
-          w={2}
-          h={2}
-          borderRadius="50%"
-          bg={primaryColorCondition(i)}
-        />
+        <Circle key={i} size={2} bg={primaryColorCondition(i)} />
       ))}
-    </Box>
+    </Flex>
   )
 }

@@ -1,7 +1,7 @@
 import { addressSchema, isEqualAddress } from "@argent/x-shared"
 
 import defaultTokens from "../../../assets/default-tokens.json"
-import { BaseToken, Token } from "./type"
+import type { BaseToken, Token } from "./type"
 
 export const equalToken = (a: BaseToken, b: BaseToken) =>
   a.networkId === b.networkId && isEqualAddress(a.address, b.address)

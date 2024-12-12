@@ -1,8 +1,9 @@
 import browser from "webextension-polyfill"
 
 import { MockStorage } from "./__test__/chrome-storage.mock"
-import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
-import {
+import type { StorageOptionsOrNameSpace } from "./options"
+import { getOptionsWithDefaults } from "./options"
+import type {
   AllowPromise,
   AreaName,
   BaseStorage,
@@ -57,7 +58,7 @@ export class KeyValueStorage<
       if (!this.storageImplementation) {
         throw new Error()
       }
-    } catch (e) {
+    } catch {
       if (options.areaName === "session") {
         const { manifest_version } = browser.runtime.getManifest()
         if (manifest_version === 2) {

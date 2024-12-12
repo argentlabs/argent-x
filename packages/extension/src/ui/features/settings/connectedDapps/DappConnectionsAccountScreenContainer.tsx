@@ -1,6 +1,6 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { usePreAuthorizationsForAccount } from "../../preAuthorizations/hooks"
-import { PreAuthorization } from "../../../../shared/preAuthorization/schema"
+import type { PreAuthorization } from "../../../../shared/preAuthorization/schema"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { useRouteWalletAccount } from "../../smartAccount/useRouteWalletAccount"
 import { DappConnectionsAccountScreen } from "./DappConnectionsAccountScreen"

@@ -1,6 +1,6 @@
-import { FC } from "react"
+import type { FC } from "react"
 
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { multisigView } from "../multisig/multisig.state"
 import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
 import { AccountTokensBalance } from "./AccountTokensBalance"
@@ -15,8 +15,8 @@ export const AccountTokensBalanceContainer: FC<
   AccountTokensBalanceContainerProps
 > = ({ account }) => {
   const multisig = useView(multisigView(account))
-  const usesLedgerSigner = useIsLedgerSigner(account)
-  const isLedgerConnected = useLedgerStatus(account)
+  const usesLedgerSigner = useIsLedgerSigner(account.id)
+  const isLedgerConnected = useLedgerStatus(account.id)
   return (
     <AccountTokensBalance
       account={account}

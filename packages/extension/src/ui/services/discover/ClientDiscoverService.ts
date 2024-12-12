@@ -1,5 +1,5 @@
-import { IDiscoverService } from "../../../shared/discover/IDiscoverService"
-import { messageClient } from "../trpc"
+import type { IDiscoverService } from "../../../shared/discover/IDiscoverService"
+import type { messageClient } from "../trpc"
 
 export class ClientDiscoverService implements IDiscoverService {
   constructor(private trpcMessageClient: typeof messageClient) {}

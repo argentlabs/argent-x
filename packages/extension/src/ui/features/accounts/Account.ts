@@ -1,27 +1,31 @@
-import { Abi, CairoVersion, Contract, ProviderInterface } from "starknet"
+import type { Abi, CairoVersion, ProviderInterface } from "starknet"
+import { Contract } from "starknet"
 
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
-import { Escape } from "../../../shared/account/details/escape.model"
-import { Network, getProvider } from "../../../shared/network"
+import type { Escape } from "../../../shared/account/details/escape.model"
+import type { Network } from "../../../shared/network"
+import { getProvider } from "../../../shared/network"
 import { networkService } from "../../../shared/network/service"
-import {
-  ArgentAccountType,
+import type {
+  WalletAccountType,
   BaseWalletAccount,
   CreateAccountType,
-  SignerType,
   WalletAccount,
   WalletAccountSigner,
+  AccountId,
 } from "../../../shared/wallet.model"
+import { SignerType } from "../../../shared/wallet.model"
 import { clientAccountService } from "../../services/account"
-import { Address } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
 
 export interface AccountConstructorProps {
+  id: AccountId
   name: string
   address: string
   network: Network
   signer: WalletAccountSigner
-  type: ArgentAccountType
+  type: WalletAccountType
   classHash?: Address
   cairoVersion?: CairoVersion
   guardian?: string | undefined
@@ -32,12 +36,13 @@ export interface AccountConstructorProps {
 }
 
 export class Account {
+  id: AccountId
   name: string
   address: string
   network: Network
   networkId: string
   signer: WalletAccountSigner
-  type: ArgentAccountType
+  type: WalletAccountType
   classHash?: Address
   cairoVersion?: CairoVersion
   guardian?: string | undefined
@@ -49,6 +54,7 @@ export class Account {
   needsDeploy?: boolean
 
   constructor({
+    id,
     name,
     address,
     network,
@@ -62,6 +68,7 @@ export class Account {
     needsDeploy = false,
     contract,
   }: AccountConstructorProps) {
+    this.id = id
     this.name = name
     this.address = address
     this.network = network
@@ -111,6 +118,7 @@ export class Account {
     }
 
     return new Account({
+      id: account.id,
       name: account.name,
       address: account.address,
       network,
@@ -122,8 +130,26 @@ export class Account {
     })
   }
 
+  static fromWalletAccount(walletAccount: WalletAccount): Account {
+    return new Account({
+      id: walletAccount.id,
+      name: walletAccount.name,
+      address: walletAccount.address,
+      network: walletAccount.network,
+      signer: walletAccount.signer,
+      type: walletAccount.type,
+      classHash: walletAccount.classHash,
+      guardian: walletAccount.guardian,
+      cairoVersion: walletAccount.cairoVersion,
+      escape: walletAccount.escape,
+      hidden: walletAccount.hidden,
+      needsDeploy: walletAccount.needsDeploy,
+    })
+  }
+
   public toWalletAccount(): WalletAccount {
     const {
+      id,
       name,
       networkId,
       address,
@@ -136,6 +162,7 @@ export class Account {
       needsDeploy,
     } = this
     return {
+      id,
       name,
       networkId,
       address,
@@ -150,8 +177,9 @@ export class Account {
   }
 
   public toBaseWalletAccount(): BaseWalletAccount {
-    const { networkId, address } = this
+    const { id, networkId, address } = this
     return {
+      id,
       networkId,
       address,
     }

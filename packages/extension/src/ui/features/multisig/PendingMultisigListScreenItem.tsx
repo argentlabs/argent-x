@@ -1,14 +1,16 @@
-import { Button, iconsDeprecated } from "@argent/x-ui"
+import { Button, icons } from "@argent/x-ui"
 import { Circle, Flex } from "@chakra-ui/react"
-import { FC, MouseEvent, useCallback, useRef } from "react"
+import type { FC, MouseEvent } from "react"
+import { useCallback, useMemo, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { PendingMultisig } from "../../../shared/multisig/types"
+import type { PendingMultisig } from "../../../shared/multisig/types"
 import { routes } from "../../../shared/ui/routes"
 import { AccountListScreenItemAccessory } from "../accounts/AccountListScreenItemAccessory"
 import { PendingMultisigListItem } from "./PendingMultisigListItem"
+import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
 
-const { ChevronRightIcon, MoreIcon } = iconsDeprecated
+const { ChevronRightSecondaryIcon, MoreSecondaryIcon } = icons
 
 /** TODO: refactor - this should use AccoutListScreenItem */
 
@@ -35,6 +37,16 @@ export const PendingMultisigListScreenItem: FC<
     [clickNavigateSettings, navigate, pendingMultisig.publicKey],
   )
 
+  const accountId = useMemo(
+    () =>
+      getAccountIdentifier(
+        pendingMultisig.publicKey,
+        pendingMultisig.networkId,
+        pendingMultisig.signer,
+      ),
+    [pendingMultisig],
+  )
+
   // TODO: Implement onOptionsClick
 
   return (
@@ -47,6 +59,7 @@ export const PendingMultisigListScreenItem: FC<
         }}
         onClick={onClick}
         accountName={pendingMultisig.name}
+        accountId={accountId}
         publicKey={pendingMultisig.publicKey}
         networkId={pendingMultisig.networkId}
         isLedger={pendingMultisig.signer.type === "ledger"}
@@ -54,7 +67,7 @@ export const PendingMultisigListScreenItem: FC<
       >
         {clickNavigateSettings && (
           <AccountListScreenItemAccessory>
-            <ChevronRightIcon opacity={0.6} />
+            <ChevronRightSecondaryIcon opacity={0.6} />
           </AccountListScreenItemAccessory>
         )}
         {!clickNavigateSettings && (
@@ -77,7 +90,7 @@ export const PendingMultisigListScreenItem: FC<
                 bg: "neutrals.600",
               }}
             >
-              <MoreIcon />
+              <MoreSecondaryIcon />
             </Button>
           </AccountListScreenItemAccessory>
         )}

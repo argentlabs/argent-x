@@ -1,7 +1,7 @@
 import { isEqualAddress, includesAddress } from "@argent/x-shared"
 
-import { NFTTransferTransaction } from "../../type"
-import { IExplorerTransactionTransformer } from "./type"
+import type { NFTTransferTransaction } from "../../type"
+import type { IExplorerTransactionTransformer } from "./type"
 
 /** adds erc721 token transfer data */
 

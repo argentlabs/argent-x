@@ -1,6 +1,8 @@
-import { PinInput, PinInputProps } from "@chakra-ui/react"
-import { FC } from "react"
-import { Control, Controller, FieldPath, FieldValues } from "react-hook-form"
+import type { PinInputProps } from "@chakra-ui/react"
+import { PinInput } from "@chakra-ui/react"
+import type { FC } from "react"
+import type { Control, FieldPath, FieldValues } from "react-hook-form"
+import { Controller } from "react-hook-form"
 
 interface ControlledPinInputProps<TFieldValues extends FieldValues = any>
   extends PinInputProps {

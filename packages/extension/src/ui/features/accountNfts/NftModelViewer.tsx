@@ -1,8 +1,9 @@
 import "@google/model-viewer/dist/model-viewer"
 
-import { FC } from "react"
+import type { FC } from "react"
 
-import { NftItem, getNftPicture } from "@argent/x-shared"
+import type { NftItem } from "@argent/x-shared"
+import { getNftPicture } from "@argent/x-shared"
 
 /* eslint-disable @typescript-eslint/no-namespace */
 declare global {

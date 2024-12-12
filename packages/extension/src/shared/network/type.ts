@@ -1,7 +1,7 @@
 import type { ArgentNetworkId, ArgentBackendNetworkId } from "@argent/x-shared"
-import { z } from "zod"
+import type { z } from "zod"
 
-import {
+import type {
   baseNetworkSchema,
   networkSchema,
   colorStatusSchema,

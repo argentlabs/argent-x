@@ -1,7 +1,8 @@
-import { P3, P4 } from "@argent/x-ui"
-import { Box, Circle, Divider, Flex, FlexProps } from "@chakra-ui/react"
-import { FC } from "react"
-import { A } from "../../../components/TrackingLink"
+import { P2, P3 } from "@argent/x-ui"
+import type { FlexProps } from "@chakra-ui/react"
+import { Box, Circle, Divider, Flex } from "@chakra-ui/react"
+import type { FC } from "react"
+import { TrackingLink } from "../../../components/TrackingLink"
 
 export const ConnectInstructionBox: FC = () => {
   return (
@@ -15,7 +16,7 @@ export const ConnectInstructionBox: FC = () => {
       borderColor="neutrals.600"
     >
       <StepBox step={1}>
-        <P3>Plug in and unlock your ledger</P3>
+        <P2>Plug in and unlock your ledger</P2>
       </StepBox>
       <Divider />
       <StepBox step={2}>
@@ -26,20 +27,20 @@ export const ConnectInstructionBox: FC = () => {
           gap={2}
           flex="1 0 0"
         >
-          <P3>Open the Starknet app on your Ledger</P3>
-          <P4 color="neutrals.300">
+          <P2>Open the Starknet app on your Ledger</P2>
+          <P3 color="neutrals.300">
             You will need to first install the Starknet app from
             <Box as="span" color="primary.500" cursor={"pointer"}>
-              <A
+              <TrackingLink
                 href={`https://support.ledger.com/hc/en-us/articles/16765262529821-Starknet-STRK?docs=true`}
                 targetBlank
               >
                 {" "}
                 Ledger Live{" "}
-              </A>
+              </TrackingLink>
             </Box>
             if you haven’t already
-          </P4>
+          </P3>
         </Flex>
       </StepBox>
     </Flex>

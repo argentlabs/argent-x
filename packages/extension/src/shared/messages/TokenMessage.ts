@@ -1,4 +1,4 @@
-import { RequestToken } from "../token/__new/types/token.model"
+import type { RequestToken } from "../token/__new/types/token.model"
 
 export type TokenMessage =
   // - used by dapps to request tokens

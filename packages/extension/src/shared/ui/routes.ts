@@ -4,7 +4,7 @@ import type { AddressBookContact } from "../addressBook/type"
 import type { Flow } from "../argentAccount/schema"
 import type { LedgerStartContext } from "../ledger/schema"
 import type { SendQuery } from "../send/schema"
-import type { CreateAccountType, SignerType } from "../wallet.model"
+import type { CreateAccountType, SignerType, AccountId } from "../wallet.model"
 
 export const route = <T extends (..._: any[]) => string>(
   ...[value, path]: [routeAndPath: string] | [routeWithParams: T, path: string]
@@ -58,25 +58,35 @@ export const routes = {
   accountDiscover: route("/account/discover"),
   beforeYouContinue: route("/before-you-continue"),
   collectionNfts: route(
-    (contractAddress: string) => `/account/collection/${contractAddress}`,
+    (contractAddress: string, returnTo?: string) =>
+      returnTo
+        ? `/account/collection/${contractAddress}?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/account/collection/${contractAddress}`,
     `/account/collection/:contractAddress`,
   ),
   accountNft: route(
-    (contractAddress: string, tokenId: string) =>
-      `/account/nfts/${contractAddress}/${tokenId}`,
+    (contractAddress: string, tokenId: string, returnTo?: string) =>
+      returnTo
+        ? `/account/nfts/${contractAddress}/${tokenId}?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/account/nfts/${contractAddress}/${tokenId}`,
     `/account/nfts/:contractAddress/:tokenId`,
   ),
-  accountHideConfirm: route(
-    (accountAddress: string) => `/account/hide-confirm/${accountAddress}`,
-    `/account/hide-confirm/:accountAddress`,
-  ),
-  accountDeleteConfirm: route(
-    (accountAddress: string) => `/account/delete-confirm/${accountAddress}`,
-    `/account/delete-confirm/:accountAddress`,
+  accountHideOrDeleteConfirm: route(
+    (accountId: AccountId, mode: "hide" | "remove" | "delete") =>
+      `/account/hide-or-remove-confirm/${accountId}/${mode}`,
+    `/account/hide-or-remove-confirm/:accountId/:mode`,
   ),
   sendRecipientScreen: route(
     (query: SendQuery) => `/send?${qs(query)}`,
     "/send",
+  ),
+  sendAddressBookEdit: route(
+    (contact?: AddressBookContact) => `/send/address-book/edit?${qs(contact)}`,
+    "/send/address-book/edit",
   ),
   sendAmountAndAssetScreen: route(
     (query: SendQuery) => `/send/amount-and-asset/?${qs(query)}`,
@@ -109,40 +119,44 @@ export const routes = {
     "/accounts/hidden/:networkId",
   ),
   accounts: routeWithReturnTo("/accounts"),
-  newAccount: routeWithReturnTo("/accounts/new"),
+  newAccount: route(
+    (networkId: string, returnTo?: string) =>
+      returnTo
+        ? `/accounts/new/${networkId}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/accounts/new/${networkId}`,
+    "/accounts/new/:networkId",
+  ),
   changeAccountImplementations: route(
-    (accountAddress) => `/accounts/${accountAddress}/change-implementation`,
-    "/accounts/:accountAddress/change-implementation",
+    (accountId) => `/accounts/${accountId}/change-implementation`,
+    "/accounts/:accountId/change-implementation",
   ),
   accountImplementation: route(
-    (accountAddress) => `/accounts/${accountAddress}/implementation`,
-    "/accounts/:accountAddress/implementation",
+    (accountId) => `/accounts/${accountId}/implementation`,
+    "/accounts/:accountId/implementation",
   ),
   addAccount: route("/accounts/new"),
   standardAccountSignerSelection: route("/account/standard/signer-selection"),
   smartAccountStart: route(
-    (accountAddress) => `/accounts/${accountAddress}/smartAccount`,
-    "/accounts/:accountAddress/smartAccount",
+    (accountId) => `/accounts/${accountId}/smartAccount`,
+    "/accounts/:accountId/smartAccount",
   ),
   argentAccountEmail: route(
-    (accountAddress, flow: Flow, returnTo?: string) =>
+    (accountId, flow: Flow, returnTo?: string) =>
       returnTo
-        ? `/accounts/${accountAddress}/${flow}/email?returnTo=${encodeURIComponent(
+        ? `/accounts/${accountId}/${flow}/email?returnTo=${encodeURIComponent(
             returnTo,
           )}`
-        : `/accounts/${accountAddress}/${flow}/email`,
-    "/accounts/:accountAddress/:flow/email",
+        : `/accounts/${accountId}/${flow}/email`,
+    "/accounts/:accountId/:flow/email",
   ),
   argentAccountLoggedIn: route(
-    (accountAddress) => `/accounts/${accountAddress}/logged-in`,
-    "/accounts/:accountAddress/logged-in",
+    (accountId) => `/accounts/${accountId}/logged-in`,
+    "/accounts/:accountId/logged-in",
   ),
   smartAccountOTP: route(
-    (accountAddress: string, email: string, flow: Flow) =>
-      `/accounts/${accountAddress}/${flow}/otp?email=${encodeURIComponent(
-        email,
-      )}`,
-    "/accounts/:accountAddress/:flow/otp",
+    (accountId: AccountId, email: string, flow: Flow) =>
+      `/accounts/${accountId}/${flow}/otp?email=${encodeURIComponent(email)}`,
+    "/accounts/:accountId/:flow/otp",
   ),
   createSmartAccountOTP: route(
     (email: string, flow: Flow) =>
@@ -157,31 +171,38 @@ export const routes = {
     "/accounts/email",
   ),
   smartAccountAction: route(
-    (accountAddress) => `/accounts/${accountAddress}/smartAccount/action`,
-    "/accounts/:accountAddress/smartAccount/action",
+    (accountId) => `/accounts/${accountId}/smartAccount/action`,
+    "/accounts/:accountId/smartAccount/action",
   ),
   smartAccountFinish: route(
-    (accountAddress) => `/accounts/${accountAddress}/smartAccount/finish`,
-    "/accounts/:accountAddress/smartAccount/finish",
+    (accountId) => `/accounts/${accountId}/smartAccount/finish`,
+    "/accounts/:accountId/smartAccount/finish",
   ),
   smartAccountEscapeWarning: route(
-    (accountAddress) =>
-      `/accounts/${accountAddress}/smartAccount/escape-warning`,
-    "/accounts/:accountAddress/smartAccount/escape-warning",
+    (accountId) => `/accounts/${accountId}/smartAccount/escape-warning`,
+    "/accounts/:accountId/smartAccount/escape-warning",
   ),
   newToken: route("/tokens/new"),
   funding: route("/funding"),
   fundingBridge: route("/funding/bridge"),
   exportPrivateKey: route(
-    (accountAddress) => `/export-private-key/${accountAddress}`,
-    "/export-private-key/:accountAddress",
+    (accountId, type) => `/export-private-key/${accountId}/${type}`,
+    "/export-private-key/:accountId/:type",
   ),
   exportPublicKey: route(
-    (accountAddress) => `/export-public-key/${accountAddress}`,
-    "/export-public-key/:accountAddress",
+    (accountId) => `/export-public-key/${accountId}`,
+    "/export-public-key/:accountId",
   ),
   fundingQrCode: route("/funding/qr-code"),
-  fundingProvider: route("/funding/provider"),
+  fundingProvider: route(
+    (tokenAddress?: string, returnTo?: string) =>
+      returnTo
+        ? `/funding/provider/${tokenAddress}?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/funding/provider/${tokenAddress}`,
+    "/funding/provider/:tokenAddress?",
+  ),
   fundingFaucetFallback: route("/funding/faucet-fallback"),
   fundingFaucetSepolia: route("/funding/faucet-sepolia"),
   hideToken: route(
@@ -189,20 +210,20 @@ export const routes = {
     "/tokens/:tokenAddress/hide",
   ),
   addPlugin: route(
-    (accountAddress) => `/add-plugin/${accountAddress}`,
-    "/add-plugin/:accountAddress",
+    (accountId) => `/add-plugin/${accountId}`,
+    "/add-plugin/:accountId",
   ),
   reset: route("/reset"),
   legacy: route("/legacy"),
   settings: routeWithReturnTo("/settings"),
   settingsAccount: route(
-    (accountAddress, returnTo?: string) =>
+    (accountId: AccountId, returnTo?: string) =>
       returnTo
-        ? `/settings/account/${accountAddress}?returnTo=${encodeURIComponent(
+        ? `/settings/account/${accountId}?returnTo=${encodeURIComponent(
             returnTo,
           )}`
-        : `/settings/account/${accountAddress}`,
-    "/settings/account/:accountAddress",
+        : `/settings/account/${accountId}`,
+    "/settings/account/:accountId",
   ),
   settingsPreferences: routeWithReturnTo("/settings/preferences"),
   settingsBlockExplorer: routeWithReturnTo(
@@ -211,34 +232,36 @@ export const routes = {
   settingsNftMarketplace: routeWithReturnTo(
     "/settings/preferences/nft-marketplace",
   ),
-  settingsNetworks: route("/settings/developer-settings/networks"),
+  settingsIdProvider: routeWithReturnTo("/settings/preferences/id-provider"),
+  settingsHiddenAndSpamTokens: routeWithReturnTo(
+    "/settings/preferences/hidden-and-spam-tokens",
+  ),
+  settingsNetworks: route("/settings/advanced/networks"),
   settingsSeed: routeWithReturnTo("/settings/seed"),
   settingsAutoLockTimer: routeWithReturnTo("/settings/auto-lock-timer"),
-  settingsAddCustomNetwork: route("/settings/developer-settings/networks/add"),
+  settingsAddCustomNetwork: route("/settings/advanced/networks/add"),
   settingsEditCustomNetwork: route(
-    (networkId) => `/settings/developer-settings/networks/${networkId}/edit`,
-    "/settings/developer-settings/networks/:networkId/edit",
+    (networkId) => `/settings/advanced/networks/${networkId}/edit`,
+    "/settings/advanced/networks/:networkId/edit",
   ),
-  settingsRemoveCustomNetwork: route(
-    "/settings/developer-settings/networks/remove",
-  ),
+  settingsRemoveCustomNetwork: route("/settings/advanced/networks/remove"),
   settingsDappConnectionsAccountList: route("/settings/dapp-connections"),
   settingsDappConnectionsAccount: route(
-    (accountAddress) => `/settings/dapp-connections/${accountAddress}`,
-    "/settings/dapp-connections/:accountAddress",
+    (accountId) => `/settings/dapp-connections/${accountId}`,
+    "/settings/dapp-connections/:accountId",
+  ),
+  settingsSecurityAndRecovery: routeWithReturnTo(
+    "/settings/security-and-recovery",
   ),
   settingsPrivacy: routeWithReturnTo("/settings/privacy"),
-  settingsDeveloper: route("/settings/developer-settings"),
-  settingsExperimental: route("/settings/developer-settings/experimental"),
-  settingsBetaFeatures: route("/settings/developer-settings/beta-features"),
+  settingsAdvanced: route("/settings/advanced"),
+  settingsExperimental: route("/settings/advanced/experimental"),
+  settingsBetaFeatures: route("/settings/advanced/beta-features"),
   settingsAddressBook: route("/settings/addressbook"),
   settingsAddressBookAddOrEdit: route(
     (contact?: AddressBookContact) =>
       `/settings/addressbook/add-or-edit?${qs(contact)}`,
     "/settings/addressbook/add-or-edit",
-  ),
-  settingsSmartContractDevelopment: route(
-    "/settings/smart-contract-development",
   ),
   settingsClearLocalStorage: route("/settings/clear-local-storage"),
   settingsDownloadLogs: route("/settings/download-logs"),
@@ -269,8 +292,10 @@ export const routes = {
       accountType: CreateAccountType,
       networkId: string,
       ctx: LedgerStartContext,
-    ) => `/ledger/connect/${accountType}/${networkId}/${ctx}`,
-    "/ledger/connect/:accountType/:networkId/:ctx",
+      signerToReplace?: string,
+    ) =>
+      `/ledger/connect/${accountType}/${networkId}/${ctx}/${signerToReplace}`,
+    "/ledger/connect/:accountType/:networkId/:ctx/:signerToReplace",
   ),
   ledgerSelect: route("/ledger/select"),
   ledgerDone: route("/ledger/done"),
@@ -279,8 +304,9 @@ export const routes = {
   multisigNew: route("/account/new/multisig"),
   multisigSetup: route("/multisig/setup"),
   multisigSignerSelection: route(
-    (ctx: "create" | "join") => `/multisig/signer-selection/${ctx}`,
-    "/multisig/signer-selection/:ctx",
+    (ctx: "create" | "join" | "replace", signerToReplace?: string) =>
+      `/multisig/signer-selection/${ctx}/${signerToReplace}`,
+    "/multisig/signer-selection/:ctx/:signerToReplace",
   ),
   multisigCreate: route(
     (networkId: string, creatorType: SignerType) =>
@@ -301,66 +327,110 @@ export const routes = {
     "/multisig/join/:publicKey/settings",
   ),
   multisigOwners: route(
-    (accountAddress) => `/multisig/${accountAddress}/owners`,
-    "/multisig/:accountAddress/owners",
+    (accountId) => `/multisig/${accountId}/owners`,
+    "/multisig/:accountId/owners",
   ),
   multisigConfirmations: route(
-    (accountAddress) => `/multisig/${accountAddress}/confirmations`,
-    "/multisig/:accountAddress/confirmations",
+    (accountId) => `/multisig/${accountId}/confirmations`,
+    "/multisig/:accountId/confirmations",
   ),
   multisigAddOwners: route(
-    (accountAddress) => `/multisig/${accountAddress}/add-owners`,
-    "/multisig/:accountAddress/add-owners",
+    (accountId) => `/multisig/${accountId}/add-owners`,
+    "/multisig/:accountId/add-owners",
   ),
   multisigRemoveOwners: route(
-    (accountAddress, signerToRemove) =>
-      `/multisig/${accountAddress}/${signerToRemove}/remove-owners`,
-    "/multisig/:accountAddress/:signerToRemove/remove-owners",
+    (accountId, signerToRemove) =>
+      `/multisig/${accountId}/${signerToRemove}/remove-owners`,
+    "/multisig/:accountId/:signerToRemove/remove-owners",
   ),
   multisigReplaceOwner: route(
-    (accountAddress, signerToReplace) =>
-      `/multisig/${accountAddress}/${signerToReplace}/replace-owner`,
-    "/multisig/:accountAddress/:signerToReplace/replace-owner",
+    (accountId, signerToReplace) =>
+      `/multisig/${accountId}/${signerToReplace}/replace-owner`,
+    "/multisig/:accountId/:signerToReplace/replace-owner",
   ),
   multisigPendingTransactionDetails: route(
-    (accountAddress, requestId, returnTo?: string) =>
+    (accountId, requestId, returnTo?: string) =>
       returnTo
-        ? `/multisig/transactions/${accountAddress}/${requestId}/details?returnTo=${encodeURIComponent(
+        ? `/multisig/transactions/${accountId}/${requestId}/details?returnTo=${encodeURIComponent(
             returnTo,
           )}`
-        : `/multisig/transactions/${accountAddress}/${requestId}/details`,
-    "/multisig/transactions/:accountAddress/:requestId/details",
+        : `/multisig/transactions/${accountId}/${requestId}/details`,
+    "/multisig/transactions/:accountId/:requestId/details",
   ),
   multisigTransactionConfirmations: route(
-    (accountAddress, requestId, transactionType: "pending" | "activity") =>
-      `/multisig/${accountAddress}/${requestId}/${transactionType}/confirmations`,
-    "/multisig/:accountAddress/:requestId/:transactionType/confirmations",
+    (accountId, requestId, transactionType: "pending" | "activity") =>
+      `/multisig/${accountId}/${requestId}/${transactionType}/confirmations`,
+    "/multisig/:accountId/:requestId/:transactionType/confirmations",
   ),
   multisigRemovedSettings: route(
-    (accountAddress: string, returnTo?: string) =>
+    (accountId: AccountId, returnTo?: string) =>
       returnTo
-        ? `/multisig/removed/${accountAddress}/settings?returnTo=${encodeURIComponent(
+        ? `/multisig/removed/${accountId}/settings?returnTo=${encodeURIComponent(
             returnTo,
           )}`
-        : `/multisig/removed/${accountAddress}/settings`,
-    "/multisig/removed/:accountAddress/settings",
+        : `/multisig/removed/${accountId}/settings`,
+    "/multisig/removed/:accountId/settings",
   ),
 
   multisigPendingOffchainSignatureDetails: route(
-    (accountAddress, requestId) =>
-      `/multisig/signatures/${accountAddress}/${requestId}/details`,
-    "/multisig/signatures/:accountAddress/:requestId/details",
+    (accountId, requestId) =>
+      `/multisig/signatures/${accountId}/${requestId}/details`,
+    "/multisig/signatures/:accountId/:requestId/details",
+  ),
+
+  tokenDetails: route(
+    (address, networkId, returnTo = routes.accountTokens()) =>
+      `/token/${address}/${networkId}?returnTo=${encodeURIComponent(returnTo)}`,
+    "/token/:address/:networkId",
   ),
 
   multisigPendingOffchainSignatureConfirmations: route(
-    (accountAddress, requestId) =>
-      `/multisig/signatures/${accountAddress}/${requestId}/confirmations`,
-    "/multisig/signatures/:accountAddress/:requestId/confirmations",
+    (accountId, requestId) =>
+      `/multisig/signatures/${accountId}/${requestId}/confirmations`,
+    "/multisig/signatures/:accountId/:requestId/confirmations",
   ),
 
   multisigOffchainSignatureWarning: route("/multisig/signatures/warning"),
 
   airGapReview: route((data) => `/airgap/${data}`, "/airgap/:data"),
 
-  swap: route("/swap"),
+  privateKeyImport: routeWithReturnTo("/account/pk-import"),
+  swapToken: route(
+    (tokenAddress?: string, returnTo?: string) =>
+      returnTo
+        ? `/swap${tokenAddress ? `/${tokenAddress}` : ""}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/swap${tokenAddress ? `/${tokenAddress}` : ""}`,
+    "/swap/:tokenAddress?",
+  ),
+
+  // Staking
+  staking: routeWithReturnTo("/staking"),
+  nativeStakingIndex: routeWithReturnTo("/staking/native"), // allows router to resolve without investmentId
+  nativeStaking: route(
+    (investmentId: string, returnTo?: string) =>
+      returnTo
+        ? `/staking/native/${investmentId}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/staking/native/${investmentId}`,
+    "/staking/native/:investmentId",
+  ),
+  nativeStakingSelect: routeWithReturnTo("/staking/native-select"),
+  liquidStakingSelect: routeWithReturnTo("/staking/liquid-select"),
+  unstake: route(
+    (investmentPositionId: string, returnTo?: string) =>
+      returnTo
+        ? `/staking/unstake/${investmentPositionId}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/staking/unstake/${investmentPositionId}`,
+    "/staking/unstake/:investmentPositionId",
+  ),
+
+  // Defi
+  defiPositionDetails: route(
+    (positionId: string, dappId: string, returnTo?: string) =>
+      returnTo
+        ? `/defi/position/${positionId}/${dappId}?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/defi/position/${positionId}/${dappId}`,
+    "/defi/position/:positionId/:dappId",
+  ),
 }

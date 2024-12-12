@@ -1,10 +1,10 @@
-import { WalletAccount } from "../../wallet.model"
+import type { ArgentWalletAccount } from "../../wallet.model"
 import { accountsEqual } from "../../utils/accountsEqual"
-import { getAccountEscapeFromChain } from "./getAccountEscapeFromChain"
-import { getAccountGuardiansFromChain } from "./getAccountGuardiansFromChain"
-import { getAccountClassHashFromChain } from "./getAccountClassHashFromChain"
-import { getAccountDeployStatusFromChain } from "./getAccountDeployStatusFromChain"
-import { getAccountCairoVersionFromChain } from "./getAccountCairoVersionFromChain"
+import type { getAccountEscapeFromChain } from "./getAccountEscapeFromChain"
+import type { getAccountGuardiansFromChain } from "./getAccountGuardiansFromChain"
+import type { getAccountClassHashFromChain } from "./getAccountClassHashFromChain"
+import type { getAccountDeployStatusFromChain } from "./getAccountDeployStatusFromChain"
+import type { getAccountCairoVersionFromChain } from "./getAccountCairoVersionFromChain"
 
 export type DetailFetchers =
   | typeof getAccountDeployStatusFromChain
@@ -16,7 +16,7 @@ export type DetailFetchers =
 /** Use Promise.all allows multicall to batch all calls to get account deatils on chain */
 
 export const getAndMergeAccountDetails = async (
-  accounts: WalletAccount[],
+  accounts: ArgentWalletAccount[],
   detailFetchers: DetailFetchers[],
 ) => {
   const accountsWithAttributesResults = await Promise.all(

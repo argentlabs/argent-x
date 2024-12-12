@@ -1,3 +1,4 @@
+import type { TokenWithBalance } from "@argent/x-shared"
 import {
   formatAddress,
   isAddress,
@@ -6,13 +7,14 @@ import {
   parseAmount,
   prettifyCurrencyValue,
   prettifyTokenNumber,
-  TokenWithBalance,
   transferCalldataSchema,
 } from "@argent/x-shared"
 import { FieldError } from "@argent/x-ui"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
-import { SubmitHandler, useForm } from "react-hook-form"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import type { SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { z } from "zod"
 
@@ -38,10 +40,8 @@ import { useFeeTokenSelection } from "../actions/transactionV2/useFeeTokenSelect
 import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { amountInputSchema } from "./amountInput"
-import {
-  SendAmountAndAssetScreen,
-  SendAmountAndAssetScreenProps,
-} from "./SendAmountAndAssetScreen"
+import type { SendAmountAndAssetScreenProps } from "./SendAmountAndAssetScreen"
+import { SendAmountAndAssetScreen } from "./SendAmountAndAssetScreen"
 import { TokenAmountInput } from "./TokenAmountInput"
 
 const formSchema = z.object({
@@ -318,10 +318,11 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     <SendAmountAndAssetScreen
       {...rest}
       onCancel={onCancel}
-      onSubmit={onSubmit}
+      onSubmit={() => void onSubmit()}
       isInvalid={disableButton}
       submitButtonError={submitButtonError}
       input={
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         <form onSubmit={handleSubmit(onAmountInputSubmit)}>
           <>
             <TokenAmountInput

@@ -1,11 +1,9 @@
-import { H3, PreBox } from "@argent/x-ui"
+import { H2, PreBox } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-import {
-  ConfirmScreen,
-  ConfirmScreenProps,
-} from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import type { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import { ConfirmScreen } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
 
 interface ErrorScreenProps extends ConfirmScreenProps {
   message: string
@@ -15,7 +13,7 @@ export const ErrorScreen: FC<ErrorScreenProps> = ({ message, ...rest }) => {
   return (
     <ConfirmScreen confirmButtonText="Back" singleButton {...rest}>
       <Flex flexDirection={"column"} flex={1} gap={4}>
-        <H3>Something went wrong</H3>
+        <H2>Something went wrong</H2>
         <PreBox>{message}</PreBox>
       </Flex>
     </ConfirmScreen>

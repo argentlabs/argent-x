@@ -1,4 +1,4 @@
-import { Transaction } from "../../../shared/transactions"
+import type { Transaction } from "../../../shared/transactions"
 import { useMemo } from "react"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
 import { isSafeUpgradeTransaction } from "../../../shared/utils/isSafeUpgradeTransaction"

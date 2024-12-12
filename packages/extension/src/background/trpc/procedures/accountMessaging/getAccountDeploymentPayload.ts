@@ -13,6 +13,7 @@ import {
   bigNumberishSchema,
   rawArgsSchema,
 } from "@argent/x-shared"
+import { walletAccountToArgentAccount } from "../../../../shared/utils/isExternalAccount"
 
 const getAccountDeploymentPayloadInputSchema = z
   .object({
@@ -48,7 +49,7 @@ export const getAccountDeploymentPayloadProcedure = connectedDappsProcedure
       }
       try {
         const walletAccount = input?.account
-          ? await wallet.getAccount(input.account)
+          ? await wallet.getAccount(input.account.id)
           : await wallet.getSelectedAccount()
         if (!walletAccount) {
           throw new AccountError({
@@ -60,7 +61,9 @@ export const getAccountDeploymentPayloadProcedure = connectedDappsProcedure
           return null
         }
 
-        return await wallet.getAccountDeploymentPayload(walletAccount)
+        return await wallet.getAccountOrMultisigDeploymentPayload(
+          walletAccountToArgentAccount(walletAccount),
+        )
       } catch (e) {
         throw new AccountMessagingError({
           options: { error: e },

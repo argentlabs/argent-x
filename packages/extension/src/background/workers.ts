@@ -12,6 +12,9 @@ import { scheduleWorker } from "./services/schedule/worker"
 import { analyticsWorker } from "./services/analytics"
 import { activityCacheWorker } from "./services/activity/cache/worker"
 import { activityWorker } from "./services/activity"
+import { nonceManagementWorker } from "./nonceManagement/worker"
+import { devWorker } from "./services/dev"
+import { investmentWorker } from "./services/investments/worker"
 
 /** TODO: refactor: remove this facade */
 export function initWorkers() {
@@ -20,6 +23,7 @@ export function initWorkers() {
     accountWorker,
     tokenWorker,
     nftsWorker,
+    investmentWorker,
     multisigWorker,
     networkWorker,
     knownDappsWorker,
@@ -30,5 +34,7 @@ export function initWorkers() {
     analyticsWorker,
     activityCacheWorker,
     activityWorker,
+    nonceManagementWorker,
+    devWorker,
   }
 }

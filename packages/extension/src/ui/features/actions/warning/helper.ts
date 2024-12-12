@@ -1,10 +1,10 @@
-import { Warning } from "@argent/x-shared/simulation"
+import type { Warning } from "@argent/x-shared/simulation"
 import { useView } from "../../../views/implementation/react"
 import {
   allWarningsView,
   warningsFindFamily,
 } from "../../../views/transactionReviews"
-import { AllowArray } from "../../../../shared/storage/__new/interface"
+import type { AllowArray } from "../../../../shared/storage/__new/interface"
 
 export const useWarningsTitle = (warnings: Warning[]) => {
   const allWarnings = useView(allWarningsView)

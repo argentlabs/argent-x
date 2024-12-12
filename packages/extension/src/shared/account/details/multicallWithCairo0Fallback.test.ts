@@ -1,6 +1,7 @@
-import { MinimalProviderInterface } from "@argent/x-multicall"
-import { Call } from "starknet"
-import { Mocked, describe, expect, test } from "vitest"
+import type { MinimalProviderInterface } from "@argent/x-multicall"
+import type { Call } from "starknet"
+import type { Mocked } from "vitest"
+import { describe, expect, test } from "vitest"
 
 import { multicallWithCairo0Fallback } from "./multicallWithCairo0Fallback"
 

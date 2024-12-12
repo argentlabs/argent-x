@@ -1,9 +1,9 @@
 import { num, shortString } from "starknet"
 
-import { NetworkMessage } from "../shared/messages/NetworkMessage"
+import type { NetworkMessage } from "../shared/messages/NetworkMessage"
 import { networkService } from "../shared/network/service"
 import { UnhandledMessage } from "./background"
-import { HandleMessage } from "./background"
+import type { HandleMessage } from "./background"
 import { networkSchema } from "../shared/network"
 
 export const handleNetworkMessage: HandleMessage<NetworkMessage> = async ({

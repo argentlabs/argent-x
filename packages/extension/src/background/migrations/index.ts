@@ -1,16 +1,16 @@
 import browser from "webextension-polyfill"
 
-import { restoreDefaultNetworks } from "./network/restoreDefaultNetworksMigration"
 import { KeyValueStorage } from "../../shared/storage"
-import { runRemoveTestnet2Accounts, runV581Migration } from "./wallet"
-import { runV59TokenMigration } from "./token/v5.9"
-import { runDefaultTokenMigration } from "./token/v5.10"
-import { runPreAuthorizationMigrationOld } from "./preAuthorizations/old"
 import { runLatestBalanceChangingActivityMigration } from "./activity/latestBalanceChangingActivityMigration"
+import { restoreDefaultNetworks } from "./network/restoreDefaultNetworksMigration"
+import { runPreAuthorizationMigrationOld } from "./preAuthorizations/old"
+import { runDefaultTokenMigration } from "./token/v5.10"
+import { runV59TokenMigration } from "./token/v5.9"
 import {
   migrateTxStatus,
   needsTxStatusMigration,
 } from "./transactions/migrateStatus"
+import { runRemoveTestnet2Accounts, runV581Migration } from "./wallet"
 
 enum WalletMigrations {
   v581 = "wallet:v581",
@@ -108,13 +108,11 @@ async function runUpdateMigrations() {
   }
 }
 
-export const installMigrationListener = browser.runtime.onInstalled.addListener(
-  async (details) => {
-    if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-      await runInstallMigrations()
-    }
-    if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
-      await runUpdateMigrations()
-    }
-  },
-)
+browser.runtime.onInstalled.addListener((details) => {
+  if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    void runInstallMigrations()
+  }
+  if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
+    void runUpdateMigrations()
+  }
+})

@@ -1,13 +1,14 @@
-import { FC, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo } from "react"
 import { getErrorMessageAndLabelFromSimulation } from "@argent/x-shared/simulation"
-import { Label, ActionScreenErrorFooter } from "@argent/x-ui"
+import { ActionScreenErrorFooter, Label } from "@argent/x-ui"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../../shared/ui/routes"
 import { DeployAccountScreenContainer } from "../../accounts/DeployAccountScreenContainer"
 import { useIsAccountDeploying } from "../../accountTokens/useIsAccountDeploying"
 import { RemovedMultisigWarningScreen } from "../../multisig/RemovedMultisigWarningScreen"
 import { WithSmartAccountVerified } from "../../smartAccount/WithSmartAccountVerified"
-import { useDappDisplayAttributes } from "../connectDapp/useDappDisplayAttributes"
+import { useDappDisplayAttributes } from "../../../services/knownDapps/useDappDisplayAttributes"
 import { ExecuteFromOutsideScreen } from "../ExecuteFromOutsideScreen"
 import { useActionScreen } from "../hooks/useActionScreen"
 import { useDefaultFeeToken } from "../useDefaultFeeToken"
@@ -22,6 +23,9 @@ import {
   multisigView,
 } from "../../multisig/multisig.state"
 import useValidateOutsideExecution from "../transaction/executeFromOutside/useValidateOutsideExecution"
+import { transactionHashFindAtom } from "../../../views/transactionHashes"
+import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
+import { validateSignatureChainId } from "../../../../shared/utils/validateSignatureChainId"
 
 export const SignActionScreenContainerV2: FC = () => {
   const {
@@ -76,6 +80,8 @@ export const SignActionScreenContainerV2: FC = () => {
     disableLedgerApproval,
   } = useLedgerForTransaction(selectedAccount)
 
+  const txHash = useView(transactionHashFindAtom(action.meta.hash))
+
   const onSubmit = useCallback(async () => {
     if (isLedgerSigner) {
       await clearLastActionError()
@@ -120,6 +126,28 @@ export const SignActionScreenContainerV2: FC = () => {
     )
   }, [review])
 
+  const invalidChainIdError = useMemo(() => {
+    if (!selectedAccount) {
+      return null
+    }
+
+    const validateSignatureChainIdResult = validateSignatureChainId(
+      selectedAccount,
+      dataToSign,
+    )
+
+    if (validateSignatureChainIdResult.success) {
+      return null
+    }
+
+    return (
+      <ActionScreenErrorFooter
+        title={validateSignatureChainIdResult.error}
+        errorMessage={validateSignatureChainIdResult.error}
+      />
+    )
+  }, [dataToSign, selectedAccount])
+
   if (
     !skipDeployWarning &&
     selectedAccount?.needsDeploy &&
@@ -152,6 +180,9 @@ export const SignActionScreenContainerV2: FC = () => {
   const confirmButtonDisabled = disableLedgerApproval
 
   const signatureReview = transactionReviewSimulationError ? undefined : review // If we have simulation errors, fallback to the normal signature screen
+  const footer = transactionReviewSimulationError || invalidChainIdError || (
+    <WithActionScreenErrorFooter />
+  )
 
   return (
     <WithSmartAccountVerified>
@@ -172,6 +203,7 @@ export const SignActionScreenContainerV2: FC = () => {
         isValidating={isValidating}
         confirmButtonDisabled={confirmButtonDisabled}
         isLedger={isLedgerSigner}
+        footer={footer}
       />
       <LedgerActionModal
         isOpen={isLedgerApprovalOpen}
@@ -180,6 +212,7 @@ export const SignActionScreenContainerV2: FC = () => {
         errorMessage={ledgerErrorMessage}
         account={selectedAccount}
         actionType="signature"
+        txHash={txHash}
       />
     </WithSmartAccountVerified>
   )

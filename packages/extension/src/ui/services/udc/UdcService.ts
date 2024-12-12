@@ -1,9 +1,9 @@
-import { DeclareContractBackgroundPayload } from "../../../shared/udc/schema"
-import {
+import type { DeclareContractBackgroundPayload } from "../../../shared/udc/schema"
+import type {
   DeployContractPayload,
   IUdcService,
 } from "../../../shared/udc/service/interface"
-import { messageClient } from "../trpc"
+import type { messageClient } from "../trpc"
 import { z } from "zod"
 
 export class UdcService implements IUdcService {

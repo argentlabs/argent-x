@@ -14,7 +14,12 @@ describe("UIService", () => {
       },
       runtime: {
         getURL: vi.fn(),
-        getManifest: vi.fn(() => ({ manifest_version: 3 }) as any),
+        getManifest: vi.fn(
+          () =>
+            ({
+              manifest_version: 3,
+            }) as any,
+        ),
       },
       tabs: {
         create: vi.fn(),

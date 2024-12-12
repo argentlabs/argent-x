@@ -1,15 +1,15 @@
+import type { Address } from "@argent/x-shared"
 import {
-  Address,
   cairoAssemblySchema,
   compiledContractClassSchema,
 } from "@argent/x-shared"
-import {
+import type {
   CairoVersion,
   DeclareContractPayload,
   UniversalDeployerContractPayload,
 } from "starknet"
 import { z } from "zod"
-import { BaseWalletAccount } from "../wallet.model"
+import type { BaseWalletAccount } from "../wallet.model"
 
 export const getConstructorParamsSchema = z.object({
   networkId: z.string(),
@@ -38,8 +38,7 @@ export interface DeployContract {
 }
 
 export const declareContractSchema = z.object({
-  address: z.string().optional(),
-  networkId: z.string().optional(),
+  accountId: z.string().optional(),
   contract: compiledContractClassSchema.or(z.string()),
   classHash: z.string().optional(),
   casm: cairoAssemblySchema.optional(),
@@ -51,8 +50,7 @@ export type DeclareContractBackgroundPayload = z.infer<
 >
 
 export const deployContractSchema = z.object({
-  address: z.string(),
-  networkId: z.string(),
+  accountId: z.string().optional(),
   classHash: z.string(),
   constructorCalldata: z.array(z.string()),
   salt: z.string().optional(),

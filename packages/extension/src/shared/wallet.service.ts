@@ -1,5 +1,9 @@
 import { isEqualAddress } from "@argent/x-shared"
-import { BaseWalletAccount, SignerType, WalletAccount } from "./wallet.model"
+import type {
+  BaseWalletAccount,
+  SignerType,
+  WalletAccount,
+} from "./wallet.model"
 import { getBaseDerivationPath } from "./signer/utils"
 
 export const DEPRECATED_TX_V0_ACCOUNT_IMPLEMENTATION_CLASS_HASH = [
@@ -67,9 +71,6 @@ export const isEqualWalletAddress = (
 
 export const isAccountHidden = (account: Pick<WalletAccount, "hidden">) =>
   account.hidden === true
-
-export const getAccountIdentifier = (account: BaseWalletAccount) =>
-  `${account.networkId}::${account.address}`
 
 export const getPendingMultisigIdentifier = (pendingMultisig: {
   networkId: string

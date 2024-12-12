@@ -7,20 +7,25 @@
   "ignoreDeps": [
     "@argent-x/extension",
     "@argent/eslint-plugin-local",
-    "@argent/x-guardian",
     "@argent/stack-router",
+    "@argent/x-guardian",
     "@argent/x-sessions",
     "@argent/x-shared",
     "@argent/x-ui",
+    "@argent/x-window",
+    "@chakra-ui/cli",
+    "@chakra-ui/react",
+    "@emotion/react",
+    "@emotion/styled",
+    "@ledgerhq/hw-app-starknet",
+    "@starknet-io/types-js",
     "get-starknet-core",
     "get-starknet-coreV3",
     "shardlabs/starknet-devnet-rs",
-    "@starknet-io/types-js",
     "starknet",
     "starknet4-deprecated",
     "starknet4",
-    "starknet5",
-    "starknetkit"
+    "starknet5"
   ],
   "packageRules": [
     {

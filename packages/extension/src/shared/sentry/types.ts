@@ -1,4 +1,4 @@
-import { BrowserClient } from "@sentry/browser"
+import type { BrowserClient } from "@sentry/browser"
 
 /** type not exported by Sentry */
 export type BrowserClientOptions = ConstructorParameters<

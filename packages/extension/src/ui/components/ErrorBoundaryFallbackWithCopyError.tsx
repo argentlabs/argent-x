@@ -1,126 +1,41 @@
-import { iconsDeprecated, useToast } from "@argent/x-ui"
-import { Collapse } from "@mui/material"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
-import styled from "styled-components"
+import {
+  CellStack,
+  CopyTooltip,
+  H4,
+  icons,
+  P3,
+  scrollbarStyleThin,
+  useToast,
+} from "@argent/x-ui"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 
 import { settingsStore } from "../../shared/settings"
 import { useKeyValueStorage } from "../hooks/useStorage"
 import { coerceErrorToString } from "../../shared/utils/error"
-import { makeClickable } from "../services/a11y"
 import { useHardResetAndReload } from "../services/resetAndReload"
-import { P } from "../theme/Typography"
-import { ColumnCenter } from "./Column"
-import { CopyTooltip } from "./CopyTooltip"
-import { ErrorBoundaryState } from "./ErrorBoundary"
-import { AlertIcon } from "./Icons/AlertIcon"
+import type { ErrorBoundaryState } from "./ErrorBoundary"
+import { useClearLocalStorage } from "../features/settings/advanced/clearLocalStorage/useClearLocalStorage"
+import type { FlexProps } from "@chakra-ui/react"
 import {
-  ContentCopyIcon,
-  KeyboardArrowDownRounded,
-  RefreshIcon,
-} from "./Icons/MuiIcons"
-import IOSSwitch from "./IOSSwitch"
-import { useClearLocalStorage } from "../features/settings/developerSettings/clearLocalStorage/useClearLocalStorage"
-import { useDisclosure } from "@chakra-ui/react"
+  Box,
+  Button,
+  Collapse,
+  Flex,
+  Switch,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react"
 import { ClearStorageModal } from "./ClearStorageModal"
 import { browserExtensionSentryWithScope } from "../../shared/sentry/scope"
 
-const Title = styled.h3`
-  font-weight: 600;
-  font-size: 17px;
-  line-height: 22px;
-  color: ${({ theme }) => theme.text1};
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  svg {
-    color: ${({ theme }) => theme.text2};
-    font-size: 12px;
-  }
-`
-
-const SettingsItem = styled.div`
-  padding: 24px 32px;
-`
-
-const MessageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-
-  padding: 21px 16px 21px;
-`
-
-const ErrorMessageContainer = styled.div`
-  margin-bottom: 16px;
-`
-
-const ActionsWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  width: 100%;
-`
-
-export const ActionContainer = styled.div`
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 100px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: all 200ms ease-in-out;
-  font-size: 12px;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
-
-  > svg {
-    font-size: 12px;
-  }
-  > svg:first-child {
-    margin-right: 0.5em;
-  }
-  > svg:last-child {
-    margin-left: 0.5em;
-  }
-`
-
-const ErrorLogsContainer = styled(ColumnCenter)`
-  margin-top: 4px;
-`
-const ShowLogsToggle = styled.div`
-  ${({ theme }) => theme.flexRowNoWrap}
-  gap: 4px;
-  align-items: flex-end;
-  font-size: 11px;
-  line-height: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-`
-const Logs = styled.div`
-  margin-top: 12px;
-  background-color: ${({ theme }) => theme.black};
-  color: ${({ theme }) => theme.text1};
-  padding: 16px;
-  overflow: hidden;
-`
-
-const StyledSettingsItem = styled(SettingsItem)`
-  align-self: stretch;
-  padding: 12px 16px;
-  border: 1px solid ${({ theme }) => theme.bg2};
-  border-radius: 8px;
-  margin-top: 9px;
-`
+const {
+  WarningCircleSecondaryIcon,
+  CopyPrimaryIcon,
+  RefreshPrimaryIcon,
+  BroomIcon,
+  DropdownDownIcon,
+} = icons
 
 const version = process.env.VERSION
 const fallbackErrorPayload = `v${version}
@@ -128,23 +43,26 @@ const fallbackErrorPayload = `v${version}
 Unable to parse error
 `
 
-const { BroomIcon } = iconsDeprecated
-export interface IErrorBoundaryFallbackWithCopyError
-  extends ErrorBoundaryState {
+interface ErrorBoundaryFallbackWithCopyErrorProps
+  extends FlexProps,
+    ErrorBoundaryState {
   message?: string
   /** overrides storage setting, used in Storybook */
   privacyErrorReporting?: boolean
+  errorPayload?: string
 }
 
-const ErrorBoundaryFallbackWithCopyError: FC<
-  IErrorBoundaryFallbackWithCopyError
+export const ErrorBoundaryFallbackWithCopyError: FC<
+  ErrorBoundaryFallbackWithCopyErrorProps
 > = ({
   error,
   errorInfo,
   message = "Sorry, an error occurred",
   privacyErrorReporting: privacyErrorReportingProp,
+  errorPayload: errorPayloadProp,
+  ...rest
 }) => {
-  const [viewLogs, setViewLogs] = useState(false)
+  const { isOpen: isErrorOpen, onToggle: onErrorToggle } = useDisclosure()
   const toast = useToast()
   const {
     isOpen: isClearStorageModalOpen,
@@ -161,6 +79,9 @@ const ErrorBoundaryFallbackWithCopyError: FC<
     useClearLocalStorage(onClearStorageSuccess)
   const errorPayload = useMemo(() => {
     try {
+      if (errorPayloadProp) {
+        return errorPayloadProp
+      }
       const displayError = coerceErrorToString(error)
       const displayStack = errorInfo?.componentStack || "No stack trace"
       return `v${version}
@@ -168,11 +89,11 @@ const ErrorBoundaryFallbackWithCopyError: FC<
 ${displayError}
 ${displayStack}
       `
-    } catch (e) {
+    } catch {
       // ignore error
     }
     return fallbackErrorPayload
-  }, [error, errorInfo])
+  }, [error, errorInfo?.componentStack, errorPayloadProp])
 
   const reportToSentry = useCallback(
     (manuallySubmitted = true) => {
@@ -212,110 +133,101 @@ ${displayStack}
     settingsStore,
     "privacyAutomaticErrorReporting",
   )
+
   useEffect(() => {
     if (privacyErrorReporting && privacyAutomaticErrorReporting) {
       reportToSentry(false)
     }
   }, [privacyErrorReporting, privacyAutomaticErrorReporting, reportToSentry])
+
   return (
-    <MessageContainer>
-      <AlertIcon style={{ marginBottom: "15px" }} />
-      <ErrorMessageContainer>
-        <P style={{ textAlign: "center" }}>{message}</P>
-
-        <ErrorLogsContainer>
-          <ShowLogsToggle
-            {...makeClickable(() => setViewLogs(!viewLogs), {
-              label: "Show error logs",
-            })}
+    <CellStack alignItems="center" textAlign="center" {...rest}>
+      <WarningCircleSecondaryIcon color="button-danger" fontSize="6xl" />
+      <H4>{message}</H4>
+      <Button
+        size="2xs"
+        colorScheme="transparent"
+        color="text-secondary"
+        onClick={onErrorToggle}
+        rightIcon={<DropdownDownIcon />}
+      >
+        Show error logs
+      </Button>
+      <Box w="full">
+        <Collapse in={isErrorOpen} animateOpacity>
+          <Flex
+            overflow="hidden"
+            overflowY="auto"
+            bg="surface-sunken"
+            rounded="lg"
+            p={4}
+            maxHeight={"80vh"}
+            sx={scrollbarStyleThin}
           >
-            View Logs
-            <KeyboardArrowDownRounded
-              style={{
-                transition: "transform 0.2s ease-in-out",
-                transform: viewLogs ? "rotate(-180deg)" : "rotate(0deg)",
-                height: 13,
-                width: 13,
-              }}
-            />
-          </ShowLogsToggle>
-        </ErrorLogsContainer>
-        <Collapse
-          in={viewLogs}
-          timeout="auto"
-          style={{
-            maxHeight: "80vh",
-            overflow: "auto",
-            borderRadius: "8px",
-          }}
-        >
-          <Logs>
-            <pre style={{ whiteSpace: "pre-wrap", lineBreak: "anywhere" }}>
+            <P3 as="pre" whiteSpace="pre-wrap" textAlign="left">
               {errorPayload}
-            </pre>
-          </Logs>
+            </P3>
+          </Flex>
         </Collapse>
-      </ErrorMessageContainer>
-
-      <ActionsWrapper>
-        <CopyTooltip message="Copied" copyValue={errorPayload}>
-          <ActionContainer>
-            <ContentCopyIcon />
-            <span>Copy error</span>
-          </ActionContainer>
+      </Box>
+      <Flex gap={2}>
+        <CopyTooltip copyValue={errorPayload}>
+          <Button size="2xs" leftIcon={<CopyPrimaryIcon />}>
+            Copy error
+          </Button>
         </CopyTooltip>
-        <ActionContainer {...makeClickable(hardResetAndReload)}>
-          <RefreshIcon />
-          <span>Retry</span>
-        </ActionContainer>
-        {/* TODO decide what to do with this */}
-        {/* {privacyErrorReporting && (
-          <ActionContainer {...makeClickable(reportToSentry)}>
-            <WarningIcon />
-            <span>Report error</span>
-          </ActionContainer>
-        )} */}
-        <ActionContainer {...makeClickable(onClearStorageModalOpen)}>
-          <BroomIcon />
-          <span>Clear storage</span>
-        </ActionContainer>
-      </ActionsWrapper>
+        <Button
+          onClick={() => void hardResetAndReload()}
+          size="2xs"
+          leftIcon={<RefreshPrimaryIcon />}
+        >
+          Retry
+        </Button>
+        <Button
+          onClick={() => void onClearStorageModalOpen()}
+          size="2xs"
+          leftIcon={<BroomIcon />}
+        >
+          Clear storage
+        </Button>
+      </Flex>
       <ClearStorageModal
         isOpen={isClearStorageModalOpen}
         onClose={onClearStorageModalClose}
         onConfirm={verifyPasswordAndClearStorage}
         isClearingStorage={isClearingStorage}
       />
-
       {privacyErrorReporting && (
-        <StyledSettingsItem>
-          <Title>
-            <span
-              style={{
-                fontSize: "12px",
-                lineHeight: "16px",
-                fontWeight: 600,
-              }}
-            >
+        <Flex
+          mt={2}
+          p={3}
+          rounded="lg"
+          border="1px solid"
+          borderColor="surface-elevated-hover"
+          gap={2}
+          w="full"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <P3>
+            <Text as="span" fontWeight="bold">
               Automatic Error Reporting.{" "}
-              <span style={{ fontWeight: 400 }}>
-                Be aware that shared logs might contain sensitive data
-              </span>
-            </span>
-            <IOSSwitch
-              checked={privacyAutomaticErrorReporting}
-              onClick={() =>
-                settingsStore.set(
-                  "privacyAutomaticErrorReporting",
-                  !privacyAutomaticErrorReporting,
-                )
-              }
-            />
-          </Title>
-        </StyledSettingsItem>
+            </Text>
+            <Text as="span" color="text-secondary">
+              Be aware that shared logs might contain sensitive data
+            </Text>
+          </P3>
+          <Switch
+            isChecked={privacyAutomaticErrorReporting}
+            onChange={() =>
+              void settingsStore.set(
+                "privacyAutomaticErrorReporting",
+                !privacyAutomaticErrorReporting,
+              )
+            }
+          />
+        </Flex>
       )}
-    </MessageContainer>
+    </CellStack>
   )
 }
-
-export default ErrorBoundaryFallbackWithCopyError

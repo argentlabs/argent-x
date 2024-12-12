@@ -1,7 +1,10 @@
 import { beforeEach, describe, test, vi } from "vitest"
 
 import { ChromeScheduleService } from "./ChromeScheduleService"
-import { BaseScheduledTask, ImplementedScheduledTask } from "./IScheduleService"
+import type {
+  BaseScheduledTask,
+  ImplementedScheduledTask,
+} from "./IScheduleService"
 
 function getMockBrowser() {
   const onStartUpListeners: Array<(...args: unknown[]) => void> = []

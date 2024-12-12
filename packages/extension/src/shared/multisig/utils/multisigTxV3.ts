@@ -1,6 +1,6 @@
 import { num } from "starknet"
-import { ResourceBounds } from "@starknet-io/types-js"
-import { ApiMultisigResourceBounds } from "../multisig.model"
+import type { ResourceBounds } from "@starknet-io/types-js"
+import type { ApiMultisigResourceBounds } from "../multisig.model"
 
 const DEFAULT_BOUNDS = {
   max_amount: "0x0",

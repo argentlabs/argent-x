@@ -5,27 +5,27 @@ import {
   CellStack,
   FieldError,
   FlowHeader,
+  icons,
   Input,
   NavigationContainer,
-  iconsDeprecated,
   useToast,
 } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { useForm } from "react-hook-form"
 
 import { Box, Link, Text } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { voidify } from "@argent/x-shared"
+
 import { ARGENT_X_LEGAL_PRIVACY_POLICY_URL } from "../../../shared/api/constants"
 import { resetDevice } from "../../../shared/smartAccount/jwt"
 import { coerceErrorToString } from "../../../shared/utils/error"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 import { clientArgentAccountService } from "../../services/argentAccount"
-import {
-  ArgentAccountBaseEmailScreenProps,
-  emailSchema,
-} from "./argentAccountBaseEmailScreen.model"
+import type { ArgentAccountBaseEmailScreenProps } from "./argentAccountBaseEmailScreen.model"
+import { emailSchema } from "./argentAccountBaseEmailScreen.model"
 
-const { EmailIcon } = iconsDeprecated
+const { MessageSecondaryIcon } = icons
 
 const screenContent = {
   toggleSmartAccount: {
@@ -89,13 +89,13 @@ export const ArgentAccountBaseEmailScreen: FC<
         as={"form"}
         display={"flex"}
         flex={1}
-        onSubmit={onSubmit}
+        onSubmit={voidify(onSubmit)}
         justifyContent={"space-between"}
         pt={0}
       >
         <Box>
           <FlowHeader
-            icon={EmailIcon}
+            icon={MessageSecondaryIcon}
             title="Enter email"
             subtitle={screenContent[flow].subtitle}
             variant="primary"
@@ -122,7 +122,7 @@ export const ArgentAccountBaseEmailScreen: FC<
             <Link
               href={ARGENT_X_LEGAL_PRIVACY_POLICY_URL}
               target="_blank"
-              color="primary.500"
+              color="text-brand"
             >
               Privacy Policy
             </Link>

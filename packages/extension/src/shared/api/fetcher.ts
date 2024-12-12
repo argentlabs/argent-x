@@ -60,7 +60,7 @@ export const fetcher = async <T>(
   try {
     const json = JSON.parse(responseText)
     return json
-  } catch (parseError) {
+  } catch {
     throw fetcherError(
       "An error occurred while parsing",
       response,

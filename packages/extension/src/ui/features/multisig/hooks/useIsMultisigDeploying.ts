@@ -7,7 +7,7 @@
 import { useMemo } from "react"
 
 import { useDeployAccountTransactions } from "../../accounts/accountTransactions.state"
-import { Multisig } from "../Multisig"
+import type { Multisig } from "../Multisig"
 
 export const useIsMultisigDeploying = (multisig?: Multisig) => {
   const { pendingTransactions } = useDeployAccountTransactions(multisig)

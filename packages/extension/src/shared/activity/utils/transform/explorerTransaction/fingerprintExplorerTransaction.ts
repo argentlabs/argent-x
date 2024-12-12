@@ -3,7 +3,7 @@
  *
  * This is used to match known transaction types in the transformer
  */
-import { IExplorerTransaction } from "../../../../explorer/type"
+import type { IExplorerTransaction } from "../../../../explorer/type"
 
 export const getPreExecutionEventNames = (
   explorerTransaction: IExplorerTransaction,

@@ -2,11 +2,11 @@ import {
   BarBackButton,
   Button,
   Empty,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { SMART_ACCOUNT_NETWORK_ID } from "../../../shared/smartAccount/constants"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
@@ -15,7 +15,7 @@ import { SmartAccountNotReady } from "./SmartAccountNotReady"
 import { useRouteWalletAccount } from "./useRouteWalletAccount"
 import { useToggleSmartAccountRoute } from "./useToggleSmartAccountRoute"
 
-const { SmartAccountActiveIcon } = iconsDeprecated
+const { ShieldSecondaryIcon } = icons
 
 export const SmartAccountStartScreen: FC = () => {
   const account = useRouteWalletAccount()
@@ -48,7 +48,7 @@ export const SmartAccountStartScreen: FC = () => {
         )
       ) : (
         <Empty
-          icon={<SmartAccountActiveIcon />}
+          icon={<ShieldSecondaryIcon />}
           title={"Smart Account is not enabled for this network"}
         />
       )}

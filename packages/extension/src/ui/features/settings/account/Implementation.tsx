@@ -1,9 +1,9 @@
-import { H6, iconsDeprecated } from "@argent/x-ui"
-import { ArgentAccountType } from "../../../../shared/wallet.model"
-import { FC, ReactNode } from "react"
-import { AutoColumn } from "../../../components/Column"
+import { H5, icons } from "@argent/x-ui"
+import type { ArgentAccountType } from "../../../../shared/wallet.model"
+import type { FC, ReactNode } from "react"
+import { Box } from "@chakra-ui/react"
 
-const { WalletIcon, PluginIcon, MulticallIcon } = iconsDeprecated
+const { WalletSecondaryIcon, StackSecondaryIcon, PluginIcon } = icons
 
 export interface Implementation {
   id: ArgentAccountType
@@ -22,7 +22,7 @@ export const implementations: Implementation[] = [
     id: "standard",
     title: "Default",
     description: "The default Argent account implementation",
-    icon: <WalletIcon />,
+    icon: <WalletSecondaryIcon />,
   },
   {
     id: "plugin",
@@ -35,7 +35,7 @@ export const implementations: Implementation[] = [
     title: "Better multicall",
     description:
       "The Argent account implementation with better multicall support",
-    icon: <MulticallIcon />,
+    icon: <StackSecondaryIcon />,
   },
 ]
 
@@ -43,9 +43,9 @@ export const CurrentImplementation: FC<{ implementationItem: ReactNode }> = ({
   implementationItem,
 }) => (
   <>
-    <H6 color="neutrals.300" pl="2">
+    <H5 color="neutrals.300" pl="2">
       Current implementation
-    </H6>
-    <AutoColumn>{implementationItem}</AutoColumn>
+    </H5>
+    <Box>{implementationItem}</Box>
   </>
 )

@@ -1,14 +1,19 @@
 import { KeyValueStorage } from "../storage"
-import { IObjectStore } from "../storage/__new/interface"
+import type { IObjectStore } from "../storage/__new/interface"
 import { adaptKeyValue } from "../storage/__new/keyvalue"
-import {
+import type {
   BaseWalletAccount,
   NetworkOnlyPlaceholderAccount,
 } from "../wallet.model"
 
+export type SelectedWalletStoreAccount =
+  | BaseWalletAccount
+  | NetworkOnlyPlaceholderAccount
+  | null
+
 export interface WalletStorageProps {
   backup?: string
-  selected?: BaseWalletAccount | NetworkOnlyPlaceholderAccount | null
+  selected?: SelectedWalletStoreAccount
   discoveredOnce?: boolean
   hasSavedRecoverySeedPhrase?: boolean
   lastUsedAccountByNetwork?: Record<string, BaseWalletAccount>

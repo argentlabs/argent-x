@@ -3,8 +3,8 @@ import {
   checkIfDeprecated,
   partitionDeprecatedAccount,
 } from "./accountUpgradeCheck"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { Network } from "../../../shared/network"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import type { Network } from "../../../shared/network"
 import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import {
   ETH_TOKEN_ADDRESS,

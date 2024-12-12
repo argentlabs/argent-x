@@ -10,7 +10,7 @@ export default mergeConfig(viteConfig, {
     environment: "happy-dom",
     pool: "forks",
     globals: true,
-    setupFiles: "test/setup.ts",
+    setupFiles: ["test/setup.ts", "fake-indexeddb/auto"],
     testTimeout: 50 * 60 * 1000,
     exclude: [
       "**/node_modules/**",
@@ -39,6 +39,16 @@ export default mergeConfig(viteConfig, {
       all: true,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       provider: "v8",
+    },
+    server: {
+      deps: {
+        /** Fix for `Named export not found` error - deps that ship .js in ESM format (that Node can't handle) */
+        inline: [
+          "@argent/x-shared",
+          "@argent/x-ui",
+          "@ledgerhq/hw-app-starknet",
+        ],
+      },
     },
     /** TODO: remove after refactor: this allows testing of components that import .svg directly */
     alias: [

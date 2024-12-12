@@ -1,5 +1,5 @@
-import { Warning } from "@argent/x-shared/simulation"
-import { ITransactionReviewWarning } from "@argent/x-shared"
+import type { Warning } from "@argent/x-shared/simulation"
+import type { ITransactionReviewWarning } from "@argent/x-shared"
 import { renderHook, waitFor } from "@testing-library/react"
 import * as reactViews from "../../../views/implementation/react"
 import { useWarningsTitle } from "./helper"

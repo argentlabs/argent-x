@@ -1,6 +1,7 @@
 import Emittery from "emittery"
-import { MinimalIBackgroundUIService } from "./decorators"
-import { Events, Opened } from "../../ui/IBackgroundUIService"
+import type { MinimalIBackgroundUIService } from "./decorators"
+import type { Events } from "../../ui/IBackgroundUIService"
+import { Opened } from "../../ui/IBackgroundUIService"
 
 interface MockBackgroundUIServiceManager {
   setOpened(opened: boolean): Promise<void>

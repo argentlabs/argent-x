@@ -10,7 +10,7 @@ export const useSeedPhrase = () => {
   )
 
   useEffect(() => {
-    getSeedPhrase().then(setSeedPhrase)
+    void getSeedPhrase().then(setSeedPhrase)
     // on mount
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 

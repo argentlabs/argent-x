@@ -1,6 +1,6 @@
-import { Atom } from "jotai"
+import type { Atom } from "jotai"
 
-import { IRepository } from "../../../shared/storage/__new/interface"
+import type { IRepository } from "../../../shared/storage/__new/interface"
 import { atomWithSubscription } from "./atomWithSubscription"
 
 export const atomFromRepo = <T>(

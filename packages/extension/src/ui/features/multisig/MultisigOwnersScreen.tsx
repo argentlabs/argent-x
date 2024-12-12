@@ -1,10 +1,9 @@
-import { B2, H4, P3, iconsDeprecated } from "@argent/x-ui"
+import { B2, H3, icons, P2 } from "@argent/x-ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
-import { usePublicKey } from "../accounts/usePublicKey"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import { multisigView } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
@@ -14,9 +13,9 @@ import { publicKeyMultisigMetadataView } from "../../views/multisig"
 import { useView } from "../../views/implementation/react"
 import { isEqualAddress } from "@argent/x-shared"
 import { multisigService } from "../../services/multisig"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
-const { MultisigJoinIcon } = iconsDeprecated
+const { AddContactSecondaryIcon } = icons
 
 export const MultisigOwnersScreen: FC = () => {
   const account = useRouteWalletAccount()
@@ -31,13 +30,13 @@ export const MultisigOwnersScreen: FC = () => {
 const MultisigOwners = ({ account }: { account: WalletAccount }) => {
   const multisig = useView(multisigView(account))
 
-  const ownerPublicKey = usePublicKey(multisig)
+  const ownerPublicKey = multisig?.publicKey
   const navigate = useNavigate()
 
   const multisigMetadata = useView(publicKeyMultisigMetadataView(multisig))
 
   const handleAddOwnerClick = () => {
-    navigate(routes.multisigAddOwners(account.address))
+    navigate(routes.multisigAddOwners(account.id))
   }
 
   const onUpdateAccountName = (key: string | undefined, name: string) => {
@@ -51,21 +50,23 @@ const MultisigOwners = ({ account }: { account: WalletAccount }) => {
     })
   }
 
+  const isLedgerSigner = account.signer.type === "ledger"
   return (
     <Box m={4} height="100%">
       <Flex flexDirection="column" height="100%" justifyContent="space-between">
         <Box>
-          <H4>{multisig?.signers.length} owners</H4>
-          <P3 color="neutrals.300">
+          <H3>{multisig?.signers.length} owners</H3>
+          <P2 color="neutrals.300">
             {multisig?.threshold}/{multisig?.signers.length} owners must confirm
             each transactions
-          </P3>
+          </P2>
           <Divider my={4} color="neutrals.800" />
-          <P3 color="neutrals.300" mb={1}>
+          <P2 color="neutrals.300" mb={1}>
             Me
-          </P3>
+          </P2>
           {ownerPublicKey && (
             <MultisigOwner
+              account={account}
               owner={ownerPublicKey}
               signerMetadata={multisigMetadata?.signers?.find(
                 (signerMetadata) =>
@@ -74,11 +75,13 @@ const MultisigOwners = ({ account }: { account: WalletAccount }) => {
               onUpdate={(name) => onUpdateAccountName(ownerPublicKey, name)}
               hasEdit
               hasCopy
+              hasUpdate={!isLedgerSigner}
+              ownerIsSelf
             />
           )}
-          <P3 color="neutrals.300" mb={1}>
+          <P2 color="neutrals.300" mb={1}>
             Other owners
-          </P3>
+          </P2>
           {multisig?.signers
             .filter((signer) => {
               if (!multisig?.publicKey) {
@@ -104,7 +107,7 @@ const MultisigOwners = ({ account }: { account: WalletAccount }) => {
         </Box>
         {!account.needsDeploy && (
           <Button
-            leftIcon={<MultisigJoinIcon />}
+            leftIcon={<AddContactSecondaryIcon />}
             variant="link"
             color="neutrals.400"
             onClick={handleAddOwnerClick}

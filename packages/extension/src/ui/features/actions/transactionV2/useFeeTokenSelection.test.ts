@@ -1,6 +1,6 @@
+import type { TokenWithBalance } from "@argent/x-shared"
 import {
   ETH_TOKEN_ADDRESS,
-  TokenWithBalance,
   getLatestArgentMultisigClassHash,
   TXV1_MULTISIG_CLASS_HASH,
 } from "@argent/x-shared"

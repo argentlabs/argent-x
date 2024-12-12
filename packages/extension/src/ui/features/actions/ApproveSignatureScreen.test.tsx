@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import { describe } from "vitest"
 
 import { renderWithLegacyProviders } from "../../test/utils"

@@ -1,24 +1,41 @@
 import { useMemo } from "react"
 import { num } from "starknet"
 
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useView } from "../../views/implementation/react"
 import {
   allTokensView,
   allTokensInfoView,
   networkFeeTokensOnNetworkFamily,
+  allTokenPricesView,
 } from "../../views/token"
-import { BaseToken, Token } from "../../../shared/token/__new/types/token.model"
-import { Address, isEqualAddress } from "@argent/x-shared"
+import type {
+  BaseToken,
+  Token,
+} from "../../../shared/token/__new/types/token.model"
+import type { Address } from "@argent/x-shared"
+import { isEqualAddress } from "@argent/x-shared"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { equalToken } from "../../../shared/token/__new/utils"
-import { tokenBalancesForAccountViewFamily } from "../../views/tokenBalances"
+import {
+  atomFamilyTokenEqual,
+  equalToken,
+} from "../../../shared/token/__new/utils"
+import {
+  tokenBalancesForAccountViewFamily,
+  tokenBalancesForNetworkViewFamily,
+} from "../../views/tokenBalances"
 import { atomFamily } from "jotai/utils"
-import { UseToken } from "@argent/x-ui"
-import { settingsStore } from "../../../shared/settings"
-import { useKeyValueStorage } from "../../hooks/useStorage"
+import type { UseToken } from "@argent/x-ui"
 import { selectedNetworkIdView } from "../../views/network"
 import { atom } from "jotai"
+import type {
+  BaseTokenWithBalance,
+  TokenWithOptionalBigIntBalance,
+} from "../../../shared/token/__new/types/tokenBalance.model"
+import {
+  defiDecompositionTokenBalancesForNetworkViewAtom,
+  defiDecompositionTokenBalancesViewAtom,
+} from "../../views/investments"
 
 export const useNetworkFeeTokens = (networkId?: string) => {
   const feeTokens = useView(networkFeeTokensOnNetworkFamily(networkId))
@@ -43,7 +60,7 @@ export const useTokensInCurrentNetworkIncludingSpam = () => {
 
 export const useTokensInCurrentNetwork = () => {
   const rawTokens = useTokensInCurrentNetworkIncludingSpam()
-  return useTokensWithSpamFilter(rawTokens)
+  return useTokensWithHiddenFilter(rawTokens)
 }
 
 export const useTradableTokensInCurrentNetwork = () => {
@@ -52,35 +69,36 @@ export const useTradableTokensInCurrentNetwork = () => {
     () => tokens.filter((token) => token.tradable),
     [tokens],
   )
-  return useTokensWithSpamFilter(rawTokens)
+  return useTokensWithHiddenFilter(rawTokens)
 }
 
-const tokensFamily = atomFamily(
-  (baseToken?: BaseToken) => {
-    return atom(async (get) => {
-      const allTokens = await get(allTokensView)
-      return allTokens.find((token) => equalToken(token, baseToken))
-    })
-  },
-  (a, b) => equalToken(a, b),
-)
+export const tokensFindFamily = atomFamily((baseToken?: BaseToken) => {
+  return atom(async (get) => {
+    const allTokens = await get(allTokensView)
+    return allTokens.find((token) => equalToken(token, baseToken))
+  })
+}, atomFamilyTokenEqual)
 
-const tokensInfoFamily = atomFamily(
-  (baseToken?: BaseToken) => {
-    return atom(async (get) => {
-      const allTokensInfo = await get(allTokensInfoView)
-      return allTokensInfo.find((token) => equalToken(token, baseToken))
-    })
-  },
-  (a, b) => equalToken(a, b),
-)
+export const tokensInfoFindFamily = atomFamily((baseToken?: BaseToken) => {
+  return atom(async (get) => {
+    const allTokensInfo = await get(allTokensInfoView)
+    return allTokensInfo.find((token) => equalToken(token, baseToken))
+  })
+}, atomFamilyTokenEqual)
+
+export const tokensPricesFindFamily = atomFamily((baseToken?: BaseToken) => {
+  return atom(async (get) => {
+    const allTokensPrices = await get(allTokenPricesView)
+    return allTokensPrices.find((token) => equalToken(token, baseToken))
+  })
+}, atomFamilyTokenEqual)
 
 export const useTokenOnCurrentNetworkByAddress = (address?: Address) => {
   const selectedNetworkId = useView(selectedNetworkIdView)
   const baseToken = address
     ? { address, networkId: selectedNetworkId }
     : undefined
-  const token = useView(tokensFamily(baseToken))
+  const token = useView(tokensFindFamily(baseToken))
   return token
 }
 
@@ -105,53 +123,78 @@ export const useTokensRecord = ({ cleanHex = false }) => {
   )
 }
 
-export const useTokensWithBalance = (account?: BaseWalletAccount) => {
-  const tokens = useView(tokensInNetwork(account?.networkId))
-  const accountBalances = useView(tokenBalancesForAccountViewFamily(account))
-
-  const rawTokens = useMemo(() => {
-    return tokens
-      .map((token) => {
-        const balance = accountBalances.find((balance) =>
-          isEqualAddress(balance.address, token.address),
-        )?.balance
+const useMapToRawTokens = (
+  tokens: Token[],
+  accountBalances: BaseTokenWithBalance[],
+): TokenWithOptionalBigIntBalance[] => {
+  return useMemo(() => {
+    return accountBalances
+      .flatMap((accountBalance) => {
+        const token = tokens.find((token) =>
+          isEqualAddress(token.address, accountBalance.address),
+        )
+        if (!token) {
+          return []
+        }
         return {
           ...token,
-          balance: BigInt(balance ?? 0n),
+          balance: BigInt(accountBalance.balance ?? 0n),
         }
       })
-      .filter(
-        (token) => token.showAlways || (token.balance && token.balance > 0n),
-      )
+      .filter((token) => token.showAlways || token.balance !== 0n)
   }, [tokens, accountBalances])
-
-  return useTokensWithSpamFilter(rawTokens)
 }
 
-export const useToken: UseToken = ({ address, networkId }) => {
-  return useView(
-    tokensFamily({
-      address: address as Address,
-      networkId,
-    }),
+export const useTokensWithBalanceForAccount = (account?: BaseWalletAccount) => {
+  const tokens = useView(tokensInNetwork(account?.networkId))
+  const accountTokenBalances = useView(
+    tokenBalancesForAccountViewFamily(account),
   )
-}
-
-export const useTokenInfo: UseToken = ({ address, networkId }) => {
-  return useView(
-    tokensInfoFamily({
-      address: address as Address,
-      networkId,
-    }),
+  const accountDefiTokenBalances = useView(
+    defiDecompositionTokenBalancesViewAtom(account),
   )
+  const accountBalances = accountTokenBalances.concat(accountDefiTokenBalances)
+  const rawTokens = useMapToRawTokens(tokens, accountBalances)
+  return useTokensWithHiddenFilter(rawTokens)
 }
 
-export const useTokensWithSpamFilter = <T extends Token>(tokens: T[]): T[] => {
-  const hideSpamTokens = useKeyValueStorage(settingsStore, "hideSpamTokens")
-  return useMemo(() => {
-    if (!hideSpamTokens) {
-      return tokens
-    }
-    return tokens.filter((token) => !token.tags?.includes("scam"))
-  }, [hideSpamTokens, tokens])
+export const useTokensWithBalanceForNetwork = (networkId: string) => {
+  const tokens = useView(tokensInNetwork(networkId))
+  const networkTokenBalances = useView(
+    tokenBalancesForNetworkViewFamily(networkId),
+  )
+  const networkDefiTokenBalances = useView(
+    defiDecompositionTokenBalancesForNetworkViewAtom(networkId),
+  )
+  const networkBalances = networkTokenBalances.concat(networkDefiTokenBalances)
+  const rawTokens = useMapToRawTokens(tokens, networkBalances)
+  return useTokensWithHiddenFilter(rawTokens)
+}
+
+export const useToken: UseToken = ({
+  address,
+  networkId,
+}: Partial<BaseWalletAccount>) => {
+  const payload =
+    address && networkId
+      ? { address: address as Address, networkId }
+      : undefined
+  return useView(tokensFindFamily(payload))
+}
+
+export const useTokenInfo = ({
+  address,
+  networkId,
+}: Partial<BaseWalletAccount>) => {
+  const payload =
+    address && networkId
+      ? { address: address as Address, networkId }
+      : undefined
+  return useView(tokensInfoFindFamily(payload))
+}
+
+export const useTokensWithHiddenFilter = <T extends Token>(
+  tokens: T[],
+): T[] => {
+  return useMemo(() => tokens.filter((token) => !token.hidden), [tokens])
 }

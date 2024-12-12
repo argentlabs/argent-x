@@ -5,7 +5,7 @@ import {
   ARGENT_X_STATUS_URL,
 } from "../../../shared/api/constants"
 import { statusMessageStore } from "../../../shared/statusMessage/storage"
-import { IStatusMessage } from "../../../shared/statusMessage/types"
+import type { IStatusMessage } from "../../../shared/statusMessage/types"
 import { useKeyValueStorage } from "../../hooks/useStorage"
 import {
   useConditionallyEnabledSWR,

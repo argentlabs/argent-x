@@ -1,14 +1,13 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
-import { PrivacyScreen } from "./OnboardingPrivacyScreen"
+import { OnboardingPrivacyScreen } from "./OnboardingPrivacyScreen"
 import { clientAccountService } from "../../services/account"
-import { useOnboardingExperiment } from "../../services/onboarding/useOnboardingExperiment"
 
 export const OnboardingPrivacyScreenContainer: FC = () => {
   const navigate = useNavigate()
-  const { onboardingExperimentCohort } = useOnboardingExperiment()
 
   const onBack = useCallback(() => {
     navigate(routes.onboardingStart())
@@ -23,15 +22,15 @@ export const OnboardingPrivacyScreenContainer: FC = () => {
     }
   }
   const handleRefuse = () => {
-    void clientAccountService.refuseTerms({ onboardingExperimentCohort })
+    void clientAccountService.refuseTerms()
     navigateToNextScreen()
   }
   const handleAccept = () => {
-    void clientAccountService.acceptTerms({ onboardingExperimentCohort })
+    void clientAccountService.acceptTerms()
     navigateToNextScreen()
   }
   return (
-    <PrivacyScreen
+    <OnboardingPrivacyScreen
       onBack={onBack}
       onAccept={handleAccept}
       onRefuse={handleRefuse}

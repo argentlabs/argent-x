@@ -1,6 +1,6 @@
-import { Address } from "@argent/x-shared"
-import { IOnRampService } from "../../../shared/onRamp/IOnRampService"
-import { messageClient } from "../trpc"
+import type { Address } from "@argent/x-shared"
+import type { IOnRampService } from "../../../shared/onRamp/IOnRampService"
+import type { messageClient } from "../trpc"
 
 export class ClientOnRampService implements IOnRampService {
   constructor(private readonly trpcClient: typeof messageClient) {}

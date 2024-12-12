@@ -1,6 +1,6 @@
 import type { Warning } from "@argent/x-shared/simulation"
 import { getHighestSeverity } from "@argent/x-shared/simulation"
-import { B2, L2, riskToSemanticTokenMap } from "@argent/x-ui"
+import { B2, L2Bold, riskToSemanticTokenMap } from "@argent/x-ui"
 import { Button, Flex, useDisclosure } from "@chakra-ui/react"
 
 import AlertFillIconWithHalo from "./AlertFillIconWithHalo"
@@ -59,7 +59,7 @@ export const WarningBanner = ({
             my={0.5}
           >
             <B2 color={semanticToken}>{header}</B2>
-            <L2>{title}</L2>
+            <L2Bold>{title}</L2Bold>
           </Flex>
         </Flex>
         {highestSeverityWarning.severity !== "info" && (

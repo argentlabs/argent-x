@@ -1,15 +1,15 @@
-import { Button, FlowHeader, P4, iconsDeprecated } from "@argent/x-ui"
+import { Button, FlowHeader, icons, P3 } from "@argent/x-ui"
 import { Center, Flex, ListItem, OrderedList } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 import {
   ESCAPE_GUARDIAN_LINK,
   SmartAccountExternalLinkButton,
 } from "../ui/SmartAccountExternalLinkButton"
-import { getEscapeDisplayAttributes } from "./EscapeBanner"
-import { LiveAccountEscapeProps } from "./useAccountEscape"
+import { getEscapeDisplayAttributes } from "./getEscapeDisplayAttributes"
+import type { LiveAccountEscapeProps } from "./useAccountEscape"
 
-const { SmartAccountActiveIcon } = iconsDeprecated
+const { ShieldSecondaryIcon } = icons
 
 interface EscapeGuardianProps {
   liveAccountEscape: LiveAccountEscapeProps
@@ -26,16 +26,16 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
   return (
     <Flex flexDirection={"column"} flex={1} px={4} pt={8} pb={4}>
       <FlowHeader
-        icon={SmartAccountActiveIcon}
+        icon={ShieldSecondaryIcon}
         title={title}
         subtitle={
           "An action to remove Argent as a guardian was started. If this wasn’t you, someone could be trying to gain access to your account."
         }
         variant={colorScheme}
       />
-      <P4 color="neutrals.100">
+      <P3 color="neutrals.100">
         If this wasn’t you we recommend the following steps:
-      </P4>
+      </P3>
       <OrderedList variant={"bordered"} mt={3}>
         <ListItem>Keep Argent as guardian on your Smart Account</ListItem>
         <ListItem>

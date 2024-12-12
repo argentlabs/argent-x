@@ -1,4 +1,4 @@
-import { AccountDeploymentData } from "@starknet-io/types-js"
+import type { AccountDeploymentData } from "@starknet-io/types-js"
 import { inpageMessageClient } from "../trpcClient"
 
 const toHex = (x: bigint) => `0x${x.toString(16)}`

@@ -1,18 +1,19 @@
-import { P4, iconsDeprecated } from "@argent/x-ui"
+import { icons, P3 } from "@argent/x-ui"
 import { Box, Flex, Text, Tooltip, useDisclosure } from "@chakra-ui/react"
-import { FC, useCallback, useMemo, useState } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo, useState } from "react"
 import {
   formatExecutionPrice,
   minimumAmountOutFromTrade,
 } from "../utils/prices"
-import { Token } from "../../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
 import { useUserState } from "../state/user"
 import { getProvidersFromTradeRoute } from "../utils"
 import { prettifyTokenAmount } from "@argent/x-shared"
 import { SlippageModal } from "./SlippageModal"
-import { Trade } from "../../../../shared/swap/model/trade.model"
+import type { Trade } from "../../../../shared/swap/model/trade.model"
 
-const { InfoIcon, EditIcon } = iconsDeprecated
+const { InfoCircleSecondaryIcon, EditPrimaryIcon } = icons
 
 interface SwapPricesInfoProps {
   tokenIn?: Token
@@ -76,50 +77,50 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
       >
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Rate</P4>
+            <P3 color="neutrals.300">Rate</P3>
             <Tooltip label="AVNU rate Includes swap fee">
               <Text color="neutrals.300" cursor="pointer">
-                <InfoIcon />
+                <InfoCircleSecondaryIcon />
               </Text>
             </Tooltip>
           </Flex>
-          <P4
+          <P3
             fontWeight="bold"
             cursor="pointer"
             _hover={{ color: "accent.500" }}
             onClick={switchRate}
           >
             {executionPrice}
-          </P4>
+          </P3>
         </Flex>
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Swap fee</P4>
+            <P3 color="neutrals.300">Swap fee</P3>
             <Tooltip label="Service fee of AVNU and Argent">
               <Text color="neutrals.300" cursor="pointer">
-                <InfoIcon />
+                <InfoCircleSecondaryIcon />
               </Text>
             </Tooltip>
           </Flex>
-          <P4 fontWeight="500">{totalFeePercentage}%</P4>
+          <P3 fontWeight="500">{totalFeePercentage}%</P3>
         </Flex>
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Min received (incl. fees) </P4>
+            <P3 color="neutrals.300">Min received (incl. fees) </P3>
             <Tooltip label="The minimum amount of tokens you're guaranteed to receive given the slippage percentage">
               <Text color="neutrals.300" cursor="pointer">
-                <InfoIcon />
+                <InfoCircleSecondaryIcon />
               </Text>
             </Tooltip>
           </Flex>
-          <P4 fontWeight="bold">{prettifiedMinReceived}</P4>
+          <P3 fontWeight="bold">{prettifiedMinReceived}</P3>
         </Flex>
         <Flex justifyContent="space-between">
           <Flex alignItems="center" gap="1">
-            <P4 color="neutrals.300">Max Slippage</P4>
+            <P3 color="neutrals.300">Max Slippage</P3>
             <Tooltip label="Maximum allowed slippage for the trade">
               <Text color="neutrals.300" cursor="pointer">
-                <InfoIcon />
+                <InfoCircleSecondaryIcon />
               </Text>
             </Tooltip>
           </Flex>
@@ -131,19 +132,18 @@ export const SwapPricesInfo: FC<SwapPricesInfoProps> = ({
               alignItems="center"
               onClick={onOpenSlippageModal}
             >
-              <EditIcon />
-              <P4 fontWeight="500">{userSlippageTolerance / 100}%</P4>
+              <EditPrimaryIcon />
+              <P3 fontWeight="500">{userSlippageTolerance / 100}%</P3>
             </Flex>
           </Box>
         </Flex>
         <Flex justifyContent="space-between">
-          <P4 color="neutrals.300">Providers</P4>
-          <P4 fontWeight="bold">
+          <P3 color="neutrals.300">Providers</P3>
+          <P3 fontWeight="bold">
             {getProvidersFromTradeRoute(trade.route).join(", ")}
-          </P4>
+          </P3>
         </Flex>
       </Flex>
-
       <SlippageModal
         isOpen={isSlippageModalOpen}
         onClose={onCloseSlippageModal}

@@ -1,11 +1,12 @@
-import { Address } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
 import {
   TOPPER_BASE_URL,
   TOPPER_KEY_ID,
   TOPPER_WIDGET_ID,
 } from "../../../shared/api/constants"
-import { IOnRampService } from "../../../shared/onRamp/IOnRampService"
-import { importPKCS8, JWTHeaderParameters, SignJWT } from "jose"
+import type { IOnRampService } from "../../../shared/onRamp/IOnRampService"
+import type { JWTHeaderParameters } from "jose"
+import { importPKCS8, SignJWT } from "jose"
 
 export class OnRampService implements IOnRampService {
   async getTopperUrl(address: Address) {

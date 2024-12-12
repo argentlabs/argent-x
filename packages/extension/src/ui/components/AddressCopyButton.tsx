@@ -1,11 +1,11 @@
 import { Button, CopyTooltip } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 
+import { formatTruncatedAddress, normalizeAddress } from "@argent/x-shared"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../shared/ui/routes"
+import { needsToSaveRecoverySeedphraseView } from "../views/account"
 import { useView } from "../views/implementation/react"
-import { hasSavedRecoverySeedPhraseView } from "../views/account"
-import { normalizeAddress, formatTruncatedAddress } from "@argent/x-shared"
 
 export interface AddressCopyButtonProps {
   address: string
@@ -17,10 +17,13 @@ export const AddressCopyButton: FC<AddressCopyButtonProps> = ({
 }) => {
   const copyValue = normalizeAddress(address)
   const navigate = useNavigate()
-  const hasSavedRecoverySeedPhrase = useView(hasSavedRecoverySeedPhraseView)
-  const onClick = hasSavedRecoverySeedPhrase
-    ? undefined
-    : () => navigate(routes.beforeYouContinue())
+  const needsToSaveRecoverySeedphrase = useView(
+    needsToSaveRecoverySeedphraseView,
+  )
+
+  const onClick = needsToSaveRecoverySeedphrase
+    ? () => navigate(routes.beforeYouContinue())
+    : undefined
 
   return (
     <CopyTooltip

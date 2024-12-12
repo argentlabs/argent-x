@@ -1,7 +1,9 @@
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Button, H2, P3, P4, logosDeprecated } from "@argent/x-ui"
-import { Box, Flex, FlexProps, Text } from "@chakra-ui/react"
+import { Button, H1, logosDeprecated, P2, P3 } from "@argent/x-ui"
+import type { FlexProps } from "@chakra-ui/react"
+import { Box, Flex, Text } from "@chakra-ui/react"
 
 import { routes } from "../../../shared/ui/routes"
 import { sessionService } from "../../services/session"
@@ -46,7 +48,7 @@ export const LockScreen: FC<FlexProps> = (props) => {
         textAlign="center"
         position="relative"
       >
-        <P4
+        <P3
           onClick={handleResetClick}
           color="text-secondary"
           position="absolute"
@@ -55,17 +57,21 @@ export const LockScreen: FC<FlexProps> = (props) => {
           cursor="pointer"
         >
           Reset
-        </P4>
+        </P3>
         <Text pt={18} fontSize="10xl">
           <ArgentXLogo />
         </Text>
         <Box mt="8" mb="8" width="100%">
-          <H2>Welcome back</H2>
-          <P3 color="text-secondary">Unlock your wallet to continue</P3>
+          <H1>Welcome back</H1>
+          <P2 color="text-secondary">Unlock your wallet to continue</P2>
         </Box>
 
         <Box width="100%">
-          <PasswordForm error={error} verifyPassword={handleVerifyPassword}>
+          <PasswordForm
+            error={error}
+            verifyPassword={handleVerifyPassword}
+            immediateFocus
+          >
             {({ isDirty, isSubmitting }) => (
               <Flex position={"absolute"} left={0} bottom={0} right={0}>
                 <Button

@@ -11,20 +11,17 @@ import {
 import { ARGENT_API_BASE_URL } from "../../../shared/api/constants"
 import { tryToMintAllFeeTokens } from "../../../shared/devnet/mintFeeToken"
 import { SessionError } from "../../../shared/errors/session"
-import { PendingMultisig } from "../../../shared/multisig/types"
+import type { PendingMultisig } from "../../../shared/multisig/types"
 import { pendingMultisigEqual } from "../../../shared/multisig/utils/selectors"
-import {
-  Network,
-  defaultNetwork,
-  defaultNetworks,
-} from "../../../shared/network"
+import type { Network } from "../../../shared/network"
+import { defaultNetwork, defaultNetworks } from "../../../shared/network"
 import * as jwtService from "../../../shared/smartAccount/jwt"
 import {
   ArrayStorage,
   KeyValueStorage,
   ObjectStorage,
 } from "../../../shared/storage"
-import {
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
@@ -32,32 +29,36 @@ import { adaptKeyValue } from "../../../shared/storage/__new/keyvalue"
 import { adaptObjectStorage } from "../../../shared/storage/__new/object"
 import { adaptArrayStorage } from "../../../shared/storage/__new/repository"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import {
+import type {
   BaseMultisigWalletAccount,
   WalletAccount,
 } from "../../../shared/wallet.model"
 import { WalletAccountStarknetService } from "../account/WalletAccountStarknetService"
-import {
-  WalletBackupService,
-  WalletStorageProps,
-} from "../backup/WalletBackupService"
+import type { WalletStorageProps } from "../backup/WalletBackupService"
+import { WalletBackupService } from "../backup/WalletBackupService"
 import { WalletCryptoSharedService } from "../crypto/WalletCryptoSharedService"
 import { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
 import { WalletSessionService } from "../session/WalletSessionService"
-import { WalletSession } from "../session/walletSession.model"
+import type { WalletSession } from "../session/walletSession.model"
 import {
-  accountServiceMock,
   analyticsServiceMock,
-  emitterMock,
   getDefaultReferralService,
-  httpServiceMock,
-  multisigBackendServiceMock,
   recoverySharedServiceMock,
   recoveryStarknetServiceMock,
 } from "../test.utils"
-import { INetworkService } from "../../../shared/network/service/INetworkService"
+import type { INetworkService } from "../../../shared/network/service/INetworkService"
 import { WalletDeploymentStarknetService } from "./WalletDeploymentStarknetService"
 import { LedgerSharedService } from "../../../shared/ledger/service/LedgerSharedService"
+import { stark } from "starknet"
+import { AccountImportSharedService } from "../../../shared/accountImport/service/AccountImportSharedService"
+import type { IPKStore } from "../../../shared/accountImport/types"
+import { PKManager } from "../../../shared/accountImport/pkManager/PKManager"
+import {
+  accountServiceMock,
+  emitterMock,
+  httpServiceMock,
+  multisigBackendServiceMock,
+} from "../../../shared/test.utils"
 
 const networkService: Pick<INetworkService, "getById"> = {
   getById: async (networkId) => {
@@ -99,6 +100,10 @@ const getPendingMultisigStore = (
   })
 }
 
+const getPKStore = (name: string) => {
+  return new KeyValueStorage<IPKStore>({ keystore: {} }, name)
+}
+
 const SCRYPT_N = 262144
 
 const getWallet = (randId = Math.random()) => {
@@ -116,6 +121,8 @@ const getWallet = (randId = Math.random()) => {
   const pendingMultisigStore: IRepository<PendingMultisig> = adaptArrayStorage(
     getPendingMultisigStore(`test:multisig:pending:${randId}`),
   )
+
+  const pkStore = adaptKeyValue(getPKStore(`test:pk:${randId}`))
 
   const defaultBackUpService = new WalletBackupService(
     storage,
@@ -137,12 +144,21 @@ const getWallet = (randId = Math.random()) => {
     multisigBackendServiceMock,
   )
 
+  const pkManager = new PKManager(pkStore, SCRYPT_N)
+
+  const importAccountService = new AccountImportSharedService(
+    accountServiceMock,
+    networkService,
+    pkManager,
+  )
+
   const defaultCryptoStarknetService = new WalletCryptoStarknetService(
     accountStore,
     sessionStore,
     pendingMultisigStore,
     defaultAccountSharedService,
     ledgerService,
+    pkManager,
     vi.fn(),
   )
 
@@ -163,12 +179,12 @@ const getWallet = (randId = Math.random()) => {
     defaultCryptoStarknetService,
     multisigBackendServiceMock,
     ledgerService,
+    importAccountService,
   )
 
   const defaultDeployStarknetService = new WalletDeploymentStarknetService(
     accountStore,
     baseMultisigStore,
-    pendingMultisigStore,
     defaultSessionService,
     sessionStore,
     defaultAccountSharedService,
@@ -204,7 +220,7 @@ const getWallet = (randId = Math.random()) => {
   return wallet
 }
 
-const address = "0x123"
+const address = stark.randomAddress()
 const BASE_URL_ENDPOINT = urlJoin(ARGENT_API_BASE_URL, "account")
 const addAccountJsonResponse = {
   address,

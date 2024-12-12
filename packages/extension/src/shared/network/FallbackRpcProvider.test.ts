@@ -25,7 +25,9 @@ describe("FallbackRpcProvider", () => {
     /** wait fetch to chainId() in constructor to resolve */
     await delay(0)
     /** reset the mock by default */
-    mockReset && fetchImplementation.mockReset()
+    if (mockReset) {
+      fetchImplementation.mockReset()
+    }
     return {
       nodeUrls,
       fetchImplementation,

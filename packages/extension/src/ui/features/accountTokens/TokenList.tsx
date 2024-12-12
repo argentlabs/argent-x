@@ -1,15 +1,20 @@
-import { FC, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo } from "react"
 
-import { Token } from "../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../shared/token/__new/types/token.model"
 import { equalToken } from "../../../shared/token/__new/utils"
 import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { NewTokenButton } from "./NewTokenButton"
-import { TokenListItemVariant } from "./TokenListItem"
+import type { TokenListItemVariant } from "./TokenListItem"
 import { TokenListItemContainer } from "./TokenListItemContainer"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
 import { useSortedTokensWithBalances } from "../../views/tokenPrices"
+import { useNavigate } from "react-router-dom"
+import { routes } from "../../../shared/ui/routes"
+import { ENABLE_TOKEN_DETAILS } from "../../../shared/ui/constants"
+import { liquidityTokensView } from "../../views/investments"
 
 interface TokenListProps {
   tokenList?: Token[]
@@ -28,22 +33,27 @@ export const TokenList: FC<TokenListProps> = ({
 }) => {
   const account = useView(selectedAccountView)
   const returnTo = useCurrentPathnameWithQuery()
+  const navigate = useNavigate()
   const addFundsDialogSend = useAddFundsDialogSend()
   const onClick = useCallback(
     (token: Token) => {
       if (onItemClick) {
         return onItemClick(token)
       }
-
-      addFundsDialogSend({
-        tokenAddress: token.address,
-        returnTo,
-      })
+      if (ENABLE_TOKEN_DETAILS) {
+        navigate(routes.tokenDetails(token.address, token.networkId, returnTo))
+      } else {
+        addFundsDialogSend({
+          tokenAddress: token.address,
+          returnTo,
+        })
+      }
     },
-    [addFundsDialogSend, onItemClick, returnTo],
+    [addFundsDialogSend, navigate, onItemClick, returnTo],
   )
 
   const sortedTokensWithBalance = useSortedTokensWithBalances(account)
+  const liquidityTokensInDefiDecomp = useView(liquidityTokensView(account))
 
   const tokens = useMemo(
     () =>
@@ -51,8 +61,11 @@ export const TokenList: FC<TokenListProps> = ({
         ? sortedTokensWithBalance.filter((token) =>
             tokenList.some((t) => equalToken(t, token)),
           )
-        : sortedTokensWithBalance,
-    [tokenList, sortedTokensWithBalance],
+        : sortedTokensWithBalance.filter(
+            (token) =>
+              !liquidityTokensInDefiDecomp?.some((t) => equalToken(t, token)),
+          ),
+    [tokenList, sortedTokensWithBalance, liquidityTokensInDefiDecomp],
   )
 
   if (!account) {

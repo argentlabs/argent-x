@@ -1,34 +1,42 @@
-import { CallData, num } from "starknet"
-import { IAccountRepo } from "../../../shared/account/store"
-import { IMultisigService } from "../../../shared/multisig/service/messaging/IMultisigService"
+import { CallData, num, TransactionType } from "starknet"
+import type { IAccountRepo } from "../../../shared/account/store"
+import type { IMultisigService } from "../../../shared/multisig/service/messaging/IMultisigService"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import {
+import type {
+  AccountId,
   ArgentAccountType,
   BaseWalletAccount,
   CreateAccountType,
   CreateWalletAccount,
   MultisigData,
   NetworkOnlyPlaceholderAccount,
-  SignerType,
   WalletAccount,
+} from "../../../shared/wallet.model"
+import {
+  SignerType,
+  accountIdSchema,
   baseWalletAccountSchema,
+  isNetworkOnlyPlaceholderAccount,
   networkOnlyPlaceholderAccountSchema,
 } from "../../../shared/wallet.model"
 import { ZERO_MULTISIG } from "../../features/multisig/constants"
 
 import { messageClient } from "../trpc"
-import { IClientAccountService } from "./IClientAccountService"
-import { ISettingsStorage } from "../../../shared/settings/types"
-import { KeyValueStorage } from "../../../shared/storage"
+import type { IClientAccountService } from "./IClientAccountService"
+import type { ISettingsStorage } from "../../../shared/settings/types"
+import type { KeyValueStorage } from "../../../shared/storage"
 
 import { ampli } from "../../../shared/analytics"
 import { hexSchema } from "@argent/x-shared"
-import { IMultisigBaseWalletRepositary } from "../../../shared/multisig/types"
-import { OnboardingCohort } from "../onboarding/useOnboardingExperiment"
+import type { IMultisigBaseWalletRepositary } from "../../../shared/multisig/types"
+import { getDefaultSortedAccounts } from "../../features/accounts/getDefaultSortedAccount"
+import type { IWalletStore } from "../../../shared/wallet/walletStore"
+import type { AccountDeployTransaction } from "../../../shared/transactionReview/transactionAction.model"
 
 export class ClientAccountService implements IClientAccountService {
   constructor(
     private readonly accountRepo: IAccountRepo,
+    private readonly walletStore: IWalletStore,
     private readonly multisigBaseRepo: IMultisigBaseWalletRepositary,
     private readonly multisigService: IMultisigService,
     private readonly settingsStore: KeyValueStorage<ISettingsStorage>,
@@ -37,12 +45,12 @@ export class ClientAccountService implements IClientAccountService {
   }
 
   async select(
-    baseAccount: BaseWalletAccount | NetworkOnlyPlaceholderAccount,
+    baseAccount: AccountId | NetworkOnlyPlaceholderAccount,
   ): Promise<void> {
     let parsedAccount = baseAccount
 
     if (parsedAccount) {
-      parsedAccount = baseWalletAccountSchema
+      parsedAccount = accountIdSchema
         .or(networkOnlyPlaceholderAccountSchema)
         .parse(baseAccount)
     }
@@ -86,7 +94,7 @@ export class ClientAccountService implements IClientAccountService {
     }
 
     // switch background wallet to the account that was selected
-    await this.select(newAccount)
+    await this.select(newAccount.id)
 
     return hit
   }
@@ -133,12 +141,10 @@ export class ClientAccountService implements IClientAccountService {
     targetImplementationType?: ArgentAccountType | undefined,
   ): Promise<void> {
     const baseAccount = baseWalletAccountSchema.parse(baseWalletAccount)
-    const [account] = await this.accountRepo.get((a) =>
-      accountsEqual(a, baseAccount),
-    )
+
     const [upgradeNeeded, correctAcc] =
       await messageClient.account.upgrade.mutate({
-        account,
+        accountId: baseAccount.id,
         targetImplementationType,
       })
 
@@ -160,7 +166,7 @@ export class ClientAccountService implements IClientAccountService {
     }
 
     return {
-      type: "DEPLOY_ACCOUNT" as const,
+      type: TransactionType.DEPLOY_ACCOUNT,
       calldata: CallData.toCalldata(accountDeployPayload.constructorCalldata),
       classHash: hexSchema.parse(num.toHex(accountDeployPayload.classHash)),
       salt: hexSchema.parse(num.toHex(accountDeployPayload.addressSalt || 0)),
@@ -168,28 +174,34 @@ export class ClientAccountService implements IClientAccountService {
     }
   }
 
-  async acceptTerms({
-    onboardingExperimentCohort,
-  }: {
-    onboardingExperimentCohort: OnboardingCohort
-  }) {
+  async getAccountDeployTransaction(
+    account: BaseWalletAccount,
+  ): Promise<AccountDeployTransaction> {
+    const { calldata, classHash, salt } =
+      await this.getAccountDeploymentPayload(account)
+    return {
+      type: TransactionType.DEPLOY_ACCOUNT as const,
+      payload: {
+        constructorCalldata: calldata,
+        classHash,
+        addressSalt: salt,
+      },
+    }
+  }
+
+  async acceptTerms() {
     await this.settingsStore.set("privacyShareAnalyticsData", true)
     ampli.onboardingAnalyticsDecided({
       "analytics activated": true,
       "wallet platform": "browser extension",
-      "onboarding experiment": onboardingExperimentCohort,
     })
     ampli.client.setOptOut(false)
   }
-  async refuseTerms({
-    onboardingExperimentCohort,
-  }: {
-    onboardingExperimentCohort: OnboardingCohort
-  }) {
+
+  async refuseTerms() {
     ampli.onboardingAnalyticsDecided({
       "analytics activated": false,
       "wallet platform": "browser extension",
-      "onboarding experiment": onboardingExperimentCohort,
     })
     await this.settingsStore.set("privacyShareAnalyticsData", false)
     ampli.client.setOptOut(true)
@@ -199,5 +211,41 @@ export class ClientAccountService implements IClientAccountService {
     networkId: string,
   ): Promise<BaseWalletAccount | undefined> {
     return messageClient.account.getLastUsedOnNetwork.query({ networkId })
+  }
+
+  async autoSelectAccountOnNetwork(networkId: string) {
+    const { selected: selectedAccount } = await this.walletStore.get()
+    const visibleAccountsOnNetwork = await this.accountRepo.get(
+      (account) => account.networkId === networkId && !account.hidden,
+    )
+
+    if (visibleAccountsOnNetwork.length === 0) {
+      await this.select({ networkId, address: null, id: null })
+      return null
+    }
+
+    const existingAccountOnNetwork =
+      selectedAccount &&
+      !isNetworkOnlyPlaceholderAccount(selectedAccount) &&
+      visibleAccountsOnNetwork.find((account) =>
+        accountsEqual(account, selectedAccount),
+      )
+
+    const lastUsedAccountOnNetwork =
+      await this.getLastUsedAccountOnNetwork(networkId)
+
+    // This is required in case of a deleted account which was last used
+    const lastUsedAccountOnNetworkAvailable = visibleAccountsOnNetwork.find(
+      (acc) => accountsEqual(acc, lastUsedAccountOnNetwork),
+    )
+
+    // if the selected account is not on the network, switch to the first visible account with standard accounts coming first
+    const account =
+      existingAccountOnNetwork ||
+      lastUsedAccountOnNetworkAvailable ||
+      getDefaultSortedAccounts(visibleAccountsOnNetwork)[0]
+
+    await this.select(account.id)
+    return account
   }
 }

@@ -1,5 +1,5 @@
 import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 interface AccountListItemSkeletonProps {
   avatarSize?: number

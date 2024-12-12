@@ -1,18 +1,13 @@
-import { BigDecimal, bigDecimal } from "@argent/x-shared"
-import {
-  ModalDialog,
-  iconsDeprecated,
-  Input,
-  FieldError,
-  P3,
-} from "@argent/x-ui"
+import type { BigDecimal } from "@argent/x-shared"
+import { bigDecimal } from "@argent/x-shared"
+import { FieldError, icons, Input, ModalDialog, P2 } from "@argent/x-ui"
 import { Button, Flex, InputGroup, InputRightElement } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC } from "react"
+import type { FC } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-const { TickIcon } = iconsDeprecated
+const { CheckmarkSecondaryIcon } = icons
 const { createUnitsSchema } = bigDecimal
 
 interface AmountEditModalFormProps {
@@ -58,6 +53,7 @@ export const AmountEditModalForm: FC<AmountEditModalFormProps> = ({
         justifyContent="space-between"
         alignItems="center"
         as="form"
+        /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
         onSubmit={handleSubmit(onSubmit)}
         w="100%"
         position="relative"
@@ -66,7 +62,7 @@ export const AmountEditModalForm: FC<AmountEditModalFormProps> = ({
           <InputGroup>
             <Input {...register("amount")} w="100%" />
             <InputRightElement mr={2}>
-              <P3 color="neutrals.200">{currency}</P3>
+              <P2 color="neutrals.200">{currency}</P2>
             </InputRightElement>
           </InputGroup>
         </Flex>
@@ -75,7 +71,12 @@ export const AmountEditModalForm: FC<AmountEditModalFormProps> = ({
             {errors?.amount.message}
           </FieldError>
         )}
-        <Button colorScheme="gray" leftIcon={<TickIcon />} type="submit" mt={4}>
+        <Button
+          colorScheme="gray"
+          leftIcon={<CheckmarkSecondaryIcon />}
+          type="submit"
+          mt={4}
+        >
           {buttonTitle}
         </Button>
       </Flex>

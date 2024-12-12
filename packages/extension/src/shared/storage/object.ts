@@ -1,8 +1,8 @@
 import { cloneDeep, isPlainObject, merge } from "lodash-es"
 
 import { KeyValueStorage } from "./keyvalue"
-import { StorageOptions, StorageOptionsOrNameSpace } from "./options"
-import { AreaName, BaseStorage, StorageChange } from "./types"
+import type { StorageOptions, StorageOptionsOrNameSpace } from "./options"
+import type { AreaName, BaseStorage, StorageChange } from "./types"
 
 type AllowPromise<T> = T | Promise<T>
 

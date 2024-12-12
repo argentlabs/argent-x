@@ -11,18 +11,18 @@ type DeepPath<
 > = CurrentDepth["length"] extends Depth
   ? never
   : T extends Record<string, any>
-  ? {
-      [K in keyof T]: T[K] extends Record<string, any>
-        ?
-            | K
-            | `${Extract<K, string>}.${DeepPath<
-                T[K],
-                Depth,
-                [...CurrentDepth, 0]
-              >}`
-        : K
-    }[keyof T]
-  : never
+    ? {
+        [K in keyof T]: T[K] extends Record<string, any>
+          ?
+              | K
+              | `${Extract<K, string>}.${DeepPath<
+                  T[K],
+                  Depth,
+                  [...CurrentDepth, 0]
+                >}`
+          : K
+      }[keyof T]
+    : never
 
 export type DeepPick<
   T,
@@ -36,8 +36,8 @@ export type DeepPick<
           ? { [K in A]: DeepPick<T[A], Extract<R, DeepPath<T[A], Depth>>> }
           : never
         : P extends keyof T
-        ? { [K in P]: T[P] }
-        : never
+          ? { [K in P]: T[P] }
+          : never
     }[K]
   >
 >

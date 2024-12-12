@@ -1,11 +1,11 @@
 import { useMemo } from "react"
+import type { MultisigPendingOffchainSignature } from "../../../shared/multisig/pendingOffchainSignaturesStore"
 import {
-  MultisigPendingOffchainSignature,
   multisigPendingOffchainSignaturesStore,
   byAccountSelector,
 } from "../../../shared/multisig/pendingOffchainSignaturesStore"
-import { SelectorFn } from "../../../shared/storage/__new/interface"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { SelectorFn } from "../../../shared/storage/__new/interface"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 import { atomFromRepo } from "../../views/implementation/atomFromRepo"
 import { useView } from "../../views/implementation/react"
 

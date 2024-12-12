@@ -1,4 +1,4 @@
-import { TypedData } from "@starknet-io/types-js"
+import type { TypedData } from "@starknet-io/types-js"
 
 export const dataToSign: TypedData = {
   domain: {

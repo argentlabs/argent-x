@@ -1,11 +1,5 @@
-import {
-  CairoOptionVariant,
-  Call,
-  CallData,
-  Calldata,
-  constants,
-  num,
-} from "starknet"
+import type { Call, Calldata } from "starknet"
+import { CairoOptionVariant, CallData, constants, num } from "starknet"
 
 export enum ChangeGuardian {
   /** Guardian is not being changed */

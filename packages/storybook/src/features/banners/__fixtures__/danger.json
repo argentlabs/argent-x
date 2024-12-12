@@ -1,0 +1,11 @@
+{
+  "id": "310e899a-8f19-43c1-990d-95d87acaecf3",
+  "updatedAt": "2022-07-19T10:39:30.288Z",
+  "level": "danger",
+  "dismissable": false,
+  "fullScreen": true,
+  "summary": "Contract bug - don't use Argent X",
+  "message": "We discovered a bug in our contracts, please don't use Argent X",
+  "linkTitle": "Learn more",
+  "linkUrl": "https://argent.xyz/announcements/034"
+}

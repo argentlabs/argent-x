@@ -1,10 +1,11 @@
 import { Button, Flex } from "@chakra-ui/react"
-import { FC, useEffect, useState } from "react"
+import type { FC } from "react"
+import { useEffect, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
-import { L2, iconsDeprecated } from "@argent/x-ui"
+import { icons, L2Bold } from "@argent/x-ui"
 
-const { AlertFillIcon } = iconsDeprecated
+const { WarningCirclePrimaryIcon } = icons
 
 export const CopySeedPhrase: FC<{ seedPhrase?: string }> = ({ seedPhrase }) => {
   const [seedPhraseCopied, setSeedPhraseCopied] = useState(false)
@@ -31,12 +32,11 @@ export const CopySeedPhrase: FC<{ seedPhrase?: string }> = ({ seedPhrase }) => {
         py={2.5}
         bg={"warn.900"}
       >
-        <L2>
+        <L2Bold>
           We do not recommend copying your recovery phrase to your clipboard. It
           can leave it susceptible to exploit!
-        </L2>
+        </L2Bold>
       </Flex>
-
       <CopyToClipboard
         onCopy={() => setSeedPhraseCopied(true)}
         text={seedPhrase}
@@ -44,7 +44,7 @@ export const CopySeedPhrase: FC<{ seedPhrase?: string }> = ({ seedPhrase }) => {
         <Button
           colorScheme={seedPhraseCopied ? "inverted" : undefined}
           size={"sm"}
-          leftIcon={<AlertFillIcon color="warn.500" />}
+          leftIcon={<WarningCirclePrimaryIcon color="warn.500" />}
           mx={"auto"}
         >
           {seedPhraseCopied ? "Copied" : "Copy"}

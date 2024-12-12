@@ -9,8 +9,11 @@ import {
 } from "../../../../call/__fixtures__/transaction-calls/sepolia-alpha"
 import { makeTransaction, accountAddress } from "./transformTransaction.test"
 import { getTransactionSubtitle } from "./getTransactionSubtitle"
+import { getRandomAccountIdentifier } from "../../../../utils/accountIdentifier"
 
 const networkId = "sepolia-alpha"
+
+const accountId = getRandomAccountIdentifier("0x123", networkId)
 
 describe("getTransactionSubtitle", () => {
   describe("when valid", () => {
@@ -27,6 +30,7 @@ describe("getTransactionSubtitle", () => {
             (await getTransactionSubtitle({
               transactionTransformed,
               networkId,
+              accountId,
             })),
         ).toMatchInlineSnapshot(`"To: 0x0541…b9fa"`)
       })
@@ -42,6 +46,7 @@ describe("getTransactionSubtitle", () => {
             (await getTransactionSubtitle({
               transactionTransformed,
               networkId,
+              accountId,
               getAddressName: () => "Foo bar",
             })),
         ).toMatchInlineSnapshot(`"To: Foo bar"`)
@@ -58,8 +63,9 @@ describe("getTransactionSubtitle", () => {
             (await getTransactionSubtitle({
               transactionTransformed,
               networkId,
+              accountId,
             })),
-        ).toMatchInlineSnapshot(`"Alpha Road"`)
+        ).toMatchInlineSnapshot(`undefined`)
       })
     })
   })

@@ -1,7 +1,9 @@
 import { FieldError } from "@argent/x-ui"
-import { Input, InputProps } from "@chakra-ui/react"
-import { FC } from "react"
-import { Control, Controller, FieldPath, FieldValues } from "react-hook-form"
+import type { InputProps } from "@chakra-ui/react"
+import { Input } from "@chakra-ui/react"
+import type { FC } from "react"
+import type { Control, FieldPath, FieldValues } from "react-hook-form"
+import { Controller } from "react-hook-form"
 
 import { useAutoFocusInputRef } from "../hooks/useAutoFocusInputRef"
 

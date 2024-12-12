@@ -1,15 +1,15 @@
+import type { NavigationContainerProps, SelectOptions } from "@argent/x-ui"
 import {
   AlertDialog,
   BarBackButton,
+  BarCloseButton,
   BarIconButton,
   CellStack,
   FieldError,
-  H4,
+  H3,
+  icons,
   NavigationContainer,
-  NavigationContainerProps,
   Select,
-  SelectOptions,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import {
   addressInputCharactersAndLengthSchema,
@@ -28,20 +28,21 @@ import {
   Spinner,
 } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC, FormEvent, useCallback, useEffect, useMemo, useState } from "react"
+import type { FC, FormEvent } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 
 import { addressBookContactNoIdSchema } from "../../../../shared/addressBook/schema"
-import {
+import type {
   AddressBookContact,
   AddressBookContactNoId,
-  isAddressBookContact,
 } from "../../../../shared/addressBook/type"
+import { isAddressBookContact } from "../../../../shared/addressBook/type"
 import { ControlledInput } from "../../../components/ControlledInput"
 import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
 import { useGetAddressFromDomainNameInput } from "../../send/useGetAddressFromDomainName"
 
-const { ProfileIcon, BinIcon } = iconsDeprecated
+const { UserSecondaryIcon, BinSecondaryIcon } = icons
 
 export interface AddressBookAddOrEditScreeProps
   extends NavigationContainerProps {
@@ -54,6 +55,7 @@ export interface AddressBookAddOrEditScreeProps
   networkOptions?: SelectOptions
   networkDisabled?: boolean
   addressDisabled?: boolean
+  modal?: boolean
 }
 
 export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
@@ -64,6 +66,7 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
   networkOptions = [],
   networkDisabled,
   addressDisabled,
+  modal,
   ...rest
 }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -105,14 +108,15 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
     }
     return getNetworkAccountImageUrl({
       accountName: contactName,
-      accountAddress: contactAddress,
-      networkId: contactNetwork,
+      accountId: `${contactAddress}-${contactNetwork}`,
     })
   }, [contactAddress, contactName, contactNetwork])
 
   const handleForm = handleSubmit(
     (contact: AddressBookContactNoId | AddressBookContact) => {
-      onSave && void onSave(contact)
+      if (onSave) {
+        void onSave(contact)
+      }
     },
   )
 
@@ -120,7 +124,9 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
 
   const onDeleteConfirm = useCallback(() => {
     setDeleteDialogOpen(false)
-    onDelete && void onDelete()
+    if (onDelete) {
+      void onDelete()
+    }
   }, [onDelete])
 
   const onDeleteCancel = useCallback(() => {
@@ -136,7 +142,7 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
         aria-label="Remove from address book"
         onClick={() => setDeleteDialogOpen(true)}
       >
-        <BinIcon />
+        <BinSecondaryIcon />
       </BarIconButton>
     )
   }, [isEditingExistingContact])
@@ -166,7 +172,13 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
 
   return (
     <NavigationContainer
-      leftButton={<BarBackButton onClick={onCancel} />}
+      leftButton={
+        modal ? (
+          <BarCloseButton onClick={onCancel} />
+        ) : (
+          <BarBackButton onClick={onCancel} />
+        )
+      }
       title={title}
       rightButton={rightButton}
       {...rest}
@@ -189,10 +201,10 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
             {contactName ? (
               <Img w={20} h={20} src={contactAvatar} />
             ) : (
-              <ProfileIcon fontSize={32} />
+              <UserSecondaryIcon fontSize={32} />
             )}
           </Circle>
-          <H4>{title}</H4>
+          <H3>{title}</H3>
         </Center>
         <CellStack
           as="form"
@@ -229,7 +241,7 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
                     e.target.value,
                   ).success
                 ) {
-                  onChange(e)
+                  void onChange(e)
                 }
               }}
             />

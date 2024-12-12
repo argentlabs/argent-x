@@ -1,0 +1,92 @@
+{
+  "investments": [
+    {
+      "id": "ee3dae35-85ac-4e67-b3ee-4e436c102cba",
+      "dappId": "ed0f9636-9a73-49e0-9f80-0932eafd0cee",
+      "productId": "5d4c7689-6759-4051-a6a2-baf4a397b081",
+      "productName": "Starknet Staking",
+      "chain": "starknet",
+      "category": "strkDelegatedStaking",
+      "name": "Starknet Staking",
+      "description": "Stake your STRK within Argent staking pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+      "learnMoreUrl": "https://learn.more.url/",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": true,
+        "tokensRequirement": "any",
+        "amountsRequirement": "fullBalance",
+        "timelockDuration": 300
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0.12", "totalApy": "0.12" },
+      "incentives": [],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "argentFee": "0.05", "totalFee": "0.05" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": true,
+      "stakerInfo": {
+        "name": "Argent",
+        "iconUrl": "https://static.argent.net/dapp/logos/3131edcd-b7f4-47d4-89ae-bd461786e547.png",
+        "address": "0x019fd64864a5fea548cc263eae6343249a7e7a9d42d638cf74ab39a6bd450af1"
+      }
+    },
+    {
+      "id": "6d2f225a-2bda-4973-a564-d127434da0c2",
+      "dappId": "ed0f9636-9a73-49e0-9f80-0932eafd0cee",
+      "productId": "5d4c7689-6759-4051-a6a2-baf4a397b081",
+      "productName": "Starknet Staking",
+      "chain": "starknet",
+      "category": "strkDelegatedStaking",
+      "name": "Starknet Staking",
+      "description": "Stake your STRK within Voyager staking pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+      "learnMoreUrl": "https://learn.more.url/",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": true,
+        "tokensRequirement": "any",
+        "amountsRequirement": "fullBalance",
+        "timelockDuration": 300
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0.1136", "totalApy": "0.1136" },
+      "incentives": [],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "argentFee": "0.09", "totalFee": "0.09" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": true,
+      "stakerInfo": {
+        "name": "Voyager",
+        "iconUrl": "https://www.dappland.com/dapps/voyager/dapp-icon-voyager.png",
+        "address": "0x00622e5d66bd907f7973f89b5f3c9f06cd466c3ca76f7ae3a6b64631722546be"
+      }
+    }
+  ]
+}

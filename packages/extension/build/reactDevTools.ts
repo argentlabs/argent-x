@@ -9,7 +9,7 @@ function checkReactDevTools() {
   try {
     execSync(`${command} react-devtools`, { stdio: "ignore" })
     return true
-  } catch (error) {
+  } catch {
     console.error(
       "❌ react-devtools is not installed - run `npm install -g react-devtools`",
     )

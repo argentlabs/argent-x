@@ -49,7 +49,7 @@ export const sendProcedure = extensionOnlyProcedure
           title,
           shortTitle,
           subtitle,
-          icon: "SendIcon",
+          icon: "SendSecondaryIcon",
         },
       )
 

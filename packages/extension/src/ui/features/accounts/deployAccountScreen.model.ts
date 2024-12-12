@@ -1,4 +1,4 @@
-import { ConfirmPageProps } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
+import type { ConfirmPageProps } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 
 export type DeployAccountScreenContainerProps = Omit<
   ConfirmPageProps,

@@ -1,15 +1,15 @@
-import { BackendAccount } from "@argent/x-shared"
+import type { BackendAccount } from "@argent/x-shared"
 import { num } from "starknet"
 
+import type { SmartAccountValidationErrorMessage } from "../../errors/argentAccount"
 import {
   ArgentAccountError,
   SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_1,
   SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_2,
   SMART_ACCOUNT_EMAIL_VALIDATION_FAILURE_SCENARIO_3,
-  SmartAccountValidationErrorMessage,
 } from "../../errors/argentAccount"
 import { isErrorOfType } from "../../errors/errorData"
-import { WalletAccount } from "../../wallet.model"
+import type { WalletAccount } from "../../wallet.model"
 
 export const getSmartAccountValidationErrorFromBackendError = (
   error: unknown,

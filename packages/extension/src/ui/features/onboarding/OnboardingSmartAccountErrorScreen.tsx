@@ -1,6 +1,7 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 
-import { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
+import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
 import SmartAccountError from "../smartAccount/ui/SmartAccountError"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
@@ -25,6 +26,7 @@ export const OnboardingSmartAccountErrorScreen: FC<
       currentIndex={3} // this is the 4th step, part of the smart account onboarding
       title={"Oops, wrong email"}
       subtitle={<SmartAccountError error={error} />}
+      illustration="email-wrong"
     >
       <OnboardingButton mt={3} onClick={onDoneClick}>
         Try again

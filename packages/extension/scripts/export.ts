@@ -103,6 +103,6 @@ async function exportForEndUserBuild() {
   console.log("✅ Buildable source and Readme exported to", destination)
 }
 
-;(async () => {
+void (async () => {
   await exportForEndUserBuild()
 })()

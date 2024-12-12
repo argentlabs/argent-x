@@ -1,15 +1,20 @@
-import { BaseWalletAccount, baseWalletAccountSchema } from "../wallet.model"
+import type { BaseWalletAccount } from "../wallet.model"
+import { baseWalletAccountSchema } from "../wallet.model"
 import { z } from "zod"
 import {
   ApiMultisigOffchainSignatureStateSchema,
   multisigSignerSignaturesSchema,
   offchainSigMessageSchema,
 } from "./multisig.model"
-import { addressSchema, getAccountIdentifier } from "@argent/x-shared"
-import { AllowArray, IRepository, SelectorFn } from "../storage/__new/interface"
+import { addressSchema } from "@argent/x-shared"
+import type {
+  AllowArray,
+  IRepository,
+  SelectorFn,
+} from "../storage/__new/interface"
 import { ChromeRepository } from "../storage/__new/chrome"
 import browser from "webextension-polyfill"
-import { memoize } from "lodash-es"
+import memoize from "memoizee"
 import { accountsEqual } from "../utils/accountsEqual"
 
 export const multisigPendingOffchainSignatureSchema = z.object({
@@ -45,7 +50,7 @@ export const byAccountSelector = memoize(
     (transaction: MultisigPendingOffchainSignature) => {
       return accountsEqual(transaction.account, account)
     },
-  (account) => (account ? getAccountIdentifier(account) : "unknown-account"),
+  { normalizer: ([account]) => (account ? account.id : "unknown-account") },
 )
 
 export async function getMultisigPendingOffchainSignatures(

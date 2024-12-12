@@ -1,6 +1,6 @@
-import { memoize } from "lodash-es"
-
-import { Network, getProvider } from "../network"
+import memoize from "memoizee"
+import type { Network } from "../network"
+import { getProvider } from "../network"
 import { RpcBatchProvider } from "@argent/x-multicall"
 import { argentXHeaders } from "../api/headers"
 
@@ -44,5 +44,5 @@ export const getMulticallForNetwork = memoize(
     })
     return multicall
   },
-  (network: Network) => getMemoizeKey(network),
+  { normalizer: ([network]) => getMemoizeKey(network) },
 )

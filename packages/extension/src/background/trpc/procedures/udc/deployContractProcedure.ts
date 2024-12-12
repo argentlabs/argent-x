@@ -6,19 +6,12 @@ export const deployContractProcedure = extensionOnlyProcedure
   .input(deployContractSchema)
   .mutation(
     async ({
-      input: {
-        address,
-        networkId,
-        classHash,
-        constructorCalldata,
-        salt,
-        unique,
-      },
+      input: { accountId, classHash, constructorCalldata, salt, unique },
       ctx: {
         services: { actionService, wallet },
       },
     }) => {
-      await wallet.selectAccount({ address, networkId })
+      await wallet.selectAccount(accountId)
       try {
         await actionService.add(
           {
@@ -34,7 +27,7 @@ export const deployContractProcedure = extensionOnlyProcedure
             icon: "DocumentIcon",
           },
         )
-      } catch (e) {
+      } catch {
         throw new UdcError({ code: "NO_DEPLOY_CONTRACT" })
       }
     },

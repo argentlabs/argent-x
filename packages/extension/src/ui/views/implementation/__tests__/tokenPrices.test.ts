@@ -22,6 +22,7 @@ describe("sortedTokensWithBalances", () => {
   })
 
   const mockAccount = {
+    id: "id",
     address: randomAddress1,
     networkId: defaultNetwork.id,
     network: defaultNetwork,

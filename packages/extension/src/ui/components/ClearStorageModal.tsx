@@ -1,4 +1,4 @@
-import { H5 } from "@argent/x-ui"
+import { H4 } from "@argent/x-ui"
 import {
   Button,
   Flex,
@@ -8,7 +8,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import { PasswordForm } from "../features/lock/PasswordForm"
 
 interface ClearStorageModalProps {
@@ -30,9 +30,9 @@ export const ClearStorageModal: FC<ClearStorageModalProps> = ({
         <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
         <ModalContent background="neutrals.700" borderRadius="2xl">
           <ModalHeader mt={2}>
-            <H5 fontWeight="600" textAlign="center">
+            <H4 fontWeight="600" textAlign="center">
               Enter your password to clear storage
-            </H5>
+            </H4>
           </ModalHeader>
 
           <ModalFooter flexDirection="column" gap="1">

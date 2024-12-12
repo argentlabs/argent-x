@@ -1,31 +1,34 @@
-import { memoize } from "lodash-es"
-import { AllowArray, BigNumberish } from "starknet"
+import memoize from "memoizee"
+import type { AllowArray, BigNumberish } from "starknet"
 
 import { isEqualAddress } from "@argent/x-shared"
 import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 import { atomFromRepo } from "../../ui/views/implementation/atomFromRepo"
 import { accountService } from "../account/service"
-import { ActionQueueItemMeta } from "../actionQueue/schema"
+import type { ActionQueueItemMeta } from "../actionQueue/schema"
 import { transformTransaction } from "../activity/utils/transform"
 import { isOnChainRejectTransaction } from "../activity/utils/transform/is"
 import { getTransactionFromPendingMultisigTransaction } from "../activity/utils/transform/transaction/transformers/pendingMultisigTransactionAdapter"
 import { ArrayStorage } from "../storage"
 import { adaptArrayStorage } from "../storage/__new/repository"
-import { SelectorFn } from "../storage/types"
-import {
+import type { SelectorFn } from "../storage/types"
+import type {
   ExtendedFinalityStatus,
   ExtendedTransactionType,
 } from "../transactions"
 import { addTransaction } from "../transactions/store"
-import { accountsEqual, atomFamilyAccountsEqual } from "../utils/accountsEqual"
-import { BaseWalletAccount, WalletAccount } from "../wallet.model"
-import { getAccountIdentifier } from "../wallet.service"
+import {
+  accountsEqual,
+  atomFamilyAccountsEqual,
+  isEqualAccountIds,
+} from "../utils/accountsEqual"
+import type { BaseWalletAccount, WalletAccount } from "../wallet.model"
 import {
   TransactionCreatedForMultisigPendingTransaction,
   multisigEmitter,
 } from "./emitter"
-import {
+import type {
   ApiMultisigTransaction,
   ApiMultisigTransactionState,
 } from "./multisig.model"
@@ -53,7 +56,8 @@ export type MultisigPendingTransaction = {
 export const multisigPendingTransactionsStore =
   new ArrayStorage<MultisigPendingTransaction>([], {
     namespace: "core:multisig:pendingTransactions",
-    compare: (a, b) => a.requestId === b.requestId,
+    compare: (a, b) =>
+      a.requestId === b.requestId && accountsEqual(a.account, b.account),
   })
 
 export const multisigPendingTransactionsRepo = adaptArrayStorage(
@@ -94,7 +98,7 @@ export const byAccountSelector = memoize(
     (transaction: MultisigPendingTransaction) => {
       return accountsEqual(transaction.account, account)
     },
-  (account) => (account ? getAccountIdentifier(account) : "unknown-account"),
+  { normalizer: ([account]) => (account ? account.id : "unknown-account") },
 )
 
 export async function getMultisigPendingTransactions(
@@ -171,8 +175,9 @@ export async function removeRejectedOnChainPendingTransactions(
   const accounts: WalletAccount[] =
     await accountService.getFromBaseWalletAccounts(
       Object.keys(groupedTransactionsByAccount).map((accountKey) => {
-        const [address, networkId] = accountKey.split("/")
+        const [address, networkId] = accountKey.split("-")
         return {
+          id: accountKey,
           address,
           networkId,
         }
@@ -196,12 +201,10 @@ const groupTransactionsByAccount = (
 ) => {
   return allTransactions.reduce(
     (groups: { [key: string]: MultisigPendingTransaction[] }, transaction) => {
-      // Serialize the account object to a string key
-      const accountKey = `${transaction.account.address}/${transaction.account.networkId}`
+      const accountKey = transaction.account.id
       // Check if a group for this account already exists
       for (const key in groups) {
-        const accountAddress = key.split("/")[0]
-        if (isEqualAddress(transaction.account.address, accountAddress)) {
+        if (isEqualAccountIds(accountKey, key)) {
           groups[key].push(transaction)
           return groups
         }

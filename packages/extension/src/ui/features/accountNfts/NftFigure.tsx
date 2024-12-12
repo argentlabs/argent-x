@@ -1,5 +1,6 @@
+import { buttonHoverStyle } from "@argent/x-ui"
 import { Box } from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 
 interface NftFigureProps {
   onClick: () => void
@@ -8,19 +9,22 @@ interface NftFigureProps {
 
 const NftFigure: FC<NftFigureProps> = ({ onClick, children }) => (
   <Box
-    w="160px"
-    h="192px"
+    w="100%"
     position="relative"
     as="figure"
-    bg="neutrals.800"
+    bg="surface-elevated"
     cursor="pointer"
     display="inline-block"
     overflow="hidden"
     data-group
-    borderRadius="lg"
+    rounded="xl"
     p="2"
     onClick={onClick}
-    _hover={{ backgroundColor: "neutrals.700" }}
+    _hover={{
+      boxShadow: buttonHoverStyle.boxShadow,
+    }}
+    transitionProperty="common"
+    transitionDuration="fast"
   >
     {children}
   </Box>

@@ -1,9 +1,14 @@
+import { Meta, StoryObj } from "@storybook/react"
 import { OnboardingRestoreSeedScreen } from "@argent-x/extension/src/ui/features/onboarding/OnboardingRestoreSeedScreen"
 
-export default {
+const meta: Meta<typeof OnboardingRestoreSeedScreen> = {
   component: OnboardingRestoreSeedScreen,
 }
 
-export const Default = {
+export default meta
+
+type Story = StoryObj<typeof OnboardingRestoreSeedScreen>
+
+export const Default: Story = {
   args: {},
 }

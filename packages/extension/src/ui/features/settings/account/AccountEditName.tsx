@@ -1,16 +1,17 @@
-import { Button, iconsDeprecated } from "@argent/x-ui"
+import { Button, icons } from "@argent/x-ui"
+import type { InputProps } from "@chakra-ui/react"
 import {
   Input,
   InputGroup,
   InputLeftElement,
-  InputProps,
   InputRightElement,
 } from "@chakra-ui/react"
-import { FC, FormEvent, useCallback, useRef, useState } from "react"
+import type { FC, FormEvent } from "react"
+import { useCallback, useRef, useState } from "react"
 
 import { useOnClickOutside } from "../../../services/useOnClickOutside"
 
-const { EditIcon, TickIcon } = iconsDeprecated
+const { EditPrimaryIcon, CheckmarkSecondaryIcon } = icons
 
 interface AccountNameProps extends InputProps {
   onSubmit: () => void
@@ -71,7 +72,7 @@ export const AccountEditName: FC<AccountNameProps> = ({
             rounded="full"
             onClick={onAccessoryButtonClick}
           >
-            {isEditing ? <TickIcon /> : <EditIcon />}
+            {isEditing ? <CheckmarkSecondaryIcon /> : <EditPrimaryIcon />}
           </Button>
         </InputRightElement>
       </InputGroup>

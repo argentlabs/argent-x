@@ -1,6 +1,7 @@
 import { Button } from "@argent/x-ui"
-import { ButtonProps } from "@chakra-ui/react"
-import { FC, memo } from "react"
+import type { ButtonProps } from "@chakra-ui/react"
+import type { FC } from "react"
+import { memo } from "react"
 
 export interface CustomButtonCellProps extends ButtonProps {
   highlighted?: boolean

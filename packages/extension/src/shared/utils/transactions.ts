@@ -1,5 +1,5 @@
 import { camelCase, snakeCase } from "lodash-es"
-import { CairoVersion } from "starknet"
+import type { CairoVersion } from "starknet"
 
 export const getEntryPointSafe = (
   entryPoint: string,

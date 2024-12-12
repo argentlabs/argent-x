@@ -1,23 +1,23 @@
-import { BarBackButton, H3, NavigationContainer } from "@argent/x-ui"
+import { BarBackButton, H2, NavigationContainer } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
-import { useNavigate } from "react-router-dom"
+import type { FC } from "react"
 
-import { routes } from "../../../shared/ui/routes"
 import { NftFallback } from "./NftFallback"
 
-export const CollectionNftsGenericError: FC = () => {
-  const navigate = useNavigate()
+interface CollectionNftsGenericErrorProps {
+  onBack?: () => void
+}
 
+export const CollectionNftsGenericError: FC<
+  CollectionNftsGenericErrorProps
+> = ({ onBack }) => {
   return (
     <NavigationContainer
-      leftButton={
-        <BarBackButton onClick={() => navigate(routes.accountCollections())} />
-      }
+      leftButton={onBack ? <BarBackButton onClick={onBack} /> : undefined}
     >
-      <H3 mt="4" textAlign="center">
+      <H2 mt="4" textAlign="center">
         Error loading nfts
-      </H3>
+      </H2>
       <Flex position="relative">
         <NftFallback />
       </Flex>

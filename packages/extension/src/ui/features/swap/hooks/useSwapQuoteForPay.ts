@@ -1,6 +1,6 @@
 import useSWR from "swr"
-import { Token } from "../../../../shared/token/__new/types/token.model"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { RefreshIntervalInSeconds } from "../../../../shared/config"
 import { swapService } from "../../../services/swap"
 import { addressSchema } from "@argent/x-shared"
@@ -8,14 +8,16 @@ import { addressSchema } from "@argent/x-shared"
 interface IUseSwapQuoteForPay {
   payToken?: Token
   receiveToken?: Token
-  payAmount?: bigint
+  sellAmount?: bigint
+  buyAmount?: bigint
   account?: BaseWalletAccount
 }
 
 export function useSwapQuoteForPay({
   payToken,
   receiveToken,
-  payAmount = 0n,
+  sellAmount,
+  buyAmount,
   account,
 }: IUseSwapQuoteForPay) {
   const {
@@ -27,11 +29,13 @@ export function useSwapQuoteForPay({
       "tradeFromPay",
       payToken?.address,
       receiveToken?.address,
-      payAmount,
+      sellAmount,
+      buyAmount,
       account?.address,
     ],
     async () => {
-      if (!payToken || !receiveToken || !payAmount || !account) return
+      if (!payToken || !receiveToken || (!sellAmount && !buyAmount) || !account)
+        return
 
       const parsedPayTokenAddress = addressSchema.parse(payToken.address)
       const parsedReceiveTokenAddress = addressSchema.parse(
@@ -42,8 +46,9 @@ export function useSwapQuoteForPay({
       const trade = await swapService.getSwapQuoteForPay(
         parsedPayTokenAddress,
         parsedReceiveTokenAddress,
-        payAmount.toString(),
         parsedAccountAddress,
+        sellAmount?.toString(),
+        buyAmount?.toString(),
       )
       return trade
     },

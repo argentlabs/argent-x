@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 
 export enum ACCOUNT_ERROR_MESSAGES {
   NOT_FOUND = "Account not found",
@@ -18,6 +19,9 @@ export enum ACCOUNT_ERROR_MESSAGES {
   UNDEPLOYED_ACCOUNT_CAIRO_VERSION_NOT_FOUND = "Unable to determine cairo version of UNDEPLOYED account",
   MISSING_METHOD = "Missing method",
   REFERRAL_NOT_ENABLED = "Referral not enabled",
+
+  UNDEPLOYED_IMPORTED_ACCOUNT = "Imported account cannot be undeployed",
+  IMPORTED_UPGRADE_NOT_SUPPORTED = "Imported account cannot be upgraded",
 }
 
 export type AccountValidationErrorMessage = keyof typeof ACCOUNT_ERROR_MESSAGES

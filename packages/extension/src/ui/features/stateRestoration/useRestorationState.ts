@@ -1,6 +1,6 @@
-import { memoize } from "lodash-es"
+import memoize from "memoizee"
 import { useEffect, useRef } from "react"
-import { PathPattern } from "react-router"
+import type { PathPattern } from "react-router"
 import { matchPath, useLocation } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
@@ -15,16 +15,21 @@ const restorationStatePathnames: Array<string | PathPattern> = [
   routes.smartAccountOTP.path,
   routes.sendAmountAndAssetScreen.path,
   routes.createSmartAccountOTP.path,
+  routes.privateKeyImport.path,
+  routes.nativeStaking.path,
 ]
 
-const isRestorationStatePathname = memoize((pathname?: string) => {
-  if (!pathname) {
-    return false
-  }
-  return restorationStatePathnames.some((pattern) =>
-    matchPath(pattern, pathname),
-  )
-})
+const isRestorationStatePathname = memoize(
+  (pathname?: string) => {
+    if (!pathname) {
+      return false
+    }
+    return restorationStatePathnames.some((pattern) =>
+      matchPath(pattern, pathname),
+    )
+  },
+  { primitive: true },
+)
 
 /**
  * Capture entryRoute for paths in {@link restorationStatePathnames}.

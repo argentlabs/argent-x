@@ -1,14 +1,12 @@
-import { Call, num } from "starknet"
+import type { Call } from "starknet"
+import { num } from "starknet"
 
 import { getMulticallForNetwork } from "../../multicall"
 import { networkService } from "../../network/service"
-import { BaseWalletAccount } from "../../wallet.model"
+import type { BaseWalletAccount } from "../../wallet.model"
 
-import {
-  ESCAPE_TYPE_GUARDIAN,
-  ESCAPE_TYPE_SIGNER,
-  Escape,
-} from "./escape.model"
+import type { Escape } from "./escape.model"
+import { ESCAPE_TYPE_GUARDIAN, ESCAPE_TYPE_SIGNER } from "./escape.model"
 import { multicallWithCairo0Fallback } from "./multicallWithCairo0Fallback"
 
 /**

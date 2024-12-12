@@ -5,7 +5,7 @@ import { MultisigThresholdButtonContainer } from "./buttons/MultisigThresholdBut
 import { MultisigOwnersButtonContainer } from "./buttons/MultisigOwnersButton"
 import { AccountEditButtonsLedger } from "./AccountEditButtonsLedger"
 import { PublicKeyExportButtonContainer } from "./buttons/PublicKeyExportButton"
-import { WalletAccount } from "../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../shared/wallet.model"
 
 export const AccountEditButtonsMultisig = ({
   account,

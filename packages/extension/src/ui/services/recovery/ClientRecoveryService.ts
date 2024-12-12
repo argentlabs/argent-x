@@ -1,6 +1,6 @@
 import { encryptForBackground } from "../crypto"
 import { messageClient } from "../trpc"
-import { IRecoveryService } from "../../../shared/recovery/IRecoveryService"
+import type { IRecoveryService } from "../../../shared/recovery/IRecoveryService"
 
 export class ClientRecoveryService implements IRecoveryService {
   async byBackup(backup: string) {

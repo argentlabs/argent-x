@@ -1,8 +1,8 @@
 import {
-  iconsDeprecated,
-  Button,
-  NavigationContainer,
   BarCloseButton,
+  Button,
+  icons,
+  NavigationContainer,
   Warning,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
@@ -13,7 +13,7 @@ import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { selectedNetworkIdView } from "../../../views/network"
 import { useView } from "../../../views/implementation/react"
 
-const { ExpandIcon } = iconsDeprecated
+const { ExpandIcon } = icons
 
 export const AccountOwnerWarningScreen = () => {
   const onBack = useNavigateReturnToOrBack()

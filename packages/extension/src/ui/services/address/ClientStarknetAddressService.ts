@@ -1,6 +1,6 @@
-import { AddressOrDomain, StarknetDomainName } from "@argent/x-shared"
-import { messageClient } from "../trpc"
-import { IClientStarknetAddressService } from "./IClientStarknetAddressService"
+import type { AddressOrDomain, StarknetDomainName } from "@argent/x-shared"
+import type { messageClient } from "../trpc"
+import type { IClientStarknetAddressService } from "./IClientStarknetAddressService"
 
 export class ClientStarknetAddressService
   implements IClientStarknetAddressService

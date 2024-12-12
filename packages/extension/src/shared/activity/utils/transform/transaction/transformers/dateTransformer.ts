@@ -1,4 +1,4 @@
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 /** date from timestamp */
 

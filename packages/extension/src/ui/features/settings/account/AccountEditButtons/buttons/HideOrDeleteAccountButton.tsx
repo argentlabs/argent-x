@@ -1,37 +1,52 @@
-import { FC, useMemo } from "react"
+import type { FC } from "react"
+import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { ButtonCell, iconsDeprecated } from "@argent/x-ui"
+import { ButtonCell, icons } from "@argent/x-ui"
 
 import { routes } from "../../../../../../shared/ui/routes"
 import { isDeprecated } from "../../../../../../shared/wallet.service"
-import { WalletAccount } from "../../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../../shared/wallet.model"
+import { upperFirst } from "lodash-es"
 
-const { HideIcon } = iconsDeprecated
+const { HideSecondaryIcon, BinSecondaryIcon } = icons
 
 export const HideOrDeleteAccountButtonContainer: FC<{
   account: WalletAccount
-}> = ({ account }) => {
+  type?: "hide" | "delete" | "remove"
+}> = ({ account, type }) => {
   const navigate = useNavigate()
 
-  const type = useMemo(() => {
+  const action = useMemo(() => {
+    if (type) {
+      return type
+    }
+
     const showDelete =
       isDeprecated(account) || account.networkId === "localhost"
 
     return showDelete ? "delete" : "hide"
-  }, [account])
+  }, [account, type])
+
+  const icon = useMemo(() => {
+    switch (action) {
+      case "hide":
+        return <HideSecondaryIcon />
+      case "remove":
+        return <BinSecondaryIcon color="accent-red" />
+      default:
+        return null
+    }
+  }, [action])
 
   const onHideOrDeleteAccount = (account: WalletAccount) => {
-    if (type === "delete") {
-      navigate(routes.accountDeleteConfirm(account.address))
-    } else {
-      navigate(routes.accountHideConfirm(account.address))
-    }
+    return navigate(routes.accountHideOrDeleteConfirm(account.id, action))
   }
 
   return (
     <HideOrDeleteAccountButton
       account={account}
-      type={type}
+      icon={icon}
+      action={action}
       onHideOrDeleteAccount={onHideOrDeleteAccount}
     />
   )
@@ -39,21 +54,24 @@ export const HideOrDeleteAccountButtonContainer: FC<{
 
 interface HideOrDeleteAccountButtonProps {
   account: WalletAccount
-  type: "hide" | "delete"
+  action: "hide" | "delete" | "remove"
+  icon: React.ReactNode
   onHideOrDeleteAccount: (account: WalletAccount) => void
 }
 
 export const HideOrDeleteAccountButton: FC<HideOrDeleteAccountButtonProps> = ({
   account,
-  type,
+  action,
+  icon,
   onHideOrDeleteAccount,
 }) => {
   return (
     <ButtonCell
+      colorScheme={action === "remove" ? "neutrals-danger" : "default"}
       onClick={() => onHideOrDeleteAccount(account)}
-      rightIcon={type === "hide" && <HideIcon />}
+      rightIcon={icon}
     >
-      {type === "delete" ? "Delete account" : "Hide account"}
+      {upperFirst(action)} account
     </ButtonCell>
   )
 }

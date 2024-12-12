@@ -35,6 +35,7 @@ export const activityService = new ActivityService(
 
 export const activityWorker = new ActivityWorker(
   activityService,
+  accountService,
   notificationService,
   activityCacheService,
   transactionTrackerWorker,

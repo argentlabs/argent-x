@@ -1,5 +1,4 @@
-import { H1, P4 } from "@argent/x-ui"
-import { iconsDeprecated } from "@argent/x-ui"
+import { icons, MassiveTitle, P3 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 
 import { ScreenLayout } from "./ScreenLayout"
@@ -7,7 +6,7 @@ import { SignerType } from "../../../../shared/wallet.model"
 import { useMemo } from "react"
 import { ActionButton } from "../../../components/FullScreenPage"
 
-const { TickCircleIcon, InfoIcon } = iconsDeprecated
+const { SuccessSecondaryIcon, InfoCircleSecondaryIcon } = icons
 
 interface MultisigThirdStepProps {
   index: number
@@ -40,11 +39,11 @@ export const MultisigThirdStep = ({
           gap="2"
           mb="270px"
         >
-          <InfoIcon color="neutrals.200" />
-          <P4 color="neutrals.200">
+          <InfoCircleSecondaryIcon color="neutrals.200" />
+          <P3 color="neutrals.200">
             Ledger accounts aren’t recoverable from an Argent X seed phrase. You
             need to add them again
-          </P4>
+          </P3>
         </Flex>
       )
     }
@@ -56,10 +55,14 @@ export const MultisigThirdStep = ({
       subtitle="Reopen the Argent X extension and add funds to your multisig to activate"
       currentIndex={index}
       title={
-        <H1 display="flex">
+        <MassiveTitle display="flex">
           Multisig created{" "}
-          <TickCircleIcon color="success.500" alignSelf="flex-end" ml="1" />
-        </H1>
+          <SuccessSecondaryIcon
+            color="success.500"
+            alignSelf="flex-end"
+            ml="1"
+          />
+        </MassiveTitle>
       }
       goBack={goBack}
       back={false}

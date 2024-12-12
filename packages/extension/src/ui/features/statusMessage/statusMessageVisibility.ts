@@ -2,7 +2,7 @@ import { isArray } from "lodash-es"
 import semverGt from "semver/functions/gt"
 import semverLt from "semver/functions/lt"
 
-import { IStatusMessage } from "../../../shared/statusMessage/types"
+import type { IStatusMessage } from "../../../shared/statusMessage/types"
 
 /**
  * Checks if `statusMessage` matches specified `version`

@@ -1,5 +1,5 @@
-import { messageClient } from "../trpc"
-import { IFeeTokenService } from "./IFeeTokenService"
+import type { messageClient } from "../trpc"
+import type { IFeeTokenService } from "./IFeeTokenService"
 
 export class FeeTokenService implements IFeeTokenService {
   constructor(private trpcMessageClient: typeof messageClient) {}

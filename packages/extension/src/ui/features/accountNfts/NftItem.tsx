@@ -1,40 +1,76 @@
-import { H6 } from "@argent/x-ui"
-import { Box, Image } from "@chakra-ui/react"
-import { FC } from "react"
+import { buttonHoverStyle, H5, icons, ImageOptimized } from "@argent/x-ui"
+import { Box, Center, Image } from "@chakra-ui/react"
+import type { FC } from "react"
 
-import { NftThumbnailImage } from "./NftThumbnailImage"
+const { NoImageSecondaryIcon } = icons
 
 interface NftItemProps {
   name: string
-  thumbnailSrc: string
+  thumbnailSrc?: string
   logoSrc?: string | null
   total?: number
 }
+
+const FallbackImage = () => (
+  <Center w="full" aspectRatio="1/1" borderRadius="lg" bgColor="black.30">
+    <NoImageSecondaryIcon color="text-secondary" fontSize="2xl" />
+  </Center>
+)
 
 const NftItem: FC<NftItemProps> = ({ logoSrc, name, thumbnailSrc, total }) => (
   <Box as="figure" role="group">
     <Box
       position="relative"
-      transition={"transform 0.2s ease-in-out"}
+      transitionProperty="common"
+      transitionDuration="fast"
       _groupHover={{
         transform: "scale(1.05)",
-        transitionDuration: "0.2s",
-        transitionTimingFunction: "ease-in-out",
       }}
     >
-      <NftThumbnailImage src={thumbnailSrc} />
+      {thumbnailSrc ? (
+        <ImageOptimized
+          src={thumbnailSrc}
+          w="full"
+          aspectRatio="1/1"
+          rounded="lg"
+          objectFit="contain"
+          format="png"
+          fallbackStrategy="onError"
+          fallback={
+            <Image
+              src={thumbnailSrc}
+              w="full"
+              aspectRatio="1/1"
+              rounded="lg"
+              objectFit="contain"
+              fallback={<FallbackImage />}
+            />
+          }
+        />
+      ) : (
+        <FallbackImage />
+      )}
       {logoSrc && (
         <Box
-          bg="neutrals.800"
+          bg="surface-elevated"
           position="absolute"
           p="1"
-          w="48px"
-          h="48px"
+          w="12"
+          h="12"
           bottom="-1"
           left="-1"
-          borderRadius="lg"
+          borderRadius="xl"
+          _groupHover={{
+            boxShadow: buttonHoverStyle.boxShadow,
+          }}
         >
-          <Image src={logoSrc} borderRadius="lg" />
+          <ImageOptimized
+            src={logoSrc}
+            format="png"
+            borderRadius="lg"
+            fallbackStrategy="onError"
+            fallback={<FallbackImage />}
+          />
         </Box>
       )}
     </Box>
@@ -47,10 +83,10 @@ const NftItem: FC<NftItemProps> = ({ logoSrc, name, thumbnailSrc, total }) => (
       alignItems="center"
       pt="3"
     >
-      <H6 textOverflow="ellipsis" overflow="hidden" whiteSpace="nowrap">
+      <H5 textOverflow="ellipsis" overflow="hidden" whiteSpace="nowrap">
         {name}
-      </H6>
-      {total && <H6 color="neutrals.400">{total}</H6>}
+      </H5>
+      {total !== undefined && <H5 color="text-secondary">{total}</H5>}
     </Box>
   </Box>
 )

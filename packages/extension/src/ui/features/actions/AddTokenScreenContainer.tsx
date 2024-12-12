@@ -1,23 +1,27 @@
-import { Address, addressSchema, isEqualAddress } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
+import { addressSchema, isEqualAddress } from "@argent/x-shared"
 import { useToast } from "@argent/x-ui"
 import { debounce } from "lodash-es"
-import { FC, Suspense, useCallback, useMemo, useState } from "react"
+import type { FC } from "react"
+import { Suspense, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { addAddressPadding } from "starknet"
 import useSWR from "swr"
 import { ZodError } from "zod"
 
-import { getAccountIdentifier } from "../../../shared/wallet.service"
+import type { RequestToken } from "../../../shared/token/__new/types/token.model"
 import { routes } from "../../../shared/ui/routes"
+import { clientTokenService } from "../../services/tokens"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { AddTokenScreen, AddTokenScreenSchemaType } from "./AddTokenScreen"
-import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
-import { RequestToken } from "../../../shared/token/__new/types/token.model"
-import { clientTokenService } from "../../services/tokens"
-import { useTokensInCurrentNetworkIncludingSpam } from "../accountTokens/tokens.state"
-import { mergeTokens } from "../../../shared/token/__new/repository/mergeTokens"
 import { selectedNetworkIdView } from "../../views/network"
+import {
+  useTokenInfo,
+  useTokensInCurrentNetworkIncludingSpam,
+} from "../accountTokens/tokens.state"
+import type { AddTokenScreenSchemaType } from "./AddTokenScreen"
+import { AddTokenScreen } from "./AddTokenScreen"
+import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 
 interface AddTokenScreenContainerProps {
   hideBackButton?: boolean
@@ -55,11 +59,7 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
     error: fetchTokenError,
   } = useSWR(
     account && fetchedTokenAddress
-      ? [
-          "fetchTokenDetails",
-          fetchedTokenAddress,
-          getAccountIdentifier(account),
-        ]
+      ? ["fetchTokenDetails", fetchedTokenAddress, account.id]
       : null,
     () =>
       clientTokenService.fetchDetails(fetchedTokenAddress, account?.networkId),
@@ -80,28 +80,41 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
     const existingToken = tokensInNetwork.find((token) =>
       isEqualAddress(token.address, tokenDetails?.address),
     )
-    const isExistingToken = Boolean(existingToken)
+
+    // we show a warning only if the user wants to add a token they already added before, or if it's a ETH or STRK token
+    const isExistingToken = Boolean(
+      existingToken && (existingToken?.custom || existingToken?.showAlways),
+    )
     return {
       isExistingToken,
       existingToken,
     }
   }, [tokenDetails, tokensInNetwork])
 
+  const tokenInfo = useTokenInfo({
+    address: fetchedTokenAddress,
+    networkId: selectedNetworkId,
+  })
+
+  const isSpamToken = tokenInfo?.tags?.includes("scam") ?? false
+
   const onContinue = useCallback(
     async (token: AddTokenScreenSchemaType) => {
       try {
+        if (isExistingToken) {
+          return
+        }
         /** merge existing token info to retain icon, tags etc. */
         const rawTokenData = {
+          ...(tokenInfo ?? {}),
           ...token,
           address: addressSchema.parse(addAddressPadding(token.address)),
           networkId: selectedNetworkId,
         }
 
-        const addTokenData = isExistingToken
-          ? mergeTokens(rawTokenData, existingToken)
-          : rawTokenData
-        await clientTokenService.addToken(addTokenData)
+        await clientTokenService.addToken(rawTokenData)
         void onSubmit?.()
+        setFetchedTokenAddress(undefined)
         navigate(routes.accountTokens())
         toast({
           title: "Token added",
@@ -116,14 +129,7 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
         }
       }
     },
-    [
-      existingToken,
-      isExistingToken,
-      navigate,
-      onSubmit,
-      selectedNetworkId,
-      toast,
-    ],
+    [isExistingToken, navigate, onSubmit, selectedNetworkId, toast, tokenInfo],
   )
 
   const error = fetchTokenError
@@ -141,6 +147,8 @@ export const AddTokenScreenContainer: FC<AddTokenScreenContainerProps> = ({
         onTokenAddressChange={onTokenAddressChange}
         isLoading={isValidating}
         isExistingToken={isExistingToken}
+        isHiddenToken={existingToken?.hidden}
+        isSpamToken={isSpamToken}
         footer={<WithActionScreenErrorFooter />}
       />
     </Suspense>

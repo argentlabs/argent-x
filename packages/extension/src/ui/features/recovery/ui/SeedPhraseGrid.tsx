@@ -1,9 +1,9 @@
-import { B3 } from "@argent/x-ui"
+import { B3, icons } from "@argent/x-ui"
 import { Box, Center, Flex } from "@chakra-ui/react"
-import { FC, PropsWithChildren, useState } from "react"
-import { iconsDeprecated } from "@argent/x-ui"
+import type { FC, PropsWithChildren } from "react"
+import { useState } from "react"
 
-const { HideIcon } = iconsDeprecated
+const { HideSecondaryIcon } = icons
 
 export const SeedPhraseGrid: FC<PropsWithChildren> = ({
   children,
@@ -44,7 +44,7 @@ export const SeedPhraseGrid: FC<PropsWithChildren> = ({
           cursor="pointer"
           flexDirection="column"
         >
-          <HideIcon fontSize="2xl" mb={2} />
+          <HideSecondaryIcon fontSize="2xl" mb={2} />
           <B3 fontWeight="bold">Click to reveal recovery phrase</B3>
         </Center>
       )}

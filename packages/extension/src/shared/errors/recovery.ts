@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 
 export enum RECOVERY_ERROR_MESSAGE {
   ARGENT_ACCOUNT_DISCOVERY_URL_NOT_SET = "ARGENT_ACCOUNT_DISCOVERY_URL is not set",

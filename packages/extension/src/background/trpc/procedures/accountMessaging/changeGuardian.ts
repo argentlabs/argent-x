@@ -68,8 +68,8 @@ export const changeGuardianProcedure = extensionOnlyProcedure
             title: isRemoveGuardian ? "Remove Guardian" : "Add Guardian",
             shortTitle: "Change guardian",
             icon: isRemoveGuardian
-              ? "SmartAccountInactiveIcon"
-              : "SmartAccountActiveIcon",
+              ? "NoShieldSecondaryIcon"
+              : "ShieldSecondaryIcon",
             subtitle: "",
           },
         )

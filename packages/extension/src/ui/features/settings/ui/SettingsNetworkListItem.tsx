@@ -1,7 +1,7 @@
-import { Button, H6, iconsDeprecated } from "@argent/x-ui"
-import { FC } from "react"
+import { Button, H5, icons } from "@argent/x-ui"
+import type { FC } from "react"
 
-const { RemoveIcon } = iconsDeprecated
+const { MinusPrimaryIcon } = icons
 
 interface SettingsNetworkListItemProps {
   host: string
@@ -28,9 +28,9 @@ export const SettingsNetworkListItem: FC<SettingsNetworkListItemProps> = ({
       size={"auto"}
       {...props}
     >
-      <H6 overflow={"hidden"} textOverflow={"ellipsis"} mr={"auto"}>
+      <H5 overflow={"hidden"} textOverflow={"ellipsis"} mr={"auto"}>
         {host}
-      </H6>
+      </H5>
       {!hideRemove && (
         <Button
           rounded={"full"}
@@ -44,7 +44,7 @@ export const SettingsNetworkListItem: FC<SettingsNetworkListItemProps> = ({
             onRemoveClick?.()
           }}
         >
-          <RemoveIcon fontSize={"xl"} />
+          <MinusPrimaryIcon fontSize={"xl"} />
         </Button>
       )}
     </Button>

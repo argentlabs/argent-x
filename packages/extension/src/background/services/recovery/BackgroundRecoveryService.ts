@@ -3,7 +3,7 @@ import type { IRecoveryService } from "../../../shared/recovery/IRecoveryService
 import { recoveredAtKeyValueStore } from "../../../shared/recovery/storage"
 import type { IRecoveryStorage } from "../../../shared/recovery/types"
 import type { IObjectStore } from "../../../shared/storage/__new/interface"
-import { TransactionTrackerWorker } from "../transactionTracker/worker/TransactionTrackerWorker"
+import type { TransactionTrackerWorker } from "../transactionTracker/worker/TransactionTrackerWorker"
 import type { Wallet } from "../../wallet"
 import { sanitiseSelectedAccount } from "../../../shared/wallet/sanitiseSelectedAccount"
 

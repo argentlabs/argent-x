@@ -1,5 +1,5 @@
-import { SelectorFn } from "../../storage/__new/interface"
-import { Network } from "../type"
+import type { SelectorFn } from "../../storage/__new/interface"
+import type { Network } from "../type"
 
 export interface INetworkService {
   get(selector?: SelectorFn<Network>): Promise<Network[]>

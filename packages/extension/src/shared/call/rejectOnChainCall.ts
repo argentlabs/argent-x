@@ -1,14 +1,9 @@
 import { isEqualAddress } from "@argent/x-shared"
-import {
-  Call,
-  constants,
-  uint256,
-  validateAndParseAddress,
-  num,
-} from "starknet"
+import type { Call } from "starknet"
+import { constants, uint256, validateAndParseAddress, num } from "starknet"
 import { ETH_TOKEN_ADDRESS } from "../network/constants"
-import { Erc20Call } from "./erc20Call"
-import { Erc20TransferCall } from "./erc20TransferCall"
+import type { Erc20Call } from "./erc20Call"
+import type { Erc20TransferCall } from "./erc20TransferCall"
 const { isUint256, uint256ToBN } = uint256
 
 /**
@@ -27,7 +22,7 @@ export const isRejectOnChainCall = (
     ) {
       return validateRejectOnChainCall(call as Erc20TransferCall, senderAddress)
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false
@@ -63,7 +58,7 @@ export const validateRejectOnChainCall = (
     if (isUint256(amount) && amount === constants.ZERO) {
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

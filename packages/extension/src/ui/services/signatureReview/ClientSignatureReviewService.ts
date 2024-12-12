@@ -1,8 +1,8 @@
-import {
+import type {
   ISignatureReviewService,
   SimulateAndReviewPayload,
 } from "../../../shared/signatureReview/ISignatureReviewService"
-import { messageClient } from "../trpc"
+import type { messageClient } from "../trpc"
 
 export class ClientSignatureReviewService implements ISignatureReviewService {
   constructor(private readonly trpcClient: typeof messageClient) {}

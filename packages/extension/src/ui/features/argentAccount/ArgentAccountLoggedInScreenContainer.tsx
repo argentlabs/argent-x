@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { useSmartAccountVerifiedEmail } from "../smartAccount/useSmartAccountVerifiedEmail"
 
 import { useToast } from "@argent/x-ui"

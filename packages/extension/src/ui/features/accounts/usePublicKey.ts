@@ -1,36 +1,35 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-import {
-  BaseWalletAccount,
+import { decodeBase58, encodeBase58 } from "@argent/x-shared"
+import type {
   CreateAccountType,
   SignerType,
 } from "../../../shared/wallet.model"
-import { accountMessagingService } from "../../services/accountMessaging"
-import { decodeBase58, encodeBase58 } from "@argent/x-shared"
 import { useOnMountUnsafe } from "../../hooks/useOnMountUnsafe"
+import { accountMessagingService } from "../../services/accountMessaging"
 import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
 import { useLedgerStatus } from "../ledger/hooks/useLedgerStatus"
 
-export const usePublicKey = (account?: BaseWalletAccount) => {
+export const usePublicKey = (accountId?: string) => {
   const [pubKey, setPubKey] = useState<string>()
-  const isLedgerSigner = useIsLedgerSigner(account)
-  const isLedgerConnected = useLedgerStatus(account)
+  const isLedgerSigner = useIsLedgerSigner(accountId)
+  const isLedgerConnected = useLedgerStatus(accountId)
 
   const getPubKeyCallback = useCallback(async () => {
     try {
-      return await accountMessagingService.getPublicKey(account)
+      return await accountMessagingService.getPublicKey(accountId)
     } catch (e) {
       console.error(e)
       return
     }
-  }, [account])
+  }, [accountId])
 
   useEffect(() => {
     if (isLedgerSigner && !isLedgerConnected) {
       return
     }
     // on mount
-    getPubKeyCallback().then((val) => !!val && setPubKey(val))
+    void getPubKeyCallback().then((val) => !!val && setPubKey(val))
 
     return () => {
       // on unmount
@@ -47,6 +46,8 @@ export const useNextPublicKey = (
   networkId: string,
 ) => {
   const [pubKey, setPubKey] = useState<string>()
+  const [derivationPath, setDerivationPath] = useState<string>()
+  const [index, setIndex] = useState<number>()
 
   const getNextPubKeyCallback = useCallback(async () => {
     return accountMessagingService.getNextPublicKey(
@@ -60,15 +61,21 @@ export const useNextPublicKey = (
   useOnMountUnsafe(
     () => {
       // on mount
-      getNextPubKeyCallback().then(setPubKey)
+      void getNextPubKeyCallback().then((result) => {
+        setPubKey(result.publicKey)
+        setDerivationPath(result.derivationPath)
+        setIndex(result.index)
+      })
     },
     () => {
       // on unmount
       setPubKey(undefined)
+      setDerivationPath(undefined)
+      setIndex(undefined)
     },
   )
 
-  return pubKey
+  return { pubKey, derivationPath, index }
 }
 
 export const useEncodedPublicKey = (pubKey: string | undefined) => {
@@ -87,8 +94,8 @@ export const useDecodedSignerKey = (signerKey: string | undefined) =>
  *
  * @returns Signer Key (encoded public key) of the current account
  */
-export const useSignerKey = (account?: BaseWalletAccount) => {
-  const pubKey = usePublicKey(account)
+export const useSignerKey = (accountId?: string) => {
+  const pubKey = usePublicKey(accountId)
   const encodedPubKey = useEncodedPublicKey(pubKey)
 
   return encodedPubKey
@@ -103,7 +110,11 @@ export const useNextSignerKey = (
   signerType: SignerType,
   networkId: string,
 ) => {
-  const pubKey = useNextPublicKey(accountType, signerType, networkId)
+  const { pubKey, derivationPath, index } = useNextPublicKey(
+    accountType,
+    signerType,
+    networkId,
+  )
   const encodedPubKey = useEncodedPublicKey(pubKey)
-  return encodedPubKey
+  return { pubKey: encodedPubKey, derivationPath, index }
 }

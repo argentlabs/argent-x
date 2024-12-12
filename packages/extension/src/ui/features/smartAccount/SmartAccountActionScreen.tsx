@@ -1,5 +1,6 @@
 import { useToast } from "@argent/x-ui"
-import { FC, useCallback, useEffect, useState } from "react"
+import type { FC } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { constants } from "starknet"
 
@@ -24,7 +25,7 @@ export const SmartAccountActionScreen: FC = () => {
     if (pendingChangeGuardian && account) {
       /** a guardian transaction for this account is now pending - move to finish */
 
-      navigate(routes.smartAccountFinish(account?.address), { replace: true })
+      navigate(routes.smartAccountFinish(account?.id), { replace: true })
     }
   }, [account, navigate, pendingChangeGuardian])
 
@@ -48,7 +49,9 @@ export const SmartAccountActionScreen: FC = () => {
         await accountMessagingService.changeGuardian(account, guardianAddress)
       }
     } catch (error) {
-      IS_DEV && console.warn(coerceErrorToString(error))
+      if (IS_DEV) {
+        console.warn(coerceErrorToString(error))
+      }
       toast({
         title: "Unable to modify account",
         status: "error",

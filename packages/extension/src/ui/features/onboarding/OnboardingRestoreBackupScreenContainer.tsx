@@ -1,6 +1,7 @@
 // TBD: should we get rid of the whole file? We dont use files anymore since a long time as a backup method. Would this be part of the refactor to drop such parts of the app? As it changes functionality
 import { useNavigateBack } from "@argent/x-ui"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useLegacyAppState } from "../../app.state"
@@ -33,5 +34,10 @@ export const OnboardingRestoreBackupScreenContainer: FC = () => {
     [navigate],
   )
 
-  return <OnboardingRestoreBackupScreen onRestore={onRestore} onBack={onBack} />
+  return (
+    <OnboardingRestoreBackupScreen
+      onRestore={(acceptedFile) => void onRestore(acceptedFile)}
+      onBack={onBack}
+    />
+  )
 }

@@ -1,4 +1,5 @@
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 
 import { networkSchema } from "../../../shared/network"
 import { useActionScreen } from "./hooks/useActionScreen"

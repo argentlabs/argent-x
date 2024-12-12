@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import { PropsWithChildren } from "react"
+import type { PropsWithChildren } from "react"
 
 import { useIsLocked } from "../../hooks/appState"
 import { LockScreen } from "./LockScreen"

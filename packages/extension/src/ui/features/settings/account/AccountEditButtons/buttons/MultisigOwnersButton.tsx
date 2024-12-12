@@ -1,8 +1,8 @@
 import { ButtonCell } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../../../../shared/ui/routes"
-import { WalletAccount } from "../../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../../shared/wallet.model"
 
 export const MultisigOwnersButtonContainer: FC<{ account: WalletAccount }> = ({
   account,
@@ -10,7 +10,7 @@ export const MultisigOwnersButtonContainer: FC<{ account: WalletAccount }> = ({
   const navigate = useNavigate()
 
   const onClick = () => {
-    navigate(routes.multisigOwners(account.address))
+    navigate(routes.multisigOwners(account.id))
   }
 
   return (

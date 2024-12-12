@@ -1,17 +1,21 @@
+import { formatTruncatedString } from "@argent/x-shared"
+import type { NavigationContainerProps } from "@argent/x-ui"
 import {
   BarCloseButton,
   Button,
   CellStack,
+  HeaderCell,
+  icons,
   NavigationContainer,
-  NavigationContainerProps,
   SpacerCell,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
 import { isPrivacySettingsEnabled } from "../../../shared/settings"
 import { routes } from "../../../shared/ui/routes"
+import { IS_DEV } from "../../../shared/utils/dev"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
 import { ClickableSmartAccountBanner } from "../accounts/ClickableSmartAccountBanner"
 import { DapplandFooter } from "./ui/DapplandFooter"
@@ -21,22 +25,19 @@ import {
   SettingsMenuItemLink,
 } from "./ui/SettingsMenuItem"
 import { SupportFooter } from "./ui/SupportFooter"
-import { formatTruncatedString } from "@argent/x-shared"
-import { IS_DEV } from "../../../shared/utils/dev"
-import { WalletAccount } from "../../../shared/wallet.model"
 
 const {
-  LockIcon,
+  LockPrimaryIcon,
+  ExpandIcon,
+  LinkPrimaryIcon,
+  MessageSecondaryIcon,
+  ChevronRightSecondaryIcon,
+  FilterSecondaryIcon,
+  ShieldSecondaryIcon,
   AddressBookIcon,
   CodeIcon,
-  ExpandIcon,
   ExtendedIcon,
-  LinkIcon,
-  SmartAccountIcon,
-  EmailIcon,
-  ChevronRightIcon,
-  PreferencesIcon,
-} = iconsDeprecated
+} = icons
 
 interface SettingsScreenProps extends NavigationContainerProps {
   onBack: ReactEventHandler
@@ -75,6 +76,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
         <CellStack>
           {account && (
             <>
+              <HeaderCell>Account settings</HeaderCell>
               <Flex direction={"column"} w={"full"} gap={"1px"}>
                 <AccountListScreenItemContainer
                   account={account}
@@ -88,67 +90,73 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
                   <ClickableSmartAccountBanner account={account} />
                 )}
               </Flex>
-              <SpacerCell />
             </>
           )}
+          <HeaderCell>Global settings</HeaderCell>
           <SettingsMenuItemGroup>
             <SettingsMenuItemLink
-              leftIcon={<PreferencesIcon />}
+              leftIcon={<FilterSecondaryIcon />}
               to={routes.settingsPreferences(returnTo)}
               title="Preferences"
             />
+            <SettingsMenuItemLink
+              leftIcon={<ShieldSecondaryIcon />}
+              to={routes.settingsSecurityAndRecovery(returnTo)}
+              title="Security & recovery"
+            />
             {isPrivacySettingsEnabled && (
               <SettingsMenuItemLink
-                leftIcon={<SmartAccountIcon />}
+                leftIcon={<LockPrimaryIcon />}
                 to={routes.settingsPrivacy(returnTo)}
-                title="Security & privacy"
+                title="Privacy"
               />
             )}
-          </SettingsMenuItemGroup>
-          <SettingsMenuItemGroup>
             <SettingsMenuItemLink
-              leftIcon={<AddressBookIcon />}
-              to={routes.settingsAddressBook()}
-              title="Address book"
-            />
-            <SettingsMenuItemLink
-              leftIcon={<LinkIcon />}
+              leftIcon={<LinkPrimaryIcon />}
               to={routes.settingsDappConnectionsAccountList()}
-              title="Connected dapps"
+              title="Authorised dapps"
             />
           </SettingsMenuItemGroup>
+          <SpacerCell />
           <SettingsMenuItemLink
             leftIcon={<CodeIcon />}
-            to={routes.settingsDeveloper()}
-            title="Developer settings"
+            to={routes.settingsAdvanced()}
+            title="Advanced settings"
           />
-          <SettingsMenuItemGroup>
-            {!extensionIsInTab && (
-              <SettingsMenuItem
-                leftIcon={<ExtendedIcon />}
-                rightIcon={<ExpandIcon />}
-                onClick={openExtensionInTab}
-                title="Extended view"
-              />
-            )}
-            <SettingsMenuItem
-              leftIcon={<LockIcon />}
-              title="Lock wallet"
-              onClick={onLock}
-            />
-          </SettingsMenuItemGroup>
+          <SpacerCell />
+          <SettingsMenuItem
+            leftIcon={<LockPrimaryIcon />}
+            title="Lock wallet"
+            onClick={onLock}
+          />
           {IS_DEV && (
-            <SettingsMenuItemGroup>
-              <SettingsMenuItemLink
-                leftIcon={<CodeIcon />}
-                to={routes.settingsClearLocalStorage()}
-                title="Clear local storage"
-              />
-            </SettingsMenuItemGroup>
+            <>
+              <HeaderCell>Local development settings</HeaderCell>
+              <SettingsMenuItemGroup>
+                {!extensionIsInTab && (
+                  <SettingsMenuItem
+                    leftIcon={<ExtendedIcon />}
+                    rightIcon={<ExpandIcon />}
+                    onClick={openExtensionInTab}
+                    title="Extended view"
+                  />
+                )}
+                <SettingsMenuItemLink
+                  leftIcon={<CodeIcon />}
+                  to={routes.settingsClearLocalStorage()}
+                  title="Clear local storage"
+                />
+                <SettingsMenuItemLink
+                  leftIcon={<AddressBookIcon />}
+                  to={routes.settingsAddressBook()}
+                  title="Address book"
+                />
+              </SettingsMenuItemGroup>
+            </>
           )}
-          <DapplandFooter />
-          <SupportFooter />
         </CellStack>
+        <DapplandFooter />
+        <SupportFooter mb={4} />
       </NavigationContainer>
       {isSignedIn ? (
         <Center
@@ -166,8 +174,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
             bgColor="neutrals.800"
             borderRadius="lg"
             margin={4}
-            leftIcon={<EmailIcon />}
-            rightIcon={<ChevronRightIcon />}
+            leftIcon={<MessageSecondaryIcon />}
+            rightIcon={<ChevronRightSecondaryIcon />}
             textOverflow={"ellipsis"}
             overflow={"hidden"}
           >
@@ -185,14 +193,10 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
         >
           <Button
             onClick={onSignIn}
-            size="md"
-            colorScheme="transparent"
-            color="white"
-            w="xl"
-            bgColor="neutrals.800"
+            w={{ base: "full", sm: "xl" }}
             borderRadius="lg"
             margin={4}
-            leftIcon={<EmailIcon />}
+            leftIcon={<MessageSecondaryIcon fontSize="xl" />}
           >
             {verifiedEmail ? "Log in to Argent" : "Sign in to Argent"}
           </Button>

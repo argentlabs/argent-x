@@ -1,10 +1,10 @@
-import { Button, P3, iconsDeprecated } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import { Button, icons, P2 } from "@argent/x-ui"
+import type { FC, ReactEventHandler } from "react"
 
-import { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
+import type { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
 import { StarknetAccountMessage } from "./ui/StarknetAccountMessage"
 
-const { DeployIcon } = iconsDeprecated
+const { RocketSecondaryIcon } = icons
 
 interface DeployAccountScreenProps extends DeployAccountScreenContainerProps {
   onActivate: ReactEventHandler
@@ -17,7 +17,7 @@ export const DeployAccountScreen: FC<DeployAccountScreenProps> = ({
   return (
     <StarknetAccountMessage
       onClose={onReject}
-      icon={<DeployIcon fontSize={"4xl"} />}
+      icon={<RocketSecondaryIcon fontSize={"4xl"} />}
       iconOutlined
       title={"Your wallet needs to be activated"}
       learnMoreLink={
@@ -29,13 +29,13 @@ export const DeployAccountScreen: FC<DeployAccountScreenProps> = ({
         </Button>
       }
     >
-      <P3>
+      <P2>
         In order to sign this transaction you need to first activate your
         account on Starknet
-      </P3>
-      <P3 fontWeight={"bold"}>
+      </P2>
+      <P2 fontWeight={"bold"}>
         Activating an account involves a fee. This is not controlled by ArgentX
-      </P3>
+      </P2>
     </StarknetAccountMessage>
   )
 }

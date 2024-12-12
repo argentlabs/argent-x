@@ -1,55 +1,49 @@
-import {
-  Collection,
-  NftItem,
-  bigDecimal,
-  getNftPicture,
-} from "@argent/x-shared"
-import {
-  BarBackButton,
-  H4,
-  H6,
-  NavigationContainer,
-  NavigationContainerProps,
-  P4,
-} from "@argent/x-ui"
-import { Flex, Image, SimpleGrid } from "@chakra-ui/react"
-import React, { FC, useCallback } from "react"
-import { useNavigate } from "react-router-dom"
+import type { Collection, NftItem } from "@argent/x-shared"
+import { bigDecimal, getNftPicture } from "@argent/x-shared"
+import type { NavigationContainerProps } from "@argent/x-ui"
+import { BarBackButton, H3, H5, NavigationContainer, P3 } from "@argent/x-ui"
+import { Flex, Image, SimpleGrid, Spinner } from "@chakra-ui/react"
+import type { FC } from "react"
+import React, { useCallback } from "react"
 
-import { Spinner } from "../../components/Spinner"
-import { routes } from "../../../shared/ui/routes"
-import { UnknownDappIcon } from "../actions/transaction/ApproveTransactionScreen/DappHeader/TransactionIcon/UnknownDappIcon"
 import { NftFigure } from "./NftFigure"
 import { NftItem as NftItemComponent } from "./NftItem"
+import { UnknownDappIcon } from "../actions/transactionV2/header/icon"
+import { routes } from "../../../shared/ui/routes"
+import { useNavigate } from "react-router-dom"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 
 interface CollectionNftsProps extends NavigationContainerProps {
   nfts: NftItem[]
   collection?: Collection
   onNftClick?: (nft: NftItem) => void
+  onBack?: () => void
 }
 
 export const CollectionNfts: FC<CollectionNftsProps> = ({
   nfts,
   collection,
   onNftClick,
+  onBack,
   ...rest
 }) => {
+  const returnTo = useCurrentPathnameWithQuery()
   const navigate = useNavigate()
   const onClick = useCallback(
     (nft: NftItem) => {
       if (onNftClick) {
         onNftClick(nft)
       } else {
-        navigate(routes.accountNft(nft.contract_address, nft.token_id))
+        navigate(
+          routes.accountNft(nft.contract_address, nft.token_id, returnTo),
+        )
       }
     },
-    [navigate, onNftClick],
+    [navigate, onNftClick, returnTo],
   )
   return (
     <NavigationContainer
-      leftButton={
-        <BarBackButton onClick={() => navigate(routes.accountCollections())} />
-      }
+      leftButton={onBack ? <BarBackButton onClick={onBack} /> : undefined}
       scrollContent={
         <>
           <Image
@@ -58,7 +52,7 @@ export const CollectionNfts: FC<CollectionNftsProps> = ({
             src={collection?.imageUri ?? undefined}
             borderRadius="lg"
           />
-          <H6>{collection?.name}</H6>
+          <H5>{collection?.name}</H5>
         </>
       }
       {...rest}
@@ -82,16 +76,16 @@ export const CollectionNfts: FC<CollectionNftsProps> = ({
             ) : (
               <UnknownDappIcon />
             )}
-            <H4>{collection?.name || "Loading..."}</H4>
+            <H3>{collection?.name || "Loading..."}</H3>
             {!!collection.floorPrice && (
-              <P4 color="neutrals.300">
+              <P3 color="neutrals.300">
                 Floor price: {bigDecimal.formatEther(collection.floorPrice)} ETH
-              </P4>
+              </P3>
             )}
           </Flex>
           <SimpleGrid
-            gridTemplateColumns="repeat(auto-fill, minmax(155px, 1fr))"
-            gap="3"
+            gridTemplateColumns="repeat(auto-fill, minmax(10em, 1fr))"
+            gap="2"
             mx="4"
             py={6}
           >

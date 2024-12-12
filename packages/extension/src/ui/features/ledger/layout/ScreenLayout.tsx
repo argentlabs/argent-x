@@ -1,12 +1,12 @@
-import { P2, iconsDeprecated, B3, H2, logosDeprecated } from "@argent/x-ui"
-import { Box, Button, Center, chakra, VStack } from "@chakra-ui/react"
+import { B3, H1, icons, logosDeprecated, P1 } from "@argent/x-ui"
+import { Box, Button, Center, VStack } from "@chakra-ui/react"
 import { isString } from "lodash-es"
-import { FC, PropsWithChildren, ReactNode } from "react"
+import type { FC, PropsWithChildren, ReactNode } from "react"
 import { ContentWrapper } from "../../../components/FullScreenPage"
 import { StepIndicator } from "../../../components/StepIndicator"
 
+const { HelpCircleSecondaryIcon } = icons
 const { ArgentXLogoFull } = logosDeprecated
-const { HelpIcon } = iconsDeprecated
 
 export interface LedgerScreenLayoutProps extends PropsWithChildren {
   back?: boolean
@@ -70,7 +70,6 @@ export const ScreenLayout: FC<LedgerScreenLayoutProps> = ({
       >
         <ArgentXLogoFull h="34px" w="116px" />
       </Box>
-
       <Center flexDirection="column" w="full" px={0} py={4}>
         <ContentWrapper maxWidth="530px">
           <StepIndicator
@@ -79,9 +78,9 @@ export const ScreenLayout: FC<LedgerScreenLayoutProps> = ({
             filled={filledIndicator}
           />
           <VStack mt={10} spacing={2} align="flex-start">
-            {isString(title) ? <H2 marginBottom="0">{title}</H2> : <>{title}</>}
+            {isString(title) ? <H1 marginBottom="0">{title}</H1> : <>{title}</>}
             {isString(subtitle) ? (
-              <P2 color="neutrals.200">{subtitle}</P2>
+              <P1 color="neutrals.300">{subtitle}</P1>
             ) : (
               <>{subtitle}</>
             )}
@@ -125,7 +124,7 @@ export const LedgerHelpButton: FC<{ helpLink: string }> = ({ helpLink }) => {
         minW="unset"
         height="auto"
       >
-        <HelpIcon color="white" />
+        <HelpCircleSecondaryIcon color="white" />
         <B3 color="white">Help</B3>
       </Button>
     </Box>

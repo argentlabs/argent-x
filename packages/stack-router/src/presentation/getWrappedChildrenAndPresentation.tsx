@@ -1,15 +1,10 @@
-import {
-  Children,
-  ReactElement,
-  ReactNode,
-  cloneElement,
-  isValidElement,
-} from "react"
+import type { ReactElement, ReactNode } from "react"
+import { Children, cloneElement, isValidElement } from "react"
 import { Route, resolvePath } from "react-router-dom"
 
 import { StackScreen } from "../StackScreen"
 import { StackScreenContainer } from "../StackScreenContainer"
-import { Presentation } from "../types"
+import type { Presentation } from "../types"
 
 type DeclaredPresentationByPath = Record<string, Presentation>
 

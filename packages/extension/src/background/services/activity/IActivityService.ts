@@ -4,7 +4,7 @@ import type Emittery from "emittery"
 import type { Activity } from "@argent/x-shared/simulation"
 import type { ActivitiesPayload } from "../../../shared/activity/types"
 import type { ContractAddress } from "../../../shared/nft/store"
-import { BaseToken } from "../../../shared/token/__new/types/token.model"
+import type { BaseToken } from "../../../shared/token/__new/types/token.model"
 import type { BaseWalletAccount } from "../../../shared/wallet.model"
 
 /** raw */

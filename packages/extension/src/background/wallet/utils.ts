@@ -1,4 +1,4 @@
-import { HDNodeWallet, KeystoreAccount } from "ethers"
+import type { HDNodeWallet, KeystoreAccount } from "ethers"
 
 export function walletToKeystore(wallet: HDNodeWallet): KeystoreAccount {
   const account: KeystoreAccount = {

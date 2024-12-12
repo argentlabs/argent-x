@@ -1,7 +1,7 @@
-import { Call } from "starknet"
+import type { Call } from "starknet"
 import { describe, expect, test } from "vitest"
 
-import { Transaction } from "../../../../transactions"
+import type { Transaction } from "../../../../transactions"
 import { nftContractAddresses } from "../__fixtures__/nftContractAddresses"
 import { tokensByNetwork } from "../__fixtures__/tokensByNetwork"
 import { transformTransaction } from "./transformTransaction"
@@ -24,13 +24,22 @@ import {
   multisigReplaceOwner,
   rejectOnChain,
 } from "../../../../call/__fixtures__/transaction-calls/sepolia-alpha"
+import { getMockSigner } from "../../../../../../test/account.mock"
+import { getAccountIdentifier } from "../../../../utils/accountIdentifier"
 
 export const accountAddress =
   "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a"
 
+const id = getAccountIdentifier(
+  accountAddress,
+  "sepolia-alpha",
+  getMockSigner(),
+)
+
 export const makeTransaction = (transactions: Call | Call[]): Transaction => {
   return {
     account: {
+      id,
       name: "Account 1",
       address: accountAddress,
       type: "standard",
@@ -99,7 +108,7 @@ describe("transformTransaction", () => {
             "decimals": 18,
             "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
             "id": 1,
-            "name": "Ether",
+            "name": "Ethereum",
             "network": "sepolia-alpha",
             "networkId": "sepolia-alpha",
             "showAlways": true,
@@ -161,17 +170,9 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "UNKNOWN",
-          "dapp": {
-            "hosts": [
-              "testnet.app.alpharoad.fi",
-            ],
-            "id": "alpharoad-fi",
-            "title": "Alpha Road",
-          },
-          "dappContractAddress": "0x4aec73f0611a9be0524e7ef21ab1679bdf9c97dc7d72614f15373d431226b6a",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Approve and swap exact tokens for tokens",
-          "entity": "DAPP",
+          "entity": "UNKNOWN",
         }
       `)
       expect(
@@ -184,17 +185,9 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "UNKNOWN",
-          "dapp": {
-            "hosts": [
-              "app.testnet.jediswap.xyz",
-            ],
-            "id": "jediswap-xyz",
-            "title": "JediSwap",
-          },
-          "dappContractAddress": "0x012b063b60553c91ed237d8905dff412fba830c5716b17821063176c6c073341",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Approve and swap exact tokens for tokens",
-          "entity": "DAPP",
+          "entity": "UNKNOWN",
         }
       `)
       expect(
@@ -207,18 +200,9 @@ describe("transformTransaction", () => {
       ).toMatchInlineSnapshot(`
         {
           "action": "UNKNOWN",
-          "dapp": {
-            "hosts": [
-              "www.myswap.xyz",
-            ],
-            "icon": "https://www.myswap.xyz/favicon.ico",
-            "id": "myswap-xyz",
-            "title": "mySwap",
-          },
-          "dappContractAddress": "0x018a439bcbb1b3535a6145c1dc9bc6366267d923f60a84bd0c7618f33c81d334",
           "date": "2022-09-01T15:47:40.000Z",
           "displayName": "Approve and swap",
-          "entity": "DAPP",
+          "entity": "UNKNOWN",
         }
       `)
       expect(

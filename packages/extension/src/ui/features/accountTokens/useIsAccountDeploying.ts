@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { transactionsRepo } from "../../../shared/transactions/store"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 
 export const useIsAccountDeploying = (account?: BaseWalletAccount) => {
   const [isDeploying, setIsDeploying] = useState<boolean>(false)

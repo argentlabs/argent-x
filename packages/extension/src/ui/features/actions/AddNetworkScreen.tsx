@@ -6,9 +6,9 @@ import {
   NavigationContainer,
 } from "@argent/x-ui"
 import { Flex, FormControl, Input } from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import type { FC, ReactNode } from "react"
 
-import { Network } from "../../../shared/network"
+import type { Network } from "../../../shared/network"
 
 export interface AddNetworkScreenProps {
   requestedNetwork: Network
@@ -32,7 +32,11 @@ export const AddNetworkScreen: FC<AddNetworkScreenProps> = ({
         display={"flex"}
         flexDirection={"column"}
         flex={1}
-        onSubmit={onSubmit}
+        onSubmit={(e) => {
+          if (onSubmit) {
+            void onSubmit(e)
+          }
+        }}
       >
         <CellStack pt={0} flex={1}>
           <HeaderCell>Network ID</HeaderCell>

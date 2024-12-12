@@ -1,6 +1,6 @@
 import { ALARM_VERSION } from "../../../../shared/schedule/constants"
-import { IScheduleService } from "../../../../shared/schedule/IScheduleService"
-import { DeepPick } from "../../../../shared/types/deepPick"
+import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
+import type { DeepPick } from "../../../../shared/types/deepPick"
 import { IS_DEV } from "../../../../shared/utils/dev"
 import { onInstallAndUpgrade } from "../../worker/schedule/decorators"
 import { pipe } from "../../worker/schedule/pipe"

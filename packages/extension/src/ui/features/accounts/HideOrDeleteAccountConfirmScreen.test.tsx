@@ -14,6 +14,7 @@ describe("HideOrDeleteAccountConfirmScreen", () => {
         mode={"hide"}
         accountName={"Foo bar account"}
         accountAddress={"0x123"}
+        accountType="standard"
         onReject={onReject}
         onSubmit={onSubmit}
         networkId="2"

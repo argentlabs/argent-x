@@ -1,4 +1,5 @@
-import { FC, useEffect } from "react"
+import type { FC } from "react"
+import { useEffect } from "react"
 
 import { clientDiscoverService } from "../../services/discover"
 import { discoverDataView } from "../../views/discover"

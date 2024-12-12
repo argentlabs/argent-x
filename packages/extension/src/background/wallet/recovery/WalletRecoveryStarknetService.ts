@@ -1,6 +1,7 @@
 import { isEmpty, partition, union } from "lodash-es"
-import { RpcProvider, num } from "starknet"
-import { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import type { RpcProvider } from "starknet"
+import { num } from "starknet"
+import type { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
 
 import {
   getAccountCairoVersionFromChain,
@@ -9,20 +10,20 @@ import {
   getAccountEscapeFromChain,
   getAccountGuardiansFromChain,
 } from "../../../shared/account/details"
-import {
-  DetailFetchers,
-  getAndMergeAccountDetails,
-} from "../../../shared/account/details/getAndMergeAccountDetails"
-import { Network, getProvider } from "../../../shared/network"
-import {
+import type { DetailFetchers } from "../../../shared/account/details/getAndMergeAccountDetails"
+import { getAndMergeAccountDetails } from "../../../shared/account/details/getAndMergeAccountDetails"
+import type { Network } from "../../../shared/network"
+import { getProvider } from "../../../shared/network"
+import type {
+  ArgentWalletAccount,
   BaseMultisigWalletAccount,
   RecoveredLedgerMultisig,
-  SignerType,
   WalletAccount,
 } from "../../../shared/wallet.model"
+import { SignerType } from "../../../shared/wallet.model"
 
+import type { Address } from "@argent/x-shared"
 import {
-  Address,
   addressSchema,
   ensureArray,
   isContractDeployed,
@@ -40,12 +41,12 @@ import {
   argentXHeaders,
 } from "../../../shared/api/headers"
 import { RecoveryError } from "../../../shared/errors/recovery"
-import { ILedgerSharedService } from "../../../shared/ledger/service/ILedgerSharedService"
-import { ApiMultisigDataForSigner } from "../../../shared/multisig/multisig.model"
-import { IMultisigBackendService } from "../../../shared/multisig/service/backend/IMultisigBackendService"
+import type { ILedgerSharedService } from "../../../shared/ledger/service/ILedgerSharedService"
+import type { ApiMultisigDataForSigner } from "../../../shared/multisig/multisig.model"
+import type { IMultisigBackendService } from "../../../shared/multisig/service/backend/IMultisigBackendService"
 import { getDefaultNetworkId } from "../../../shared/network/utils"
 import { ArgentSigner } from "../../../shared/signer"
-import { PublicKeyWithIndex } from "../../../shared/signer/types"
+import type { PublicKeyWithIndex } from "../../../shared/signer/types"
 import { getBaseDerivationPath } from "../../../shared/signer/utils"
 import { getStandardAccountDiscoveryUrl } from "../../../shared/utils/getStandardAccountDiscoveryUrl"
 import {
@@ -56,14 +57,16 @@ import {
   sortAccountsByDerivationPath,
   sortMultisigByDerivationPath,
 } from "../../../shared/utils/accountsMultisigSort"
-import { IRepository } from "../../../shared/storage/__new/interface"
-import { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
-import { IWalletRecoveryService } from "./IWalletRecoveryService"
+import type { IRepository } from "../../../shared/storage/__new/interface"
+import type { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
+import type { IWalletRecoveryService } from "./IWalletRecoveryService"
+import { getPathForIndex } from "../../../shared/utils/derivationPath"
+import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
 
 const INITIAL_PUB_KEY_COUNT = 20
 
 interface TempAccountData {
-  account: WalletAccount
+  account: ArgentWalletAccount
   pubKeyWithIndex: PublicKeyWithIndex
 }
 
@@ -90,7 +93,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
     network: Network,
     initialPubKeyCount: number = INITIAL_PUB_KEY_COUNT,
   ): Promise<WalletAccount[]> {
-    const accounts: WalletAccount[] = []
+    const accounts: ArgentWalletAccount[] = []
 
     let pubKeyCount = initialPubKeyCount
     let lastCheck = 0
@@ -274,7 +277,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
           network,
           needsDeploy: false,
           name: `Account ${pubKeyWithIndex.index + 1}`,
-          address: "",
+          address: "0x0", // we don't know the address yet
         }),
         owner: pubKeyWithIndex.pubKey,
       }
@@ -322,7 +325,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
   }
 
   private async fetchValidAccounts(
-    tempAccounts: WalletAccount[],
+    tempAccounts: ArgentWalletAccount[],
     network: Network,
   ) {
     const tempAddresses = tempAccounts.map((account) =>
@@ -346,7 +349,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
     try {
       await provider.getSpecVersion()
       return true
-    } catch (e) {
+    } catch {
       return false
     }
   }
@@ -443,7 +446,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
         network,
         publicKeysWithIndices.map(({ pubKey }) => pubKey),
       )
-    } catch (error) {
+    } catch {
       return []
     }
 
@@ -453,7 +456,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       network,
       signerType,
     )
-    return resolvedMultisigs.filter((m): m is WalletAccount => !!m)
+    return resolvedMultisigs.filter((m): m is ArgentWalletAccount => !!m)
   }
 
   private async resolveValidMultisigs(
@@ -463,24 +466,36 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
     signerType: SignerType,
   ) {
     const multisigToInsert: BaseMultisigWalletAccount[] = []
-    const resolvedMultisigs = validMultisigs.content
-      .map((validMultisig) => {
-        const pubKeyWithIndex = publicKeysWithIndices.find(({ pubKey }) =>
+    const resolvedMultisigs: ArgentWalletAccount[] = []
+
+    for (const validMultisig of validMultisigs.content) {
+      const matchingPubKeysWithIndices = publicKeysWithIndices.filter(
+        ({ pubKey }) =>
           validMultisig.signers.some(
             (signer) => num.toBigInt(signer) === num.toBigInt(pubKey),
           ),
-        )
-        if (!pubKeyWithIndex) {
-          return
+      )
+
+      for (const pubKeyWithIndex of matchingPubKeysWithIndices) {
+        const signer = {
+          type: signerType,
+          derivationPath: getPathForIndex(
+            pubKeyWithIndex.index,
+            getBaseDerivationPath("multisig", signerType),
+          ),
         }
-        multisigToInsert.push({
+
+        const multisigData: BaseMultisigWalletAccount = {
           ...validMultisig,
           publicKey: pubKeyWithIndex.pubKey,
           networkId: network.id,
           updatedAt: Date.now(),
-        })
+          id: getAccountIdentifier(validMultisig.address, network.id, signer),
+        }
 
-        return {
+        multisigToInsert.push(multisigData)
+
+        resolvedMultisigs.push({
           ...this.walletAccountSharedService.getDefaultMultisigAccount({
             index: pubKeyWithIndex.index,
             address: validMultisig.address,
@@ -489,21 +504,21 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
             signerType,
           }),
           type: "multisig",
-        }
-      })
-      .filter((m): m is WalletAccount => !!m)
+        })
+      }
+    }
 
-    const multisigAccountsWithDetails = (
-      await getAndMergeAccountDetails(resolvedMultisigs, [
-        getAccountClassHashFromChain,
-      ])
-    ).sort(sortMultisigByDerivationPath)
+    const multisigAccountsWithDetails = await getAndMergeAccountDetails(
+      resolvedMultisigs,
+      [getAccountClassHashFromChain],
+    )
+
     await this.multisigStore.upsert(multisigToInsert)
-    return multisigAccountsWithDetails
-  }
 
+    return multisigAccountsWithDetails.sort(sortMultisigByDerivationPath)
+  }
   private async fetchValidSmartAccounts(
-    tempAccounts: WalletAccount[],
+    tempAccounts: ArgentWalletAccount[],
     network: Network,
   ) {
     const pukKeysAddresses = tempAccounts
@@ -523,7 +538,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       return []
     }
 
-    return tempAccounts.reduce((acc: WalletAccount[], account) => {
+    return tempAccounts.reduce((acc: ArgentWalletAccount[], account) => {
       const validAccount = validAccountsResponse.find((a) => {
         return account.owner && isEqualAddress(account.owner, a.ownerAddress)
       })
@@ -534,6 +549,11 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
         const accountWithDetails = {
           ...account,
           address: validAccount.account,
+          id: getAccountIdentifier(
+            validAccount.account,
+            network.id,
+            account.signer,
+          ),
           guardian: hasGuardian
             ? validAccount.guardianAddresses?.[0]
             : undefined,
@@ -566,7 +586,7 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
     }, [])
   }
 
-  private async getAccountDetails(accounts: WalletAccount[]) {
+  private async getAccountDetails(accounts: ArgentWalletAccount[]) {
     try {
       const standardAccountDetailFetchers: DetailFetchers[] = [
         getAccountDeployStatusFromChain,

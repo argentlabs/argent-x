@@ -1,4 +1,5 @@
-import { Collection, NftItem, isEqualAddress } from "@argent/x-shared"
+import type { Collection, NftItem } from "@argent/x-shared"
+import { isEqualAddress } from "@argent/x-shared"
 import browser from "webextension-polyfill"
 
 import { ChromeRepository } from "../storage/__new/chrome"

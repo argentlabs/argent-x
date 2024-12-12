@@ -1,4 +1,4 @@
-import { Presentation } from "../types"
+import type { Presentation } from "../types"
 
 export const isModalPresentation = (presentation?: Presentation) => {
   return presentation === "modal" || presentation === "modalSheet"

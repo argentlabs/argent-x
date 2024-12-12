@@ -1,14 +1,14 @@
+import type { NavigateOptions } from "react-router-dom"
+import { ledgerStartContextSchema } from "../../../shared/ledger/schema"
+import { routes } from "../../../shared/ui/routes"
 import { IS_DEV } from "../../../shared/utils/dev"
 import {
   createAccountTypeSchema,
   signerTypeSchema,
 } from "../../../shared/wallet.model"
-import { ledgerStartContextSchema } from "../../../shared/ledger/schema"
-import { routes } from "../../../shared/ui/routes"
 import { getInitialHardReloadRoute } from "../resetAndReload"
 import type { IRouterService } from "./IRouterService"
-import { NavigateOptions } from "react-router-dom"
-import { useRestorationState } from "../../features/stateRestoration/restoration.state"
+import type { useRestorationState } from "../../features/stateRestoration/restoration.state"
 
 type UseRestorationState = typeof useRestorationState
 
@@ -102,8 +102,19 @@ export default class RouterService implements IRouterService {
       throw new Error("Missing accountType query param")
     }
 
+    const signerToReplace = query.get("signerToReplace") ?? undefined
+
+    if (parsedCtx.data === "replace" && !query.get("signerToReplace")) {
+      throw new Error("Missing signerToReplace query param")
+    }
+
     return {
-      entry: routes.ledgerConnect(accountType.data, networkId, parsedCtx.data),
+      entry: routes.ledgerConnect(
+        accountType.data,
+        networkId,
+        parsedCtx.data,
+        signerToReplace,
+      ),
     }
   }
 

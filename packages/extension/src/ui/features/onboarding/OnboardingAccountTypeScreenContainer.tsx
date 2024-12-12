@@ -1,4 +1,5 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { defaultNetwork } from "../../../shared/network"
@@ -7,10 +8,9 @@ import { routes } from "../../../shared/ui/routes"
 import { clientAccountService } from "../../services/account"
 import { AccountTypeId } from "../accounts/AddNewAccountScreen"
 import { useAccountTypesForOnboarding } from "../accounts/useAccountTypesForNetwork"
-import OnboardingAccountTypeScreen from "./OnboardingAccountTypeScreen"
+import { OnboardingAccountTypeScreen } from "./OnboardingAccountTypeScreen"
 import { ampli } from "../../../shared/analytics"
 import { SignerType } from "../../../shared/wallet.model"
-import { useOnboardingExperiment } from "../../services/onboarding/useOnboardingExperiment"
 
 export const OnboardingAccountTypeContainer: FC = () => {
   const navigate = useNavigate()
@@ -28,7 +28,6 @@ export const OnboardingAccountTypeContainer: FC = () => {
   const network = defaultNetwork
 
   const accountTypes = useAccountTypesForOnboarding(network)
-  const { onboardingExperimentCohort } = useOnboardingExperiment()
 
   const handleContinue = useCallback(
     async (accountTypeId: AccountTypeId) => {
@@ -39,29 +38,26 @@ export const OnboardingAccountTypeContainer: FC = () => {
           network.id,
         )
 
-        await clientAccountService.select(newAccount)
+        await clientAccountService.select(newAccount.id)
         ampli.onboardingAccountTypeSelected({
           "account type": "standard",
           "wallet platform": "browser extension",
-          "onboarding experiment": onboardingExperimentCohort,
         })
 
         ampli.onboardingCompleted({
           "account type": "standard",
           "wallet platform": "browser extension",
-          "onboarding experiment": onboardingExperimentCohort,
         })
         return navigate(routes.onboardingFinish.path, { replace: true })
       } else if (accountTypeId === AccountTypeId.SMART_ACCOUNT) {
         ampli.onboardingAccountTypeSelected({
           "account type": "smart",
           "wallet platform": "browser extension",
-          "onboarding experiment": onboardingExperimentCohort,
         })
         navigate(routes.onboardingSmartAccountEmail())
       }
     },
-    [addAccount, navigate, network.id, onboardingExperimentCohort],
+    [addAccount, navigate, network.id],
   )
 
   const isAccountTypeLoading = useCallback(
@@ -83,7 +79,9 @@ export const OnboardingAccountTypeContainer: FC = () => {
     <OnboardingAccountTypeScreen
       onBack={onBack}
       accountTypes={accountTypes}
-      onAccountTypeConfirmed={handleContinue}
+      onAccountTypeConfirmed={(accountTypeId) =>
+        void handleContinue(accountTypeId)
+      }
       isAccountTypeLoading={isAccountTypeLoading}
     />
   )

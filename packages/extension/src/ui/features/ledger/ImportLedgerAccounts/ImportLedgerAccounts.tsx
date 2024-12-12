@@ -1,8 +1,9 @@
-import { FC, useCallback, useMemo, useState } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { ScreenLayout } from "../layout/ScreenLayout"
 import { Box, Checkbox, Flex, HStack, Tooltip, VStack } from "@chakra-ui/react"
-import { P3 } from "@argent/x-ui"
-import {
+import { P2 } from "@argent/x-ui"
+import type {
   BaseWalletAccount,
   ImportedLedgerAccount,
 } from "../../../../shared/wallet.model"
@@ -162,9 +163,9 @@ export const ImportLedgerAccounts: FC<ImportLedgerAccountsProps> = ({
                     _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
                   />
                   <Tooltip label={acc.address}>
-                    <P3 fontWeight="bold" color="white">
+                    <P2 fontWeight="bold" color="white">
                       {`${i + 1 + pageIndex * PAGE_SIZE}. ${acc.address.substring(0, 6)}...${acc.address.substring(acc.address.length - 4)}`}
-                    </P3>
+                    </P2>
                   </Tooltip>
                 </HStack>
                 {/* <H6 color="neutrals.200">
@@ -180,9 +181,8 @@ export const ImportLedgerAccounts: FC<ImportLedgerAccountsProps> = ({
           prevPage={() => setPageIndex((p) => p - 1)}
         />
       </VStack>
-
       <ActionButton
-        onClick={onAddAccounts}
+        onClick={() => void onAddAccounts()}
         isDisabled={!selectedAccounts.size}
         isLoading={isAdding}
       >

@@ -1,5 +1,5 @@
 import { KeyValueStorage } from "../storage"
-import { IStatusMessageStorage } from "./types"
+import type { IStatusMessageStorage } from "./types"
 
 export const statusMessageStore = new KeyValueStorage<IStatusMessageStorage>(
   {},

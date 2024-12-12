@@ -1,6 +1,6 @@
 import type { Transaction } from "../transactions"
 import { getTransactionStatus } from "./utils"
-import { StorageChange } from "../storage/__new/interface"
+import type { StorageChange } from "../storage/__new/interface"
 
 export function getChangedStatusTransactions(
   changeSet: StorageChange<Transaction[]>,

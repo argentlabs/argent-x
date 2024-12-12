@@ -1,4 +1,4 @@
-import { MessageType } from "../../shared/messages"
+import type { MessageType } from "../../shared/messages"
 
 export const safeMessages: MessageType["type"][] = [
   "IS_PREAUTHORIZED",

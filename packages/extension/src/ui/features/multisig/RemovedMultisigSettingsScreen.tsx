@@ -1,9 +1,9 @@
-import { ButtonCell, CellStack, H6, P4, SpacerCell } from "@argent/x-ui"
+import { ButtonCell, CellStack, H5, P3, SpacerCell } from "@argent/x-ui"
 import { Center, Flex, Image } from "@chakra-ui/react"
-import { FC, MouseEvent } from "react"
+import type { FC, MouseEvent } from "react"
 
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import { Multisig } from "./Multisig"
+import type { Multisig } from "./Multisig"
 import { MultisigHideModal } from "./MultisigHideModal"
 
 export interface RemovedMultisigSettingsScreenProps {
@@ -34,18 +34,17 @@ export const RemovedMultisigSettingsScreen: FC<
           height={20}
           src={getNetworkAccountImageUrl({
             accountName,
-            accountAddress: multisig.address,
-            networkId: multisig.networkId,
+            accountId: multisig.id,
             backgroundColor: multisig.hidden ? "#333332" : undefined,
           })}
         />
       </Center>
       <CellStack>
         <Flex direction={"column"} justify="center" align="center">
-          <H6>{accountName}</H6>
-          <P4 fontWeight="bold" color={"white.50"}>
+          <H5>{accountName}</H5>
+          <P3 fontWeight="bold" color={"white.50"}>
             You were removed from this multisig
-          </P4>
+          </P3>
         </Flex>
         <SpacerCell />
 

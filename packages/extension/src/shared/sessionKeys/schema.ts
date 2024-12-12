@@ -27,7 +27,7 @@ export const sessionKeyMetadataSchema = z
     try {
       const json = JSON.parse(str)
       return sessionKeyMetadataJsonSchema.parse(json)
-    } catch (e) {
+    } catch {
       ctx.addIssue({ code: "custom", message: "Invalid Metadata" })
       return z.NEVER
     }

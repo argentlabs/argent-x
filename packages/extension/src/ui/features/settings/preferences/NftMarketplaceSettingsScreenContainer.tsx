@@ -1,10 +1,10 @@
-import { FC } from "react"
+import type { FC } from "react"
 
 import { settingsStore } from "../../../../shared/settings"
 import { useKeyValueStorage } from "../../../hooks/useStorage"
 import { NftMarketplaceSettingsScreen } from "./NftMarketplaceSettingsScreen"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
-import { NftMarketplaceKey } from "../../../../shared/nft/marketplaces"
+import type { NftMarketplaceKey } from "../../../../shared/nft/marketplaces"
 import { ampli } from "../../../../shared/analytics"
 
 export const NftMarketplaceSettingsScreenContainer: FC = () => {

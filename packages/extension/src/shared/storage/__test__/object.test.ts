@@ -1,4 +1,5 @@
-import { IObjectStorage, ObjectStorage } from "../object"
+import type { IObjectStorage } from "../object"
+import { ObjectStorage } from "../object"
 
 describe("full storage flow with object", () => {
   const defaults = { foo: "bar" }

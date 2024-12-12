@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 
 export enum ACCOUNT_MESSAGING_ERROR_MESSAGES {
   ESCAPE_CANCELLATION_FAILED = "Escape cancellation failed",

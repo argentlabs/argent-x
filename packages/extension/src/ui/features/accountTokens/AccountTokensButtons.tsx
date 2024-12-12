@@ -1,104 +1,105 @@
-import { Button, iconsDeprecated } from "@argent/x-ui"
-import { Flex, SimpleGrid, Skeleton } from "@chakra-ui/react"
-import { FC } from "react"
+import { icons } from "@argent/x-ui"
+import { Center, Skeleton } from "@chakra-ui/react"
+import type { FC } from "react"
 
 import { MultisigHideModal } from "../multisig/MultisigHideModal"
+import { ActionButton } from "../../components/ActionButton"
 
-const { AddIcon, SendIcon, HideIcon, PieChartIcon } = iconsDeprecated
+const {
+  PlusSecondaryIcon,
+  SendSecondaryIcon,
+  HideSecondaryIcon,
+  SwapPrimaryIcon,
+} = icons
 
 export interface AccountTokensButtonsProps {
-  onAddFunds: () => void
-  showAddFundsButton: boolean
-  showSendButton: boolean
-  onSend: () => void
-  showHideMultisigButton?: boolean
-  onHideMultisigModalOpen: () => void
+  hasNonZeroBalance: boolean
   isHideMultisigModalOpen: boolean
-  onHideMultisigModalClose: () => void
+  onAddFunds: () => void
   onHideConfirm: () => Promise<void>
-  portfolioUrl: string | null
-  buttonColumnCount: number
+  onHideMultisigModalClose: () => void
+  onHideMultisigModalOpen: () => void
+  onSend: () => void
+  onSwap: () => void
+  showAddFundsButton: boolean
+  showHideMultisigButton?: boolean
+  showSendButton: boolean
+  showSwapButton: boolean
 }
 
 export const AccountTokensButtonsSkeleton: FC = () => {
   return (
-    <SimpleGrid w="full" columns={3} spacing={2} px={4}>
-      <Skeleton rounded="full" h={10} />
-      <Skeleton rounded="full" h={10} />
-      <Skeleton rounded="full" h={10} />
-    </SimpleGrid>
+    <Center gap={10} pb={6}>
+      <Skeleton rounded="full" w={12} h={12} />
+      <Skeleton rounded="full" w={12} h={12} />
+      <Skeleton rounded="full" w={12} h={12} />
+    </Center>
   )
 }
 
 export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
-  onAddFunds,
-  showAddFundsButton,
-  showSendButton,
-  onSend,
-  showHideMultisigButton,
-  onHideMultisigModalOpen,
+  hasNonZeroBalance,
   isHideMultisigModalOpen,
-  onHideMultisigModalClose,
+  onAddFunds,
   onHideConfirm,
-  portfolioUrl,
-  buttonColumnCount,
+  onHideMultisigModalClose,
+  onHideMultisigModalOpen,
+  onSend,
+  onSwap,
+  showAddFundsButton,
+  showHideMultisigButton,
+  showSendButton,
+  showSwapButton,
 }) => {
+  if (
+    !showAddFundsButton &&
+    !showSendButton &&
+    !showSwapButton &&
+    !showHideMultisigButton
+  ) {
+    return null
+  }
   return (
-    <Flex gap={2} mx={"auto"} flexDirection="column">
-      {buttonColumnCount && (
-        <SimpleGrid columns={buttonColumnCount} spacing={2} mx={4}>
-          {showAddFundsButton && (
-            <Button
-              onClick={onAddFunds}
-              colorScheme={"secondary"}
-              size="sm"
-              leftIcon={<AddIcon />}
-            >
-              Fund
-            </Button>
-          )}
-          {showSendButton && (
-            <Button
-              onClick={onSend}
-              colorScheme={"secondary"}
-              size="sm"
-              leftIcon={<SendIcon />}
-            >
-              Send
-            </Button>
-          )}
-          {portfolioUrl && showSendButton && (
-            <Button
-              as={"a"}
-              href={portfolioUrl}
-              target="_blank"
-              colorScheme={"secondary"}
-              size="sm"
-              leftIcon={<PieChartIcon />}
-            >
-              Portfolio
-            </Button>
-          )}
-        </SimpleGrid>
-      )}
-      {showHideMultisigButton && (
-        <Button
-          onClick={onHideMultisigModalOpen}
-          colorScheme={"secondary"}
-          size="sm"
-          leftIcon={<HideIcon />}
-          mx={"auto"}
-        >
-          Hide account
-        </Button>
-      )}
-
+    <>
+      <Center gap={9}>
+        {showAddFundsButton && (
+          <ActionButton
+            colorScheme="primary"
+            onClick={onAddFunds}
+            icon={<PlusSecondaryIcon />}
+            label="Fund"
+          />
+        )}
+        {showSendButton && (
+          <ActionButton
+            onClick={onSend}
+            colorScheme={hasNonZeroBalance ? "primary" : undefined}
+            icon={<SendSecondaryIcon />}
+            label="Send"
+          />
+        )}
+        {showSwapButton && (
+          <ActionButton
+            onClick={onSwap}
+            colorScheme={hasNonZeroBalance ? "primary" : undefined}
+            icon={<SwapPrimaryIcon />}
+            label="Swap"
+          />
+        )}
+        {showHideMultisigButton && (
+          <ActionButton
+            onClick={onHideMultisigModalOpen}
+            icon={<HideSecondaryIcon />}
+            label="Hide"
+          />
+        )}
+      </Center>
       <MultisigHideModal
         onClose={onHideMultisigModalClose}
         isOpen={isHideMultisigModalOpen}
         onHide={onHideConfirm}
         multisigType="active"
       />
-    </Flex>
+    </>
   )
 }

@@ -1,9 +1,6 @@
 import useSWR from "swr"
-import { accountsEqual } from "../../../../shared/utils/accountsEqual"
-import { sortByCurrencyBalance } from "../../../../shared/utils/sortByCurrencyValue"
 import { useRef } from "react"
 import { ledgerService } from "../../../services/ledger"
-import { clientTokenService } from "../../../services/tokens"
 
 export function useGetLedgerAccounts(
   networkId: string,

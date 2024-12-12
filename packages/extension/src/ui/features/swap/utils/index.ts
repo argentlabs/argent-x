@@ -1,14 +1,13 @@
-import { bigDecimal, BigDecimal } from "@argent/x-shared"
-import {
+import type { BigDecimal } from "@argent/x-shared"
+import { bigDecimal } from "@argent/x-shared"
+import type {
   BaseToken,
   Token,
 } from "../../../../shared/token/__new/types/token.model"
-import { BaseTokenAmount } from "../../../../shared/token/__new/types/tokenAmount.model"
-import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
-import {
-  SwapQuoteRoute,
-  SwapQuoteRouteSchema,
-} from "../../../../shared/swap/model/quote.model"
+import type { BaseTokenAmount } from "../../../../shared/token/__new/types/tokenAmount.model"
+import type { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import type { SwapQuoteRoute } from "../../../../shared/swap/model/quote.model"
+import { SwapQuoteRouteSchema } from "../../../../shared/swap/model/quote.model"
 import { ETH } from "../../../../shared/token/__new/constants"
 import { equalToken } from "../../../../shared/token/__new/utils"
 

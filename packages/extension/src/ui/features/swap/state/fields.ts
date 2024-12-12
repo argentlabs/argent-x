@@ -1,4 +1,4 @@
-import { Address } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
 import { create } from "zustand"
 import { ETH, USDC } from "../../../../shared/token/__new/constants"
 import { constants } from "starknet"
@@ -26,6 +26,7 @@ export interface SwapState {
   replaceSwapState: (params: ReplaceSwapState) => void
   resetIndependentField: () => void
   resetTypedValue: () => void
+  setDefaultPayToken: (defaultPayToken: Address) => void
 }
 
 type SelectToken = {
@@ -50,88 +51,95 @@ const defaultNetworkChainId =
     ? constants.StarknetChainId.SN_MAIN
     : constants.StarknetChainId.SN_SEPOLIA
 
-export const initialState = {
+export const createInitialState = (defaultPayToken?: Address) => ({
   independentField: Field.PAY,
   typedValue: "",
   [Field.PAY]: {
-    tokenAddress: ETH[defaultNetworkChainId].address,
+    tokenAddress: defaultPayToken || ETH[defaultNetworkChainId].address,
   },
   [Field.RECEIVE]: {
     tokenAddress: USDC[defaultNetworkChainId].address,
   },
-}
+})
 
-export const useSwapState = create<SwapState>()((set) => ({
-  ...initialState,
+export const useSwapState = create<SwapState>((set) => {
+  let initialState = createInitialState()
 
-  // Select Token
-  selectToken: ({ field, tokenAddress }: SelectToken) =>
-    set((state) => {
-      const otherField = field === Field.PAY ? Field.RECEIVE : Field.PAY
-      if (tokenAddress === state[otherField].tokenAddress) {
-        // the case where we have to swap the order
-        return {
-          ...state,
-          independentField:
-            state.independentField === Field.PAY ? Field.RECEIVE : Field.PAY,
-          [field]: { tokenAddress },
-          [otherField]: { tokenAddress: state[field].tokenAddress },
+  return {
+    ...initialState,
+
+    // Set initial pay token
+    setDefaultPayToken: (defaultPayToken: Address) => {
+      initialState = createInitialState(defaultPayToken)
+      set(initialState)
+    },
+
+    // Select Token
+    selectToken: ({ field, tokenAddress }: SelectToken) =>
+      set((state) => {
+        const otherField = field === Field.PAY ? Field.RECEIVE : Field.PAY
+        if (tokenAddress === state[otherField].tokenAddress) {
+          // the case where we have to swap the order
+          return {
+            ...state,
+            independentField:
+              state.independentField === Field.PAY ? Field.RECEIVE : Field.PAY,
+            [field]: { tokenAddress },
+            [otherField]: { tokenAddress: state[field].tokenAddress },
+          }
+        } else {
+          // the normal case
+          return {
+            ...state,
+            [field]: { tokenAddress },
+          }
         }
-      } else {
-        // the normal case
-        return {
-          ...state,
-          [field]: { tokenAddress },
-        }
-      }
-    }),
+      }),
 
-  // Switch Currencies
-  switchTokens: () =>
-    set((state) => ({
-      ...state,
-      // independentField: Field.PAY, // for now backend only supports trade from a Pay amount. Uncomment the line below when backend supports trade from a Receive amount as well
-      independentField:
-        state.independentField === Field.PAY ? Field.RECEIVE : Field.PAY,
-      [Field.PAY]: { tokenAddress: state[Field.RECEIVE].tokenAddress },
-      [Field.RECEIVE]: { tokenAddress: state[Field.PAY].tokenAddress },
-    })),
-
-  // typeInput
-  typeInput: ({ field, typedValue }: TypeInput) =>
-    set((state) => {
-      return {
+    // Switch Currencies
+    switchTokens: () =>
+      set((state) => ({
         ...state,
-        // for now backend only supports trade from a Pay amount. Uncomment the line below when backend supports trade from a Receive amount as well
-        // independentField: Field.PAY,
+        independentField:
+          state.independentField === Field.PAY ? Field.RECEIVE : Field.PAY,
+        [Field.PAY]: { tokenAddress: state[Field.RECEIVE].tokenAddress },
+        [Field.RECEIVE]: { tokenAddress: state[Field.PAY].tokenAddress },
+      })),
+
+    // typeInput
+    typeInput: ({ field, typedValue }: TypeInput) =>
+      set((state) => {
+        return {
+          ...state,
+          independentField: field,
+          typedValue,
+        }
+      }),
+
+    // replaceSwapState
+    replaceSwapState: ({
+      field,
+      typedValue,
+      payTokenAddress,
+      receiveTokenAddress,
+    }: ReplaceSwapState) =>
+      set(() => ({
         independentField: field,
         typedValue,
-      }
-    }),
+        [Field.PAY]: { tokenAddress: payTokenAddress },
+        [Field.RECEIVE]: { tokenAddress: receiveTokenAddress },
+      })),
 
-  // replaceSwapState
-  replaceSwapState: ({
-    field,
-    typedValue,
-    payTokenAddress,
-    receiveTokenAddress,
-  }: ReplaceSwapState) =>
-    set(() => ({
-      independentField: field,
-      typedValue,
-      [Field.PAY]: { tokenAddress: payTokenAddress },
-      [Field.RECEIVE]: { tokenAddress: receiveTokenAddress },
-    })),
+    resetIndependentField: () =>
+      set((state) => ({
+        ...state,
+        independentField: Field.PAY,
+      })),
 
-  resetIndependentField: () =>
-    set((state) => ({
-      ...state,
-      independentField: Field.PAY,
-    })),
-
-  resetTypedValue: () =>
-    set((state) => ({
-      ...state,
-      typedValue: "",
-    })),
-}))
+    resetTypedValue: () =>
+      set((state) => ({
+        ...state,
+        typedValue: "",
+      })),
+  }
+})

@@ -1,6 +1,6 @@
 import { getActualFee } from "./getActualFee"
 import { describe, it, expect } from "vitest"
-import { IExplorerTransaction } from "../../../../explorer/type"
+import type { IExplorerTransaction } from "../../../../explorer/type"
 
 describe("getActualFee", () => {
   it("should return correct fee, given actualFee as a string", () => {

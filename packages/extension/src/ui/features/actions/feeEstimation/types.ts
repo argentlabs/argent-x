@@ -1,6 +1,6 @@
-import { ApiTransactionBulkSimulationResponse } from "../../../../shared/transactionSimulation/types"
-import { EstimatedFees } from "@argent/x-shared/simulation"
-import { TokenWithBalance, TransactionAction } from "@argent/x-shared"
+import type { TokenWithBalance, TransactionAction } from "@argent/x-shared"
+import type { AccountId } from "../../../../shared/wallet.model"
+import type { EstimatedFees } from "@argent/x-shared/simulation"
 
 export interface TransactionsFeeEstimationProps {
   feeToken?: TokenWithBalance
@@ -11,12 +11,11 @@ export interface TransactionsFeeEstimationProps {
   onFeeErrorChange?: (error: boolean) => void
   accountAddress: string
   networkId: string
+  accountId: AccountId
   actionHash: string
   userClickedAddFunds?: boolean
-  transactionSimulation?: ApiTransactionBulkSimulationResponse
   transactionSimulationFee?: EstimatedFees
   transactionSimulationLoading: boolean
-  transactionSimulationFeeError?: Error
   needsDeploy?: boolean
   allowFeeTokenSelection?: boolean
   onFeeTokenPickerOpen?: () => void

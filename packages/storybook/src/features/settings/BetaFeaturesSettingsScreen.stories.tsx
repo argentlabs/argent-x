@@ -1,4 +1,4 @@
-import { BetaFeaturesSettingsScreen } from "@argent-x/extension/src/ui/features/settings/developerSettings/betaFeatures/BetaFeaturesSettingsScreen"
+import { BetaFeaturesSettingsScreen } from "@argent-x/extension/src/ui/features/settings/advanced/betaFeatures/BetaFeaturesSettingsScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 

@@ -2,7 +2,7 @@ import {
   ARGENT_PORTFOLIO_GOERLI_BASE_URL,
   ARGENT_PORTFOLIO_MAINNET_BASE_URL,
 } from "../../../../shared/api/constants"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { useIsDefaultNetwork } from "../../networks/hooks/useIsDefaultNetwork"
 
 export const usePortfolioUrl = (account?: BaseWalletAccount) => {

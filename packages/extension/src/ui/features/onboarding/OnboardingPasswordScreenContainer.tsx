@@ -1,15 +1,14 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
 import { sessionService } from "../../services/session"
 import { OnboardingPasswordScreen } from "./OnboardingPasswordScreen"
 import { ampli } from "../../../shared/analytics"
-import { useOnboardingExperiment } from "../../services/onboarding/useOnboardingExperiment"
 
 export const OnboardingPasswordScreenContainer: FC = () => {
   const navigate = useNavigate()
-  const { onboardingExperimentCohort } = useOnboardingExperiment()
 
   const onBack = useCallback(() => {
     navigate(routes.onboardingPrivacy("password"))
@@ -20,17 +19,16 @@ export const OnboardingPasswordScreenContainer: FC = () => {
       await sessionService.startSession(password)
       ampli.onboardingPasswordSet({
         "wallet platform": "browser extension",
-        "onboarding experiment": onboardingExperimentCohort,
       })
       return navigate(routes.onboardingAccountType.path, { replace: true })
     },
-    [navigate, onboardingExperimentCohort],
+    [navigate],
   )
 
   return (
     <OnboardingPasswordScreen
       onBack={onBack}
-      title={"New wallet"}
+      title={"Create a password"}
       onSubmit={handleSubmit}
     />
   )

@@ -1,30 +1,37 @@
 import { find, partition } from "lodash-es"
 
+import type { IHttpService } from "@argent/x-shared"
 import {
   addressSchemaArgentBackend,
   BaseError,
   ensureArray,
   getLatestArgentMultisigClassHash,
-  IHttpService,
 } from "@argent/x-shared"
 import { ARGENT_ACCOUNT_URL, ARGENT_ACCOUNTS_URL } from "../../../api/constants"
 import { AccountError } from "../../../errors/account"
-import { PendingMultisig } from "../../../multisig/types"
+import type { PendingMultisig } from "../../../multisig/types"
 import { defaultNetwork } from "../../../network"
-import { IObjectStore, IRepository } from "../../../storage/__new/interface"
-import { accountsEqual } from "../../../utils/accountsEqual"
+import type {
+  IObjectStore,
+  IRepository,
+} from "../../../storage/__new/interface"
+import { accountsEqual, isEqualAccountIds } from "../../../utils/accountsEqual"
 import { getIndexForPath, getPathForIndex } from "../../../utils/derivationPath"
-import {
+import type {
+  AccountId,
+  ArgentWalletAccount,
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
-  defaultNetworkOnlyPlaceholderAccount,
-  isNetworkOnlyPlaceholderAccount,
   MultisigWalletAccount,
   NetworkOnlyPlaceholderAccount,
-  SignerType,
   WalletAccount,
   WalletAccountSigner,
+} from "../../../wallet.model"
+import {
+  defaultNetworkOnlyPlaceholderAccount,
+  isNetworkOnlyPlaceholderAccount,
+  SignerType,
 } from "../../../wallet.model"
 import type { WalletStorageProps } from "../../../wallet/walletStore"
 import { withHiddenSelector } from "../../selectors"
@@ -33,7 +40,10 @@ import urlJoin from "url-join"
 import { getBaseDerivationPath } from "../../../signer/utils"
 import { SMART_ACCOUNT_NETWORK_ID } from "../../../smartAccount/constants"
 import { generateJwt } from "../../../smartAccount/jwt"
-import { IAccountService } from "../accountService/IAccountService"
+import type { IAccountService } from "../accountService/IAccountService"
+import { walletAccountToArgentAccount } from "../../../utils/isExternalAccount"
+import { getAccountIdentifier } from "../../../utils/accountIdentifier"
+import { toBaseWalletAccount } from "../../utils"
 
 export interface WalletSession {
   secret: string
@@ -96,19 +106,23 @@ export class WalletAccountSharedService {
     name,
     classHash,
     signerType = SignerType.LOCAL_SECRET,
-    signer,
-  }: GetAccountArgs): WalletAccount {
+    signer: providedSigner,
+  }: GetAccountArgs): ArgentWalletAccount {
     const baseDerivationPath = getBaseDerivationPath("standard", signerType)
+
+    const signer = providedSigner ?? {
+      type: signerType,
+      derivationPath: getPathForIndex(index, baseDerivationPath),
+    }
+
     return {
+      id: getAccountIdentifier(address, network.id, signer),
       name: name || `Account ${index + 1}`,
       address,
       network,
       networkId: network.id,
       type: "standard",
-      signer: signer || {
-        derivationPath: getPathForIndex(index, baseDerivationPath),
-        type: signerType,
-      },
+      signer,
       classHash,
       needsDeploy,
     }
@@ -122,18 +136,22 @@ export class WalletAccountSharedService {
     name,
     classHash,
     signerType = SignerType.LOCAL_SECRET,
-  }: GetAccountArgs): WalletAccount {
+    signer: providedSigner,
+  }: GetAccountArgs): ArgentWalletAccount {
     const baseDerivationPath = getBaseDerivationPath("smart", signerType)
+    const signer = providedSigner ?? {
+      type: signerType,
+      derivationPath: getPathForIndex(index, baseDerivationPath),
+    }
+
     return {
+      id: getAccountIdentifier(address, network.id, signer, false),
       name: name || `Account ${index + 1}`,
       address,
       network,
       networkId: network.id,
       type: "smart",
-      signer: {
-        derivationPath: getPathForIndex(index, baseDerivationPath),
-        type: signerType,
-      },
+      signer,
       classHash,
       needsDeploy,
     }
@@ -146,18 +164,23 @@ export class WalletAccountSharedService {
     needsDeploy,
     name,
     signerType = SignerType.LOCAL_SECRET,
-  }: GetAccountArgs): WalletAccount {
+    signer: providedSigner,
+  }: GetAccountArgs): ArgentWalletAccount {
     const baseDerivationPath = getBaseDerivationPath("multisig", signerType)
+
+    const signer = providedSigner ?? {
+      type: signerType,
+      derivationPath: getPathForIndex(index, baseDerivationPath),
+    }
+
     return {
+      id: getAccountIdentifier(address, network.id, signer),
       name: name || `Multisig ${index + 1}`,
       address,
       networkId: network.id,
       network,
       type: "multisig",
-      signer: {
-        derivationPath: getPathForIndex(index, baseDerivationPath),
-        type: signerType,
-      },
+      signer,
       classHash: getLatestArgentMultisigClassHash(),
       cairoVersion: "1",
       needsDeploy,
@@ -165,16 +188,25 @@ export class WalletAccountSharedService {
   }
 
   // TODO rewrite using views, move out of service and rename to accountView
-  public async getAccount(
-    selector: BaseWalletAccount,
-  ): Promise<WalletAccount | null> {
+  public async getAccount(accountId: AccountId): Promise<WalletAccount | null> {
     const [hit] = await this.walletStore.get((account) =>
-      accountsEqual(account, selector),
+      isEqualAccountIds(account.id, accountId),
     )
     if (!hit) {
       throw new AccountError({ code: "NOT_FOUND" })
     }
     return hit
+  }
+
+  public async getArgentAccount(
+    accountId: AccountId,
+  ): Promise<ArgentWalletAccount | null> {
+    const account = await this.getAccount(accountId)
+    if (!account) {
+      return null
+    }
+
+    return walletAccountToArgentAccount(account)
   }
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
@@ -198,7 +230,7 @@ export class WalletAccountSharedService {
 
   public async selectAccount(
     accountIdentifier:
-      | BaseWalletAccount
+      | AccountId
       | NetworkOnlyPlaceholderAccount = defaultNetworkOnlyPlaceholderAccount,
   ) {
     if (isNetworkOnlyPlaceholderAccount(accountIdentifier)) {
@@ -208,17 +240,20 @@ export class WalletAccountSharedService {
 
     const accounts = await this.walletStore.get()
     const account = find(accounts, (account) =>
-      accountsEqual(account, accountIdentifier),
+      isEqualAccountIds(account.id, accountIdentifier),
     )
 
     if (!account) {
       throw new AccountError({ code: "NOT_FOUND" })
     }
 
-    const { address, networkId } = account // makes sure to strip away unused properties
-    await this.store.set({ selected: { address, networkId } })
+    const baseAccount = toBaseWalletAccount(account)
+    await this.store.set({ selected: baseAccount })
 
-    await this.updateLastUsedAccountOnNetwork(networkId, account)
+    await this.updateLastUsedAccountOnNetwork(
+      baseAccount.networkId,
+      baseAccount,
+    )
 
     return account
   }
@@ -233,7 +268,8 @@ export class WalletAccountSharedService {
       lastUsedAccountByNetwork = {}
     }
     if (!accountsEqual(lastUsedAccountByNetwork[networkId], account)) {
-      lastUsedAccountByNetwork[networkId] = account
+      const baseAccount = toBaseWalletAccount(account)
+      lastUsedAccountByNetwork[networkId] = baseAccount
       await this.store.set({ lastUsedAccountByNetwork })
     }
   }
@@ -249,29 +285,24 @@ export class WalletAccountSharedService {
     if (!accountExists) {
       const updatedAccounts = [...currentAccounts, account]
       await this.store.set({
-        noUpgradeBannerAccounts: updatedAccounts.map(
-          ({ address, networkId }) => ({
-            address,
-            networkId,
-          }),
-        ),
+        noUpgradeBannerAccounts: updatedAccounts.map(toBaseWalletAccount),
       })
     }
   }
 
   public async getMultisigAccount(
-    selector: BaseWalletAccount,
+    accountId: AccountId,
   ): Promise<MultisigWalletAccount> {
     const [walletAccount] = await this.walletStore.get(
       (account) =>
-        accountsEqual(account, selector) && account.type === "multisig",
+        isEqualAccountIds(account.id, accountId) && account.type === "multisig",
     )
     if (!walletAccount) {
       throw new AccountError({ code: "MULTISIG_NOT_FOUND" })
     }
 
     const [multisigBaseWalletAccount] = await this.multisigStore.get(
-      (account) => accountsEqual(account, selector),
+      (account) => isEqualAccountIds(account.id, accountId),
     )
 
     if (!multisigBaseWalletAccount) {
@@ -322,7 +353,7 @@ export class WalletAccountSharedService {
           "Content-Type": "application/json",
         },
       })
-    } catch (e) {
+    } catch {
       throw new BaseError({ message: "Failed to send account name to backend" })
     }
   }
@@ -371,7 +402,7 @@ export class WalletAccountSharedService {
         // BE does not retrieve the networkId because smart accounts are not multi-network. E.g. in prod you cannot add smart accounts on Sepolia
         return { ...account, networkId: SMART_ACCOUNT_NETWORK_ID }
       })
-    } catch (e) {
+    } catch {
       throw new BaseError({ message: "Failed to send account name to backend" })
     }
   }
@@ -385,7 +416,7 @@ export class WalletAccountSharedService {
     // and each call to update attempts to read, modify, and write the accounts array in the accountRepo almost simultaneously.
     // This can lead to race conditions where some updates overwrite others because they all read the accounts array before any of them has a chance to write their updates back.
     for (const account of accounts) {
-      await this.accountService.setName(account.name, account)
+      await this.accountService.setName(account.name, account.id)
     }
   }
 

@@ -1,10 +1,22 @@
-import { FieldError, Input, iconsDeprecated } from "@argent/x-ui"
-import { Box, Flex, FlexProps, Text } from "@chakra-ui/react"
+import { FieldError, icons, Input } from "@argent/x-ui"
+import type { FlexProps } from "@chakra-ui/react"
+import {
+  Box,
+  Flex,
+  InputGroup,
+  InputRightElement,
+  Text,
+} from "@chakra-ui/react"
 import { isEmpty, isString } from "lodash-es"
-import { FC, ReactNode, useEffect } from "react"
-import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import type { FC, ReactNode } from "react"
+import { useEffect } from "react"
+import type { SubmitHandler } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
+import useCapsLockStatus from "../../hooks/useCapsLockStatus"
+
+const { InfoCircleSecondaryIcon, BackupPrimaryIcon } = icons
 
 interface FieldValues {
   password: string
@@ -13,19 +25,23 @@ interface FieldValues {
 export interface PasswordFormProps extends Omit<FlexProps, "children"> {
   error?: string
   verifyPassword: (password: string) => Promise<boolean>
+  /** If true, the input will auto-focus immediately, otherwise it will wait for the animation to complete */
+  immediateFocus?: boolean
   children?: (options: { isDirty: boolean; isSubmitting: boolean }) => ReactNode
 }
 
 export const PasswordForm: FC<PasswordFormProps> = ({
   error,
   verifyPassword,
+  immediateFocus,
   children,
   ...rest
 }) => {
   const { control, formState, handleSubmit, clearErrors, setError } =
-    useForm<FieldValues>()
+    useForm<FieldValues>({ defaultValues: { password: "" } })
   const { errors, isDirty, isSubmitting } = formState
-  const { InfoIcon } = iconsDeprecated
+
+  const isCapsLockOn = useCapsLockStatus()
 
   useEffect(() => {
     if (isString(error)) {
@@ -45,12 +61,37 @@ export const PasswordForm: FC<PasswordFormProps> = ({
     }
   }
 
-  const inputRef = useAutoFocusInputRef<HTMLInputElement>()
+  const inputRef = useAutoFocusInputRef<HTMLInputElement>(!immediateFocus)
+
+  const InfoMessage = ({
+    text,
+    isError,
+  }: {
+    text?: string
+    isError?: boolean
+  }) => {
+    const textColor = isError ? "error.500" : "text-primary"
+    return (
+      <Box
+        position="relative"
+        display="flex"
+        justifyContent="flex-start"
+        gap="5px"
+        mt="3"
+      >
+        <Text fontSize="sm" color={textColor}>
+          <InfoCircleSecondaryIcon />
+        </Text>
+        <FieldError color={textColor}>{text}</FieldError>
+      </Box>
+    )
+  }
 
   return (
     <Flex
       as="form"
       direction="column"
+      /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
       onSubmit={handleSubmit(handlePassword)}
       {...rest}
     >
@@ -61,36 +102,42 @@ export const PasswordForm: FC<PasswordFormProps> = ({
         rules={{ required: true }}
         defaultValue=""
         render={({ field: { ref, ...field } }) => (
-          <Input
-            placeholder="Password"
-            type="password"
-            {...field}
-            isInvalid={!isEmpty(errors.password)}
-            ref={(e) => {
-              ref(e)
-              inputRef.current = e
-            }}
-          />
+          <InputGroup>
+            {isCapsLockOn && (
+              <InputRightElement pointerEvents="none" mr={"6px"}>
+                <BackupPrimaryIcon
+                  color="icon-secondary"
+                  height={"20px"}
+                  width={"20px"}
+                />
+              </InputRightElement>
+            )}
+            <Input
+              placeholder="Password"
+              type="password"
+              autoFocus={immediateFocus}
+              {...field}
+              isInvalid={!isEmpty(errors.password)}
+              ref={(e) => {
+                ref(e)
+                inputRef.current = e
+              }}
+            />
+          </InputGroup>
         )}
       />
       {!isEmpty(errors.password) && (
-        <Box
-          position="relative"
-          display="flex"
-          justifyContent="flex-start"
-          gap="5px"
-          mt="3"
-        >
-          <Text fontSize="sm" color="error.500">
-            <InfoIcon />
-          </Text>
-          {errors.password?.type === "required" && (
-            <FieldError>Password is required</FieldError>
-          )}
-          {errors.password?.message && (
-            <FieldError>{errors.password.message}</FieldError>
-          )}
-        </Box>
+        <InfoMessage
+          isError={true}
+          text={
+            errors.password?.type === "required"
+              ? "Password is required"
+              : errors.password.message
+          }
+        ></InfoMessage>
+      )}
+      {isCapsLockOn && (
+        <InfoMessage isError={false} text={"Caps lock is on"}></InfoMessage>
       )}
       {children?.({ isDirty, isSubmitting })}
     </Flex>

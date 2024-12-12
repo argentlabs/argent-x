@@ -52,5 +52,7 @@ module.exports = {
     "@typescript-eslint/no-misused-promises": "warn",
     "@typescript-eslint/no-floating-promises": "warn",
     "no-restricted-globals": ["error", "origin"], // Error on use of global 'origin' which defaults to current window url
+    "@typescript-eslint/consistent-type-exports": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
   },
 }

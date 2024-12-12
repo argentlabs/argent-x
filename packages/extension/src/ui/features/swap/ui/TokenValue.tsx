@@ -1,9 +1,9 @@
-import { L2 } from "@argent/x-ui"
-import { FC } from "react"
+import { L2Bold } from "@argent/x-ui"
+import type { FC } from "react"
 
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
 import { bigDecimal, prettifyCurrencyValue } from "@argent/x-shared"
-import { Token } from "../../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
 
 interface TokenValueProps {
   amount: string
@@ -18,9 +18,9 @@ export const TokenValue: FC<TokenValueProps> = ({ amount, approx, token }) => {
   )
 
   return (
-    <L2 color="neutrals.400">
+    <L2Bold color="neutrals.400">
       {approx && <>≈ </>}
       {prettifyCurrencyValue(currencyValue)}
-    </L2>
+    </L2Bold>
   )
 }

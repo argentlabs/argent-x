@@ -1,8 +1,9 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import {
-  useRouteAccountAddress,
+  useRouteAccountId,
   useRouteEmailAddress,
   useRouteFlow,
 } from "../../hooks/useRoute"
@@ -10,45 +11,39 @@ import { routes } from "../../../shared/ui/routes"
 import { SmartAccountBaseOTPScreen } from "./SmartAccountBaseOTPScreen"
 
 export const SmartAccountOTPScreen: FC = () => {
-  const accountAddress = useRouteAccountAddress()
+  const accountId = useRouteAccountId()
   const email = useRouteEmailAddress()
   const navigate = useNavigate()
   const flow = useRouteFlow()
 
   const onBack = useCallback(() => {
-    navigate(
-      routes.argentAccountEmail(accountAddress, flow, routes.accountTokens()),
-    )
-  }, [accountAddress, navigate, flow])
+    navigate(routes.argentAccountEmail(accountId, flow, routes.accountTokens()))
+  }, [accountId, navigate, flow])
 
   const onOTPReEnterEmail = useCallback(async () => {
     navigate(
-      routes.argentAccountEmail(accountAddress, flow, routes.accountTokens()),
+      routes.argentAccountEmail(accountId, flow, routes.accountTokens()),
       { replace: true },
     )
-  }, [accountAddress, navigate, flow])
+  }, [accountId, navigate, flow])
 
   const onOTPConfirmed = useCallback(() => {
     switch (flow) {
       case "toggleSmartAccount":
-        return navigate(routes.smartAccountAction(accountAddress), {
+        return navigate(routes.smartAccountAction(accountId), {
           replace: true,
         })
       case "argentAccount":
-        return navigate(routes.argentAccountLoggedIn(accountAddress), {
+        return navigate(routes.argentAccountLoggedIn(accountId), {
           replace: true,
         })
     }
-  }, [accountAddress, navigate, flow])
+  }, [accountId, navigate, flow])
 
   if (!email) {
     return (
       <Navigate
-        to={routes.argentAccountEmail(
-          accountAddress,
-          flow,
-          routes.accountTokens(),
-        )}
+        to={routes.argentAccountEmail(accountId, flow, routes.accountTokens())}
       />
     )
   }

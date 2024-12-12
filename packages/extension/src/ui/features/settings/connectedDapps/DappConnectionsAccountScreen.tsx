@@ -2,18 +2,18 @@ import {
   BarBackButton,
   CellStack,
   Empty,
-  H6,
+  H5,
+  icons,
   NavigationContainer,
-  P4,
-  iconsDeprecated,
+  P3,
 } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
 import { Flex } from "@chakra-ui/react"
 import { DappConnectionMenuItem } from "../ui/DappConnectionMenuItem"
-import { PreAuthorization } from "../../../../shared/preAuthorization/schema"
+import type { PreAuthorization } from "../../../../shared/preAuthorization/schema"
 
-const { LinkIcon } = iconsDeprecated
+const { LinkPrimaryIcon } = icons
 
 interface DappConnectionsAccountScreenProps {
   accountName?: string
@@ -28,15 +28,15 @@ export const DappConnectionsAccountScreen: FC<
   return (
     <NavigationContainer
       leftButton={<BarBackButton />}
-      title={accountName ?? "Connected dapps"}
+      title={accountName ?? "Authorised dapps"}
     >
       {preAuthorizations.length === 0 ? (
-        <Empty icon={<LinkIcon />} title={"No connected dapps"} />
+        <Empty icon={<LinkPrimaryIcon />} title={"No authorised dapps"} />
       ) : (
         <CellStack width={"full"}>
           <Flex w="full" alignItems={"center"}>
-            <H6 color="text-secondary">Connected dapps</H6>
-            <P4
+            <H5 color="text-secondary">Connected dapps</H5>
+            <P3
               ml="auto"
               fontWeight="semibold"
               color="primary.500"
@@ -47,7 +47,7 @@ export const DappConnectionsAccountScreen: FC<
               _hover={{ color: "primary.600" }}
             >
               Disconnect all
-            </P4>
+            </P3>
           </Flex>
           {preAuthorizations.map((preAuthorization) => (
             <DappConnectionMenuItem

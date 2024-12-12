@@ -1,8 +1,8 @@
-import { Call } from "starknet"
+import type { Call } from "starknet"
 import { describe, expect, test } from "vitest"
 
+import type { Erc20TransferCall } from "./erc20TransferCall"
 import {
-  Erc20TransferCall,
   isErc20TransferCall,
   parseErc20TransferCall,
 } from "./erc20TransferCall"

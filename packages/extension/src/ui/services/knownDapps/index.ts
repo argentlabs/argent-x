@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useKnownDapps } from "./knownDapps"
 
-const normalizeHost = (h: string) => h.replace(/^www\./i, "")
+export const normalizeHost = (h: string) => h.replace(/^www\./i, "")
 
 export function useDappFromKnownDappsByHost(host: string) {
   const knownDapps = useKnownDapps()
@@ -17,7 +17,7 @@ export function useDappFromKnownDappsByHost(host: string) {
           const knownHost = new URL(knownDapp.dappUrl).host
           const inputHost = new URL(host).host
           return normalizeHost(knownHost) === normalizeHost(inputHost)
-        } catch (error) {
+        } catch {
           return undefined
         }
       }),

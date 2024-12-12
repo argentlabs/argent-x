@@ -6,7 +6,8 @@ import {
 } from "./prices"
 import { getMockTrade } from "../../../../../test/trade.mock"
 import { getMockToken } from "../../../../../test/token.mock"
-import { Trade, TradeType } from "../../../../shared/swap/model/trade.model"
+import type { Trade } from "../../../../shared/swap/model/trade.model"
+import { TradeType } from "../../../../shared/swap/model/trade.model"
 import { bigDecimal } from "@argent/x-shared"
 
 describe("prices utils", () => {

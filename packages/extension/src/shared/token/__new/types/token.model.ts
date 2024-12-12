@@ -29,7 +29,9 @@ export const TokenSchema = RequestTokenSchema.required().extend({
   custom: z.boolean().optional(),
   pricingId: z.number().optional(),
   tradable: z.boolean().optional(),
+  hidden: z.boolean().optional(),
   tags: z.string().array().optional(),
+  brandColor: z.string().optional(),
 })
 
 export type Token = z.infer<typeof TokenSchema>

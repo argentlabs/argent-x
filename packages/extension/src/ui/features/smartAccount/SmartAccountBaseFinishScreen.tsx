@@ -1,43 +1,55 @@
-import {
-  Button,
-  CellStack,
-  FlowHeader,
-  FlowHeaderProps,
-  iconsDeprecated,
-} from "@argent/x-ui"
+import type { FlowHeaderProps } from "@argent/x-ui"
+import { Button, CellStack, FlowHeader, icons } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
-import { To, useNavigate } from "react-router-dom"
+import type { FC } from "react"
+import { useCallback, useEffect, useState } from "react"
+import type { To } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
-import { LiveAccountGuardianState } from "./usePendingChangingGuardian"
+import type { LiveAccountGuardianState } from "./usePendingChangingGuardian"
 import { ChangeGuardian } from "../../../shared/smartAccount/changeGuardianCallDataToType"
 
 const {
-  SmartAccountActiveIcon,
-  SmartAccountInactiveIcon,
-  TickIcon,
-  AlertIcon,
-} = iconsDeprecated
+  CheckmarkSecondaryIcon,
+  WarningCircleSecondaryIcon,
+  ShieldSecondaryIcon,
+  NoShieldSecondaryIcon,
+} = icons
 
 export interface GetFlowHeaderProps {
   accountName?: string
   liveAccountGuardianState?: LiveAccountGuardianState
 }
 
-const getFlowHeaderProps = ({
+const useFlowHeaderProps = ({
   liveAccountGuardianState,
   accountName,
 }: GetFlowHeaderProps): FlowHeaderProps => {
+  const [finalStatus, setFinalStatus] = useState<string | null>(null)
+
+  // Set final status when the transaction is done, so that it won't change back to 'UNKNOWN' once the tx is processed
+  useEffect(() => {
+    if (liveAccountGuardianState) {
+      const { status } = liveAccountGuardianState
+      if (status === "ERROR" || status === "SUCCESS") {
+        setFinalStatus(status)
+      }
+    }
+  }, [liveAccountGuardianState])
+
   if (!liveAccountGuardianState) {
     return {
       title: "Argent account",
     }
   }
   const { status, type } = liveAccountGuardianState
+
+  const currentStatus = finalStatus || status
+
   const isAdding = type === ChangeGuardian.ADDING
-  if (status === "ERROR") {
+  if (currentStatus === "ERROR") {
     return {
-      icon: AlertIcon,
+      icon: WarningCircleSecondaryIcon,
       title: isAdding
         ? "Upgrading to Smart Account Failed"
         : "Changing to Standard Account Failed",
@@ -45,14 +57,14 @@ const getFlowHeaderProps = ({
       variant: "danger",
     }
   }
-  if (status === "PENDING") {
+  if (currentStatus === "PENDING") {
     return {
-      icon: isAdding ? SmartAccountActiveIcon : SmartAccountInactiveIcon,
+      icon: isAdding ? ShieldSecondaryIcon : NoShieldSecondaryIcon,
       title: isAdding ? "Upgrading account…" : "Changing to Standard Account…",
       subtitle: isAdding ? (
         <>
           {accountName} will be protected by a guardian. A{" "}
-          <SmartAccountActiveIcon
+          <ShieldSecondaryIcon
             display={"inline"}
             position={"relative"}
             top={"0.125em"}
@@ -68,9 +80,9 @@ const getFlowHeaderProps = ({
       isLoading: true,
     }
   }
-  if (status === "SUCCESS") {
+  if (currentStatus === "SUCCESS") {
     return {
-      icon: TickIcon,
+      icon: CheckmarkSecondaryIcon,
       title: isAdding ? "Account upgraded" : "Changed to Standard Account",
       subtitle: isAdding
         ? `${accountName} has been upgraded to a Smart Account`
@@ -95,7 +107,7 @@ export const SmartAccountBaseFinishScreen: FC<
 > = ({ accountName, liveAccountGuardianState, returnRoute }) => {
   const navigate = useNavigate()
 
-  const headerProps = getFlowHeaderProps({
+  const headerProps = useFlowHeaderProps({
     accountName,
     liveAccountGuardianState,
   })
@@ -106,11 +118,7 @@ export const SmartAccountBaseFinishScreen: FC<
   return (
     <CellStack flex={1}>
       <Center flex={1} flexDirection={"column"}>
-        <FlowHeader
-          size={"lg"}
-          icon={SmartAccountActiveIcon}
-          {...headerProps}
-        />
+        <FlowHeader size={"lg"} icon={ShieldSecondaryIcon} {...headerProps} />
       </Center>
       <Button onClick={onFinish} colorScheme={"primary"}>
         {headerProps.isLoading ? "Dismiss" : "Done"}

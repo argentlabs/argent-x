@@ -3,7 +3,7 @@ import {
   getCallNames,
   getPreExecutionEventNames,
 } from "../fingerprintExplorerTransaction"
-import { IExplorerTransactionTransformer } from "./type"
+import type { IExplorerTransactionTransformer } from "./type"
 
 /** default displayName from calls or events */
 

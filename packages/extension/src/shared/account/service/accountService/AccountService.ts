@@ -1,24 +1,37 @@
-import { IChainService } from "../../../chain/service/IChainService"
+import type { IChainService } from "../../../chain/service/IChainService"
 import type { AllowArray, SelectorFn } from "../../../storage/__new/interface"
+import type { AccountId, ArgentWalletAccount } from "../../../wallet.model"
 import {
   type BaseWalletAccount,
   type WalletAccount,
 } from "../../../wallet.model"
-import { accountsEqual } from "../../../utils/accountsEqual"
+import { accountsEqual, isEqualAccountIds } from "../../../utils/accountsEqual"
 import { withoutHiddenSelector } from "../../selectors"
 import type { IAccountRepo } from "../../store"
-import { IAccountService } from "./IAccountService"
+import type { Events, IAccountService } from "./IAccountService"
+import { AccountAddedEvent } from "./IAccountService"
+import type { IPKManager } from "../../../accountImport/pkManager/IPKManager"
+import type Emittery from "emittery"
+import { ensureArray } from "@argent/x-shared"
+import { filterArgentAccounts } from "../../../utils/isExternalAccount"
 
 export class AccountService implements IAccountService {
   constructor(
+    public readonly emitter: Emittery<Events>,
     private readonly chainService: IChainService,
     private readonly accountRepo: IAccountRepo,
+    private readonly pkManager: IPKManager,
   ) {}
 
   async get(
     selector: SelectorFn<WalletAccount> = withoutHiddenSelector,
   ): Promise<WalletAccount[]> {
     return this.accountRepo.get(selector)
+  }
+
+  async getArgentWalletAccounts(): Promise<ArgentWalletAccount[]> {
+    const accounts = await this.get()
+    return filterArgentAccounts(accounts)
   }
 
   async getFromBaseWalletAccounts(baseWalletAccounts: BaseWalletAccount[]) {
@@ -32,12 +45,32 @@ export class AccountService implements IAccountService {
 
   async upsert(account: AllowArray<WalletAccount>): Promise<void> {
     await this.accountRepo.upsert(account)
+
+    for (const accountItem of ensureArray(account)) {
+      await this.emitter.emit(AccountAddedEvent, accountItem)
+    }
   }
 
-  async remove(baseAccount: BaseWalletAccount): Promise<void> {
-    await this.accountRepo.remove((account) =>
-      accountsEqual(account, baseAccount),
+  async remove(
+    selector: SelectorFn<WalletAccount> | AllowArray<WalletAccount>,
+  ): Promise<WalletAccount[]> {
+    return this.accountRepo.remove(selector)
+  }
+
+  async removeById(accountId: AccountId): Promise<void> {
+    const [account] = await this.accountRepo.get((account) =>
+      isEqualAccountIds(account.id, accountId),
     )
+
+    if (!account) {
+      return
+    }
+
+    await this.accountRepo.remove(account)
+
+    if (account.type === "imported") {
+      await this.pkManager.removeKey(account.id)
+    }
   }
 
   // TBD: should we expose this function and get rid of one function per property? Or should we keep it as is?
@@ -55,19 +88,16 @@ export class AccountService implements IAccountService {
     })
   }
 
-  async setHide(
-    hidden: boolean,
-    baseAccount: BaseWalletAccount,
-  ): Promise<void> {
+  async setHide(hidden: boolean, accountId: AccountId): Promise<void> {
     return this.update(
-      (account) => accountsEqual(account, baseAccount),
+      (account) => isEqualAccountIds(account.id, accountId),
       (account) => ({ ...account, hidden }),
     )
   }
 
-  async setName(name: string, baseAccount: BaseWalletAccount): Promise<void> {
+  async setName(name: string, accountId: AccountId): Promise<void> {
     return this.update(
-      (account) => accountsEqual(account, baseAccount),
+      (account) => isEqualAccountIds(account.id, accountId),
       (account) => ({ ...account, name }),
     )
   }

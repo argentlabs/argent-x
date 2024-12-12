@@ -1,6 +1,7 @@
 import { type LogoDeprecatedKeys, logosDeprecated } from "@argent/x-ui"
-import { Center, CenterProps } from "@chakra-ui/react"
-import { FC } from "react"
+import type { CenterProps } from "@chakra-ui/react"
+import { Center } from "@chakra-ui/react"
+import type { FC } from "react"
 
 interface SettingsRadioIconProps extends CenterProps {
   logo: LogoDeprecatedKeys

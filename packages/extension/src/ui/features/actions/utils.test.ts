@@ -1,4 +1,4 @@
-import { Call } from "starknet"
+import type { Call } from "starknet"
 import { getV3UpgradeCall } from "./utils"
 
 describe("getV3UpgradeCall", () => {

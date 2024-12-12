@@ -1,33 +1,6 @@
-import { TransactionActionFixture } from "./types"
+import type { TransactionActionFixture } from "./types"
 
 export const transfer: TransactionActionFixture = {
-  aggregatedData: [
-    {
-      token: {
-        address:
-          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-        name: "Ether",
-        symbol: "ETH",
-        decimals: 18,
-        iconUrl: "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
-        showAlways: true,
-        networkId: "localhost",
-        type: "erc20",
-      },
-      approvals: [],
-      amount: BigInt("-1000000000000000"),
-      usdValue: "3.438859",
-      recipients: [
-        {
-          address:
-            "0x624b60bb6e9fa65f5a6879c496d1c6f48e49c53e8bb7ff0218c37988b003673",
-          amount: BigInt("-1000000000000000"),
-          usdValue: "3.438859",
-        },
-      ],
-      safe: true,
-    },
-  ],
   transactionReview: {
     transactions: [
       {

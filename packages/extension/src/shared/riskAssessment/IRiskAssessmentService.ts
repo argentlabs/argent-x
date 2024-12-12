@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { RiskAssessment } from "./schema"
+import type { RiskAssessment } from "./schema"
 
 export const dappContextSchema = z.object({
   dappDomain: z.string(),

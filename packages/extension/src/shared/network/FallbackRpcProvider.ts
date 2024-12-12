@@ -1,9 +1,5 @@
-import {
-  RpcChannel,
-  RpcProvider,
-  RpcProviderOptions,
-  json as starknetJson,
-} from "starknet"
+import type { RpcProviderOptions } from "starknet"
+import { RpcChannel, RpcProvider, json as starknetJson } from "starknet"
 import { delay } from "../utils/delay"
 import { exponentialBackoff } from "./exponentialBackoff"
 import { shuffle } from "lodash-es"

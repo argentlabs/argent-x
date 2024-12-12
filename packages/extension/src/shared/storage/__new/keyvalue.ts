@@ -1,7 +1,7 @@
 import { debounce } from "lodash-es"
 
-import { KeyValueStorage } from "../keyvalue"
-import { IObjectStore, StorageChange } from "./interface"
+import type { KeyValueStorage } from "../keyvalue"
+import type { IObjectStore, StorageChange } from "./interface"
 
 export function adaptKeyValue<T extends Record<string, any>>(
   storage: KeyValueStorage<T>,

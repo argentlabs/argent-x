@@ -1,9 +1,9 @@
 import {
   BarBackButton,
   CellStack,
-  L2,
+  L2Bold,
   NavigationContainer,
-  P3,
+  P2,
 } from "@argent/x-ui"
 import { Button, Center, Flex } from "@chakra-ui/react"
 import copy from "copy-to-clipboard"
@@ -12,29 +12,16 @@ import { useMemo, useState } from "react"
 import { QrCode } from "../../../components/QrCode"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { usePublicKey } from "../../accounts/usePublicKey"
-import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 import { encodeBase58 } from "@argent/x-shared"
-import { useRouteAccountAddress } from "../../../hooks/useRoute"
+import { useRouteAccountId } from "../../../hooks/useRoute"
 
 export const ExportPublicKeyScreen = () => {
   const onBack = useNavigateReturnToOrBack()
 
   const [publicKeyCopied, setPublicKeyCopied] = useState(false)
-  const accountAddress = useRouteAccountAddress()
-  const network = useCurrentNetwork()
+  const accountId = useRouteAccountId()
 
-  const baseAccount = useMemo(
-    () =>
-      accountAddress
-        ? {
-            address: accountAddress,
-            networkId: network.id,
-          }
-        : undefined,
-    [accountAddress, network.id],
-  )
-
-  const publicKey = usePublicKey(baseAccount)
+  const publicKey = usePublicKey(accountId)
 
   const encodedPublicKey = useMemo(() => {
     if (!publicKey) {
@@ -69,7 +56,9 @@ export const ExportPublicKeyScreen = () => {
           color={"accent-blue"}
           mb={4}
         >
-          <L2>Exporting public key does NOT give access to your funds.</L2>
+          <L2Bold>
+            Exporting public key does NOT give access to your funds.
+          </L2Bold>
         </Flex>
         <Center overflow={"hidden"} flexDirection={"column"} gap={6} px={6}>
           <QrCode
@@ -77,14 +66,14 @@ export const ExportPublicKeyScreen = () => {
             data={encodedPublicKey}
             data-key={encodedPublicKey}
           />
-          <P3
+          <P2
             aria-label="Public key"
             textAlign={"center"}
             fontWeight={"semibold"}
             w={"full"}
           >
             {encodedPublicKey}
-          </P3>
+          </P2>
         </Center>
         <Button
           mt={3}

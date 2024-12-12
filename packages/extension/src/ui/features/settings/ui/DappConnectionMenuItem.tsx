@@ -1,10 +1,8 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { DappIcon } from "../../actions/connectDapp/DappIcon"
-import { useDappDisplayAttributes } from "../../actions/connectDapp/useDappDisplayAttributes"
-import {
-  SettingsMenuItemRemove,
-  SettingsMenuItemRemoveProps,
-} from "./SettingsMenuItem"
+import { useDappDisplayAttributes } from "../../../services/knownDapps/useDappDisplayAttributes"
+import type { SettingsMenuItemRemoveProps } from "./SettingsMenuItem"
+import { SettingsMenuItemRemove } from "./SettingsMenuItem"
 
 interface DappConnectionMenuItemProps
   extends Omit<SettingsMenuItemRemoveProps, "title"> {

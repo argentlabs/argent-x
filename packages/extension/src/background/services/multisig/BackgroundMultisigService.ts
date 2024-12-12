@@ -4,17 +4,19 @@ import {
   decodeBase58,
   decodeBase58Array,
   estimatedFeeToMaxResourceBounds,
+  isEqualAddress,
   removeOwnersCalldataSchema,
   replaceSignerCalldataSchema,
   transferCalldataSchema,
 } from "@argent/x-shared"
-import { ArraySignatureType, CallData, TransactionType } from "starknet"
+import type { ArraySignatureType } from "starknet"
+import { CallData, TransactionType } from "starknet"
 import { tryToMintAllFeeTokens } from "../../../shared/devnet/mintFeeToken"
 import { AccountError } from "../../../shared/errors/account"
 import { MultisigError } from "../../../shared/errors/multisig"
 import { TransactionError } from "../../../shared/errors/transaction"
 import { MultisigAccount } from "../../../shared/multisig/account"
-import {
+import type {
   AddAccountPayload,
   AddOwnerMultisigPayload,
   MultisigSignerSignatures,
@@ -28,29 +30,32 @@ import {
   getMultisigPendingTransaction,
   removeFromMultisigPendingTransactions,
 } from "../../../shared/multisig/pendingTransactionsStore"
-import { AddAccountResponse } from "../../../shared/multisig/service/messaging/IMultisigService"
+import type { AddAccountResponse } from "../../../shared/multisig/service/messaging/IMultisigService"
+import type { PendingMultisig } from "../../../shared/multisig/types"
 import {
   MultisigEntryPointType,
   MultisigTransactionType,
-  PendingMultisig,
 } from "../../../shared/multisig/types"
 import {
   getMultisigAccountFromBaseWallet,
   getMultisigAccounts,
 } from "../../../shared/multisig/utils/baseMultisig"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
-import {
+import type {
   ExtendedFinalityStatus,
-  nameTransaction,
   TransactionRequest,
 } from "../../../shared/transactions"
+import { nameTransaction } from "../../../shared/transactions"
 import { addTransaction } from "../../../shared/transactions/store"
 import { getEstimatedFees } from "../../../shared/transactionSimulation/fees/estimatedFeesRepository"
-import { BaseWalletAccount, SignerType } from "../../../shared/wallet.model"
+import type {
+  BaseWalletAccount,
+  SignerType,
+} from "../../../shared/wallet.model"
 import { hexBigIntSort } from "../../utils/bigIntSort"
-import { Wallet } from "../../wallet"
-import { IBackgroundActionService } from "../action/IBackgroundActionService"
-import { IBackgroundMultisigService } from "./IBackgroundMultisigService"
+import type { Wallet } from "../../wallet"
+import type { IBackgroundActionService } from "../action/IBackgroundActionService"
+import type { IBackgroundMultisigService } from "./IBackgroundMultisigService"
 
 export default class BackgroundMultisigService
   implements IBackgroundMultisigService
@@ -69,6 +74,8 @@ export default class BackgroundMultisigService
       publicKey,
       updatedAt,
       signerType,
+      index,
+      derivationPath,
     } = payload
 
     const account = await this.wallet.newAccount(
@@ -81,6 +88,8 @@ export default class BackgroundMultisigService
         creator,
         publicKey,
         updatedAt,
+        index,
+        derivationPath,
       },
     )
     await tryToMintAllFeeTokens(account)
@@ -128,7 +137,7 @@ export default class BackgroundMultisigService
       },
       {
         title,
-        icon: "MultisigJoinIcon",
+        icon: "AddContactSecondaryIcon",
       },
     )
   }
@@ -170,7 +179,7 @@ export default class BackgroundMultisigService
       },
       {
         title,
-        icon: "MultisigRemoveIcon",
+        icon: "RemoveContactSecondaryIcon",
       },
     )
   }
@@ -228,7 +237,6 @@ export default class BackgroundMultisigService
   ): Promise<string> {
     const multisigStarknetAccount = await this.getMultisigStarknetAccount()
     const transactionToSign = await getMultisigPendingTransaction(requestId)
-
     if (!transactionToSign) {
       throw new MultisigError({
         code: "PENDING_MULTISIG_TRANSACTION_NOT_FOUND",
@@ -286,7 +294,7 @@ export default class BackgroundMultisigService
 
   async deploy(account: BaseWalletAccount): Promise<void> {
     let displayCalldata: string[] = []
-    const walletAccount = await this.wallet.getAccount(account)
+    const walletAccount = await this.wallet.getArgentAccount(account.id)
     if (!walletAccount) {
       throw new AccountError({ code: "MULTISIG_NOT_FOUND" })
     }
@@ -318,7 +326,7 @@ export default class BackgroundMultisigService
       },
       {
         title: "Activate multisig",
-        icon: "MultisigIcon",
+        icon: "MultisigSecondaryIcon",
       },
     )
   }
@@ -405,7 +413,7 @@ export default class BackgroundMultisigService
       },
       {
         title: "On-chain rejection",
-        icon: "CloseIcon",
+        icon: "CrossSecondaryIcon",
       },
     )
   }
@@ -417,8 +425,9 @@ export default class BackgroundMultisigService
       throw new AccountError({ code: "NOT_SELECTED" })
     }
 
-    const multisigStarknetAccount =
-      await this.wallet.getStarknetAccount(selectedAccount)
+    const multisigStarknetAccount = await this.wallet.getStarknetAccount(
+      selectedAccount.id,
+    )
 
     if (!MultisigAccount.isMultisig(multisigStarknetAccount)) {
       throw new AccountError({ code: "NOT_MULTISIG" })
@@ -470,6 +479,19 @@ export default class BackgroundMultisigService
     const multisig = await getMultisigAccountFromBaseWallet(selectedAccount)
 
     const acc = await this.getMultisigStarknetAccount()
+
+    // this can happen if the multisig owner was changed with ledger after the transaction was created
+    if (
+      !pendingMultisigTransaction.approvedSigners.find((signer) =>
+        isEqualAddress(signer, multisig?.publicKey),
+      )
+    ) {
+      throw new MultisigError({
+        code: "INVALID_SIGNER",
+        message:
+          "The signature of the transaction is not valid anymore - please reject this transaction and try again",
+      })
+    }
 
     const transaction = await acc.execute(
       pendingMultisigTransaction.transaction.calls,

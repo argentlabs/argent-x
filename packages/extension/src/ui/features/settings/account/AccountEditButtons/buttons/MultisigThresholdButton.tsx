@@ -1,14 +1,14 @@
-import { FC } from "react"
-import { Button, H6, iconsDeprecated } from "@argent/x-ui"
+import type { FC } from "react"
+import { Button, H5, icons } from "@argent/x-ui"
 import { routes } from "../../../../../../shared/ui/routes"
 import { useNavigate } from "react-router-dom"
 import { Flex } from "@chakra-ui/react"
 import { multisigView } from "../../../../multisig/multisig.state"
-import { Multisig } from "../../../../multisig/Multisig"
+import type { Multisig } from "../../../../multisig/Multisig"
 import { useView } from "../../../../../views/implementation/react"
-import { WalletAccount } from "../../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../../shared/wallet.model"
 
-const { ChevronRightIcon } = iconsDeprecated
+const { ChevronRightSecondaryIcon } = icons
 
 export const MultisigThresholdButtonContainer: FC<{
   account: WalletAccount
@@ -21,7 +21,7 @@ export const MultisigThresholdButtonContainer: FC<{
   }
 
   const onClick = () => {
-    navigate(routes.multisigConfirmations(account.address))
+    navigate(routes.multisigConfirmations(account.id))
   }
 
   return <MultisigThresholdButton onClick={onClick} multisig={multisig} />
@@ -40,21 +40,21 @@ export const MultisigThresholdButton: FC<MultisigThresholdButtonProps> = ({
     <Button
       onClick={onClick}
       width="full"
-      rightIcon={<ChevronRightIcon />}
+      rightIcon={<ChevronRightSecondaryIcon />}
       borderRadius="lg"
       p={4}
     >
       <Flex width="100%" justifyContent="space-between">
-        <H6>
+        <H5>
           {multisig.needsDeploy ? (
             <>View confirmations</>
           ) : (
             <>Set confirmations</>
           )}
-        </H6>
-        <H6 color="neutrals.200">
+        </H5>
+        <H5 color="neutrals.200">
           {multisig.threshold}/{multisig.signers.length}
-        </H6>
+        </H5>
       </Flex>
     </Button>
   )

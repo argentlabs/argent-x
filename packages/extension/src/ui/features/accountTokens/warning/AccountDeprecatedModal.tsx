@@ -1,23 +1,31 @@
 import {
-  iconsDeprecated,
-  Button,
-  NavigationContainer,
   BarCloseButton,
+  Button,
+  icons,
+  NavigationContainer,
   Warning,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { useCurrentPathnameWithQuery } from "../../../hooks/useRoute"
 import { routes } from "../../../../shared/ui/routes"
-import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
+import { useNavigateReturnToOr } from "../../../hooks/useNavigateReturnTo"
 import { selectedNetworkIdView } from "../../../views/network"
 import { useView } from "../../../views/implementation/react"
+import { clientAccountService } from "../../../services/account"
 
-const { ExpandIcon } = iconsDeprecated
+const { ExpandIcon } = icons
 
 export const AccountDeprecatedModal = () => {
-  const onBack = useNavigateReturnToOrBack()
+  const onBack = useNavigateReturnToOr(routes.accountTokens())
   const returnTo = useCurrentPathnameWithQuery()
+  const networkId = useView(selectedNetworkIdView)
+
+  const onClose = async () => {
+    await clientAccountService.autoSelectAccountOnNetwork(networkId)
+    onBack()
+  }
+
   const selectedNetworkId = useView(selectedNetworkIdView)
   const navigate = useNavigate()
   const navigateToHiddenAccounts = () => {
@@ -26,7 +34,7 @@ export const AccountDeprecatedModal = () => {
   return (
     <NavigationContainer
       isAbsolute
-      rightButton={<BarCloseButton onClick={onBack} />}
+      rightButton={<BarCloseButton onClick={onClose} />}
     >
       <Flex py={4} px={5} direction="column" flex={1}>
         <Warning

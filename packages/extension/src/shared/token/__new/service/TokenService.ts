@@ -1,42 +1,49 @@
-import {
+import type {
   ApiAccountTokenBalances,
+  ApiTokenInfo,
+  ApiTokensInfoResponse,
   IHttpService,
-  apiAccountTokenBalancesSchema,
+} from "@argent/x-shared"
+import {
+  apiPriceDataResponseSchema,
+  apiTokensInfoResponseSchema,
   bigDecimal,
   convertTokenAmountToCurrencyValue,
   ensureArray,
   isEqualAddress,
   stripAddressZeroPadding,
-  ApiTokenInfo,
-  ApiTokensInfoResponse,
-  apiTokensInfoResponseSchema,
-  apiPriceDataResponseSchema,
+  retryUntilInitialised,
+  apiAccountTokenBalancesSchema,
 } from "@argent/x-shared"
-import retry from "async-retry"
 import { groupBy, isEmpty, uniq } from "lodash-es"
-import { AllowArray, shortString, uint256 } from "starknet"
+import type { AllowArray } from "starknet"
+import { shortString, uint256 } from "starknet"
 import urlJoin from "url-join"
 import { ARGENT_API_BASE_URL } from "../../../api/constants"
 import { argentApiNetworkForNetwork } from "../../../api/headers"
 import { RefreshIntervalInSeconds } from "../../../config"
 import { TokenError } from "../../../errors/token"
-import { ArgentDatabase } from "../../../idb/db"
+import type { ArgentDatabase } from "../../../idb/db"
+import { chunkedBulkPut } from "../../../idb/utils/chunkedBulkPut"
 import { getMulticallForNetwork } from "../../../multicall"
-import { Network, defaultNetwork } from "../../../network"
+import type { Network } from "../../../network"
+import { defaultNetwork } from "../../../network"
 import { getProvider } from "../../../network/provider"
-import { INetworkService } from "../../../network/service/INetworkService"
+import type { INetworkService } from "../../../network/service/INetworkService"
 import { getDefaultNetworkId } from "../../../network/utils"
-import { SelectorFn } from "../../../storage/__new/interface"
-import { BaseWalletAccount } from "../../../wallet.model"
-import { BaseToken, BaseTokenSchema, Token } from "../types/token.model"
-import { BaseTokenWithBalance } from "../types/tokenBalance.model"
-import {
+import type { SelectorFn } from "../../../storage/__new/interface"
+import type { BaseWalletAccount } from "../../../wallet.model"
+import type { BaseToken, Token } from "../types/token.model"
+import { BaseTokenSchema } from "../types/token.model"
+import type { BaseTokenWithBalance } from "../types/tokenBalance.model"
+import type {
   TokenPriceDetails,
   TokenWithBalanceAndPrice,
 } from "../types/tokenPrice.model"
 import { equalToken } from "../utils"
-import { ITokenService } from "./ITokenService"
-import { chunkedBulkPut } from "../../../idb/chunkedBulkPut"
+import type { ITokenService, FetchedTokenDetails } from "./ITokenService"
+import type retry from "async-retry"
+import { decodeShortStringArray } from "../utils/decodeShortStringArray"
 
 /**
  * TokenService class implements ITokenService interface.
@@ -45,12 +52,15 @@ import { chunkedBulkPut } from "../../../idb/chunkedBulkPut"
 export class TokenService implements ITokenService {
   private readonly TOKENS_INFO_URL: string
   private readonly TOKENS_PRICES_URL: string
+  private readonly ARGENT_API_TOKENS_REPORT_SPAM_URL: string
+
   constructor(
     private readonly networkService: INetworkService,
     private readonly db: ArgentDatabase,
     private readonly httpService: IHttpService,
     TOKENS_INFO_URL: string | undefined,
     TOKENS_PRICES_URL: string | undefined,
+    ARGENT_API_TOKENS_REPORT_SPAM_URL: string | undefined,
   ) {
     if (!TOKENS_INFO_URL) {
       throw new TokenError({ code: "NO_TOKEN_API_URL" })
@@ -58,8 +68,12 @@ export class TokenService implements ITokenService {
     if (!TOKENS_PRICES_URL) {
       throw new TokenError({ code: "NO_TOKEN_PRICE_API_URL" })
     }
+    if (!ARGENT_API_TOKENS_REPORT_SPAM_URL) {
+      throw new TokenError({ code: "NO_TOKEN_REPORT_SPAM_API_URL" })
+    }
     this.TOKENS_INFO_URL = TOKENS_INFO_URL
     this.TOKENS_PRICES_URL = TOKENS_PRICES_URL
+    this.ARGENT_API_TOKENS_REPORT_SPAM_URL = ARGENT_API_TOKENS_REPORT_SPAM_URL
   }
 
   /**
@@ -84,6 +98,20 @@ export class TokenService implements ITokenService {
    */
   async removeToken(baseToken: BaseToken): Promise<void> {
     await this.db.tokens.filter((t) => equalToken(t, baseToken)).delete()
+  }
+
+  /**
+   * Hide a token in the token repository.
+   * @param {BaseToken} baseToken - The base token to remove.
+   */
+  async toggleHideToken(baseToken: BaseToken, hidden: boolean): Promise<void> {
+    const allTokens = await this.db.tokens.toArray()
+    const token = allTokens.find((t) => equalToken(t, baseToken))
+    if (!token) {
+      return
+    }
+    token.hidden = hidden
+    await this.updateTokens(token)
   }
 
   /**
@@ -357,17 +385,15 @@ export class TokenService implements ITokenService {
     }
 
     const network = await this.networkService.getById(baseToken.networkId)
-    let name: string, symbol: string, decimals: string
+    let name: string, symbol: string, decimals: number
 
     try {
       if (network.multicallAddress) {
-        ;[name, symbol, decimals] = await this.fetchTokenDetailsWithMulticall(
-          baseToken,
-          network,
-        )
+        ;({ name, symbol, decimals } =
+          await this.fetchTokenDetailsWithMulticall(baseToken, network))
       } else {
-        ;[name, symbol, decimals] =
-          await this.fetchTokenDetailsWithoutMulticall(baseToken, network)
+        ;({ name, symbol, decimals } =
+          await this.fetchTokenDetailsWithoutMulticall(baseToken, network))
       }
     } catch (error) {
       console.error(error)
@@ -377,28 +403,41 @@ export class TokenService implements ITokenService {
       })
     }
 
-    if (Number.parseInt(decimals) > Number.MAX_SAFE_INTEGER) {
+    if (decimals > Number.MAX_SAFE_INTEGER) {
       throw new TokenError({
         code: "UNSAFE_DECIMALS",
         options: { context: { decimals } },
       })
     }
 
-    return {
+    console.log("decimals", [name, symbol, decimals])
+
+    const fetchedToken = {
       address: baseToken.address,
       networkId: baseToken.networkId,
-      name: shortString.decodeShortString(name),
-      symbol: shortString.decodeShortString(symbol),
-      decimals: Number.parseInt(decimals),
+      name,
+      symbol,
+      decimals,
       custom: true,
     }
+
+    return fetchedToken
+  }
+
+  decodeFetchedTokenDetailsResponse(response: string[][]): FetchedTokenDetails {
+    const res = {
+      name: decodeShortStringArray(response[0]),
+      symbol: decodeShortStringArray(response[1]),
+      decimals: Number.parseInt(response[2][0]),
+    }
+    return res
   }
 
   async fetchTokenDetailsWithMulticall(
     baseToken: BaseToken,
     network: Network,
     tokenEntryPoints = ["name", "symbol", "decimals"],
-  ): Promise<string[]> {
+  ): Promise<FetchedTokenDetails> {
     const multicall = getMulticallForNetwork(network)
     const responses = await Promise.all(
       tokenEntryPoints.map((entrypoint) =>
@@ -408,14 +447,14 @@ export class TokenService implements ITokenService {
         }),
       ),
     )
-    return responses.map((response) => response[0])
+    return this.decodeFetchedTokenDetailsResponse(responses)
   }
 
   async fetchTokenDetailsWithoutMulticall(
     baseToken: BaseToken,
     network: Network,
     tokenEntryPoints = ["name", "symbol", "decimals"],
-  ): Promise<string[]> {
+  ): Promise<FetchedTokenDetails> {
     const provider = getProvider(network)
     const responses = await Promise.all(
       tokenEntryPoints.map((entrypoint) =>
@@ -425,7 +464,7 @@ export class TokenService implements ITokenService {
         }),
       ),
     )
-    return responses.map((response) => response[0])
+    return this.decodeFetchedTokenDetailsResponse(responses)
   }
 
   async getToken(baseToken: BaseToken): Promise<Token | undefined> {
@@ -455,8 +494,8 @@ export class TokenService implements ITokenService {
    * @param {Token[]} tokens - The tokens.
    * @returns {Promise<BaseTokenWithBalance[]>} - The fetched token balances.
    */
-  async getTokenBalancesForAccount(
-    account: BaseWalletAccount,
+  async getAllTokenBalancesForAccount(
+    account: Omit<BaseWalletAccount, "id">,
     tokens: Token[],
   ): Promise<BaseTokenWithBalance[]> {
     const allTokenBalances = await this.db.tokenBalances.toArray()
@@ -470,6 +509,19 @@ export class TokenService implements ITokenService {
     return tokenBalances
   }
 
+  async getTokenBalanceForAccount(
+    account: Omit<BaseWalletAccount, "id">, // token balances are unique by address and network
+    token: Token,
+  ): Promise<BaseTokenWithBalance | undefined> {
+    const allTokenBalances = await this.db.tokenBalances.toArray()
+    const tokenBalance = allTokenBalances.find(
+      (t) =>
+        t.networkId === account.networkId &&
+        isEqualAddress(t.account, account.address) &&
+        equalToken(t, token),
+    )
+    return tokenBalance
+  }
   /**
    * Get currency value for tokens.
    * @param {BaseTokenWithBalance[]} tokensWithBalances - The tokens with balances.
@@ -602,34 +654,17 @@ export class TokenService implements ITokenService {
     )
 
     /** retry until status is "initialised" */
-    const accountTokenBalances = await retry(
-      async (bail) => {
-        let response
-        try {
-          response = await this.httpService.get<ApiAccountTokenBalances>(url)
-        } catch (e) {
-          /** bail without retry if there is any fetching error */
-          bail(new Error("Error fetching"))
-          return []
-        }
-        const parsedRespose = apiAccountTokenBalancesSchema.safeParse(response)
-        if (!parsedRespose.success) {
-          bail(new Error("Error parsing response"))
-          return []
-        }
-        if (parsedRespose.data.status !== "initialised") {
-          /** causes a retry */
-          throw new Error("Not initialised yet")
-        }
-        return parsedRespose.data.balances
-      },
-      {
-        /** seems to take 5-10 sec for initialised state */
-        retries: 5,
-        minTimeout: 5000,
-        ...opts,
-      },
-    )
+    const accountTokenBalancesResult =
+      await retryUntilInitialised<ApiAccountTokenBalances>(
+        () => this.httpService.get(url),
+        apiAccountTokenBalancesSchema,
+        opts,
+      )
+
+    const accountTokenBalances =
+      accountTokenBalancesResult?.status === "initialised"
+        ? accountTokenBalancesResult.balances
+        : []
 
     const baseTokenWithBalances: BaseTokenWithBalance[] =
       accountTokenBalances.map((accountTokenBalance) => {
@@ -642,5 +677,29 @@ export class TokenService implements ITokenService {
       })
 
     return baseTokenWithBalances
+  }
+
+  async reportSpamToken(
+    token: BaseToken,
+    account: BaseWalletAccount,
+  ): Promise<void> {
+    try {
+      await this.httpService.post(this.ARGENT_API_TOKENS_REPORT_SPAM_URL, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tokenAddress: token.address,
+          reporterAddress: account.address,
+        }),
+      })
+    } catch {
+      console.error("Error while reporting spam token")
+    }
+  }
+
+  async getTokenInfo(token: BaseToken): Promise<Token | undefined> {
+    const allTokensInfo = await this.db.tokensInfo.toArray()
+    return allTokensInfo.find((t) => equalToken(t, token))
   }
 }

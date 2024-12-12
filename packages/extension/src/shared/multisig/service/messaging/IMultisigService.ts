@@ -1,4 +1,4 @@
-import {
+import type {
   AddAccountPayload,
   AddOwnerMultisigPayload,
   MultisigSignerSignatures,
@@ -6,12 +6,12 @@ import {
   ReplaceOwnerMultisigPayload,
   UpdateMultisigThresholdPayload,
 } from "../../multisig.model"
-import {
+import type {
   BaseWalletAccount,
   SignerType,
   WalletAccount,
 } from "../../../wallet.model"
-import { PendingMultisig } from "../../types"
+import type { PendingMultisig } from "../../types"
 
 export interface AddAccountResponse {
   account: WalletAccount

@@ -1,13 +1,9 @@
-import { BarBackButton, H4, NavigationContainer, P3 } from "@argent/x-ui"
+import { BarBackButton, H3, NavigationContainer, P2 } from "@argent/x-ui"
 import { Box, Divider } from "@chakra-ui/react"
 import { useMemo } from "react"
 
-import {
-  Address,
-  ensureArray,
-  isEqualAddress,
-  pluralise,
-} from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
+import { ensureArray, isEqualAddress, pluralise } from "@argent/x-shared"
 import { Navigate } from "react-router-dom"
 import { transformTransaction } from "../../../shared/activity/utils/transform"
 import { getTransactionFromPendingMultisigTransaction } from "../../../shared/activity/utils/transform/transaction/transformers/pendingMultisigTransactionAdapter"
@@ -19,7 +15,7 @@ import {
 } from "../../hooks/useRoute"
 import { activityForTransactionHashView } from "../../views/activityCache"
 import { useView } from "../../views/implementation/react"
-import { Multisig } from "./Multisig"
+import type { Multisig } from "./Multisig"
 import { multisigView } from "./multisig.state"
 import { MultisigTransactionConfirmationsScreen } from "./MultisigTransactionConfirmationsScreen"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
@@ -112,9 +108,9 @@ export const MultisigTransactionConfirmationsScreenContainer = () => {
     >
       <Box p={4}>
         {isPendingTx ? (
-          <H4>Waiting for confirmations...</H4>
+          <H3>Waiting for confirmations...</H3>
         ) : (
-          <H4>{signers.approvedSigners.length} Confirmations</H4>
+          <H3>{signers.approvedSigners.length} Confirmations</H3>
         )}
         {selectedAccount && (
           <TransactionConfirmationsScreenSubtitle
@@ -147,11 +143,11 @@ const TransactionConfirmationsScreenSubtitle = ({
     if (isPendingTx) {
       if (multisig?.threshold) {
         const missingConfirmations = multisig?.threshold - approvedSignersLength
-        return `${missingConfirmations} more ${pluralise(missingConfirmations, "confirmation")} required`
+        return `${pluralise(missingConfirmations, "more confirmation")} required`
       }
     } else {
       return "No more confirmations required"
     }
   }, [approvedSignersLength, isPendingTx, multisig?.threshold])
-  return <P3>{missingConfirmationsMessage}</P3>
+  return <P2>{missingConfirmationsMessage}</P2>
 }

@@ -1,20 +1,21 @@
-import { P4, iconsDeprecated } from "@argent/x-ui"
+import { icons, P3 } from "@argent/x-ui"
 import { Button, Flex, Link } from "@chakra-ui/react"
-import { FC, MouseEventHandler } from "react"
+import type { FC, MouseEventHandler } from "react"
 
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import { ARGENT_X_LEGAL_PRIVACY_POLICY_URL } from "../../../shared/api/constants"
+import { OnboardingButton } from "./ui/OnboardingButton"
 
-const { TickIcon } = iconsDeprecated
+const { CheckmarkSecondaryIcon } = icons
 
-interface OnboardingStartScreenProps {
+interface OnboardingPrivacyScreenProps {
   onAccept: MouseEventHandler
   onRefuse: MouseEventHandler
   onBack: () => void
   length?: number
 }
 
-export const PrivacyScreen: FC<OnboardingStartScreenProps> = ({
+export const OnboardingPrivacyScreen: FC<OnboardingPrivacyScreenProps> = ({
   onAccept,
   onRefuse,
   onBack,
@@ -22,8 +23,9 @@ export const PrivacyScreen: FC<OnboardingStartScreenProps> = ({
 }) => {
   return (
     <OnboardingScreen
-      length={length ?? 5} // there are 5 steps in the onboarding process
-      currentIndex={1} // this is the second step
+      length={length ?? 5}
+      currentIndex={1}
+      illustration={"improve"}
       title="Help us improve Argent X"
       subtitle="Argent would like to track anonymous usage data to help identify issues, prioritise features and build a better product without compromising your privacy"
       onBack={onBack}
@@ -31,24 +33,24 @@ export const PrivacyScreen: FC<OnboardingStartScreenProps> = ({
       <Flex
         alignItems={"start"}
         p={4}
-        rounded={"lg"}
+        rounded={"xl"}
         border="1px solid #404040"
         direction="column"
         pr={20}
         mb={8}
       >
-        <P4 display="flex" alignItems="center" my={1}>
-          <TickIcon color="success.500" mr={2} />
+        <P3 display="flex" alignItems="center" my={1}>
+          <CheckmarkSecondaryIcon color="success.500" mr={2} />
           Opt-out at any time via settings
-        </P4>
-        <P4 display="flex" alignItems="center" my={1}>
-          <TickIcon color="success.500" mr={2} />
+        </P3>
+        <P3 display="flex" alignItems="center" my={1}>
+          <CheckmarkSecondaryIcon color="success.500" mr={2} />
           Send anonymized clicks and pageview events
-        </P4>
-        <P4 display="flex" alignItems="center" my={1}>
-          <TickIcon color="success.500" mr={2} />
+        </P3>
+        <P3 display="flex" alignItems="center" my={1}>
+          <CheckmarkSecondaryIcon color="success.500" mr={2} />
           We never sell your data!
-        </P4>
+        </P3>
       </Flex>
       <Link
         href={ARGENT_X_LEGAL_PRIVACY_POLICY_URL}
@@ -57,19 +59,17 @@ export const PrivacyScreen: FC<OnboardingStartScreenProps> = ({
       >
         Privacy Policy
       </Link>
-      <Flex mt={8}>
-        <Button px={8} mr={4} maxW="160" onClick={onRefuse}>
+      <Flex mt={15}>
+        <Button px={8} mr={4} onClick={onRefuse}>
           No thanks
         </Button>
-        <Button
+        <OnboardingButton
           data-testid="agree-button"
-          px={8}
-          maxW="160"
           onClick={onAccept}
           colorScheme="primary"
         >
           I agree
-        </Button>
+        </OnboardingButton>
       </Flex>
     </OnboardingScreen>
   )

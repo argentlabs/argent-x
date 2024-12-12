@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react"
 
 import { multisigService } from "../../../services/multisig"
-import { SignerType } from "../../../../shared/wallet.model"
+import type { SignerType } from "../../../../shared/wallet.model"
 
 export function useCreatePendingMultisig() {
   const [isError, setIsError] = useState(false)
@@ -12,7 +12,7 @@ export function useCreatePendingMultisig() {
       try {
         setLoading(true)
         return await multisigService.addPendingAccount(networkId, signerType)
-      } catch (error) {
+      } catch {
         setIsError(true)
       } finally {
         setLoading(false)

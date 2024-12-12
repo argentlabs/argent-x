@@ -1,7 +1,8 @@
-import { TokenMessage } from "../shared/messages/TokenMessage"
+import type { TokenMessage } from "../shared/messages/TokenMessage"
 import { defaultNetwork } from "../shared/network"
 import { tokenService } from "../shared/token/__new/service"
-import { HandleMessage, UnhandledMessage } from "./background"
+import type { HandleMessage } from "./background"
+import { UnhandledMessage } from "./background"
 
 export const handleTokenMessaging: HandleMessage<TokenMessage> = async ({
   msg,

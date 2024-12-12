@@ -1,10 +1,11 @@
 import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
-import { PendingMultisig } from "../../../shared/multisig/types"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { PendingMultisig } from "../../../shared/multisig/types"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { PendingMultisigListItem } from "../multisig/PendingMultisigListItem"
 import { AccountListItem } from "./AccountListItem"
+import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
 
 interface AccountListHiddenScreenProps {
   onBack: ReactEventHandler
@@ -32,18 +33,26 @@ export const AccountListHiddenScreen: FC<AccountListHiddenScreenProps> = ({
       <CellStack>
         {accounts.map((account) => (
           <AccountListItem
-            key={account.address}
+            key={account.id}
+            accountId={account.id}
             accountName={account.name}
             accountAddress={account.address}
             networkId={account.networkId}
             hidden={account.hidden ?? false}
             onClick={() => onToggleHiddenAccount(account, !account.hidden)}
-            showRightElements={true}
+            showRightElements
+            isLedger={account.signer.type === "ledger"}
+            isSmartAccount={account.type === "smart"}
           />
         ))}
         {pendingMultisigAccounts.map((pendingMultisig) => (
           <PendingMultisigListItem
             key={pendingMultisig.publicKey}
+            accountId={getAccountIdentifier(
+              pendingMultisig.publicKey,
+              pendingMultisig.networkId,
+              pendingMultisig.signer,
+            )}
             accountName={pendingMultisig.name}
             publicKey={pendingMultisig.publicKey}
             networkId={pendingMultisig.networkId}

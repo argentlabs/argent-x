@@ -1,6 +1,6 @@
-import { AddSmartAccountRequest } from "@argent/x-shared"
-import { Flow } from "../../../shared/argentAccount/schema"
-import { messageClient } from "../trpc"
+import type { AddSmartAccountRequest } from "@argent/x-shared"
+import type { Flow } from "../../../shared/argentAccount/schema"
+import type { messageClient } from "../trpc"
 import type { IClientArgentAccountService } from "./IClientArgentAccountService"
 
 export class ClientArgentAccountService implements IClientArgentAccountService {

@@ -1,13 +1,13 @@
+import type { AddressOrDomain } from "@argent/x-shared"
 import {
-  AddressOrDomain,
   normalizeAddress,
   formatTruncatedAddress,
   isValidAddress,
-  getAccountIdentifier,
   isStarknetDomainName,
 } from "@argent/x-shared"
-import { iconsDeprecated } from "@argent/x-ui"
-import { FC, ReactNode, useEffect, useMemo, useState } from "react"
+import { icons } from "@argent/x-ui"
+import type { FC, ReactNode } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { AccountListItem } from "../accounts/AccountListItem"
 import { AccountListItemWithBalance } from "../accounts/AccountListItemWithBalance"
@@ -16,7 +16,7 @@ import { useGetAddressFromDomainName } from "../send/useGetAddressFromDomainName
 import { useView } from "../../views/implementation/react"
 import { selectedNetworkIdView } from "../../views/network"
 
-const { WalletIcon } = iconsDeprecated
+const { WalletSecondaryIcon } = icons
 
 interface AccountAddressListItemProps {
   accountAddress: AddressOrDomain
@@ -81,14 +81,14 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
   ])
 
   if (account) {
-    const key = getAccountIdentifier(account)
     return (
       <AccountListItemWithBalance
-        key={key}
+        key={account.id}
         account={account}
         avatarSize={9}
         accountAddress={account.address}
         networkId={account.networkId}
+        accountId={account.id}
         accountName={account.name}
         onClick={onClick}
         isSmartAccount={account.type === "smart"}
@@ -98,13 +98,13 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
   }
 
   if (contact) {
-    const key = getAccountIdentifier(contact)
     return (
       <AccountListItem
-        key={key}
+        key={contact.id}
         avatarSize={9}
         accountAddress={contact.address}
         networkId={contact.networkId}
+        accountId={contact.id}
         accountName={contact.name}
         onClick={onClick}
       />
@@ -117,8 +117,9 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
       accountAddress=""
       accountDescription={accountDescription}
       networkId={selectedNetworkId}
+      accountId={`${accountAddress}-${selectedNetworkId}`}
       avatarSize={9}
-      avatarIcon={<WalletIcon />}
+      avatarIcon={<WalletSecondaryIcon />}
       onClick={onClick}
     >
       {fallbackAccessory}

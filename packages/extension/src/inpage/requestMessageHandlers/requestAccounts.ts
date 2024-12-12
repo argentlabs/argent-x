@@ -1,4 +1,4 @@
-import { RequestAccountsParameters } from "@starknet-io/types-js"
+import type { RequestAccountsParameters } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
 
 export async function requestAccountsHandler(

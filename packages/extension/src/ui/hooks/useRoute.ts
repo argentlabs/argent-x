@@ -1,6 +1,8 @@
 import { useLocation, useParams } from "react-router-dom"
 import { flowSchema } from "../../shared/argentAccount/schema"
 import { useQuery } from "./useQuery"
+import { addressSchema } from "@argent/x-shared"
+import { routes } from "../../shared/ui/routes"
 
 /** TODO: refactor: move hooks into /hooks folder in individual files */
 /** hook to get the `returnTo` query parameter */
@@ -13,6 +15,11 @@ export const useReturnTo = () => {
 export const useRouteAccountAddress = () => {
   const { accountAddress } = useParams()
   return accountAddress
+}
+
+export const useRouteAccountId = () => {
+  const { accountId } = useParams()
+  return accountId
 }
 
 export const useRouteFlow = () => {
@@ -44,9 +51,29 @@ export const useRouteTransactionType = () => {
   return transactionType
 }
 
-/** makes a returnTo parameter that captures current page location including query */
+export const useRouteTokenAddress = () => {
+  const { tokenAddress } = useParams()
+  return addressSchema.safeParse(tokenAddress).data
+}
+
+export const useRouteInvestmentPositionId = () => {
+  const { investmentPositionId } = useParams()
+  return investmentPositionId
+}
+
+export const useRouteInvestmentId = () => {
+  const { investmentId } = useParams()
+  return investmentId
+}
+
+/** makes a returnTo parameter that captures current page location including query and hash */
 
 export const useCurrentPathnameWithQuery = () => {
   const location = useLocation()
-  return `${location.pathname}${location.search}`
+  return `${location.pathname}${location.search}${location.hash}`
+}
+
+export const useRouteAccountDefi = () => {
+  const route = routes.accountTokens()
+  return `${route}#defi`
 }

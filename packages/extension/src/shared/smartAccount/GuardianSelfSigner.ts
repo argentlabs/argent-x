@@ -1,12 +1,12 @@
-import {
+import type {
   Call,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
-  stark,
 } from "starknet"
-import { TypedData } from "starknet"
+import { stark } from "starknet"
+import type { TypedData } from "starknet"
 import { ArgentSigner } from "../signer/ArgentSigner"
 
 /**

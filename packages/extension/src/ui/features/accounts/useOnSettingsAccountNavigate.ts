@@ -1,4 +1,4 @@
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { useOnSettingsNavigate } from "./useOnSettingsNavigate"
 
 export const useOnSettingsAccountNavigate = (account?: WalletAccount) => {

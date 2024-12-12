@@ -1,15 +1,15 @@
 import { differenceWith } from "lodash-es"
 
 import { ArrayStorage } from "../storage"
-import { StorageChange } from "../storage/types"
-import {
+import type { StorageChange } from "../storage/types"
+import type {
   Transaction,
   TransactionRequest,
   ExtendedTransactionStatus,
-  compareTransactions,
 } from "../transactions"
+import { compareTransactions } from "../transactions"
 import { adaptArrayStorage } from "../storage/__new/repository"
-import { IRepository } from "../storage/__new/interface"
+import type { IRepository } from "../storage/__new/interface"
 import { checkTransactionHash, getTransactionStatus } from "./utils"
 
 /**

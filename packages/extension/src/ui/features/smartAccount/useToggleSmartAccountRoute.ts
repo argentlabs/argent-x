@@ -6,7 +6,7 @@ import { routes } from "../../../shared/ui/routes"
 import { useToast } from "@argent/x-ui"
 import { useSmartAccountVerifiedEmail } from "./useSmartAccountVerifiedEmail"
 import { useNavigate } from "react-router-dom"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 export const useToggleSmartAccountRoute = () => {
   const verifiedEmail = useSmartAccountVerifiedEmail()
@@ -28,14 +28,14 @@ export const useToggleSmartAccountRoute = () => {
             if (account?.address) {
               navigate(
                 routes.smartAccountOTP(
-                  account?.address,
+                  account.id,
                   verifiedEmail,
                   "toggleSmartAccount",
                 ),
               )
             }
           } else {
-            navigate(routes.smartAccountAction(account?.address))
+            navigate(routes.smartAccountAction(account?.id))
           }
         } catch {
           toast({
@@ -47,9 +47,7 @@ export const useToggleSmartAccountRoute = () => {
           setIsLoading(false)
         }
       } else {
-        navigate(
-          routes.argentAccountEmail(account?.address, "toggleSmartAccount"),
-        )
+        navigate(routes.argentAccountEmail(account?.id, "toggleSmartAccount"))
       }
     },
     [navigate, toast, verifiedEmail],

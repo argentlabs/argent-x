@@ -1,8 +1,7 @@
-import {
-  ITransactionReviewWarning,
-  transactionReviewWarningSchema,
-} from "@argent/x-shared"
-import { FC, useMemo } from "react"
+import type { ITransactionReviewWarning } from "@argent/x-shared"
+import { transactionReviewWarningSchema } from "@argent/x-shared"
+import type { FC } from "react"
+import { useMemo } from "react"
 
 import {
   WarningModal,
@@ -18,6 +17,7 @@ const isITransactionReviewWarning = (
   return parsedWarningSchema.success
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface WarningModalContainerProps
   extends Omit<WarningModalProps, "warningsByReason" | "title"> {}
 

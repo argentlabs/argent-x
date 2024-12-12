@@ -1,15 +1,30 @@
+import type { Mocked } from "vitest"
 import { mockChainService } from "../../../chain/service/__test__/mock"
 import { MockFnRepository } from "../../../storage/__new/__test__/mockFunctionImplementation"
 import type { BaseWalletAccount, WalletAccount } from "../../../wallet.model"
 import { AccountService } from "./AccountService"
+import type { IPKManager } from "../../../accountImport/pkManager/IPKManager"
+import { emitterMock } from "../../../test.utils"
 
 describe("AccountService", () => {
   let accountRepo: MockFnRepository<WalletAccount>
   let accountService: AccountService
 
+  let mockPkManager: Mocked<IPKManager>
+
   beforeEach(() => {
     accountRepo = new MockFnRepository()
-    accountService = new AccountService(mockChainService, accountRepo)
+    mockPkManager = {
+      storeEncryptedKey: vi.fn(),
+      retrieveDecryptedKey: vi.fn(),
+      removeKey: vi.fn(),
+    } as Mocked<IPKManager>
+    accountService = new AccountService(
+      emitterMock,
+      mockChainService,
+      accountRepo,
+      mockPkManager,
+    )
   })
 
   describe("get", () => {
@@ -40,10 +55,13 @@ describe("AccountService", () => {
   describe("remove", () => {
     it("should remove accounts from the accountRepo", async () => {
       const baseAccount: BaseWalletAccount = {
+        id: "0x123-0x1-local_secret",
         address: "0x123",
         networkId: "0x1",
       }
-      await accountService.remove(baseAccount)
+
+      accountRepo.get.mockResolvedValue([baseAccount])
+      await accountService.removeById(baseAccount.id)
 
       expect(accountRepo.remove).toHaveBeenCalled()
     })
@@ -52,6 +70,7 @@ describe("AccountService", () => {
   describe("getDeployed", () => {
     it("should return mock value", async () => {
       const result = await accountService.getDeployed({
+        id: "0x123-0x1-local_secret",
         address: "0x123",
         networkId: "0x1",
       })

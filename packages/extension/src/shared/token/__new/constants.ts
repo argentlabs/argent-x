@@ -1,5 +1,5 @@
 import { constants } from "starknet"
-import { BaseToken } from "./types/token.model"
+import type { BaseToken } from "./types/token.model"
 
 export const ETH: Record<string, BaseToken> = {
   [constants.StarknetChainId.SN_MAIN]: {

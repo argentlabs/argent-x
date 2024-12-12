@@ -1,8 +1,10 @@
-import { differenceWith, isEqual, isFunction } from "lodash-es"
+import { isArray, isEqual, isFunction, partition } from "lodash-es"
 
-import { ObjectStorage, ObjectStorageOptions } from "./object"
-import { StorageOptionsOrNameSpace, getOptionsWithDefaults } from "./options"
-import {
+import type { ObjectStorageOptions } from "./object"
+import { ObjectStorage } from "./object"
+import type { StorageOptionsOrNameSpace } from "./options"
+import { getOptionsWithDefaults } from "./options"
+import type {
   AllowArray,
   AllowPromise,
   AreaName,
@@ -97,14 +99,17 @@ export class ArrayStorage<T> implements IArrayStorage<T> {
    */
   public async remove(value: AllowArray<T> | SelectorFn<T>): Promise<T[]> {
     const all = await this.get()
-    const valuesToRemove = isFunction(value)
-      ? await this.get(value)
-      : Array.isArray(value)
-        ? value
-        : [value]
-    const newAll = differenceWith(all, valuesToRemove, this.compare)
-    await this.storageImplementation.set(newAll)
-    return valuesToRemove
+    const compareFn = this.compare.bind(this)
+
+    const selector = isFunction(value)
+      ? (item: T) => !value(item)
+      : isArray(value)
+        ? (item: T) => !value.some((v) => compareFn(v, item))
+        : (item: T) => !compareFn(value, item)
+
+    const [keptValues, removedValues] = partition(all, selector)
+    await this.storageImplementation.set(keptValues)
+    return removedValues
   }
 
   public subscribe(

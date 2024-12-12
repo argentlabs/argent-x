@@ -2,9 +2,8 @@ import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { afterEach, describe, expect, test, vi } from "vitest"
 
+import type { Fetcher, FetcherError } from "../src/shared/api/fetcher"
 import {
-  Fetcher,
-  FetcherError,
   fetcher,
   fetcherWithArgentApiHeadersForNetwork,
 } from "../src/shared/api/fetcher"
@@ -106,7 +105,9 @@ describe("fetcher", () => {
 
     describe("when no options set", () => {
       test("should provide the expected API headers to underlying fetcher", async () => {
-        expect(fetcherWithArgentApiHeaders("/foo/bar")).resolves.toEqual("foo")
+        await expect(fetcherWithArgentApiHeaders("/foo/bar")).resolves.toEqual(
+          "foo",
+        )
         expect(fetcher).toHaveBeenLastCalledWith("/foo/bar", {
           headers: {
             "argent-version": MOCK_VERSION,
@@ -118,7 +119,7 @@ describe("fetcher", () => {
     })
     describe("when options set", () => {
       test("should provide the expected API headers to underlying fetcher", async () => {
-        expect(
+        await expect(
           fetcherWithArgentApiHeaders("/foo/bar", {
             method: "POST",
             headers: {

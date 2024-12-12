@@ -2,8 +2,8 @@ import {
   BarCloseButton,
   CellStack,
   Empty,
+  icons,
   NavigationContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import {
   Input,
@@ -15,7 +15,7 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
@@ -29,7 +29,7 @@ import { useSendQuery } from "./useSendQuery"
 import { useFilteredCollections } from "./useFilteredCollections"
 import { useFilteredTokens } from "./useFilteredTokens"
 
-const { SearchIcon, WalletIcon, NftIcon } = iconsDeprecated
+const { SearchPrimaryIcon, WalletSecondaryIcon, NftIcon } = icons
 
 export const SendAssetScreen: FC = () => {
   const { recipientAddress, tokenId, amount, returnTo } = useSendQuery()
@@ -63,7 +63,7 @@ export const SendAssetScreen: FC = () => {
       <CellStack pt={0} flex={1}>
         <InputGroup size="sm">
           <InputLeftElement pointerEvents="none">
-            <SearchIcon />
+            <SearchPrimaryIcon />
           </InputLeftElement>
           <Input
             {...rest}
@@ -111,7 +111,9 @@ export const SendAssetScreen: FC = () => {
                 </CellStack>
               ) : (
                 <Empty
-                  icon={hasQuery ? <SearchIcon /> : <WalletIcon />}
+                  icon={
+                    hasQuery ? <SearchPrimaryIcon /> : <WalletSecondaryIcon />
+                  }
                   title={hasQuery ? `No matching tokens` : `No tokens`}
                 />
               )}
@@ -119,7 +121,7 @@ export const SendAssetScreen: FC = () => {
             <TabPanel flex={1} display={"flex"} flexDirection={"column"}>
               {hasCollections ? (
                 <AccountCollections
-                  networkId={account.networkId}
+                  account={account}
                   collections={filteredCollections}
                   px={0}
                   pt={2}
@@ -135,7 +137,7 @@ export const SendAssetScreen: FC = () => {
                 />
               ) : (
                 <Empty
-                  icon={hasQuery ? <SearchIcon /> : <NftIcon />}
+                  icon={hasQuery ? <SearchPrimaryIcon /> : <NftIcon />}
                   title={hasQuery ? `No matching NFTs` : `No NFTs`}
                 />
               )}

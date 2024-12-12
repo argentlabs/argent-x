@@ -1,15 +1,15 @@
+import type { NftItem } from "@argent/x-shared"
 import {
-  NftItem,
   formatAddress,
   getUint256CalldataFromBN,
   isAddress,
 } from "@argent/x-shared"
 import { CallData } from "starknet"
 
-import { messageClient } from "../trpc"
-import { Network } from "../../../shared/network"
-import { IClientNftService } from "./IClientNftService"
-import { IClientStarknetAddressService } from "../address/IClientStarknetAddressService"
+import type { messageClient } from "../trpc"
+import type { Network } from "../../../shared/network"
+import type { IClientNftService } from "./IClientNftService"
+import type { IClientStarknetAddressService } from "../address/IClientStarknetAddressService"
 
 export class ClientNftService implements IClientNftService {
   constructor(

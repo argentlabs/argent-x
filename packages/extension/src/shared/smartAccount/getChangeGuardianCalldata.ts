@@ -13,7 +13,7 @@ import {
   num,
 } from "starknet"
 
-import { WalletAccount } from "../wallet.model"
+import type { WalletAccount } from "../wallet.model"
 
 export const getChangeGuardianCalldataForAccount = ({
   account,

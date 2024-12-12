@@ -1,27 +1,67 @@
-import { Address } from "@argent/x-shared"
+import { addressSchema, type Address } from "@argent/x-shared"
 import {
-  Alert,
+  B2,
   BarBackButton,
   Button,
   CellStack,
+  H3,
   HeaderCell,
+  icons,
+  ModalBottomDialog,
   NavigationContainer,
-  iconsDeprecated,
+  P2,
+  useToast,
 } from "@argent/x-ui"
-import { Flex, FormControl } from "@chakra-ui/react"
+import { Box, Center, Flex, FormControl, useDisclosure } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC, ReactNode, useEffect, useMemo } from "react"
+import type { FC, ReactNode } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import type { z } from "zod"
 
-import { ControlledInput } from "../../components/ControlledInput"
-import {
-  RequestToken,
-  RequestTokenSchema,
-} from "../../../shared/token/__new/types/token.model"
 import { ampli } from "../../../shared/analytics"
+import type { RequestToken } from "../../../shared/token/__new/types/token.model"
+import { RequestTokenSchema } from "../../../shared/token/__new/types/token.model"
+import { ControlledInput } from "../../components/ControlledInput"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
+
+interface ScamWarningModalProps {
+  onClose: () => void
+  onContinue: () => void
+  isOpen: boolean
+}
+
+export const ScamWarningDialog: FC<ScamWarningModalProps> = ({
+  isOpen,
+  onClose,
+  onContinue,
+}) => {
+  return (
+    <ModalBottomDialog isOpen={isOpen} onClose={onClose}>
+      <Center flexDirection="column" textAlign="center">
+        <Box mb="4">
+          <WarningCircleSecondaryIcon
+            h="40.5px"
+            w="40.5px"
+            color="primary.red.400"
+          />
+        </Box>
+        <H3 mb="2">Spam token identified</H3>
+        <Box pb="6" textAlign="center">
+          <P2 color="deprecated.neutrals.300">
+            The token you are adding has been identified by Argent as a spam
+            token
+          </P2>
+        </Box>
+
+        <Button w="full" bg="deprecated.neutrals.700" onClick={onContinue}>
+          <B2>Add this token</B2>
+        </Button>
+      </Center>
+    </ModalBottomDialog>
+  )
+}
 
 export const AddTokenScreenSchema = RequestTokenSchema.omit({
   networkId: true,
@@ -38,6 +78,8 @@ interface AddTokenScreenProps {
   onTokenAddressChange: (address: Address) => void
   isLoading: boolean
   isExistingToken: boolean
+  isHiddenToken?: boolean
+  isSpamToken?: boolean
   footer?: ReactNode
 }
 
@@ -50,6 +92,8 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   onTokenAddressChange,
   isLoading,
   isExistingToken,
+  isHiddenToken,
+  isSpamToken,
   footer,
 }) => {
   const {
@@ -64,6 +108,14 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     resolver: zodResolver(AddTokenScreenSchema),
   })
 
+  const toast = useToast()
+
+  const {
+    isOpen: isScamWarningModalOpen,
+    onClose: onScamWarningModalClose,
+    onOpen: onScamWarningModalOpen,
+  } = useDisclosure()
+
   useEffect(() => {
     reset(tokenDetails)
   }, [reset, tokenDetails])
@@ -73,9 +125,43 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
   }, [error, setError])
 
   useEffect(() => {
+    if (isExistingToken) {
+      let warningText = "You are adding a token that you already own"
+      if (isHiddenToken) {
+        warningText =
+          "You are adding a token that you already own and is hidden"
+      }
+      toast({
+        title: warningText,
+        status: "info",
+        duration: 5000,
+      })
+    } else if (isSpamToken) {
+      onScamWarningModalOpen()
+    }
+    if (errors?.root?.message) {
+      toast({
+        title: errors.root.message,
+        status: "info",
+        duration: 5000,
+      })
+    }
+  }, [
+    errors?.root?.message,
+    isExistingToken,
+    isHiddenToken,
+    isSpamToken,
+    onScamWarningModalOpen,
+    toast,
+  ])
+
+  useEffect(() => {
     const { unsubscribe } = watch((value, { name, type }) => {
-      if (type === "change" && name === "address" && value.address) {
-        onTokenAddressChange(value.address)
+      const trimmedAddress = value.address?.trim()
+      if (addressSchema.safeParse(trimmedAddress).success) {
+        if (type === "change" && name === "address" && trimmedAddress) {
+          onTokenAddressChange(trimmedAddress as Address)
+        }
       }
     })
     return () => unsubscribe()
@@ -92,14 +178,10 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
     }
   })
 
-  const warningText = useMemo(() => {
-    if (isExistingToken) {
-      return "This action will edit tokens that are already listed in your wallet, which can be used to phish you. Only approve if you are certain that you mean to change what these tokens represent."
-    }
-    if (errors?.root?.message) {
-      return errors.root.message
-    }
-  }, [errors?.root?.message, isExistingToken])
+  const handleFormOnClose = () => {
+    void handleForm()
+    onScamWarningModalClose()
+  }
 
   return (
     <NavigationContainer
@@ -115,14 +197,6 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
         isDisabled={isSubmitting}
       >
         <CellStack pt={0} flex={1}>
-          {warningText && (
-            <Alert
-              size={"lg"}
-              icon={<AlertIcon />}
-              colorScheme={"warning"}
-              description={warningText}
-            />
-          )}
           <HeaderCell>Contract address</HeaderCell>
           <ControlledInput
             name="address"
@@ -161,7 +235,7 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
             )}
             <Button
               type="submit"
-              isDisabled={isSubmitting || isLoading}
+              isDisabled={isSubmitting || isLoading || isExistingToken}
               isLoading={isSubmitting || isLoading}
               loadingText={"Validating"}
               colorScheme={"primary"}
@@ -172,6 +246,11 @@ export const AddTokenScreen: FC<AddTokenScreenProps> = ({
           </Flex>
         </CellStack>
       </FormControl>
+      <ScamWarningDialog
+        isOpen={isScamWarningModalOpen}
+        onClose={onScamWarningModalClose}
+        onContinue={handleFormOnClose}
+      />
     </NavigationContainer>
   )
 }

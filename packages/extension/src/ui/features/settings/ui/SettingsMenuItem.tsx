@@ -1,9 +1,11 @@
-import { ButtonCell, P4, iconsDeprecated } from "@argent/x-ui"
-import { Box, Button, ButtonProps, Flex, Text } from "@chakra-ui/react"
-import { FC, PropsWithChildren, ReactEventHandler } from "react"
-import { Link, LinkProps } from "react-router-dom"
+import { ButtonCell, icons, P3 } from "@argent/x-ui"
+import type { ButtonProps } from "@chakra-ui/react"
+import { Box, Button, Flex, Text } from "@chakra-ui/react"
+import type { FC, PropsWithChildren, ReactEventHandler } from "react"
+import type { LinkProps } from "react-router-dom"
+import { Link } from "react-router-dom"
 
-const { ChevronRightIcon, RemoveIcon } = iconsDeprecated
+const { ChevronRightSecondaryIcon, MinusPrimaryIcon } = icons
 
 export interface SettingsMenuItemProps extends ButtonProps {
   title: string
@@ -11,7 +13,7 @@ export interface SettingsMenuItemProps extends ButtonProps {
 }
 
 export const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
-  rightIcon = <ChevronRightIcon />,
+  rightIcon = <ChevronRightSecondaryIcon />,
   title,
   subtitle,
   ...rest
@@ -21,7 +23,7 @@ export const SettingsMenuItem: FC<SettingsMenuItemProps> = ({
       <Text overflow={"hidden"} textOverflow={"ellipsis"}>
         {title}
       </Text>
-      {subtitle && <P4 color="text-secondary">{subtitle}</P4>}
+      {subtitle && <P3 color="text-secondary">{subtitle}</P3>}
     </Flex>
   </ButtonCell>
 )
@@ -58,7 +60,7 @@ export const SettingsMenuItemRemove: FC<SettingsMenuItemRemoveProps> = ({
           onRemoveClick(e)
         }}
       >
-        <RemoveIcon fontSize={"base"} />
+        <MinusPrimaryIcon fontSize={"base"} />
       </Button>
     }
     _hover={{}}

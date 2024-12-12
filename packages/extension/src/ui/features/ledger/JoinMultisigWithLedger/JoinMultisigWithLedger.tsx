@@ -1,26 +1,29 @@
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 import { ScreenLayout } from "../layout/ScreenLayout"
 import { JoinMultisigSidePanel } from "./JoinMultisigSidePanel"
 import { Box, Flex, Spinner } from "@chakra-ui/react"
-import { CopyTooltip, H6, P3, iconsDeprecated } from "@argent/x-ui"
+import { CopyTooltip, H5, icons, P2 } from "@argent/x-ui"
 import { useCreatePendingMultisig } from "../../multisig/hooks/useCreatePendingMultisig"
 import { useOnMountUnsafe } from "../../../hooks/useOnMountUnsafe"
 import { SignerType } from "../../../../shared/wallet.model"
 import { encodeBase58 } from "@argent/x-shared"
 import { ActionButton } from "../../../components/FullScreenPage"
 
-const { CopyIcon } = iconsDeprecated
+const { CopyPrimaryIcon } = icons
 
 interface JoinMultisigWithLedgerProps {
   networkId: string
   currentStep: number
   helpLink?: string
+  totalSteps: number
 }
 
 export const JoinMultisigWithLedger: FC<JoinMultisigWithLedgerProps> = ({
   networkId,
   currentStep,
   helpLink,
+  totalSteps,
 }) => {
   const { createPendingMultisig, loading } = useCreatePendingMultisig()
   const [signerKey, setSignerKey] = useState<string>()
@@ -42,14 +45,14 @@ export const JoinMultisigWithLedger: FC<JoinMultisigWithLedgerProps> = ({
       title="Share your signer pubkey"
       subtitle="Share your signer pubkey with the multisig creator. It can also be viewed from the account list in your Argent X wallet"
       currentIndex={currentStep}
-      length={2}
+      length={totalSteps}
       sidePanel={<JoinMultisigSidePanel />}
       helpLink={helpLink}
       filledIndicator
     >
       <Box mt="5" pt="5" borderTop="1px solid" borderColor="neutrals.700">
         <Flex direction="column" gap="4">
-          <H6 color="neutrals.300">My signer pubkey</H6>
+          <H5 color="neutrals.300">My signer pubkey</H5>
           <Flex
             p="16px"
             bgColor="neutrals.800"
@@ -58,14 +61,14 @@ export const JoinMultisigWithLedger: FC<JoinMultisigWithLedgerProps> = ({
             justifyContent="space-between"
             alignItems="center"
           >
-            <P3 fontWeight="bold" color="white.50">
+            <P2 fontWeight="bold" color="white.50">
               {signerKey || "Assigning Ledger signer pubkey..."}
-            </P3>
+            </P2>
 
             {loading && <Spinner size="sm" color="white.50" />}
             {signerKey && (
               <CopyTooltip copyValue={signerKey}>
-                <CopyIcon width={5} height={5} color="white.50" />
+                <CopyPrimaryIcon width={5} height={5} color="white.50" />
               </CopyTooltip>
             )}
           </Flex>

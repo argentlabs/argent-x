@@ -1,6 +1,7 @@
 import { CellStack, NavigationContainerSkeleton } from "@argent/x-ui"
-import { FlexProps, Skeleton } from "@chakra-ui/react"
-import { FC, PropsWithChildren } from "react"
+import type { FlexProps } from "@chakra-ui/react"
+import { Skeleton } from "@chakra-ui/react"
+import type { FC, PropsWithChildren } from "react"
 
 export interface ScreenSkeletonProps extends PropsWithChildren {
   list?: boolean

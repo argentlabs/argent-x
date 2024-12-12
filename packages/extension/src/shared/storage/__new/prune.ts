@@ -3,8 +3,10 @@ import {
   ARGENT_API_BASE_URL,
   ARGENT_EXPLORER_BASE_URL,
 } from "../../api/constants"
-import { Transaction, getInFlightTransactions } from "../../transactions"
+import type { Transaction } from "../../transactions"
+import { getInFlightTransactions } from "../../transactions"
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IMinimalStorage
   extends Pick<Storage, "setItem" | "getItem" | "removeItem"> {}
 
@@ -38,7 +40,7 @@ export function pruneTransactions(value: string) {
     const transactions: Transaction[] = JSON.parse(value)
     const prunedTransactions = getInFlightTransactions(transactions)
     return JSON.stringify(prunedTransactions)
-  } catch (e) {
+  } catch {
     // ignore parsing error
   }
   return value

@@ -1,25 +1,24 @@
-import { H4, P3 } from "@argent/x-ui"
+import { H3, P2 } from "@argent/x-ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 
 import { useEncodedPublicKeys, useSignerKey } from "../accounts/usePublicKey"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import { AddOwnersForm } from "./AddOwnerForm"
-import {
-  FieldValuesCreateMultisigForm,
-  useCreateMultisigForm,
-} from "./hooks/useCreateMultisigForm"
+import type { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
+import { useCreateMultisigForm } from "./hooks/useCreateMultisigForm"
 import { multisigView } from "./multisig.state"
 import { MultisigConfirmationsWithOwners } from "./MultisigConfirmationsScreen"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { useNavigate } from "react-router-dom"
 import { useView } from "../../views/implementation/react"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigAddOwnersScreen: FC = () => {
   const account = useRouteWalletAccount()
-  const signerKey = useSignerKey(account)
+  const signerKey = useSignerKey(account?.id)
   const methods = useCreateMultisigForm(signerKey)
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
@@ -75,15 +74,15 @@ const MultisigAddOwners = ({
     <Box m={4} height="100%">
       <Flex flexDirection="column" height="100%" justifyContent="space-between">
         <Flex flexDirection="column" gap="1">
-          <H4>Add owners</H4>
-          <P3 color="neutrals.300">
+          <H3>Add owners</H3>
+          <P2 color="neutrals.300">
             Ask your co-owners to go to “Join existing multisig” in Argent X and
             send you their signer pubkey
-          </P3>
-          <P3 color="primary.400" mt="3">
+          </P2>
+          <P2 color="primary.400" mt="3">
             For security reasons each owner should have their own Argent X
             wallet. Never add 2 signer pubkeys from the same Argent X wallet.
-          </P3>
+          </P2>
           <Divider my={4} color="neutrals.800" mt="4" />
           <AddOwnersForm
             nextOwnerIndex={signerKeys.length + 1}

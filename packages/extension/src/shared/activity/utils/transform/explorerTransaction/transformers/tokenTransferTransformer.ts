@@ -1,7 +1,7 @@
 import { isEqualAddress } from "@argent/x-shared"
-import { TokenTransferTransaction } from "../../type"
+import type { TokenTransferTransaction } from "../../type"
 import { getParameter } from "../getParameter"
-import { IExplorerTransactionTransformer } from "./type"
+import type { IExplorerTransactionTransformer } from "./type"
 
 /** adds erc20 token transfer data */
 

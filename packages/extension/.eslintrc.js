@@ -11,6 +11,18 @@ module.exports = {
             message: "Please use lodash-es instead.",
             allowTypeImports: true,
           },
+          {
+            name: "lodash-es",
+            importNames: ["memoize"],
+            message: "Please use memoizee instead of lodash memoize.",
+          },
+        ],
+        patterns: [
+          {
+            group: ["**/ampli", "**/ampli/**"],
+            importNames: ["ampli"],
+            message: "Please import 'ampli' from 'shared/analytics' instead.",
+          },
         ],
       },
     ],

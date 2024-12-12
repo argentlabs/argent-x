@@ -1,13 +1,9 @@
-import { P3, iconsDeprecated } from "@argent/x-ui"
-import {
-  Flex,
-  FormLabel,
-  UseCheckboxProps,
-  useCheckbox,
-} from "@chakra-ui/react"
-import { FC, PropsWithChildren } from "react"
+import { icons, P2 } from "@argent/x-ui"
+import type { UseCheckboxProps } from "@chakra-ui/react"
+import { Flex, FormLabel, useCheckbox } from "@chakra-ui/react"
+import type { FC, PropsWithChildren } from "react"
 
-const { CheckboxDefaultIcon, CheckboxActiveIcon } = iconsDeprecated
+const { RadioEmptyIcon, RadioFilledIcon } = icons
 
 export const OnboardingCheckbox: FC<PropsWithChildren & UseCheckboxProps> = ({
   children,
@@ -38,12 +34,12 @@ export const OnboardingCheckbox: FC<PropsWithChildren & UseCheckboxProps> = ({
       <input {...getInputProps()} hidden />
       <Flex {...getCheckboxProps()} fontSize={"4xl"}>
         {state.isChecked ? (
-          <CheckboxActiveIcon color={"success.500"} />
+          <RadioFilledIcon color={"success.500"} />
         ) : (
-          <CheckboxDefaultIcon color={"neutrals.500"} />
+          <RadioEmptyIcon color={"neutrals.500"} />
         )}
       </Flex>
-      <P3>{children}</P3>
+      <P2>{children}</P2>
     </FormLabel>
   )
 }

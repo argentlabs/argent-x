@@ -1,10 +1,10 @@
-import { Mocked, MockedFunction } from "vitest"
+import type { Mocked, MockedFunction } from "vitest"
 import { getAccountClassHashFromChain } from "./getAccountClassHashFromChain"
 import { tryGetClassHash } from "./tryGetClassHash"
 import { networkService } from "../../network/service"
 import { getProvider } from "../../network"
 import { getMulticallForNetwork } from "../../multicall"
-import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
+import { getMockArgentWalletAccount } from "../../../../test/walletAccount.mock"
 import {
   addressSchema,
   TXV1_ACCOUNT_CLASS_HASH,
@@ -14,6 +14,7 @@ import {
   getMockNetwork,
   getMockNetworkWithoutMulticall,
 } from "../../../../test/network.mock"
+import { getRandomAccountIdentifier } from "../../utils/accountIdentifier"
 
 vi.mock("../../network/service")
 vi.mock("../../multicall")
@@ -45,7 +46,7 @@ describe("getAccountClassHashFromChain", () => {
     })
 
     const accounts = [
-      getMockWalletAccount({
+      getMockArgentWalletAccount({
         networkId: mockNetwork.id,
         network: mockNetwork,
         classHash: undefined,
@@ -84,6 +85,7 @@ describe("getAccountClassHashFromChain", () => {
     )
 
     expect(results[0]).toEqual({
+      id: accounts[0].id,
       address: accounts[0].address,
       networkId: accounts[0].networkId,
       type: "standard",
@@ -103,13 +105,14 @@ describe("getAccountClassHashFromChain", () => {
     })
 
     const accounts = [
-      getMockWalletAccount({
+      getMockArgentWalletAccount({
         address: "0x01",
         networkId: mockNetwork.id,
         network: mockNetwork,
         classHash: TXV1_ACCOUNT_CLASS_HASH,
       }),
-      getMockWalletAccount({
+      getMockArgentWalletAccount({
+        id: getRandomAccountIdentifier("0x02"),
         address: "0x02",
         networkId: mockNetwork.id,
         network: mockNetwork,
@@ -173,6 +176,7 @@ describe("getAccountClassHashFromChain", () => {
     )
 
     expect(results[0]).toEqual({
+      id: accounts[0].id,
       address: accounts[0].address,
       networkId: accounts[0].networkId,
       type: "standard",
@@ -180,6 +184,7 @@ describe("getAccountClassHashFromChain", () => {
     })
 
     expect(results[1]).toEqual({
+      id: accounts[1].id,
       address: accounts[1].address,
       networkId: accounts[1].networkId,
       type: "multisig",
@@ -198,7 +203,7 @@ describe("getAccountClassHashFromChain", () => {
     })
 
     const accounts = [
-      getMockWalletAccount({
+      getMockArgentWalletAccount({
         networkId: mockNetwork.id,
         network: mockNetwork,
         classHash: undefined,
@@ -221,6 +226,7 @@ describe("getAccountClassHashFromChain", () => {
     )
     expect(mockTryGetClassHash).toHaveBeenCalledTimes(1)
     expect(results[0]).toEqual({
+      id: accounts[0].id,
       address: accounts[0].address,
       networkId: accounts[0].networkId,
       type: "standard",

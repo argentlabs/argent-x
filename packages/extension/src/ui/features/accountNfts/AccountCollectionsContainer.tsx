@@ -1,32 +1,40 @@
-import { Collection, addressSchema } from "@argent/x-shared"
-import { Empty, H4, iconsDeprecated } from "@argent/x-ui"
-import { Flex } from "@chakra-ui/react"
-import { FC, Suspense } from "react"
+import type { Address, Collection } from "@argent/x-shared"
+import { Empty, H3, icons } from "@argent/x-ui"
+import type { FC, ReactNode } from "react"
 
-import { BaseWalletAccount } from "../../../shared/wallet.model"
-import { Spinner } from "../../components/Spinner"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import type { AccountCollectionsProps } from "./AccountCollections"
 import { AccountCollections } from "./AccountCollections"
 import { useCollectionsByAccountAndNetwork } from "./nfts.state"
 import { nftService } from "../../../shared/nft"
 
-const { NftIcon } = iconsDeprecated
+const { NftIcon } = icons
 
-interface AccountCollectionsContainerProps {
+interface AccountCollectionsContainerProps
+  extends Omit<AccountCollectionsProps, "collections"> {
   account: BaseWalletAccount
   withHeader?: boolean
   customList?: Collection[]
   navigateToSend?: boolean
+  emptyFallback?: ReactNode
 }
 
 export const AccountCollectionsContainer: FC<
   AccountCollectionsContainerProps
-> = ({ account, withHeader = true, customList, navigateToSend, ...rest }) => {
+> = ({
+  account,
+  withHeader = true,
+  customList,
+  navigateToSend,
+  emptyFallback,
+  ...rest
+}) => {
   const network = useCurrentNetwork()
   const isSupported = nftService.isSupported(network)
 
   const ownedCollections = useCollectionsByAccountAndNetwork(
-    addressSchema.parse(account.address),
+    account.address as Address,
     account.networkId,
   )
 
@@ -42,16 +50,14 @@ export const AccountCollectionsContainer: FC<
 
   return (
     <>
-      {withHeader && <H4 textAlign="center">NFTs</H4>}
-      <Flex direction="column" flex={1} {...rest}>
-        <Suspense fallback={<Spinner size={64} style={{ marginTop: 40 }} />}>
-          <AccountCollections
-            networkId={account.networkId}
-            collections={customList ?? ownedCollections}
-            navigateToSend={navigateToSend}
-          />
-        </Suspense>
-      </Flex>
+      {withHeader && <H3 textAlign="center">NFTs</H3>}
+      <AccountCollections
+        account={account}
+        collections={customList ?? ownedCollections}
+        navigateToSend={navigateToSend}
+        emptyFallback={emptyFallback}
+        {...rest}
+      />
     </>
   )
 }

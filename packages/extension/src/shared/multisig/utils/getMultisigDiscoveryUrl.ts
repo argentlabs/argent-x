@@ -1,7 +1,7 @@
 import urlJoin from "url-join"
 import { ARGENT_MULTISIG_DISCOVERY_URL } from "../../api/constants"
 import { RecoveryError } from "../../errors/recovery"
-import { Network } from "../../network"
+import type { Network } from "../../network"
 import { networkIdToStarknetNetwork } from "../../utils/starknetNetwork"
 
 export function getMultisigDiscoveryUrl(network: Network) {

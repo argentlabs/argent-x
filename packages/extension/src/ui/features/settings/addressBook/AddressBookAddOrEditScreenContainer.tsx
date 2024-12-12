@@ -1,13 +1,14 @@
-import { NavigationContainerProps, SelectOptions } from "@argent/x-ui"
+import type { NavigationContainerProps, SelectOptions } from "@argent/x-ui"
 import { isFunction } from "lodash-es"
-import { FC, useMemo } from "react"
+import type { FC } from "react"
+import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import {
+import type {
   AddressBookContact,
   AddressBookContactNoId,
-  isAddressBookContact,
 } from "../../../../shared/addressBook/type"
+import { isAddressBookContact } from "../../../../shared/addressBook/type"
 import { useQuery } from "../../../hooks/useQuery"
 import { addressBookService } from "../../../services/addressBook"
 import { addressBookContactIdView } from "../../../views/addressBook"
@@ -23,6 +24,7 @@ export interface AddressBookAddOrEditScreenContainerProps
   onSave?: (savedContact: AddressBookContact) => void
   onCancel?: () => void
   contact?: Partial<AddressBookContact>
+  modal?: boolean
 }
 
 export const AddressBookAddOrEditScreenContainer: FC<
@@ -33,6 +35,7 @@ export const AddressBookAddOrEditScreenContainer: FC<
   onSave: onSaveProp,
   onCancel: onCancelProp,
   contact: contactProp,
+  modal,
   ...rest
 }) => {
   /** allow providing the contact props in url or prop */
@@ -124,6 +127,7 @@ export const AddressBookAddOrEditScreenContainer: FC<
       networkOptions={networkOptions}
       networkDisabled={networkDisabled}
       addressDisabled={addressDisabled}
+      modal={modal}
       {...rest}
     />
   )

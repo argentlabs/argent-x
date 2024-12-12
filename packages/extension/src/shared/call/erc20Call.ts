@@ -1,11 +1,6 @@
 import { normalizeAddress } from "@argent/x-shared"
-import {
-  Call,
-  constants,
-  num,
-  uint256,
-  validateAndParseAddress,
-} from "starknet"
+import type { Call } from "starknet"
+import { constants, num, uint256, validateAndParseAddress } from "starknet"
 
 const { isUint256, uint256ToBN } = uint256
 
@@ -40,7 +35,7 @@ export const validateERC20Call = (call: Erc20Call) => {
     if (isUint256(amount) && amount > constants.ZERO) {
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

@@ -1,4 +1,4 @@
-import { Token } from "../../../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../../../shared/token/__new/types/token.model"
 import { parsedDefaultTokens } from "../../../../../shared/token/__new/utils"
 
 export const getFeeToken = (networkId: string) =>

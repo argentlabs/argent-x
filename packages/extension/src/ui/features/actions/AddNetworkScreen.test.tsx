@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { fireEvent, render, screen } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 
-import { Network } from "../../../shared/network"
-import { AddNetworkScreen, AddNetworkScreenProps } from "./AddNetworkScreen"
+import type { Network } from "../../../shared/network"
+import type { AddNetworkScreenProps } from "./AddNetworkScreen"
+import { AddNetworkScreen } from "./AddNetworkScreen"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 
 const network: Network = {

@@ -1,9 +1,9 @@
 import { CallData } from "starknet"
 
 import { isChangeGuardianCall } from "../../../../../call/changeGuardianCall"
-import { ChangeGuardianTransaction } from "../../type"
+import type { ChangeGuardianTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 import {
   ChangeGuardian,
   changeGuardianCalldataToType,

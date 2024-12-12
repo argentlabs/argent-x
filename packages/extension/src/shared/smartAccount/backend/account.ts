@@ -1,15 +1,11 @@
-import {
+import type {
   Cosigner,
   CosignerMessage,
   CosignerOffchainMessage,
   CosignerResponse,
 } from "@argent/x-guardian"
-import {
-  AddSmartAccountResponse,
-  AddSmartAcountRequestSchema,
-  BackendAccount,
-  BaseError,
-} from "@argent/x-shared"
+import type { AddSmartAccountResponse, BackendAccount } from "@argent/x-shared"
+import { AddSmartAcountRequestSchema, BaseError } from "@argent/x-shared"
 import retry from "async-retry"
 import urlJoin from "url-join"
 import { z } from "zod"
@@ -20,7 +16,6 @@ import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
 import { idb } from "../idb"
 import { jwtFetcher } from "../jwtFetcher"
-import { throttle } from "lodash-es"
 
 export const requestEmailAuthentication = async (
   email: string,
@@ -43,7 +38,7 @@ export const requestEmailAuthentication = async (
       },
     )
     return json
-  } catch (error) {
+  } catch {
     throw new BaseError({ message: "failed to request email verification" })
   }
 }
@@ -81,7 +76,7 @@ export const getEmailVerificationStatus = async () => {
       urlJoin(ARGENT_API_BASE_URL, `account/emailVerificationStatus`),
     )
     return json.status
-  } catch (error) {
+  } catch {
     throw new BaseError({ message: "Failed to get email verification status" })
   }
 }
@@ -134,7 +129,9 @@ export const register = async () => {
 
     return json
   } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
+    if (IS_DEV) {
+      console.warn(coerceErrorToString(error))
+    }
     throw new BaseError({ message: "Failed to register" })
   }
 }
@@ -169,7 +166,7 @@ export const getRegistrationStatus = async () => {
       urlJoin(ARGENT_API_BASE_URL, `account/registrationStatus`),
     )
     return json.status
-  } catch (error) {
+  } catch {
     throw new BaseError({ message: "Failed to get registration status" })
   }
 }
@@ -185,7 +182,9 @@ export const isTokenExpired = async () => {
     await idb.ids.put({ key: "userId", id: res.userId })
     return false
   } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
+    if (IS_DEV) {
+      console.warn(coerceErrorToString(error))
+    }
   }
   return true
 }
@@ -203,11 +202,12 @@ export const getBackendAccounts = async () => {
       ),
     )
     return json.accounts
-  } catch (error) {
+  } catch {
     throw new BaseError({ message: "Failed to get accounts" })
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AddBackendAccountSchema = AddSmartAcountRequestSchema.extend({
   accountAddress: z.string().optional(),
 })
@@ -268,6 +268,11 @@ export const cosignerSign: Cosigner = async (
     )
     return json
   } catch (error) {
+    if (isFetcherError(error) && error.status === 403) {
+      throw new BaseError({
+        message: "Smart Account token is expired",
+      })
+    }
     throw new BaseError({
       message: `This transaction failed as the cosigner could not provide a valid signature. Please contact support.`,
     })

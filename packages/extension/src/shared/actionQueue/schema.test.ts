@@ -16,7 +16,7 @@ describe("actionQueue", () => {
           actionQueueItemMetaSchema.safeParse({
             hash: "0x0123",
             expires: 0,
-            icon: "SendIcon",
+            icon: "SendSecondaryIcon",
           }).success,
         ).toBeTruthy()
       })

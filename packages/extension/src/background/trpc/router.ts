@@ -45,10 +45,17 @@ import { uiService } from "../../shared/ui"
 import { onboardingRouter } from "./procedures/onboarding"
 import { onboardingService } from "../services/onboarding"
 import { preAuthorizationRouter } from "./procedures/preAuthorization"
+import { accountImportSharedService } from "../../shared/accountImport/service"
+import { importAccountRouter } from "./procedures/importAccount"
 import { onRampRouter } from "./procedures/onramp"
 import { onRampService } from "../services/onRamp"
 import { notificationsRouter } from "./procedures/notifications"
 import { notificationService } from "../services/notifications"
+import { uiRouter } from "./procedures/ui"
+import { stakingService } from "../services/staking"
+import { stakingRouter } from "./procedures/staking"
+import { investmentService } from "../services/investments"
+import { investmentsRouter } from "./procedures/investments"
 
 const appRouter = router({
   account: accountRouter,
@@ -75,8 +82,12 @@ const appRouter = router({
   dappMessaging: dappMessagingRouter,
   onboarding: onboardingRouter,
   preAuthorization: preAuthorizationRouter,
+  importAccount: importAccountRouter,
   onramp: onRampRouter,
   notifications: notificationsRouter,
+  ui: uiRouter,
+  staking: stakingRouter,
+  investments: investmentsRouter,
 })
 
 export type AppRouter = typeof appRouter
@@ -107,8 +118,11 @@ createChromeHandler({
       backgroundUIService,
       uiService,
       onboardingService,
+      importAccountService: accountImportSharedService,
       onRampService,
       notificationService,
+      stakingService,
+      investmentService,
     },
   }),
 })

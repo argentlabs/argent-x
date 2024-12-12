@@ -1,4 +1,4 @@
-import {
+import type {
   BaseTransaction,
   TransactionWithStatus,
 } from "../../transactions/interface"

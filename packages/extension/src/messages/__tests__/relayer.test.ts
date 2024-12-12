@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { Relayer } from "../exchange/relayer"
-import { Message, Messenger } from "../messenger"
+import type { Message, Messenger } from "../messenger"
 import { WindowMessenger } from "../messenger/window"
 import { getMockWindow } from "./windowMock.mock"
 

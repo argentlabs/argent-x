@@ -1,4 +1,4 @@
-import { Call, ProviderInterface } from "starknet"
+import type { Call, ProviderInterface } from "starknet"
 import { addressSchema, TXV1_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 
 export async function tryGetClassHash(
@@ -9,11 +9,11 @@ export async function tryGetClassHash(
   try {
     const expected = await provider.callContract(call)
     return expected[0]
-  } catch (e) {
+  } catch {
     try {
       const firstFallback = await provider.getClassHashAt(call.contractAddress)
       return addressSchema.parse(firstFallback)
-    } catch (e) {
+    } catch {
       if (fallbackClassHash) {
         return fallbackClassHash
       }

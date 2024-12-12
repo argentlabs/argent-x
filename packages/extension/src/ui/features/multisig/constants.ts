@@ -1,4 +1,4 @@
-import { MultisigData } from "../../../shared/wallet.model"
+import type { MultisigData } from "../../../shared/wallet.model"
 
 export const ZERO_MULTISIG: MultisigData = {
   signers: [],

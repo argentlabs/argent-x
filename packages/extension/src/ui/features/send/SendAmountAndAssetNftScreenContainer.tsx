@@ -1,5 +1,6 @@
 import { addressSchema } from "@argent/x-shared"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
@@ -8,10 +9,8 @@ import { useView } from "../../views/implementation/react"
 import { useNft } from "../accountNfts/nfts.state"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { NftInput } from "./NftInput"
-import {
-  SendAmountAndAssetScreen,
-  SendAmountAndAssetScreenProps,
-} from "./SendAmountAndAssetScreen"
+import type { SendAmountAndAssetScreenProps } from "./SendAmountAndAssetScreen"
+import { SendAmountAndAssetScreen } from "./SendAmountAndAssetScreen"
 import { clientNftService } from "../../services/nfts"
 import { delay } from "../../../shared/utils/delay"
 
@@ -58,7 +57,7 @@ export const SendAmountAndAssetNftScreenContainer: FC<
     <SendAmountAndAssetScreen
       {...rest}
       onCancel={onCancel}
-      onSubmit={onSubmit}
+      onSubmit={() => void onSubmit()}
       input={
         <NftInput
           contractAddress={nft.contract_address}

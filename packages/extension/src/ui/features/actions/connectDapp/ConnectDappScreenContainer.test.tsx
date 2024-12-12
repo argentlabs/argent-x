@@ -1,13 +1,15 @@
-import { render } from "@testing-library/react"
-import { RiskAssessment } from "../../../../shared/riskAssessment/schema"
-import { ConnectDappScreenContainer } from "./ConnectDappScreenContainer"
-import { act, renderWithLegacyProviders } from "../../../test/utils"
-import * as useActionScreenParent from "../hooks/useActionScreen"
-import * as useRiskAssessmentParent from "./useRiskAssessment"
-import { mockNetworks } from "../../networks/NetworkSwitcher/NetworkSwitcher.test"
-import { MemoryRouter } from "react-router-dom"
 import { ChakraProvider } from "@chakra-ui/react"
+import { render } from "@testing-library/react"
+import { MemoryRouter } from "react-router-dom"
+
+import type { RiskAssessment } from "../../../../shared/riskAssessment/schema"
+import { getRandomAccountIdentifier } from "../../../../shared/utils/accountIdentifier"
 import { SignerType } from "../../../../shared/wallet.model"
+import { act, renderWithLegacyProviders } from "../../../test/utils"
+import { mockNetworks } from "../../navigation/NetworkSwitcher.test"
+import * as useActionScreenParent from "../hooks/useActionScreen"
+import { ConnectDappScreenContainer } from "./ConnectDappScreenContainer"
+import * as useRiskAssessmentParent from "./useRiskAssessment"
 
 vi.mock("../hooks/useActionScreen", () => {
   return {
@@ -63,6 +65,7 @@ const useActionDefaultResponse = {
     address: "0x1",
     networkId: "sepolia",
     name: "account_1",
+    id: getRandomAccountIdentifier(),
     network: mockNetworks[1],
     signer: {
       type: SignerType.LOCAL_SECRET,

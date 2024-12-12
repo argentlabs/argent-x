@@ -4,7 +4,8 @@ import {
   erc1155Transfer,
   erc721Transfer,
 } from "./__fixtures__/transaction-calls/sepolia-alpha"
-import { NftTransferCall, parseNftTransferCall } from "./nftTransferCall"
+import type { NftTransferCall } from "./nftTransferCall"
+import { parseNftTransferCall } from "./nftTransferCall"
 
 describe("nftTransferCall", () => {
   describe("parseNftTransferCall()", () => {

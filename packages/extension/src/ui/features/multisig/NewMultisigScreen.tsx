@@ -2,15 +2,15 @@ import {
   B2,
   BarBackButton,
   BarCloseButton,
-  H6,
-  NavigationContainer,
-  P4,
-  StickyGroup,
-  iconsDeprecated,
+  H5,
+  icons,
   logosDeprecated,
+  NavigationContainer,
+  P3,
+  StickyGroup,
 } from "@argent/x-ui"
 import { Button, Center, Flex, Text } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { CustomButtonCell } from "../../components/CustomButtonCell"
@@ -20,11 +20,8 @@ import { useIsFirefox } from "../../hooks/useUserAgent"
 import { selectedNetworkIdView } from "../../views/network"
 import { useView } from "../../views/implementation/react"
 
-const {
-  AddIcon,
-  MultisigJoinIcon,
-  MultisigImageIcon: MultisigDiagram,
-} = iconsDeprecated
+const { PlusSecondaryIcon, AddContactSecondaryIcon, MultisigImageIcon } = icons
+
 const { LedgerLogo } = logosDeprecated
 
 type MultisigOptionType = "create" | "join"
@@ -40,12 +37,12 @@ const multisigOptions: MultisigOption[] = [
   {
     title: "Create new multisig",
     type: "create",
-    icon: <AddIcon />,
+    icon: <PlusSecondaryIcon />,
   },
   {
     title: "Join existing multisig",
     type: "join",
-    icon: <MultisigJoinIcon />,
+    icon: <AddContactSecondaryIcon />,
   },
 ]
 
@@ -78,12 +75,12 @@ export const NewMultisigScreen: FC = () => {
           mb={1}
         >
           <Text fontSize="58px">
-            <MultisigDiagram />
+            <MultisigImageIcon />
           </Text>
-          <P4 color="neutrals.100" flex={1} textAlign="left">
+          <P3 color="neutrals.100" flex={1} textAlign="left">
             A multisig allows multiple owners to manage an account by requiring
             multiple confirmations for a transaction
-          </P4>
+          </P3>
         </Flex>
         {multisigOptions.map((option, index) => (
           <CustomButtonCell
@@ -113,18 +110,17 @@ export const NewMultisigScreen: FC = () => {
                 {option.icon}
               </Center>
               <Flex direction="column" flex={0.5}>
-                <H6>{option.title}</H6>
+                <H5>{option.title}</H5>
                 {option.subtitle && (
-                  <P4 fontWeight="bold" color="neutrals.300">
+                  <P3 fontWeight="bold" color="neutrals.300">
                     {option.subtitle}
-                  </P4>
+                  </P3>
                 )}
               </Flex>
             </Flex>
           </CustomButtonCell>
         ))}
       </Flex>
-
       {!isFirefox && (
         <StickyGroup>
           <Button

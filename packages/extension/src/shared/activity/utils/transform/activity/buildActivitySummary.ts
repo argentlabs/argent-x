@@ -1,14 +1,12 @@
-import {
-  ActivitySummary,
-  activitySummarySchema,
-} from "@argent/x-shared/simulation"
+import type { ActivitySummary } from "@argent/x-shared/simulation"
+import { activitySummarySchema } from "@argent/x-shared/simulation"
 import {
   isSwapTransaction,
   isTokenApproveTransaction,
   isTokenMintTransaction,
   isTokenTransferTransaction,
 } from "../is"
-import { TransformedTransaction } from "./../type"
+import type { TransformedTransaction } from "./../type"
 import { addressSchema } from "@argent/x-shared"
 
 /**

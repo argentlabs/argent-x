@@ -1,10 +1,12 @@
 import { TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
-import { Call, CallData, RawArgs, num } from "starknet"
-import { ActionQueueItem } from "../../../shared/actionQueue/schema"
-import { TransactionActionPayload } from "../../../shared/actionQueue/types"
-import { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
+import type { Call, RawArgs } from "starknet"
+import { CallData, num } from "starknet"
+import type { ActionQueueItem } from "../../../shared/actionQueue/schema"
+import type { TransactionActionPayload } from "../../../shared/actionQueue/types"
+import type { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
 import { MultisigTransactionType } from "../../../shared/multisig/types"
 import { ApproveScreenType } from "./transaction/types"
+import { getMultisigTransactionType } from "../../../shared/multisig/utils/getMultisigTransactionType"
 
 export const getApproveScreenTypeFromAction = (
   action: ActionQueueItem & {
@@ -35,7 +37,11 @@ export const getApproveScreenTypeFromAction = (
 export const getApproveScreenTypeFromPendingTransaction = (
   pendingTransaction: MultisigPendingTransaction,
 ) => {
-  switch (pendingTransaction.type) {
+  let type = pendingTransaction.type
+  if (type === "INVOKE") {
+    type = getMultisigTransactionType(pendingTransaction.transaction.calls)
+  }
+  switch (type) {
     case MultisigTransactionType.MULTISIG_ADD_SIGNERS:
       return ApproveScreenType.MULTISIG_ADD_SIGNERS
     case MultisigTransactionType.MULTISIG_CHANGE_THRESHOLD:

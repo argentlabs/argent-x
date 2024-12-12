@@ -1,4 +1,4 @@
-import { IExplorerTransactionTransformer } from "./type"
+import type { IExplorerTransactionTransformer } from "./type"
 import { getActualFee } from "../getActualFee"
 
 export default function ({

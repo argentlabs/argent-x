@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 
-import { IExplorerTransaction } from "../../../../explorer/type"
+import type { IExplorerTransaction } from "../../../../explorer/type"
 import { fingerprintExplorerTransaction } from "./fingerprintExplorerTransaction"
 import {
   accountCreated,

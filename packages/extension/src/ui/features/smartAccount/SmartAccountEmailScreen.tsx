@@ -1,12 +1,13 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { useRouteAccountAddress } from "../../hooks/useRoute"
+import { useRouteAccountId } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import { ArgentAccountBaseEmailScreen } from "../argentAccount/ArgentAccountBaseEmailScreen"
 
 export const SmartAccountEmailScreen: FC = () => {
-  const accountAddress = useRouteAccountAddress()
+  const accountId = useRouteAccountId()
   const navigate = useNavigate()
 
   const onBack = useCallback(() => {
@@ -15,13 +16,11 @@ export const SmartAccountEmailScreen: FC = () => {
 
   const onEmailRequested = useCallback(
     (email: string) => {
-      if (accountAddress) {
-        navigate(
-          routes.smartAccountOTP(accountAddress, email, "toggleSmartAccount"),
-        )
+      if (accountId) {
+        navigate(routes.smartAccountOTP(accountId, email, "toggleSmartAccount"))
       }
     },
-    [accountAddress, navigate],
+    [accountId, navigate],
   )
 
   return (

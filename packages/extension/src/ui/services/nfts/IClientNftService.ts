@@ -1,5 +1,5 @@
-import { NftItem } from "@argent/x-shared"
-import { Network } from "../../../shared/network"
+import type { NftItem } from "@argent/x-shared"
+import type { Network } from "../../../shared/network"
 
 export interface IClientNftService {
   transferNft(

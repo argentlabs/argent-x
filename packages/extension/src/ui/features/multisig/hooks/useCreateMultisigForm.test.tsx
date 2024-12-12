@@ -1,8 +1,8 @@
-import { FieldError, P3 } from "@argent/x-ui"
+import { FieldError, P2 } from "@argent/x-ui"
 import { Box, Button, Input, InputGroup } from "@chakra-ui/react"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { JSXElementConstructor, ReactElement } from "react"
+import type { JSXElementConstructor, ReactElement } from "react"
 import { z } from "zod"
 import * as baseMultisigModule from "../../../../shared/multisig/utils/baseMultisig"
 import { accountMessagingService } from "../../../services/accountMessaging"
@@ -129,7 +129,7 @@ describe("useCreateMultisigForm", () => {
 
       return (
         <form onSubmit={() => void trigger("signerKeys")}>
-          <P3 mb="1">Add owners</P3>
+          <P2 mb="1">Add owners</P2>
           {Array.from({ length: TOTAL_OWNERS }).map((_, index) => {
             return (
               <Box key={index}>

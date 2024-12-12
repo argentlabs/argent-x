@@ -1,9 +1,9 @@
-import { memoize } from "lodash-es"
+import memoize from "memoizee"
 import { useMemo } from "react"
 
 import { transactionsStore } from "../../../shared/transactions/store"
 import { useArrayStorage } from "../../hooks/useStorage"
-import {
+import type {
   ExtendedFinalityStatus,
   Transaction,
 } from "../../../shared/transactions"
@@ -13,10 +13,10 @@ function transformStatus(status: ExtendedFinalityStatus): Status {
   return ["ACCEPTED_ON_L1", "ACCEPTED_ON_L2", "PENDING"].includes(status)
     ? "SUCCESS"
     : ["REJECTED", "REVERTED"].includes(status)
-    ? "ERROR"
-    : status === "CANCELLED"
-    ? "CANCELLED"
-    : "PENDING"
+      ? "ERROR"
+      : status === "CANCELLED"
+        ? "CANCELLED"
+        : "PENDING"
 }
 
 type Status = "UNKNOWN" | "PENDING" | "SUCCESS" | "ERROR" | "CANCELLED"
@@ -24,7 +24,7 @@ type Status = "UNKNOWN" | "PENDING" | "SUCCESS" | "ERROR" | "CANCELLED"
 const transactionSelector = memoize(
   (hash?: string, networkId?: string) => (transaction: Transaction) =>
     transaction.hash === hash && transaction.account.networkId === networkId,
-  (hash, networkId) => `${hash}-${networkId}`,
+  { normalizer: ([hash = "0x0", networkId = ""]) => `${hash}-${networkId}` },
 )
 
 export const useTransactionStatus = (

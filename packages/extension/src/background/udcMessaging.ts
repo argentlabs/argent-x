@@ -1,6 +1,7 @@
-import { UdcMessage } from "../shared/messages/UdcMessage"
+import type { UdcMessage } from "../shared/messages/UdcMessage"
 
-import { HandleMessage, UnhandledMessage } from "./background"
+import type { HandleMessage } from "./background"
+import { UnhandledMessage } from "./background"
 
 export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
   msg,
@@ -14,10 +15,7 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
       const { data } = msg
       const { account, payload } = data
       if (account) {
-        await wallet.selectAccount({
-          address: account.address,
-          networkId: account.networkId,
-        })
+        await wallet.selectAccount(account.id)
       }
 
       const action = await actionService.add(

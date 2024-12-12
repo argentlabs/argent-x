@@ -1,13 +1,13 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { UnknownDappIcon } from "./UnknownDappIcon"
 import { DappIcon } from "./DappIcon"
 import { KnownIcon } from "./KnownIcon"
-import { BoxProps, Skeleton } from "@chakra-ui/react"
-import { IconDeprecatedKeys } from "@argent/x-ui"
+import type { BoxProps } from "@chakra-ui/react"
+import type { IconKeys } from "@argent/x-ui"
 
 export interface TransactionIconProps extends BoxProps {
   dappLogoUrl?: string
-  iconKey?: IconDeprecatedKeys
+  iconKey?: IconKeys
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({
@@ -20,8 +20,8 @@ export const TransactionIcon: FC<TransactionIconProps> = ({
   }
 
   return iconKey ? (
-    <KnownIcon iconKey={iconKey} {...rest} />
+    <KnownIcon iconKey={iconKey} {...rest} borderRadius={"full"} />
   ) : (
-    <UnknownDappIcon {...rest} />
+    <UnknownDappIcon {...rest} borderRadius={"full"} />
   )
 }

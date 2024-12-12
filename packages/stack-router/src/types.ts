@@ -1,4 +1,4 @@
-import { Target } from "framer-motion"
+import type { Target } from "framer-motion"
 
 export interface ScreenProps {
   /** path e.g. /accounts/:id */

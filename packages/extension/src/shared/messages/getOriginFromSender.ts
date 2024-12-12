@@ -1,4 +1,4 @@
-import browser from "webextension-polyfill"
+import type browser from "webextension-polyfill"
 
 export function getOriginFromSender(
   sender: browser.runtime.MessageSender,

@@ -1,4 +1,4 @@
-import { SeedSettingsScreen } from "@argent-x/extension/src/ui/features/settings/securityAndPrivacy/SeedSettingsScreen"
+import { SeedSettingsScreen } from "@argent-x/extension/src/ui/features/settings/securityAndRecovery/SeedSettingsScreen"
 
 import { decorators } from "../../decorators/routerDecorators"
 

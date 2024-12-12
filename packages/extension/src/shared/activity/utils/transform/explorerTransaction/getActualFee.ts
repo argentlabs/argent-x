@@ -1,7 +1,5 @@
-import {
-  explorerTransactionActualFeeSchema,
-  IExplorerTransaction,
-} from "../../../../explorer/type"
+import type { IExplorerTransaction } from "../../../../explorer/type"
+import { explorerTransactionActualFeeSchema } from "../../../../explorer/type"
 
 export function getActualFee({ actualFee }: IExplorerTransaction) {
   let actualFeeAmount = "0x0"

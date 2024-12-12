@@ -1,15 +1,15 @@
 import {
-  iconsDeprecated,
-  NavigationContainer,
   BarCloseButton,
+  H5,
+  icons,
   Input,
-  H6,
+  NavigationContainer,
 } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import { ArgentAccountFeaturesList } from "./ArgentAccountFeaturesList"
 
-const { LogoutIcon } = iconsDeprecated
+const { LogOutIcon } = icons
 
 type ArgentAccountLoggedInScreenProps = {
   handleClose: () => void
@@ -41,10 +41,10 @@ export const ArgentAccountLoggedInScreen: FC<
             fontWeight={600}
           />
           <Divider color="neutrals.700" mt={4} mb={5} />
-          <H6 color="neutrals.300" mx={2}>
+          <H5 color="neutrals.300" mx={2}>
             Your email will be used for the following features if you choose to
             enable them:
-          </H6>
+          </H5>
           <Box my={5}>
             <ArgentAccountFeaturesList
               accountsWithGuardianEnabled={accountsWithGuardianEnabled}
@@ -62,9 +62,9 @@ export const ArgentAccountLoggedInScreen: FC<
           display="flex"
           alignItems="center"
           _hover={{ color: "error.500" }}
-          onClick={handleLogout}
+          onClick={() => void handleLogout()}
         >
-          <LogoutIcon />
+          <LogOutIcon />
           &nbsp; Logout
         </Button>
       </Flex>

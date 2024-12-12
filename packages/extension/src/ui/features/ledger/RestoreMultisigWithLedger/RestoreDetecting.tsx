@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { ScreenLayout } from "../layout/ScreenLayout"
 import { Box } from "@chakra-ui/react"
 import { RestoreMultisigSidePanel } from "./RestoreMultisigSidePanel"

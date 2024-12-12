@@ -1,10 +1,10 @@
 import { z } from "zod"
 
-import { extensionOnlyProcedure } from "../permissions"
 import {
   createAccountTypeSchema,
   signerTypeSchema,
 } from "../../../../shared/wallet.model"
+import { extensionOnlyProcedure } from "../permissions"
 
 const getNextPublicKeyForMultisigSchema = z.object({
   networkId: z.string(),
@@ -12,9 +12,15 @@ const getNextPublicKeyForMultisigSchema = z.object({
   accountType: createAccountTypeSchema,
 })
 
+const getNextPublicKeyForMultisigOutputSchema = z.object({
+  publicKey: z.string(),
+  index: z.number(),
+  derivationPath: z.string(),
+})
+
 export const getNextPublicKeyProcedure = extensionOnlyProcedure
   .input(getNextPublicKeyForMultisigSchema)
-  .output(z.string())
+  .output(getNextPublicKeyForMultisigOutputSchema)
   .mutation(
     async ({
       input: { accountType, signerType, networkId },
@@ -22,11 +28,11 @@ export const getNextPublicKeyProcedure = extensionOnlyProcedure
         services: { wallet },
       },
     }) => {
-      const { publicKey } = await wallet.getNextPublicKey(
+      const result = await wallet.getNextPublicKey(
         accountType,
         signerType,
         networkId,
       )
-      return publicKey
+      return result
     },
   )

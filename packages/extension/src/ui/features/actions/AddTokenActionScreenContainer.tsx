@@ -1,5 +1,5 @@
 import { addressSchema } from "@argent/x-shared"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { AddTokenScreenContainer } from "./AddTokenScreenContainer"
 import { useActionScreen } from "./hooks/useActionScreen"

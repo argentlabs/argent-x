@@ -1,7 +1,7 @@
 import { constants } from "starknet"
 import { getMockBaseToken, getMockToken } from "../../../../../test/token.mock"
 import { ETH, USDC } from "../../../../shared/token/__new/constants"
-import { BaseToken } from "../../../../shared/token/__new/types/token.model"
+import type { BaseToken } from "../../../../shared/token/__new/types/token.model"
 import {
   bipsToPercent,
   isETH,

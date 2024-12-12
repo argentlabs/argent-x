@@ -1,6 +1,6 @@
-import { ILedgerSharedService } from "./ILedgerSharedService"
+import type { ILedgerSharedService } from "./ILedgerSharedService"
+import type { Address } from "@argent/x-shared"
 import {
-  Address,
   addressSchema,
   isEqualAddress,
   getLedgerAccountClassHashes,
@@ -8,19 +8,21 @@ import {
 import TransportWebHID from "@ledgerhq/hw-transport-webhid"
 import { StarknetClient } from "@ledgerhq/hw-app-starknet"
 import { LedgerSigner } from "../../signer"
-import Transport from "@ledgerhq/hw-transport"
+import type Transport from "@ledgerhq/hw-transport"
 import { AxLedgerError } from "../../errors/ledger"
 import { getBaseDerivationPath } from "../../signer/utils"
 import { getMultisigDiscoveryUrl } from "../../multisig/utils/getMultisigDiscoveryUrl"
 import { RecoveryError } from "../../errors/recovery"
-import { PublicKeyWithIndex } from "../../signer/types"
-import { CreateAccountType, SignerType } from "../../wallet.model"
+import type { PublicKeyWithIndex } from "../../signer/types"
+import type { CreateAccountType } from "../../wallet.model"
+import { SignerType } from "../../wallet.model"
 import { argentXHeaders } from "../../api/headers"
 import { getStandardAccountDiscoveryUrl } from "../../utils/getStandardAccountDiscoveryUrl"
 import { z } from "zod"
 import { getCairo1AccountContractAddress } from "../../utils/getContractAddress"
-import { INetworkService } from "../../network/service/INetworkService"
-import { IMultisigBackendService } from "../../multisig/service/backend/IMultisigBackendService"
+import type { INetworkService } from "../../network/service/INetworkService"
+import type { IMultisigBackendService } from "../../multisig/service/backend/IMultisigBackendService"
+import { getBaseMultisigAccounts } from "../../multisig/utils/baseMultisig"
 
 const NEXT_PUBLIC_KEY_BUFFER = 5
 
@@ -225,13 +227,18 @@ export class LedgerSharedService implements ILedgerSharedService {
           pubKeys.map(({ pubKey }) => pubKey),
         )
 
-        // find the first public key that is not associated with an account and the index is not used
+        const pendingPubKeys = (await getBaseMultisigAccounts())
+          .map((m) => m.pendingSigner?.pubKey)
+          .filter((m) => !!m) as string[]
+
+        // find the first public key that is not associated with an account, the index is not used and it's not involved in any change signer operations
         nextAvailablePublicKey = pubKeys.find(
           ({ pubKey, index }) =>
             !usedIndices.includes(index) &&
             !multisigs.content.some((multisig) =>
               multisig.signers.some((signer) => isEqualAddress(signer, pubKey)),
-            ),
+            ) &&
+            !pendingPubKeys.some((key) => isEqualAddress(key, pubKey)),
         )
 
         if (nextAvailablePublicKey) {
@@ -290,10 +297,8 @@ export class LedgerSharedService implements ILedgerSharedService {
     try {
       if (!this.app) {
         this.transport = await TransportWebHID.create()
-        console.log("Transport created")
         const app = new StarknetClient(this.transport)
         this.app = app
-        console.log("App created")
         return app
       }
       return this.app

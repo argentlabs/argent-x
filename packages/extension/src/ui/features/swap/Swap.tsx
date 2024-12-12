@@ -1,9 +1,11 @@
-import { Button, CellStack, L2, iconsDeprecated } from "@argent/x-ui"
-import { Box, Flex, IconButton, chakra, keyframes } from "@chakra-ui/react"
+import { Button, CellStack, icons, L2Bold } from "@argent/x-ui"
+import { Box, chakra, Flex, IconButton, keyframes } from "@chakra-ui/react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
+import type { Address } from "@argent/x-shared"
 import { bigDecimal, ensureDecimals } from "@argent/x-shared"
-import { Token } from "../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../shared/token/__new/types/token.model"
+import { delay } from "../../../shared/utils/delay"
 import { useSwapActionHandlers } from "./hooks/useSwapActionHandler"
 import { useSwapCallback } from "./hooks/useSwapCallback"
 import { SwapInputError, useSwapInfo } from "./hooks/useSwapInfo"
@@ -14,9 +16,8 @@ import { SwapPricesInfo } from "./ui/SwapPricesInfo"
 import { SwapQuoteRefresh } from "./ui/SwapQuoteRefresh"
 import { SwapTradeLoading } from "./ui/SwapTradeLoading"
 import { maxAmountSpendFromTokenBalance } from "./utils"
-import { delay } from "../../../shared/utils/delay"
 
-const { SwitchDirectionIcon } = iconsDeprecated
+const { SwitchPrimaryIcon } = icons
 
 const SwapContainer = chakra(CellStack, {
   baseStyle: {
@@ -51,7 +52,7 @@ const SwitchDirectionButton = chakra(IconButton, {
   },
 })
 
-const StyledSwitchDirectionIcon = chakra(SwitchDirectionIcon, {
+const StyledSwitchDirectionIcon = chakra(SwitchPrimaryIcon, {
   baseStyle: {
     color: "neutrals.300",
   },
@@ -62,7 +63,7 @@ export const spin = keyframes`
   to { transform: translate(-50%, -50%) rotate(180deg); }
 `
 
-const Swap = () => {
+const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
   const {
     tokens,
     tokenBalances,
@@ -71,8 +72,8 @@ const Swap = () => {
     parsedAmount,
     inputError: swapInputError,
   } = useSwapInfo()
-
-  const { independentField, typedValue, resetTypedValue } = useSwapState()
+  const { independentField, typedValue, resetTypedValue, setDefaultPayToken } =
+    useSwapState()
   const { onTokenSelection, onUserInput, onSwitchTokens } =
     useSwapActionHandlers()
   const { userSlippageTolerance } = useUserState()
@@ -82,6 +83,12 @@ const Swap = () => {
 
   const payToken = tokens[Field.PAY]
   const receiveToken = tokens[Field.RECEIVE]
+
+  useEffect(() => {
+    if (tokenAddress) {
+      setDefaultPayToken(tokenAddress)
+    }
+  }, [setDefaultPayToken, tokenAddress])
 
   const parsedAmounts = useMemo(
     () => ({
@@ -148,8 +155,7 @@ const Swap = () => {
   )
 
   const handleMaxInput = useCallback(() => {
-    maxAmountInput !== undefined &&
-      payToken?.decimals &&
+    if (maxAmountInput !== undefined && payToken?.decimals) {
       onUserInput(
         Field.PAY,
         bigDecimal.formatUnits({
@@ -157,6 +163,7 @@ const Swap = () => {
           decimals: payToken.decimals,
         }),
       )
+    }
   }, [maxAmountInput, onUserInput, payToken?.decimals])
 
   const handleOutputSelect = useCallback(
@@ -254,9 +261,9 @@ const Swap = () => {
         {!trade && !swapInputError && tradeLoading && <SwapTradeLoading />}
 
         {!trade && !isValid && (
-          <L2 color="neutrals.500" mt="2">
+          <L2Bold color="neutrals.500" mt="2">
             Powered by AVNU
-          </L2>
+          </L2Bold>
         )}
 
         {trade && isValid && (
@@ -279,6 +286,7 @@ const Swap = () => {
       <Box mx="4">
         {isValid ? (
           <Button
+            data-testid="review-swap-button"
             w="100%"
             bg="primary.500"
             mb="3"
@@ -287,7 +295,7 @@ const Swap = () => {
               !formattedAmounts[Field.RECEIVE] ||
               tradeLoading
             }
-            onClick={handleSwap}
+            onClick={() => void handleSwap()}
           >
             Review swap
           </Button>

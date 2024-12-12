@@ -1,6 +1,6 @@
-import { IRepository } from "../storage/__new/interface"
-import { BaseMultisigWalletAccount } from "../wallet.model"
-import {
+import type { IRepository } from "../storage/__new/interface"
+import type { BaseMultisigWalletAccount } from "../wallet.model"
+import type {
   IMultisigBaseWalletRepositary,
   MultisigMetadata,
   PendingMultisig,

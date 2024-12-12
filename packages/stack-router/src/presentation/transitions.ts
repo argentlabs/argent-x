@@ -1,4 +1,4 @@
-import { Transition } from "framer-motion"
+import type { Transition } from "framer-motion"
 
 /**
  * Exact values from UINavigationController's animation configuration.

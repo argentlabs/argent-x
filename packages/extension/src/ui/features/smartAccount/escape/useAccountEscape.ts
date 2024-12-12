@@ -1,15 +1,13 @@
-import { isNumeric, pluralise } from "@argent/x-shared"
 import { useCallback, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import useSWR from "swr"
 import { useCurrentNetwork } from "./../../networks/hooks/useCurrentNetwork"
 
-import { Escape } from "../../../../shared/account/details/escape.model"
-import {
+import type { Escape } from "../../../../shared/account/details/escape.model"
+import type {
   BaseWalletAccount,
   WalletAccount,
 } from "../../../../shared/wallet.model"
-import { getAccountIdentifier } from "../../../../shared/wallet.service"
 import { useArrayStorage } from "../../../hooks/useStorage"
 import { routes } from "../../../../shared/ui/routes"
 import { clientAccountService } from "../../../services/account"
@@ -21,33 +19,7 @@ import {
   escapeWarningStore,
   getEscapeWarningStoreKey,
 } from "./escapeWarningStore"
-
-export const getActiveFromNow = (activeAt: number, now = new Date()) => {
-  if (!isNumeric(activeAt)) {
-    throw "activeAt should be numeric"
-  }
-  const activeFromNowMs = Math.max(0, activeAt * 1000 - now.getTime())
-  /** 7 days max */
-  const seconds = Math.floor((activeFromNowMs / 1000) % 60)
-  const minutes = Math.floor((activeFromNowMs / (1000 * 60)) % 60)
-  const hours = Math.floor((activeFromNowMs / (1000 * 60 * 60)) % 24)
-  const days = Math.floor(activeFromNowMs / (1000 * 60 * 60 * 24))
-  const daysCeil = Math.ceil(activeFromNowMs / (1000 * 60 * 60 * 24))
-  const activeFromNowPretty =
-    days > 0
-      ? pluralise(daysCeil, "day")
-      : hours > 0
-        ? pluralise(hours, "hour")
-        : minutes > 0
-          ? pluralise(minutes, "minute")
-          : seconds > 0
-            ? pluralise(seconds, "second")
-            : "now"
-  return {
-    activeFromNowMs,
-    activeFromNowPretty,
-  }
-}
+import { getActiveFromNow } from "../../../../shared/utils/getActiveFromNow"
 
 export type LiveAccountEscapeProps = Escape &
   ReturnType<typeof getActiveFromNow>
@@ -58,7 +30,7 @@ export const useLiveAccountEscape = (account?: WalletAccount) => {
   const { data: liveAccountEscape } = useSWR<
     LiveAccountEscapeProps | undefined
   >(
-    account ? [getAccountIdentifier(account), "accountEscape"] : null,
+    account ? [account.id, "accountEscape"] : null,
     async () => {
       if (!account?.escape) {
         return
@@ -101,8 +73,8 @@ export const useAccountEscapeWarning = () => {
   const maybeShowWarning = useCallback(async () => {
     if (accountWithNewEscape && !hasDisplayedWarning) {
       hasDisplayedWarning = true
-      await clientAccountService.select(accountWithNewEscape)
-      navigate(routes.smartAccountEscapeWarning(accountWithNewEscape.address))
+      await clientAccountService.select(accountWithNewEscape.id)
+      navigate(routes.smartAccountEscapeWarning(accountWithNewEscape.id))
     }
   }, [accountWithNewEscape, navigate])
 

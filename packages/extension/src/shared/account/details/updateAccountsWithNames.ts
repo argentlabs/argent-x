@@ -1,6 +1,6 @@
 import { partition } from "lodash-es"
 
-import { WalletAccount } from "../../wallet.model"
+import type { WalletAccount } from "../../wallet.model"
 
 export const updateAccountsWithNames = (accounts: WalletAccount[]) => {
   const [multisigAccounts, standardAccounts] = partition(

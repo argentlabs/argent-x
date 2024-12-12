@@ -1,9 +1,14 @@
 import {
+  ensureArray,
   estimatedFeeToMaxResourceBounds,
+  ETH_TOKEN_ADDRESS,
   getTxVersionFromFeeToken,
+  isEqualAddress,
+  STRK_TOKEN_ADDRESS,
 } from "@argent/x-shared"
+import type { AllowArray, Call } from "starknet"
 import { TransactionType, num } from "starknet"
-import {
+import type {
   ExtQueueItem,
   TransactionActionPayload,
 } from "../../shared/actionQueue/types"
@@ -12,11 +17,11 @@ import { SessionError } from "../../shared/errors/session"
 import { TransactionError } from "../../shared/errors/transaction"
 import { getMultisigAccountFromBaseWallet } from "../../shared/multisig/utils/baseMultisig"
 import { getEstimatedFees } from "../../shared/transactionSimulation/fees/estimatedFeesRepository"
-import {
+import type {
   ExtendedFinalityStatus,
   TransactionRequest,
-  nameTransaction,
 } from "../../shared/transactions"
+import { nameTransaction } from "../../shared/transactions"
 import {
   addTransaction,
   transactionsStore,
@@ -28,8 +33,10 @@ import {
 import { accountsEqual } from "../../shared/utils/accountsEqual"
 import { isSafeUpgradeTransaction } from "../../shared/utils/isSafeUpgradeTransaction"
 import { isAccountDeployed } from "../accountDeploy"
-import { getNonce, increaseStoredNonce } from "../nonce"
-import { Wallet } from "../wallet"
+import type { Wallet } from "../wallet"
+import { isArgentAccount } from "../../shared/utils/isExternalAccount"
+import { nonceManagementService } from "../nonceManagement"
+import { addTransactionHash } from "../../shared/transactions/transactionHashes/transactionHashesRepository"
 
 export type TransactionAction = ExtQueueItem<{
   type: "TRANSACTION"
@@ -40,7 +47,7 @@ export const executeTransactionAction = async (
   action: TransactionAction,
   wallet: Wallet,
 ) => {
-  const { transactions, abis, transactionsDetail, meta = {} } = action.payload
+  const { transactions, transactionsDetail, meta = {} } = action.payload
   const allTransactions = await transactionsStore.get()
   const preComputedFees = await getEstimatedFees({
     type: TransactionType.INVOKE,
@@ -78,7 +85,7 @@ export const executeTransactionAction = async (
   )
 
   const starknetAccount = await wallet.getStarknetAccount(
-    selectedAccount,
+    selectedAccount.id,
     hasUpgradePending,
   )
 
@@ -89,21 +96,36 @@ export const executeTransactionAction = async (
 
   // if nonce doesnt get provided by the UI, we can use the stored nonce to allow transaction queueing
   const nonceWasProvidedByUI = transactionsDetail?.nonce !== undefined // nonce can be a number of 0 therefore we need to check for undefined
+
   const nonce = accountNeedsDeploy
     ? num.toHex(1)
     : nonceWasProvidedByUI
       ? num.toHex(transactionsDetail?.nonce || 0)
-      : await getNonce(selectedAccount, starknetAccount)
+      : await nonceManagementService.getNonce(selectedAccount.id)
 
   const version = getTxVersionFromFeeToken(
     preComputedFees.transactions.feeTokenAddress,
   )
 
-  if (accountNeedsDeploy && preComputedFees.deployment) {
-    const { account, txHash } = await wallet.deployAccount(selectedAccount, {
+  if (
+    isArgentAccount(selectedAccount) &&
+    accountNeedsDeploy &&
+    preComputedFees.deployment
+  ) {
+    const deployDetails = {
       version,
       ...estimatedFeeToMaxResourceBounds(preComputedFees.deployment),
-    })
+    }
+
+    const deployTxHash = await wallet.getDeployAccountTransactionHash(
+      selectedAccount,
+      deployDetails,
+    )
+
+    const { account, txHash } = await wallet.deployAccount(
+      selectedAccount,
+      deployDetails,
+    )
     if (!checkTransactionHash(txHash)) {
       throw Error(
         "Deploy Account Transaction could not get added to the sequencer",
@@ -134,12 +156,23 @@ export const executeTransactionAction = async (
     throw new Error("Old Accounts are not supported anymore")
   }
 
-  const transaction = await acc.execute(transactions, abis, {
-    ...transactionsDetail,
+  const txDetails = {
+    ...(transactionsDetail || {}),
+    ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),
     nonce,
     version,
-    ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),
-  })
+  }
+
+  if (!isStrkOrEthTransfer(transactions)) {
+    const calculatedTxHash = await acc.getInvokeTransactionHash(
+      transactions,
+      txDetails,
+    )
+
+    await addTransactionHash(action.meta.hash, calculatedTxHash)
+  }
+
+  const transaction = await acc.execute(transactions, txDetails)
 
   if (!checkTransactionHash(transaction.transaction_hash, selectedAccount)) {
     throw new Error("Transaction could not get added to the sequencer")
@@ -166,8 +199,22 @@ export const executeTransactionAction = async (
 
   // This will not execute for multisig transactions
   if (!nonceWasProvidedByUI && finalityStatus === "RECEIVED") {
-    await increaseStoredNonce(selectedAccount)
+    await nonceManagementService.increaseLocalNonce(selectedAccount.id)
   }
 
   return transaction
+}
+
+const isStrkOrEthTransfer = (calls: AllowArray<Call>) => {
+  const callsArray = ensureArray(calls)
+  if (callsArray.length === 0) {
+    return false
+  }
+  const call = callsArray[0]
+
+  return (
+    call.entrypoint === "transfer" &&
+    (isEqualAddress(call.contractAddress, ETH_TOKEN_ADDRESS) ||
+      isEqualAddress(call.contractAddress, STRK_TOKEN_ADDRESS))
+  )
 }

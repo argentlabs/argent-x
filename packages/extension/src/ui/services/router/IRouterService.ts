@@ -1,4 +1,4 @@
-import { NavigateOptions } from "react-router-dom"
+import type { NavigateOptions } from "react-router-dom"
 
 export interface IRouterService {
   getInitialRoute: ({

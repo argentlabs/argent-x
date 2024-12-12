@@ -1,4 +1,5 @@
-import { Call, validateAndParseAddress } from "starknet"
+import type { Call } from "starknet"
+import { validateAndParseAddress } from "starknet"
 
 export interface ChangeGuardianCall extends Call {
   entrypoint: "changeGuardian" | "change_guardian"
@@ -15,7 +16,7 @@ export const isChangeGuardianCall = (
       validateAndParseAddress(call.contractAddress)
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

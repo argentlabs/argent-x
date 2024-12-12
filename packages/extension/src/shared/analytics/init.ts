@@ -1,6 +1,6 @@
 import { UUID } from "@amplitude/analytics-core"
 import { ampli } from "."
-import { Environment, LoadOptions } from "../../ampli"
+import type { Environment, LoadOptions } from "../../ampli"
 import { settingsStore } from "../settings"
 import { StoreDexie } from "../smartAccount/idb"
 

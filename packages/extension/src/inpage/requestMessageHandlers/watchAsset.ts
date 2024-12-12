@@ -1,4 +1,4 @@
-import { WatchAssetParameters } from "@starknet-io/types-js"
+import type { WatchAssetParameters } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
 import { addressSchema } from "@argent/x-shared"
 import { WalletRPCError, WalletRPCErrorCodes } from "./errors"

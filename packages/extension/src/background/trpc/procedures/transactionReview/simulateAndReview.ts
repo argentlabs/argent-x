@@ -2,14 +2,19 @@ import { z } from "zod"
 
 import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
-import { transactionReviewTransactionsSchema } from "../../../../shared/transactionReview/interface"
 import { enrichedSimulateAndReviewSchema } from "@argent/x-shared/simulation"
 import { addressSchema } from "@argent/x-shared"
+import {
+  accountDeployTransactionSchema,
+  transactionActionSchema,
+} from "../../../../shared/transactionReview/transactionAction.model"
 
 const simulateAndReviewSchema = z.object({
   feeTokenAddress: addressSchema,
-  transactions: z.array(transactionReviewTransactionsSchema),
+  transaction: transactionActionSchema,
+  accountDeployTransaction: accountDeployTransactionSchema.optional(),
   appDomain: z.string().optional(),
+  maxSendEstimate: z.boolean().optional(),
 })
 
 export const simulateAndReviewProcedure = extensionOnlyProcedure

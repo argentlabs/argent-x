@@ -1,8 +1,10 @@
-import { FC } from "react"
-import { UIShowNotificationPayload } from "../../shared/ui/UIMessage"
-import { Flex, FlexProps, Image, IconButton } from "@chakra-ui/react"
-import { P4 } from "@argent/x-ui"
+import type { FC } from "react"
+import type { UIShowNotificationPayload } from "../../shared/ui/UIMessage"
+import type { FlexProps } from "@chakra-ui/react"
+import { Flex, Image, IconButton } from "@chakra-ui/react"
+import { P3 } from "@argent/x-ui"
 import { CloseIcon } from "@chakra-ui/icons"
+import { isPlaywright } from "../../shared/api/constants"
 
 export interface NotificationProps
   extends FlexProps,
@@ -14,7 +16,7 @@ export const Notification: FC<NotificationProps> = ({
   onClose,
   ...rest
 }) => {
-  if ((window as any).PLAYWRIGHT) {
+  if (isPlaywright) {
     return null
   }
   return (
@@ -35,9 +37,9 @@ export const Notification: FC<NotificationProps> = ({
     >
       {iconUrl && <Image src={iconUrl} w={8} h={8} />}
       <Flex direction="column" flex={1}>
-        {title && <P4 fontWeight="bold">{title}</P4>}
+        {title && <P3 fontWeight="bold">{title}</P3>}
       </Flex>
-      <P4 color="text-secondary">View</P4>
+      <P3 color="text-secondary">View</P3>
       <IconButton
         position="absolute"
         bg="surface-elevated"

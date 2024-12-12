@@ -1,6 +1,6 @@
-import { DeepPick } from "../types/deepPick"
+import type { DeepPick } from "../types/deepPick"
 import { ALARM_VERSION } from "./constants"
-import {
+import type {
   BaseScheduledTask,
   IScheduleService,
   ImplementedScheduledTask,

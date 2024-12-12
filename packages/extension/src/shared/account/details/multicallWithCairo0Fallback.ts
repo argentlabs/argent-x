@@ -1,5 +1,5 @@
-import { Call } from "starknet"
-import { MinimalProviderInterface } from "@argent/x-multicall"
+import type { Call } from "starknet"
+import type { MinimalProviderInterface } from "@argent/x-multicall"
 
 import { getEntryPointSafe } from "../../utils/transactions"
 

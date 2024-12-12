@@ -1,8 +1,8 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { ScreenLayout } from "../layout/ScreenLayout"
 import { RestoreMultisigSidePanel } from "./RestoreMultisigSidePanel"
 import { Box, Flex, VStack } from "@chakra-ui/react"
-import { H6, P4 } from "@argent/x-ui"
+import { H5, P3 } from "@argent/x-ui"
 import { ActionButton } from "../../../components/FullScreenPage"
 
 export interface FoundMultisigData {
@@ -62,12 +62,12 @@ const FoundMultisigListItem: FC<{ foundMultisig: FoundMultisigData }> = ({
       width="100%"
     >
       <Flex flexDirection="column" gap="2px">
-        <H6 color="white">
+        <H5 color="white">
           {firstParthSignerKey}...{lastPartSignerKey}
-        </H6>
-        <P4 fontWeight="bold" color="neutrals.400">
+        </H5>
+        <P3 fontWeight="bold" color="neutrals.400">
           {foundMultisig.address}
-        </P4>
+        </P3>
       </Flex>
     </Box>
   )

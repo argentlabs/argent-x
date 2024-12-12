@@ -3,7 +3,13 @@ import DotenvWebPack from "dotenv-webpack"
 import path from "path"
 import type { StorybookConfig } from "@storybook/nextjs"
 
+import rootPkg from "../../../package.json"
+import { getLocalDevelopmentAttributes } from "../../extension/build/getLocalDevelopmentAttributes"
+
 export const isCI = Boolean(process.env.CI)
+
+const { hasLinkedPackageOverrides } =
+  getLocalDevelopmentAttributes(rootPkg) || {}
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -30,15 +36,10 @@ const config: StorybookConfig = {
     },
   },
   webpackFinal: async (config: Configuration) => {
-    /**
-     * Use Mui with styled-components
-     * @see https://mui.com/material-ui/guides/styled-engine/
-     */
     config.resolve = {
       ...config.resolve,
       alias: {
         ...(config.resolve?.alias || {}),
-        "@mui/styled-engine": "@mui/styled-engine-sc",
         "webextension-polyfill": path.resolve(
           __dirname,
           "./webextension-polyfill-mock.ts",
@@ -56,6 +57,15 @@ const config: StorybookConfig = {
     })
     if (fileLoaderRule && fileLoaderRule !== "...") {
       fileLoaderRule.exclude = /\.svg$/
+    }
+    if (hasLinkedPackageOverrides) {
+      // for linked local `@argent/...` package overrides, prioritise local node_modules
+      // otherwise their peerDependencies will be loaded from linked packages,
+      // resulting in duplicate instances of React etc. and some interesting bugs
+      config.resolve.modules = [
+        path.resolve(__dirname, "../node_modules"),
+        "node_modules",
+      ].concat(config.resolve?.modules || [])
     }
     config.module = {
       ...(config.module || {}),

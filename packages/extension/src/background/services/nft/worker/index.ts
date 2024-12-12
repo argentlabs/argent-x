@@ -2,7 +2,6 @@ import { nftService } from "../../../../shared/nft"
 import { debounceService } from "../../../../shared/debounce"
 import { chromeScheduleService } from "../../../../shared/schedule"
 import { old_walletStore } from "../../../../shared/wallet/walletStore"
-import { transactionsStore } from "../../../../shared/transactions/store"
 import {
   recoverySharedService,
   sessionService,
@@ -10,13 +9,14 @@ import {
 } from "../../../walletSingleton"
 import { backgroundUIService } from "../../ui"
 import { NftsWorker } from "./NftsWorker"
+import { activityService } from "../../activity"
 
 export const nftsWorker = new NftsWorker(
   nftService,
   chromeScheduleService,
   walletSingleton,
   old_walletStore,
-  transactionsStore,
+  activityService,
   sessionService,
   backgroundUIService,
   debounceService,

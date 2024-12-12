@@ -1,18 +1,18 @@
-import { H6, L2, P4, iconsDeprecated } from "@argent/x-ui"
+import { H5, icons, L2Bold, P3 } from "@argent/x-ui"
 import { Box, Flex, List, ListIcon, ListItem, Text } from "@chakra-ui/react"
-import { FC, PropsWithChildren, ReactNode } from "react"
+import type { FC, PropsWithChildren, ReactNode } from "react"
 
-import {
+import type {
   BaseWalletAccount,
   WalletAccount,
 } from "../../../../shared/wallet.model"
 import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
 import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
-import { DappDisplayAttributes } from "./useDappDisplayAttributes"
+import type { DappDisplayAttributes } from "../../../services/knownDapps/types"
 import { DappActionHeader } from "./DappActionHeader"
 import { getDefaultSortedAccounts } from "../../accounts/getDefaultSortedAccount"
 
-const { TickIcon, LinkIcon } = iconsDeprecated
+const { CheckmarkSecondaryIcon, LinkPrimaryIcon } = icons
 
 export interface ConnectDappScreenProps extends PropsWithChildren {
   isConnected: boolean
@@ -81,18 +81,18 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
           />
           {isConnected && (
             <Flex gap={1} color={"info.300"} alignItems={"center"} mt={2}>
-              <L2>
-                <LinkIcon
+              <L2Bold>
+                <LinkPrimaryIcon
                   transform={"rotate(-45deg)"}
                   display={"inline-block"}
                 />
                 This account is already connected
-              </L2>
+              </L2Bold>
             </Flex>
           )}
         </Flex>
         <Flex my={6} borderTop={"1px solid"} borderTopColor={"neutrals.800"} />
-        <H6 color="neutrals.400">This dapp will be able to:</H6>
+        <H5 color="neutrals.400">This dapp will be able to:</H5>
         <Box
           border="1px solid"
           borderColor="neutrals.700"
@@ -104,22 +104,22 @@ export const ConnectDappScreen: FC<ConnectDappScreenProps> = ({
           <List spacing={2}>
             <ListItem display="flex" alignItems="center">
               <ListIcon
-                as={TickIcon}
+                as={CheckmarkSecondaryIcon}
                 color="green.500"
                 marginInlineEnd="3"
                 fontSize="16"
               />
-              <P4>Read your wallet address</P4>
+              <P3>Read your wallet address</P3>
             </ListItem>
 
             <ListItem display="flex" alignItems="center">
               <ListIcon
-                as={TickIcon}
+                as={CheckmarkSecondaryIcon}
                 color="green.500"
                 marginInlineEnd="3"
                 fontSize="16"
               />
-              <P4>Request transactions</P4>
+              <P3>Request transactions</P3>
             </ListItem>
           </List>
 

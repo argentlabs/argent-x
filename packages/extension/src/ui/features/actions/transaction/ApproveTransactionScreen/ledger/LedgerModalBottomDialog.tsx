@@ -1,24 +1,18 @@
-import { H5, P3, P4, iconsDeprecated } from "@argent/x-ui"
-import {
-  Button,
-  Center,
-  CenterProps,
-  Spinner,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react"
-import { FC, ReactEventHandler, ReactNode, useMemo } from "react"
+import { CopyTooltip, H4, icons, L1Bold, P2, P3 } from "@argent/x-ui"
+import type { CenterProps } from "@chakra-ui/react"
+import { Button, Center, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
+import type { FC, ReactEventHandler, ReactNode } from "react"
+import { useMemo } from "react"
 
 import LedgerNanoConnected from "./assets/ledger-nano-connected.svg"
 import LedgerNanoDisconnected from "./assets/ledger-nano-disconnected.svg"
 import { upperFirst } from "lodash-es"
 
-const { AlertIcon, CloseIcon } = iconsDeprecated
-
 export enum LedgerModalBottomDialogState {
   CONFIRM = "CONFIRM",
   NOT_CONNECTED = "NOT_CONNECTED",
   INVALID_APP = "INVALID_APP",
+  UNSUPPORTED_APP_VERSION = "UNSUPPORTED_APP_VERSION",
   ERROR_UNKNOWN = "ERROR_UNKNOWN",
   ERROR_SIGNATURE_PENDING = "ERROR_SIGNATURE_PENDING",
   ERROR_REJECTED = "ERROR_REJECTED",
@@ -33,6 +27,7 @@ export interface LedgerModalBottomDialogProps
   onRetry?: ReactEventHandler
   actionType?: "transaction" | "signature"
   txHash?: string | null
+  deployTxHash?: string | null
 }
 
 export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
@@ -42,8 +37,21 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
   onRetry,
   actionType = "transaction",
   txHash,
+  deployTxHash,
   ...rest
 }) => {
+  const tooltip = useMemo(() => {
+    if (txHash && deployTxHash) {
+      return (
+        <CombinedTxHashTooltip txHash={txHash} deployTxHash={deployTxHash} />
+      )
+    } else if (txHash) {
+      return <TxHashTooltip txHash={txHash} />
+    }
+
+    return null
+  }, [deployTxHash, txHash])
+
   const content = useMemo(() => {
     switch (state) {
       case LedgerModalBottomDialogState.CONFIRM:
@@ -55,7 +63,7 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
                 Confirm on Ledger <Spinner size={"sm"} ml={1} />
               </>
             }
-            tooltip={txHash && <TxHashTooltip txHash={txHash} />}
+            tooltip={tooltip}
             subtitle={
               "Please confirm this transaction using your Ledger device"
             }
@@ -81,6 +89,15 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
           />
         )
 
+      case LedgerModalBottomDialogState.UNSUPPORTED_APP_VERSION:
+        return (
+          <LedgerModalContent
+            icon={<WarningCircleSecondaryIcon />}
+            title={"Update required"}
+            subtitle={errorMessage}
+          />
+        )
+
       case LedgerModalBottomDialogState.ERROR_UNKNOWN:
         return (
           <LedgerModalContent
@@ -94,7 +111,7 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
       case LedgerModalBottomDialogState.ERROR_SIGNATURE_PENDING:
         return (
           <LedgerModalContent
-            icon={<AlertIcon />}
+            icon={<WarningCircleSecondaryIcon />}
             title={"There is already another signature pending"}
             subtitle={
               "You need to clear that signature before you can confirm this transaction"
@@ -104,7 +121,7 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
       case LedgerModalBottomDialogState.ERROR_REJECTED:
         return (
           <LedgerModalContent
-            icon={<CloseIcon />}
+            icon={<CrossSecondaryIcon />}
             title={`${upperFirst(actionType)} rejected`}
             subtitle={`${upperFirst(actionType)} rejected on your Ledger`}
             onRetry={onRetry}
@@ -113,7 +130,7 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
       case LedgerModalBottomDialogState.ERROR:
         return (
           <LedgerModalContent
-            icon={<AlertIcon />}
+            icon={<WarningCircleSecondaryIcon />}
             title={"An error occurred"}
             subtitle={errorMessage}
             onRetry={onRetry}
@@ -121,7 +138,7 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
         )
     }
     state satisfies never
-  }, [actionType, errorMessage, onRetry, state, txHash])
+  }, [actionType, errorMessage, onRetry, state, tooltip])
 
   const disableCloseButton = state === LedgerModalBottomDialogState.CONFIRM
 
@@ -140,11 +157,33 @@ export const LedgerModalBottomDialog: FC<LedgerModalBottomDialogProps> = ({
 
 const TxHashTooltip: FC<{ txHash: string }> = ({ txHash }) => {
   return (
-    <Tooltip label={txHash} aria-label="Transaction hash">
-      <P4 color="text-secondary" mt={1}>
+    <CopyTooltip
+      copyValue={txHash}
+      prompt={txHash}
+      aria-label="Transaction hash"
+    >
+      <P3 color="text-secondary" mt={1}>
         {`${txHash.slice(0, 6)}...${txHash.slice(-4)}`}
-      </P4>
-    </Tooltip>
+      </P3>
+    </CopyTooltip>
+  )
+}
+
+const CombinedTxHashTooltip: FC<{ txHash: string; deployTxHash: string }> = ({
+  txHash,
+  deployTxHash,
+}) => {
+  return (
+    <VStack spacing={1} mt={1}>
+      <HStack align="baseline" gap="0.5">
+        <L1Bold>Deploy:</L1Bold>
+        <TxHashTooltip txHash={deployTxHash} />
+      </HStack>
+      <HStack align="baseline" gap="0.5">
+        <L1Bold>Transaction: </L1Bold>
+        <TxHashTooltip txHash={txHash} />
+      </HStack>
+    </VStack>
   )
 }
 
@@ -179,12 +218,12 @@ function LedgerModalContent({
           {icon}
         </Text>
       )}
-      {title && <H5>{title}</H5>}
+      {title && <H4>{title}</H4>}
       {tooltip}
       {subtitle && (
-        <P3 color="text-secondary" mt={2}>
+        <P2 color="text-secondary" mt={2}>
           {subtitle}
-        </P3>
+        </P2>
       )}
       {onRetry && (
         <Button bg="neutrals.600" mt={4} onClick={onRetry} w="full">
@@ -200,14 +239,16 @@ function LedgerModalContent({
 // TODO: Make this part of x-ui after latest release
 // =============================================================================
 
+import type { DrawerProps } from "@chakra-ui/react"
 import {
   Drawer,
   DrawerContent,
   DrawerOverlay,
-  DrawerProps,
   Flex,
   useModalContext,
 } from "@chakra-ui/react"
+
+const { WarningCircleSecondaryIcon, CrossSecondaryIcon } = icons
 
 export interface ModalBottomDialogProps extends DrawerProps {
   disableCloseButton?: boolean
@@ -267,7 +308,7 @@ export const ModalCloseButton: FC = () => {
         color: "white.50",
       }}
     >
-      <CloseIcon />
+      <CrossSecondaryIcon />
     </Button>
   )
 }

@@ -7,8 +7,15 @@ export function getPathForIndex(
 
 export function getIndexForPath(path: string, baseDerivationPath: string) {
   if (!path.startsWith(baseDerivationPath)) {
-    throw new Error("path should begin with baseDerivationPath")
+    throw new Error(
+      `path ${path} should begin with baseDerivationPath ${baseDerivationPath}`,
+    )
   }
+  const index = path.substring(path.lastIndexOf("/") + 1)
+  return parseInt(index)
+}
+
+export function getIndexForPathUnsafe(path: string) {
   const index = path.substring(path.lastIndexOf("/") + 1)
   return parseInt(index)
 }

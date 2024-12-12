@@ -1,4 +1,5 @@
-import { Call, validateAndParseAddress } from "starknet"
+import type { Call } from "starknet"
+import { validateAndParseAddress } from "starknet"
 import { MultisigEntryPointType } from "../multisig/types"
 
 export interface ChangeTresholdMultisigCall extends Call {
@@ -16,7 +17,7 @@ export const isChangeTresholdMultisigCall = (
       validateAndParseAddress(call.contractAddress)
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

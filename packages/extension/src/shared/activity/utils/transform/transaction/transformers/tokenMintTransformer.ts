@@ -1,8 +1,8 @@
 import { isErc20MintCall } from "../../../../../call"
 import { parseErc20Call } from "../../../../../call/erc20Call"
-import { TokenMintTransaction } from "../../type"
+import type { TokenMintTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 /** adds erc20 token mint data */
 

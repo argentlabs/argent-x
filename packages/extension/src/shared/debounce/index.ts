@@ -11,4 +11,4 @@ const debounceStorage = new KeyValueStorage(
 
 export const debounceService = new DebounceService(debounceStorage)
 
-export { IDebounceService } from "./IDebounceService"
+export type { IDebounceService } from "./IDebounceService"

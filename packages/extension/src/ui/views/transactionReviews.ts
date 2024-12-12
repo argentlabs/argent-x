@@ -5,8 +5,9 @@ import {
 } from "../../shared/transactionReview/store"
 import { atomFromKeyValueStore } from "./implementation/atomFromKeyValueStore"
 import { atom } from "jotai"
-import { AllowArray } from "../../shared/storage/__new/interface"
-import { ITransactionReviewWarning, ensureArray } from "@argent/x-shared"
+import type { AllowArray } from "../../shared/storage/__new/interface"
+import type { ITransactionReviewWarning } from "@argent/x-shared"
+import { ensureArray } from "@argent/x-shared"
 import { isArray, isEqual, lowerCase, upperFirst } from "lodash-es"
 
 export const allLabelsView = atomFromKeyValueStore(

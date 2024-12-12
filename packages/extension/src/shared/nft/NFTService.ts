@@ -1,16 +1,16 @@
+import type { BackendNftService, PaginatedCollections } from "@argent/x-shared"
 import {
   type Address,
   type ArgentBackendNetworkId,
-  BackendNftService,
   type Collection,
   type NftItem,
   type PaginatedItems,
   isEqualAddress,
   isArgentNetworkId,
-  PaginatedCollections,
 } from "@argent/x-shared"
 import { differenceWith, groupBy, isEqual } from "lodash-es"
-import { AllowArray, constants, num, shortString } from "starknet"
+import type { AllowArray } from "starknet"
+import { constants, num, shortString } from "starknet"
 import type { INFTService } from "./INFTService"
 import type {
   ContractAddress,
@@ -18,8 +18,8 @@ import type {
   INftsContractsRepository,
   INftsRepository,
 } from "./store"
-import { Network } from "../network"
-import { NetworkService } from "../network/service/NetworkService"
+import type { Network } from "../network"
+import type { NetworkService } from "../network/service/NetworkService"
 import type { KeyValueStorage } from "../storage"
 import type { ISettingsStorage } from "../settings/types"
 import {

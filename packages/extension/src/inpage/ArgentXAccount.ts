@@ -1,6 +1,5 @@
-import {
+import type {
   Abi,
-  Account,
   Call,
   DeclareContractPayload,
   DeclareContractResponse,
@@ -8,14 +7,13 @@ import {
   ProviderInterface,
   Signature,
   UniversalDetails,
-  defaultProvider,
-  ec,
 } from "starknet"
+import { Account, defaultProvider, ec } from "starknet"
 
 import { sendMessage, waitForMessage } from "./messageActions"
-import { StarknetMethodArgumentsSchemas } from "starknetkit/window"
-import { SignMessageOptions } from "../shared/messages/ActionMessage"
-import { TypedData } from "@starknet-io/types-js"
+import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
+import type { SignMessageOptions } from "../shared/messages/ActionMessage"
+import type { TypedData } from "@starknet-io/types-js"
 import { signTypedDataHandler } from "./requestMessageHandlers/signTypedData"
 
 /**

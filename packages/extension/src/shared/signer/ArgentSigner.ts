@@ -1,15 +1,17 @@
-import { Signature, Signer, encode, num } from "starknet"
+import type { Signature } from "starknet"
+import { Signer, encode, num } from "starknet"
 import { HDKey } from "@scure/bip32"
 import { hexToBytes } from "@noble/curves/abstract/utils"
 import { grindKey } from "./utils"
-import { BaseSignerInterface } from "./BaseSignerInterface"
+import type { BaseSignerInterface } from "./BaseSignerInterface"
 import { SignerType } from "../wallet.model"
-import { PublicKeyWithIndex } from "./types"
+import type { PublicKeyWithIndex } from "./types"
 import { isString } from "lodash-es"
 import { getStarkKey } from "micro-starknet"
 
 export class ArgentSigner extends Signer implements BaseSignerInterface {
   signerType: SignerType
+  derivationPath: string
   constructor(secret: string, derivationPath: string) {
     const hex = encode.removeHexPrefix(num.toHex(secret))
     // Bytes must be a multiple of 2 and default is multiple of 8
@@ -25,6 +27,7 @@ export class ArgentSigner extends Signer implements BaseSignerInterface {
     const groundKey = grindKey(childNode.privateKey)
     super(encode.sanitizeHex(groundKey))
     this.signerType = SignerType.LOCAL_SECRET
+    this.derivationPath = derivationPath
   }
 
   async getPubKey(): Promise<string> {

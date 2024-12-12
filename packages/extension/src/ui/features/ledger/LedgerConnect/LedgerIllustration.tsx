@@ -1,4 +1,4 @@
-import { FC, SVGProps } from "react"
+import type { FC, SVGProps } from "react"
 
 export const LedgerIllustration: FC<SVGProps<SVGSVGElement>> = (props) => {
   return (

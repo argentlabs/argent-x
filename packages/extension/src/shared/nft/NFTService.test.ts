@@ -1,7 +1,8 @@
-import { BackendNftService } from "@argent/x-shared"
+import type { BackendNftService } from "@argent/x-shared"
 import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
-import { beforeEach, describe, expect, vi, Mocked } from "vitest"
+import type { Mocked } from "vitest"
+import { beforeEach, describe, expect, vi } from "vitest"
 import { NFTService } from "./NFTService"
 import {
   emptyJson,
@@ -11,12 +12,12 @@ import {
   validJson,
 } from "./__mocks__/nft.mock"
 import { constants } from "starknet"
-import {
+import type {
   nftsCollectionsRepository,
   nftsContractsRepository,
   nftsRepository,
 } from "./store"
-import { networkService } from "../network/service"
+import type { networkService } from "../network/service"
 import type { KeyValueStorage } from "../storage"
 import type { ISettingsStorage } from "../settings/types"
 

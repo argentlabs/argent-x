@@ -1,11 +1,5 @@
-import React, {
-  FC,
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useState,
-} from "react"
+import type { FC, ReactNode } from "react"
+import React, { createContext, useCallback, useContext, useState } from "react"
 import browser from "webextension-polyfill"
 
 import { resetDevice } from "../../shared/smartAccount/jwt"
@@ -99,7 +93,7 @@ export const useHardResetAndReload = () => {
   const resetCache = useResetCache()
   const hardReload = useHardReload()
   return useCallback(async () => {
-    resetCache()
+    void resetCache()
     // delay should allow state to persist
     await delay(100)
     hardReload()

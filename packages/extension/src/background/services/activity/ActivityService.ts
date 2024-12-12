@@ -1,6 +1,4 @@
-import { map } from "rxjs/operators"
 import {
-  getAccountIdentifier,
   includesAddress,
   stripAddressZeroPadding,
   type Address,
@@ -57,7 +55,7 @@ import {
 } from "@argent/x-shared/simulation"
 import type { IKeyValueStorage } from "../../../shared/storage"
 import type { WalletStorageProps } from "../../wallet/backup/WalletBackupService"
-import { BaseToken } from "../../../shared/token/__new/types/token.model"
+import type { BaseToken } from "../../../shared/token/__new/types/token.model"
 
 /** maps activity details action to an equivalent Event to emit */
 
@@ -125,6 +123,8 @@ export class ActivityService implements IActivityService {
   async fetchAccountActivities(
     account?: BaseWalletAccount,
     updateModifiedAfter = true,
+    tokenAddress?: Address,
+    alwaysFetch = false,
   ) {
     const apiBaseUrl = ARGENT_API_BASE_URL
     if (!account || !apiBaseUrl) {
@@ -134,7 +134,17 @@ export class ActivityService implements IActivityService {
     if (!argentApiNetwork) {
       return
     }
-    const modifiedAfter = (await this.getModifiedAfter(account)) ?? 0
+    const modifiedAfter = alwaysFetch
+      ? 0
+      : ((await this.getModifiedAfter(account)) ?? 0)
+
+    // Prepare the query parameters
+    const queryParams: Record<string, any> = { modifiedAfter }
+    if (tokenAddress) {
+      queryParams.relatedAddress = stripAddressZeroPadding(tokenAddress)
+    }
+
+    // Construct the URL with the query parameters
     const url = urlWithQuery(
       [
         apiBaseUrl,
@@ -145,10 +155,9 @@ export class ActivityService implements IActivityService {
         stripAddressZeroPadding(account.address),
         "activities",
       ],
-      {
-        modifiedAfter,
-      },
+      queryParams,
     )
+
     const response = await this.httpService.get<ActivityResponse>(url)
     if (!response) {
       throw new ActivityError({ code: "FETCH_FAILED" })
@@ -161,7 +170,7 @@ export class ActivityService implements IActivityService {
         await this.setModifiedAfter(account, overallLastModified)
       }
     }
-    return activities
+    return activities.sort((a, b) => b.submitted - a.submitted)
   }
 
   async processAndEmitActivities({
@@ -196,10 +205,6 @@ export class ActivityService implements IActivityService {
     const tokenAddressesOnNetwork = tokensOnNetwork.map(
       (token) => token.address,
     )
-    const nftAddressesOnNetwork = nftsOnNetwork.map(
-      (nft) => nft.contractAddress as Address,
-    )
-
     /** ignore any "failure" */
 
     const filteredActivities = activities.filter(
@@ -215,7 +220,6 @@ export class ActivityService implements IActivityService {
       activities: filteredActivities,
       accountAddressesOnNetwork,
       tokenAddressesOnNetwork,
-      nftAddressesOnNetwork,
     })
 
     /** rehydrate the assets and accounts - these are already filtered to same network */
@@ -225,13 +229,6 @@ export class ActivityService implements IActivityService {
     )
     const tokens = tokensOnNetwork.filter((token) =>
       includesAddress(token.address, tokenActivity.tokenAddresses),
-    )
-
-    const nftAccounts = accountsOnNetwork.filter((account) =>
-      includesAddress(account.address, nftActivity.accountAddresses),
-    )
-    const nfts = nftsOnNetwork.filter((token) =>
-      includesAddress(token.contractAddress, nftActivity.tokenAddresses),
     )
 
     const newTokens: BaseToken[] = tokenActivity.newTokenAddresses.map(
@@ -248,7 +245,14 @@ export class ActivityService implements IActivityService {
       })
     }
 
-    if (nftAccounts.length && nfts.length) {
+    if (nftActivity.tokenAddresses.length) {
+      const nftAccounts = accountsOnNetwork.filter((account) =>
+        includesAddress(account.address, nftActivity.accountAddresses),
+      )
+      const nfts = nftsOnNetwork.filter((token) =>
+        includesAddress(token.contractAddress, nftActivity.tokenAddresses),
+      )
+
       void this.emitter.emit(NftActivity, {
         accounts: nftAccounts,
         nfts,
@@ -292,14 +296,12 @@ export class ActivityService implements IActivityService {
     account: BaseWalletAccount,
   ): Promise<number | undefined> {
     const { modifiedAfter } = await this.activityStore.get()
-    const key = getAccountIdentifier(account)
-    return modifiedAfter[key]
+    return modifiedAfter[account.id]
   }
 
   async setModifiedAfter(account: BaseWalletAccount, value: number) {
     const { modifiedAfter } = await this.activityStore.get()
-    const key = getAccountIdentifier(account)
-    modifiedAfter[key] = value
+    modifiedAfter[account.id] = value
     await this.activityStore.set({ modifiedAfter })
   }
 }

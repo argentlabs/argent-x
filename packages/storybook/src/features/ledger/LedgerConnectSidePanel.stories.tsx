@@ -1,5 +1,5 @@
 import {
-  LedgerConnectSidePanel,
+  default as LedgerConnectSidePanel,
   LedgerConnectSidePanelProps,
 } from "@argent-x/extension/src/ui/features/ledger/LedgerConnect/LedgerConnectSidePanel"
 

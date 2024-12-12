@@ -1,5 +1,6 @@
-import { AccountMessage } from "../shared/messages/AccountMessage"
-import { HandleMessage, UnhandledMessage } from "./background"
+import type { AccountMessage } from "../shared/messages/AccountMessage"
+import type { HandleMessage } from "./background"
+import { UnhandledMessage } from "./background"
 
 export const handleAccountMessage: HandleMessage<AccountMessage> = async ({
   msg,

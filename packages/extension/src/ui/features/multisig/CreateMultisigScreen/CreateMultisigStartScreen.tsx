@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 
-import { SignerType } from "../../../../shared/wallet.model"
+import type { SignerType } from "../../../../shared/wallet.model"
 import { MultisigCreationForm } from "./MultisigCreationForm"
 
 export const CreateMultisigStartScreen = () => {

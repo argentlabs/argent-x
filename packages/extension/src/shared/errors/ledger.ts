@@ -1,5 +1,6 @@
 import { LedgerError } from "@ledgerhq/hw-app-starknet"
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 import { isNumber, isString } from "lodash-es"
 
 // Taken from ledger clientjs
@@ -18,6 +19,7 @@ export enum AX_LEDGER_ERROR_MESSAGES {
   PUBKEY_GENERATION_ERROR = "Public keys generation error",
   UNKNOWN_ERROR = "Unknown error",
   UNSUPPORTED_ACCOUNT_TYPE = "Unsupported account type",
+  UNSUPPORTED_APP_VERSION = "To transact, you must update the starknet app on ledger to the latest version",
 }
 
 const STATUS_CODE_TO_AX_LEDGER_ERROR_MESSAGE = {

@@ -1,9 +1,8 @@
 import { Flex, Text } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-import { FormError } from "../../theme/Typography"
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
-import { TokenIcon } from "@argent/x-ui"
+import { FieldError, TokenIcon } from "@argent/x-ui"
 
 interface HideTokenScreenProps {
   error: string
@@ -28,7 +27,7 @@ export const HideTokenScreen: FC<HideTokenScreenProps> = ({
         <TokenIcon url={image} name={name} size={12} />
         <Text fontSize="medium">{name}</Text>
       </Flex>
-      {error && <FormError>{error}</FormError>}
+      {error && <FieldError>{error}</FieldError>}
 
       <Flex
         paddingTop={8}

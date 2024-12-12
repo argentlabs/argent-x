@@ -3,11 +3,13 @@ import { describe, expect, test } from "vitest"
 import { InMemoryRepository } from "../storage/__new/__test__/inmemoryImplementations"
 import { isEqualPreAuthorization, type PreAuthorization } from "./schema"
 import { PreAuthorizationService } from "./PreAuthorizationService"
+import { getRandomAccountIdentifier } from "../utils/accountIdentifier"
 
 describe("PreAuthorisationService", () => {
   const preAuthorizations: PreAuthorization[] = [
     {
       account: {
+        id: getRandomAccountIdentifier(),
         address: "0x123",
         networkId: "foo",
       },
@@ -15,6 +17,7 @@ describe("PreAuthorisationService", () => {
     },
     {
       account: {
+        id: getRandomAccountIdentifier(),
         address: "0x123",
         networkId: "bar",
       },
@@ -63,6 +66,7 @@ describe("PreAuthorisationService", () => {
         await expect(
           preAuthorisationService.add({
             account: {
+              id: "id1",
               address: "0x123",
               networkId: "foo",
             },

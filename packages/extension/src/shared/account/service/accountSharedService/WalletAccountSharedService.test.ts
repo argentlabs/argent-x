@@ -1,16 +1,17 @@
-import {
-  WalletAccountSharedService,
-  WalletSession,
-} from "./WalletAccountSharedService"
-import { WalletStorageProps } from "../../../wallet/walletStore"
+import type { WalletSession } from "./WalletAccountSharedService"
+import { WalletAccountSharedService } from "./WalletAccountSharedService"
+import type { WalletStorageProps } from "../../../wallet/walletStore"
 
-import {
-  BaseMultisigWalletAccount,
-  defaultNetworkOnlyPlaceholderAccount,
-} from "../../../wallet.model"
-import { PendingMultisig } from "../../../multisig/types"
+import type { BaseMultisigWalletAccount } from "../../../wallet.model"
+import { defaultNetworkOnlyPlaceholderAccount } from "../../../wallet.model"
+import type { PendingMultisig } from "../../../multisig/types"
 
-import { WalletAccount } from "../../../wallet.model"
+import type { WalletAccount } from "../../../wallet.model"
+import type {
+  IObjectStore,
+  IRepository,
+} from "../../../storage/__new/interface"
+import { getRandomAccountIdentifier } from "../../../utils/accountIdentifier"
 import {
   accountServiceMock,
   getMultisigStoreMock,
@@ -19,11 +20,7 @@ import {
   getStoreMock,
   getWalletStoreMock,
   httpServiceMock,
-  // Doesnt matter for tests
-  // eslint-disable-next-line @argent/local/code-import-patterns
-} from "../../../../background/wallet/test.utils"
-import { IObjectStore, IRepository } from "../../../storage/__new/interface"
-import { defaultNetwork } from "../../../network"
+} from "../../../test.utils"
 
 describe("WalletAccountSharedService", () => {
   let service: WalletAccountSharedService
@@ -62,7 +59,7 @@ describe("WalletAccountSharedService", () => {
         accountServiceMock,
       )
 
-      const result = await service.getAccount(accountMock)
+      const result = await service.getAccount(accountMock.id)
 
       expect(walletStoreMock.get).toHaveBeenCalledWith(expect.any(Function))
       expect(result).toEqual(accountMock)
@@ -92,7 +89,7 @@ describe("WalletAccountSharedService", () => {
         accountServiceMock,
       )
 
-      await expect(service.getAccount(accountMock)).rejects.toThrow(
+      await expect(service.getAccount(accountMock.id)).rejects.toThrow(
         "Account not found",
       )
     })
@@ -207,10 +204,6 @@ describe("WalletAccountSharedService", () => {
     })
 
     it("should throw an error when the selected account is not found", async () => {
-      const accountIdentifierMock = {
-        address: "address",
-        networkId: "networkId",
-      }
       const accountsMock = [
         { address: "address1", networkId: "networkId1" },
         { address: "address2", networkId: "networkId2" },
@@ -233,19 +226,23 @@ describe("WalletAccountSharedService", () => {
         accountServiceMock,
       )
 
-      await expect(
-        service.selectAccount(accountIdentifierMock),
-      ).rejects.toThrow("Account not found")
+      await expect(service.selectAccount("abc")).rejects.toThrow(
+        "Account not found",
+      )
     })
 
     it("should set selected account and return it when a valid account identifier is provided", async () => {
-      const accountIdentifierMock = {
-        address: "0x2",
-        networkId: "networkId2",
-      }
+      const accountIdentifierMock = getRandomAccountIdentifier(
+        "0x2",
+        "networkId2",
+      )
       const accountsMock = [
-        { address: "0x1", networkId: "networkId1" },
-        { address: "0x2", networkId: "networkId2" },
+        {
+          address: "0x1",
+          networkId: "networkId1",
+          id: getRandomAccountIdentifier(),
+        },
+        { address: "0x2", networkId: "networkId2", id: accountIdentifierMock },
       ] as WalletAccount[]
       storeMock = getStoreMock()
       walletStoreMock = getWalletStoreMock({
@@ -271,6 +268,7 @@ describe("WalletAccountSharedService", () => {
 
       expect(storeMock.set).toHaveBeenCalledWith({
         selected: {
+          id: accountIdentifierMock,
           address: accountsMock[1].address,
           networkId: accountsMock[1].networkId,
         },
@@ -281,9 +279,11 @@ describe("WalletAccountSharedService", () => {
 
   describe("getMultisigAccount", () => {
     it("should return the multisig wallet account when found", async () => {
+      const id = getRandomAccountIdentifier()
       const accountIdentifierMock = {
         address: "address",
         networkId: "networkId",
+        id,
       }
       const walletAccountMock = {
         address: "address",
@@ -319,7 +319,7 @@ describe("WalletAccountSharedService", () => {
         accountServiceMock,
       )
 
-      const result = await service.getMultisigAccount(accountIdentifierMock)
+      const result = await service.getMultisigAccount(accountIdentifierMock.id)
 
       expect(walletStoreMock.get).toHaveBeenCalledWith(expect.any(Function))
       expect(multisigStoreMock.get).toHaveBeenCalledWith(expect.any(Function))
@@ -327,9 +327,11 @@ describe("WalletAccountSharedService", () => {
     })
 
     it("should throw an error when multisig wallet account not found", async () => {
+      const id = getRandomAccountIdentifier()
       const accountIdentifierMock = {
         address: "address",
         networkId: "networkId",
+        id,
       }
       const walletAccountMock = {
         address: "address",
@@ -358,8 +360,76 @@ describe("WalletAccountSharedService", () => {
       )
 
       await expect(
-        service.getMultisigAccount(accountIdentifierMock),
+        service.getMultisigAccount(accountIdentifierMock.id),
       ).rejects.toThrow("Multisig base wallet account not found")
+    })
+  })
+
+  describe("getLastUsedAccountOnNetwork", () => {
+    it("should return the last used account on network", async () => {
+      const accountsMock = [
+        { address: "address1", networkId: "networkId1" },
+        { address: "address2", networkId: "networkId2" },
+      ] as WalletAccount[]
+
+      storeMock = getStoreMock({
+        set: vi.fn(),
+        subscribe: vi.fn(),
+        namespace: "",
+        get: vi.fn(() =>
+          Promise.resolve({
+            selected: {
+              id: accountsMock[0].id,
+              address: accountsMock[0].address,
+              networkId: accountsMock[0].networkId,
+            },
+            lastUsedAccountByNetwork: {
+              networkId1: {
+                id: accountsMock[0].id,
+                address: accountsMock[0].address,
+                networkId: accountsMock[0].networkId,
+              },
+            },
+          }),
+        ),
+      })
+      walletStoreMock = getWalletStoreMock({
+        get: vi.fn(() => Promise.resolve(accountsMock)),
+      })
+      sessionStoreMock = getSessionStoreMock()
+      multisigStoreMock = getMultisigStoreMock()
+      pendingMultisigStoreMock = getPendingMultisigStoreMock()
+
+      service = new WalletAccountSharedService(
+        storeMock,
+        walletStoreMock,
+        sessionStoreMock,
+        multisigStoreMock,
+        pendingMultisigStoreMock,
+        httpServiceMock,
+        accountServiceMock,
+      )
+
+      await service.selectAccount(accountsMock[0].id)
+      const result = await service.getSelectedAccount()
+
+      expect(sessionStoreMock.get).toHaveBeenCalled()
+      expect(walletStoreMock.get).toHaveBeenCalled()
+      expect(storeMock.get).toHaveBeenCalled()
+
+      expect(result).toEqual({
+        id: accountsMock[0].id,
+        address: accountsMock[0].address,
+        networkId: accountsMock[0].networkId,
+      })
+
+      const lastUsedAccountByNetwork =
+        await service.getLastUsedAccountOnNetwork("networkId1")
+      expect(lastUsedAccountByNetwork).toEqual({
+        id: accountsMock[0].id,
+        address: accountsMock[0].address,
+        networkId: accountsMock[0].networkId,
+      })
     })
   })
 })

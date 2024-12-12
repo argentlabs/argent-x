@@ -9,5 +9,5 @@ export const fetchDetailsProcedure = extensionOnlyProcedure
   .input(BaseTokenSchema)
   .output(RequestTokenSchema)
   .query(async ({ input: baseToken }) => {
-    return await tokenService.fetchTokenDetails(baseToken)
+    return tokenService.fetchTokenDetails(baseToken)
   })

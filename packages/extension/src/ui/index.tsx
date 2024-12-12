@@ -2,13 +2,12 @@ import { lazy, StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 
 import { ARGENT_API_ENABLED } from "../shared/api/constants"
-import { App } from "./App"
 import { clientUIService } from "./services/ui"
 
-// allows the popup to open instantly
-// const App = lazy(() =>
-//   import("./App").then((module) => ({ default: module.App })),
-// )
+// lazy allows the popup to open instantly
+const App = lazy(() =>
+  import("./App").then((module) => ({ default: module.App })),
+)
 
 const container = document.getElementById("root")
 

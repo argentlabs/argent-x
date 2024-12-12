@@ -1,4 +1,4 @@
-import { Transaction } from "../transactions"
+import type { Transaction } from "../transactions"
 import { getTransactionStatus } from "../transactions/utils"
 
 export const hasSuccessfulTransaction = (

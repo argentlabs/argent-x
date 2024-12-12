@@ -1,18 +1,15 @@
 import { defaultNetworks } from "../../../shared/network"
-import { INetworkService } from "../../../shared/network/service/INetworkService"
-import {
+import type { INetworkService } from "../../../shared/network/service/INetworkService"
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { WalletSession } from "../session/walletSession.model"
-import {
-  Events,
-  IWalletRecoveryService,
-  Recovered,
-} from "./IWalletRecoveryService"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletSession } from "../session/walletSession.model"
+import type { Events, IWalletRecoveryService } from "./IWalletRecoveryService"
+import { Recovered } from "./IWalletRecoveryService"
 import { WalletError } from "../../../shared/errors/wallet"
-import Emittery from "emittery"
+import type Emittery from "emittery"
 import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 import { isEqualAddress } from "@argent/x-shared"
 

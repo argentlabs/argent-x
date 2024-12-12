@@ -1,12 +1,12 @@
 import { addressSchema, prettifyCurrencyValue } from "@argent/x-shared"
-import { TokenButton, getTokenIconUrl } from "@argent/x-ui"
-import { FC } from "react"
+import { getTokenIconUrl, TokenButton } from "@argent/x-ui"
+import type { FC } from "react"
 import { prettifyTokenBalance } from "../../../../shared/token/prettifyTokenBalance"
 import { selectedAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
 import { useTokenAmountToCurrencyValue } from "../../accountTokens/tokenPriceHooks"
-import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
-import { Token } from "../../../../shared/token/__new/types/token.model"
+import type { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
 import { useTokenBalanceForAccount } from "../../accountTokens/useTokenBalanceForAccount"
 
 interface OwnedTokenProps {

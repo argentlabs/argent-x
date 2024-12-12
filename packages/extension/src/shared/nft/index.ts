@@ -6,18 +6,13 @@ import {
   nftsRepository,
 } from "./store"
 import { NFTService } from "./NFTService"
-import { ARGENT_API_BASE_URL, ARGENT_OPTIMIZER_URL } from "../api/constants"
+import { ARGENT_API_BASE_URL } from "../api/constants"
 import { settingsStore } from "../settings/store"
+import { httpService } from "../http/singleton"
 
 export const backendNftService = new BackendNftService(
   ARGENT_API_BASE_URL,
-  {
-    headers: {
-      "argent-version": process.env.VERSION ?? "Unknown version",
-      "argent-client": "argent-x",
-    },
-  },
-  ARGENT_OPTIMIZER_URL,
+  httpService,
 )
 
 export const nftService = new NFTService(

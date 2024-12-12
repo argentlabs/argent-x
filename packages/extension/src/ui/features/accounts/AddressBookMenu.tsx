@@ -1,19 +1,12 @@
 import { B3 } from "@argent/x-ui"
-import {
-  Box,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanelProps,
-  TabPanels,
-  TabProps,
-  Tabs,
-} from "@chakra-ui/react"
-import { FC, useCallback } from "react"
+import type { TabPanelProps, TabProps } from "@chakra-ui/react"
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react"
+import type { FC } from "react"
+import { useCallback } from "react"
 
 import type { AddressBookContact } from "../../../shared/addressBook/type"
-import { WalletAccount } from "../../../shared/wallet.model"
-import { AddressBook } from "../../hooks/useAddressBook"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import type { AddressBook } from "../../hooks/useAddressBook"
 import { AccountListItem } from "./AccountListItem"
 
 const StyledTab = ({ children, ...rest }: TabProps) => (
@@ -56,7 +49,8 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
 
         return (
           <AccountListItem
-            key={account.address}
+            key={account.id}
+            accountId={account.id}
             accountName={accountName}
             accountAddress={account.address}
             networkId={account.networkId}

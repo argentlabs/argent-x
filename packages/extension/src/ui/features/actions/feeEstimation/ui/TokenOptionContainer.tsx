@@ -1,13 +1,11 @@
-import {
-  Address,
-  prettifyCurrencyValue,
-  prettifyTokenAmount,
-} from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
+import { prettifyCurrencyValue, prettifyTokenAmount } from "@argent/x-shared"
 import { getTokenIconUrl } from "@argent/x-ui"
-import { FC, useCallback, useEffect, useState } from "react"
+import type { FC } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { num } from "starknet"
 import { AccountError } from "../../../../../shared/errors/account"
-import { TokenWithBalance } from "../../../../../shared/token/__new/types/tokenBalance.model"
+import type { TokenWithBalance } from "../../../../../shared/token/__new/types/tokenBalance.model"
 import { TokenOption } from "../../../../components/TokenOption"
 import { clientAccountService } from "../../../../services/account"
 import {
@@ -49,7 +47,7 @@ export const TokenOptionContainer: FC<TokenOptionContainerProps> = ({
   onFeeTokenSelect,
   ref,
 }) => {
-  const account = useWalletAccount(token.account)
+  const account = useWalletAccount(token.account.id)
   const { name, iconUrl, symbol, address, balance } = toTokenView(token)
   const showCurrencyValue = useCurrencyDisplayEnabled()
   const currencyValue = useTokenBalanceToCurrencyValue(token)
@@ -91,7 +89,7 @@ export const TokenOptionContainer: FC<TokenOptionContainerProps> = ({
       errorText="Insufficient funds"
       requiresTxV3Upgrade={requiresTxV3Upgrade}
       onTokenSelect={() => onFeeTokenSelect(token)}
-      onEnableTxV3={enableTxV3}
+      onEnableTxV3={() => void enableTxV3()}
       upgradeLoading={upgradeLoading}
     />
   )

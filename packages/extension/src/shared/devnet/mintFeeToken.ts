@@ -2,9 +2,9 @@ import urlJoin from "url-join"
 
 import { networkService as argentNetworkService } from "../network/service"
 
-import { BaseWalletAccount } from "../wallet.model"
-import { INetworkService } from "../network/service/INetworkService"
-import { FRI, WEI } from "@argent/x-shared"
+import type { BaseWalletAccount } from "../wallet.model"
+import type { INetworkService } from "../network/service/INetworkService"
+import type { FRI, WEI } from "@argent/x-shared"
 
 export const tryToMintFeeToken = async (
   account: BaseWalletAccount,
@@ -29,7 +29,6 @@ export const tryToMintFeeToken = async (
         address: account.address.toLowerCase().replace("0x0", "0x"),
         amount: 1e18,
         unit,
-        lite: true,
       }),
     })
 

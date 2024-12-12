@@ -1,5 +1,7 @@
-import { Box, BoxProps } from "@chakra-ui/react"
-import { FC, useEffect, useMemo } from "react"
+import type { BoxProps } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
+import type { FC } from "react"
+import { useEffect, useMemo } from "react"
 import { Fit, Layout, useRive } from "@rive-app/react-canvas"
 
 export interface LedgerConnectSidePanelProps extends BoxProps {
@@ -8,7 +10,7 @@ export interface LedgerConnectSidePanelProps extends BoxProps {
   error: boolean
 }
 
-export const LedgerConnectSidePanel: FC<LedgerConnectSidePanelProps> = ({
+const LedgerConnectSidePanel: FC<LedgerConnectSidePanelProps> = ({
   hover,
   connect,
   error,
@@ -63,3 +65,5 @@ export const LedgerConnectSidePanel: FC<LedgerConnectSidePanelProps> = ({
     </Box>
   )
 }
+
+export default LedgerConnectSidePanel

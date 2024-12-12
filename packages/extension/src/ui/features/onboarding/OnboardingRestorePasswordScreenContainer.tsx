@@ -1,18 +1,15 @@
 import { useNavigateBack, useToast } from "@argent/x-ui"
-import { FC, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { getMessageFromTrpcError } from "@argent/x-shared"
 import { useAtom } from "jotai"
 import { isErrorOfType } from "../../../shared/errors/errorData"
-import {
-  RecoveryError,
-  RecoveryErrorMessage,
-} from "../../../shared/errors/recovery"
-import {
-  WALLET_ERROR_MESSAGES,
-  WalletValidationErrorMessage,
-} from "../../../shared/errors/wallet"
+import type { RecoveryErrorMessage } from "../../../shared/errors/recovery"
+import { RecoveryError } from "../../../shared/errors/recovery"
+import type { WalletValidationErrorMessage } from "../../../shared/errors/wallet"
+import { WALLET_ERROR_MESSAGES } from "../../../shared/errors/wallet"
 import { routes } from "../../../shared/ui/routes"
 import { clientRecoveryService } from "../../services/recovery"
 import { useView } from "../../views/implementation/react"
@@ -91,7 +88,7 @@ export const OnboardingRestorePasswordScreenContainer: FC = () => {
   }
   return (
     <OnboardingPasswordScreen
-      title="New password"
+      title={"Create a password"}
       submitText={{
         start: buttonLabel,
         submitting: "Restoring…",

@@ -1,5 +1,5 @@
 import type { ArraySignatureType } from "starknet"
-import { TypedData } from "@starknet-io/types-js"
+import type { TypedData } from "@starknet-io/types-js"
 
 export interface SignMessageOptions {
   skipDeploy: boolean

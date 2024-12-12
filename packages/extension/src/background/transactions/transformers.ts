@@ -1,6 +1,6 @@
-import { Transaction } from "../../shared/transactions"
-import { WalletAccount } from "../../shared/wallet.model"
-import { VoyagerTransaction } from "./sources/voyager.model"
+import type { Transaction } from "../../shared/transactions"
+import type { WalletAccount } from "../../shared/wallet.model"
+import type { VoyagerTransaction } from "./sources/voyager.model"
 
 export const mapVoyagerTransactionToTransaction = (
   transaction: VoyagerTransaction,

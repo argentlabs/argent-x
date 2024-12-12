@@ -1,7 +1,7 @@
-import { H5, iconsDeprecated } from "@argent/x-ui"
+import { H4, icons } from "@argent/x-ui"
 import { Flex, Text } from "@chakra-ui/react"
 
-const { SwapIcon } = iconsDeprecated
+const { SwapPrimaryIcon } = icons
 
 export function NoSwap() {
   return (
@@ -14,11 +14,11 @@ export function NoSwap() {
       mx="14"
     >
       <Text fontSize="40">
-        <SwapIcon />
+        <SwapPrimaryIcon />
       </Text>
-      <H5 mt="10" textAlign="center">
+      <H4 mt="10" textAlign="center">
         Swaps are not available on this network
-      </H5>
+      </H4>
     </Flex>
   )
 }

@@ -1,14 +1,13 @@
 import { useEffect } from "react"
-import useSWR, {
+import type {
   BareFetcher,
   Cache,
   Key,
   SWRConfiguration,
-  unstable_serialize,
-  useSWRConfig,
   Revalidator,
   RevalidatorOptions,
 } from "swr"
+import useSWR, { unstable_serialize, useSWRConfig } from "swr"
 
 import { reviveJsonBigNumber } from "../../shared/json"
 import {
@@ -161,5 +160,9 @@ export function onErrorRetry<Data = any, Error = any>(
     return
   }
 
-  setTimeout(revalidate, timeout, opts)
+  setTimeout(
+    () => void revalidate({ retryCount: currentRetryCount }),
+    timeout,
+    opts,
+  )
 }

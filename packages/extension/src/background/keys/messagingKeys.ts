@@ -1,4 +1,5 @@
-import { JWK, KeyLike, exportJWK, generateKeyPair, importJWK } from "jose"
+import type { JWK, KeyLike } from "jose"
+import { exportJWK, generateKeyPair, importJWK } from "jose"
 import browser from "webextension-polyfill"
 
 export interface MessagingKeys {
@@ -29,7 +30,7 @@ export async function getMessagingKeys(): Promise<MessagingKeys> {
   const privateKeyJwk = { alg: "ECDH-ES", ...exportedPrivateKey }
   const publicKeyJwk = { alg: "ECDH-ES", ...exportedPublicKey }
 
-  browser.storage.local.set({
+  void browser.storage.local.set({
     PRIVATE_KEY: JSON.stringify(privateKeyJwk),
     PUBLIC_KEY: JSON.stringify(publicKeyJwk),
   })

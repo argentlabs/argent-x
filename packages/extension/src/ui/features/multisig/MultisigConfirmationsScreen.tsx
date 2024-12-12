@@ -1,25 +1,23 @@
-import { H1, H4, P3 } from "@argent/x-ui"
+import { H3, MassiveTitle, P2 } from "@argent/x-ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
-import { FC } from "react"
+import type { FC } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
-import { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
-import {
-  FieldValuesThresholdForm,
-  useUpdateThresholdForm,
-} from "./hooks/useUpdateThreshold"
+import type { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
+import type { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
+import { useUpdateThresholdForm } from "./hooks/useUpdateThreshold"
 import { multisigView } from "./multisig.state"
 import { MultisigSettingsWrapper } from "./MultisigSettingsWrapper"
 import { SetConfirmationsInput } from "./SetConfirmationsInput"
 import { multisigService } from "../../services/multisig"
-import { SignerMetadata } from "../../../shared/multisig/types"
+import type { SignerMetadata } from "../../../shared/multisig/types"
 import { decodeBase58 } from "@argent/x-shared"
 import { useView } from "../../views/implementation/react"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigConfirmationsScreen: FC = () => {
   const account = useRouteWalletAccount()
@@ -163,10 +161,10 @@ export const BaseMultisigConfirmations = ({
       height="full"
     >
       <Flex flexDirection="column" gap="1">
-        <H4>Set confirmations</H4>
-        <P3 color="neutrals.100" pb={4}>
+        <H3>Set confirmations</H3>
+        <P2 color="neutrals.100" pb={4}>
           How many owners must confirm each transaction before it&apos;s sent?
-        </P3>
+        </P2>
       </Flex>
       {account.needsDeploy ? (
         <Box height="full">
@@ -178,13 +176,13 @@ export const BaseMultisigConfirmations = ({
             boxShadow="menu"
           >
             <Center>
-              <H1>{multisig?.threshold}</H1>
+              <MassiveTitle>{multisig?.threshold}</MassiveTitle>
             </Center>
           </Box>
           <Center>
-            <P3 color="neutrals.100">
+            <P2 color="neutrals.100">
               out of {multisig?.signers.length} owners
-            </P3>
+            </P2>
           </Center>
         </Box>
       ) : (

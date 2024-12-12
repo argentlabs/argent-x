@@ -1,6 +1,7 @@
 import { updateMultisigAccountDetails } from "../../../shared/account/update"
-import { MULTISG_TXN_TYPES, Transaction } from "../../../shared/transactions"
-import { TransactionUpdateListener } from "./type"
+import type { Transaction } from "../../../shared/transactions"
+import { MULTISG_TXN_TYPES } from "../../../shared/transactions"
+import type { TransactionUpdateListener } from "./type"
 
 export const handleMultisigUpdates: TransactionUpdateListener = async (
   updates: Transaction[],

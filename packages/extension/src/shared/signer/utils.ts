@@ -1,9 +1,16 @@
-import { Hex, bytesToHex } from "@noble/curves/abstract/utils"
+import type { Hex } from "@noble/curves/abstract/utils"
+import { bytesToHex } from "@noble/curves/abstract/utils"
 import { sha256 } from "@noble/hashes/sha256"
 import { encode } from "starknet"
 import { grindKey as microGrindKey } from "micro-starknet"
-import { CreateAccountType, SignerType } from "../wallet.model"
+import type {
+  CreateAccountType,
+  ExternalAccountType,
+  SignerType,
+  WalletAccountType,
+} from "../wallet.model"
 import { DERIVATION_PATHS } from "./derivationPaths"
+import { assertNever } from "../utils/assertNever"
 
 const { addHexPrefix } = encode
 
@@ -26,7 +33,7 @@ export function pathHash(name: string): number {
 }
 
 export function getBaseDerivationPath(
-  accountType: CreateAccountType,
+  accountType: CreateAccountType | ExternalAccountType,
   signerType: SignerType,
 ): string {
   const path = DERIVATION_PATHS[accountType][signerType]
@@ -36,4 +43,36 @@ export function getBaseDerivationPath(
     )
   }
   return path
+}
+
+export const getDerivationPathForIndex = (
+  index: number,
+  signerType: SignerType,
+  accountType: WalletAccountType,
+): string => {
+  const getDerivableType = (
+    accountType: WalletAccountType,
+  ): CreateAccountType | ExternalAccountType => {
+    switch (accountType) {
+      case "standard":
+      case "multisig":
+      case "smart":
+      case "standardCairo0":
+      case "imported":
+        return accountType
+      case "argent5MinuteEscapeTestingAccount":
+        return "smart"
+      case "plugin":
+      case "betterMulticall":
+        return "standard"
+      default:
+        assertNever(accountType)
+        throw new Error(`Unsupported account type ${accountType}`)
+    }
+  }
+
+  const derivableType = getDerivableType(accountType)
+  const baseDerivationPath = getBaseDerivationPath(derivableType, signerType)
+
+  return `${baseDerivationPath}/${index}`
 }

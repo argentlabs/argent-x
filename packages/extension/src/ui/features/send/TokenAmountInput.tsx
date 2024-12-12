@@ -1,18 +1,22 @@
+/* eslint-disable react/prop-types */
 import {
   Button,
-  L2,
-  iconsDeprecated,
-  typographyStyles,
+  icons,
+  L2Bold,
   TokenIcon,
+  typographyStyles,
 } from "@argent/x-ui"
-import { Flex, InputProps, Spinner, chakra } from "@chakra-ui/react"
-import { ReactNode, forwardRef, useCallback, useMemo, useState } from "react"
-import Measure, { ContentRect } from "react-measure"
+import type { InputProps } from "@chakra-ui/react"
+import { Flex, Spinner, chakra } from "@chakra-ui/react"
+import type { ReactNode } from "react"
+import { forwardRef, useCallback, useMemo, useState } from "react"
+import type { ContentRect } from "react-measure"
+import Measure from "react-measure"
 
 import { clientTokenService } from "../../services/tokens"
-import { Token } from "../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../shared/token/__new/types/token.model"
 
-const { ChevronDownIcon } = iconsDeprecated
+const { ChevronDownSecondaryIcon } = icons
 
 interface TokenAmountInputProps extends InputProps {
   token: Token
@@ -99,7 +103,7 @@ const TokenAmountInput = forwardRef<HTMLInputElement, TokenAmountInputProps>(
                   _placeholder={{ color: "neutrals.500" }}
                   _focus={{ outline: "none" }}
                   value={value}
-                  {...typographyStyles.H4}
+                  {...typographyStyles.H3}
                   fontSize={`${fontSize}px`}
                   {...rest}
                 />
@@ -112,16 +116,17 @@ const TokenAmountInput = forwardRef<HTMLInputElement, TokenAmountInputProps>(
                 ref={measureRef}
                 position={"fixed"}
                 visibility={"hidden"}
-                {...typographyStyles.H4}
+                {...typographyStyles.H3}
               >
                 {value}
               </Flex>
             )}
           </Measure>
           <Button
+            data-testid="select-token-button"
             size={"3xs"}
             leftIcon={<TokenIcon size={5} url={image} name={name} mr={2} />}
-            rightIcon={<ChevronDownIcon fontSize={"2xs"} mx={1} />}
+            rightIcon={<ChevronDownSecondaryIcon fontSize={"2xs"} mx={1} />}
             minHeight={0}
             bg="surface-default"
             p={1}
@@ -154,18 +159,18 @@ const TokenAmountInput = forwardRef<HTMLInputElement, TokenAmountInputProps>(
                 cursor="pointer"
                 _hover={{ color: "primary.400" }}
                 onClick={onMaxClick}
-                {...typographyStyles.L2}
+                {...typographyStyles.L2Bold}
               >
                 Max
               </Button>
             )
           ) : (
-            <L2 noOfLines={1}>{leftText}</L2>
+            <L2Bold noOfLines={1}>{leftText}</L2Bold>
           )}
           {rightText && (
-            <L2 noOfLines={1} textAlign={"right"}>
+            <L2Bold noOfLines={1} textAlign={"right"}>
               {rightText}
-            </L2>
+            </L2Bold>
           )}
         </Flex>
       </Flex>

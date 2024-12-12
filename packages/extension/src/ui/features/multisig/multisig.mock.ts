@@ -1,14 +1,16 @@
-import { Abi, Contract } from "starknet"
+import type { Abi } from "starknet"
+import { Contract } from "starknet"
 
 import ArgentCompiledContractAbi from "../../../abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../../../abis/Proxy.json"
-import { Network, getProvider } from "../../../shared/network"
-import {
+import type { Network } from "../../../shared/network"
+import { getProvider } from "../../../shared/network"
+import type {
   ArgentAccountType,
-  SignerType,
   WalletAccountSigner,
 } from "../../../shared/wallet.model"
-import { Multisig } from "./Multisig"
+import { SignerType } from "../../../shared/wallet.model"
+import type { Multisig } from "./Multisig"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 
 const defaultNetwork: Network = {
@@ -28,8 +30,10 @@ const defaultNeedsDeploy = false
 const defaultAddress = "0x0"
 const defaultHidden = false
 const defaultName = "Multisig 1"
+const defaultId = `${defaultAddress}-${defaultNetwork.id}-${defaultSigner.type}`
 
 const defaultMultisig: Multisig = {
+  id: defaultId,
   name: defaultName,
   address: defaultAddress,
   network: defaultNetwork,
@@ -52,6 +56,7 @@ const defaultMultisig: Multisig = {
   ),
   getCurrentImplementation: defaultFn,
   toWalletAccount: () => ({
+    id: defaultId,
     name: defaultName,
     networkId: defaultNetwork.id,
     address: defaultAddress,
@@ -61,12 +66,14 @@ const defaultMultisig: Multisig = {
     needsDeploy: defaultNeedsDeploy,
   }),
   toBaseWalletAccount: () => ({
+    id: defaultId,
     networkId: defaultNetwork.id,
     address: defaultAddress,
   }),
   signers: ["0x0", "0x1"],
   threshold: 2,
   toBaseMultisigAccount: () => ({
+    id: defaultId,
     address: defaultAddress,
     signers: ["0x0", "0x1"],
     threshold: 2,

@@ -1,8 +1,9 @@
-import { Ampli, Event, EventOptions, PromiseResult, Result } from "../../ampli"
-import { WalletAccountSharedService } from "../account/service/accountSharedService/WalletAccountSharedService"
+import type { Event, EventOptions, PromiseResult, Result } from "../../ampli"
+import { Ampli } from "../../ampli"
+import type { WalletAccountSharedService } from "../account/service/accountSharedService/WalletAccountSharedService"
 import { isProd } from "../api/constants"
-import { ISettingsStorage } from "../settings/types"
-import { KeyValueStorage } from "../storage"
+import type { ISettingsStorage } from "../settings/types"
+import type { KeyValueStorage } from "../storage"
 
 const getVoidPromiseResult = () => ({ promise: Promise.resolve() })
 

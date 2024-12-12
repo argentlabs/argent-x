@@ -1,4 +1,4 @@
-import { BaseTransaction } from "../../../shared/transactions/interface"
+import type { BaseTransaction } from "../../../shared/transactions/interface"
 
 type TxStatusUpdate<H extends BaseTransaction, S> = {
   transaction: H

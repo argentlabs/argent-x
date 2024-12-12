@@ -1,14 +1,25 @@
 import { describe, it, expect } from "vitest"
-import { Transaction } from "../../../../../transactions"
+import type { Transaction } from "../../../../../transactions"
 import { SignerType } from "../../../../../wallet.model"
-import { TransformedTransaction } from "../../type"
+import type { TransformedTransaction } from "../../type"
 import upgradeAccountTransformer from "./upgradeAccountTransformer"
-import { Call } from "starknet"
+import type { Call } from "starknet"
+import { getAccountIdentifier } from "../../../../../utils/accountIdentifier"
+
+export const accountAddress =
+  "0x07059f14f63fe428f802520078965ead76fbe8693d1f7bd88de74a887cccf418"
+
+const mockSigner = {
+  type: SignerType.LOCAL_SECRET,
+  derivationPath: "m/44'/60'/0'/0/0",
+}
+
+const id = getAccountIdentifier(accountAddress, "sepolia-alpha", mockSigner)
 
 const mockTransaction: Transaction = {
   account: {
-    address:
-      "0x07059f14f63fe428f802520078965ead76fbe8693d1f7bd88de74a887cccf418",
+    id,
+    address: accountAddress,
     cairoVersion: "1",
     classHash:
       "0x0737ee2f87ce571a58c6c8da558ec18a07ceb64a6172d5ec46171fbc80077a48",

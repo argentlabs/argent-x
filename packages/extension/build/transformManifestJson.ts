@@ -1,4 +1,4 @@
-import CopyPlugin from "copy-webpack-plugin"
+import type CopyPlugin from "copy-webpack-plugin"
 
 import { getReleaseTrack } from "./getReleaseTrack"
 import { HOT_RELOAD_PORT } from "../src/shared/utils/dev"

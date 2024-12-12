@@ -1,28 +1,27 @@
 import { TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import { stark } from "starknet"
 import { accountService } from "../shared/account/service"
-import { ExtensionActionItem } from "../shared/actionQueue/types"
+import type { ExtensionActionItem } from "../shared/actionQueue/types"
 import { ampli } from "../shared/analytics"
-import { MessageType } from "../shared/messages"
+import type { MessageType } from "../shared/messages"
 import { multisigArraySignatureSchema } from "../shared/multisig/multisig.model"
 import { networkSchema } from "../shared/network"
 import { networkService } from "../shared/network/service"
 import { preAuthorizationService } from "../shared/preAuthorization"
 import { assertNever } from "../shared/utils/assertNever"
-import { encodeChainId } from "../shared/utils/encodeChainId"
 import { isEqualWalletAddress } from "../shared/wallet.service"
 import { accountDeployAction } from "./accountDeployAction"
 import { addMultisigDeployAction } from "./multisig/multisigDeployAction"
-import {
-  TransactionAction,
-  executeTransactionAction,
-} from "./transactions/transactionExecution"
+import type { TransactionAction } from "./transactions/transactionExecution"
+import { executeTransactionAction } from "./transactions/transactionExecution"
 import { udcDeclareContract, udcDeployContract } from "./udcAction"
-import { Wallet } from "./wallet"
+import type { Wallet } from "./wallet"
 import { respondToHost } from "./respond"
 import { backgroundUIService } from "./services/ui"
 import { isNetworkOnlyPlaceholderAccount } from "../shared/wallet.model"
-import { ActionItemExtra } from "../shared/actionQueue/schema"
+import type { ActionItemExtra } from "../shared/actionQueue/schema"
+import { validateSignatureChainId } from "../shared/utils/validateSignatureChainId"
+import { addTransactionHash } from "../shared/transactions/transactionHashes/transactionHashesRepository"
 
 const handleTransactionAction = async ({
   action,
@@ -151,32 +150,31 @@ export const handleActionApproval = async (
         }
       }
 
-      // let's compare encoded formats of both chainIds
-      const encodedDomainChainId = encodeChainId(typedData.domain.chainId)
-      const encodedSelectedChainId = encodeChainId(
-        selectedAccount.network.chainId,
+      const validateSignatureChainIdResult = validateSignatureChainId(
+        selectedAccount,
+        typedData,
       )
-      // typedData.domain.chainId is optional, so we need to check if it exists
-      if (
-        encodedDomainChainId &&
-        encodedSelectedChainId !== encodedDomainChainId
-      ) {
+
+      if (!validateSignatureChainIdResult.success) {
         return {
           type: "SIGNATURE_FAILURE",
           data: {
-            error: `Cannot sign the message from a different chainId. Expected ${encodedSelectedChainId}, got ${encodedDomainChainId}`,
+            error: validateSignatureChainIdResult.error,
             actionHash,
           },
         }
       }
 
       try {
+        const messageHash = await starknetAccount.hashMessage(typedData)
+        await addTransactionHash(actionHash, messageHash)
         const signature = await starknetAccount.signMessage(typedData)
         let formattedSignature
 
         if (selectedAccount.type === "multisig") {
-          const multisigAccount =
-            await wallet.getMultisigAccount(selectedAccount)
+          const multisigAccount = await wallet.getMultisigAccount(
+            selectedAccount.id,
+          )
 
           // Should be [requestId, signer, r, s]
           const parsedSignature =
@@ -239,7 +237,7 @@ export const handleActionApproval = async (
           type: "APPROVE_REQUEST_ADD_CUSTOM_NETWORK",
           data: { actionHash },
         }
-      } catch (error) {
+      } catch {
         return {
           type: "REJECT_REQUEST_ADD_CUSTOM_NETWORK",
           data: { actionHash },
@@ -274,9 +272,10 @@ export const handleActionApproval = async (
             isEqualWalletAddress(account, currentlySelectedAccount),
           )
 
-        const selectedAccount = await wallet.selectAccount(
-          existingAccountOnNetwork ?? accountsOnNetwork[0] ?? newAccount,
-        )
+        const account =
+          existingAccountOnNetwork ?? accountsOnNetwork[0] ?? newAccount
+
+        const selectedAccount = await wallet.selectAccount(account.id)
 
         if (isNetworkOnlyPlaceholderAccount(selectedAccount)) {
           throw Error(`No accounts found on network with chainId ${chainId}`)
@@ -285,7 +284,7 @@ export const handleActionApproval = async (
           type: "APPROVE_REQUEST_SWITCH_CUSTOM_NETWORK",
           data: { actionHash, selectedAccount },
         }
-      } catch (error) {
+      } catch {
         return {
           type: "REJECT_REQUEST_SWITCH_CUSTOM_NETWORK",
           data: { actionHash },

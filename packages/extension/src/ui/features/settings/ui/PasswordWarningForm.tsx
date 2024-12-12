@@ -1,12 +1,12 @@
-import { CellStack, HeaderCell, icons } from "@argent/x-ui"
-import { FC } from "react"
-import { Button, Flex, FlexProps } from "@chakra-ui/react"
+import { CellStack, HeaderCell } from "@argent/x-ui"
+import type { FC } from "react"
+import type { FlexProps } from "@chakra-ui/react"
+import { Button, Flex } from "@chakra-ui/react"
 
-import { PasswordForm, PasswordFormProps } from "../../lock/PasswordForm"
-import {
-  WarningRecoveryBanner,
-  WarningRecoveryBannerProps,
-} from "./WarningRecoveryBanner"
+import type { PasswordFormProps } from "../../lock/PasswordForm"
+import { PasswordForm } from "../../lock/PasswordForm"
+import type { WarningRecoveryBannerProps } from "./WarningRecoveryBanner"
+import { WarningRecoveryBanner } from "./WarningRecoveryBanner"
 
 interface PasswordWarningFormProps
   extends Pick<PasswordFormProps, "verifyPassword">,
@@ -24,12 +24,12 @@ export const PasswordWarningForm: FC<PasswordWarningFormProps> = ({
       <WarningRecoveryBanner title={title} reasons={reasons} mb={4} />
       <HeaderCell color={"text-primary"}>Enter your password</HeaderCell>
       <PasswordForm flex={1} verifyPassword={verifyPassword}>
-        {(isDirty) => (
+        {({ isDirty }) => (
           <>
             <Flex flex={1}></Flex>
             <Button
               type="submit"
-              disabled={!isDirty}
+              isDisabled={!isDirty}
               colorScheme="primary"
               width="full"
             >

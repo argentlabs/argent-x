@@ -1,8 +1,17 @@
-import { L2 } from "@argent/x-ui"
-import { Flex } from "@chakra-ui/react"
-import { FC, PropsWithChildren } from "react"
+import { L2Bold } from "@argent/x-ui"
+import type { FlexProps } from "@chakra-ui/react"
+import { Flex, SkeletonText } from "@chakra-ui/react"
+import type { FC, PropsWithChildren } from "react"
 
-export const FeeEstimationBox: FC<PropsWithChildren> = (props) => {
+export const FeeEstimationBoxSkeleton: FC<FlexProps> = (props) => {
+  return (
+    <FeeEstimationBox minHeight={12} alignItems="center" {...props}>
+      <SkeletonText noOfLines={1} w="33.3%" />
+    </FeeEstimationBox>
+  )
+}
+
+export const FeeEstimationBox: FC<FlexProps> = (props) => {
   return (
     <Flex
       borderRadius="xl"
@@ -46,6 +55,7 @@ export const FeeEstimationBoxWithDeploy: FC<PropsWithChildren> = ({
       alignItems="center"
       borderBottomRadius="xl"
       p="1"
+      data-testid="deploy-fee"
     >
       Includes one-time activation fee
     </Flex>
@@ -82,11 +92,11 @@ export const FeeEstimationBoxWithInsufficientFunds: FC<
         borderBottomRadius="xl"
         p="1"
       >
-        <L2 color="text-danger">
+        <L2Bold color="text-danger">
           {userClickedAddFunds
             ? "Waiting for funds..."
             : "Insufficient funds to pay fee"}
-        </L2>
+        </L2Bold>
       </Flex>
     </Flex>
   )

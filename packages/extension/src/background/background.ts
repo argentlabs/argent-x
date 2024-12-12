@@ -1,11 +1,11 @@
-import browser from "webextension-polyfill"
+import type browser from "webextension-polyfill"
 
-import { IBackgroundActionService } from "./services/action/IBackgroundActionService"
+import type { IBackgroundActionService } from "./services/action/IBackgroundActionService"
 import type { MessagingKeys } from "./keys/messagingKeys"
 import type { Respond } from "./respond"
-import { Wallet } from "./wallet"
-import { TransactionTrackerWorker } from "./services/transactionTracker/worker/TransactionTrackerWorker"
-import { IFeeTokenService } from "../shared/feeToken/service/IFeeTokenService"
+import type { Wallet } from "./wallet"
+import type { TransactionTrackerWorker } from "./services/transactionTracker/worker/TransactionTrackerWorker"
+import type { IFeeTokenService } from "../shared/feeToken/service/IFeeTokenService"
 
 export interface BackgroundService {
   wallet: Wallet

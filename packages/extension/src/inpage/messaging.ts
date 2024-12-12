@@ -11,7 +11,7 @@ export const getIsPreauthorized = async () => {
       10 * 1000, // 10 seconds, temporary
     )
     return isPreauthorized
-  } catch (e) {
+  } catch {
     // ignore timeout or other error
   }
   return false

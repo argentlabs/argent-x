@@ -15,12 +15,12 @@ import {
   transferV3,
   transferWithWarnings,
 } from "../../__fixtures__"
-import { TransactionActionFixture } from "../../__fixtures__/types"
+import type { TransactionActionFixture } from "../../__fixtures__/types"
 import * as txReviewUtils from "../../warning/helper"
 import { ApproveScreenType } from "../types"
 import { ApproveTransactionScreen } from "./ApproveTransactionScreen"
-import { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
-import { ITransactionReviewWarning } from "@argent/x-shared"
+import type { ApproveTransactionScreenProps } from "./approveTransactionScreen.model"
+import type { ITransactionReviewWarning } from "@argent/x-shared"
 
 vi.mock("../../hooks/useActionScreen", () => ({
   useActionScreen: vi.fn().mockReturnValue({
@@ -48,11 +48,8 @@ const renderWithProps = async (
           confirmations: 0,
           onClick: noop,
         }}
-        showTransactionActions={false}
-        hasBalanceChange={true}
         disableConfirm={false}
         isMainnet
-        isSimulationLoading={false}
         hasPendingMultisigTransactions={false}
         selectedAccount={accounts[0]}
         approveScreenType={ApproveScreenType.TRANSACTION}
@@ -76,10 +73,6 @@ describe("ApproveTransactionScreen", () => {
     const onSubmit = vi.fn()
     await renderWithProps({
       ...transfer,
-      transactionActionsType: {
-        type: "INVOKE_FUNCTION",
-        payload: transfer.transactions,
-      },
       onReject,
       onSubmit,
     })
@@ -92,10 +85,6 @@ describe("ApproveTransactionScreen", () => {
     const onSubmit = vi.fn()
     await renderWithProps({
       ...transferV3,
-      transactionActionsType: {
-        type: "INVOKE_FUNCTION",
-        payload: transferV3.transactions,
-      },
       onReject,
       onSubmit,
     })
@@ -106,10 +95,6 @@ describe("ApproveTransactionScreen", () => {
     const onSubmit = vi.fn()
     await renderWithProps({
       ...aspect,
-      transactionActionsType: {
-        type: "INVOKE_FUNCTION",
-        payload: aspect.transactions,
-      },
       onReject,
       onSubmit,
     })
@@ -143,10 +128,6 @@ describe("ApproveTransactionScreen", () => {
     const onSubmit = vi.fn()
     await renderWithProps({
       ...transferWithWarnings,
-      transactionActionsType: {
-        type: "INVOKE_FUNCTION",
-        payload: transferWithWarnings.transactions,
-      },
       onReject,
       onSubmit,
     })
@@ -180,10 +161,6 @@ describe("ApproveTransactionScreen", () => {
     const onSubmit = vi.fn()
     await renderWithProps({
       ...transfer,
-      transactionActionsType: {
-        type: "INVOKE_FUNCTION",
-        payload: transfer.transactions,
-      },
       onReject,
       onSubmit,
     })

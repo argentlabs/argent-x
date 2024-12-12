@@ -1,13 +1,13 @@
 import { useFeeTokenBalancesView } from "./../../views/tokenBalances"
-import { Account } from "../accounts/Account"
+import type { Account } from "../accounts/Account"
+import type { TokenWithBalance } from "@argent/x-shared"
 import {
-  TokenWithBalance,
   feeTokenNeedsTxV3Support,
   classHashSupportsTxV3,
 } from "@argent/x-shared"
 
 export const useFeeTokenBalances = (
-  account?: Pick<Account, "address" | "networkId">,
+  account?: Pick<Account, "id" | "address" | "networkId">,
 ) => {
   const feeTokenBalances = useFeeTokenBalancesView(account)
 
@@ -21,7 +21,7 @@ export const useFeeTokenBalances = (
 }
 
 export const usePossibleFeeTokenBalances = (
-  account?: Pick<Account, "address" | "networkId" | "classHash">,
+  account?: Pick<Account, "id" | "address" | "networkId" | "classHash">,
 ) => {
   const feeTokenBalances = useFeeTokenBalances(account)
 
@@ -33,7 +33,7 @@ export const usePossibleFeeTokenBalances = (
 }
 
 export const useBigIntFeeTokenBalances = (
-  account?: Pick<Account, "address" | "networkId">,
+  account?: Pick<Account, "id" | "address" | "networkId" | "classHash">,
 ): TokenWithBalance[] => {
   const feeTokenBalances = useFeeTokenBalances(account)
 
@@ -44,7 +44,7 @@ export const useBigIntFeeTokenBalances = (
 }
 
 export const useHasFeeTokenBalance = (
-  account?: Pick<Account, "address" | "networkId">,
+  account?: Pick<Account, "id" | "address" | "networkId" | "classHash">,
 ) => {
   const feeTokenBalances = useFeeTokenBalances(account)
   return feeTokenBalances.some((balance) => balance.amount > 0n)

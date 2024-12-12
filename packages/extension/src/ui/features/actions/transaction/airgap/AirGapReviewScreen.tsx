@@ -1,19 +1,20 @@
 import { Box, Button, HStack, VStack } from "@chakra-ui/react"
 import { base64, base64url } from "@scure/base"
-import { FC, useEffect, useMemo, useState } from "react"
+import type { FC } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { FullscreenQrCode } from "../../../../components/QrCode"
 import {
   B3,
   CopyTooltip,
-  L1,
-  P4,
+  icons,
+  L1Bold,
+  P3,
   ScrollContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { ScreenLayout } from "../../../ledger/layout/ScreenLayout"
 
-const { TickIcon } = iconsDeprecated
+const { CheckmarkSecondaryIcon } = icons
 
 export const AirGapReviewScreen: FC = () => {
   const { data } = useParams<{ data: string }>()
@@ -69,7 +70,7 @@ export const AirGapReviewBody: FC<AirGapReviewBodyProps> = ({
           textAlign="center"
           width={{ base: "full", md: "328px" }}
         >
-          <L1 color="white">Scan the QR with an air-gapped device</L1>
+          <L1Bold color="white">Scan the QR with an air-gapped device</L1Bold>
         </Box>
 
         <CopyTooltip copyValue={data} prompt="" placement="bottom">
@@ -90,9 +91,9 @@ export const AirGapReviewBody: FC<AirGapReviewBodyProps> = ({
         alignSelf={{ base: "flex-start", md: "center" }}
         width={{ base: "full", md: "328px" }}
       >
-        <P4 color="neutrals.300" mb={3}>
+        <P3 color="neutrals.300" mb={3}>
           You will be able to:
-        </P4>
+        </P3>
         <Box
           w="full"
           borderRadius="xl"
@@ -102,17 +103,17 @@ export const AirGapReviewBody: FC<AirGapReviewBodyProps> = ({
           <VStack spacing="2" p={4} align="flex-start">
             <HStack spacing="3">
               <Box>
-                <TickIcon color="success.500" h={4} w={4} />
+                <CheckmarkSecondaryIcon color="success.500" h={4} w={4} />
               </Box>
-              <P4 color="neutrals.300">View the transaction details</P4>
+              <P3 color="neutrals.300">View the transaction details</P3>
             </HStack>
             <HStack spacing="3" align="flex-start">
               <Box>
-                <TickIcon color="success.500" h={4} w={4} />
+                <CheckmarkSecondaryIcon color="success.500" h={4} w={4} />
               </Box>
-              <P4 color="neutrals.300">
+              <P3 color="neutrals.300">
                 Compare the transaction hash on your air-gapped device
-              </P4>
+              </P3>
             </HStack>
           </VStack>
         </Box>

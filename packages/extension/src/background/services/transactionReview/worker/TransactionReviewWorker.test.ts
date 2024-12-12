@@ -1,17 +1,17 @@
 import { describe, expect, test, vi } from "vitest"
 
 import type { IHttpService } from "@argent/x-shared"
-import { KeyValueStorage } from "../../../../shared/storage"
+import type { KeyValueStorage } from "../../../../shared/storage"
 import type {
   ITransactionReviewLabelsStore,
   ITransactionReviewWarningsStore,
 } from "../../../../shared/transactionReview/interface"
 import { TransactionReviewWorker } from "./TransactionReviewWorker"
 import type { IBackgroundUIService } from "../../ui/IBackgroundUIService"
-import { emitterMock } from "../../../wallet/test.utils"
 import { delay } from "../../../../shared/utils/delay"
 import { getMockDebounceService } from "../../../../shared/debounce/mock"
 import { createScheduleServiceMock } from "../../../../shared/schedule/mock"
+import { emitterMock } from "../../../../shared/test.utils"
 
 describe("TransactionReviewWorker", () => {
   const makeService = () => {

@@ -1,30 +1,30 @@
 import { useDisclosure } from "@chakra-ui/react"
-import { FC, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { hideMultisig } from "../../../shared/multisig/utils/baseMultisig"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 import { routes } from "../../../shared/ui/routes"
-import { hasSavedRecoverySeedPhraseView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import { autoSelectAccountOnNetwork } from "../accounts/switchAccount"
-import { usePortfolioUrl } from "../actions/hooks/usePortfolioUrl"
 import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
 import {
   isSignerInMultisigView,
   multisigView,
 } from "../multisig/multisig.state"
-import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { useToken } from "./tokens.state"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
 import { useHasFeeTokenBalance } from "./useFeeTokenBalance"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { selectedNetworkIdView } from "../../views/network"
+import { clientAccountService } from "../../services/account"
+import { useIsDefaultNetwork } from "../networks/hooks/useIsDefaultNetwork"
+import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
+import { useHasNonZeroBalance } from "./useHasNonZeroBalance"
 
 interface AccountTokensButtonsContainerProps {
   account?: WalletAccount
-  hideSend?: boolean
 }
 
 export const AccountTokensButtonsContainer: FC<
@@ -34,8 +34,10 @@ export const AccountTokensButtonsContainer: FC<
   const selectedNetworkId = useView(selectedNetworkIdView)
   const multisig = useView(multisigView(account))
   const signerIsInMultisig = useView(isSignerInMultisigView(account))
-  const isMainnet = useIsMainnet()
   const feeToken = useDefaultFeeToken(account)
+  const isDefaultNetwork = useIsDefaultNetwork()
+  const returnTo = useCurrentPathnameWithQuery()
+  const hasNonZeroBalance = useHasNonZeroBalance(account)
 
   const sendToken = useToken({
     address: feeToken?.address ?? ETH_TOKEN_ADDRESS,
@@ -43,21 +45,14 @@ export const AccountTokensButtonsContainer: FC<
   })
   const hasFeeTokenBalance = useHasFeeTokenBalance(account)
 
-  const hasSavedRecoverySeedPhrase = useView(hasSavedRecoverySeedPhraseView)
-
   const addFundsDialogSend = useAddFundsDialogSend()
 
   const onAddFunds = useCallback(() => {
     navigate(routes.funding())
   }, [navigate])
 
-  const showSaveRecoveryPhraseModal = useMemo(() => {
-    return !hasSavedRecoverySeedPhrase && isMainnet
-  }, [hasSavedRecoverySeedPhrase, isMainnet])
-
   const showSendButton = useMemo(() => {
     if (
-      showSaveRecoveryPhraseModal ||
       (multisig && (multisig.needsDeploy || !signerIsInMultisig)) ||
       !hasFeeTokenBalance
     ) {
@@ -65,21 +60,20 @@ export const AccountTokensButtonsContainer: FC<
     }
 
     return Boolean(sendToken)
-  }, [
-    multisig,
-    sendToken,
-    signerIsInMultisig,
-    showSaveRecoveryPhraseModal,
-    hasFeeTokenBalance,
-  ])
-  const portfolioUrl = usePortfolioUrl(account)
+  }, [multisig, sendToken, signerIsInMultisig, hasFeeTokenBalance])
+
   const showAddFundsButton = useMemo(() => {
-    if (showSaveRecoveryPhraseModal || (multisig && !signerIsInMultisig)) {
+    if (multisig && !signerIsInMultisig) {
       return false
     }
-
     return true
-  }, [multisig, signerIsInMultisig, showSaveRecoveryPhraseModal])
+  }, [multisig, signerIsInMultisig])
+
+  const showSwapButton = showAddFundsButton && isDefaultNetwork
+
+  const onSwap = useCallback(() => {
+    navigate(routes.swapToken(undefined, returnTo))
+  }, [navigate, returnTo])
 
   const showHideMultisigButton = useMemo(() => {
     return multisig && !signerIsInMultisig
@@ -94,7 +88,8 @@ export const AccountTokensButtonsContainer: FC<
   const onHideConfirm = useCallback(async () => {
     if (multisig) {
       await hideMultisig(multisig)
-      const account = await autoSelectAccountOnNetwork(selectedNetworkId)
+      const account =
+        await clientAccountService.autoSelectAccountOnNetwork(selectedNetworkId)
       onHideMultisigModalClose()
       if (account) {
         navigate(routes.accounts())
@@ -107,27 +102,20 @@ export const AccountTokensButtonsContainer: FC<
 
   const onSend = () => addFundsDialogSend()
 
-  let buttonColumnCount = 1
-  if (showSendButton) {
-    buttonColumnCount++
-  }
-  if (showSendButton && portfolioUrl) {
-    buttonColumnCount++
-  }
-
   return (
     <AccountTokensButtons
-      onAddFunds={onAddFunds}
-      showAddFundsButton={showAddFundsButton}
-      showSendButton={showSendButton}
-      onSend={onSend}
-      showHideMultisigButton={showHideMultisigButton}
-      onHideMultisigModalOpen={onHideMultisigModalOpen}
-      onHideMultisigModalClose={onHideMultisigModalClose}
+      hasNonZeroBalance={hasNonZeroBalance}
       isHideMultisigModalOpen={isHideMultisigModalOpen}
+      onAddFunds={onAddFunds}
       onHideConfirm={onHideConfirm}
-      portfolioUrl={portfolioUrl}
-      buttonColumnCount={buttonColumnCount}
+      onHideMultisigModalClose={onHideMultisigModalClose}
+      onHideMultisigModalOpen={onHideMultisigModalOpen}
+      onSend={onSend}
+      onSwap={onSwap}
+      showAddFundsButton={showAddFundsButton}
+      showHideMultisigButton={showHideMultisigButton}
+      showSendButton={showSendButton}
+      showSwapButton={showSwapButton}
     />
   )
 }

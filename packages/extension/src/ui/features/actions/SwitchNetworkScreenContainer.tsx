@@ -1,9 +1,9 @@
-import { FC } from "react"
+import type { FC } from "react"
 import { useActionScreen } from "./hooks/useActionScreen"
-import { useDappDisplayAttributes } from "./connectDapp/useDappDisplayAttributes"
-import { AccountNavigationBarContainer } from "../accounts/AccountNavigationBarContainer"
+import { useDappDisplayAttributes } from "../../services/knownDapps/useDappDisplayAttributes"
 import { SwitchNetworkScreen } from "./SwitchNetworkScreen"
 import { WithActionScreenErrorFooter } from "./transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
+import { AccountDetailsNavigationBarContainer } from "../navigation/AccountDetailsNavigationBarContainer"
 
 export const SwitchNetworkScreenContainer: FC = () => {
   const { action, selectedAccount, approveAndClose, reject } = useActionScreen()
@@ -19,12 +19,7 @@ export const SwitchNetworkScreenContainer: FC = () => {
   const fromNetworkTitle = selectedAccount?.network.name
   const toNetworkTitle = requestedNetwork.name
 
-  const networkNavigationBar = (
-    <AccountNavigationBarContainer
-      showSettingsButton={false}
-      showAccountButton={false}
-    />
-  )
+  const networkNavigationBar = <AccountDetailsNavigationBarContainer />
 
   return (
     <SwitchNetworkScreen
@@ -40,6 +35,6 @@ export const SwitchNetworkScreenContainer: FC = () => {
           <WithActionScreenErrorFooter />
         </>
       }
-    ></SwitchNetworkScreen>
+    />
   )
 }

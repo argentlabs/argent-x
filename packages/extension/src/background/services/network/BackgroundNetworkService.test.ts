@@ -1,13 +1,14 @@
-import { Mocked, describe, expect, test, vi } from "vitest"
+import type { Mocked } from "vitest"
+import { describe, expect, test, vi } from "vitest"
 
-import { Network } from "../../../shared/network"
+import type { Network } from "../../../shared/network"
 import { defaultReadonlyNetworks } from "../../../shared/network/defaults"
 import { networkSelector } from "../../../shared/network/selectors"
 import { networksEqual } from "../../../shared/network/store"
 import { InMemoryRepository } from "../../../shared/storage/__new/__test__/inmemoryImplementations"
 import BackgroundNetworkService from "./BackgroundNetworkService"
-import { NetworkWithStatus } from "../../../shared/network/type"
-import { IHttpService } from "@argent/x-shared"
+import type { NetworkWithStatus } from "../../../shared/network/type"
+import type { IHttpService } from "@argent/x-shared"
 import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 
 describe("BackgroundNetworkService", () => {

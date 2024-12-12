@@ -3,7 +3,8 @@ import userEvent from "@testing-library/user-event"
 
 import { renderWithLegacyProviders } from "../../../test/utils"
 import { accounts } from "../__fixtures__"
-import { ConnectDappScreen, ConnectDappScreenProps } from "./ConnectDappScreen"
+import type { ConnectDappScreenProps } from "./ConnectDappScreen"
+import { ConnectDappScreen } from "./ConnectDappScreen"
 
 describe("ConnectDappScreen", () => {
   const onConnect = vi.fn()
@@ -16,6 +17,7 @@ describe("ConnectDappScreen", () => {
     onDisconnect,
     accounts,
     selectedAccount: {
+      id: accounts[0].id ?? "",
       address: accounts[0].address ?? "",
       networkId: accounts[0].networkId ?? "",
     },

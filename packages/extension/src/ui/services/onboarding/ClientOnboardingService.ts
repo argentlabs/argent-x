@@ -1,5 +1,5 @@
-import { IOnboardingService } from "../../../shared/onboarding/IOnboardingService"
-import { messageClient } from "../trpc"
+import type { IOnboardingService } from "../../../shared/onboarding/IOnboardingService"
+import type { messageClient } from "../trpc"
 
 export class ClientOnboardingService
   implements Pick<IOnboardingService, "getOnboardingComplete">

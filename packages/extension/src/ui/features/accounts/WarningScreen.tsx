@@ -1,16 +1,18 @@
 import {
   Button,
-  H3,
+  H2,
+  icons,
   NavigationContainer,
-  P3,
+  P2,
   StickyGroup,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Box, Center, Circle, Flex } from "@chakra-ui/react"
-import { FC, isValidElement, useCallback, useState } from "react"
-import Measure, { ContentRect } from "react-measure"
+import type { FC } from "react"
+import { isValidElement, useCallback, useState } from "react"
+import type { ContentRect } from "react-measure"
+import Measure from "react-measure"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
 
 export interface WarningScreenProps {
   title: React.ReactNode
@@ -40,21 +42,21 @@ export const WarningScreen: FC<WarningScreenProps> = ({
       <Flex pt="7" px="16px" pb="0" direction="column" gap="2" {...rest}>
         <Center flexDirection="column" gap="8">
           <Circle p="7" bgColor="primaryExtraDark.500">
-            <AlertIcon color="primary.500" fontSize="5xl" />
+            <WarningCircleSecondaryIcon color="primary.500" fontSize="5xl" />
           </Circle>
           <Flex flexDirection="column" align="center" justify="center" gap="3">
             {isValidElement(title) ? (
               title
             ) : (
-              <H3 textAlign="center">{title}</H3>
+              <H2 textAlign="center">{title}</H2>
             )}
             {description &&
               (isValidElement(description) ? (
                 description
               ) : (
-                <P3 color="neutrals.300" textAlign="center">
+                <P2 color="neutrals.300" textAlign="center">
                   {description}
-                </P3>
+                </P2>
               ))}
           </Flex>
         </Center>

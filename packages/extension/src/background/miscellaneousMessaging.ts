@@ -1,10 +1,10 @@
 import browser from "webextension-polyfill"
 
-import { MiscenalleousMessage as MiscellaneousMessage } from "../shared/messages/MiscellaneousMessage"
+import type { MiscenalleousMessage as MiscellaneousMessage } from "../shared/messages/MiscellaneousMessage"
 import { resetDevice } from "../shared/smartAccount/jwt"
 import { sendMessageToUi } from "./activeTabs"
 import { UnhandledMessage } from "./background"
-import { HandleMessage } from "./background"
+import type { HandleMessage } from "./background"
 import { backgroundUIService } from "./services/ui"
 
 export const handleMiscellaneousMessage: HandleMessage<

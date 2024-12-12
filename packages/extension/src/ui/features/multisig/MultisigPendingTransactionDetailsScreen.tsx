@@ -1,5 +1,5 @@
-import { BarBackButton, H6, NavigationBar, P3 } from "@argent/x-ui"
-import { Box, Flex, useDisclosure } from "@chakra-ui/react"
+import { BarBackButton, H5, NavigationBar, P2 } from "@argent/x-ui"
+import { Divider, Flex, useDisclosure } from "@chakra-ui/react"
 import { useEffect, useMemo, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
@@ -18,30 +18,29 @@ import {
   isUpgradeTransaction,
 } from "../../../shared/activity/utils/transform/is"
 import { getTransactionFromPendingMultisigTransaction } from "../../../shared/activity/utils/transform/transaction/transformers/pendingMultisigTransactionAdapter"
-import { useLegacyAppState } from "../../app.state"
-import { useRouteRequestId } from "../../hooks/useRoute"
+import { isMultisigTransactionRejectedAndNonceNotConsumed } from "../../../shared/multisig/utils/getMultisigTransactionType"
 import { routes } from "../../../shared/ui/routes"
+import { useLegacyAppState } from "../../app.state"
+import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
+import { useRouteRequestId } from "../../hooks/useRoute"
 import { multisigService } from "../../services/multisig"
 import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { usePublicKey } from "../accounts/usePublicKey"
 import { ledgerErrorMessageSchema } from "../actions/hooks/usePrettyError"
 import { ApproveTransactionScreenContainer } from "../actions/transaction/ApproveTransactionScreen/ApproveTransactionScreenContainer"
-import { MultisigConfirmationsBannerProps } from "../actions/transaction/MultisigConfirmationsBanner"
-import { ApproveScreenType } from "../actions/transaction/types"
+import type { MultisigConfirmationsBannerProps } from "../actions/transaction/MultisigConfirmationsBanner"
+import { getApproveScreenTypeFromPendingTransaction } from "../actions/utils"
 import { isLedgerSigner } from "../ledger/utils"
 import { useLedgerForPendingMultisigTransaction } from "./hooks/useLedgerForPendingMultisigTransaction"
 import { multisigView } from "./multisig.state"
-import { RejectOnChainModal } from "./RejectOnChainModal"
-import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
-import { isMultisigTransactionRejectedAndNonceNotConsumed } from "../../../shared/multisig/utils/getMultisigTransactionType"
 
 export const MultisigPendingTransactionDetailsScreen = () => {
   const selectedAccount = useView(selectedAccountView)
   const requestId = useRouteRequestId()
   const pendingTransaction = useView(multisigPendingTransactionView(requestId))
   const multisig = useView(multisigView(selectedAccount))
-  const publicKey = usePublicKey(multisig)
+  const publicKey = usePublicKey(multisig?.id)
   const navigate = useNavigate()
   const onBack = useNavigateReturnToOrBack()
 
@@ -101,12 +100,6 @@ export const MultisigPendingTransactionDetailsScreen = () => {
     return { isRejectOnChain, isUpgradeAccount }
   }, [pendingTransaction, selectedAccount])
 
-  const {
-    isOpen: isRejectOnChainModalOpen,
-    onOpen: onRejectOnChainModalOpen,
-    onClose: onRejectOnChainModalClose,
-  } = useDisclosure()
-
   const onRejectOnChain = useCallback(async () => {
     if (requestId && !isApprovedByEnoughSigners) {
       await multisigService.rejectOnChainTransaction(requestId)
@@ -140,7 +133,7 @@ export const MultisigPendingTransactionDetailsScreen = () => {
   const goToTransactionsConfirmations = () => {
     navigate(
       routes.multisigTransactionConfirmations(
-        selectedAccount.address,
+        selectedAccount.id,
         requestId,
         "pending",
       ),
@@ -148,12 +141,12 @@ export const MultisigPendingTransactionDetailsScreen = () => {
   }
 
   const onSubmit = async () => {
-    if (isLedgerSigner(selectedAccount)) {
-      return onSubmitWithLedger()
-    }
-
     if (txNeedsRetry) {
       return onRetryTransaction()
+    }
+
+    if (isLedgerSigner(selectedAccount)) {
+      return onSubmitWithLedger()
     }
 
     useLegacyAppState.setState({ isLoading: true })
@@ -225,20 +218,21 @@ export const MultisigPendingTransactionDetailsScreen = () => {
       py="18px"
       gap={1}
     >
-      <H6 mr={2}>{selectedAccount.name}</H6>
-      <P3 color="neutrals.300">
+      <H5 mr={2}>{selectedAccount.name}</H5>
+      <P2 color="neutrals.300">
         ({formatTruncatedAddress(selectedAccount.address)})
-      </P3>
+      </P2>
     </Flex>
   )
 
   const navigationBar = (
-    <Box pb="2">
+    <>
       <NavigationBar
         leftButton={<BarBackButton onClick={onBack} />}
         title={title}
       />
-    </Box>
+      <Divider color="neutrals.700" />
+    </>
   )
 
   const multisigBannerProps: MultisigConfirmationsBannerProps = {
@@ -250,42 +244,45 @@ export const MultisigPendingTransactionDetailsScreen = () => {
   const canBeRejected =
     publicKey && !isApprovedByEnoughSigners && !isRejectOnChain
 
+  const approveScreenType =
+    getApproveScreenTypeFromPendingTransaction(pendingTransaction)
+
+  const confirmButtonText = txNeedsRetry
+    ? "Retry"
+    : isRejectOnChain
+      ? "Confirm rejection"
+      : "Confirm"
+  const rejectButtonText = canBeRejected ? "Reject" : "Cancel"
+
   return (
-    <>
-      <ApproveTransactionScreenContainer
-        actionHash={requestId}
-        navigationBar={navigationBar}
-        onSubmit={onConfirm}
-        onConfirmAnyway={() => void onSubmit()}
-        onReject={canBeRejected ? onRejectOnChainModalOpen : onReject}
-        transactionAction={{
-          type: TransactionType.INVOKE,
-          payload: transactionCalls,
-        }}
-        approveScreenType={ApproveScreenType.TRANSACTION}
-        multisigBannerProps={multisigBannerProps}
-        ledgerActionModalDisclosure={ledgerActionModalDisclosure}
-        ledgerErrorMessage={ledgerErrorMessage}
-        selectedAccount={selectedAccount}
-        showHeader={false}
-        transactionContext="MULTISIG_ADD_SIGNATURE"
-        actionErrorApproving={txError}
-        disableLedgerApproval={disableLedgerApproval}
-        showConfirmButton={needsApproval}
-        hideFooter={!canBeRejected && !needsApproval}
-        rejectButtonText={canBeRejected ? "Reject" : "Cancel"}
-        confirmButtonText={txNeedsRetry ? "Retry" : "Confirm"}
-        isRejectOnChain={isRejectOnChain}
-        isUpgradeAccount={isUpgradeAccount}
-        useRejectButtonColorFallback={false}
-        nonce={pendingTransaction.nonce}
-        txNeedsRetry={txNeedsRetry}
-      />
-      <RejectOnChainModal
-        isOpen={isRejectOnChainModalOpen}
-        onClose={onRejectOnChainModalClose}
-        onConfirm={() => void onRejectOnChain()}
-      />
-    </>
+    <ApproveTransactionScreenContainer
+      actionHash={requestId}
+      navigationBar={navigationBar}
+      onSubmit={onConfirm}
+      onConfirmAnyway={() => void onSubmit()}
+      onReject={canBeRejected ? onRejectOnChain : onReject}
+      transactionAction={{
+        type: TransactionType.INVOKE,
+        payload: transactionCalls,
+      }}
+      approveScreenType={approveScreenType}
+      multisigBannerProps={multisigBannerProps}
+      ledgerActionModalDisclosure={ledgerActionModalDisclosure}
+      ledgerErrorMessage={ledgerErrorMessage}
+      selectedAccount={selectedAccount}
+      showHeader={false}
+      transactionContext="MULTISIG_ADD_SIGNATURE"
+      actionErrorApproving={txError}
+      disableLedgerApproval={disableLedgerApproval}
+      showConfirmButton={needsApproval}
+      hideFooter={!canBeRejected && !needsApproval}
+      rejectButtonText={rejectButtonText}
+      confirmButtonText={confirmButtonText}
+      isRejectOnChain={isRejectOnChain}
+      isUpgradeAccount={isUpgradeAccount}
+      useRejectButtonColorFallback={false}
+      nonce={pendingTransaction.nonce}
+      txNeedsRetry={txNeedsRetry}
+    />
   )
 }

@@ -1,6 +1,7 @@
-import { H6 } from "@argent/x-ui"
+import { H5 } from "@argent/x-ui"
 import { Center, chakra } from "@chakra-ui/react"
-import { FC, MouseEventHandler, useCallback } from "react"
+import type { FC, MouseEventHandler } from "react"
+import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 
 import { OnboardingButton } from "./ui/OnboardingButton"
@@ -54,10 +55,10 @@ export const OnboardingRestoreBackupScreen: FC<
       >
         <input {...getInputProps()} />
         {disableSubmit ? (
-          <H6>Drag &amp; drop your backup file here, or click to select it</H6>
+          <H5>Drag &amp; drop your backup file here, or click to select it</H5>
         ) : (
           <>
-            <H6>Backup selected:</H6>
+            <H5>Backup selected:</H5>
             <chakra.code fontSize={"sm"}>{acceptedFile.name}</chakra.code>
           </>
         )}

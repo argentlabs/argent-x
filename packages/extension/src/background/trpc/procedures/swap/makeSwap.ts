@@ -41,7 +41,7 @@ export const makeSwapProcedure = extensionOnlyProcedure
         {
           title,
           shortTitle: "Swap",
-          icon: "SwapIcon",
+          icon: "SwapPrimaryIcon",
         },
       )
 

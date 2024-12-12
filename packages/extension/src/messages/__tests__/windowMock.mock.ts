@@ -1,6 +1,6 @@
+import type { Handler } from "@argent/x-window"
+import { mittx } from "@argent/x-window"
 import { vi } from "vitest"
-
-import { Handler, mittx } from "starknetkit/window"
 
 // Mock the window object
 export const getMockWindow = (origin: string): Window => {

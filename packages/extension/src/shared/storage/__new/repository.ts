@@ -1,4 +1,4 @@
-import {
+import type {
   AllowArray,
   AllowPromise,
   IRepository,
@@ -7,7 +7,7 @@ import {
   StorageChange,
   UpsertResult,
 } from "./interface"
-import { ArrayStorage } from ".."
+import type { ArrayStorage } from ".."
 
 export function adaptArrayStorage<T>(storage: ArrayStorage<T>): IRepository<T> {
   return {

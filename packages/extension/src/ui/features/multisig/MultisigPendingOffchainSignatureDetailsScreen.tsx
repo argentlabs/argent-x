@@ -6,14 +6,14 @@ import { useView } from "../../views/implementation/react"
 import { useMultisigPendingOffchainSignature } from "./multisigOffchainSignatures.state"
 import { SignActionScreenV2 } from "../actions/transactionV2/SignActionScreenV2"
 import { isObject, isString } from "lodash-es"
-import { useDappFromKnownDappsByName } from "../../services/knownDapps"
+import { useDappFromKnownDappsByName } from "../../services/knownDapps/useDappFromKnownDappsByName"
 import { useLegacyAppState } from "../../app.state"
 import { multisigService } from "../../services/multisig"
 import { WithActionScreenErrorFooter } from "../actions/transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { useMemo, useState } from "react"
 import { num } from "starknet"
 import { usePublicKey } from "../accounts/usePublicKey"
-import { isEqualAddress } from "@argent/x-shared"
+import { isEqualAddress, voidify } from "@argent/x-shared"
 import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
 import { LedgerActionModal } from "../actions/transaction/ApproveTransactionScreen/ledger/LedgerActionModal"
 import { ledgerErrorMessageSchema } from "../actions/hooks/usePrettyError"
@@ -21,7 +21,7 @@ import { useLedgerForPendingMultisigTransaction } from "./hooks/useLedgerForPend
 
 export const MultisigPendingOffchainSignatureDetailsScreen = () => {
   const selectedAccount = useView(selectedAccountView)
-  const currentSigner = usePublicKey(selectedAccount)
+  const currentSigner = usePublicKey(selectedAccount?.id)
   const requestId = useRouteRequestId()
   const navigate = useNavigate()
   const [txError, setTxError] = useState<string>()
@@ -46,7 +46,7 @@ export const MultisigPendingOffchainSignatureDetailsScreen = () => {
     [currentSigner, pendingOffchainSignature],
   )
 
-  const usesLedgerSigner = useIsLedgerSigner(selectedAccount)
+  const usesLedgerSigner = useIsLedgerSigner(selectedAccount?.id)
 
   const {
     ledgerActionModalDisclosure,
@@ -125,7 +125,7 @@ export const MultisigPendingOffchainSignatureDetailsScreen = () => {
         dappLogoUrl={dapp?.logoUrl}
         dappHost={dapp?.dappUrl || ""}
         dataToSign={pendingOffchainSignature.message.content}
-        onSubmit={() => void onSubmit()}
+        onSubmit={voidify(onSubmit)}
         footer={<WithActionScreenErrorFooter customError={txError} />}
         onReject={() => void onReject()}
         showConfirmButton={needsApproval}

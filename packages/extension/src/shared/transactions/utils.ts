@@ -8,17 +8,17 @@ import { constants, num } from "starknet"
 import { TransactionError } from "../errors/transaction"
 import type { WalletAccount } from "../wallet.model"
 import type { BaseTransaction } from "./interface"
-import {
+import type {
   ExtendedFinalityStatus,
   ExtendedTransactionStatus,
   Transaction,
   ExecutionStatus,
-  SUCCESS_STATUSES,
 } from "../transactions"
+import { SUCCESS_STATUSES } from "../transactions"
 import { z } from "zod"
 import { isSafeUpgradeTransaction } from "../utils/isSafeUpgradeTransaction"
-import { NativeActivity } from "@argent/x-shared/simulation"
-import { TransformedTransaction } from "../activity/utils/transform/type"
+import type { NativeActivity } from "@argent/x-shared/simulation"
+import type { TransformedTransaction } from "../activity/utils/transform/type"
 
 export function getTransactionIdentifier(transaction: BaseTransaction): string {
   return `${transaction.networkId}::${hexSchema.parse(transaction.hash)}`

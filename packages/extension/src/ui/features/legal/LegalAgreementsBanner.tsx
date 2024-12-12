@@ -1,6 +1,7 @@
-import { FC, ReactEventHandler } from "react"
-import { P4 } from "@argent/x-ui"
-import { Button, Flex, FlexProps, Link } from "@chakra-ui/react"
+import type { FC, ReactEventHandler } from "react"
+import { P3 } from "@argent/x-ui"
+import type { FlexProps } from "@chakra-ui/react"
+import { Button, Flex, Link } from "@chakra-ui/react"
 
 import {
   ARGENT_X_LEGAL_PRIVACY_POLICY_URL,
@@ -25,7 +26,7 @@ export const LegalAgreementsBanner: FC<LegalAgreementsBannerProps> = ({
       borderTopColor="border"
       {...rest}
     >
-      <P4 color="text-secondary">
+      <P3 color="text-secondary">
         We’ve updated our terms, please accept the new{" "}
         <Link
           href={ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL}
@@ -42,7 +43,7 @@ export const LegalAgreementsBanner: FC<LegalAgreementsBannerProps> = ({
         >
           Privacy Policy
         </Link>
-      </P4>
+      </P3>
       <Button onClick={onAgree} colorScheme="primary" size={"sm"}>
         Agree
       </Button>

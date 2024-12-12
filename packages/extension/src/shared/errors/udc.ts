@@ -1,4 +1,5 @@
-import { BaseError, BaseErrorPayload } from "@argent/x-shared"
+import type { BaseErrorPayload } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 
 export enum UDC_ERROR_MESSAGES {
   FETCH_CONTRACT_CONTRUCTOR_PARAMS = "Error while fetching contract constructor params",

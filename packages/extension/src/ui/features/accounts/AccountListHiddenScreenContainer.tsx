@@ -1,10 +1,11 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { useParams } from "react-router-dom"
 
 import { accountService } from "../../../shared/account/service"
-import { PendingMultisig } from "../../../shared/multisig/types"
+import type { PendingMultisig } from "../../../shared/multisig/types"
 import { unhidePendingMultisig } from "../../../shared/multisig/utils/pendingMultisig"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { useNavigateReturnToOr } from "../../hooks/useNavigateReturnTo"
 import { routes } from "../../../shared/ui/routes"
 import { useView } from "../../views/implementation/react"
@@ -12,6 +13,7 @@ import { usePendingMultisigsOnNetwork } from "../multisig/multisig.state"
 import { AccountListHiddenScreen } from "./AccountListHiddenScreen"
 import { allAccountsOnNetworkFamily } from "../../views/account"
 import { selectedNetworkIdView } from "../../views/network"
+import { useSortedAccounts } from "./useSortedAccounts"
 
 export const AccountListHiddenScreenContainer: FC = () => {
   const { networkId } = useParams()
@@ -27,7 +29,7 @@ export const AccountListHiddenScreenContainer: FC = () => {
 
   const onToggleHiddenAccount = useCallback(
     (account: WalletAccount, hidden: boolean) => {
-      void accountService.setHide(hidden, account)
+      void accountService.setHide(hidden, account.id)
     },
     [],
   )
@@ -39,10 +41,12 @@ export const AccountListHiddenScreenContainer: FC = () => {
     [],
   )
 
+  const sortedAccounts = useSortedAccounts(accounts)
+
   return (
     <AccountListHiddenScreen
       onBack={navigateReturnTo}
-      accounts={accounts}
+      accounts={sortedAccounts}
       pendingMultisigAccounts={pendingMultisigAccounts}
       onToggleHiddenAccount={onToggleHiddenAccount}
       onToggleHiddenPendingMultisig={onToggleHiddenPendingMultisig}

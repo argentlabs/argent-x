@@ -16,16 +16,18 @@ import { WalletDeploymentStarknetService } from "./wallet/deployment/WalletDeplo
 import { loadContracts } from "./wallet/loadContracts"
 import { WalletRecoverySharedService } from "./wallet/recovery/WalletRecoverySharedService"
 import { WalletRecoveryStarknetService } from "./wallet/recovery/WalletRecoveryStarknetService"
-import { Events as SessionEvents } from "./wallet/session/interface"
+import type { Events as SessionEvents } from "./wallet/session/interface"
 import { WalletSessionService } from "./wallet/session/WalletSessionService"
 import { MultisigBackendService } from "../shared/multisig/service/backend/MultisigBackendService"
 import { ARGENT_MULTISIG_URL } from "../shared/api/constants"
-import { Events as RecoverySharedEvents } from "./wallet/recovery/IWalletRecoveryService"
+import type { Events as RecoverySharedEvents } from "./wallet/recovery/IWalletRecoveryService"
 import { accountSharedService } from "../shared/account/service"
 import { sessionRepo } from "../shared/account/store/session"
 import { ampli } from "../shared/analytics"
 import { referralService } from "./services/referral"
 import { ledgerSharedService } from "../shared/ledger/service"
+import { accountImportSharedService } from "../shared/accountImport/service"
+import { pkManager } from "../shared/accountImport/pkManager"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -52,6 +54,7 @@ export const cryptoStarknetService = new WalletCryptoStarknetService(
   pendingMultisigRepo,
   accountSharedService,
   ledgerSharedService,
+  pkManager,
   loadContracts,
 )
 
@@ -81,7 +84,7 @@ export const sessionService = new WalletSessionService(
   SCRYPT_N,
 )
 
-const accountStarknetService = new WalletAccountStarknetService(
+export const accountStarknetService = new WalletAccountStarknetService(
   pendingMultisigRepo,
   networkService,
   sessionService,
@@ -89,12 +92,12 @@ const accountStarknetService = new WalletAccountStarknetService(
   cryptoStarknetService,
   multisigBackendService,
   ledgerSharedService,
+  accountImportSharedService,
 )
 
 const deployStarknetService = new WalletDeploymentStarknetService(
   accountRepo,
   multisigBaseWalletRepo,
-  pendingMultisigRepo,
   sessionService,
   sessionRepo,
   accountSharedService,

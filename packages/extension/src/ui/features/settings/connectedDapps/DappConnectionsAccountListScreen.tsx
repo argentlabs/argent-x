@@ -2,20 +2,20 @@ import {
   BarBackButton,
   CellStack,
   Empty,
+  icons,
   NavigationContainer,
-  P3,
-  iconsDeprecated,
+  P2,
 } from "@argent/x-ui"
-import { FC, ReactEventHandler } from "react"
+import type { FC, ReactEventHandler } from "react"
 
-import { PreAuthorization } from "../../../../shared/preAuthorization/schema"
+import type { PreAuthorization } from "../../../../shared/preAuthorization/schema"
 import { useWalletAccount } from "../../accounts/accounts.state"
 import { AccountListItem } from "../../accounts/AccountListItem"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../../shared/ui/routes"
 import { Flex } from "@chakra-ui/react"
 
-const { LinkIcon, ChevronRightIcon } = iconsDeprecated
+const { LinkPrimaryIcon, ChevronRightSecondaryIcon } = icons
 
 interface DappConnectionsAccountListScreenProps {
   onBack: ReactEventHandler
@@ -29,15 +29,15 @@ export const DappConnectionsAccountListScreen: FC<
   return (
     <NavigationContainer
       leftButton={<BarBackButton onClick={onBack} />}
-      title={"Connected dapps"}
+      title={"Authorised dapps"}
     >
       {accountIdentifiers.length === 0 ? (
-        <Empty icon={<LinkIcon />} title={"No connected dapps"} />
+        <Empty icon={<LinkPrimaryIcon />} title={"No authorised dapps"} />
       ) : (
         <CellStack width={"full"}>
-          <P3 color="text-secondary">
+          <P2 color="text-secondary">
             One or more dapps are connected to these accounts:
-          </P3>
+          </P2>
           <Flex
             w="full"
             borderTop="1px solid"
@@ -67,9 +67,9 @@ function DappConnectionsAccountListItem({
   preAuthorizations: PreAuthorization[]
 }) {
   const navigate = useNavigate()
-  const account = useWalletAccount(preAuthorizations[0].account)
+  const account = useWalletAccount(preAuthorizations[0].account.id)
   const onClick = () => {
-    navigate(routes.settingsDappConnectionsAccount(account?.address))
+    navigate(routes.settingsDappConnectionsAccount(account?.id))
   }
   if (!account) {
     return null
@@ -82,6 +82,7 @@ function DappConnectionsAccountListItem({
     <AccountListItem
       avatarSize={9}
       accountName={account.name}
+      accountId={account.id}
       accountAddress={account.address}
       accountDescription={accountDescription}
       networkId={account.networkId}
@@ -90,7 +91,7 @@ function DappConnectionsAccountListItem({
       isLedger={account.signer.type === "ledger"}
       onClick={onClick}
     >
-      <ChevronRightIcon opacity={0.6} />
+      <ChevronRightSecondaryIcon opacity={0.6} />
     </AccountListItem>
   )
 }

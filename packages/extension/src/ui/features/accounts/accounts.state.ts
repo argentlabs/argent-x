@@ -1,4 +1,4 @@
-import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import type { AccountId, WalletAccount } from "../../../shared/wallet.model"
 import {
   accountFindFamily,
   allAccountsOnNetworkFamily,
@@ -10,11 +10,9 @@ import { Account } from "./Account"
 // TODO: we should get rid of this and use the WalletAccount interface only (renaming it at some point)
 export const mapWalletAccountsToAccounts = (
   walletAccounts: WalletAccount[],
-): Account[] => {
-  return walletAccounts.map((walletAccount) => new Account(walletAccount))
-}
+): Account[] => walletAccounts.map(Account.fromWalletAccount)
 
-export const useWalletAccount = (account?: BaseWalletAccount) => {
+export const useWalletAccount = (account?: AccountId) => {
   return useView(accountFindFamily(account))
 }
 

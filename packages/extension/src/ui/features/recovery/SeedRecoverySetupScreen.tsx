@@ -1,11 +1,12 @@
 import {
   BarCloseButton,
   CellStack,
+  icons,
   NavigationContainer,
-  P4,
-  iconsDeprecated,
+  P3,
 } from "@argent/x-ui"
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAtom } from "jotai"
 import { Button, Flex } from "@chakra-ui/react"
@@ -15,7 +16,7 @@ import { SeedPhraseWithCopyButton } from "./SeedPhraseWithCopyButton"
 import { hasSavedRecoverySeedphraseAtom } from "./hasSavedRecoverySeedphraseAtom"
 import { useSeedPhrase } from "./hooks/useSeedPhrase"
 
-const { CheckboxDefaultIcon, CheckboxActiveIcon } = iconsDeprecated
+const { RadioEmptyIcon, SuccessPrimaryIcon } = icons
 
 export const SeedRecoverySetupScreen: FC = () => {
   const navigate = useNavigate()
@@ -25,7 +26,7 @@ export const SeedRecoverySetupScreen: FC = () => {
   )
   const [isChecked, setIsChecked] = useState(false)
   const handleSubmit = async () => {
-    setHasSavedRecoverySeedPhrase(true)
+    void setHasSavedRecoverySeedPhrase(true)
     navigate(routes.accountTokens())
   }
   return (
@@ -42,30 +43,31 @@ export const SeedRecoverySetupScreen: FC = () => {
           mb={2}
           size={"auto"}
           colorScheme="transparent"
+          _active={{ bg: "transparent" }}
           _hover={{ bg: "transparent" }}
           whiteSpace={"initial"}
           leftIcon={
             isChecked ? (
-              <CheckboxActiveIcon
+              <SuccessPrimaryIcon
                 data-testid="recovery-phrase-checked"
                 fontSize={"4xl"}
                 color={"success.500"}
               />
             ) : (
-              <CheckboxDefaultIcon fontSize={"4xl"} color={"neutrals.500"} />
+              <RadioEmptyIcon fontSize={"4xl"} color={"neutrals.500"} />
             )
           }
           onClick={() => setIsChecked((prevChecked) => !prevChecked)}
         >
-          <P4 textAlign={"left"} color="neutrals.300">
+          <P3 textAlign={"left"} color="neutrals.300">
             I have saved my recovery phrase and understand I should never share
             it with anyone else
-          </P4>
+          </P3>
         </Button>
         <Button
           colorScheme="primary"
           isDisabled={!seedPhrase || !isChecked}
-          onClick={handleSubmit}
+          onClick={() => void handleSubmit()}
         >
           Done
         </Button>

@@ -1,7 +1,8 @@
-import { FC } from "react"
-import { Route, RouteProps } from "react-router-dom"
+import type { FC } from "react"
+import type { RouteProps } from "react-router-dom"
+import { Route } from "react-router-dom"
 
-import { Presentation } from "./types"
+import type { Presentation } from "./types"
 
 type StackRouteProps = RouteProps & {
   presentation?: Presentation

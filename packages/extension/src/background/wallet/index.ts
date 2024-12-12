@@ -1,13 +1,15 @@
-import { Account, InvocationsDetails } from "starknet"
+import type { Account, InvocationsDetails } from "starknet"
 
-import { Address } from "@argent/x-shared"
-import { ProgressCallback } from "ethers"
-import { WalletAccountSharedService } from "../../shared/account/service/accountSharedService/WalletAccountSharedService"
-import { PendingMultisig } from "../../shared/multisig/types"
-import { Network } from "../../shared/network"
-import { BaseSignerInterface } from "../../shared/signer/BaseSignerInterface"
-import {
+import type { Address } from "@argent/x-shared"
+import type { ProgressCallback } from "ethers"
+import type { WalletAccountSharedService } from "../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import type { PendingMultisig } from "../../shared/multisig/types"
+import type { Network } from "../../shared/network"
+import type { BaseSignerInterface } from "../../shared/signer/BaseSignerInterface"
+import type {
+  AccountId,
   ArgentAccountType,
+  ArgentWalletAccount,
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
@@ -17,14 +19,15 @@ import {
   SignerType,
   WalletAccount,
 } from "../../shared/wallet.model"
-import { WalletAccountStarknetService } from "./account/WalletAccountStarknetService"
-import { WalletBackupService } from "./backup/WalletBackupService"
-import { WalletCryptoSharedService } from "./crypto/WalletCryptoSharedService"
-import { WalletCryptoStarknetService } from "./crypto/WalletCryptoStarknetService"
-import { WalletDeploymentStarknetService } from "./deployment/WalletDeploymentStarknetService"
-import { WalletRecoverySharedService } from "./recovery/WalletRecoverySharedService"
-import { WalletRecoveryStarknetService } from "./recovery/WalletRecoveryStarknetService"
-import { WalletSessionService } from "./session/WalletSessionService"
+import type { WalletAccountStarknetService } from "./account/WalletAccountStarknetService"
+import type { WalletBackupService } from "./backup/WalletBackupService"
+import type { WalletCryptoSharedService } from "./crypto/WalletCryptoSharedService"
+import type { WalletCryptoStarknetService } from "./crypto/WalletCryptoStarknetService"
+import type { WalletDeploymentStarknetService } from "./deployment/WalletDeploymentStarknetService"
+import type { WalletRecoverySharedService } from "./recovery/WalletRecoverySharedService"
+import type { WalletRecoveryStarknetService } from "./recovery/WalletRecoveryStarknetService"
+import type { WalletSessionService } from "./session/WalletSessionService"
+import type { ValidatedImport } from "../../shared/accountImport/types"
 
 export class Wallet {
   constructor(
@@ -49,21 +52,24 @@ export class Wallet {
       type,
     )
   }
-  public async getAccount(
-    selector: BaseWalletAccount,
-  ): Promise<WalletAccount | null> {
-    return this.walletAccountSharedService.getAccount(selector)
+  public async getAccount(accountId: AccountId): Promise<WalletAccount | null> {
+    return this.walletAccountSharedService.getAccount(accountId)
+  }
+  public async getArgentAccount(
+    accountId: AccountId,
+  ): Promise<ArgentWalletAccount | null> {
+    return this.walletAccountSharedService.getArgentAccount(accountId)
   }
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
     return this.walletAccountSharedService.getSelectedAccount()
   }
   public async selectAccount(
-    accountIdentifier?: BaseWalletAccount | NetworkOnlyPlaceholderAccount,
+    accountIdentifier?: AccountId | NetworkOnlyPlaceholderAccount,
   ) {
     return this.walletAccountSharedService.selectAccount(accountIdentifier)
   }
-  public async getMultisigAccount(selector: BaseWalletAccount) {
-    return this.walletAccountSharedService.getMultisigAccount(selector)
+  public async getMultisigAccount(accountId: AccountId) {
+    return this.walletAccountSharedService.getMultisigAccount(accountId)
   }
   public async getLastUsedOnNetwork(networkId: string) {
     return this.walletAccountSharedService.getLastUsedAccountOnNetwork(
@@ -72,12 +78,9 @@ export class Wallet {
   }
 
   // WalletAccountStarknetService
-  public async getStarknetAccount(
-    selector: BaseWalletAccount,
-    useLatest = false,
-  ) {
+  public async getStarknetAccount(accountId: AccountId, useLatest = false) {
     return this.walletAccountStarknetService.getStarknetAccount(
-      selector,
+      accountId,
       useLatest,
     )
   }
@@ -123,6 +126,10 @@ export class Wallet {
     )
   }
 
+  public importAccount(account: ValidatedImport) {
+    return this.walletAccountStarknetService.importAccount(account)
+  }
+
   // WalletBackupService
   public async getBackup() {
     return this.walletBackupService.getBackup()
@@ -154,13 +161,11 @@ export class Wallet {
   public async getSignerForAccount(account: WalletAccount) {
     return this.walletCryptoStarknetService.getSignerForAccount(account)
   }
-  public async getPrivateKey(
-    baseWalletAccount: BaseWalletAccount,
-  ): Promise<string> {
-    return this.walletCryptoStarknetService.getPrivateKey(baseWalletAccount)
+  public async getPrivateKey(accountId: AccountId): Promise<string> {
+    return this.walletCryptoStarknetService.getPrivateKey(accountId)
   }
-  public async getPublicKey(baseAccount?: BaseWalletAccount) {
-    return this.walletCryptoStarknetService.getPublicKey(baseAccount)
+  public async getPublicKey(accountId?: AccountId) {
+    return this.walletCryptoStarknetService.getPublicKey(accountId)
   }
 
   public async getNextPublicKey(
@@ -207,7 +212,7 @@ export class Wallet {
 
   // WalletDeploymentStarknetService
   public async deployAccount(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
     transactionDetails?: InvocationsDetails | undefined,
   ) {
     return this.walletDeploymentStarknetService.deployAccount(
@@ -215,8 +220,19 @@ export class Wallet {
       transactionDetails,
     )
   }
+
+  public async getDeployAccountTransactionHash(
+    walletAccount: ArgentWalletAccount,
+    transactionDetails?: InvocationsDetails | undefined,
+  ) {
+    return this.walletDeploymentStarknetService.getDeployAccountTransactionHash(
+      walletAccount,
+      transactionDetails,
+    )
+  }
+
   public async getAccountDeploymentFee(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
     feeTokenAddress: Address,
   ) {
     return this.walletDeploymentStarknetService.getAccountDeploymentFee(
@@ -224,21 +240,20 @@ export class Wallet {
       feeTokenAddress,
     )
   }
-  public async redeployAccount(account: WalletAccount) {
-    return this.walletDeploymentStarknetService.redeployAccount(account)
-  }
-  public async getAccountDeploymentPayload(walletAccount: WalletAccount) {
+  public async getAccountDeploymentPayload(walletAccount: ArgentWalletAccount) {
     return this.walletDeploymentStarknetService.getAccountDeploymentPayload(
       walletAccount,
     )
   }
-  public async getMultisigDeploymentPayload(walletAccount: WalletAccount) {
+  public async getMultisigDeploymentPayload(
+    walletAccount: ArgentWalletAccount,
+  ) {
     return this.walletDeploymentStarknetService.getMultisigDeploymentPayload(
       walletAccount,
     )
   }
   public async getAccountOrMultisigDeploymentPayload(
-    walletAccount: WalletAccount,
+    walletAccount: ArgentWalletAccount,
   ) {
     return this.walletDeploymentStarknetService.getAccountOrMultisigDeploymentPayload(
       walletAccount,
@@ -258,9 +273,8 @@ export class Wallet {
   public async getDeployContractPayloadForMultisig(props: {
     threshold: number
     signers: string[]
-    index: number
     networkId: string
-    signerType: SignerType
+    publicKey: string
   }) {
     return this.walletDeploymentStarknetService.getDeployContractPayloadForMultisig(
       props,

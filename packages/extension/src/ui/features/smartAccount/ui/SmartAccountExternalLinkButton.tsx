@@ -1,8 +1,8 @@
-import { Button, iconsDeprecated } from "@argent/x-ui"
-import { ButtonProps } from "@chakra-ui/react"
-import { ComponentPropsWithoutRef, FC } from "react"
+import { Button, icons } from "@argent/x-ui"
+import type { ButtonProps } from "@chakra-ui/react"
+import type { ComponentPropsWithoutRef, FC } from "react"
 
-const { ExpandIcon } = iconsDeprecated
+const { ExpandIcon } = icons
 
 export const ARGENT_GUARDIAN_LINK =
   "https://support.argent.xyz/hc/en-us/articles/9950649206685"

@@ -1,12 +1,16 @@
-import { FC, useMemo, useState } from "react"
+import type { FC } from "react"
+import { useMemo, useState } from "react"
 import { ConnectInstructionBox } from "./ConnectInstructionBox"
 import { B1 } from "@argent/x-ui"
 import { LedgerConnectionError } from "./LedgerConnectionError"
 import { useLedgerConnectCallback } from "../hooks/useLedgerConnect"
 import { ScreenLayout } from "../layout/ScreenLayout"
-import { LedgerConnectSidePanel } from "./LedgerConnectSidePanel"
 import { Box } from "@chakra-ui/react"
 import { ActionButton } from "../../../components/FullScreenPage"
+import { lazy } from "react"
+
+/** Lazy load to avoid bundling @rive in main chunk */
+const LedgerConnectSidePanel = lazy(() => import("./LedgerConnectSidePanel"))
 
 type ConnectionState = "idle" | "connecting" | "error"
 
@@ -103,7 +107,7 @@ export const LedgerConnectStep: FC<LedgerConnectStepProps> = ({
         isLoading={isLoading}
         disabled={isLoading}
         loadingText={buttonLabel}
-        onClick={onClick}
+        onClick={() => void onClick()}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >

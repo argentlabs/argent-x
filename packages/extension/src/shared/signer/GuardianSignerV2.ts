@@ -1,30 +1,22 @@
-import {
+import type {
   Abi,
   Call,
-  CallData,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
   TypedData,
-  hash,
-  stark,
 } from "starknet"
-import {
-  addAddressPadding,
-  num,
-  transaction,
-  CairoVersion,
-  V3InvocationsSignerDetails,
-} from "starknet"
+import { CallData, hash, stark } from "starknet"
+import type { CairoVersion, V3InvocationsSignerDetails } from "starknet"
+import { addAddressPadding, num, transaction } from "starknet"
 import type {
   Cosigner,
   CosignerMessage,
   CosignerOffchainMessage,
 } from "@argent/x-guardian"
-import { BaseSignerInterface } from "./BaseSignerInterface"
+import type { BaseSignerInterface } from "./BaseSignerInterface"
 import { isEqualAddress } from "@argent/x-shared"
-import { isTokenExpired } from "../smartAccount/backend/account"
 
 export function isV3Details<T extends { version: string }>(
   details: T,
@@ -117,12 +109,6 @@ export class GuardianSignerV2 implements BaseSignerInterface {
       )
     ) {
       return []
-    }
-
-    const tokenExpired = await isTokenExpired()
-
-    if (tokenExpired) {
-      throw new Error("Smart Account token is expired")
     }
 
     const response = await this.cosigner(cosignerMessage, isOffchainMessage)

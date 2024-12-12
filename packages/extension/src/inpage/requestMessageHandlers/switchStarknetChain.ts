@@ -1,4 +1,4 @@
-import { SwitchStarknetChainParameters } from "@starknet-io/types-js"
+import type { SwitchStarknetChainParameters } from "@starknet-io/types-js"
 import { sendMessage, waitForMessage } from "../messageActions"
 import { WalletRPCError, WalletRPCErrorCodes } from "./errors"
 

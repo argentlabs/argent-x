@@ -1,4 +1,4 @@
-import { addressSchema, apiTokenInfoSchema } from "@argent/x-shared"
+import { apiTokenInfoSchema } from "@argent/x-shared"
 import { z } from "zod"
 
 export const dbTokenInfoSchema = apiTokenInfoSchema.extend({

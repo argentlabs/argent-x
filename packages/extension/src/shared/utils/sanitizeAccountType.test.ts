@@ -1,5 +1,5 @@
 import { sanitizeAccountType } from "./sanitizeAccountType"
-import { ArgentAccountType } from "../wallet.model"
+import type { ArgentAccountType } from "../wallet.model"
 
 describe("sanitizeAccountType", () => {
   test.each(["standard", "multisig", "smart"])(

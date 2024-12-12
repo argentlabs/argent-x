@@ -1,11 +1,11 @@
-import { AllowArray } from "starknet"
+import type { AllowArray } from "starknet"
 
 import { getLatestArgentMultisigClassHash } from "@argent/x-shared"
 import { withoutHiddenSelector } from "../../account/selectors"
 import { accountService } from "../../account/service"
-import { SelectorFn } from "../../storage/types"
+import type { SelectorFn } from "../../storage/types"
 import { accountsEqual } from "../../utils/accountsEqual"
-import {
+import type {
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   MultisigWalletAccount,
@@ -75,6 +75,7 @@ export async function addMultisigAccount(
   account: MultisigWalletAccount,
 ): Promise<void> {
   await accountService.upsert({
+    id: account.id,
     address: account.address,
     name: account.name,
     network: account.network,
@@ -90,6 +91,7 @@ export async function addMultisigAccount(
   })
 
   await addBaseMultisigAccounts({
+    id: account.id,
     address: account.address,
     networkId: account.networkId,
     publicKey: account.publicKey,
@@ -103,7 +105,7 @@ export async function addMultisigAccount(
 export async function hideMultisig(
   baseAccount: BaseMultisigWalletAccount,
 ): Promise<void> {
-  await accountService.setHide(true, baseAccount)
+  await accountService.setHide(true, baseAccount.id)
 }
 
 export async function updateBaseMultisigAccount(
@@ -121,5 +123,14 @@ export async function removeMultisigAccount(
     accountsEqual(account, baseAccount),
   )
 
-  await accountService.remove(baseAccount)
+  await accountService.removeById(baseAccount.id)
+}
+
+export async function getBaseMultisigAccount(
+  baseWalletAccount: BaseWalletAccount,
+): Promise<BaseMultisigWalletAccount> {
+  const accounts = await multisigBaseWalletRepo.get((account) =>
+    accountsEqual(account, baseWalletAccount),
+  )
+  return accounts[0]
 }

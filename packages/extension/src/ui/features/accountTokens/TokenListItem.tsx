@@ -1,11 +1,12 @@
-import { H6, P4, TextWithAmount, TokenIcon } from "@argent/x-ui"
-import { ButtonProps, Flex, Tooltip } from "@chakra-ui/react"
-import { FC } from "react"
+import { H5, P3, P4, TextWithAmount, TokenIcon } from "@argent/x-ui"
+import type { ButtonProps } from "@chakra-ui/react"
+import { Flex, Tooltip } from "@chakra-ui/react"
+import type { FC } from "react"
 
 import { prettifyTokenBalance } from "../../../shared/token/prettifyTokenBalance"
 import { prettifyCurrencyValue } from "@argent/x-shared"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
-import { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
+import type { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
 
 export type TokenListItemVariant = "default" | "no-currency"
 
@@ -33,7 +34,7 @@ export const TokenListItem: FC<TokenListItemProps> = ({
 
   return (
     <CustomButtonCell w="full" {...rest}>
-      <TokenIcon size={9} url={iconUrl} name={name} />
+      <TokenIcon size={10} url={iconUrl} name={name} />
       <Flex
         flexGrow={1}
         alignItems="center"
@@ -43,13 +44,16 @@ export const TokenListItem: FC<TokenListItemProps> = ({
       >
         <Tooltip label={tokenName} openDelay={1500} placement="top">
           <Flex direction="column" gap={0.5} overflow="hidden">
-            <H6 overflow="hidden" textOverflow={"ellipsis"}>
+            <H5
+              overflow="hidden"
+              textOverflow={"ellipsis"}
+              data-testid={token.symbol}
+            >
               {tokenName}
-            </H6>
+            </H5>
             {!isNoCurrencyVariant && (
               <P4
                 color="text-secondary"
-                fontWeight="semibold"
                 overflow="hidden"
                 textOverflow="ellipsis"
                 data-testid={`${token.symbol}-balance`}
@@ -58,9 +62,9 @@ export const TokenListItem: FC<TokenListItemProps> = ({
               </P4>
             )}
             {showTokenSymbol && (
-              <P4 color="text-secondary" fontWeight="semibold">
+              <P3 color="text-secondary" fontWeight="semibold">
                 {symbol}
-              </P4>
+              </P3>
             )}
           </Flex>
         </Tooltip>
@@ -69,9 +73,9 @@ export const TokenListItem: FC<TokenListItemProps> = ({
             amount={token.balance?.toString() ?? 0}
             decimals={token.decimals}
           >
-            <H6>
+            <H5>
               {isNoCurrencyVariant ? displayBalance : displayCurrencyValue}
-            </H6>
+            </H5>
           </TextWithAmount>
         </Flex>
       </Flex>

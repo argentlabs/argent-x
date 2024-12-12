@@ -1,5 +1,6 @@
 import { ArrayStorage } from "../storage"
-import { Transaction, compareTransactions } from "../transactions"
+import type { Transaction } from "../transactions"
+import { compareTransactions } from "../transactions"
 
 export const declaredTransactionsStore = new ArrayStorage<Transaction>([], {
   namespace: "core:udcDeclaredTransactions",

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { clientRiskAssessmentService } from "../../../services/riskAssessment"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
-import { RiskAssessment } from "../../../../shared/riskAssessment/schema"
+import type { RiskAssessment } from "../../../../shared/riskAssessment/schema"
 
 export interface IUseRiskAssessment {
   host: string

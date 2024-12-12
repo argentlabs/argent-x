@@ -1,4 +1,4 @@
-import { Device } from "@argent/x-guardian"
+import type { Device } from "@argent/x-guardian"
 import {
   SignJWT,
   calculateJwkThumbprint,

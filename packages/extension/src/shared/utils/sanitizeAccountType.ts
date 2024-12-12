@@ -1,9 +1,9 @@
-import { ArgentAccountType } from "../wallet.model"
+import type { WalletAccountType } from "../wallet.model"
 
 type SanitizedAccountType = "standard" | "smart" | "multisig"
 
 export const sanitizeAccountType = (
-  type: ArgentAccountType | undefined,
+  type: WalletAccountType | undefined,
 ): SanitizedAccountType => {
   if (!type) {
     return "standard"

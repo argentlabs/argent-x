@@ -1,5 +1,7 @@
-import { Address, addressSchema } from "@argent/x-shared"
-import { Call, validateAndParseAddress } from "starknet"
+import type { Address } from "@argent/x-shared"
+import { addressSchema } from "@argent/x-shared"
+import type { Call } from "starknet"
+import { validateAndParseAddress } from "starknet"
 import { MultisigEntryPointType } from "../multisig/types"
 
 export interface UpgradeAccountCall extends Call {
@@ -17,7 +19,7 @@ export const isUpgradeAccountCall = (
       validateAndParseAddress(call.contractAddress)
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

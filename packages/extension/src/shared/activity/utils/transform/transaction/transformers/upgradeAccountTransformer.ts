@@ -2,9 +2,9 @@ import {
   extractNewClassHash,
   isUpgradeAccountCall,
 } from "../../../../../call/upgradeAccountCall"
-import { UpgradeAccountTransaction } from "../../type"
+import type { UpgradeAccountTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 export default function ({ transaction, result }: ITransactionTransformer) {
   const calls = getCallsFromTransaction(transaction)

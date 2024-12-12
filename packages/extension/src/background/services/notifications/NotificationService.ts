@@ -1,4 +1,4 @@
-import { getAccountIdentifier, normalizeAddress } from "@argent/x-shared"
+import { normalizeAddress } from "@argent/x-shared"
 import type { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
 import type {
   INotificationService,
@@ -10,9 +10,9 @@ import {
   type NotificationDeepLink,
 } from "../../../shared/notifications/schema"
 import type { DeepPick } from "../../../shared/types/deepPick"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 import type { IBackgroundUIService } from "../ui/IBackgroundUIService"
-import { MinimalIWalletSessionService } from "../ui/BackgroundUIService"
+import type { MinimalIWalletSessionService } from "../ui/BackgroundUIService"
 
 export type MinimalBrowser = DeepPick<
   typeof chrome,
@@ -118,7 +118,7 @@ export class NotificationService implements INotificationService {
       const notificationDeepLinkParsed =
         notificationDeepLinkSchema.parse(notificationDeepLink)
       await this.accountSharedService.selectAccount(
-        notificationDeepLinkParsed.account,
+        notificationDeepLinkParsed.account.id,
       )
       await this.backgroundUIService.openUi(notificationDeepLinkParsed.route)
     } catch {
@@ -127,8 +127,6 @@ export class NotificationService implements INotificationService {
   }
 
   makeId({ hash, account }: { hash: string; account: BaseWalletAccount }) {
-    return [normalizeAddress(hash), getAccountIdentifier(account)]
-      .filter(Boolean)
-      .join(":")
+    return [normalizeAddress(hash), account.id].filter(Boolean).join(":")
   }
 }

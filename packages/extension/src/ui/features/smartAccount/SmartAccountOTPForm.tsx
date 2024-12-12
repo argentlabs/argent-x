@@ -1,11 +1,12 @@
-import { FieldError, iconsDeprecated, useToast } from "@argent/x-ui"
+import { FieldError, icons, useToast } from "@argent/x-ui"
 import { Button, Center, HStack, PinInputField } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FormEvent, MouseEvent, useCallback, useRef } from "react"
+import type { FormEvent, MouseEvent } from "react"
+import { useCallback, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import type { EmailVerificationStatus } from "../../../shared/smartAccount/backend/account"
 import {
-  EmailVerificationStatus,
   emailVerificationStatusErrorSchema,
   getVerificationErrorMessage,
 } from "../../../shared/smartAccount/backend/account"
@@ -15,19 +16,19 @@ import { useAction } from "../../hooks/useAction"
 import { clientAccountService } from "../../services/account"
 import { clientArgentAccountService } from "../../services/argentAccount"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
+import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
 import { getAddBackendAccountErrorFromBackendError } from "../../../shared/smartAccount/validation/addBackendAccount"
 import { getVerificationErrorFromBackendError } from "../../../shared/smartAccount/validation/verification"
 import { updateVerifiedEmail } from "../../../shared/smartAccount/verifiedEmail"
 import { getSmartAccountValidationErrorFromBackendError } from "../../../shared/smartAccount/validation/validateAccount"
-import { Flow } from "../../../shared/argentAccount/schema"
+import type { Flow } from "../../../shared/argentAccount/schema"
 import { accountSharedService } from "../../../shared/account/service"
 import { SignerType } from "../../../shared/wallet.model"
 import { ampli } from "../../../shared/analytics"
-import { useOnboardingExperiment } from "../../services/onboarding/useOnboardingExperiment"
 import { browserExtensionSentryWithScope } from "../../../shared/sentry/scope"
+import { getMessageFromTrpcError } from "@argent/x-shared"
 
-const { EmailIcon, ResendIcon } = iconsDeprecated
+const { MessageSecondaryIcon, RefreshPrimaryIcon } = icons
 
 const schema = z.object({
   otp: z
@@ -43,6 +44,18 @@ interface SmartAccountOTPFormProps {
   onValidationError: (error: SmartAccountValidationErrorMessage) => void
   flow: Flow
   pinInputWidth?: number
+}
+
+const errorSchema = z.object({
+  message: z.string(),
+})
+
+const getMessageFromError = (error: unknown) => {
+  const parsed = errorSchema.safeParse(error)
+  if (!parsed.success) {
+    return
+  }
+  return parsed.data.message
 }
 
 const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
@@ -62,7 +75,6 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
     clientAccountService.create.bind(clientAccountService),
   )
   const network = useCurrentNetwork()
-  const { onboardingExperimentCohort } = useOnboardingExperiment()
 
   const onResendEmail = useCallback(
     async (e: MouseEvent) => {
@@ -73,14 +85,13 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
       try {
         await clientArgentAccountService.requestEmail(email)
         toast({
-          icon: <EmailIcon />,
+          icon: <MessageSecondaryIcon />,
           title: "A new code has been sent to your email",
           status: "info",
           duration: 3000,
         })
         ampli.onboardingVerificationCodeResent({
           "wallet platform": "browser extension",
-          "onboarding experiment": onboardingExperimentCohort,
         })
       } catch (error) {
         console.warn(coerceErrorToString(error))
@@ -91,7 +102,7 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
         })
       }
     },
-    [email, onboardingExperimentCohort, toast],
+    [email, toast],
   )
 
   const { handleSubmit, formState, setError, control } = useForm({
@@ -131,33 +142,38 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
 
       /** Other possible error status from backend */
       try {
-        const errorObject = z
-          .object({
-            message: z.string(),
-          })
-          .parse(e)
-        const error = emailVerificationStatusErrorSchema.safeParse(
-          JSON.parse(errorObject.message),
-        )
-        if (error.success) {
-          if (error.data.responseJson.status === "notRequested") {
-            /** need to start verification over again */
-            toast({
-              title: "Please re-enter email",
-              status: "error",
-              duration: 3000,
-            })
-            onOTPReEnterEmail()
+        const errorObject = errorSchema.parse(e)
+        try {
+          const error = emailVerificationStatusErrorSchema.safeParse(
+            JSON.parse(errorObject.message),
+          )
+          if (error.success) {
+            if (error.data.responseJson.status === "notRequested") {
+              /** need to start verification over again */
+              toast({
+                title: "Please re-enter email",
+                status: "error",
+                duration: 3000,
+              })
+              onOTPReEnterEmail()
+            } else {
+              return setError("otp", {
+                type: "manual",
+                message: getVerificationErrorMessage(
+                  error.data.responseJson.status as EmailVerificationStatus,
+                ),
+              })
+            }
           } else {
-            return setError("otp", {
-              type: "manual",
-              message: getVerificationErrorMessage(
-                error.data.responseJson.status as EmailVerificationStatus,
-              ),
-            })
+            /** if parsing the json fails, re-throw the original error */
+            throw e
           }
+        } catch {
+          /** if parsing as json fails, re-throw the original error */
+          throw e
         }
       } catch (e) {
+        /** capture unhandled original error in Sentry */
         console.error(e)
         browserExtensionSentryWithScope((scope) => {
           scope.setLevel("warning")
@@ -166,9 +182,13 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
           )
         })
       }
+      /** Try to show the error message to the user */
+      const trpcMessage = getMessageFromTrpcError(e)
+      const errorMessage = getMessageFromError(e)
+      const message = trpcMessage || errorMessage
       return setError("otp", {
         type: "manual",
-        message: "Unknown error - please try again later",
+        message: `Unknown error - please try again later${message ? ` (${message})` : ""}`,
       })
     },
     [onOTPReEnterEmail, onValidationError, setError, toast],
@@ -203,7 +223,6 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
           // Only trigger this event if the account was successfully validated
           ampli.onboardingVerificationCodeAccepted({
             "wallet platform": "browser extension",
-            "onboarding experiment": onboardingExperimentCohort,
           })
 
           onOTPConfirmed()
@@ -211,7 +230,6 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
           // Verification code rejected even if otp is correct but account validation failed
           ampli.onboardingVerificationCodeRejected({
             "wallet platform": "browser extension",
-            "onboarding experiment": onboardingExperimentCohort,
           })
           handleSubmitError(e)
         }
@@ -225,7 +243,6 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
       handleSubmitError,
       network.id,
       onOTPConfirmed,
-      onboardingExperimentCohort,
     ],
   )
 
@@ -267,7 +284,7 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
           size="2xs"
           colorScheme="transparent"
           color="neutrals.400"
-          leftIcon={<ResendIcon />}
+          leftIcon={<RefreshPrimaryIcon />}
           isLoading={formState.isSubmitting}
           loadingText={"Verifying"}
         >

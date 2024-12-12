@@ -7,7 +7,6 @@ import {
   ETH_TOKEN_ADDRESS,
   MULTICALL_CONTRACT_ADDRESS,
   STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH,
-  STANDARD_DEVNET_ACCOUNT_CLASS_HASH,
   STRK_TOKEN_ADDRESS,
 } from "./constants"
 import type { Network, NetworkWithStatus } from "./type"
@@ -86,14 +85,13 @@ export const defaultNetworks: Network[] = [
   ...(process.env.NODE_ENV === "development" ? NODE_ENV_DEV_ONLY_NETWORKS : []),
   {
     id: "localhost",
-    chainId: "SN_GOERLI",
+    chainId: "SN_SEPOLIA",
     rpcUrl: "http://localhost:5050",
     explorerUrl: "http://localhost:4000/testnet/",
     name: "Devnet",
-    possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS],
+    possibleFeeTokenAddresses: [ETH_TOKEN_ADDRESS, STRK_TOKEN_ADDRESS],
     accountClassHash: {
-      standard: STANDARD_DEVNET_ACCOUNT_CLASS_HASH,
-      smart: STANDARD_DEVNET_ACCOUNT_CLASS_HASH,
+      standard: TXV3_ACCOUNT_CLASS_HASH,
     },
   },
 ]

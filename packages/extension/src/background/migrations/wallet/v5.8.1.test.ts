@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { determineMigrationNeededV581 } from "./v5.8.1"
-import {
-  cryptoStarknetServiceMock,
-  getWalletStoreMock,
-} from "../../wallet/test.utils"
+import { cryptoStarknetServiceMock } from "../../wallet/test.utils"
 import { SignerType } from "../../../shared/wallet.model"
+import { getWalletStoreMock } from "../../../shared/test.utils"
 
 describe("v5.8.1", () => {
   it("should detect falsey accounts for migration", async () => {

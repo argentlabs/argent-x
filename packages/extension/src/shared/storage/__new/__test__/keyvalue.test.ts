@@ -1,7 +1,7 @@
 import { MockStorage } from "../../__test__/chrome-storage.mock"
 import { KeyValueStorage } from "../../keyvalue"
-import { AreaName, StorageArea } from "../../types"
-import { IObjectStore } from "../interface"
+import type { AreaName, StorageArea } from "../../types"
+import type { IObjectStore } from "../interface"
 import { adaptKeyValue } from "../keyvalue"
 
 type TestData = {

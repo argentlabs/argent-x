@@ -1,5 +1,6 @@
-import { Address, addressSchema, txVersionSchema } from "@argent/x-shared"
-import {
+import type { Address } from "@argent/x-shared"
+import { addressSchema, txVersionSchema } from "@argent/x-shared"
+import type {
   Abi,
   Account,
   AccountInterface,
@@ -13,32 +14,28 @@ import {
   InvokeFunctionResponse,
   ProviderInterface,
   Signature,
-  TransactionType,
   TypedData,
   UniversalDetails,
   V2InvocationsSignerDetails,
   V3InvocationsSignerDetails,
-  constants,
-  hash,
-  num,
-  stark,
 } from "starknet"
+import { TransactionType, constants, hash, num, stark } from "starknet"
 import { EDataAvailabilityMode } from "@starknet-io/types-js"
 import { MultisigError } from "../errors/multisig"
 import { ArgentSigner } from "../signer/ArgentSigner"
-import { BaseSignerInterface } from "../signer/BaseSignerInterface"
+import type { BaseSignerInterface } from "../signer/BaseSignerInterface"
 import { LedgerSigner } from "../signer/LedgerSigner"
 import { BaseStarknetAccount } from "../starknetAccount/base"
 import { chainIdToArgentNetwork } from "../utils/starknetNetwork"
-import { MultisigSignerSignatures } from "./multisig.model"
-import {
-  MultisigPendingOffchainSignature,
-  removeMultisigPendingOffchainSignature,
-} from "./pendingOffchainSignaturesStore"
-import { MultisigPendingTransaction } from "./pendingTransactionsStore"
-import { IMultisigBackendService } from "./service/backend/IMultisigBackendService"
+import type { MultisigSignerSignatures } from "./multisig.model"
+import type { MultisigPendingOffchainSignature } from "./pendingOffchainSignaturesStore"
+import { removeMultisigPendingOffchainSignature } from "./pendingOffchainSignaturesStore"
+import type { MultisigPendingTransaction } from "./pendingTransactionsStore"
+import type { IMultisigBackendService } from "./service/backend/IMultisigBackendService"
 import { getMultisigAccountFromBaseWallet } from "./utils/baseMultisig"
 import { mapResourceBoundsToStrkBounds } from "./utils/multisigTxV3"
+import { getAccountIdentifier } from "../utils/accountIdentifier"
+import { addTransactionHash } from "../transactions/transactionHashes/transactionHashesRepository"
 
 export type MultisigAccountSigner = ArgentSigner | LedgerSigner
 
@@ -124,7 +121,7 @@ export class MultisigAccount extends BaseStarknetAccount {
         ? transactionsDetail
         : abiOrDetails
     const transactions = Array.isArray(calls) ? calls : [calls]
-    const version = txVersionSchema.parse(details.version)
+    const version = this.getTxVersion(details)
 
     const signerDetails =
       await this.buildInvocationSignerDetailsPayload(details)
@@ -149,6 +146,7 @@ export class MultisigAccount extends BaseStarknetAccount {
     const formattedSignature = await this.prependWithPublicSigner(signature)
 
     return this.multisigBackendService.createTransactionRequest({
+      accountId: await this.getId(signerDetails.chainId),
       address: this.address,
       calls: transactions,
       transactionDetails,
@@ -161,8 +159,11 @@ export class MultisigAccount extends BaseStarknetAccount {
     const formattedSignature = await this.prependWithPublicSigner(signature)
     const chainId = await this.getChainId()
 
+    const accountId = await this.getId(chainId)
+
     const signatureRequest =
       await this.multisigBackendService.createOffchainSignatureRequest({
+        accountId,
         address: this.address,
         data: typedData,
         signature: formattedSignature,
@@ -184,7 +185,7 @@ export class MultisigAccount extends BaseStarknetAccount {
     payload: DeployAccountContractPayload,
     details: UniversalDetails = {},
   ): Promise<DeployContractResponse> {
-    const version = txVersionSchema.parse(details.version)
+    const version = this.getTxVersion(details)
 
     const signerDetails = await this.buildAccountDeploySignerDetailsPayload(
       payload,
@@ -262,10 +263,17 @@ export class MultisigAccount extends BaseStarknetAccount {
       } as V2InvocationsSignerDetails
     }
 
+    await addTransactionHash(
+      transactionToSign.requestId,
+      transactionToSign.transactionHash,
+    )
+
     const signature = await this.signer.signTransaction(calls, signerDetails)
     const formattedSignature = await this.prependWithPublicSigner(signature)
+    const accountId = await this.getId(chainId)
 
     return this.multisigBackendService.addTransactionSignature({
+      accountId,
       address: this.address,
       transactionToSign,
       chainId,
@@ -285,8 +293,11 @@ export class MultisigAccount extends BaseStarknetAccount {
 
     const formattedSignature = await this.prependWithPublicSigner(signature)
 
+    const accountId = await this.getId(chainId)
+
     const { signatures } =
       await this.multisigBackendService.addOffchainSignature({
+        accountId,
         address: this.address,
         pendingOffchainSignature,
         chainId,
@@ -301,10 +312,8 @@ export class MultisigAccount extends BaseStarknetAccount {
   ): Promise<MultisigSignerSignatures> {
     const chainId = await this.getChainId()
 
-    const multisig = await getMultisigAccountFromBaseWallet({
-      address: this.address,
-      networkId: chainIdToArgentNetwork(chainId),
-    })
+    const account = pendingOffchainSignature.account
+    const multisig = await getMultisigAccountFromBaseWallet(account)
 
     if (!multisig) {
       throw new MultisigError({ code: "MULTISIG_ACCOUNT_NOT_FOUND" })
@@ -361,5 +370,20 @@ export class MultisigAccount extends BaseStarknetAccount {
   async prependWithPublicSigner(signature: Signature): Promise<Signature> {
     const publicSigner = await this.signer.getPubKey()
     return [publicSigner, ...stark.signatureToHexArray(signature)]
+  }
+
+  private async getId(providedChainId?: constants.StarknetChainId) {
+    const chainId = providedChainId ?? (await this.getChainId())
+
+    const signer = {
+      type: this.signer.signerType,
+      derivationPath: this.signer.derivationPath, // because both ArgentSigner and LedgerSigner have this property
+    }
+
+    return getAccountIdentifier(
+      this.address,
+      chainIdToArgentNetwork(chainId),
+      signer,
+    )
   }
 }

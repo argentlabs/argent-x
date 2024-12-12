@@ -1,5 +1,5 @@
 import { SpacerCell } from "@argent/x-ui"
-import { FC } from "react"
+import type { FC } from "react"
 import { AccountEditButtonsLedger } from "./AccountEditButtonsLedger"
 import { ConnectedDappButtonContainer } from "./buttons/ConnectedDappsButton"
 import { DeployAccountButtonContainer } from "./buttons/DeployAccountButton"
@@ -8,7 +8,7 @@ import { PrivateKeyExportButtonContainer } from "./buttons/PrivateKeyExportButto
 import { PublicKeyExportButtonContainer } from "./buttons/PublicKeyExportButton"
 import { SmartAccountToggleButtonContainer } from "./buttons/SmartAccountToggleButton"
 import { ViewOnExplorerButtonContainer } from "./buttons/ViewOnExplorerButton"
-import { WalletAccount } from "../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../shared/wallet.model"
 
 export const AccountEditButtons: FC<{
   account: WalletAccount

@@ -1,5 +1,5 @@
-import { AnalyticsService } from "../../../shared/analytics/AnalyticsService"
-import { IBackgroundUIService } from "../ui/IBackgroundUIService"
+import type { AnalyticsService } from "../../../shared/analytics/AnalyticsService"
+import type { IBackgroundUIService } from "../ui/IBackgroundUIService"
 import { onOpen } from "../worker/schedule/decorators"
 import { pipe } from "../worker/schedule/pipe"
 

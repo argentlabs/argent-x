@@ -1,18 +1,20 @@
 import { getAccountContractAddress, isEqualAddress } from "@argent/x-shared"
 import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
-import {
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import {
+import type {
   BaseWalletAccount,
-  defaultNetworkOnlyPlaceholderAccount,
-  isNetworkOnlyPlaceholderAccount,
   WalletAccount,
 } from "../../../shared/wallet.model"
+import {
+  defaultNetworkOnlyPlaceholderAccount,
+  isNetworkOnlyPlaceholderAccount,
+} from "../../../shared/wallet.model"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { WalletCryptoStarknetService } from "../../wallet/crypto/WalletCryptoStarknetService"
-import { WalletStorageProps } from "../../../shared/wallet/walletStore"
+import type { WalletCryptoStarknetService } from "../../wallet/crypto/WalletCryptoStarknetService"
+import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 
 export async function determineMigrationNeededV581(
   cryptoStarknetService: WalletCryptoStarknetService,
@@ -76,6 +78,7 @@ export async function migrateAccountsV581(
     await store.set({
       selected: firstValidAccount
         ? {
+            id: firstValidAccount.id,
             address: firstValidAccount.address,
             networkId: firstValidAccount.networkId,
           }

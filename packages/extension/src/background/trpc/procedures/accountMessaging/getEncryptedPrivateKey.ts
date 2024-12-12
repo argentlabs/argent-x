@@ -1,14 +1,13 @@
 import { z } from "zod"
 
 import { extensionOnlyProcedure } from "../permissions"
-import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
 import { encryptForUi } from "../../../crypto"
 import { AccountMessagingError } from "../../../../shared/errors/accountMessaging"
 import { SessionError } from "../../../../shared/errors/session"
 
 const getEncryptedPrivateKeySchema = z.object({
   encryptedSecret: z.string(),
-  account: baseWalletAccountSchema,
+  accountId: z.string(),
 })
 
 export const getEncryptedPrivateKeyProcedure = extensionOnlyProcedure
@@ -16,7 +15,7 @@ export const getEncryptedPrivateKeyProcedure = extensionOnlyProcedure
   .output(z.string())
   .mutation(
     async ({
-      input: { account, encryptedSecret },
+      input: { accountId, encryptedSecret },
       ctx: {
         services: { wallet, messagingKeys },
       },
@@ -28,7 +27,7 @@ export const getEncryptedPrivateKeyProcedure = extensionOnlyProcedure
       }
       try {
         return await encryptForUi(
-          await wallet.getPrivateKey(account),
+          await wallet.getPrivateKey(accountId),
           encryptedSecret,
           messagingKeys.privateKey,
         )

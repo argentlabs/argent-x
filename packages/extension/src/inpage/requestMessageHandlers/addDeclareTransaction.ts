@@ -1,4 +1,4 @@
-import {
+import type {
   AddDeclareTransactionParameters,
   AddDeclareTransactionResult,
 } from "@starknet-io/types-js"

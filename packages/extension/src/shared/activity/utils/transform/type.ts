@@ -1,8 +1,7 @@
-import { Address } from "@argent/x-shared"
-import { KnownDapp } from "../../../knownDapps"
-import { Token } from "../../../token/__new/types/token.model"
-import { TransactionMeta } from "../../../transactions"
-import { ActivityTransactionFailureReason } from "./getTransactionFailureReason"
+import type { Address } from "@argent/x-shared"
+import type { Token } from "../../../token/__new/types/token.model"
+import type { TransactionMeta } from "../../../transactions"
+import type { ActivityTransactionFailureReason } from "./getTransactionFailureReason"
 
 export type TransformedTransactionAction =
   | "UNKNOWN"
@@ -42,7 +41,6 @@ export interface BaseTransformedTransaction {
   maxFee?: string
   actualFee?: string
   dappContractAddress?: string
-  dapp?: Omit<KnownDapp, "contracts">
 }
 
 export interface TokenTransferTransaction extends BaseTransformedTransaction {
@@ -89,7 +87,6 @@ export interface SwapTransaction extends BaseTransformedTransaction {
   action: "SWAP"
   contractAddress: string
   dappContractAddress?: string
-  dapp: Omit<KnownDapp, "contracts">
   fromTokenAddress: string
   toTokenAddress: string
   fromAmount: string
@@ -121,6 +118,10 @@ export interface ChangeMultisigSignerTransaction
   entity: "SIGNER"
 }
 
+export interface ChangeMultisigSelfSignerTransaction
+  extends ChangeMultisigSignerTransaction {
+  newSigner: Address
+}
 export interface ChangeMultisigThresholdTransaction
   extends BaseTransformedTransaction {
   action: "CHANGE"

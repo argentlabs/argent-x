@@ -3,9 +3,9 @@ import {
   isRemoveMultisigSignersCall,
   isReplaceMultisigSignerCall,
 } from "../../../../../call/changeMultisigSignersCall"
-import { ChangeMultisigSignerTransaction } from "../../type"
+import type { ChangeMultisigSignerTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 export default function ({ transaction, result }: ITransactionTransformer) {
   const calls = getCallsFromTransaction(transaction)

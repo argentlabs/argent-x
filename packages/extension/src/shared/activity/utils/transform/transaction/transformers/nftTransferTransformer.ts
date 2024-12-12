@@ -2,9 +2,9 @@ import {
   isNftTransferCall,
   parseNftTransferCall,
 } from "../../../../../call/nftTransferCall"
-import { NFTTransferTransaction } from "../../type"
+import type { NFTTransferTransaction } from "../../type"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 /** adds erc721 token transfer data */
 

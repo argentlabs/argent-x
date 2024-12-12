@@ -7,8 +7,8 @@ import { selectedAccountView } from "../../../views/account"
 import { currentActionView, isLastActionView } from "../../../views/actions"
 import { useView } from "../../../views/implementation/react"
 import { focusExtensionTab, useExtensionIsInTab } from "../../browser/tabs"
-import { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
-import { ActionItemExtra } from "../../../../shared/actionQueue/schema"
+import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type { ActionItemExtra } from "../../../../shared/actionQueue/schema"
 
 export const useActionScreen = () => {
   const selectedAccount = useView(selectedAccountView)
@@ -59,7 +59,9 @@ export const useActionScreen = () => {
   }, [closePopupIfLastAction, approve])
 
   const reject = useCallback(async () => {
-    action && void clientActionService.reject(action.meta.hash)
+    if (action) {
+      void clientActionService.reject(action.meta.hash)
+    }
   }, [action])
 
   const rejectAndClose = useCallback(async () => {

@@ -1,18 +1,13 @@
-import { BaseError } from "@argent/x-shared"
-import { isErrorOfType } from "../../errors/errorData"
+import { getMessageFromTrpcError } from "@argent/x-shared"
 
 export const addBackendAccountErrorStatus = {
   accountAlreadyAdded: "This account is already added - please check account",
   accountInUse: "This account is already linked to a different email address",
+  ownerAlreadyInUse: "This email address is already in use",
 } as const
 
 export const getAddBackendAccountErrorFromBackendError = (error: unknown) => {
-  // Need BaseError.name instead of "BaseError" because the import from x-shared alters the name
-  if (!isErrorOfType<string>(error, BaseError.name)) {
-    return null
-  }
-
-  const message = error.data.message
+  const message = getMessageFromTrpcError(error)
   if (!message) {
     return null
   }

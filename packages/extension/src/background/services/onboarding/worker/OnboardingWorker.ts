@@ -1,7 +1,5 @@
-import {
-  MinimalActionBrowser,
-  getBrowserAction,
-} from "../../../../shared/browser"
+import type { MinimalActionBrowser } from "../../../../shared/browser"
+import { getBrowserAction } from "../../../../shared/browser"
 import type { KeyValueStorage } from "../../../../shared/storage"
 import type { StorageChange } from "../../../../shared/storage/types"
 import type { DeepPick } from "../../../../shared/types/deepPick"

@@ -5,11 +5,11 @@ import {
   CellStack,
   Empty,
   FieldError,
-  H6,
+  H5,
   HeaderCell,
+  icons,
   NavigationContainer,
   TextareaAutosize,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import {
   Flex,
@@ -23,8 +23,8 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react"
-import { BaseSyntheticEvent, FC, ReactNode } from "react"
-import { FieldErrors, UseFormRegister } from "react-hook-form"
+import type { BaseSyntheticEvent, FC, ReactNode } from "react"
+import type { FieldErrors, UseFormRegister } from "react-hook-form"
 
 import { addressInputCharactersAndLengthSchema } from "@argent/x-shared"
 import { isEmpty } from "lodash-es"
@@ -34,10 +34,18 @@ import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 import { AccountListItem } from "../accounts/AccountListItem"
 import { AccountListWithBalance } from "./AccountListWithBalance"
 import { SendModalAddContactScreen } from "./SendModalAddContactScreen"
-import { FormType } from "./sendRecipientScreen.model"
+import type { FormType } from "./sendRecipientScreen.model"
+import { AccountListItemEditAccessory } from "../accounts/AccountListItemEditAccessory"
+import { useTabIndexWithHash } from "../../hooks/useTabIndexWithHash"
 
-const { SearchIcon, WalletIcon, AddressBookIcon, CloseIcon, MultisigIcon } =
-  iconsDeprecated
+const {
+  SearchPrimaryIcon,
+  WalletSecondaryIcon,
+  CrossSecondaryIcon,
+  MultisigSecondaryIcon,
+  AddressBookIcon,
+  ImportIcon,
+} = icons
 
 interface SendRecipientScreenProps {
   errors: FieldErrors<FormType>
@@ -51,6 +59,7 @@ interface SendRecipientScreenProps {
   onClearQuery: () => void
   onCloseAddContact: () => void
   onContactClick: (contact: AddressBookContact) => void
+  onEditContactClick: (contact: AddressBookContact) => void
   onOpenAddContact: () => void
   onQuerySubmit: (e?: BaseSyntheticEvent) => void
   onSaveContact: (contact: AddressBookContact) => void
@@ -61,6 +70,7 @@ interface SendRecipientScreenProps {
   selectedNetworkId: string
   multisigAccounts: WalletAccount[]
   standardAccounts: WalletAccount[]
+  importedAccounts: WalletAccount[]
 }
 
 export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
@@ -75,6 +85,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
   onClearQuery,
   onCloseAddContact,
   onContactClick,
+  onEditContactClick,
   onOpenAddContact,
   onQuerySubmit,
   onSaveContact,
@@ -84,6 +95,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
   register,
   selectedNetworkId,
   multisigAccounts,
+  importedAccounts,
   standardAccounts,
 }) => {
   const { ref, onChange, ...rest } = register("query")
@@ -93,12 +105,20 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
 
   const hasMultisigAccounts = !isEmpty(multisigAccounts)
   const hasStandardAccounts = !isEmpty(standardAccounts)
-  const hasMultipleAccountTypes = hasStandardAccounts && hasMultisigAccounts
+  const hasImportedAccounts = !isEmpty(importedAccounts)
+  const hasMultipleAccountTypes =
+    [hasStandardAccounts, hasMultisigAccounts, hasImportedAccounts].filter(
+      Boolean,
+    ).length > 1
   const hasOnlyMultisigAccounts = hasMultisigAccounts && !hasStandardAccounts
 
   const hasQuery = Boolean(query)
 
   const defaultTabIndex = hasAccounts ? 0 : 1
+  const [tabIndex, setTabIndex] = useTabIndexWithHash(
+    ["my-accounts", "address-book"],
+    defaultTabIndex,
+  )
 
   return (
     <>
@@ -111,8 +131,8 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
           <HeaderCell>Recipient</HeaderCell>
           <form onSubmit={onQuerySubmit}>
             <InputGroup size="sm">
-              <InputLeftElement pointerEvents="none" h={"full"}>
-                <SearchIcon />
+              <InputLeftElement pointerEvents="none">
+                <SearchPrimaryIcon />
               </InputLeftElement>
               <TextareaAutosize
                 data-testid="recipient-input"
@@ -141,7 +161,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                       e.target.value,
                     ).success
                   ) {
-                    onChange(e)
+                    void onChange(e)
                   }
                 }}
                 onPaste={(e) => {
@@ -169,7 +189,7 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                     fontSize={"2xs"}
                     color={"neutrals.400"}
                   >
-                    <CloseIcon />
+                    <CrossSecondaryIcon />
                   </Button>
                 </InputRightElement>
               )}
@@ -185,9 +205,10 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
               display={"flex"}
               flexDirection={"column"}
               mt={4}
-              defaultIndex={defaultTabIndex}
+              index={tabIndex}
+              onChange={setTabIndex}
             >
-              <TabList>
+              <TabList mx={-4}>
                 <Tab>My accounts</Tab>
                 <Tab>Address book</Tab>
               </TabList>
@@ -202,22 +223,47 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                         px={2}
                         pt={4}
                       >
-                        <WalletIcon w={4} h={4} />
-                        <H6>My Accounts</H6>
+                        <WalletSecondaryIcon w={4} h={4} />
+                        <H5>My Accounts</H5>
                       </Flex>
                       <AccountListWithBalance
                         accounts={standardAccounts}
                         onAccountClick={onAccountClick}
                       />
-
-                      <Flex gap={2} align="center" color="neutrals.300" px={2}>
-                        <MultisigIcon w={4} h={4} />
-                        <H6>Multisig Accounts</H6>
-                      </Flex>
-                      <AccountListWithBalance
-                        accounts={multisigAccounts}
-                        onAccountClick={onAccountClick}
-                      />
+                      {hasMultisigAccounts && (
+                        <>
+                          <Flex
+                            gap={2}
+                            align="center"
+                            color="neutrals.300"
+                            px={2}
+                          >
+                            <MultisigSecondaryIcon w={4} h={4} />
+                            <H5>Multisig Accounts</H5>
+                          </Flex>
+                          <AccountListWithBalance
+                            accounts={multisigAccounts}
+                            onAccountClick={onAccountClick}
+                          />
+                        </>
+                      )}
+                      {hasImportedAccounts && (
+                        <>
+                          <Flex
+                            gap={2}
+                            align="center"
+                            color="neutrals.300"
+                            px={2}
+                          >
+                            <ImportIcon w={4} h={4} />
+                            <H5>Imported Accounts</H5>
+                          </Flex>
+                          <AccountListWithBalance
+                            accounts={importedAccounts}
+                            onAccountClick={onAccountClick}
+                          />
+                        </>
+                      )}
                     </>
                   ) : hasOnlyMultisigAccounts ? (
                     <AccountListWithBalance
@@ -229,9 +275,20 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                       accounts={standardAccounts}
                       onAccountClick={onAccountClick}
                     />
+                  ) : hasImportedAccounts ? (
+                    <AccountListWithBalance
+                      accounts={importedAccounts}
+                      onAccountClick={onAccountClick}
+                    />
                   ) : (
                     <Empty
-                      icon={hasQuery ? <SearchIcon /> : <WalletIcon />}
+                      icon={
+                        hasQuery ? (
+                          <SearchPrimaryIcon />
+                        ) : (
+                          <WalletSecondaryIcon />
+                        )
+                      }
                       title={hasQuery ? `No matching accounts` : `No accounts`}
                     />
                   )}
@@ -244,15 +301,23 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                           key={contact.id}
                           avatarSize={9}
                           accountAddress={contact.address}
+                          accountId={contact.id}
                           networkId={contact.networkId}
                           accountName={contact.name}
                           onClick={() => onContactClick(contact)}
-                        />
+                        >
+                          <AccountListItemEditAccessory
+                            data-testid={`edit-contact-${contact.id}`}
+                            onClick={() => onEditContactClick(contact)}
+                          />
+                        </AccountListItem>
                       ))}
                     </CellStack>
                   ) : (
                     <Empty
-                      icon={hasQuery ? <SearchIcon /> : <AddressBookIcon />}
+                      icon={
+                        hasQuery ? <SearchPrimaryIcon /> : <AddressBookIcon />
+                      }
                       title={
                         hasQuery
                           ? `No matching addresses`

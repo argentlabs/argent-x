@@ -1,4 +1,4 @@
-import { Button, H5, P3 } from "@argent/x-ui"
+import { Button, H4, P2 } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,
@@ -7,11 +7,11 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react"
-import { FC, MouseEvent } from "react"
+import type { FC, MouseEvent } from "react"
 
 interface MultisigDeleteModalProps {
   isOpen: boolean
-  onDelete?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void>
+  onDelete?: (e?: MouseEvent<HTMLButtonElement>) => void | Promise<void>
   onClose: () => void
 }
 
@@ -25,19 +25,27 @@ export const MultisigDeleteModal: FC<MultisigDeleteModalProps> = ({
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
       <ModalContent background="neutrals.700" borderRadius="2xl">
         <ModalHeader>
-          <H5 fontWeight="600" textAlign="center">
+          <H4 fontWeight="600" textAlign="center">
             Are you sure?
-          </H5>
+          </H4>
         </ModalHeader>
         <ModalBody>
-          <P3 fontWeight="400" textAlign="center">
+          <P2 fontWeight="400" textAlign="center">
             The multisig owner will not be able to add you to the multisig
             anymore
-          </P3>
+          </P2>
         </ModalBody>
 
         <ModalFooter flexDirection="column" gap="3">
-          <Button w="100%" colorScheme="primary" onClick={onDelete}>
+          <Button
+            w="100%"
+            colorScheme="primary"
+            onClick={(e) => {
+              if (onDelete) {
+                void onDelete(e)
+              }
+            }}
+          >
             Delete
           </Button>
           <Button w="100%" backgroundColor="neutrals.600" onClick={onClose}>

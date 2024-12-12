@@ -1,8 +1,8 @@
-import { H6, P3, iconsDeprecated, logosDeprecated } from "@argent/x-ui"
+import { H5, icons, logosDeprecated, P2 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
-const { ChromeExtensionIcon, PinIcon } = iconsDeprecated
+const { ChromeExtensionIcon, PinIcon } = icons
 const { ArgentXLogo } = logosDeprecated
 
 export const OnboardingToastMessage: FC = () => {
@@ -19,11 +19,11 @@ export const OnboardingToastMessage: FC = () => {
     >
       <Flex alignItems={"center"} gap={3} pl={1}>
         <ChromeExtensionIcon flexShrink={0} fontSize={"xl"} />
-        <P3>Pin the Argent X extension for quick access</P3>
+        <P2>Pin the Argent X extension for quick access</P2>
       </Flex>
       <Flex alignItems={"center"} p={3} gap={3} rounded={"lg"} bg={"#f0f0f0"}>
         <ArgentXLogo flexShrink={0} fontSize={"xl"} color={"primary.500"} />
-        <H6 mr={"auto"}>Argent X</H6>
+        <H5 mr={"auto"}>Argent X</H5>
         <PinIcon fontSize={"xl"} color={"#2E75E0"} />
       </Flex>
     </Flex>

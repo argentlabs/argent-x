@@ -1,6 +1,7 @@
 import { isAddress } from "@argent/x-shared"
 import { AlertDialog, BarBackButton, NavigationContainer } from "@argent/x-ui"
-import { FC, useState } from "react"
+import type { FC } from "react"
+import { useState } from "react"
 import { Navigate, useNavigate, useParams } from "react-router-dom"
 
 import { nftService } from "../../../shared/nft"
@@ -12,8 +13,10 @@ import { NftScreen } from "./NftScreen"
 import { useRemoteNft } from "./useRemoteNft"
 import { useDisclosure } from "@chakra-ui/react"
 import { genericErrorSchema } from "../actions/feeEstimation/feeError"
+import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
 
 export const NftScreenContainer: FC = () => {
+  const onBack = useNavigateReturnToOrBack()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [message, setMessage] = useState("")
   const navigate = useNavigate()
@@ -59,11 +62,7 @@ export const NftScreenContainer: FC = () => {
   if (!nft) {
     return (
       <NavigationContainer
-        leftButton={
-          <BarBackButton
-            onClick={() => navigate(routes.accountCollections())}
-          />
-        }
+        leftButton={<BarBackButton onClick={onBack} />}
         title="Not found"
       />
     )

@@ -6,17 +6,14 @@ import {
 } from "@argent/x-shared"
 import { useDisclosure } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC, useCallback, useEffect, useMemo } from "react"
-import { SubmitHandler, useForm } from "react-hook-form"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo } from "react"
+import type { SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 
-import { partition } from "lodash-es"
 import type { AddressBookContact } from "../../../shared/addressBook/type"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import {
-  sortMultisigAccounts,
-  sortStandardAccounts,
-} from "../../../shared/utils/accountsMultisigSort"
 import { IS_DEV } from "../../../shared/utils/dev"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
@@ -27,11 +24,14 @@ import { useView } from "../../views/implementation/react"
 import { AccountAddressListItem } from "../accounts/AccountAddressListItem"
 import { SendRecipientScreen } from "./SendRecipientScreen"
 import { useSendQuery } from "./useSendQuery"
-import { FormType, formSchema } from "./sendRecipientScreen.model"
+import type { FormType } from "./sendRecipientScreen.model"
+import { formSchema } from "./sendRecipientScreen.model"
 import { useFilteredAccounts } from "./useFilteredAccounts"
 import { useFilteredContacts } from "./useFilteredContacts"
 import { useGetAddressFromDomainNameInput } from "./useGetAddressFromDomainName"
 import { selectedNetworkIdView } from "../../views/network"
+import { usePartitionedAccountsByType } from "../accounts/usePartitionedAccountsByType"
+import { mapWalletAccountsToAccounts } from "../accounts/accounts.state"
 
 export const SendRecipientScreenContainer: FC = () => {
   const returnTo = useCurrentPathnameWithQuery()
@@ -110,6 +110,10 @@ export const SendRecipientScreenContainer: FC = () => {
     selectAddress(contact.address)
   }
 
+  const onEditContactClick = (contact: AddressBookContact) => {
+    navigate(routes.sendAddressBookEdit(contact))
+  }
+
   const { accounts, filteredAccounts: allFilteredAccounts } =
     useFilteredAccounts(query)
   const { filteredContacts } = useFilteredContacts(query)
@@ -122,21 +126,15 @@ export const SendRecipientScreenContainer: FC = () => {
     ? accounts.length > 0
     : accounts.length > 1
 
-  const [multisigAccounts, standardAccounts] = partition(
-    allFilteredAccounts,
-    (account) => account.type === "multisig",
-  )
+  const { multisigAccounts, importedAccounts, standardAccounts } =
+    usePartitionedAccountsByType(
+      mapWalletAccountsToAccounts(allFilteredAccounts),
+    )
 
-  const sortedMultisigAccounts = useMemo(
-    () => sortMultisigAccounts(multisigAccounts),
-    [multisigAccounts],
-  )
-
-  const sortedStandardAccounts = useMemo(() => {
-    const sortedAccounts = sortStandardAccounts(standardAccounts)
+  const conditionalStandardAccounts = useMemo(() => {
     return includeSelfAccount
-      ? sortedAccounts
-      : sortedAccounts.filter((a) => !accountsEqual(a, account))
+      ? standardAccounts
+      : standardAccounts.filter((a) => !accountsEqual(a, account))
   }, [standardAccounts, includeSelfAccount, account])
 
   useEffect(() => {
@@ -168,6 +166,7 @@ export const SendRecipientScreenContainer: FC = () => {
     return (
       <AccountAddressListItem
         accountAddress={query}
+        /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
         onClick={handleSubmit(onSubmit)}
         truncated
       />
@@ -215,8 +214,9 @@ export const SendRecipientScreenContainer: FC = () => {
     <SendRecipientScreen
       errors={errors}
       hasAccounts={hasAccounts}
-      multisigAccounts={sortedMultisigAccounts}
-      standardAccounts={sortedStandardAccounts}
+      multisigAccounts={multisigAccounts}
+      standardAccounts={conditionalStandardAccounts}
+      importedAccounts={importedAccounts}
       filteredContacts={filteredContacts}
       hasQueryError={hasQueryError}
       isLoading={isLoading}
@@ -226,10 +226,11 @@ export const SendRecipientScreenContainer: FC = () => {
       onClearQuery={onClearQuery}
       onCloseAddContact={onCloseAddContact}
       onContactClick={onContactClick}
+      onEditContactClick={onEditContactClick}
       onOpenAddContact={onOpenAddContact}
-      onQuerySubmit={onQuerySubmit}
+      onQuerySubmit={() => void onQuerySubmit()}
       onSaveContact={onSaveContact}
-      onQueryPaste={onQueryPaste}
+      onQueryPaste={(queryPaste) => void onQueryPaste(queryPaste)}
       placeholderValidAddress={placeholderValidAddress}
       query={query}
       register={register}

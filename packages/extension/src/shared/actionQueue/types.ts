@@ -7,12 +7,12 @@ import type {
 } from "starknet"
 import { z } from "zod"
 
-import { Network } from "../network"
-import { TransactionMeta } from "../transactions"
-import { BaseWalletAccount } from "../wallet.model"
-import { ActionQueueItem } from "./schema"
-import { SignMessageOptions } from "../messages/ActionMessage"
-import { TypedData } from "@starknet-io/types-js"
+import type { Network } from "../network"
+import type { TransactionMeta } from "../transactions"
+import type { BaseWalletAccount } from "../wallet.model"
+import type { ActionQueueItem } from "./schema"
+import type { SignMessageOptions } from "../messages/ActionMessage"
+import type { TypedData } from "@starknet-io/types-js"
 
 export type ExtQueueItem<T> = ActionQueueItem & T
 

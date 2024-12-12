@@ -8,19 +8,16 @@
     "@changesets/cli": "^2.26.1",
     "@lavamoat/allow-scripts": "^3.0.0",
     "@lavamoat/preinstall-always-fail": "^2.0.0",
-    "bundlewatch": "^0.4.0",
     "husky": "^9.0.0",
-    "import-sort-style-module": "^6.0.0",
     "lint-staged": "^15.0.0",
-    "nx": "^19.0.0",
     "patch-package": "^8.0.0",
     "prettier": "^3.2.5",
     "prettier-plugin-import-sort": "^0.0.7",
     "ts-node": "^10.9.1"
   },
   "resolutions": {
-    "@babel/preset-react": "7.24.7",
-    "@babel/plugin-transform-react-jsx": "7.24.7"
+    "@babel/preset-react": "7.25.9",
+    "@babel/plugin-transform-react-jsx": "7.25.9"
   },
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
@@ -33,35 +30,26 @@
     "build:extension": "pnpm run --filter @argent-x/extension build",
     "build:extension:alpha": "RELEASE_TRACK=alpha pnpm run --filter @argent-x/extension build",
     "build:extension:beta": "RELEASE_TRACK=beta pnpm run --filter @argent-x/extension build",
-    "build:sourcemaps": "GEN_SOURCE_MAPS=true pnpm run build",
     "lint": "pnpm run -r --parallel lint",
     "test": "pnpm run -r --parallel --stream test",
     "test:watch": "pnpm run -r --parallel; --stream test:watch",
-    "test:e2e:extension": "pnpm run --filter @argent-x/e2e test:extension",
-    "test:e2e:extension:prod": "pnpm run --filter @argent-x/e2e test:extension:prod",
-    "test:e2e:extension:tx": "pnpm run --filter @argent-x/e2e test:extension:tx",
-    "test:e2e:slack-notifications": "pnpm run --filter @argent-x/e2e test:slack-notifications",
+    "test:e2e": "pnpm run --filter @argent-x/e2e test",
+    "test:e2e:mainnet": "pnpm run --filter @argent-x/e2e test:mainnet",
+    "test:e2e:tx": "pnpm run --filter @argent-x/e2e test:tx",
+    "test:e2e:upgrade": "pnpm run --filter @argent-x/e2e test:upgrade",
     "setup": "pnpm install --frozen-lockfile && pnpm allow-scripts && husky install && patch-package && pnpm run -r --stream setup",
     "test:ci": "pnpm run --stream --parallel test:ci",
     "storybook": "cd packages/storybook && pnpm run storybook",
     "devnet:upgrade-helper": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-upgrade-helper.ts",
     "devnet:setup-contracts": "NODE_NO_WARNINGS=1 ts-node ./scripts/devnet-setup-contracts.ts",
-    "export:extension": "pnpm run --filter @argent-x/extension export"
+    "export:extension": "pnpm run --filter @argent-x/extension export",
+    "check-bundle-size": "pnpm run --filter @argent-x/extension check-bundle-size"
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
       "style": "module",
       "parser": "typescript"
     }
-  },
-  "bundlewatch": {
-    "files": [
-      {
-        "path": "packages/extension/dist/**/*.*",
-        "maxSize": "4mB",
-        "compression": "none"
-      }
-    ]
   },
   "license": "GPL-3.0-only",
   "lint-staged": {
@@ -77,7 +65,8 @@
       "nx>@swc/core": false,
       "lerna>@nrwl/devkit>nx": false,
       "lerna>nx": false,
-      "lerna>nx>@nrwl/cli>nx": false
+      "lerna>nx>@nrwl/cli>nx": false,
+      "ts-node>@swc/core": false
     }
   }
 }

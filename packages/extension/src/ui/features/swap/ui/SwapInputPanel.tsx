@@ -1,5 +1,6 @@
 import { debounce } from "lodash-es"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import {
   isAllowedNumericInputValue,
@@ -7,19 +8,12 @@ import {
 } from "@argent/x-shared"
 import { TokenValue } from "./TokenValue"
 import { SwapTokensModal } from "./SwapTokensModal"
-import { Token } from "../../../../shared/token/__new/types/token.model"
-import { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
+import type { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
 import { useDisclosure, Flex, Input, Button } from "@chakra-ui/react"
-import {
-  H6,
-  L2,
-  LoadingPulse,
-  P4,
-  iconsDeprecated,
-  TokenIcon,
-} from "@argent/x-ui"
+import { H5, icons, L2Bold, LoadingPulse, P3, TokenIcon } from "@argent/x-ui"
 
-const { ChevronDownIcon } = iconsDeprecated
+const { ChevronDownSecondaryIcon } = icons
 
 interface SwapInputPanelProps {
   value: string
@@ -117,7 +111,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
         id={id}
       >
         <Flex>
-          <P4 color="neutrals.400">{type === "pay" ? "Pay" : "Receive"}</P4>
+          <P3 color="neutrals.400">{type === "pay" ? "Pay" : "Receive"}</P3>
         </Flex>
 
         <Flex justifyContent="space-between" alignItems="center">
@@ -134,7 +128,6 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
               value={inputValue}
               onChange={onChange}
               data-testid={id}
-              isDisabled={type === "receive"}
               _disabled={{ opacity: 1, cursor: "default" }}
             />
           </LoadingPulse>
@@ -142,6 +135,7 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
           {token && (
             <Flex alignItems="center">
               <Button
+                data-testid="swap-token-button"
                 height="min-content"
                 minH="min-content"
                 width="min-content"
@@ -157,9 +151,9 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
                 }
                 px="1"
                 py="1"
-                rightIcon={<ChevronDownIcon />}
+                rightIcon={<ChevronDownSecondaryIcon />}
               >
-                <H6>{token?.symbol}</H6>
+                <H5>{token?.symbol}</H5>
               </Button>
             </Flex>
           )}
@@ -168,14 +162,15 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
         <Flex justifyContent="space-between">
           <Flex flexDirection="column">
             {showMaxButton && (
-              <L2
+              <L2Bold
+                data-testid="use-max-button"
                 onClick={onMaxCheck}
                 fontWeight="500"
                 color="primary.500"
                 cursor="pointer"
               >
                 Max
-              </L2>
+              </L2Bold>
             )}
             {value && token && (
               <TokenValue
@@ -185,12 +180,11 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
               />
             )}
           </Flex>
-          <L2 fontWeight="500" color="neutrals.400">
+          <L2Bold fontWeight="500" color="neutrals.400">
             {`Balance: ${prettyBalance}`}
-          </L2>
+          </L2Bold>
         </Flex>
       </Flex>
-
       <SwapTokensModal
         isOpen={isTokenListOpen}
         onClose={onCloseTokenList}

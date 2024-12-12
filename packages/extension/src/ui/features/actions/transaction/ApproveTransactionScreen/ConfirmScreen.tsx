@@ -1,28 +1,23 @@
+/* eslint-disable react/prop-types */
 import {
   Button,
-  H6,
-  P3,
+  H5,
+  icons,
+  P2,
   ScrollContainer,
   StickyGroup,
   useNavigateBack,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { Box, Flex, Tooltip } from "@chakra-ui/react"
-import {
-  FC,
-  FormEvent,
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useMemo,
-  useState,
-} from "react"
-import Measure, { ContentRect } from "react-measure"
+import type { FC, FormEvent, PropsWithChildren, ReactNode } from "react"
+import { useCallback, useMemo, useState } from "react"
+import type { ContentRect } from "react-measure"
+import Measure from "react-measure"
 
-import { WalletAccount } from "../../../../../shared/wallet.model"
+import type { WalletAccount } from "../../../../../shared/wallet.model"
 import { formatTruncatedAddress } from "@argent/x-shared"
 
-const { LockIcon } = iconsDeprecated
+const { LockPrimaryIcon } = icons
 
 export interface ConfirmPageProps {
   onSubmit?: (e: FormEvent<HTMLFormElement>) => void
@@ -95,7 +90,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
       return
     }
 
-    return <LockIcon />
+    return <LockPrimaryIcon />
   }, [isLedger])
 
   const ConfirmButtonContainer = useCallback(
@@ -128,13 +123,7 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
           {...props}
         >
           {header}
-          <Flex
-            pt={accountHeader || navigationBar ? "0" : "18px"}
-            px="16px"
-            pb="0"
-            direction="column"
-            gap="2"
-          >
+          <Flex pt={accountHeader ? 0 : 4} px={4} direction="column" gap={2}>
             {showHeader && selectedAccount && (
               <Flex
                 w="100%"
@@ -142,10 +131,10 @@ export const ConfirmScreen: FC<ConfirmScreenProps> = ({
                 alignItems="center"
                 py="18px"
               >
-                <H6 mr={2}>{selectedAccount.name}</H6>
-                <P3 color="neutrals.300">
+                <H5 mr={2}>{selectedAccount.name}</H5>
+                <P2 color="neutrals.300">
                   ({formatTruncatedAddress(selectedAccount.address)})
-                </P3>
+                </P2>
               </Flex>
             )}
             {children}

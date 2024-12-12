@@ -1,8 +1,8 @@
 import { uiService } from "../shared/ui"
-import { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
+import type { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
 import { Opened, backgroundUIService } from "./services/ui"
 import { UnhandledMessage } from "./background"
-import { HandleMessage } from "./background"
+import type { HandleMessage } from "./background"
 import { preAuthorizationService } from "../shared/preAuthorization"
 import { respondToHost } from "./respond"
 

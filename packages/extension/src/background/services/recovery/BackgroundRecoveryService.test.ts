@@ -1,8 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
 
 import { BackgroundRecoveryService } from "./BackgroundRecoveryService"
-import { IObjectStore } from "../../../shared/storage/__new/interface"
-import { IRecoveryStorage } from "../../../shared/recovery/types"
+import type { IObjectStore } from "../../../shared/storage/__new/interface"
+import type { IRecoveryStorage } from "../../../shared/recovery/types"
 import type { Wallet } from "../../wallet"
 import type { TransactionTrackerWorker } from "../transactionTracker/worker/TransactionTrackerWorker"
 

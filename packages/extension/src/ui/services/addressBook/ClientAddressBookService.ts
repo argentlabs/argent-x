@@ -3,7 +3,7 @@ import type {
   AddressBookContact,
   AddressBookContactNoId,
 } from "../../../shared/addressBook/type"
-import { messageClient } from "../trpc"
+import type { messageClient } from "../trpc"
 
 export class ClientAddressBookService implements IAddressBookService {
   constructor(private readonly trpcClient: typeof messageClient) {}

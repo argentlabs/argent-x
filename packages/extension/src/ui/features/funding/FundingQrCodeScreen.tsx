@@ -2,18 +2,19 @@ import {
   BarBackButton,
   BarCloseButton,
   CopyTooltip,
-  H4,
+  H3,
+  icons,
   NavigationContainer,
-  P2,
-  iconsDeprecated,
+  P1,
 } from "@argent/x-ui"
 import { Button, Flex } from "@chakra-ui/react"
-import { FC, useCallback, useRef } from "react"
+import type { FC } from "react"
+import { useCallback, useRef } from "react"
 
 import { formatFullAddress, normalizeAddress } from "@argent/x-shared"
 import { QrCode } from "../../components/QrCode"
 
-const { CopyIcon } = iconsDeprecated
+const { CopyPrimaryIcon } = icons
 
 interface FundingQrCodeScreenProps {
   onClose?: () => void
@@ -71,19 +72,19 @@ export const FundingQrCodeScreen: FC<FundingQrCodeScreenProps> = ({
           data={normalizedAddress}
           data-address={normalizedAddress}
         />
-        <H4>{accountName}</H4>
-        <P2
+        <H3>{accountName}</H3>
+        <P1
           color={"neutrals.300"}
           ref={setAddressRef}
           aria-label="Full account address"
         >
           {formattedAddress}
-        </P2>
+        </P1>
         <CopyTooltip
           prompt="Click to copy address"
           copyValue={normalizedAddress}
         >
-          <Button size={"sm"} leftIcon={<CopyIcon />}>
+          <Button size={"sm"} leftIcon={<CopyPrimaryIcon />}>
             Copy address
           </Button>
         </CopyTooltip>

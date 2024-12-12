@@ -1,5 +1,7 @@
+import type { FC } from "react"
 import { useState } from "react"
-import { AccountType, AccountTypeId } from "../accounts/AddNewAccountScreen"
+import type { AccountType } from "../accounts/AddNewAccountScreen"
+import { AccountTypeId } from "../accounts/AddNewAccountScreen"
 import { AccountTypesList } from "../accounts/ui/AccountTypesList"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import { Box } from "@chakra-ui/react"
@@ -14,27 +16,30 @@ interface OnboardingAccountTypeProps {
   accountTypes: AccountType[]
   isAccountTypeLoading: (id: AccountTypeId) => boolean
   onAccountTypeConfirmed: (id: AccountTypeId) => void
+  isSmartAccountSelected?: boolean
 }
-const OnboardingAccountTypeScreen = (props: OnboardingAccountTypeProps) => {
-  const {
-    onBack,
-    onAccountTypeConfirmed,
-    currentIndex,
-    length,
-    accountTypes,
-    isAccountTypeLoading,
-  } = props
 
+export const OnboardingAccountTypeScreen: FC<OnboardingAccountTypeProps> = ({
+  onBack,
+  onAccountTypeConfirmed,
+  currentIndex,
+  length,
+  accountTypes,
+  isAccountTypeLoading,
+}) => {
   const [selectedAccountTypeId, setSelectedAccountTypeId] =
     useState<AccountTypeId>(accountTypes[IS_DEV ? 1 : 0].id)
+
+  const isSmart = selectedAccountTypeId === AccountTypeId.SMART_ACCOUNT
 
   return (
     <OnboardingScreen
       onBack={onBack}
       length={length ?? 5} // there are 5 steps in the onboarding process
       currentIndex={currentIndex ?? 3} // this is the 4th step
-      title={"Choose account type"}
-      subtitle="Which type of account would you like to create? You can always add additional accounts later"
+      title={"Choose your first account"}
+      subtitle="Pick an account type which best suits your needs. You can change this later at any time"
+      illustration={isSmart ? "account-smart" : "account-standard"}
     >
       <AccountTypesList
         accountTypes={accountTypes}
@@ -44,7 +49,7 @@ const OnboardingAccountTypeScreen = (props: OnboardingAccountTypeProps) => {
       />
       <Box>
         <OnboardingButton
-          mt={12}
+          mt={15}
           type="submit"
           isDisabled={!isDirty || isAccountTypeLoading(selectedAccountTypeId)}
           onClick={() => onAccountTypeConfirmed(selectedAccountTypeId)}
@@ -55,5 +60,3 @@ const OnboardingAccountTypeScreen = (props: OnboardingAccountTypeProps) => {
     </OnboardingScreen>
   )
 }
-
-export default OnboardingAccountTypeScreen

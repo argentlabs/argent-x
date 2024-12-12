@@ -1,12 +1,13 @@
-import { FC, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo } from "react"
 
 import { usePreAuthorizations } from "../../preAuthorizations/hooks"
-import {
+import type {
   BaseWalletAccount,
   WalletAccount,
 } from "../../../../shared/wallet.model"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
-import { AccountListItemProps } from "../../accounts/accountListItem.model"
+import type { AccountListItemProps } from "../../accounts/accountListItem.model"
 import { AccountSelect } from "../../accounts/AccountSelect"
 import { isEqualPreAuthorization } from "../../../../shared/preAuthorization/schema"
 
@@ -27,13 +28,14 @@ export const ConnectDappAccountSelect: FC<ConnectDappAccountSelectProps> = ({
   const makeAccountListItem = useCallback(
     (account: WalletAccount): AccountListItemProps => {
       const accountName = account.name
-      const { address, networkId } = account
+      const { address, networkId, id } = account
 
-      if (!account.address && !account.networkId) {
+      if (!account.id) {
         return {
           accountName,
           accountAddress: "",
           networkId: "",
+          accountId: "",
           connectedHost: undefined,
           accountType: account.type,
         }
@@ -43,12 +45,17 @@ export const ConnectDappAccountSelect: FC<ConnectDappAccountSelectProps> = ({
         preAuths.some((preAuth) =>
           isEqualPreAuthorization(preAuth, {
             host,
-            account: { address: address ?? "", networkId: networkId ?? "" },
+            account: {
+              id: id ?? "",
+              address: address ?? "",
+              networkId: networkId ?? "",
+            },
           }),
         ),
       )
       return {
         accountName,
+        accountId: account.id ?? "",
         accountAddress: account.address ?? "",
         networkId: account.networkId ?? "",
         connectedHost: connected ? host : undefined,
@@ -70,6 +77,7 @@ export const ConnectDappAccountSelect: FC<ConnectDappAccountSelectProps> = ({
             {
               address: accountItem.accountAddress,
               networkId: accountItem.networkId,
+              id: accountItem.accountId,
             },
             selectedAccount,
           ),
@@ -78,11 +86,13 @@ export const ConnectDappAccountSelect: FC<ConnectDappAccountSelectProps> = ({
   )
   const onSelectedAccountItemChange = useCallback(
     (accountItem: AccountListItemProps) => {
-      onSelectedAccountChange &&
+      if (onSelectedAccountChange) {
         onSelectedAccountChange({
+          id: accountItem.accountId,
           address: accountItem.accountAddress,
           networkId: accountItem.networkId,
         })
+      }
     },
     [onSelectedAccountChange],
   )

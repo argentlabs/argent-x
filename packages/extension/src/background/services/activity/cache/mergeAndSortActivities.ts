@@ -1,9 +1,9 @@
+import { isEqualAddress } from "@argent/x-shared"
+import type { NativeActivity } from "@argent/x-shared/simulation"
 import {
-  NativeActivity,
   NativeActivityTypeNative,
   type AnyActivity,
 } from "@argent/x-shared/simulation"
-import { isEqualAddress } from "@argent/x-shared"
 
 import { mergeArrayStableWith } from "../../../../shared/storage/__new/base"
 
@@ -42,6 +42,9 @@ const options = {
       }
       if (b.multisigDetails) {
         merged.multisigDetails = b.multisigDetails
+      }
+      if (b.actions) {
+        merged.actions = b.actions
       }
       return merged
     }

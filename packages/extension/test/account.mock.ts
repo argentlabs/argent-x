@@ -1,15 +1,17 @@
-import { Abi, Contract } from "starknet"
+import type { Abi } from "starknet"
+import { Contract } from "starknet"
 
 import { ETH_TOKEN_ADDRESS, TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import ArgentCompiledContractAbi from "../src/abis/ArgentAccount.json"
 import ProxyCompiledContractAbi from "../src/abis/Proxy.json"
-import { Network, getProvider } from "../src/shared/network"
-import {
+import type { Network } from "../src/shared/network"
+import { getProvider } from "../src/shared/network"
+import type {
   ArgentAccountType,
-  SignerType,
   WalletAccountSigner,
 } from "../src/shared/wallet.model"
-import { Account } from "../src/ui/features/accounts/Account"
+import { SignerType } from "../src/shared/wallet.model"
+import type { Account } from "../src/ui/features/accounts/Account"
 
 const defaultNetwork: Network = {
   id: "localhost",
@@ -20,7 +22,7 @@ const defaultNetwork: Network = {
 }
 const defaultSigner: WalletAccountSigner = {
   type: SignerType.LOCAL_SECRET,
-  derivationPath: "derivationPath",
+  derivationPath: "m/44'/60'/0'/0/0",
 }
 const defaultAccountType: ArgentAccountType = "standard"
 const defaultFn = () => undefined
@@ -28,8 +30,10 @@ const defaultNeedsDeploy = false
 const defaultAddress = "0x0"
 const defaultHidden = false
 const defaultName = "Account 1"
+const defaultId = `${defaultAddress}-${defaultNetwork.id}-${defaultSigner.type}`
 
 const defaultAccount: Account = {
+  id: defaultId,
   name: defaultName,
   address: defaultAddress,
   classHash: TXV3_ACCOUNT_CLASS_HASH,
@@ -53,6 +57,7 @@ const defaultAccount: Account = {
   needsDeploy: defaultNeedsDeploy,
   getCurrentImplementation: defaultFn,
   toWalletAccount: () => ({
+    id: defaultId,
     name: defaultName,
     networkId: defaultNetwork.id,
     address: defaultAddress,
@@ -62,6 +67,7 @@ const defaultAccount: Account = {
     needsDeploy: defaultNeedsDeploy,
   }),
   toBaseWalletAccount: () => ({
+    id: defaultId,
     networkId: defaultNetwork.id,
     address: defaultAddress,
   }),
@@ -69,5 +75,10 @@ const defaultAccount: Account = {
 
 export const getMockAccount = (overrides?: Partial<Account>) => ({
   ...defaultAccount,
+  ...(overrides || {}),
+})
+
+export const getMockSigner = (overrides?: Partial<WalletAccountSigner>) => ({
+  ...defaultSigner,
   ...(overrides || {}),
 })

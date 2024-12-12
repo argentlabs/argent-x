@@ -1,5 +1,5 @@
+import type { AddressOrDomain } from "@argent/x-shared"
 import {
-  AddressOrDomain,
   isEqualAddress,
   isEqualStarknetDomainName,
   isStarknetDomainName,

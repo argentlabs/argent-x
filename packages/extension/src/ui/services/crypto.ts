@@ -1,6 +1,6 @@
+import type { KeyLike } from "jose"
 import {
   CompactEncrypt,
-  KeyLike,
   exportJWK,
   generateSecret,
   importJWK,

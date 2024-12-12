@@ -1,37 +1,42 @@
 import { getProvider } from "../../../shared/network"
-import { Account, CairoVersion } from "starknet"
+import type { CairoVersion } from "starknet"
+import { Account } from "starknet"
 
 import { MultisigAccount } from "../../../shared/multisig/account"
-import { PendingMultisig } from "../../../shared/multisig/types"
-import { INetworkService } from "../../../shared/network/service/INetworkService"
-import { IRepository } from "../../../shared/storage/__new/interface"
+import type { PendingMultisig } from "../../../shared/multisig/types"
+import type { INetworkService } from "../../../shared/network/service/INetworkService"
+import type { IRepository } from "../../../shared/storage/__new/interface"
 import { getAccountCairoVersion } from "../../../shared/utils/argentAccountVersion"
-import {
-  BaseWalletAccount,
+import type {
+  AccountId,
   ImportedLedgerAccount,
-  SignerType,
   WalletAccount,
 } from "../../../shared/wallet.model"
-import { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
-import { WalletSessionService } from "../session/WalletSessionService"
-import { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import { SignerType } from "../../../shared/wallet.model"
+import type { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
+import type { WalletSessionService } from "../session/WalletSessionService"
+import type { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
 import { SessionError } from "../../../shared/errors/session"
 import { AccountError } from "../../../shared/errors/account"
-import { IMultisigBackendService } from "../../../shared/multisig/service/backend/IMultisigBackendService"
+import type { IMultisigBackendService } from "../../../shared/multisig/service/backend/IMultisigBackendService"
 import { SmartAccount } from "../../../shared/smartAccount/account"
-import { BaseSignerInterface } from "../../../shared/signer/BaseSignerInterface"
+import type { BaseSignerInterface } from "../../../shared/signer/BaseSignerInterface"
 import { StarknetAccount } from "../../../shared/starknetAccount"
 import { cosignerSign } from "../../../shared/smartAccount/backend/account"
-import { ILedgerSharedService } from "../../../shared/ledger/service/ILedgerSharedService"
+import type { ILedgerSharedService } from "../../../shared/ledger/service/ILedgerSharedService"
 import { union } from "lodash-es"
 import { getCairo1AccountContractAddress } from "../../../shared/utils/getContractAddress"
-import { getBaseDerivationPath } from "../../../shared/signer/utils"
+import { getDerivationPathForIndex } from "../../../shared/signer/utils"
 import {
   isContractDeployed,
   getLatestLedgerAccountClassHash,
   getLedgerAccountClassHashes,
 } from "@argent/x-shared"
-import { BaseStarknetAccount } from "../../../shared/starknetAccount/base"
+import type { BaseStarknetAccount } from "../../../shared/starknetAccount/base"
+import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
+import type { IAccountImportSharedService } from "../../../shared/accountImport/service/IAccountImportSharedService"
+import type { ValidatedImport } from "../../../shared/accountImport/types"
+import { ImportedAccount } from "../../../shared/accountImport/account"
 
 export class WalletAccountStarknetService {
   constructor(
@@ -42,16 +47,17 @@ export class WalletAccountStarknetService {
     private readonly cryptoStarknetService: WalletCryptoStarknetService,
     private readonly multisigBackendService: IMultisigBackendService,
     private readonly ledgerService: ILedgerSharedService,
+    private readonly importedAccountService: IAccountImportSharedService,
   ) {}
 
   public async getStarknetAccount(
-    selector: BaseWalletAccount,
+    accountId: AccountId,
     useLatest = false,
   ): Promise<BaseStarknetAccount> {
     if (!(await this.sessionService.isSessionOpen())) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
-    const account = await this.accountSharedService.getAccount(selector)
+    const account = await this.accountSharedService.getAccount(accountId)
     if (!account) {
       throw new AccountError({ code: "NOT_FOUND" })
     }
@@ -59,7 +65,7 @@ export class WalletAccountStarknetService {
     const provider = getProvider(
       account.network && account.network.rpcUrl
         ? account.network
-        : await this.networkService.getById(selector.networkId),
+        : await this.networkService.getById(account.networkId),
     )
 
     const signer = await this.cryptoStarknetService.getSignerForAccount(account)
@@ -69,7 +75,7 @@ export class WalletAccountStarknetService {
     if (account.needsDeploy) {
       cairoVersion =
         await this.cryptoStarknetService.getUndeployedAccountCairoVersion(
-          selector,
+          account,
         )
     } else if (useLatest) {
       cairoVersion = "1"
@@ -111,7 +117,7 @@ export class WalletAccountStarknetService {
       throw new Error("no selected account")
     }
 
-    return this.getStarknetAccount(account)
+    return this.getStarknetAccount(account.id)
   }
 
   public async newPendingMultisig(
@@ -163,6 +169,13 @@ export class WalletAccountStarknetService {
           cosignerSign,
         )
 
+      case "imported":
+        return ImportedAccount.fromAccount(
+          account,
+          signer,
+          walletAccount.classHash,
+        )
+
       default:
         return StarknetAccount.fromAccount(
           account,
@@ -198,13 +211,21 @@ export class WalletAccountStarknetService {
 
     return pubKeys.flatMap(({ pubKey, index }) =>
       classHashes.map((classHash) => {
+        const address = getCairo1AccountContractAddress(classHash, pubKey)
+        const signer = {
+          type: SignerType.LEDGER as const,
+          derivationPath: getDerivationPathForIndex(
+            index,
+            SignerType.LEDGER,
+            "standard",
+          ),
+        }
+
         return {
-          address: getCairo1AccountContractAddress(classHash, pubKey),
+          id: getAccountIdentifier(address, networkId, signer),
+          address,
           networkId,
-          signer: {
-            type: SignerType.LEDGER as const,
-            derivationPath: `${getBaseDerivationPath("standard", SignerType.LEDGER)}/${index}`,
-          },
+          signer,
         }
       }),
     )
@@ -242,5 +263,18 @@ export class WalletAccountStarknetService {
     )
 
     return ledgerAccountsToWalletAccounts
+  }
+
+  async importAccount(account: ValidatedImport) {
+    const session = await this.sessionService.sessionStore.get()
+
+    if (!session) {
+      throw new SessionError({ code: "NO_OPEN_SESSION" })
+    }
+
+    return await this.importedAccountService.importAccount(
+      account,
+      session.password,
+    )
   }
 }

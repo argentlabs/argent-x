@@ -2,13 +2,14 @@ import {
   BarBackButton,
   ButtonCell,
   CellStack,
-  H6,
+  H5,
   NavigationContainer,
-  P4,
+  P3,
   SpacerCell,
 } from "@argent/x-ui"
 import { Center, Flex, Image, useDisclosure } from "@chakra-ui/react"
-import React, { FC, useCallback } from "react"
+import type { FC } from "react"
+import React, { useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 import {
@@ -17,7 +18,7 @@ import {
 } from "../../../shared/multisig/utils/pendingMultisig"
 import { useReturnTo } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
-import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
+import { getNetworkOwnerImageUrl } from "../accounts/accounts.service"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { usePendingMultisig } from "./multisig.state"
 import { MultisigHideModal } from "./MultisigHideModal"
@@ -83,9 +84,9 @@ export const JoinMultisigSettingsScreen: FC = () => {
             borderRadius={"full"}
             width={20}
             height={20}
-            src={getNetworkAccountImageUrl({
+            src={getNetworkOwnerImageUrl({
               accountName,
-              accountAddress: publicKey,
+              publicKey,
               networkId: currentNetwork.id,
               backgroundColor: pendingMultisig?.hidden ? "#333332" : undefined,
             })}
@@ -93,10 +94,10 @@ export const JoinMultisigSettingsScreen: FC = () => {
         </Center>
         <CellStack>
           <Flex direction={"column"} justify="center" align="center">
-            <H6>{accountName}</H6>
-            <P4 fontWeight="bold" color={"white.50"}>
+            <H5>{accountName}</H5>
+            <P3 fontWeight="bold" color={"white.50"}>
               Awaiting owner to finish setup
-            </P4>
+            </P3>
           </Flex>
           <SpacerCell />
 

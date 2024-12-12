@@ -1,22 +1,29 @@
 import "fake-indexeddb/auto"
-import { afterEach, describe, Mocked, vi } from "vitest"
+import type { Mocked } from "vitest"
+import { afterEach, describe, vi } from "vitest"
 
-import { emitterMock } from "../../../wallet/test.utils"
 import { ActivityWorker } from "./ActivityWorker"
-import { IActivityCacheService } from "../../../../shared/activity/cache/IActivityCacheService"
-import { IActivityService } from "../IActivityService"
-import { INotificationService } from "../../../../shared/notifications/INotificationService"
-import {
-  TransactionStatusChanged,
-  TransactionTrackerWorker,
-} from "../../transactionTracker/worker/TransactionTrackerWorker"
+import type { IActivityCacheService } from "../../../../shared/activity/cache/IActivityCacheService"
+import type { IActivityService } from "../IActivityService"
+import type { INotificationService } from "../../../../shared/notifications/INotificationService"
+import type { TransactionTrackerWorker } from "../../transactionTracker/worker/TransactionTrackerWorker"
+import { TransactionStatusChanged } from "../../transactionTracker/worker/TransactionTrackerWorker"
+import type { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
+import { getMockWalletAccount } from "../../../../../test/walletAccount.mock"
+import { getRandomAccountIdentifier } from "../../../../shared/utils/accountIdentifier"
+import { emitterMock } from "../../../../shared/test.utils"
+import { delay } from "../../../../shared/utils/delay"
+
+vi.mock("../../../../shared/utils/delay")
 
 describe("ActivityWorker", () => {
   let activityService: Mocked<IActivityService>
+  let mockAccountService: Mocked<IAccountService>
   let notificationService: Mocked<INotificationService>
   let transactionTrackerWorker: TransactionTrackerWorker
   let activityCacheService: IActivityCacheService
   let activityWorker: ActivityWorker
+
   const mockActivity = {
     details: {
       srcAsset: {
@@ -77,6 +84,7 @@ describe("ActivityWorker", () => {
       {
         address:
           "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f",
+        id: "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f::sepolia-alpha::local_secret::0",
         network: "starknet",
         type: "wallet",
       },
@@ -145,6 +153,18 @@ describe("ActivityWorker", () => {
       "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f",
   }
 
+  const mockAddress =
+    "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f"
+  const mockNetworkId = "sepolia-alpha"
+
+  const mockId = getRandomAccountIdentifier(mockAddress, mockNetworkId)
+
+  const mockAccount = getMockWalletAccount({
+    address: mockAddress,
+    networkId: mockNetworkId,
+    id: mockId,
+  })
+
   beforeEach(() => {
     activityService = {
       updateAccountActivities: vi.fn(),
@@ -159,9 +179,13 @@ describe("ActivityWorker", () => {
       makeId: vi.fn(),
       hasShown: vi.fn(),
     } as unknown as Mocked<INotificationService>
+    mockAccountService = {
+      get: vi.fn().mockResolvedValue([mockAccount]),
+    } as unknown as Mocked<IAccountService>
 
     activityWorker = new ActivityWorker(
       activityService,
+      mockAccountService,
       notificationService,
       activityCacheService,
       transactionTrackerWorker,
@@ -226,6 +250,7 @@ describe("ActivityWorker", () => {
           account: {
             address:
               "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f",
+            id: "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f::sepolia-alpha::local_secret::0",
             networkId: "sepolia-alpha",
           },
         },
@@ -242,6 +267,7 @@ describe("ActivityWorker", () => {
           account: {
             address:
               "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f",
+            id: "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f::sepolia-alpha::local_secret::0",
             networkId: "sepolia-alpha",
           },
         },
@@ -250,6 +276,76 @@ describe("ActivityWorker", () => {
           status: "success",
         },
       )
+    })
+
+    it("should poll if there are no activities yet", async () => {
+      activityService.updateSelectedAccountActivities
+        .mockReturnValueOnce([] as any)
+        .mockReturnValueOnce([] as any)
+        .mockReturnValueOnce([
+          mockActivity,
+          { ...mockActivity, transaction: { hash: "0x1" } },
+        ] as any)
+
+      await activityWorker.onTransactionStatusChanged({
+        transactions: [
+          "0x006e58fdc2a6b6aa6b4d92348aa189afe206921be09dd51e776dca1e762d23da",
+          "0x1",
+        ],
+      })
+
+      expect(delay).toHaveBeenCalledTimes(2)
+      expect(notificationService.showWithDeepLink).toHaveBeenNthCalledWith(
+        1,
+        {
+          id: undefined,
+          route:
+            "/account/activity/0x006e58fdc2a6b6aa6b4d92348aa189afe206921be09dd51e776dca1e762d23da?returnTo=%2Faccount%2Factivity",
+          account: {
+            address:
+              "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f",
+            id: "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f::sepolia-alpha::local_secret::0",
+            networkId: "sepolia-alpha",
+          },
+        },
+        {
+          title: "Swap",
+          status: "success",
+        },
+      )
+      expect(notificationService.showWithDeepLink).toHaveBeenNthCalledWith(
+        2,
+        {
+          id: undefined,
+          route: "/account/activity/0x1?returnTo=%2Faccount%2Factivity",
+          account: {
+            address:
+              "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f",
+            id: "0x01979190a7a4b6e7a497c6086f7183629a41828d9cc1f47e4f4bb6848461974f::sepolia-alpha::local_secret::0",
+            networkId: "sepolia-alpha",
+          },
+        },
+        {
+          title: "Swap",
+          status: "success",
+        },
+      )
+    })
+
+    it("should stop polling, if there are no activities after all delays", async () => {
+      activityService.updateSelectedAccountActivities.mockReturnValueOnce(
+        [] as any,
+      )
+
+      await activityWorker.onTransactionStatusChanged({
+        transactions: [
+          "0x006e58fdc2a6b6aa6b4d92348aa189afe206921be09dd51e776dca1e762d23da",
+          "0x1",
+        ],
+      })
+
+      expect(delay).toHaveBeenCalledTimes(5)
+      expect(notificationService.showWithDeepLink).not.toHaveBeenCalled()
     })
   })
 })

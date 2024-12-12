@@ -1,30 +1,11 @@
 import { render, act, screen } from "@testing-library/react"
-import { describe, expect, it, vi, beforeAll } from "vitest"
+import { describe, expect, it } from "vitest"
 
-import {
-  OnboardingFinishScreen,
-  OnboardingFinishScreenProps,
-} from "./OnboardingFinishScreen"
-
-// mock useShowExperimentalFinishScreen
+import { OnboardingFinishScreen } from "./OnboardingFinishScreen"
 
 describe("OnboardingFinishScreen", () => {
-  const defaultProps: OnboardingFinishScreenProps = {
-    onFinish: vi.fn(),
-  }
-
-  beforeAll(() => {
-    vi.mock("../../services/onboarding/useOnboardingExperiment", () => ({
-      useShowExperimentalFinishScreen: () => ({
-        showExperimentalFinishScreen: true,
-      }),
-    }))
-  })
-
-  const renderComponent = (
-    props: OnboardingFinishScreenProps = defaultProps,
-  ) => {
-    return render(<OnboardingFinishScreen {...props} />)
+  const renderComponent = () => {
+    return render(<OnboardingFinishScreen />)
   }
 
   it("renders the follow X button and link", async () => {
@@ -60,7 +41,7 @@ describe("OnboardingFinishScreen", () => {
     expect(screen.getByTestId("extension-icon")).toBeInTheDocument()
   })
 
-  it("renders the title, subtitle, and icon correctly", async () => {
+  it("renders the title and subtitle", async () => {
     await act(async () => {
       renderComponent()
     })
@@ -70,6 +51,5 @@ describe("OnboardingFinishScreen", () => {
         "Get ready to experience the power of Argent + Starknet",
       ),
     ).toBeInTheDocument()
-    expect(screen.getByTestId("TickCircleIcon")).toBeInTheDocument()
   })
 })

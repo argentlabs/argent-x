@@ -25,7 +25,7 @@ export async function runPreAuthorizationMigrationOld() {
 
       const accountHostCombinations: PreAuthorization[] = old.flatMap((h) =>
         allAccounts.map((a) => ({
-          account: pick(a, "address", "networkId"),
+          account: pick(a, "id", "address", "networkId"),
           host: h,
         })),
       )

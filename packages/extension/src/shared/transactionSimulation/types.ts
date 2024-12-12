@@ -1,14 +1,13 @@
-import {
+import type {
   ArraySignatureType,
   Calldata,
   TransactionType,
   constants,
 } from "starknet"
 
-import { Sequencer } from "starknet5"
+import type { Sequencer } from "starknet5"
 
-import { Fetcher } from "../api/fetcher"
-import { EstimatedFees } from "@argent/x-shared/simulation"
+import type { Fetcher } from "../api/fetcher"
 
 export type WEI = "WEI" | "wei"
 export type FRI = "FRI" | "fri"
@@ -101,11 +100,6 @@ export type ApiTransactionBulkSimulationResponse =
 
 export type ApiTransactionSimulationResponseUnparsed = {
   simulationResults: ApiTransactionBulkSimulationResponse
-}
-
-export interface TransactionSimulationWithFees {
-  simulation: ApiTransactionBulkSimulationResponse
-  feeEstimation: EstimatedFees
 }
 
 export type EventsToTrack = "Transfer" | "Approval"

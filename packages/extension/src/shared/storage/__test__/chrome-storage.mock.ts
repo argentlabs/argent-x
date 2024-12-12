@@ -1,7 +1,8 @@
-import { WildcardHandler, mittx } from "starknetkit/window"
+import type { WildcardHandler } from "@argent/x-window"
+import { mittx } from "@argent/x-window"
 import { isFunction } from "lodash-es"
 
-import {
+import type {
   AreaName,
   Implementations,
   OnChanged,

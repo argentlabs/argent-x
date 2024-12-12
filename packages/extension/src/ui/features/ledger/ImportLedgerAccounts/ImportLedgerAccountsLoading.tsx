@@ -1,4 +1,4 @@
-import { H4 } from "@argent/x-ui"
+import { H3 } from "@argent/x-ui"
 import { Center, Spinner, VStack } from "@chakra-ui/react"
 
 export const ImportLedgerAccountsLoading = () => {
@@ -6,7 +6,7 @@ export const ImportLedgerAccountsLoading = () => {
     <Center height="full">
       <VStack spacing="8">
         <Spinner color="white" size="lg" />
-        <H4 color="white">Detecting accounts...</H4>
+        <H3 color="white">Detecting accounts...</H3>
       </VStack>
     </Center>
   )

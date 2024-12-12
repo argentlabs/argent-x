@@ -1,15 +1,15 @@
 import { seedphraseSchema } from "@argent/x-shared"
-import { Alert, B3, FieldError, SeedInput, iconsDeprecated } from "@argent/x-ui"
+import { Alert, B3, FieldError, icons, SeedInput } from "@argent/x-ui"
 import { Flex, chakra } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC, MouseEventHandler } from "react"
+import type { FC, MouseEventHandler } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 
-const { AlertIcon } = iconsDeprecated
+const { WarningCircleSecondaryIcon } = icons
 
 interface OnboardingRestoreSeedScreenProps {
   onBack?: MouseEventHandler
@@ -40,7 +40,7 @@ export const OnboardingRestoreSeedScreen: FC<
   const handleForm = handleSubmit(async ({ seedPhrase }) => {
     try {
       await onRestore(seedPhrase)
-    } catch (error) {
+    } catch {
       setError("root", { message: "Something went wrong" })
     }
   })
@@ -54,6 +54,7 @@ export const OnboardingRestoreSeedScreen: FC<
       subtitle="Enter each of the 12 words from your recovery phrase separated by a
       space"
     >
+      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
       <chakra.form onSubmit={handleForm}>
         <Controller
           name="seedPhrase"
@@ -69,13 +70,13 @@ export const OnboardingRestoreSeedScreen: FC<
         <Alert
           mt={8}
           size={"lg"}
-          icon={<AlertIcon />}
+          icon={<WarningCircleSecondaryIcon />}
           colorScheme={"warning"}
           title="Typing is safer"
           description="You can paste your recovery phrase at once, but typing the words individually is safer"
         />
 
-        <Flex mt={8}>
+        <Flex mt={15}>
           <OnboardingButton type="submit" isDisabled={isSubmitting}>
             Continue
           </OnboardingButton>

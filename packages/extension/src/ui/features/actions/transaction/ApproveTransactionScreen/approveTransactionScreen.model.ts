@@ -1,15 +1,14 @@
-import { BigNumberish, Call } from "starknet"
+import type { BigNumberish, Call } from "starknet"
 
-import { TransactionAction } from "@argent/x-shared"
-import { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
-import { UseDisclosureReturn } from "@chakra-ui/react"
-import { ApiTransactionReviewTargettedDapp } from "../../../../../shared/transactionReview.service"
-import { WalletAccount } from "../../../../../shared/wallet.model"
-import { Multisig } from "../../../multisig/Multisig"
-import { MultisigConfirmationsBannerProps } from "../MultisigConfirmationsBanner"
-import { ApproveScreenType, TransactionActionsType } from "../types"
-import { AggregatedSimData } from "../useTransactionSimulatedData"
-import { ConfirmScreenProps } from "./ConfirmScreen"
+import type { TransactionAction } from "@argent/x-shared"
+import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type { UseDisclosureReturn } from "@chakra-ui/react"
+import type { ApiTransactionReviewTargettedDapp } from "../../../../../shared/transactionReview.service"
+import type { WalletAccount } from "../../../../../shared/wallet.model"
+import type { Multisig } from "../../../multisig/Multisig"
+import type { MultisigConfirmationsBannerProps } from "../MultisigConfirmationsBanner"
+import type { ApproveScreenType } from "../types"
+import type { ConfirmScreenProps } from "./ConfirmScreen"
 
 export interface ApproveTransactionScreenContainerProps
   extends Omit<ConfirmScreenProps, "onSubmit"> {
@@ -37,11 +36,8 @@ export interface ApproveTransactionScreenContainerProps
 export interface ApproveTransactionScreenProps
   extends ApproveTransactionScreenContainerProps,
     Omit<ConfirmScreenProps, "onSubmit"> {
-  aggregatedData: AggregatedSimData[]
   isMainnet: boolean
-  isSimulationLoading: boolean
   transactionReview?: EnrichedSimulateAndReview
-  transactionActionsType?: TransactionActionsType
   selectedAccount: WalletAccount
   disableConfirm: boolean
   verifiedDapp?: ApiTransactionReviewTargettedDapp
@@ -49,8 +45,6 @@ export interface ApproveTransactionScreenProps
   multisig?: Multisig
   confirmButtonText?: string
   transactions: Call[]
-  hasBalanceChange: boolean
-  showTransactionActions: boolean
   showTxDetails: boolean
   setShowTxDetails: (viewMoreDetails: boolean) => void
 }

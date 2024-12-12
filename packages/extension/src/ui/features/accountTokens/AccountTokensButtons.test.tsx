@@ -2,10 +2,8 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 
 import { getMockAccount } from "../../../../test/account.mock"
-import {
-  AccountTokensButtons,
-  AccountTokensButtonsProps,
-} from "./AccountTokensButtons"
+import type { AccountTokensButtonsProps } from "./AccountTokensButtons"
+import { AccountTokensButtons } from "./AccountTokensButtons"
 
 const mockProps = {
   account: getMockAccount({}),
@@ -23,8 +21,10 @@ const mockProps = {
   isHideMultisigModalOpen: true,
   onHideMultisigModalClose: vi.fn(),
   onHideConfirm: vi.fn(),
-  portfolioUrl: "https://example.com",
   buttonColumnCount: 3,
+  hasNonZeroBalance: true,
+  showSwapButton: false,
+  onSwap: () => {},
 } as AccountTokensButtonsProps
 
 describe("AccountTokensButtons", async () => {
@@ -32,23 +32,19 @@ describe("AccountTokensButtons", async () => {
     render(<AccountTokensButtons {...mockProps} />)
 
     // Add funds button
-    const addFundsButton = await screen.findAllByText(/Fund/, {
-      selector: "button",
-    })
-    expect(addFundsButton[0]).toBeInTheDocument()
-    fireEvent.click(addFundsButton[0])
+    const addFundsButton = screen.getByLabelText("Fund")
+    expect(addFundsButton).toBeInTheDocument()
+    fireEvent.click(addFundsButton)
     expect(mockProps.onAddFunds).toHaveBeenCalled()
 
     // Send button
-    const sendButton = screen.getByText(/Send/, { selector: "button" })
+    const sendButton = screen.getByLabelText("Send")
     expect(sendButton).toBeInTheDocument()
     fireEvent.click(sendButton)
     expect(mockProps.onSend).toHaveBeenCalled()
 
     // Hide account button
-    const hideAccountButton = screen.getByText(/Hide account/, {
-      selector: "button",
-    })
+    const hideAccountButton = screen.getByLabelText("Hide")
     expect(hideAccountButton).toBeInTheDocument()
     fireEvent.click(hideAccountButton)
     expect(mockProps.onHideMultisigModalOpen).toHaveBeenCalled()

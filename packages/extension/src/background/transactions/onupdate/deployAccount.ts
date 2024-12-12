@@ -1,6 +1,6 @@
 import { updateAccountDetails } from "../../../shared/account/update"
 import { SUCCESS_STATUSES } from "../../../shared/transactions"
-import { TransactionUpdateListener } from "./type"
+import type { TransactionUpdateListener } from "./type"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
 
 export const handleDeployAccountTransaction: TransactionUpdateListener = async (

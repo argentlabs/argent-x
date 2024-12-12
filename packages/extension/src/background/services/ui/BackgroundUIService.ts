@@ -1,4 +1,4 @@
-import Emittery from "emittery"
+import type Emittery from "emittery"
 import browser from "webextension-polyfill"
 
 import { urlWithQuery } from "@argent/x-shared"
@@ -141,7 +141,7 @@ export default class BackgroundUIService implements IBackgroundUIService {
       return await this.sendMessageToClientUIService<boolean>({
         type: "HAS_POPUP",
       })
-    } catch (e) {
+    } catch {
       // ignore error - no ui is open
       return false
     }
@@ -150,7 +150,7 @@ export default class BackgroundUIService implements IBackgroundUIService {
   async closePopup() {
     try {
       await this.sendMessageToClientUIService({ type: "CLOSE_POPUP" })
-    } catch (e) {
+    } catch {
       // ignore error - no ui is open
     }
   }
@@ -205,7 +205,18 @@ export default class BackgroundUIService implements IBackgroundUIService {
       }
       return
     }
+    await this.createFloatingWindow(initialRoute)
+  }
 
+  async openUiAsFloatingWindow() {
+    if (await this.uiService.hasFloatingWindow()) {
+      await this.uiService.focusFloatingWindow()
+      return
+    }
+    await this.createFloatingWindow()
+  }
+
+  private async createFloatingWindow(initialRoute?: string) {
     let left = 0
     let top = 0
     try {
@@ -216,7 +227,7 @@ export default class BackgroundUIService implements IBackgroundUIService {
       left =
         (lastFocused.left ?? 0) +
         Math.max((lastFocused.width ?? 0) - NOTIFICATION_WIDTH, 0)
-    } catch (_) {
+    } catch {
       // The following properties are more than likely 0, due to being
       // opened from the background chrome process for the extension that
       // has no physical dimensions
@@ -226,7 +237,6 @@ export default class BackgroundUIService implements IBackgroundUIService {
     }
 
     const url = urlWithQuery("index.html", initialRoute ? { initialRoute } : {})
-
     await this.browser.windows.create({
       url,
       type: "popup",
@@ -236,7 +246,6 @@ export default class BackgroundUIService implements IBackgroundUIService {
       top,
     })
   }
-
   async showNotification(payload: UIShowNotificationPayload) {
     await this.sendMessageToClientUIService({
       type: "SHOW_NOTIFICATION",

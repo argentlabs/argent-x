@@ -1,9 +1,9 @@
-import { INetworkService } from "../../../shared/network/service/INetworkService"
-import {
+import type { INetworkService } from "../../../shared/network/service/INetworkService"
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
-import {
+import type {
   BaseWalletAccount,
   NetworkOnlyPlaceholderAccount,
   WalletAccount,

@@ -1,17 +1,17 @@
-import {
+import type {
   CairoVersion,
   DeployAccountContractPayload as StarknetDeployAccountContractPayload,
   InvocationsDetails as StarknetInvocationDetails,
 } from "starknet"
-import {
+import type {
   CreateAccountType,
   CreateWalletAccount,
   MultisigData,
   SignerType,
   WalletAccount,
 } from "../../../shared/wallet.model"
-import { Address } from "@argent/x-shared"
-import { EstimatedFee } from "@argent/x-shared/simulation"
+import type { Address, Hex } from "@argent/x-shared"
+import type { EstimatedFee } from "@argent/x-shared/simulation"
 
 // Extend to support multichain
 type InvocationsDetails = StarknetInvocationDetails
@@ -25,13 +25,14 @@ export interface IWalletDeploymentService {
     walletAccount: WalletAccount,
     transactionDetails?: InvocationsDetails | undefined,
   ): Promise<{ account: WalletAccount; txHash: string }>
+  getDeployAccountTransactionHash(
+    walletAccount: WalletAccount,
+    transactionDetails?: InvocationsDetails | undefined,
+  ): Promise<Hex>
   getAccountDeploymentFee(
     walletAccount: WalletAccount,
     feeTokenAddress?: Address,
   ): Promise<EstimatedFee>
-  redeployAccount(
-    account: WalletAccount,
-  ): Promise<{ account: WalletAccount; txHash: string }>
   getAccountDeploymentPayload(
     walletAccount: WalletAccount,
   ): Promise<Required<DeployAccountContractPayload>>

@@ -1,10 +1,10 @@
-import { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
 
 export const getRelatedTokensFromReview = (
   transactions: EnrichedSimulateAndReview["transactions"],
-): `0x${string}`[] => {
+): `0x${string}`[] | undefined => {
   return transactions
-    .flatMap(
+    ?.flatMap(
       (tx) =>
         tx.simulation?.summary?.map((summary) => summary.token.address) || [],
     )

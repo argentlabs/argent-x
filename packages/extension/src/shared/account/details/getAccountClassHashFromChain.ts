@@ -1,11 +1,17 @@
 import { flatten, groupBy, toPairs } from "lodash-es"
-import { Call, num } from "starknet"
+import type { Call } from "starknet"
+import { num } from "starknet"
 
 import { getMulticallForNetwork } from "../../multicall"
 import { getProvider } from "../../network"
 import { networkService } from "../../network/service"
 import { mapImplementationToArgentAccountType } from "../../network/utils"
-import { ArgentAccountType, WalletAccount } from "../../wallet.model"
+import type {
+  AccountId,
+  ArgentAccountType,
+  ArgentWalletAccount,
+  WalletAccount,
+} from "../../wallet.model"
 import { accountsEqual } from "../../utils/accountsEqual"
 import {
   addressSchema,
@@ -15,8 +21,8 @@ import {
 import { tryGetClassHash } from "./tryGetClassHash"
 
 export type AccountClassHashFromChain = Pick<
-  WalletAccount,
-  "address" | "networkId" | "type" | "classHash"
+  ArgentWalletAccount,
+  "id" | "address" | "networkId" | "type" | "classHash"
 >
 
 const getDefaultClassHash = (account: WalletAccount) => {
@@ -36,7 +42,7 @@ const getDefaultClassHash = (account: WalletAccount) => {
  * @returns AccountClassHashFromChain[]
  */
 export async function getAccountClassHashFromChain(
-  accounts: WalletAccount[],
+  accounts: ArgentWalletAccount[],
 ): Promise<AccountClassHashFromChain[]> {
   const accountsByNetwork = toPairs(groupBy(accounts, (a) => a.networkId))
 
@@ -48,11 +54,13 @@ export async function getAccountClassHashFromChain(
           (
             account,
           ): {
+            id: AccountId
             classHash: string | undefined
             call: Call
             fallbackType: ArgentAccountType
           } => {
             return {
+              id: account.id,
               classHash: account.classHash || getDefaultClassHash(account),
               call: {
                 contractAddress: account.address,
@@ -70,6 +78,7 @@ export async function getAccountClassHashFromChain(
       accountTypeCallsByNetwork.map(
         async ([networkId, classHashWithCalls]): Promise<
           Array<{
+            id: AccountId
             address: string
             networkId: string
             type: ArgentAccountType
@@ -96,6 +105,7 @@ export async function getAccountClassHashFromChain(
             )
 
             const result = responses.map((response, i) => {
+              const id = classHashWithCalls[i].id
               const call = classHashWithCalls[i].call
               const fallbackType = classHashWithCalls[i].fallbackType
               const type: ArgentAccountType =
@@ -105,6 +115,7 @@ export async function getAccountClassHashFromChain(
                   fallbackType,
                 )
               return {
+                id,
                 address: call.contractAddress,
                 networkId,
                 classHash: response,
@@ -120,7 +131,8 @@ export async function getAccountClassHashFromChain(
             ),
           )
           const results: string[] = responses.map((res) => num.toHex(res))
-          return classHashWithCalls.map(({ call, fallbackType }, i) => ({
+          return classHashWithCalls.map(({ call, fallbackType, id }, i) => ({
+            id,
             address: call.contractAddress,
             networkId,
             classHash: results[i],
@@ -139,13 +151,14 @@ export async function getAccountClassHashFromChain(
     const updatedAccount = updatedAccounts.find((x) =>
       accountsEqual(x, account),
     )
-    const { address, networkId } = account
+    const { address, networkId, id } = account
     const classHash = updatedAccount?.classHash || account.classHash
     const parsedClassHash = classHash
       ? addressSchema.parse(classHash)
       : undefined
 
     return {
+      id,
       address,
       networkId,
       classHash: parsedClassHash,

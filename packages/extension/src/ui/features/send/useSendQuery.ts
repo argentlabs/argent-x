@@ -1,7 +1,6 @@
-import { useQuery } from "../../hooks/useQuery"
-import { parseQuery, sendQuerySchema } from "../../../shared/send/schema"
+import { sendQuerySchema } from "../../../shared/send/schema"
+import { useParseQuery } from "../../hooks/useParseQuery"
 
 export const useSendQuery = () => {
-  const query = useQuery()
-  return parseQuery(query, sendQuerySchema)
+  return useParseQuery(sendQuerySchema)
 }

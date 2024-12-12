@@ -1,9 +1,9 @@
-import {
+import type {
   IHttpService,
-  BaseError,
   AddSmartAccountRequest,
   AddSmartAccountResponse,
 } from "@argent/x-shared"
+import { BaseError } from "@argent/x-shared"
 import { stringToBytes } from "@scure/base"
 import { keccak, pedersen } from "micro-starknet"
 import { num, stark } from "starknet"
@@ -14,12 +14,12 @@ import {
 } from "../../../shared/account/selectors"
 import { accountService } from "../../../shared/account/service"
 import { ARGENT_ACCOUNT_PREFERENCES_URL } from "../../../shared/api/constants"
-import { IBackgroundArgentAccountService } from "./IBackgroundArgentAccountService"
-import {
+import type { IBackgroundArgentAccountService } from "./IBackgroundArgentAccountService"
+import type {
   Flow,
   PreferencesPayload,
-  preferencesEndpointPayload,
 } from "../../../shared/argentAccount/schema"
+import { preferencesEndpointPayload } from "../../../shared/argentAccount/schema"
 import {
   addBackendAccount,
   emailVerificationStatusErrorSchema,
@@ -32,8 +32,8 @@ import {
 import { SMART_ACCOUNT_NETWORK_ID } from "../../../shared/smartAccount/constants"
 import { generateJwt } from "../../../shared/smartAccount/jwt"
 import { validateEmailForAccounts } from "../../../shared/smartAccount/validation/validateAccount"
-import { Wallet } from "../../wallet"
-import { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import type { Wallet } from "../../wallet"
+import type { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
 
 export default class BackgroundArgentAccountService
   implements IBackgroundArgentAccountService

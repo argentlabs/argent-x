@@ -22,6 +22,7 @@ try {
 
 try {
   // catch any errors from init.ts
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require("./init")
 } catch (error) {
   console.error("Fatal exception in background/init.ts", error)

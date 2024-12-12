@@ -1,10 +1,11 @@
 import { Box, FormControl } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { FC, MouseEventHandler, useMemo } from "react"
+import type { FC, MouseEventHandler } from "react"
+import { useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { AllowPromise } from "../../../shared/storage/types"
+import type { AllowPromise } from "../../../shared/storage/types"
 import { ControlledInput } from "../../components/ControlledInput"
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
@@ -68,17 +69,17 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
   const submitButtonText = useMemo(
     () =>
       errors.root?.message
-        ? submitText?.retryAfterError ?? "Retry"
+        ? (submitText?.retryAfterError ?? "Retry")
         : isSubmitting
-          ? submitText?.submitting ?? "Continuing..."
-          : submitText?.start ?? "Continue",
+          ? (submitText?.submitting ?? "Continuing...")
+          : (submitText?.start ?? "Continue"),
     [isSubmitting, errors.root?.message, submitText],
   )
 
   const handleForm = handleSubmit(async ({ password }) => {
     try {
       await onSubmit(password)
-    } catch (error) {
+    } catch {
       setError("root", { message: "Something went wrong" })
     }
   })
@@ -89,13 +90,15 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
       length={length ?? 5} // there are 5 steps in the onboarding process
       currentIndex={currentIndex ?? 2} // this is the 3rd step
       title={title}
-      subtitle="Enter a password to protect your wallet"
+      subtitle="This is used to protect and unlock your wallet"
+      illustration="password"
     >
       <FormControl
         as="form"
         display={"flex"}
         flexDirection={"column"}
         gap={3}
+        /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
         onSubmit={handleForm}
       >
         <ControlledInput
@@ -106,7 +109,7 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
           placeholder="Password"
           isDisabled={isSubmitting}
         />
-        <PasswordStrengthIndicator password={watch("password")} />
+        <PasswordStrengthIndicator password={watch("password")} showAlways />
         <ControlledInput
           name="repeatPassword"
           control={control}
@@ -116,7 +119,7 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
         />
         <Box>
           <OnboardingButton
-            mt={5}
+            mt={12}
             type="submit"
             isDisabled={!isDirty || isSubmitting}
           >

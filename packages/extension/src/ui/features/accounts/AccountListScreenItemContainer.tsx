@@ -1,9 +1,13 @@
-import { FC, Suspense, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { Suspense, useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { BoxProps } from "@chakra-ui/react"
+import type { BoxProps } from "@chakra-ui/react"
 import { accountsEqual } from "../../../shared/utils/accountsEqual"
-import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { routes } from "../../../shared/ui/routes"
 import { clientAccountService } from "../../services/account"
 import { useStarknetId } from "../../services/useStarknetId"
@@ -21,7 +25,7 @@ import { useIsDeprecatedTxV0 } from "./accountUpgradeCheck"
 import { useAccountOwnerIsSelf } from "./useAccountOwner"
 import { useShowAccountUpgrade } from "../accountTokens/useShowAccountUpgrade"
 import { useView } from "../../views/implementation/react"
-import { PrettyAccountBalance } from "../accountTokens/PrettyAccountBalance"
+import { PrettyBalanceForAccount } from "../accountTokens/PrettyBalance"
 
 interface AccountListScreenItemContainerProps
   extends Pick<BoxProps, "borderBottomRadius"> {
@@ -66,12 +70,12 @@ export const AccountListScreenItemContainer: FC<
   const onClick = useCallback(async () => {
     if (clickNavigateSettings) {
       const routeTo = isRemovedFromMultisig
-        ? routes.multisigRemovedSettings(account.address)
-        : routes.settingsAccount(account.address)
+        ? routes.multisigRemovedSettings(account.id)
+        : routes.settingsAccount(account.id)
 
       navigate(routeTo)
     } else {
-      await clientAccountService.select(account)
+      await clientAccountService.select(account.id)
 
       // For multisig accounts, navigate to the multisig screen if the account is not yet deployed
       // Otherwise, it blocks users as there is no navigation to go back to the tokens screen
@@ -105,7 +109,7 @@ export const AccountListScreenItemContainer: FC<
 
   const prettyAccountBalance = !clickNavigateSettings ? (
     <Suspense>
-      <PrettyAccountBalance account={account} />
+      <PrettyBalanceForAccount account={account} />
     </Suspense>
   ) : undefined
 
@@ -114,6 +118,7 @@ export const AccountListScreenItemContainer: FC<
       onClick={() => void onClick()}
       accountName={account.name}
       accountDescription={accountDescription}
+      accountId={account.id}
       accountAddress={account.address}
       accountExtraInfo={accountExtraInfo}
       networkId={account.networkId}

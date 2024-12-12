@@ -1,26 +1,28 @@
-import { SvgIconProps } from "@mui/material"
-import { FC } from "react"
+import { icons } from "@argent/x-ui"
+import type { ChakraComponent } from "@chakra-ui/react"
+import type { ComponentProps, FC } from "react"
 
-import { IStatusMessageLevel } from "../../../shared/statusMessage/types"
-import {
-  ErrorOutlineRoundedIcon,
-  InfoOutlinedIcon,
-  WarningRoundedIcon,
-} from "../../components/Icons/MuiIcons"
+import type { IStatusMessageLevel } from "../../../shared/statusMessage/types"
 
-export interface IStatusMessageIcon extends SvgIconProps {
-  level: IStatusMessageLevel
+const {
+  WarningCircleSecondaryIcon,
+  AlertSecondaryIcon,
+  InfoCircleSecondaryIcon,
+} = icons
+
+export type StatusMessageIconProps = ComponentProps<ChakraComponent<"svg">> & {
+  level?: IStatusMessageLevel
 }
 
-export const StatusMessageIcon: FC<IStatusMessageIcon> = ({
+export const StatusMessageIcon: FC<StatusMessageIconProps> = ({
   level,
   ...rest
 }) => {
   switch (level) {
     case "danger":
-      return <ErrorOutlineRoundedIcon {...rest} />
-    case "warn":
-      return <WarningRoundedIcon {...rest} />
+      return <WarningCircleSecondaryIcon {...rest} />
+    case "warning":
+      return <AlertSecondaryIcon {...rest} />
   }
-  return <InfoOutlinedIcon {...rest} />
+  return <InfoCircleSecondaryIcon {...rest} />
 }

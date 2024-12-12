@@ -1,7 +1,7 @@
-import { Address, Collection, NftItem } from "@argent/x-shared"
-import { ContractAddress } from "./store"
-import { AllowArray } from "../storage/types"
-import { Network } from "../network"
+import type { Address, Collection, NftItem } from "@argent/x-shared"
+import type { ContractAddress } from "./store"
+import type { AllowArray } from "../storage/types"
+import type { Network } from "../network"
 
 export interface INFTService {
   isSupported: (network: Network) => boolean

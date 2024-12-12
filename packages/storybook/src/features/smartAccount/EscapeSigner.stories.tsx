@@ -1,6 +1,6 @@
 import { ESCAPE_TYPE_SIGNER } from "@argent-x/extension/src/shared/account/details/escape.model"
 import { EscapeSigner } from "@argent-x/extension/src/ui/features/smartAccount/escape/EscapeSigner"
-import { getActiveFromNow } from "@argent-x/extension/src/ui/features/smartAccount/escape/useAccountEscape"
+import { getActiveFromNow } from "@argent-x/extension/src/shared/utils/getActiveFromNow"
 
 import { decorators } from "../../decorators/routerDecorators"
 

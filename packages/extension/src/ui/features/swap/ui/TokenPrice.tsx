@@ -1,5 +1,5 @@
-import { P4, TokenButton, getTokenIconUrl } from "@argent/x-ui"
-import { FC } from "react"
+import { getTokenIconUrl, P3, TokenButton } from "@argent/x-ui"
+import type { FC } from "react"
 
 import {
   useTokenAmountToCurrencyValue,
@@ -10,7 +10,7 @@ import {
   ensureDecimals,
   prettifyCurrencyValue,
 } from "@argent/x-shared"
-import { Token } from "../../../../shared/token/__new/types/token.model"
+import type { Token } from "../../../../shared/token/__new/types/token.model"
 
 interface TokenPriceProps {
   token: Token
@@ -46,9 +46,9 @@ const TokenPrice: FC<TokenPriceProps> = ({ token, onClick }) => {
       valueLabelPrimary={displayCurrencyValue}
       valueLabelSecondary={
         priceDetails ? (
-          <P4 color={displayPriceDetails > 0 ? "green" : "red"}>
+          <P3 color={displayPriceDetails > 0 ? "green" : "red"}>
             {displayPriceDetails.toFixed(2)}%
-          </P4>
+          </P3>
         ) : null
       }
       w="100%"

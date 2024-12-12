@@ -1,104 +1,51 @@
-import { partition } from "lodash-es"
-import { FC, useCallback, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
+import type { FC } from "react"
+import { Suspense, useState } from "react"
 
-import { isAccountHidden } from "../../../shared/wallet.service"
 import { useReturnTo } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
-import {
-  selectedAccountView,
-  allAccountsOnNetworkFamily,
-} from "../../views/account"
 import { useView } from "../../views/implementation/react"
-import {
-  isHiddenPendingMultisig,
-  usePendingMultisigs,
-} from "../multisig/multisig.state"
-import { Account } from "./Account"
-import { AccountListScreen } from "./AccountListScreen"
-import {
-  sortMultisigAccounts,
-  sortStandardAccounts,
-} from "../../../shared/utils/accountsMultisigSort"
-import { isEqualAddress } from "@argent/x-shared"
-import { selectedNetworkIdView, selectedNetworkView } from "../../views/network"
+import { selectedNetworkIdView } from "../../views/network"
+import { NetworkSwitcherContainer } from "../navigation/NetworkSwitcherContainer"
+import { useNavigateReturnToOr } from "../../hooks/useNavigateReturnTo"
+import type { NavigationBarProps } from "@argent/x-ui"
+import { BarCloseButton, NavigationBar } from "@argent/x-ui"
+import { AccountListContainer } from "./AccountListContainer"
+import { AccountListSkeleton } from "./AccountList"
 
-/** TODO: we should be able to retreive all these account collections using queries from storage */
-export const AccountListScreenContainer: FC = () => {
-  const navigate = useNavigate()
+export const AccountListScreenContainerSkeleton: FC = () => {
+  return (
+    <>
+      <NavigationBar />
+      <AccountListSkeleton />
+    </>
+  )
+}
+
+export const AccountListScreenContainer: FC<NavigationBarProps> = (props) => {
   const returnTo = useReturnTo()
-  const selectedNetworkId = useView(selectedNetworkIdView)
-  const selectedNetwork = useView(selectedNetworkView)
+  const onBack = useNavigateReturnToOr(routes.accountTokens())
 
-  const selectedAccount = useView(selectedAccountView)
-  const allAccounts = useView(allAccountsOnNetworkFamily(selectedNetworkId))
+  /** Switching network is transient here - only change account when user explicitly selects one */
+  const defaultNetworkId = useView(selectedNetworkIdView)
+  const [networkId, setNetworkId] = useState(defaultNetworkId)
 
-  const [hiddenAccounts, visibleAccounts] = useMemo(
-    () => partition(allAccounts, isAccountHidden),
-    [allAccounts],
+  const title = (
+    <NetworkSwitcherContainer
+      networkId={networkId}
+      onChangeNetworkId={setNetworkId}
+    />
   )
-
-  // TODO: refactor to use view as soon as multisig is using views
-  const pendingMultisigs = usePendingMultisigs({ showHidden: true })
-  const [hiddenPendingMultisigs, visiblePendingMultisigs] = partition(
-    pendingMultisigs,
-    isHiddenPendingMultisig,
-  )
-
-  const accountFromAddress = useCallback(
-    (accountAddress: string) => {
-      return allAccounts.find(
-        (account) =>
-          isEqualAddress(account.address, accountAddress) &&
-          selectedNetworkId === account.networkId,
-      )
-    },
-    [allAccounts, selectedNetworkId],
-  )
-
-  const accounts = visibleAccounts
-    .map((account) => accountFromAddress(account.address))
-    .filter((account): account is Account => Boolean(account))
-
-  const onClose = useCallback(() => {
-    navigate(returnTo || routes.accountTokens())
-  }, [navigate, returnTo])
-
-  const onAdd = useCallback(() => {
-    navigate(routes.newAccount(returnTo))
-  }, [navigate, returnTo])
-
-  const { sortedMultisigAccounts, sortedStandardAccounts } = useMemo(() => {
-    const [multisigAccounts, standardAccounts] = partition(
-      accounts,
-      (account) => account.type === "multisig",
-    )
-
-    const sortedMultisigAccounts = sortMultisigAccounts(multisigAccounts)
-
-    const sortedStandardAccounts = sortStandardAccounts(standardAccounts)
-
-    return {
-      sortedMultisigAccounts,
-      sortedStandardAccounts,
-    }
-  }, [accounts])
-
-  const title = `${selectedNetwork.name} accounts`
 
   return (
-    <AccountListScreen
-      hiddenAccounts={hiddenAccounts}
-      hiddenPendingMultisigs={hiddenPendingMultisigs}
-      multisigAccounts={sortedMultisigAccounts}
-      onAdd={onAdd}
-      onClose={onClose}
-      pendingMultisigs={pendingMultisigs}
-      returnTo={returnTo}
-      selectedAccount={selectedAccount}
-      standardAccounts={sortedStandardAccounts}
-      title={title}
-      visiblePendingMultisigs={visiblePendingMultisigs}
-    />
+    <>
+      <NavigationBar
+        title={title}
+        rightButton={<BarCloseButton onClick={onBack} />}
+        {...props}
+      />
+      <Suspense fallback={<AccountListSkeleton />}>
+        <AccountListContainer networkId={networkId} returnTo={returnTo} />
+      </Suspense>
+    </>
   )
 }

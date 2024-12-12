@@ -1,9 +1,9 @@
-import { iconsDeprecated } from "@argent/x-ui"
-import { ComponentProps, FC } from "react"
+import { icons } from "@argent/x-ui"
+import type { ComponentProps, FC } from "react"
 
-const { CheckboxActiveIcon, CheckboxDefaultIcon } = iconsDeprecated
+const { RadioFilledIcon, RadioEmptyIcon } = icons
 
-type SettingsRadioIconProps = ComponentProps<typeof CheckboxActiveIcon> & {
+type SettingsRadioIconProps = ComponentProps<typeof RadioFilledIcon> & {
   checked: boolean
 }
 
@@ -12,7 +12,7 @@ export const SettingsRadioIcon: FC<SettingsRadioIconProps> = ({
   ...rest
 }) => {
   if (checked) {
-    return <CheckboxActiveIcon fontSize="3xl" color="primary.500" {...rest} />
+    return <RadioFilledIcon fontSize="3xl" color="primary.500" {...rest} />
   }
-  return <CheckboxDefaultIcon fontSize="3xl" color="text-secondary" {...rest} />
+  return <RadioEmptyIcon fontSize="3xl" color="text-secondary" {...rest} />
 }

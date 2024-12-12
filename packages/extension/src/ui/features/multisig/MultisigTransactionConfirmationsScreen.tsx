@@ -1,5 +1,6 @@
-import { H5, P3, logosDeprecated } from "@argent/x-ui"
-import { FC, useMemo } from "react"
+import { H4, logosDeprecated, P2 } from "@argent/x-ui"
+import type { FC } from "react"
+import { useMemo } from "react"
 
 import { ensureArray, isEqualAddress } from "@argent/x-shared"
 import { Box, Center, Circle, VStack } from "@chakra-ui/react"
@@ -14,7 +15,7 @@ import {
 import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
 import { multisigView } from "./multisig.state"
 import { MultisigOwner } from "./MultisigOwner"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 const { LedgerLogo } = logosDeprecated
 
@@ -28,7 +29,7 @@ export const MultisigTransactionConfirmationsScreen: FC<
 > = (props) => {
   const { account, approvedSigners, nonApprovedSigners } = props
 
-  const publicKey = usePublicKey(account)
+  const publicKey = usePublicKey(account?.id)
   const approvedSignersPublicKey = useEncodedPublicKeys(
     ensureArray(approvedSigners),
   )
@@ -36,7 +37,7 @@ export const MultisigTransactionConfirmationsScreen: FC<
 
   const multisig = useView(multisigView(account))
   const multisigMetadata = useView(publicKeyMultisigMetadataView(multisig))
-  const isLedgerSigner = useIsLedgerSigner(multisig)
+  const isLedgerSigner = useIsLedgerSigner(multisig?.id)
 
   const noLedgerPublicKey = useMemo(
     () => isLedgerSigner && !publicKey,
@@ -49,9 +50,9 @@ export const MultisigTransactionConfirmationsScreen: FC<
 
   return (
     <>
-      <P3 color="neutrals.300" mb={3}>
+      <P2 color="neutrals.300" mb={3}>
         Me
-      </P3>
+      </P2>
       {publicKey && (
         <MultisigOwner
           owner={publicKey}
@@ -63,9 +64,9 @@ export const MultisigTransactionConfirmationsScreen: FC<
           )}
         />
       )}
-      <P3 color="neutrals.300" mb={3}>
+      <P2 color="neutrals.300" mb={3}>
         Other owners
-      </P3>
+      </P2>
       {approvedSigners
         .filter((signer) => {
           if (!publicKey) {
@@ -113,7 +114,7 @@ const ConnectLedgerMessage: FC = () => {
           </Center>
         </Circle>
         <Box maxW={{ base: 62 }} textAlign="center">
-          <H5 color="text-subtle">Connect your Ledger to view details</H5>
+          <H4 color="text-subtle">Connect your Ledger to view details</H4>
         </Box>
       </VStack>
     </Box>

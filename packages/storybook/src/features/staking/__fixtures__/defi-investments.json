@@ -1,0 +1,386 @@
+{
+  "investments": [
+    {
+      "id": "ee3dae35-85ac-4e67-b3ee-4e436c102cba",
+      "dappId": "ed0f9636-9a73-49e0-9f80-0932eafd0cee",
+      "productId": "5d4c7689-6759-4051-a6a2-baf4a397b081",
+      "productName": "Starknet Staking",
+      "chain": "starknet",
+      "category": "strkDelegatedStaking",
+      "name": "Starknet Staking",
+      "description": "Stake your STRK within Argent staking pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+      "learnMoreUrl": "https://learn.more.url/",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": true,
+        "tokensRequirement": "any",
+        "amountsRequirement": "fullBalance",
+        "timelockDuration": 300
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0.12", "totalApy": "0.12" },
+      "incentives": [],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "argentFee": "0.05", "totalFee": "0.05" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": true,
+      "stakerInfo": {
+        "name": "Argent",
+        "iconUrl": "https://static.argent.net/dapp/logos/3131edcd-b7f4-47d4-89ae-bd461786e547.png",
+        "address": "0x019fd64864a5fea548cc263eae6343249a7e7a9d42d638cf74ab39a6bd450af1"
+      }
+    },
+    {
+      "id": "f77d6ce4-a799-475d-920d-c76734e2f748",
+      "dappId": "49007844-7a78-4185-be2f-b06bf6fc26a5",
+      "productId": "01a7b83d-d4c4-4109-af0d-ad5b15ab712b",
+      "productName": "Lido ETH Staking",
+      "chain": "starknet",
+      "category": "staking",
+      "name": "ETH Staking",
+      "description": "Stake your ETH and earn daily rewards. You'll receive a new token representing your stake that you can convert back to ETH.",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x0703911a6196ef674fc635de02763dcd4ccc16d7cf736f68a9483cc44eccaa94"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "riskFactor": "low",
+      "metrics": {
+        "baseApy": "0.030913",
+        "totalApy": "0.030913",
+        "tvl": "25804331611.6954"
+      },
+      "incentives": [],
+      "fees": {
+        "depositFees": { "protocolFee": "0.001", "totalFee": "0.001" },
+        "withdrawalFees": { "protocolFee": "0.001", "totalFee": "0.001" },
+        "performanceFees": { "totalFee": "0" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": false
+    },
+    {
+      "id": "628f48c5-32a7-4466-bc28-cfb439b2cec5",
+      "dappId": "02d43d9d-b82e-44fb-aaa1-69753adc2f14",
+      "productId": "e287cf81-8b05-425c-875b-ef031498ad31",
+      "productName": "Vesu Earn",
+      "chain": "starknet",
+      "category": "lending",
+      "name": "Vesu ETH Pool",
+      "description": "Description for Vesu ETH Pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+      "learnMoreUrl": "https://medium.com/@shelleymae/vesu-launches-on-starknet-permissionless-lending-and-borrowing-2a8652736268",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x07809bb63f557736e49ff0ae4a64bd8aa6ea60e3f77f26c520cb92c24e3700d3"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x01ceb6db3ac889e2c0d2881eff602117c340316e55436f37699d91c193ee8aa0"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0", "totalApy": "0.091392" },
+      "incentives": [
+        {
+          "name": "DeFi Spring",
+          "description": "DeFi Spring rewards description",
+          "iconUrl": "https://static.hydrogen.argent47.net/dapp/logos/90be09e5-e782-4b70-9bde-03e212389c4c.png",
+          "learnMoreUrl": "https://www.starknet.io/blog/defi-spring-2-0/",
+          "metric": { "apy": "0.091392" }
+        }
+      ],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "totalFee": "0" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": false
+    },
+    {
+      "id": "f071cc6a-27d7-49c8-a87c-1b41ea4113a6",
+      "dappId": "02d43d9d-b82e-44fb-aaa1-69753adc2f14",
+      "productId": "e287cf81-8b05-425c-875b-ef031498ad31",
+      "productName": "Vesu Earn",
+      "chain": "starknet",
+      "category": "lending",
+      "name": "Vesu USDC Pool",
+      "description": "Description for Vesu USDC Pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
+      "learnMoreUrl": "https://medium.com/@shelleymae/vesu-launches-on-starknet-permissionless-lending-and-borrowing-2a8652736268",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x027ef4670397069d7d5442cb7945b27338692de0d8896bdb15e6400cf5249f94"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x07632c8fab1399aede8ad1f89411f082b0a492ca58e87b5ebc475d38f799b0c7"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0.000505", "totalApy": "0.106615" },
+      "incentives": [
+        {
+          "name": "DeFi Spring",
+          "description": "DeFi Spring rewards description",
+          "iconUrl": "https://static.hydrogen.argent47.net/dapp/logos/90be09e5-e782-4b70-9bde-03e212389c4c.png",
+          "learnMoreUrl": "https://www.starknet.io/blog/defi-spring-2-0/",
+          "metric": { "apy": "0.10611" }
+        }
+      ],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "totalFee": "0" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": false
+    },
+    {
+      "id": "6f3fd191-504d-40ac-8184-ad000862bc0b",
+      "dappId": "02d43d9d-b82e-44fb-aaa1-69753adc2f14",
+      "productId": "e287cf81-8b05-425c-875b-ef031498ad31",
+      "productName": "Vesu Earn",
+      "chain": "starknet",
+      "category": "lending",
+      "name": "Vesu STRK Pool",
+      "description": "Description for Vesu STRK Pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+      "learnMoreUrl": "https://medium.com/@shelleymae/vesu-launches-on-starknet-permissionless-lending-and-borrowing-2a8652736268",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x0772131070c7d56f78f3e46b27b70271d8ca81c7c52e3f62aa868fab4b679e43"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x0360bac2ddf1f6d3aeea78d032acb1ec66845a6f112eecb5907ed2518f68a8c3"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0", "totalApy": "0.077223" },
+      "incentives": [
+        {
+          "name": "DeFi Spring",
+          "description": "DeFi Spring rewards description",
+          "iconUrl": "https://static.hydrogen.argent47.net/dapp/logos/90be09e5-e782-4b70-9bde-03e212389c4c.png",
+          "learnMoreUrl": "https://www.starknet.io/blog/defi-spring-2-0/",
+          "metric": { "apy": "0.077223" }
+        }
+      ],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "totalFee": "0" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": false
+    },
+    {
+      "id": "eda8cf73-be8c-4401-979a-8b616f9238b0",
+      "dappId": "02d43d9d-b82e-44fb-aaa1-69753adc2f14",
+      "productId": "e287cf81-8b05-425c-875b-ef031498ad31",
+      "productName": "Vesu Earn",
+      "chain": "starknet",
+      "category": "lending",
+      "name": "Vesu wstETH Pool",
+      "description": "Description for Vesu wstETH Pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/steth.png",
+      "learnMoreUrl": "https://medium.com/@shelleymae/vesu-launches-on-starknet-permissionless-lending-and-borrowing-2a8652736268",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x057181b39020af1416747a7d0d2de6ad5a5b721183136585e8774e1425efd5d2"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x06dd3df5c9037b0e5b202a7b96cf2054f4696e4e11a0e5557461d629b4870a5f"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0.000012", "totalApy": "0.000012" },
+      "incentives": [],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "totalFee": "0" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": false
+    },
+    {
+      "id": "43e1aa72-06f2-4db6-9fb2-675b3cb3fc82",
+      "dappId": "02d43d9d-b82e-44fb-aaa1-69753adc2f14",
+      "productId": "e287cf81-8b05-425c-875b-ef031498ad31",
+      "productName": "Vesu Earn",
+      "chain": "starknet",
+      "category": "lending",
+      "name": "Vesu WBTC Pool",
+      "description": "Description for Vesu WBTC Pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/wbtc.png",
+      "learnMoreUrl": "https://medium.com/@shelleymae/vesu-launches-on-starknet-permissionless-lending-and-borrowing-2a8652736268",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x063d32a3fa6074e72e7a1e06fe78c46a0c8473217773e19f11d8c8cbfc4ff8ca"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x05868ed6b7c57ac071bf6bfe762174a2522858b700ba9fb062709e63b65bf186"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0", "totalApy": "0" },
+      "incentives": [],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "totalFee": "0" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": false
+    },
+    {
+      "id": "93f24152-fbf4-4960-98ba-f50c4eb7a70e",
+      "dappId": "02d43d9d-b82e-44fb-aaa1-69753adc2f14",
+      "productId": "e287cf81-8b05-425c-875b-ef031498ad31",
+      "productName": "Vesu Earn",
+      "chain": "starknet",
+      "category": "lending",
+      "name": "Vesu USDT Pool",
+      "description": "Description for Vesu USDT Pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdt.png",
+      "learnMoreUrl": "https://medium.com/@shelleymae/vesu-launches-on-starknet-permissionless-lending-and-borrowing-2a8652736268",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x002cd937c3dccd4a4e125011bbe3189a6db0419bb6dd95c4b5ce5f6d834d8996"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x07f39fc9465588bb783023401230d2318354b23e71e632aa7019a423d284f8c4"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0.000007", "totalApy": "0.10706" },
+      "incentives": [
+        {
+          "name": "DeFi Spring",
+          "description": "DeFi Spring rewards description",
+          "iconUrl": "https://static.hydrogen.argent47.net/dapp/logos/90be09e5-e782-4b70-9bde-03e212389c4c.png",
+          "learnMoreUrl": "https://www.starknet.io/blog/defi-spring-2-0/",
+          "metric": { "apy": "0.107053" }
+        }
+      ],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "totalFee": "0" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": false
+    },
+    {
+      "id": "6d2f225a-2bda-4973-a564-d127434da0c2",
+      "dappId": "ed0f9636-9a73-49e0-9f80-0932eafd0cee",
+      "productId": "5d4c7689-6759-4051-a6a2-baf4a397b081",
+      "productName": "Starknet Staking",
+      "chain": "starknet",
+      "category": "strkDelegatedStaking",
+      "name": "Starknet Staking",
+      "description": "Stake your STRK within Voyager staking pool",
+      "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+      "learnMoreUrl": "https://learn.more.url/",
+      "investableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": false,
+        "tokensRequirement": "any"
+      },
+      "withdrawableAssets": {
+        "tokenAddresses": [
+          "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+        ],
+        "useDecomposedBalances": true,
+        "tokensRequirement": "any",
+        "amountsRequirement": "fullBalance",
+        "timelockDuration": 300
+      },
+      "riskFactor": "low",
+      "metrics": { "baseApy": "0.1136", "totalApy": "0.1136" },
+      "incentives": [],
+      "fees": {
+        "depositFees": { "totalFee": "0" },
+        "withdrawalFees": { "totalFee": "0" },
+        "performanceFees": { "argentFee": "0.09", "totalFee": "0.09" }
+      },
+      "buyEnabled": true,
+      "sellEnabled": true,
+      "claimEnabled": true,
+      "stakerInfo": {
+        "name": "Voyager",
+        "iconUrl": "https://www.dappland.com/dapps/voyager/dapp-icon-voyager.png",
+        "address": "0x00622e5d66bd907f7973f89b5f3c9f06cd466c3ca76f7ae3a6b64631722546be"
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
-import { FC, useEffect, useState, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
+import { useEffect, useState } from "react"
 import { Box, keyframes } from "@chakra-ui/react"
-import { P3 } from "@argent/x-ui"
+import { P2 } from "@argent/x-ui"
 
 const fadeInAndOut = keyframes`
   0% {
@@ -22,7 +23,7 @@ const FadeInAndOutText: FC<{ duration?: string } & PropsWithChildren> = ({
   ...props
 }) => {
   return (
-    <P3
+    <P2
       animation={`${fadeInAndOut} ${duration} ease-in-out forwards`}
       color="neutrals.300"
       mt={6}

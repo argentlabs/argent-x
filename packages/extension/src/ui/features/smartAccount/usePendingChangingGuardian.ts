@@ -1,7 +1,7 @@
 import { useMemo, useRef } from "react"
 
-import { Transaction } from "../../../shared/transactions"
-import { BaseWalletAccount } from "../../../shared/wallet.model"
+import type { Transaction } from "../../../shared/transactions"
+import type { BaseWalletAccount } from "../../../shared/wallet.model"
 import { useWalletAccount } from "../accounts/accounts.state"
 import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import { useTransactionStatus } from "../accountTokens/useTransactionStatus"
@@ -63,7 +63,7 @@ export interface LiveAccountGuardianState {
 export const useLiveAccountGuardianState = (
   account?: BaseWalletAccount,
 ): LiveAccountGuardianState => {
-  const liveAccount = useWalletAccount(account)
+  const liveAccount = useWalletAccount(account?.id)
 
   /** keep initial guardian state so we can react to change */
   const hasGuardian = Boolean(liveAccount?.guardian)

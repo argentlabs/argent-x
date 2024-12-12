@@ -1,4 +1,4 @@
-import Emittery from "emittery"
+import type Emittery from "emittery"
 
 export const IsSignedIn = Symbol("IsSignedIn")
 

@@ -1,11 +1,12 @@
 import {
-  iconsDeprecated,
   buttonBaseStyle,
   buttonHoverStyle,
+  icons,
   scrollbarStyleThin,
 } from "@argent/x-ui"
 import { Box, Flex } from "@chakra-ui/react"
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import ReactSelect, {
   type ControlProps,
   type MenuListProps,
@@ -19,7 +20,7 @@ import ReactSelect, {
 import { AccountListItem } from "./AccountListItem"
 import type { AccountListItemProps } from "./accountListItem.model"
 
-const { ChevronDownIcon } = iconsDeprecated
+const { ChevronDownSecondaryIcon } = icons
 
 const Control = ({
   children,
@@ -63,7 +64,7 @@ const SingleValue = ({ data }: SingleValueProps<AccountListItemProps>) => {
       }}
       connectedTooltipLabel="Account is already connected"
     >
-      <ChevronDownIcon />
+      <ChevronDownSecondaryIcon />
     </AccountListItem>
   )
 }

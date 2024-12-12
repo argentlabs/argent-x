@@ -1,4 +1,4 @@
-import {
+import type {
   ImplementedScheduledTask,
   BaseScheduledTask,
 } from "../schedule/IScheduleService"

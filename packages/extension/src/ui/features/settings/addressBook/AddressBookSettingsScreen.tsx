@@ -4,20 +4,21 @@ import {
   CellStack,
   Empty,
   EmptyButton,
+  icons,
   Input,
   NavigationContainer,
-  iconsDeprecated,
 } from "@argent/x-ui"
 import { InputGroup, InputLeftElement } from "@chakra-ui/react"
-import { FC, useCallback, useMemo } from "react"
+import type { FC } from "react"
+import { useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 
-import { AddressBookContact } from "../../../../shared/addressBook/type"
-import { Network } from "../../../../shared/network"
+import type { AddressBookContact } from "../../../../shared/addressBook/type"
+import type { Network } from "../../../../shared/network"
 import { useAutoFocusInputRef } from "../../../hooks/useAutoFocusInputRef"
 import { AccountListItem } from "../../accounts/AccountListItem"
 
-const { SearchIcon, AddressBookIcon, AddIcon } = iconsDeprecated
+const { SearchPrimaryIcon, PlusSecondaryIcon, AddressBookIcon } = icons
 
 interface AddressBookSettingsScreenProps {
   contacts: AddressBookContact[]
@@ -73,7 +74,11 @@ export const AddressBookSettingsScreen: FC<AddressBookSettingsScreenProps> = ({
     if (!hasContacts) {
       return (
         <Empty icon={<AddressBookIcon />} title={`No saved contacts`}>
-          <EmptyButton mt={8} leftIcon={<AddIcon />} onClick={onAddContact}>
+          <EmptyButton
+            mt={8}
+            leftIcon={<PlusSecondaryIcon />}
+            onClick={onAddContact}
+          >
             New contact
           </EmptyButton>
         </Empty>
@@ -84,7 +89,7 @@ export const AddressBookSettingsScreen: FC<AddressBookSettingsScreenProps> = ({
       <CellStack pt="0" flex={1}>
         <InputGroup size="sm">
           <InputLeftElement pointerEvents="none">
-            <SearchIcon />
+            <SearchPrimaryIcon />
           </InputLeftElement>
           <Input
             ref={(e) => {
@@ -97,16 +102,15 @@ export const AddressBookSettingsScreen: FC<AddressBookSettingsScreenProps> = ({
             type="text"
           />
         </InputGroup>
-
         {!hasFilteredContacts && (
-          <Empty icon={<SearchIcon />} title={`No matching contacts`} />
+          <Empty icon={<SearchPrimaryIcon />} title={`No matching contacts`} />
         )}
-
         {filteredContacts.map((contact) => {
           const networkName = networkNameFromNetworkId(contact.networkId)
           return (
             <AccountListItem
               key={contact.id}
+              accountId={contact.id}
               avatarSize={9}
               accountAddress={contact.address}
               networkId={contact.networkId}

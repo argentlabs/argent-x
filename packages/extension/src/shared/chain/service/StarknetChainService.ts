@@ -1,11 +1,11 @@
 import { getProvider } from "../../network"
-import { INetworkService } from "../../network/service/INetworkService"
-import {
+import type { INetworkService } from "../../network/service/INetworkService"
+import type {
   BaseTransaction,
   TransactionStatus,
   TransactionWithStatus,
 } from "../../transactions/interface"
-import { BaseContract, IChainService } from "./IChainService"
+import type { BaseContract, IChainService } from "./IChainService"
 import { isContractDeployed } from "@argent/x-shared"
 import { SUCCESS_STATUSES } from "../../transactions"
 

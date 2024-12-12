@@ -1,15 +1,13 @@
-import { B3, iconsDeprecated } from "@argent/x-ui"
+import { B3, icons } from "@argent/x-ui"
 import { Center, Flex, Text } from "@chakra-ui/react"
-import { FC, PropsWithChildren } from "react"
+import type { FC, PropsWithChildren } from "react"
 
 import { DappActionHeader } from "./connectDapp/DappActionHeader"
-import { DappDisplayAttributes } from "./connectDapp/useDappDisplayAttributes"
-import {
-  ConfirmScreen,
-  ConfirmScreenProps,
-} from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import type { DappDisplayAttributes } from "../../services/knownDapps/types"
+import type { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
+import { ConfirmScreen } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
 
-const { ChevronRightIcon } = iconsDeprecated
+const { ChevronRightSecondaryIcon } = icons
 
 export interface SwitchNetworkScreenProps extends ConfirmScreenProps {
   fromNetworkTitle?: string
@@ -49,7 +47,7 @@ export const SwitchNetworkScreen: FC<SwitchNetworkScreenProps> = ({
       >
         <NetworkPill>{fromNetworkTitle}</NetworkPill>
         <Text fontSize={"xl"}>
-          <ChevronRightIcon />
+          <ChevronRightSecondaryIcon />
         </Text>
         <NetworkPill>{toNetworkTitle}</NetworkPill>
       </Flex>

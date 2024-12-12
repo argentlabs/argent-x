@@ -1,6 +1,8 @@
-import { Address, addressSchema } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
+import { addressSchema } from "@argent/x-shared"
 import { isArray } from "lodash-es"
-import { Call, CallData, num, uint256 } from "starknet"
+import type { Call } from "starknet"
+import { CallData, num, uint256 } from "starknet"
 
 export function parseTransferTokenCall(
   calls: Call | Call[],

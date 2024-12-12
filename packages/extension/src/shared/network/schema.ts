@@ -92,6 +92,12 @@ export const networkSchema = baseNetworkSchema.extend({
           message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,
         })
         .optional(),
+      imported: z
+        .string()
+        .regex(REGEX_HEXSTRING, {
+          message: `Account class hash must match the following: /^0x[a-f0-9]+$/i`,
+        })
+        .optional(),
     }),
     z.undefined(),
   ]),

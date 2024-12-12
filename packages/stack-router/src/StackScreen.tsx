@@ -1,15 +1,14 @@
 import { usePresence, useReducedMotionConfig } from "framer-motion"
-import { FC, PropsWithChildren, useEffect, useMemo, useRef } from "react"
+import type { FC, PropsWithChildren } from "react"
+import { useEffect, useMemo, useRef } from "react"
 
 import {
   animatedTransition,
   replaceTransition,
 } from "./presentation/transitions"
 import { useStackContext } from "./StackContext"
-import {
-  StackScreenContainerProps,
-  StackScreenMotionContainer,
-} from "./StackScreenContainer"
+import type { StackScreenContainerProps } from "./StackScreenContainer"
+import { StackScreenMotionContainer } from "./StackScreenContainer"
 import { PresentationDirection } from "./types"
 import { isModalSheetPresentation, isStackedPresentation } from "./utils/is"
 
@@ -56,11 +55,14 @@ export const StackScreen: FC<StackScreenProps> = ({
       }
     }
 
-    isModalSheet && document.addEventListener("mousedown", handleClickOutside)
+    if (isModalSheet) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
 
     return () => {
-      isModalSheet &&
+      if (isModalSheet) {
         document.removeEventListener("mousedown", handleClickOutside)
+      }
     }
   }, [isModalSheet, isPresent, onStackClicked])
 

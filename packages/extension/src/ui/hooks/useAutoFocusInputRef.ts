@@ -1,11 +1,9 @@
-import { useEventListener, useIsEventEmitterEnabled } from "@argent/x-shared"
+import { useEventListener, useIsEventEmitterEnabled } from "@argent/x-ui"
 import { useIsPresent } from "framer-motion"
 import { useRef } from "react"
 
-import {
-  AppRoutesAnimationComplete,
-  AppRoutesEvents,
-} from "./useOnAppRoutesAnimationComplete"
+import type { AppRoutesEvents } from "./useOnAppRoutesAnimationComplete"
+import { AppRoutesAnimationComplete } from "./useOnAppRoutesAnimationComplete"
 
 /**
  * Returns a ref that can be used on an input to give automatic focus once route animation is complete.

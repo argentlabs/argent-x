@@ -1,5 +1,5 @@
 import { ConfirmScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ConfirmScreen"
-import { H5, ModalBottomDialog, P3, P4 } from "@argent/x-ui"
+import { H4, ModalBottomDialog, P2, P3 } from "@argent/x-ui"
 import { Center } from "@chakra-ui/layout"
 import { ComponentProps } from "react"
 
@@ -37,7 +37,7 @@ export const WithFooter = {
     confirmButtonDisabled: false,
     footer: (
       <Center bg={"neutrals.500"} rounded={"base"} px={1} py={2}>
-        <P4>Placeholder footer</P4>
+        <P3>Placeholder footer</P3>
       </Center>
     ),
   },
@@ -56,11 +56,11 @@ export const WithModalBottomDialog = {
     footer: (
       <ModalBottomDialog isOpen onClose={() => {}}>
         <Center textAlign="center" flexDirection="column" gap={1}>
-          <H5>Lorem ipsum</H5>
-          <P3>
+          <H4>Lorem ipsum</H4>
+          <P2>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lectus
             nisl, diam iaculis porttitor
-          </P3>
+          </P2>
         </Center>
       </ModalBottomDialog>
     ),

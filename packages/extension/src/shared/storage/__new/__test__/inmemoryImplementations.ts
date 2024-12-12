@@ -1,6 +1,6 @@
 import { isArray, isEqual, isFunction, isString } from "lodash-es"
 
-import {
+import type {
   AllowArray,
   AllowPromise,
   IObjectStore,
@@ -12,7 +12,7 @@ import {
   StorageChange,
   UpsertResult,
 } from "../interface"
-import { IKeyValueStorage } from "../.."
+import type { IKeyValueStorage } from "../.."
 
 export class InMemoryObjectStore<T> implements IObjectStore<T> {
   public namespace: string

@@ -1,9 +1,11 @@
 import { getChainIdFromNetworkId } from "@argent/x-shared"
-import { BlockIdentifier, Call, Provider, ProviderInterface } from "starknet5"
+import type { BlockIdentifier, Call, ProviderInterface } from "starknet5"
+import { Provider } from "starknet5"
 
-import { Network, getProvider5 } from "../shared/network"
+import type { Network } from "../shared/network"
 import { getPublicRPCNodeUrls, isArgentNetwork } from "../shared/network/utils"
 import { FallbackRpcProvider5 } from "../shared/network/FallbackRpcProvider5"
+import { getProvider5 } from "./provider"
 
 export class ArgentXProvider5 extends Provider implements ProviderInterface {
   constructor(network: Network) {

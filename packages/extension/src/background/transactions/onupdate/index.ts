@@ -2,8 +2,7 @@ import { handleChangeGuardianTransaction } from "./changeGuardian"
 import { handleDeclareContractTransaction } from "./declareContract"
 import { handleDeployAccountTransaction } from "./deployAccount"
 import { handleMultisigUpdates } from "./multisigUpdates"
-import { checkResetStoredNonce } from "./nonce"
-import { TransactionUpdateListener } from "./type"
+import type { TransactionUpdateListener } from "./type"
 import { handleUpgradeTransaction } from "./upgrade"
 
 const addedOrUpdatedHandlers: TransactionUpdateListener[] = [
@@ -12,7 +11,6 @@ const addedOrUpdatedHandlers: TransactionUpdateListener[] = [
   handleDeclareContractTransaction,
   handleChangeGuardianTransaction,
   handleMultisigUpdates,
-  checkResetStoredNonce,
 ]
 
 export const runAddedOrUpdatedHandlers: TransactionUpdateListener = async (

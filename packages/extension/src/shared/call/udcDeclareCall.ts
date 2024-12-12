@@ -1,5 +1,6 @@
 import { isEqualAddress } from "@argent/x-shared"
-import { Call, constants, validateAndParseAddress } from "starknet"
+import type { Call } from "starknet"
+import { constants, validateAndParseAddress } from "starknet"
 
 const { UDC } = constants
 
@@ -17,7 +18,7 @@ export const isUdcDeclareCall = (call: Call): call is UdcDeclareCall => {
       validateAndParseAddress(call.contractAddress)
       return true
     }
-  } catch (e) {
+  } catch {
     // failure implies invalid
   }
   return false

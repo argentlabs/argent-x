@@ -32,5 +32,6 @@ initWorkers()
 
 // hot reload in development
 if (IS_DEV) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require("./dev/hotReload")
 }

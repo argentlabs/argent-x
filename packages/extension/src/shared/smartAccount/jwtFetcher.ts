@@ -22,7 +22,9 @@ export const jwtFetcher = async <T>(
   try {
     return await fetcher<T>(input, initWithArgentJwtHeaders)
   } catch (error) {
-    IS_DEV && console.warn(coerceErrorToString(error))
+    if (IS_DEV) {
+      console.warn(coerceErrorToString(error))
+    }
     throw error
   }
 }

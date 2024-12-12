@@ -1,4 +1,4 @@
-import { Message, Messenger, ResponseMessage } from "../messenger"
+import type { Message, Messenger, ResponseMessage } from "../messenger"
 
 type AllowPromise<T> = T | Promise<T>
 type InferPromise<T> = T extends Promise<infer U> ? U : T

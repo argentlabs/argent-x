@@ -1,4 +1,4 @@
-import { BigNumberish } from "starknet"
+import type { BigNumberish } from "starknet"
 import { useTokenAmountToCurrencyValue } from "./tokenPriceHooks"
 import {
   isEqualAddress,

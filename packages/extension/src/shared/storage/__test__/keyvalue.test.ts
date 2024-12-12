@@ -1,7 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
 
-import { IKeyValueStorage, KeyValueStorage } from "../keyvalue"
-import { AreaName, StorageArea } from "../types"
+import type { IKeyValueStorage } from "../keyvalue"
+import { KeyValueStorage } from "../keyvalue"
+import type { AreaName, StorageArea } from "../types"
 import { MockStorage } from "./chrome-storage.mock"
 
 interface IStore {

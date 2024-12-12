@@ -4,7 +4,7 @@ import {
   getOtherTabsOrigins,
 } from "../../../../shared/browser/origin"
 import {
-  baseWalletAccountSchema,
+  accountIdSchema,
   isNetworkOnlyPlaceholderAccount,
   networkOnlyPlaceholderAccountSchema,
 } from "../../../../shared/wallet.model"
@@ -15,7 +15,7 @@ import { extensionOnlyProcedure } from "../permissions"
 
 export const selectAccountProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
-  .input(baseWalletAccountSchema.or(networkOnlyPlaceholderAccountSchema))
+  .input(accountIdSchema.or(networkOnlyPlaceholderAccountSchema))
   .mutation(
     async ({
       input: baseWalletAccount,

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { Flow } from "../../../shared/argentAccount/schema"
+import type { Flow } from "../../../shared/argentAccount/schema"
 
 export const emailSchema = z.object({
   email: z.string().email("Invalid email address"),

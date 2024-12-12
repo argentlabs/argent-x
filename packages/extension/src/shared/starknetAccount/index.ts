@@ -1,4 +1,4 @@
-import {
+import type {
   Abi,
   AccountInterface,
   AllowArray,
@@ -11,18 +11,21 @@ import {
   DeployContractResponse,
   ProviderInterface,
   Signature,
-  TransactionType,
   TypedData,
   UniversalDetails,
+} from "starknet"
+import {
+  TransactionType,
   constants,
   isSierra,
   provider,
   stark,
   transaction,
 } from "starknet"
-import { BaseSignerInterface } from "../signer/BaseSignerInterface"
+import type { BaseSignerInterface } from "../signer/BaseSignerInterface"
 import { ArgentSigner, LedgerSigner } from "../signer"
-import { Address, addressSchema, txVersionSchema } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
+import { addressSchema, txVersionSchema } from "@argent/x-shared"
 import { BaseStarknetAccount } from "./base"
 
 export class StarknetAccount extends BaseStarknetAccount {
@@ -43,7 +46,9 @@ export class StarknetAccount extends BaseStarknetAccount {
     payload: DeployAccountContractPayload,
     details: UniversalDetails = {},
   ): Promise<DeployContractResponse> {
-    const version = txVersionSchema.parse(details.version)
+    const version = txVersionSchema.parse(
+      details.version,
+    ) as constants.TRANSACTION_VERSION
     const signerDetails = await this.buildAccountDeploySignerDetailsPayload(
       payload,
       details,
@@ -91,7 +96,7 @@ export class StarknetAccount extends BaseStarknetAccount {
         ? transactionsDetail
         : abiOrDetails
     const transactions = Array.isArray(calls) ? calls : [calls]
-    const version = txVersionSchema.parse(details.version)
+    const version = this.getTxVersion(details)
     const signerDetails =
       await this.buildInvocationSignerDetailsPayload(details)
 
@@ -158,7 +163,7 @@ export class StarknetAccount extends BaseStarknetAccount {
     details: UniversalDetails = {},
   ): Promise<DeclareContractResponse> {
     const version = isSierra(payload.contract) // Means Cairo1 contract which supports txV2 and v3
-      ? txVersionSchema.parse(details.version)
+      ? this.getTxVersion(details)
       : constants.TRANSACTION_VERSION.V1 // Cairo0 contract which only supports txV1
 
     const signerDetails = await this.buildDeclareSignerDetailsPayload(

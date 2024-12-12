@@ -1,8 +1,9 @@
-import { Call, constants, num } from "starknet"
+import type { Call } from "starknet"
+import { constants, num } from "starknet"
 
 import { getMulticallForNetwork } from "../../multicall"
 import { networkService } from "../../network/service"
-import { BaseWalletAccount } from "../../wallet.model"
+import type { BaseWalletAccount } from "../../wallet.model"
 import { multicallWithCairo0Fallback } from "./multicallWithCairo0Fallback"
 
 export const getGuardianForAccount = async (

@@ -1,16 +1,9 @@
-import { B3, L2, P4, iconsDeprecated } from "@argent/x-ui"
-import {
-  Center,
-  Flex,
-  Img,
-  Spinner,
-  Text,
-  ThemingProps,
-  Tooltip,
-} from "@chakra-ui/react"
-import { FC, ReactNode } from "react"
+import { B3, icons, L2Bold, P3 } from "@argent/x-ui"
+import type { ThemingProps } from "@chakra-ui/react"
+import { Center, Flex, Img, Spinner, Text, Tooltip } from "@chakra-ui/react"
+import type { FC, ReactNode } from "react"
 
-const { InfoIcon, ChevronRightIcon } = iconsDeprecated
+const { InfoCircleSecondaryIcon, ChevronRightSecondaryIcon } = icons
 
 export interface FeeEstimationTextProps extends ThemingProps<"Flex"> {
   allowFeeTokenSelection?: boolean
@@ -48,13 +41,13 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
         <Flex flexDirection="column" gap={1}>
           <Flex alignItems="center" gap="5px" mr={2} flexShrink={0}>
             <Flex alignItems="center" justifyContent="center" gap="5px">
-              <P4
+              <P3
                 fontWeight="medium"
                 color={`${colorScheme}.300`}
                 noOfLines={1}
               >
                 {title}
-              </P4>
+              </P3>
             </Flex>
             {tooltipText && (
               <Tooltip label={tooltipText}>
@@ -65,12 +58,12 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
                   _hover={{ color: "white" }}
                   aria-label={`Information about ${title}`}
                 >
-                  <InfoIcon />
+                  <InfoCircleSecondaryIcon />
                 </Text>
               </Tooltip>
             )}
           </Flex>
-          {subtitle && <L2 color={`${colorScheme}.300`}>{subtitle}</L2>}
+          {subtitle && <L2Bold color={`${colorScheme}.300`}>{subtitle}</L2Bold>}
         </Flex>
         {isLoading ? (
           <Spinner size={"sm"} />
@@ -98,9 +91,9 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
                 </Flex>
               )}
               {secondaryText && (
-                <L2 cursor="inherit" color={`${colorScheme}.300`}>
+                <L2Bold cursor="inherit" color={`${colorScheme}.300`}>
                   {secondaryText}
-                </L2>
+                </L2Bold>
               )}
             </Flex>
             {allowFeeTokenSelection && (
@@ -115,7 +108,7 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
                 transitionProperty="common"
                 transitionDuration="fast"
               >
-                <ChevronRightIcon />
+                <ChevronRightSecondaryIcon />
               </Center>
             )}
           </Flex>

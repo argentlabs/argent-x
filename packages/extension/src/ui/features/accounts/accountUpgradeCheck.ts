@@ -1,13 +1,16 @@
 import { partition } from "lodash-es"
 
 import { isDeprecatedTxV0 } from "../../../shared/wallet.service"
-import { Network } from "../../../shared/network"
-import { BaseWalletAccount, WalletAccount } from "../../../shared/wallet.model"
+import type { Network } from "../../../shared/network"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
 import { useMemo } from "react"
 import { useWalletAccount } from "./accounts.state"
-import { Account } from "./Account"
+import type { Account } from "./Account"
 import { isEqualAddress } from "@argent/x-shared"
 
 export function checkIfUpgradeAvailable(
@@ -107,7 +110,7 @@ export const useCheckUpgradeAvailable = (account?: Account | WalletAccount) => {
 }
 
 export const useIsDeprecatedTxV0 = (account?: BaseWalletAccount) => {
-  const walletAccount = useWalletAccount(account)
+  const walletAccount = useWalletAccount(account?.id)
 
   return useMemo(() => {
     if (!walletAccount) {

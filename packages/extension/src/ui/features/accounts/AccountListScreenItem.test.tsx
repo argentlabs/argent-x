@@ -13,6 +13,7 @@ vi.mock("./useOnSettingsNavigate", () => {
 })
 describe("AccountListScreenItem", async () => {
   const account = {
+    accountId: "acc-id",
     accountName: "Account 1",
     accountAddress: "0x123",
     networkId: "sepolia-alpha",

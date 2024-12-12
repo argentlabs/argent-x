@@ -1,8 +1,8 @@
-import {
+import type {
   BaseTransaction,
   TransactionWithStatus,
 } from "../../../transactions/interface"
-import { IChainService } from "../IChainService"
+import type { IChainService } from "../IChainService"
 
 export class MockChainService implements IChainService {
   constructor(

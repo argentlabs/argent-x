@@ -1,19 +1,18 @@
 import urlJoin from "url-join"
-import { IHttpService } from "@argent/x-shared"
-import { INetworkService } from "../../network/service/INetworkService"
-import { ITokenService } from "../../token/__new/service/ITokenService"
+import type { IHttpService } from "@argent/x-shared"
+import type { INetworkService } from "../../network/service/INetworkService"
+import type { ITokenService } from "../../token/__new/service/ITokenService"
 import { urlWithQuery } from "../../utils/url"
+import type { SwapOrderResponse } from "../model/order.model"
 import {
   SwapOrderRequestSchema,
-  SwapOrderResponse,
   SwapOrderResponseSchema,
 } from "../model/order.model"
-import {
-  SwapQuoteResponse,
-  SwapQuoteResponseSchema,
-} from "../model/quote.model"
-import { Trade, TradeSchema } from "../model/trade.model"
-import { ISharedSwapService } from "./ISharedSwapService"
+import type { SwapQuoteResponse } from "../model/quote.model"
+import { SwapQuoteResponseSchema } from "../model/quote.model"
+import type { Trade } from "../model/trade.model"
+import { TradeSchema } from "../model/trade.model"
+import type { ISharedSwapService } from "./ISharedSwapService"
 import { SwapError } from "../../errors/swap"
 import { calculateTotalFee } from "../utils"
 import { ampli } from "../../analytics"
@@ -39,24 +38,31 @@ export class SharedSwapService implements ISharedSwapService {
   async getSwapQuoteForPay(
     payTokenAddress: string,
     receiveTokenAddress: string,
-    payAmount: string,
     accountAddress: string,
+    sellAmount?: string,
+    buyAmount?: string,
   ): Promise<SwapQuoteResponse> {
-    const quoteUrl = urlWithQuery(this.swapQuoteUrl, {
+    const queryParams: Record<string, string | number | undefined> = {
       chain: "starknet",
       currency: "USD",
       sellToken: payTokenAddress,
       buyToken: receiveTokenAddress,
-      sellAmount: payAmount,
       accountAddress,
-    })
+    }
+
+    if (sellAmount) {
+      queryParams.sellAmount = sellAmount
+    } else {
+      queryParams.buyAmount = buyAmount
+    }
+
+    const quoteUrl = urlWithQuery(this.swapQuoteUrl, queryParams)
 
     try {
       const response = await this.httpService.get(quoteUrl)
       const quoteResult = await SwapQuoteResponseSchema.parseAsync(response)
       return quoteResult
     } catch (error) {
-      console.error(error)
       ampli.swapQuoteFailed({
         "error type": `${error}` as any,
         "wallet platform": "browser extension",
@@ -135,8 +141,7 @@ export class SharedSwapService implements ISharedSwapService {
 
       const parsedResponse = await SwapOrderResponseSchema.parseAsync(response)
       return parsedResponse
-    } catch (error) {
-      console.error(error)
+    } catch {
       throw new SwapError({ code: "INVALID_SWAP_ORDER_RESPONSE" })
     }
   }

@@ -1,13 +1,14 @@
 import { ARGENT_EXPLORER_BASE_URL } from "../../../shared/api/constants"
 import { argentApiNetworkForNetwork } from "../../../shared/api/headers"
-import { Network } from "../../../shared/network"
-import { Transaction, compareTransactions } from "../../../shared/transactions"
+import type { Network } from "../../../shared/network"
+import type { Transaction } from "../../../shared/transactions"
+import { compareTransactions } from "../../../shared/transactions"
 import { urlWithQuery } from "../../../shared/utils/url"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { stripAddressZeroPadding } from "@argent/x-shared"
 import { fetchWithTimeout } from "../../utils/fetchWithTimeout"
 import { mapVoyagerTransactionToTransaction } from "../transformers"
-import { VoyagerTransaction } from "./voyager.model"
+import type { VoyagerTransaction } from "./voyager.model"
 
 export const fetchVoyagerTransactions = async (
   address: string,

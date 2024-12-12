@@ -1,11 +1,6 @@
-import {
-  Drawer,
-  DrawerContent,
-  DrawerOverlay,
-  DrawerProps,
-  Flex,
-} from "@chakra-ui/react"
-import { FC } from "react"
+import type { DrawerProps } from "@chakra-ui/react"
+import { Drawer, DrawerContent, DrawerOverlay, Flex } from "@chakra-ui/react"
+import type { FC } from "react"
 
 import { ResponsiveBox } from "./Responsive"
 

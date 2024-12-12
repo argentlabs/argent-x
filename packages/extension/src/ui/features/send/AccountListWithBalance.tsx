@@ -1,8 +1,7 @@
 import { CellStack } from "@argent/x-ui"
-import { FC } from "react"
-import { WalletAccount } from "../../../shared/wallet.model"
+import type { FC } from "react"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { AccountListItemWithBalance } from "../accounts/AccountListItemWithBalance"
-import { getAccountIdentifier } from "@argent/x-shared"
 
 interface AccountListWithBalanceProps {
   accounts: WalletAccount[]
@@ -16,7 +15,8 @@ const AccountListWithBalance: FC<AccountListWithBalanceProps> = ({
   <CellStack px={0} pt={4}>
     {accounts.map((account) => (
       <AccountListItemWithBalance
-        key={getAccountIdentifier(account)}
+        key={account.id}
+        accountId={account.id}
         account={account}
         avatarSize={9}
         accountAddress={account.address}

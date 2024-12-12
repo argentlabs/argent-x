@@ -22,7 +22,7 @@ export const getAllTokenBalancesProcedure = extensionOnlyProcedure
       ),
     )
     const account = { address: accountAddress, networkId }
-    const tokenBalances = await tokenService.getTokenBalancesForAccount(
+    const tokenBalances = await tokenService.getAllTokenBalancesForAccount(
       account,
       tokens,
     )

@@ -1,4 +1,4 @@
-import { Network } from "../src/shared/network"
+import type { Network } from "../src/shared/network"
 import {
   ETH_TOKEN_ADDRESS,
   STRK_TOKEN_ADDRESS,

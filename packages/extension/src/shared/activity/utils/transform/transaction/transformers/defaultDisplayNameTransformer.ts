@@ -1,7 +1,7 @@
 import { formatTruncatedAddress } from "@argent/x-shared"
 import { transactionNamesToTitle } from "../../../../../transactions"
 import { getCallsFromTransaction } from "../getCallsFromTransaction"
-import { ITransactionTransformer } from "./type"
+import type { ITransactionTransformer } from "./type"
 
 /** default displayName from calls */
 

@@ -11,5 +11,5 @@ export function useOnMountUnsafe(effect: EffectCallback, cleanup?: () => void) {
     }
 
     return cleanup
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 }

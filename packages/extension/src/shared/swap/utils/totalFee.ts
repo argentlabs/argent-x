@@ -1,6 +1,6 @@
 import { bigDecimal } from "@argent/x-shared"
-import { SwapQuoteResponse } from "../model/quote.model"
-import { Trade } from "../model/trade.model"
+import type { SwapQuoteResponse } from "../model/quote.model"
+import type { Trade } from "../model/trade.model"
 
 type TotalTradeFee = Pick<
   Trade,

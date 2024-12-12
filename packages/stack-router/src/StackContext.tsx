@@ -1,6 +1,5 @@
+import type { FC, PropsWithChildren } from "react"
 import {
-  FC,
-  PropsWithChildren,
   createContext,
   useCallback,
   useContext,
@@ -8,22 +7,18 @@ import {
   useMemo,
   useRef,
 } from "react"
-import {
-  Location,
-  useLocation,
-  useNavigate,
-  useNavigationType,
-} from "react-router-dom"
+import type { Location } from "react-router-dom"
+import { useLocation, useNavigate, useNavigationType } from "react-router-dom"
 
 import { getPresentationByPath } from "./presentation/getPresentationByPath"
 import { updateScreenStack } from "./presentation/screenStack"
 import { useStackRoutesConfig } from "./StackRoutesConfig"
-import {
+import type {
   DeclaredPresentationByPath,
   PresentationByPath,
-  PresentationDirection,
   ScreenProps,
 } from "./types"
+import { PresentationDirection } from "./types"
 import { isModalPresentation } from "./utils/is"
 
 interface StackContextProps {

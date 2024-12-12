@@ -1,5 +1,6 @@
-import { FC } from "react"
-import { Location, useLocation } from "react-router-dom"
+import type { FC } from "react"
+import type { Location } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 
 import { ReviewFeedbackScreen } from "./ReviewFeedbackScreen"
 import { ZENDESK_LINK } from "./constants"

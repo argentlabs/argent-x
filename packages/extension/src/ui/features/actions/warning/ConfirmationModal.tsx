@@ -1,4 +1,4 @@
-import { H5, P3 } from "@argent/x-ui"
+import { H4, P2 } from "@argent/x-ui"
 import {
   Button,
   Modal,
@@ -8,7 +8,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -26,15 +26,15 @@ export const ConfirmationModal: FC<ConfirmationModalProps> = ({
       <ModalOverlay bg="rgba(0, 0, 0, 0.5)" />
       <ModalContent color="text-primary" bg="surface-elevated" rounded="2xl">
         <ModalHeader>
-          <H5 fontWeight="600" textAlign="center">
+          <H4 fontWeight="600" textAlign="center">
             Dangerous transaction!
-          </H5>
+          </H4>
         </ModalHeader>
         <ModalBody>
-          <P3 fontWeight="400" textAlign="center">
+          <P2 fontWeight="400" textAlign="center">
             By confirming this transaction you are exposing your wallet to a
             serious risk
-          </P3>
+          </P2>
         </ModalBody>
 
         <ModalFooter flexDirection="column" gap="2">

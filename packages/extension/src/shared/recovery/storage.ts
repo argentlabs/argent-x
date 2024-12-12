@@ -1,6 +1,6 @@
 import { KeyValueStorage } from "../storage"
 import { adaptKeyValue } from "../storage/__new/keyvalue"
-import { IRecoveryStorage } from "./types"
+import type { IRecoveryStorage } from "./types"
 
 const keyValueStorage = new KeyValueStorage<IRecoveryStorage>(
   {

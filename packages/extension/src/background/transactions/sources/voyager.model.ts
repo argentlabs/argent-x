@@ -1,4 +1,7 @@
-import { TransactionExecutionStatus, TransactionFinalityStatus } from "starknet"
+import type {
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
+} from "starknet"
 
 export interface VoyagerTransaction {
   blockId: string

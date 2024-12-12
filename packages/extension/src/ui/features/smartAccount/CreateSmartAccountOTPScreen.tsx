@@ -1,7 +1,8 @@
-import { FC, useCallback } from "react"
+import type { FC } from "react"
+import { useCallback } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
-import { useRouteEmailAddress, useRouteFlow } from "../../hooks/useRoute"
+import { useRouteEmailAddress } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import { SmartAccountBaseOTPScreen } from "./SmartAccountBaseOTPScreen"
 

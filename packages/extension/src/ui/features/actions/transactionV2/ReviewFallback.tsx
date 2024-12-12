@@ -1,9 +1,10 @@
-import { P4, iconsDeprecated, CallDataModal } from "@argent/x-ui"
-import { Flex, FlexProps, useDisclosure } from "@chakra-ui/react"
-import { Call } from "starknet"
-import { FC } from "react"
+import { CallDataModal, icons, P3 } from "@argent/x-ui"
+import type { FlexProps } from "@chakra-ui/react"
+import { Flex, useDisclosure } from "@chakra-ui/react"
+import type { Call } from "starknet"
+import type { FC } from "react"
 
-const { AlertFillIcon } = iconsDeprecated
+const { WarningCirclePrimaryIcon } = icons
 
 interface ReviewFallbackProps extends FlexProps {
   calls: Call[]
@@ -26,10 +27,14 @@ export const ReviewFallback: FC<ReviewFallbackProps> = ({
         gap={2}
         marginBottom={4}
       >
-        <AlertFillIcon color="text-danger" fontSize="base" flexShrink={0} />
-        <P4 fontWeight="bold" color="text-danger">
+        <WarningCirclePrimaryIcon
+          color="text-danger"
+          fontSize="base"
+          flexShrink={0}
+        />
+        <P3 fontWeight="bold" color="text-danger">
           {message}
-        </P4>
+        </P3>
       </Flex>
       <CallDataModal
         calldata={calldata}

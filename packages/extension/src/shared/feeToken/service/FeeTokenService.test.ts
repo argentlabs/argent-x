@@ -1,9 +1,8 @@
 import "fake-indexeddb/auto"
-import { Mocked } from "vitest"
+import type { Mocked } from "vitest"
 
+import type { Address, IHttpService } from "@argent/x-shared"
 import {
-  Address,
-  IHttpService,
   TXV3_ACCOUNT_CLASS_HASH,
   ETH_TOKEN_ADDRESS,
   STRK_TOKEN_ADDRESS,
@@ -17,25 +16,36 @@ import {
   getMockTokenWithBalance,
 } from "../../../../test/token.mock"
 import { AccountService } from "../../account/service/accountService/AccountService"
-import { IAccountService } from "../../account/service/accountService/IAccountService"
+import type { IAccountService } from "../../account/service/accountService/IAccountService"
 import { StarknetChainService } from "../../chain/service/StarknetChainService"
 import { ArgentDatabase } from "../../idb/db"
-import { INetworkService } from "../../network/service/INetworkService"
+import type { INetworkService } from "../../network/service/INetworkService"
 import { NetworkService } from "../../network/service/NetworkService"
-import { INetworkRepo } from "../../network/store"
+import type { INetworkRepo } from "../../network/store"
 import {
   MockFnObjectStore,
   MockFnRepository,
 } from "../../storage/__new/__test__/mockFunctionImplementation"
 import { TokenService } from "../../token/__new/service/TokenService"
-import { ITransactionsRepository } from "../../transactions/store"
-import { FeeTokenPreference } from "../types/preference.model"
+import type { ITransactionsRepository } from "../../transactions/store"
+import type { FeeTokenPreference } from "../types/preference.model"
 import { FeeTokenService } from "./FeeTokenService"
+import { getMockSigner } from "../../../../test/account.mock"
+import { getAccountIdentifier } from "../../utils/accountIdentifier"
+import type { IPKManager } from "../../accountImport/pkManager/IPKManager"
+import { emitterMock } from "../../test.utils"
 
 const randomAddress1 = addressSchema.parse(stark.randomAddress())
 
+const randomId = getAccountIdentifier(
+  randomAddress1,
+  "sepolia-alpha",
+  getMockSigner(),
+)
+
 const BASE_INFO_ENDPOINT = "https://token.info.argent47.net/v1"
 const BASE_PRICES_ENDPOINT = "https://token.prices.argent47.net/v1"
+const BASE_TOKENS_REPORT_SPAM = "https://token.report-spam.argent47.net/v1"
 
 describe("FeeTokenService", () => {
   let tokenService: TokenService
@@ -47,6 +57,8 @@ describe("FeeTokenService", () => {
   let mockFeeTokenPreferenceStore: MockFnObjectStore<FeeTokenPreference>
   let db: ArgentDatabase
 
+  let mockPkManager: Mocked<IPKManager>
+
   beforeEach(() => {
     mockNetworkRepo = new MockFnRepository()
     mockTransactionsRepo = new MockFnRepository()
@@ -56,8 +68,18 @@ describe("FeeTokenService", () => {
     )
     const mockAccountRepo = new MockFnRepository()
     const chainService = new StarknetChainService(mockNetworkService)
+    mockPkManager = {
+      storeEncryptedKey: vi.fn(),
+      retrieveDecryptedKey: vi.fn(),
+      removeKey: vi.fn(),
+    } as Mocked<IPKManager>
     mockAccountService = vi.mocked<IAccountService>(
-      new AccountService(chainService, mockAccountRepo),
+      new AccountService(
+        emitterMock,
+        chainService,
+        mockAccountRepo,
+        mockPkManager,
+      ),
     )
     mockFeeTokenPreferenceStore = new MockFnObjectStore()
     mockFeeTokenPreferenceStore.get = vi.fn().mockResolvedValue({
@@ -76,6 +98,7 @@ describe("FeeTokenService", () => {
       mockHttpService,
       BASE_INFO_ENDPOINT,
       BASE_PRICES_ENDPOINT,
+      BASE_TOKENS_REPORT_SPAM,
     )
 
     feeTokenService = new FeeTokenService(
@@ -96,6 +119,7 @@ describe("FeeTokenService", () => {
       classHash: TXV3_ACCOUNT_CLASS_HASH as Address,
       address: randomAddress1,
       networkId: mockNetwork.id,
+      id: randomId,
     }
     const mockBaseTokens = [
       getMockBaseToken({ networkId: mockNetwork.id }),
@@ -174,6 +198,7 @@ describe("FeeTokenService", () => {
         ...token,
         account: {
           ...token.account,
+          id: randomId,
           address: stripAddressZeroPadding(token?.account?.address || ""),
         },
         address: stripAddressZeroPadding(token.address),
@@ -187,6 +212,7 @@ describe("FeeTokenService", () => {
       classHash: TXV3_ACCOUNT_CLASS_HASH as Address,
       address: randomAddress1,
       networkId: mockNetwork.id,
+      id: randomId,
     }
     const mockBaseTokens = [
       getMockBaseToken({ networkId: mockNetwork.id }),
@@ -251,6 +277,7 @@ describe("FeeTokenService", () => {
         ...token,
         account: {
           ...token.account,
+          id: randomId,
           address: stripAddressZeroPadding(token?.account?.address || ""),
         },
         address: stripAddressZeroPadding(token.address),
@@ -264,6 +291,7 @@ describe("FeeTokenService", () => {
       classHash: "0x123" as Address,
       address: randomAddress1,
       networkId: mockNetwork.id,
+      id: randomId,
     }
     const mockBaseTokens = [
       getMockBaseToken({ networkId: mockNetwork.id }),
@@ -311,6 +339,7 @@ describe("FeeTokenService", () => {
     expect(result).toEqual({
       ...mockTokens[0],
       account: {
+        id: randomId,
         address: stripAddressZeroPadding(mockAccount.address),
         networkId: mockTokens[0].networkId,
       },
@@ -325,6 +354,7 @@ describe("FeeTokenService", () => {
       classHash: TXV3_ACCOUNT_CLASS_HASH as Address,
       address: randomAddress1,
       networkId: mockNetwork.id,
+      id: randomId,
     }
     const mockBaseTokens = [
       getMockBaseToken({ networkId: mockNetwork.id }),
@@ -377,6 +407,7 @@ describe("FeeTokenService", () => {
       balance: mockTokensWithBalance[1].balance,
       address: stripAddressZeroPadding(mockTokens[1].address),
       account: {
+        id: randomId,
         address: stripAddressZeroPadding(mockAccount.address),
         networkId: mockTokens[1].networkId,
       },

@@ -1,5 +1,6 @@
-import { Circle, Flex, Image, ImageProps, SquareProps } from "@chakra-ui/react"
-import { FC } from "react"
+import type { ImageProps, SquareProps } from "@chakra-ui/react"
+import { Circle, Flex, Image } from "@chakra-ui/react"
+import type { FC } from "react"
 
 export interface AccountAvatarProps
   extends ImageProps,
@@ -23,14 +24,14 @@ export const AccountAvatar: FC<AccountAvatarProps> = ({
             top={0}
             size={size}
             borderWidth={"0.25rem"}
-            borderColor={"black"}
+            borderColor={"surface-default"}
           />
           <Circle
             position={"absolute"}
             top={0}
             size={size}
             borderWidth={"0.125rem"}
-            borderColor={"white"}
+            borderColor={"text-primary"}
           />
         </>
       )}

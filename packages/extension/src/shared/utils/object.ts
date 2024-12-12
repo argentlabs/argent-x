@@ -6,8 +6,8 @@ export const isEmptyValue = (value: any) => {
   const result = isString(value)
     ? value === ""
     : isObject(value)
-    ? Object.keys(value).length === 0
-    : value === undefined
+      ? Object.keys(value).length === 0
+      : value === undefined
   return result
 }
 

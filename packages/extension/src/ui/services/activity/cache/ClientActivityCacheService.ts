@@ -1,6 +1,6 @@
-import { messageClient } from "../../trpc"
-import { IActivityCacheService } from "../../../../shared/activity/cache/IActivityCacheService"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { messageClient } from "../../trpc"
+import type { IActivityCacheService } from "../../../../shared/activity/cache/IActivityCacheService"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 
 export class ClientActivityCacheService
   implements Pick<IActivityCacheService, "loadMore">
@@ -11,7 +11,11 @@ export class ClientActivityCacheService
     if (!account) {
       return
     }
-    const { address, networkId } = account
-    return this.trpcClient.activityCache.loadMore.mutate({ address, networkId })
+    const { id, address, networkId } = account
+    return this.trpcClient.activityCache.loadMore.mutate({
+      id,
+      address,
+      networkId,
+    })
   }
 }

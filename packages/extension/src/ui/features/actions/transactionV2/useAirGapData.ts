@@ -1,9 +1,8 @@
-import { BigNumberish, Call } from "starknet"
-import { BaseWalletAccount } from "../../../../shared/wallet.model"
-import { EstimatedFees } from "@argent/x-shared/simulation"
+import type { BigNumberish, Call } from "starknet"
+import type { BaseWalletAccount } from "../../../../shared/wallet.model"
+import type { EstimatedFees } from "@argent/x-shared/simulation"
 
 import useSWR from "swr"
-import { getAccountIdentifier } from "@argent/x-shared"
 import { clientTransactionReviewService } from "../../../services/transactionReview"
 import { useRef } from "react"
 
@@ -17,13 +16,7 @@ export const useAirGapData = (
   const cacheBust = useRef(Date.now())
   return useSWR(
     account
-      ? [
-          "getAirGapData",
-          cacheBust,
-          getAccountIdentifier(account),
-          transactions,
-          estimatedFees,
-        ]
+      ? ["getAirGapData", cacheBust, account.id, transactions, estimatedFees]
       : null,
     () =>
       account &&

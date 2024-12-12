@@ -1,4 +1,4 @@
-import { IKeyValueStorage } from "../../../shared/storage"
+import type { IKeyValueStorage } from "../../../shared/storage"
 import { atomWithSubscription } from "./atomWithSubscription"
 
 export const atomFromKeyValueStore = <

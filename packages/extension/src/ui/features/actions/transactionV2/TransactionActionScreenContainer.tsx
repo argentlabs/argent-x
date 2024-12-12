@@ -1,87 +1,102 @@
+import type { TokenWithBalance } from "@argent/x-shared"
 import {
-  Address,
   classHashSupportsTxV3,
   ensureArray,
   formatAddress,
   getMessageFromTrpcError,
+  getPrettyRpcError,
   getUint256CalldataFromBN,
   isEqualAddress,
   nonNullable,
   prettifyTokenNumber,
-  TokenWithBalance,
   transferCalldataSchema,
-  getPrettyRpcError,
 } from "@argent/x-shared"
-import { Divider, useDisclosure } from "@chakra-ui/react"
+import { useDisclosure } from "@chakra-ui/react"
 import { formatUnits } from "ethers"
 import { useAtom } from "jotai"
 import { isEmpty, isObject } from "lodash-es"
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { FC } from "react"
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { useNavigate } from "react-router-dom"
 import { z } from "zod"
 
 import {
   getErrorMessageAndLabelFromSimulation,
+  getHighestSeverity,
   isNotTransactionSimulationError,
   warningSchema,
-  getHighestSeverity,
 } from "@argent/x-shared/simulation"
-import { ActionScreenErrorFooter, Label, P4 } from "@argent/x-ui"
+import { ActionScreenErrorFooter, Label, P3 } from "@argent/x-ui"
 import {
   TransactionReviewActions,
   TransactionReviewSimulation,
 } from "@argent/x-ui/simulation"
-import { num } from "starknet"
+import { num, TransactionType } from "starknet"
 import { isTransactionActionItem } from "../../../../shared/actionQueue/types"
 import { ampli } from "../../../../shared/analytics"
 import { removeMultisigPendingTransactionOnRejectOnChain } from "../../../../shared/multisig/pendingTransactionsStore"
 import { MultisigTransactionType } from "../../../../shared/multisig/types"
-import { BaseToken } from "../../../../shared/token/__new/types/token.model"
+import type { BaseToken } from "../../../../shared/token/__new/types/token.model"
 import { equalToken } from "../../../../shared/token/__new/utils"
 import { DAPP_TRANSACTION_TITLE } from "../../../../shared/transactions/utils"
 import { routes } from "../../../../shared/ui/routes"
 import { isSafeUpgradeTransaction } from "../../../../shared/utils/isSafeUpgradeTransaction"
-import { ListSkeleton } from "../../../components/ScreenSkeleton"
+import { sanitizeAccountType } from "../../../../shared/utils/sanitizeAccountType"
 import { feeTokenService } from "../../../services/feeToken"
 import { clientTokenService } from "../../../services/tokens"
 import { userClickedAddFundsAtom } from "../../../views/actions"
+import { useView } from "../../../views/implementation/react"
+import { transactionHashFindAtom } from "../../../views/transactionHashes"
 import { useFeeTokenBalances } from "../../accountTokens/useFeeTokenBalance"
 import { maxFeeEstimateForTransfer } from "../../accountTokens/useMaxFeeForTransfer"
 import { RemovedMultisigWarningScreen } from "../../multisig/RemovedMultisigWarningScreen"
+import { AccountDetailsNavigationBarContainer } from "../../navigation/AccountDetailsNavigationBarContainer"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
 import { WithSmartAccountVerified } from "../../smartAccount/WithSmartAccountVerified"
+import { FeeEstimationBoxSkeleton } from "../feeEstimation/ui/FeeEstimationBox"
 import { FeeTokenPickerModal } from "../feeEstimation/ui/FeeTokenPickerModal"
 import { WaitingForFunds } from "../feeEstimation/ui/WaitingForFunds"
 import { useActionScreen } from "../hooks/useActionScreen"
 import { useLedgerForTransaction } from "../hooks/useLedgerForTransaction"
 import { useRejectDeployIfPresent } from "../hooks/useRejectDeployAction"
-import {
-  ConfirmScreen,
-  ConfirmScreenProps,
-} from "../transaction/ApproveTransactionScreen/ConfirmScreen"
+import type { ConfirmScreenProps } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
+import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmScreen"
 import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { LedgerActionModal } from "../transaction/ApproveTransactionScreen/ledger/LedgerActionModal"
+import { AirGapReviewButtonContainer } from "../transaction/airgap/AirGapReviewButton"
 import { useDefaultFeeToken } from "../useDefaultFeeToken"
 import { ConfirmationModal } from "../warning/ConfirmationModal"
 import { ReviewFooter } from "../warning/ReviewFooter"
 import { WarningBanner } from "../warning/WarningBanner"
-import { FeeEstimationContainerV2 } from "./FeeEstimationContainerV2"
+import { FeeEstimationContainer } from "./FeeEstimationContainer"
 import { ReviewFallback } from "./ReviewFallback"
+import {
+  TransactionActionScreenSekeleton,
+  TransactionReviewSkeleton,
+} from "./TransactionActionScreenSkeleton"
 import { TransactionHeader } from "./header"
-import { NavigationBarAccountDetailsContainer } from "./header/NavigationBarAccountDetailsContainer"
 import { useFeeTokenSelection } from "./useFeeTokenSelection"
 import { useMultisigActionScreen } from "./useMultisigActionScreen"
 import { useTransactionReviewV2 } from "./useTransactionReviewV2"
 import { getRelatedTokensFromReview } from "./utils/getAmpliPayloadFromReview"
 import { parseTransferTokenCall } from "./utils/parseTransferTokenCall"
-import { sanitizeAccountType } from "../../../../shared/utils/sanitizeAccountType"
-import { AirGapReviewButtonContainer } from "../transaction/airgap/AirGapReviewButton"
 
-export interface TransactionActionScreenContainerProps
-  extends ConfirmScreenProps {
+interface TransactionActionScreenContainerProps extends ConfirmScreenProps {
   transactionContext?: "STANDARD_EXECUTE" | "MULTISIG_ADD_SIGNATURE"
 }
 
+/**
+ * TransactionActionScreenContainerV2 component is responsible for handling the transaction action screen.
+ * It manages the state and logic for approving, rejecting, and reviewing transactions.
+ * It is only used for TRANSACTION (INVOKE) actions
+ */
 export const TransactionActionScreenContainer: FC<
   TransactionActionScreenContainerProps
 > = ({ ...rest }) => {
@@ -131,6 +146,8 @@ export const TransactionActionScreenContainer: FC<
   const feeTokePickerRef = useRef<HTMLDivElement>(null)
   const networkId = useCurrentNetwork().id
 
+  const txHash = useView(transactionHashFindAtom(action.meta.hash))
+
   const [hasSentTransactionReviewedEvent, setHasSentTransactionReviewedEvent] =
     useState(false)
 
@@ -141,12 +158,17 @@ export const TransactionActionScreenContainer: FC<
   const [isFeeTokenSelectionReady, setIsFeeTokenSelectionReady] =
     useState(false)
 
+  const transaction = {
+    type: TransactionType.INVOKE as const,
+    payload: action.payload.transactions,
+  }
+
   const {
     data: transactionReview,
     error,
     isValidating: transactionReviewLoading,
   } = useTransactionReviewV2({
-    calls: action.payload.transactions,
+    transaction,
     actionHash: action.meta.hash,
     feeTokenAddress: feeToken?.address,
     selectedAccount,
@@ -173,17 +195,26 @@ export const TransactionActionScreenContainer: FC<
 
   useEffect(() => {
     if (!transactionReviewLoading && !hasSentTransactionReviewedEvent) {
+      const errorMessageAndLabel =
+        getErrorMessageAndLabelFromSimulation(transactionReview)
+
+      const hasSimulationError = Boolean(
+        errorMessageAndLabel?.label || errorMessageAndLabel?.message,
+      )
+
       ampli.transactionReviewed({
         host: action.meta.origin,
-        "simulation succeeded": Boolean(transactionReview && !error),
+        "simulation succeeded":
+          Boolean(transactionReview) && !error && !hasSimulationError, // either the tx review request failed or the actual simulation failed
         "transaction type":
           action?.payload?.meta?.ampliProperties?.["transaction type"] ??
           "dapp",
+        "staking provider":
+          action?.payload?.meta?.ampliProperties?.["staking provider"],
         "wallet platform": "browser extension",
-        "simulation error message": error?.message,
+        "simulation error message": errorMessageAndLabel?.message,
         "simulation error label":
-          getPrettyRpcError(getMessageFromTrpcError(error)) ??
-          "Tx not executed",
+          errorMessageAndLabel?.label ?? "Tx not executed",
       })
       setHasSentTransactionReviewedEvent(true)
     }
@@ -232,10 +263,12 @@ export const TransactionActionScreenContainer: FC<
       // stay on error screen
     } else {
       await rejectDeployIfPresent()
-      closePopupIfLastAction()
-      if (location.pathname === routes.swap()) {
-        navigate(routes.accountActivity())
+
+      if (location.pathname.includes(routes.swapToken())) {
+        navigate(routes.accountTokens())
       }
+
+      closePopupIfLastAction()
     }
   }, [
     approve,
@@ -255,23 +288,21 @@ export const TransactionActionScreenContainer: FC<
     void updateTransactionReview(transactionReview)
   }, [transactionReview, updateTransactionReview])
 
-  const loadingOrErrorState = useMemo(() => {
-    if (error) {
-      console.warn("error", error)
-      const defaultMessage =
-        "Failed to load transaction details and fraud warnings. Transaction not executed."
-      return (
-        <ReviewFallback
-          calls={ensureArray(action.payload.transactions)}
-          message={defaultMessage}
-        />
-      )
+  const transactionReviewSimulationError = useMemo(() => {
+    const errorMessageAndLabel =
+      getErrorMessageAndLabelFromSimulation(transactionReview)
+    if (!errorMessageAndLabel) {
+      return null
     }
-    if (!transactionReview) {
-      return <ListSkeleton px={0} />
-    }
-    return null
-  }, [action.payload.transactions, error, transactionReview])
+    const { label, message } = errorMessageAndLabel
+
+    return (
+      <ActionScreenErrorFooter
+        title={<Label prefix="Tx not executed:" label={label} />}
+        errorMessage={message}
+      />
+    )
+  }, [transactionReview])
 
   const customErrorFooter = useMemo(() => {
     if (!error) {
@@ -290,28 +321,39 @@ export const TransactionActionScreenContainer: FC<
     return <ActionScreenErrorFooter title={title} errorMessage={message} />
   }, [error])
 
-  const transactionReviewSimulationError = useMemo(() => {
-    const errorMessageAndLabel =
-      getErrorMessageAndLabelFromSimulation(transactionReview)
-    if (!errorMessageAndLabel) {
+  const loadingOrErrorState = useMemo(() => {
+    if (error) {
+      console.warn("error", error)
+      const defaultMessage =
+        "Failed to load transaction details and fraud warnings. Transaction not executed."
+      return (
+        <ReviewFallback
+          calls={ensureArray(action.payload.transactions)}
+          message={defaultMessage}
+        />
+      )
+    }
+    if (transactionReviewSimulationError) {
       return null
     }
-    const { label, message } = errorMessageAndLabel
-
-    return (
-      <ActionScreenErrorFooter
-        title={<Label prefix="Tx not executed:" label={label} />}
-        errorMessage={message}
-      />
-    )
-  }, [transactionReview])
+    if (!transactionReview || !isFeeTokenSelectionReady) {
+      return <TransactionReviewSkeleton px={0} />
+    }
+    return null
+  }, [
+    action.payload.transactions,
+    error,
+    isFeeTokenSelectionReady,
+    transactionReview,
+    transactionReviewSimulationError,
+  ])
 
   const rejectOnChainBanner = useMemo(() => {
     if (!isRejectOnChain) {
       return null
     }
     return (
-      <P4
+      <P3
         background={"black"}
         border={"1px solid"}
         borderColor={"neutrals.600"}
@@ -322,7 +364,7 @@ export const TransactionActionScreenContainer: FC<
         On-chain rejections don’t send any funds. Executing this on-chain
         rejection will allow the next queued transaction to move to the front of
         the queue
-      </P4>
+      </P3>
     )
   }, [isRejectOnChain])
 
@@ -341,7 +383,7 @@ export const TransactionActionScreenContainer: FC<
       return null
     }
 
-    const txSimulations = transactionReview.transactions.flatMap(
+    const txSimulations = transactionReview.transactions?.flatMap(
       (transaction) =>
         isNotTransactionSimulationError(transaction)
           ? transaction.simulation
@@ -355,7 +397,7 @@ export const TransactionActionScreenContainer: FC<
 
     // don't show 'no balance change' when there is a critical warning as the two messages conflict from a user perspective
     const hasNoBalanceChange = isEmpty(lastSimulation.summary)
-    const hasCriticalWarning = transactionReview.transactions.some(
+    const hasCriticalWarning = transactionReview.transactions?.some(
       (transaction) =>
         transaction.reviewOfTransaction?.warnings?.some(
           (warning) => warning.severity === "critical",
@@ -366,18 +408,30 @@ export const TransactionActionScreenContainer: FC<
       return null
     }
 
+    if (
+      !hasCriticalWarning &&
+      action.meta.investment?.stakingAction === "initiateWithdraw"
+    ) {
+      return null
+    }
+
     return (
       <TransactionReviewSimulation
         simulation={lastSimulation}
         networkId={networkId}
       />
     )
-  }, [transactionReview, isRejectOnChain, networkId])
+  }, [
+    transactionReview,
+    isRejectOnChain,
+    action.meta.investment?.stakingAction,
+    networkId,
+  ])
 
   const transactionReviewActions = useMemo(() => {
     if (isRejectOnChain) {
       return (
-        <P4
+        <P3
           background={"neutrals.800"}
           borderRadius={"md"}
           fontWeight={"semibold"}
@@ -386,22 +440,25 @@ export const TransactionActionScreenContainer: FC<
           p={3}
         >
           On-chain rejection
-        </P4>
+        </P3>
       )
     }
-    return transactionReview?.transactions.map((transaction, index) => {
-      return (
-        <TransactionReviewActions
-          key={`review-${index}`}
-          reviewOfTransaction={transaction.reviewOfTransaction}
-          initiallyExpanded={false}
-          networkId={networkId}
-        />
-      )
-    })
+    const actions = transactionReview?.transactions?.map(
+      (transaction, index) => {
+        return (
+          <TransactionReviewActions
+            key={`review-${index}`}
+            reviewOfTransaction={transaction.reviewOfTransaction}
+            initiallyExpanded={false}
+            networkId={networkId}
+          />
+        )
+      },
+    )
+    return actions
   }, [isRejectOnChain, networkId, transactionReview?.transactions])
 
-  const warnings = transactionReview?.transactions.flatMap((transaction) => {
+  const warnings = transactionReview?.transactions?.flatMap((transaction) => {
     return transaction.reviewOfTransaction?.warnings
   })
 
@@ -454,12 +511,8 @@ export const TransactionActionScreenContainer: FC<
     [transactionReview, action.payload.transactions],
   )
 
-  const navigationBar = (
-    <>
-      <NavigationBarAccountDetailsContainer />
-      <Divider color="neutrals.700" />
-    </>
-  )
+  const navigationBar = <AccountDetailsNavigationBarContainer />
+
   const actionIsApproving = Boolean(action.meta.startedApproving)
 
   const onSubmitWithLedger = async () => {
@@ -518,8 +571,7 @@ export const TransactionActionScreenContainer: FC<
           const { recipient, tokenAddress } = transferTokenCall
           const balance = await clientTokenService.fetchTokenBalance(
             transferToken.address,
-            selectedAccount.address as Address,
-            selectedAccount.networkId,
+            selectedAccount,
           )
 
           const deductMaxFeeFromMaxAmount = isEqualAddress(
@@ -605,30 +657,33 @@ export const TransactionActionScreenContainer: FC<
   ) : customErrorFooter ? (
     customErrorFooter
   ) : (
-    <WithActionScreenErrorFooter isTransaction>
-      {isHighRisk && <ReviewFooter />}
-      {selectedAccount &&
+    <Suspense fallback={<FeeEstimationBoxSkeleton />}>
+      <WithActionScreenErrorFooter isTransaction>
+        {isHighRisk && <ReviewFooter />}
+        {selectedAccount &&
         transactionReview?.enrichedFeeEstimation &&
-        isFeeTokenSelectionReady && (
-          <FeeEstimationContainerV2
+        isFeeTokenSelectionReady ? (
+          <FeeEstimationContainer
             onErrorChange={setDisableConfirm}
             onFeeErrorChange={onShowAddFunds}
-            transactionSimulationLoading={transactionReviewLoading}
             fee={transactionReview.enrichedFeeEstimation}
             feeToken={feeToken}
-            networkId={selectedAccount.networkId}
-            accountAddress={selectedAccount.address}
+            accountId={selectedAccount.id}
             needsDeploy={selectedAccount.needsDeploy}
             onOpenFeeTokenPicker={() => setIsFeeTokenPickerOpen(true)}
             allowFeeTokenSelection={allowFeeTokenSelection}
+            transactionSimulationLoading={transactionReviewLoading}
             error={error}
             isSendingMoreThanBalanceAndGas={
               transactionReview?.isSendingMoreThanBalanceAndGas
             }
           />
+        ) : (
+          <FeeEstimationBoxSkeleton />
         )}
-      {transactionReviewSimulationError}
-    </WithActionScreenErrorFooter>
+        {transactionReviewSimulationError}
+      </WithActionScreenErrorFooter>
+    </Suspense>
   )
 
   if (multisig && !signerIsInMultisig) {
@@ -640,19 +695,29 @@ export const TransactionActionScreenContainer: FC<
   }
 
   const confirmButtonText =
-    hasInsufficientFunds && !userClickedAddFunds ? "Add funds" : "Confirm"
+    hasInsufficientFunds && !userClickedAddFunds
+      ? "Add funds"
+      : isRejectOnChain
+        ? "Confirm rejection"
+        : "Confirm"
+
+  const rejectButtonText = isRejectOnChain ? "Cancel" : "Reject"
 
   const confirmButtonDisabled =
     disableConfirm || (isHighRisk && !hasAcceptedRisk) || disableLedgerApproval
 
   return (
-    <WithSmartAccountVerified transactions={action.payload.transactions}>
+    <WithSmartAccountVerified
+      transactions={action.payload.transactions}
+      fallback={<TransactionActionScreenSekeleton action={action} />}
+    >
       <ConfirmScreen
         navigationBar={navigationBar}
         confirmButtonIsLoading={actionIsApproving}
         confirmButtonDisabled={confirmButtonDisabled}
         confirmButtonText={confirmButtonText}
-        onSubmit={onSubmitWithChecks}
+        rejectButtonText={rejectButtonText}
+        onSubmit={() => void onSubmitWithChecks()}
         showHeader={true}
         onReject={onReject}
         footer={footer}
@@ -664,30 +729,32 @@ export const TransactionActionScreenContainer: FC<
           px={0}
           title={action.meta?.title}
           dappLogoUrl={
-            transactionReview?.transactions[0]?.reviewOfTransaction
+            transactionReview?.transactions?.[0]?.reviewOfTransaction
               ?.targetedDapp?.logoUrl
           }
           subtitle={action.meta?.subtitle ?? action.meta.origin}
           dappHost={action.meta.origin}
           iconKey={action.meta?.icon}
         />
-        {rejectOnChainBanner}
-        {multisigBanner}
-        {isFeeTokenSelectionReady && (
-          <>
-            {transactionReviewFallback}
-            {transactionReviewWarnings}
-            {transactionReviewSimulation}
-            {transactionReviewActions}
-            <AirGapReviewButtonContainer
-              selectedAccount={selectedAccount}
-              transactions={action.payload.transactions}
-              estimatedFees={transactionReview?.enrichedFeeEstimation}
-              nonce={rejectOnChainNonce}
-            />
-          </>
-        )}
-        {loadingOrErrorState}
+        <Suspense fallback={<TransactionReviewSkeleton px={0} />}>
+          {rejectOnChainBanner}
+          {multisigBanner}
+          {isFeeTokenSelectionReady && (
+            <>
+              {transactionReviewFallback}
+              {transactionReviewWarnings}
+              {transactionReviewSimulation}
+              {transactionReviewActions}
+              <AirGapReviewButtonContainer
+                selectedAccount={selectedAccount}
+                transactions={action.payload.transactions}
+                estimatedFees={transactionReview?.enrichedFeeEstimation}
+                nonce={rejectOnChainNonce}
+              />
+            </>
+          )}
+          {loadingOrErrorState}
+        </Suspense>
       </ConfirmScreen>
       <ConfirmationModal
         isOpen={isConfirmationModalOpen}
@@ -701,7 +768,7 @@ export const TransactionActionScreenContainer: FC<
         }}
         tokens={feeTokens}
         initialFocusRef={feeTokePickerRef}
-        onFeeTokenSelect={setPreferredFeeToken}
+        onFeeTokenSelect={(token) => void setPreferredFeeToken(token)}
       />
       {isLedgerSigner && transactionReview?.enrichedFeeEstimation && (
         <LedgerActionModal
@@ -709,10 +776,7 @@ export const TransactionActionScreenContainer: FC<
           onClose={onLedgerApprovalClose}
           onSubmit={onSubmit}
           errorMessage={ledgerErrorMessage}
-          account={selectedAccount}
-          transactions={action.payload.transactions}
-          estimatedFees={transactionReview.enrichedFeeEstimation}
-          nonce={rejectOnChainNonce}
+          txHash={txHash}
         />
       )}
     </WithSmartAccountVerified>

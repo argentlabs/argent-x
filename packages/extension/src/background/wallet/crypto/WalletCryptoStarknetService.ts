@@ -1,61 +1,80 @@
+import type { Hex, Implementation } from "@argent/x-shared"
 import {
-  Hex,
-  Implementation,
+  decodeBase58Array,
+  ensureArray,
   findImplementationForAccount,
+  getLatestArgentAccountClassHash,
   hexSchema,
 } from "@argent/x-shared"
-import { CairoVersion, CallData, hash } from "starknet"
+import type { CairoVersion } from "starknet"
+import { CallData, hash } from "starknet"
 import { withHiddenSelector } from "../../../shared/account/selectors"
-import { PendingMultisig } from "../../../shared/multisig/types"
-import {
-  WalletAccount,
-  BaseWalletAccount,
-  BaseMultisigWalletAccount,
-  ArgentAccountType,
-  SignerType,
-  WalletAccountSigner,
-  CreateAccountType,
-} from "../../../shared/wallet.model"
-import {
-  getIndexForPath,
-  getNextPathIndex,
-  getPathForIndex,
-} from "../../../shared/utils/derivationPath"
-import { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import type { WalletAccountSharedService } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
+import { C0_PROXY_CONTRACT_CLASS_HASHES } from "../../../shared/account/starknet.constants"
+import { AccountError } from "../../../shared/errors/account"
+import { SessionError } from "../../../shared/errors/session"
+import type { ILedgerSharedService } from "../../../shared/ledger/service/ILedgerSharedService"
+import type { PendingMultisig } from "../../../shared/multisig/types"
 import { getMultisigAccountFromBaseWallet } from "../../../shared/multisig/utils/baseMultisig"
-import type { WalletSession } from "../session/walletSession.model"
-import { Network } from "../../../shared/network"
+import type { Network } from "../../../shared/network"
+import { ArgentSigner } from "../../../shared/signer/ArgentSigner"
+import type { BaseSignerInterface } from "../../../shared/signer/BaseSignerInterface"
 import {
-  getPreDeployedAccount,
-  declareContracts,
-} from "../../devnet/declareAccounts"
-import { LoadContracts } from "../loadContracts"
-import {
+  getBaseDerivationPath,
+  getDerivationPathForIndex,
+} from "../../../shared/signer/utils"
+import type {
   IObjectStore,
   IRepository,
 } from "../../../shared/storage/__new/interface"
 import {
-  decodeBase58Array,
-  getLatestArgentAccountClassHash,
-} from "@argent/x-shared"
-import { SessionError } from "../../../shared/errors/session"
-import { AccountError } from "../../../shared/errors/account"
-import { C0_PROXY_CONTRACT_CLASS_HASHES } from "../../../shared/account/starknet.constants"
-import { ArgentSigner } from "../../../shared/signer/ArgentSigner"
-import { BaseSignerInterface } from "../../../shared/signer/BaseSignerInterface"
-import { getBaseDerivationPath } from "../../../shared/signer/utils"
-import { ILedgerSharedService } from "../../../shared/ledger/service/ILedgerSharedService"
+  getIndexForPath,
+  getPathForIndex,
+} from "../../../shared/utils/derivationPath"
+import type {
+  AccountId,
+  ArgentAccountType,
+  BaseMultisigWalletAccount,
+  BaseWalletAccount,
+  CreateAccountType,
+  WalletAccount,
+  WalletAccountType,
+} from "../../../shared/wallet.model"
+import { SignerType } from "../../../shared/wallet.model"
+import {
+  declareContracts,
+  getPreDeployedAccount,
+} from "../../devnet/declareAccounts"
+import type { LoadContracts } from "../loadContracts"
+import type { WalletSession } from "../session/walletSession.model"
+import { PrivateKeySigner } from "../../../shared/signer/PrivateKeySigner"
+import { deserializeAccountIdentifier } from "../../../shared/utils/accountIdentifier"
+import type { IPKManager } from "../../../shared/accountImport/pkManager/IPKManager"
+import memoize, { type Memoized } from "memoizee"
+
 const { getSelectorFromName, calculateContractAddressFromHash } = hash
 
+type PublicKeyGetter = (
+  account: WalletAccount,
+) => Promise<{ publicKey: string; account: WalletAccount }>
+
 export class WalletCryptoStarknetService {
+  private memoizedGetPublicKey: PublicKeyGetter & Memoized<PublicKeyGetter>
+
   constructor(
     private readonly walletStore: IRepository<WalletAccount>,
     private readonly sessionStore: IObjectStore<WalletSession | null>,
     private readonly pendingMultisigStore: IRepository<PendingMultisig>,
     private readonly accountSharedService: WalletAccountSharedService,
     private readonly ledgerService: ILedgerSharedService,
+    private readonly pkManager: IPKManager,
     private readonly loadContracts: LoadContracts,
-  ) {}
+  ) {
+    this.memoizedGetPublicKey = memoize(this._getPublicKey.bind(this), {
+      promise: true,
+      normalizer: ([account]) => account.id,
+    })
+  }
 
   public async getArgentPubKeyByDerivationPath(derivationPath: string) {
     const session = await this.sessionStore.get()
@@ -66,10 +85,6 @@ export class WalletCryptoStarknetService {
     return signer.getPubKey()
   }
 
-  public getLedgerPubKeyByDerivationPath(derivationPath: string) {
-    return this.ledgerService.getPubKey(derivationPath)
-  }
-
   public getPubKeyByDerivationPathForSigner(
     signerType: SignerType,
     derivationPath: string,
@@ -78,46 +93,54 @@ export class WalletCryptoStarknetService {
       case SignerType.LOCAL_SECRET:
         return this.getArgentPubKeyByDerivationPath(derivationPath)
       case SignerType.LEDGER:
-        return this.getLedgerPubKeyByDerivationPath(derivationPath)
+        return this.ledgerService.getPubKey(derivationPath)
       default:
         throw new Error(`Unsupported signer type: ${signerType}`)
     }
   }
 
-  public getSignerForAccount(account: WalletAccount) {
-    return this.getSigner(account.signer)
+  public getSignerForAccount({ id, type }: Pick<WalletAccount, "id" | "type">) {
+    return this.getSigner(id, type)
   }
 
   public async getSigner(
-    signer: WalletAccountSigner,
+    accountId: AccountId,
+    type: WalletAccountType,
   ): Promise<BaseSignerInterface> {
     const session = await this.sessionStore.get()
     if (!session?.secret) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
-
-    const { type, derivationPath } = signer
-
-    switch (type) {
+    const { signer } = deserializeAccountIdentifier(accountId)
+    const derivationPath = getDerivationPathForIndex(
+      signer.index,
+      signer.type,
+      type,
+    )
+    switch (signer.type) {
       case SignerType.LOCAL_SECRET:
         return new ArgentSigner(session.secret, derivationPath)
       case SignerType.LEDGER:
         return this.ledgerService.getSigner(derivationPath)
+      case SignerType.PRIVATE_KEY: {
+        const pk = await this.pkManager.retrieveDecryptedKey(
+          session.password,
+          accountId,
+        )
+        return new PrivateKeySigner(pk)
+      }
       default:
         throw new Error("Unsupported signer type")
     }
   }
 
-  public async getPrivateKey(
-    baseWalletAccount: BaseWalletAccount,
-  ): Promise<string> {
+  public async getPrivateKey(accountId: AccountId): Promise<string> {
     const session = await this.sessionStore.get()
     if (session === null || !session?.secret) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
 
-    const account =
-      await this.accountSharedService.getAccount(baseWalletAccount)
+    const account = await this.accountSharedService.getAccount(accountId)
 
     if (!account) {
       throw new AccountError({ code: "NOT_SELECTED" })
@@ -128,21 +151,16 @@ export class WalletCryptoStarknetService {
     return signer.getPrivateKey()
   }
 
-  public async getPublicKey(
-    baseAccount?: BaseWalletAccount,
-  ): Promise<{ publicKey: string; account: BaseWalletAccount }> {
-    const account = baseAccount
-      ? await this.accountSharedService.getAccount(baseAccount)
+  public async getPublicKey(accountId?: string) {
+    const account = accountId
+      ? await this.accountSharedService.getAccount(accountId)
       : await this.accountSharedService.getSelectedAccount()
 
     if (!account) {
       throw new AccountError({ code: "NOT_SELECTED" })
     }
 
-    const signer = await this.getSignerForAccount(account)
-    const publicKey = await signer.getPubKey()
-
-    return { publicKey, account }
+    return this.memoizedGetPublicKey(account)
   }
 
   /**
@@ -176,23 +194,36 @@ export class WalletCryptoStarknetService {
       ...pendingMultisigs,
     ]
 
-    const currentPaths = accountsOrPendingMultisigs
-      .filter(
-        (account) =>
-          account.signer.type === signerType && account.networkId === networkId,
+    const derivationPathsBySignerType = accountsOrPendingMultisigs
+      .filter((account) => account.networkId === networkId)
+      .reduce(
+        (acc, account) => {
+          const { type, derivationPath } = account.signer
+
+          if (!acc[type]) {
+            acc[type] = []
+          }
+
+          acc[type].push(derivationPath)
+          return acc
+        },
+        {} as Record<SignerType, string[]>,
       )
-      .map((account) => account.signer.derivationPath)
 
     const baseDerivationPath = getBaseDerivationPath(accountType, signerType)
-    const usedIndices = currentPaths.map((path) =>
-      getIndexForPath(path, baseDerivationPath),
-    )
-    const nextIndex = getNextPathIndex(currentPaths, baseDerivationPath)
+    const usedIndices = ensureArray(
+      derivationPathsBySignerType[signerType],
+    ).map((path) => getIndexForPath(path, baseDerivationPath))
+
+    // We consider all signers when determining the next available index to ensure that any changes in signers are accounted for, preventing the reuse of an index linked to a previously assigned address, which would result in a duplicate.
+    const nextIndex = accountsOrPendingMultisigs.length
+
     const path = getPathForIndex(nextIndex, baseDerivationPath)
 
     switch (signerType) {
       case SignerType.LOCAL_SECRET: {
         const publicKey = await this.getArgentPubKeyByDerivationPath(path)
+
         return {
           index: nextIndex,
           derivationPath: path,
@@ -208,7 +239,6 @@ export class WalletCryptoStarknetService {
             usedIndices,
             networkId,
           )
-
         return {
           index,
           derivationPath: getPathForIndex(index, baseDerivationPath),
@@ -294,7 +324,9 @@ export class WalletCryptoStarknetService {
   public async getUndeployedAccountCairoVersion(
     baseAccount: BaseWalletAccount,
   ): Promise<CairoVersion> {
-    const account = await this.accountSharedService.getAccount(baseAccount)
+    const account = await this.accountSharedService.getArgentAccount(
+      baseAccount.id,
+    )
 
     if (!account) {
       throw new AccountError({ code: "NOT_FOUND" })
@@ -312,7 +344,7 @@ export class WalletCryptoStarknetService {
       return "1" // multisig is always Cairo 1
     }
 
-    const { publicKey } = await this.getPublicKey(account)
+    const { publicKey } = await this.getPublicKey(account.id)
 
     // If no class hash is provided by the account, we want to add the network implementation to check
     const networkImplementation: Implementation = {
@@ -349,7 +381,7 @@ export class WalletCryptoStarknetService {
       throw new AccountError({ code: "MULTISIG_NOT_FOUND" })
     }
 
-    const { publicKey } = await this.getPublicKey(multisigAccount)
+    const { publicKey } = await this.getPublicKey(multisigAccount.id)
 
     const accountClassHash =
       multisigAccount.classHash ??
@@ -381,5 +413,11 @@ export class WalletCryptoStarknetService {
       deployMultisigPayload.constructorCalldata,
       0,
     )
+  }
+
+  private async _getPublicKey(account: WalletAccount) {
+    const signer = await this.getSignerForAccount(account)
+    const publicKey = await signer.getPubKey()
+    return { publicKey, account }
   }
 }

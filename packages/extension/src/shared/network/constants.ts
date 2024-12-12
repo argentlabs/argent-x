@@ -1,15 +1,18 @@
-import { PublicRpcNode } from "./type"
+import type { PublicRpcNode } from "./type"
 
 export const ETH_TOKEN_ADDRESS =
   "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
 export const STRK_TOKEN_ADDRESS =
   "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
 
+export const USDC_TOKEN_ADDRESS =
+  "0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8"
+
 export const STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH =
   "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2"
 
 export const STANDARD_DEVNET_ACCOUNT_CLASS_HASH =
-  "0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f"
+  "0x61dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f"
 
 export const PLUGIN_ACCOUNT_CLASS_HASH =
   "0x4ee23ad83fb55c1e3fac26e2cd951c60abf3ddc851caa9a7fbb9f5eddb2091"

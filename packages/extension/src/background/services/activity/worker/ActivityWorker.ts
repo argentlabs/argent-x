@@ -11,20 +11,28 @@ import type {
 } from "../../../../shared/notifications/INotificationService"
 import { routes } from "../../../../shared/ui/routes"
 import { starknetNetworkToNetworkId } from "../../../../shared/utils/starknetNetwork"
+
 import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 import type { IActivityService } from "../IActivityService"
+import type { IAccountService } from "../../../../shared/account/service/accountService/IAccountService"
+import type { TransactionTrackerWorker } from "../../transactionTracker/worker/TransactionTrackerWorker"
+import { TransactionStatusChanged } from "../../transactionTracker/worker/TransactionTrackerWorker"
 import {
-  TransactionStatusChanged,
-  TransactionTrackerWorker,
-} from "../../transactionTracker/worker/TransactionTrackerWorker"
-import { Activity } from "@argent/x-shared/simulation"
-import { IActivityCacheService } from "../../../../shared/activity/cache/IActivityCacheService"
-import { argentDb } from "../../../../shared/idb/db"
+  isRejectOnChainActivity,
+  type Activity,
+} from "@argent/x-shared/simulation"
+import type { IActivityCacheService } from "../../../../shared/activity/cache/IActivityCacheService"
+import { argentDb } from "../../../../shared/idb/argentDb"
 import { equalToken } from "../../../../shared/token/__new/utils"
+import { delay } from "../../../../shared/utils/delay"
+
+// We poll activities instantly after a transaction status change, then we try 2*500ms and 3*1s intervals
+const DELAYS = [...Array(2).fill(500), ...Array(3).fill(1000)]
 
 export class ActivityWorker {
   constructor(
     private readonly activityService: IActivityService,
+    private readonly accountService: IAccountService,
     private readonly notificationService: INotificationService,
     private readonly activityCacheService: IActivityCacheService,
     private readonly transactionTrackerWorker: TransactionTrackerWorker,
@@ -39,6 +47,10 @@ export class ActivityWorker {
     activity: Activity,
     account: BaseWalletAccount,
   ) {
+    if (isRejectOnChainActivity(activity)) {
+      return "On-chain reject"
+    }
+
     const title = activity.title || ""
 
     if (activity.details.type !== "payment") {
@@ -76,15 +88,12 @@ export class ActivityWorker {
   }
 
   private async sendActivityNotification(activity: Activity) {
-    if (!activity.networkDetails) {
+    const account = await this.makeAccountFromActivity(activity)
+
+    if (!account) {
       return
     }
-    const account: BaseWalletAccount = {
-      address: activity.wallet,
-      networkId: starknetNetworkToNetworkId(
-        activity.networkDetails.ethereumNetwork,
-      ),
-    }
+
     const hash = activity.transaction.hash
     const id = this.notificationService.makeId({ hash, account })
     if (this.notificationService.hasShown(id)) {
@@ -128,21 +137,71 @@ export class ActivityWorker {
     )
   }
 
+  private async getActivitiesForTransactions(transactions: string[]) {
+    const activities =
+      await this.activityService.updateSelectedAccountActivities()
+    return ensureArray(activities).filter((activity) =>
+      transactions.some((transaction) =>
+        isEqualAddress(activity.transaction.hash, transaction),
+      ),
+    )
+  }
+
+  private async pollForActivities(transactions: string[]) {
+    for (const delayMs of DELAYS) {
+      await delay(delayMs)
+      const newActivities =
+        await this.getActivitiesForTransactions(transactions)
+      if (newActivities.length > 0) {
+        return newActivities
+      }
+    }
+    return []
+  }
+
   async onTransactionStatusChanged({
     transactions,
   }: {
     transactions: string[]
   }) {
-    const activities =
-      await this.activityService.updateSelectedAccountActivities()
-    const newActivities = ensureArray(activities).filter((activity) =>
-      transactions.some((transaction) =>
-        isEqualAddress(activity.transaction.hash, transaction),
-      ),
-    )
+    let newActivities = await this.getActivitiesForTransactions(transactions)
+
+    if (newActivities.length === 0) {
+      newActivities = await this.pollForActivities(transactions)
+    }
 
     await Promise.all(
       newActivities.map((activity) => this.sendActivityNotification(activity)),
     )
+  }
+
+  private async makeAccountFromActivity(activity: Activity) {
+    if (!activity.networkDetails) {
+      return
+    }
+
+    const network = starknetNetworkToNetworkId(
+      activity.networkDetails.ethereumNetwork,
+    )
+
+    const accounts = await this.accountService.get()
+
+    // TODO: Find a better way to get the account
+    const maybeAccount = accounts.find(
+      (account) =>
+        isEqualAddress(account.address, activity.wallet) &&
+        account.networkId === network,
+    )
+
+    if (!maybeAccount) {
+      console.error("Account not found")
+      return
+    }
+
+    return {
+      id: maybeAccount.id,
+      address: maybeAccount.address,
+      networkId: maybeAccount.networkId,
+    }
   }
 }

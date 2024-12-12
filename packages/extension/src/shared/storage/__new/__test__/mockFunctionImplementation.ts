@@ -1,6 +1,6 @@
 import { vi } from "vitest"
 
-import { IObjectStore, IRepository } from "../interface"
+import type { IObjectStore, IRepository } from "../interface"
 
 export class MockFnObjectStore<T> implements IObjectStore<T> {
   public namespace = "test:mockFnObjectStore"

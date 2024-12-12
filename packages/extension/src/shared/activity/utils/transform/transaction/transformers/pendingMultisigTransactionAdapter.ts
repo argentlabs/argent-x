@@ -1,6 +1,6 @@
-import { MultisigPendingTransaction } from "../../../../../multisig/pendingTransactionsStore"
-import { Transaction } from "../../../../../transactions"
-import { WalletAccount } from "../../../../../wallet.model"
+import type { MultisigPendingTransaction } from "../../../../../multisig/pendingTransactionsStore"
+import type { Transaction } from "../../../../../transactions"
+import type { WalletAccount } from "../../../../../wallet.model"
 
 export const getTransactionFromPendingMultisigTransaction = (
   pendingMultisigTransaction: MultisigPendingTransaction,

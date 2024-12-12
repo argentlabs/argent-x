@@ -3,7 +3,7 @@
  * - 'popup' refers to the normal extension window opened by user clicking extension icon
  */
 
-import Emittery from "emittery"
+import type Emittery from "emittery"
 import type { UIShowNotificationPayload } from "../../../shared/ui/UIMessage"
 
 export const Opened = Symbol("Opened")
@@ -33,6 +33,11 @@ export interface IBackgroundUIService {
    * Opens ui and navigates to the initialRoute
    */
   openUi(initialRoute?: string): Promise<void>
+
+  /**
+   * Opens ui as a floating window, regardles of whether it's already opened in a tab
+   */
+  openUiAsFloatingWindow(): Promise<void>
 
   /**
    * Determine if there is an existing popup
