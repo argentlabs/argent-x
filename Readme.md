@@ -8,7 +8,7 @@
 <h3 align='center' style='margin: 1em;'>⬇️ Get <b>Argent X</b> for Starknet today:</h3>
 
 <p align="center">
-  <a href="https://chrome.google.com/webstore/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb/">
+  <a href="https://chromewebstore.google.com/detail/argent-x-starknet-wallet/dlcobpjiigpikoobohmabehhmhfoodbb">
     <img src="https://raw.githubusercontent.com/argentlabs/argent-x/HEAD/assets/button-download.svg">
   </a>
 </p>
