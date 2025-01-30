@@ -64,11 +64,11 @@ await starknet.enable()
 
 // Check if connection was successful
 if(starknet.isConnected) {
-    // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kinds of requests through the user's wallet contract.
-    starknet.account.execute({ ... })
+  // If the extension was installed and successfully connected, you have access to a starknet.js Signer object to do all kinds of requests through the user's wallet contract.
+  starknet.account.execute({ ... })
 } else {
-    // In case the extension wasn't successfully connected you still have access to a starknet.js Provider to read starknet states and sent anonymous transactions
-    starknet.provider.callContract( ... )
+  // In case the extension wasn't successfully connected you still have access to a starknet.js Provider to read starknet states and sent anonymous transactions
+  starknet.provider.callContract( ... )
 }
 ```
 
@@ -80,18 +80,23 @@ First clone this repository on your machine then run:
 
 ```bash
 pnpm run setup  # setup dependencies
+```
+
+Now set your environment variables in a new file `/extension/.env` using `.env.example` to guide you.
+
+With your env vars set, run
+
+```bash
 pnpm build  # run build process for all packages
 ```
 
-Now you need to load the locally built chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
+Now you need to load the locally built Chrome extension into your browser, by loading an unpacked extension from path `packages/extension/dist`:
 
 ### Chrome
 
 1. Open the Extension Management page by navigating to `chrome://extensions`.
-2. Enable Developer Mode by clicking the toggle switch next to **Developer mode**.
-3. Click the Load unpacked button and select the extension directory.
-
-![Chrome screenshot of setup](https://wd.imgix.net/image/BhuKGJaIeLNPW9ehns59NfwqKxF2/vOu7iPbaapkALed96rzN.png?auto=format)
+2. Enable Developer Mode by clicking the toggle switch next to _**Developer mode**_. <img src="https://dv3jj1unlp2jl.cloudfront.net/github-readme/argent-x/chrome-developer-mode.png" alt="Screenshot of Chrome developer mode button" width="200"/>
+3. Click the _**Load unpacked**_ button and select the `/extension/dist` directory. <img src="https://dv3jj1unlp2jl.cloudfront.net/github-readme/argent-x/chrome-load-unpacked.png" alt="Screenshot of Chrome load unpacked extension button" width="200"/>
 
 [Source](https://developer.chrome.com/docs/extensions/mv3/getstarted/#manifest)
 
