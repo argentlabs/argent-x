@@ -1,16 +1,16 @@
-import { H5, icons, P3, typographyStyles } from "@argent/x-ui"
+import { ShowSecondaryIcon } from "@argent/x-ui/icons"
+import { H5, P4 } from "@argent/x-ui"
 import { Circle, Flex, Text, chakra } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
-import { AccountAvatar } from "../accounts/AccountAvatar"
-import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import { formatTruncatedAddress } from "@argent/x-shared"
+import { encodeBase58, formatTruncatedSignerKey } from "@argent/x-shared"
 import { AccountListItemLedgerBadge } from "../accounts/AccountListItemLedgerBadge"
-import type { AccountId } from "../../../shared/wallet.model"
+import type { AccountId, AvatarMeta } from "../../../shared/wallet.model"
+import { AccountAvatar } from "../accounts/AccountAvatar"
 
-const { ShowSecondaryIcon } = icons
+import { typographyStyles } from "@argent/x-ui/theme"
 
 export interface PendingMultisigListItemProps extends CustomButtonCellProps {
   accountName: string
@@ -20,6 +20,7 @@ export interface PendingMultisigListItemProps extends CustomButtonCellProps {
   networkName?: string
   hidden?: boolean
   avatarOutlined?: boolean
+  avatarMeta?: AvatarMeta
   isLedger?: boolean
 }
 
@@ -43,6 +44,7 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
   hidden,
   avatarOutlined,
   isLedger,
+  avatarMeta,
   children,
   ...rest
 }) => {
@@ -55,12 +57,14 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
   return (
     <CustomButtonCell {...rest}>
       <AccountAvatar
+        size={12}
         outlined={avatarOutlined}
-        src={getNetworkAccountImageUrl({
-          accountName,
-          accountId,
-          backgroundColor: hidden ? "#333332" : undefined,
-        })}
+        accountId={accountId}
+        accountType="multisig"
+        accountName={accountName}
+        avatarMeta={{ emoji: "⏳", ...avatarMeta }}
+        emojiStyle={typographyStyles.H2}
+        initialsStyle={typographyStyles.H4}
       >
         {getAvatarBadge()}
       </AccountAvatar>
@@ -76,15 +80,17 @@ export const PendingMultisigListItem: FC<PendingMultisigListItemProps> = ({
               {accountName}
             </H5>
           </Flex>
-          <Flex gap={2} color={"neutrals.300"}>
+          <Flex gap={2} color={"text-secondary"}>
             {hidden ? (
-              <P3 fontWeight={"semibold"}>
-                {formatTruncatedAddress(publicKey)}
-              </P3>
+              <P4 w="full" sx={{ textWrap: "wrap" }}>
+                {formatTruncatedSignerKey(encodeBase58(publicKey))}
+              </P4>
             ) : (
               <>
-                <P3 fontWeight={"semibold"}>Awaiting owner to finish setup</P3>
-                {networkName && <P3 noOfLines={1}>{networkName}</P3>}
+                <P4 data-testid="signer-key" w="full" sx={{ textWrap: "wrap" }}>
+                  {formatTruncatedSignerKey(encodeBase58(publicKey))}
+                </P4>
+                {networkName && <P4 noOfLines={1}>{networkName}</P4>}
               </>
             )}
           </Flex>

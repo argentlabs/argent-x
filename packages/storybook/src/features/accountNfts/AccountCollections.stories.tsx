@@ -1,8 +1,6 @@
-import { Meta, StoryObj } from "@storybook/react"
-import {
-  AccountCollectionsProps,
-  AccountCollections,
-} from "@argent-x/extension/src/ui/features/accountNfts/AccountCollections"
+import type { Meta, StoryObj } from "@storybook/react"
+import type { AccountCollectionsProps } from "@argent-x/extension/src/ui/features/accountNfts/AccountCollections"
+import { AccountCollections } from "@argent-x/extension/src/ui/features/accountNfts/AccountCollections"
 
 import { decorators } from "../../decorators/routerDecorators"
 

@@ -1,8 +1,8 @@
-import { bigDecimal } from "@argent/x-shared"
+import { bigDecimal, formatTruncatedAddress } from "@argent/x-shared"
 import { useMemo } from "react"
 import {
   isCollateralizedDebtBorrowingPosition,
-  isCollateralizedDebtLendingPosition,
+  isDelegatedTokensPosition,
   isStakingPosition,
   isStrkDelegatedStakingPosition,
   type ParsedPosition,
@@ -11,6 +11,7 @@ import type { BaseWalletAccount } from "../../../../../shared/wallet.model"
 import { useView } from "../../../../views/implementation/react"
 import { knownDappWithId } from "../../../../views/knownDapps"
 import { strkDelegatedStakingPositionUsdValueAtom } from "../../../../views/staking"
+import urlJoin from "url-join"
 
 interface UseDefiPositionBreakdownInfoProps {
   position: ParsedPosition
@@ -22,7 +23,7 @@ const dappManageUrls: Record<string, string> = {
   nostra: "https://app.nostra.finance/lend-borrow",
   vesu: "https://vesu.xyz",
   nimbora: "https://app.nimbora.io/",
-  ekubo: "https://app.ekubo.org/positions",
+  ekubo: "https://app.ekubo.org",
   zklend: "https://app.zklend.com/markets",
 }
 
@@ -89,23 +90,36 @@ export const useDefiPositionBreakdownInfo = ({
     let providerInfo
     let managePositionUrl
     if (isStrkDelegatedStakingPosition(position)) {
-      if (position.stakerInfo.iconUrl && position.stakerInfo.name) {
+      if (position.stakerInfo?.name || position.stakerInfo?.address) {
+        const name =
+          position.stakerInfo.name ??
+          formatTruncatedAddress(position.stakerInfo.address ?? "")
         providerInfo = {
           url: position.stakerInfo.iconUrl,
-          name: position.stakerInfo.name,
+          name,
         }
       }
     } else if (dapp) {
       if (dapp.logoUrl && dapp.name) {
         providerInfo = { url: dapp.logoUrl, name: dapp.name }
-        const isVesu = dapp.name.toLowerCase() === "vesu"
-        const manageUrl = dappManageUrls[dapp.name.toLowerCase()]
-        if (isCollateralizedDebtBorrowingPosition(position) && isVesu) {
-          managePositionUrl = `${manageUrl}/borrow`
-        } else if (isCollateralizedDebtLendingPosition(position) && isVesu) {
-          managePositionUrl = `${manageUrl}/lend`
-        } else {
-          managePositionUrl = manageUrl
+
+        const dappNameLower = dapp.name.toLowerCase()
+        const manageUrl = dappManageUrls[dappNameLower]
+
+        if (manageUrl) {
+          if (dappNameLower === "vesu") {
+            const path = isCollateralizedDebtBorrowingPosition(position)
+              ? "borrow"
+              : "lend"
+            managePositionUrl = urlJoin(manageUrl, path)
+          } else if (dappNameLower === "ekubo") {
+            const path = isDelegatedTokensPosition(position)
+              ? "governance/delegate"
+              : "positions"
+            managePositionUrl = urlJoin(manageUrl, path)
+          } else {
+            managePositionUrl = manageUrl
+          }
         }
       }
     }

@@ -1,15 +1,15 @@
 import { pluralise, type ITransactionReviewWarning } from "@argent/x-shared"
 import type { Warning } from "@argent/x-shared/simulation"
+import { WarningCirclePrimaryIcon } from "@argent/x-ui/icons"
 import {
   B3,
   Button,
   H5,
-  icons,
   L1Bold,
   P3,
   riskToSemanticTokenMap,
-  scrollbarStyleThin,
 } from "@argent/x-ui"
+import { scrollbarStyleThin } from "@argent/x-ui/theme"
 import type { ModalProps } from "@chakra-ui/react"
 import {
   Badge,
@@ -24,8 +24,6 @@ import {
 import type { FC } from "react"
 
 import { riskToBadgeMap, riskToColorSchemeMap } from "./warningMap"
-
-const { WarningCirclePrimaryIcon } = icons
 
 export type WarningsByReason = Record<string, ITransactionReviewWarning>
 

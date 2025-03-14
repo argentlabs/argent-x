@@ -33,6 +33,7 @@ import type {
   ApiMultisigTransactionState,
 } from "./multisig.model"
 import { getMultisigAccountFromBaseWallet } from "./utils/baseMultisig"
+import { atomWithDebugLabel } from "../../ui/views/atomWithDebugLabel"
 
 export type MultisigPendingTransaction = {
   requestId: string
@@ -73,24 +74,32 @@ export const allMultisigPendingTransactionsView = atom(async (get) => {
 
 export const multisigPendingTransactionsAccountView = atomFamily(
   (account?: BaseWalletAccount) =>
-    atom(async (get) => {
-      const multisigPendingTransactions = await get(
-        allMultisigPendingTransactionsView,
-      )
-      return multisigPendingTransactions.filter((tx) =>
-        accountsEqual(tx.account, account),
-      )
-    }),
+    atomWithDebugLabel(
+      atom(async (get) => {
+        const multisigPendingTransactions = await get(
+          allMultisigPendingTransactionsView,
+        )
+        return multisigPendingTransactions.filter((tx) =>
+          accountsEqual(tx.account, account),
+        )
+      }),
+      `multisigPendingTransactionsAccountView-${account?.id || "unknown"}`,
+    ),
   atomFamilyAccountsEqual,
 )
 
 export const multisigPendingTransactionView = atomFamily((requestId?: string) =>
-  atom(async (get) => {
-    const multisigPendingTransactions = await get(
-      allMultisigPendingTransactionsView,
-    )
-    return multisigPendingTransactions.find((tx) => tx.requestId === requestId)
-  }),
+  atomWithDebugLabel(
+    atom(async (get) => {
+      const multisigPendingTransactions = await get(
+        allMultisigPendingTransactionsView,
+      )
+      return multisigPendingTransactions.find(
+        (tx) => tx.requestId === requestId,
+      )
+    }),
+    `multisigPendingTransactionView-${requestId || "unknown"}`,
+  ),
 )
 
 export const byAccountSelector = memoize(

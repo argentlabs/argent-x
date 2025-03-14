@@ -1,4 +1,5 @@
-import { BarBackButton, H2, icons, NavigationContainer, P2 } from "@argent/x-ui"
+import { BroomIcon } from "@argent/x-ui/icons"
+import { BarBackButton, H2, NavigationContainer, P2 } from "@argent/x-ui"
 import { Button, Center, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import { IconWrapper } from "../../../actions/transactionV2/header/icon"
@@ -6,8 +7,6 @@ import { PasswordForm } from "../../../lock/PasswordForm"
 import { useClearLocalStorage } from "./useClearLocalStorage"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../../../shared/ui/routes"
-
-const { BroomIcon } = icons
 
 export const ClearLocalStorageScreen: FC = () => {
   const navigate = useNavigate()

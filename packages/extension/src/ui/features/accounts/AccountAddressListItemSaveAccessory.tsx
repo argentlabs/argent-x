@@ -1,8 +1,7 @@
-import { Button, icons } from "@argent/x-ui"
+import { AddressBookIcon } from "@argent/x-ui/icons"
+import { Button } from "@argent/x-ui"
 import type { ButtonProps } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { AddressBookIcon } = icons
 
 export const AccountAddressListItemSaveAccessory: FC<ButtonProps> = ({
   onClick,

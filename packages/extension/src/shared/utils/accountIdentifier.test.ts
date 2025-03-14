@@ -8,6 +8,10 @@ import { addressSchema } from "@argent/x-shared"
 
 describe("accountIdentifier", () => {
   describe("getAccountIdentifier", () => {
+    beforeEach(() => {
+      vi.clearAllMocks()
+    })
+
     const mockSigner: WalletAccountSigner = {
       type: SignerType.LOCAL_SECRET,
       derivationPath: "m/44'/60'/0'/0/0",

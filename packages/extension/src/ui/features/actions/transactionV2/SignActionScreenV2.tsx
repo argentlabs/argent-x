@@ -1,4 +1,7 @@
-import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type {
+  EnrichedSimulateAndReview,
+  EnrichedSimulateAndReviewV2,
+} from "@argent/x-shared/simulation"
 import { isNotTransactionSimulationError } from "@argent/x-shared/simulation"
 import {
   TransactionReviewActions,
@@ -18,6 +21,7 @@ import { AccountDetailsNavigationBarContainer } from "../../navigation/AccountDe
 import { SessionKeyHeader } from "./header/SessionKeyHeader"
 import { isSessionKeyTypedData } from "../../../../shared/sessionKeys/schema"
 import { useIsInfluenceDapp } from "../connectDapp/useIsInfluenceDapp"
+import { TransactionType } from "starknet"
 
 interface SignActionScreenV2Props extends ConfirmScreenProps {
   dataToSign: TypedData
@@ -26,7 +30,7 @@ interface SignActionScreenV2Props extends ConfirmScreenProps {
   subtitle?: string
   dappLogoUrl?: string
   dappHost: string
-  review?: EnrichedSimulateAndReview
+  review?: EnrichedSimulateAndReviewV2
   networkId: string
   error?: unknown
   isValidating?: boolean
@@ -93,6 +97,7 @@ export const SignActionScreenV2: FC<SignActionScreenV2Props> = ({
       subtitle={subtitle}
       dappHost={dappHost}
       px={0}
+      transactionType={TransactionType.INVOKE}
     />
   )
 

@@ -1,7 +1,7 @@
 import type { Address, Hex, Implementation } from "@argent/x-shared"
 import {
-  AddSmartAcountRequestSchema,
   addressSchema,
+  AddSmartAcountRequestSchema,
   estimatedFeeToMaxResourceBounds,
   findImplementationForAccount,
   getAccountDeploymentPayload,
@@ -18,10 +18,7 @@ import { CallData, hash, stark, TransactionType } from "starknet"
 import { getMultisigAccountFromBaseWallet } from "../../../shared/multisig/utils/baseMultisig"
 import { getProvider } from "../../../shared/network/provider"
 import type { INetworkService } from "../../../shared/network/service/INetworkService"
-import type {
-  IObjectStore,
-  IRepository,
-} from "../../../shared/storage/__new/interface"
+import type { IRepository } from "../../../shared/storage/__new/interface"
 import type {
   ArgentWalletAccount,
   BaseMultisigWalletAccount,
@@ -53,23 +50,25 @@ import type { WalletAccountStarknetService } from "../account/WalletAccountStark
 import type { WalletBackupService } from "../backup/WalletBackupService"
 import type { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
 import type { WalletSessionService } from "../session/WalletSessionService"
-import type { WalletSession } from "../session/walletSession.model"
 import type {
   DeployAccountContractPayload,
   IWalletDeploymentService,
 } from "./IWalletDeploymentService"
 
-import type { EstimatedFee } from "@argent/x-shared/simulation"
+import type { EstimatedFee, EstimatedFeeV2 } from "@argent/x-shared/simulation"
 import type { BaseSignerInterface } from "../../../shared/signer/BaseSignerInterface"
 import { getBaseDerivationPath } from "../../../shared/signer/utils"
-import { sanitizeAccountType } from "../../../shared/utils/sanitizeAccountType"
-import { sanitizeSignerType } from "../../../shared/utils/sanitizeSignerType"
 import {
   deserializeAccountIdentifier,
   getAccountIdentifier,
 } from "../../../shared/utils/accountIdentifier"
+import { getAccountMeta } from "../../../shared/accountNameGenerator"
+import { sanitizeAccountType } from "../../../shared/utils/sanitizeAccountType"
+import { sanitizeSignerType } from "../../../shared/utils/sanitizeSignerType"
 import { ArgentSigner } from "../../../shared/signer"
 import { addEstimatedFee } from "../../../shared/transactionSimulation/fees/estimatedFeesRepository"
+import { TransactionError } from "../../../shared/errors/transaction"
+import type { ISecretStorageService } from "../session/interface"
 
 const { calculateContractAddressFromHash } = hash
 
@@ -96,7 +95,7 @@ export class WalletDeploymentStarknetService
     private readonly walletStore: IRepository<WalletAccount>,
     private readonly multisigStore: IRepository<BaseMultisigWalletAccount>,
     private readonly sessionService: WalletSessionService,
-    public readonly sessionStore: IObjectStore<WalletSession | null>,
+    public readonly secretStorageService: ISecretStorageService,
     private readonly accountSharedService: WalletAccountSharedService,
     private readonly accountStarknetService: WalletAccountStarknetService,
     private readonly cryptoStarknetService: WalletCryptoStarknetService,
@@ -153,7 +152,7 @@ export class WalletDeploymentStarknetService
   public async getAccountDeploymentFee(
     walletAccount: ArgentWalletAccount,
     feeTokenAddress: Address,
-  ): Promise<EstimatedFee> {
+  ): Promise<EstimatedFeeV2> {
     const starknetAccount =
       await this.accountStarknetService.getStarknetAccount(walletAccount.id)
 
@@ -187,10 +186,13 @@ export class WalletDeploymentStarknetService
     }
 
     await addEstimatedFee(
-      { transactions: fees },
+      { type: "native", transactions: fees },
       { type: TransactionType.DEPLOY_ACCOUNT, payload: deployAccountPayload },
     )
-    return fees
+    return {
+      ...fees,
+      type: "native",
+    }
   }
 
   /** Get the Account Deployment Payload
@@ -444,10 +446,13 @@ export class WalletDeploymentStarknetService
     signerType: SignerType = SignerType.LOCAL_SECRET,
     multisigPayload?: MultisigData,
   ): Promise<CreateWalletAccount> {
-    const session = await this.sessionStore.get()
-    if (!session?.secret) {
+    const decrypted = await this.secretStorageService.decrypt()
+    if (!decrypted) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
+
+    const { secret } = decrypted
+
     const network = await this.networkService.getById(networkId)
 
     let index, derivationPath, publicKey
@@ -485,7 +490,7 @@ export class WalletDeploymentStarknetService
     let salt: string | undefined
 
     if (accountType === "smart") {
-      const _signer = new ArgentSigner(session.secret, derivationPath) // used temporarily to sign the account creation
+      const _signer = new ArgentSigner(secret, derivationPath) // used temporarily to sign the account creation
       const signature = await _signer.signRawMsgHash(
         pedersen(keccak(stringToBytes("utf8", "starknet")), publicKey),
       )
@@ -496,6 +501,7 @@ export class WalletDeploymentStarknetService
         implClassHash: addressSchema.parse(payload.classHash),
         signature: { r, s },
         ownerAddress: publicKey,
+        network: network.id,
       })
 
       const addSmartAccountResponse = await addBackendAccount(
@@ -513,19 +519,6 @@ export class WalletDeploymentStarknetService
       )
     }
 
-    const nonMultisigAccounts = await this.walletStore.get(
-      (acc) => acc.networkId === networkId && acc.type !== "multisig",
-    )
-
-    const multisigAccounts = await this.walletStore.get(
-      (acc) => acc.networkId === networkId && acc.type === "multisig",
-    )
-
-    const defaultAccountName =
-      accountType === "multisig"
-        ? `Multisig ${multisigAccounts.length + 1}`
-        : `Account ${nonMultisigAccounts.length + 1}`
-
     const isDeployed = await isContractDeployed(
       getProvider(network),
       accountAddress,
@@ -537,10 +530,11 @@ export class WalletDeploymentStarknetService
     }
 
     const accountId = getAccountIdentifier(accountAddress, networkId, signer)
+    const { name } = getAccountMeta(accountId, accountType)
 
     const account: CreateWalletAccount = {
       id: accountId,
-      name: defaultAccountName,
+      name,
       network,
       networkId: network.id,
       address: accountAddress,
@@ -578,9 +572,10 @@ export class WalletDeploymentStarknetService
       "wallet platform": "browser extension",
     })
     if (accountType === "smart") {
-      await this.accountSharedService.sendAccountNameToBackend({
+      await this.accountSharedService.sendAccountLabelToBackend({
         address: account.address,
         name: account.name,
+        networkId: account.networkId,
       })
     }
 
@@ -621,13 +616,16 @@ export class WalletDeploymentStarknetService
         resourceBounds: transactionDetails.resourceBounds,
       }
     } else {
-      const estimatedFees = estimatedFeeToMaxResourceBounds(
-        await this.getAccountDeploymentFee(
-          walletAccount,
-          mapVersionToFeeToken(transactionDetails?.version ?? "0x1"),
-        ),
+      const deploymentFee = await this.getAccountDeploymentFee(
+        walletAccount,
+        mapVersionToFeeToken(transactionDetails?.version ?? "0x1"),
       )
-      maxFeeOrBounds = estimatedFees
+
+      if (deploymentFee.type === "paymaster") {
+        throw new TransactionError({ code: "PAYMASTER_FEES_NOT_SUPPORTED" })
+      }
+
+      maxFeeOrBounds = estimatedFeeToMaxResourceBounds(deploymentFee)
     }
 
     const details = {

@@ -39,10 +39,6 @@ export default class TokenDetails extends Navigation {
     return this.page.locator('[id^="menu-button"]')
   }
 
-  get menuCopyTokenAddressLoc() {
-    return this.page.getByText("Copy token address")
-  }
-
   get menuViewOnVoyagerLoc() {
     return this.page.getByRole("menuitem", { name: "View on Voyager" })
   }

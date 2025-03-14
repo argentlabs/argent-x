@@ -11,7 +11,7 @@ import {
 import { atomFromRepo } from "./implementation/atomFromRepo"
 import type { Address, Collection, NftItem } from "@argent/x-shared"
 import { isEqualAddress, ensureArray } from "@argent/x-shared"
-
+import { atomWithDebugLabel } from "./atomWithDebugLabel"
 const allNftsAtom = atomFromRepo(nftsRepository)
 
 export const allNftsView = atom(async (get) => {
@@ -75,29 +75,31 @@ export const allCollectionsView = atom(async (get) => {
 })
 
 export const collectionAtomFamily = (view: Atom<Promise<Collection[]>>) =>
-  atomFamily(
-    (contractAddress: Address) =>
+  atomFamily((contractAddress: Address) =>
+    atomWithDebugLabel(
       atom(async (get) => {
         const collections = await get(view)
         return collections.find((collection) =>
           isEqualAddress(collection.contractAddress, contractAddress),
         )
       }),
-    (a, b) => a === b,
+      `collectionAtomFamily-${contractAddress}`,
+    ),
   )
 
 export const collectionsByNetworkAtomFamily = (
   view: Atom<Promise<Collection[]>>,
 ) =>
-  atomFamily(
-    (networkId: string) =>
+  atomFamily((networkId: string) =>
+    atomWithDebugLabel(
       atom(async (get) => {
         const collections = await get(view)
         return collections.filter((collection) => {
           return collection.networkId === networkId
         })
       }),
-    (a, b) => a === b,
+      `collectionsByNetworkAtomFamily-${networkId}`,
+    ),
   )
 
 interface CollectionsByAccountAndNetworkParams {
@@ -110,33 +112,36 @@ export const collectionsByAccountAndNetworkAtomFamily = (
 ) =>
   atomFamily(
     ({ accountAddress, networkId }: CollectionsByAccountAndNetworkParams) =>
-      atom(async (get) => {
-        const collections = await get(view)
-        const nfts = await get(allNftsView)
+      atomWithDebugLabel(
+        atom(async (get) => {
+          const collections = await get(view)
+          const nfts = await get(allNftsView)
 
-        const collectionsByNetwork = collections.filter(
-          (collection) => collection.networkId === networkId,
-        )
+          const collectionsByNetwork = collections.filter(
+            (collection) => collection.networkId === networkId,
+          )
 
-        const accountCollections = []
-        for (const collection of collectionsByNetwork) {
-          if (
-            nfts.some(
-              (nft) =>
-                isEqualAddress(
-                  nft.owner.account_address ?? "",
-                  accountAddress,
-                ) &&
-                nft.networkId === networkId &&
-                nft.contract_address === collection.contractAddress,
-            )
-          ) {
-            accountCollections.push(collection)
+          const accountCollections = []
+          for (const collection of collectionsByNetwork) {
+            if (
+              nfts.some(
+                (nft) =>
+                  isEqualAddress(
+                    nft.owner.account_address ?? "",
+                    accountAddress,
+                  ) &&
+                  nft.networkId === networkId &&
+                  nft.contract_address === collection.contractAddress,
+              )
+            ) {
+              accountCollections.push(collection)
+            }
           }
-        }
 
-        return accountCollections
-      }),
+          return accountCollections
+        }),
+        `collectionsByAccountAndNetworkAtomFamily-${accountAddress}-${networkId}`,
+      ),
     (a, b) =>
       isEqualAddress(a.accountAddress, b.accountAddress) &&
       a.networkId === b.networkId,
@@ -145,14 +150,17 @@ export const collectionsByAccountAndNetworkAtomFamily = (
 export const collectionNftsAtomFamily = (nftsView: Atom<Promise<NftItem[]>>) =>
   atomFamily(
     (contractAddress: Address) =>
-      atom(async (get) => {
-        const nfts = await get(nftsView)
+      atomWithDebugLabel(
+        atom(async (get) => {
+          const nfts = await get(nftsView)
 
-        return nfts.filter((nft) =>
-          isEqualAddress(nft.contract_address, contractAddress),
-        )
-      }),
-    (a, b) => a === b,
+          return nfts.filter((nft) =>
+            isEqualAddress(nft.contract_address, contractAddress),
+          )
+        }),
+        `collectionNftsAtomFamily-${contractAddress}`,
+      ),
+    (a, b) => isEqualAddress(a, b),
   )
 
 export const collectionNftsByAccountAndNetworkAtomFamily = (
@@ -168,18 +176,21 @@ export const collectionNftsByAccountAndNetworkAtomFamily = (
       accountAddress: Address
       networkId?: string
     }) =>
-      atom(async (get) => {
-        const nfts = await get(nftsView)
+      atomWithDebugLabel(
+        atom(async (get) => {
+          const nfts = await get(nftsView)
 
-        return nfts.filter(
-          (nft) =>
-            isEqualAddress(nft.contract_address, contractAddress) &&
-            isEqualAddress(nft.owner.account_address ?? "", accountAddress) &&
-            nft.networkId === networkId,
-        )
-      }),
+          return nfts.filter(
+            (nft) =>
+              isEqualAddress(nft.contract_address, contractAddress) &&
+              isEqualAddress(nft.owner.account_address ?? "", accountAddress) &&
+              nft.networkId === networkId,
+          )
+        }),
+        `collectionNftsByAccountAndNetworkAtomFamily-${contractAddress}-${accountAddress}-${networkId}`,
+      ),
     (a, b) =>
-      a.contractAddress === b.contractAddress &&
+      isEqualAddress(a.contractAddress, b.contractAddress) &&
       a.accountAddress === b.accountAddress &&
       a.networkId === b.networkId,
   )
@@ -204,15 +215,16 @@ export const allNftsContractsView = atom(async (get) => {
 export const contractAddressesAtomFamily = (
   view: Atom<Promise<ContractAddress[]>>,
 ) =>
-  atomFamily(
-    (networkId: string) =>
+  atomFamily((networkId: string) =>
+    atomWithDebugLabel(
       atom(async (get) => {
         const addresses = await get(view)
         return addresses
           .filter((address) => address.networkId === networkId)
           .map((address) => address.contractAddress)
       }),
-    (a, b) => a === b,
+      `contractAddressesAtomFamily-${networkId}`,
+    ),
   )
 
 export const contractAddressesNfts =

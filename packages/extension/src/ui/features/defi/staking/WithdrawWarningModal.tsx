@@ -1,14 +1,5 @@
 import { H4, ModalDialog, P2 } from "@argent/x-ui"
-import {
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from "@chakra-ui/react"
+import { Button, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import {
   isStrkDelegatedStakingPosition,
@@ -63,7 +54,7 @@ export const WithdrawWarningModalContainer: FC<WithdrawWarningModalProps> = ({
   const onWithdraw = () => {
     onClose()
 
-    if (isWithdrawCurrentlyAvailable && account) {
+    if (isWithdrawCurrentlyAvailable && account && position.investmentId) {
       void unstakeAction({
         accountAddress: account.address as Address,
         accountType: account.type,
@@ -73,7 +64,7 @@ export const WithdrawWarningModalContainer: FC<WithdrawWarningModalProps> = ({
         tokenAddress: position.token.address,
       })
     } else {
-      navigate(routes.unstake(position.id, returnTo))
+      void navigate(routes.nativeUnstake(position.id, returnTo))
     }
   }
 

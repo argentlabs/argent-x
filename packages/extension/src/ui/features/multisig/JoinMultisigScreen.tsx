@@ -1,4 +1,5 @@
-import { Button, H4, icons, NavigationContainer, P2 } from "@argent/x-ui"
+import { CopyPrimaryIcon, ShareIcon } from "@argent/x-ui/icons"
+import { Button, H4, NavigationContainer, P2 } from "@argent/x-ui"
 import { Box, Center, Flex, Spinner, useClipboard } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useEffect } from "react"
@@ -6,8 +7,6 @@ import { useNavigate, useParams } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
 import { useEncodedPublicKey } from "../accounts/usePublicKey"
-
-const { CopyPrimaryIcon, ShareIcon } = icons
 
 export const JoinMultisigScreen: FC = () => {
   const navigate = useNavigate()
@@ -59,7 +58,7 @@ export const JoinMultisigScreen: FC = () => {
           w="full"
         >
           {signerKey ? (
-            <P2 fontWeight="bold" color="white.50">
+            <P2 fontWeight="bold" color="white.50" data-testid="signerKey">
               {signerKey}
             </P2>
           ) : (

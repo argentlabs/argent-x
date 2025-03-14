@@ -21,6 +21,11 @@ describe("UIService", () => {
             }) as any,
         ),
       },
+      sidePanel: {
+        setOptions: vi.fn(),
+        setPanelBehavior: vi.fn(),
+        open: vi.fn(),
+      },
       tabs: {
         create: vi.fn(),
         query: vi.fn(),
@@ -30,6 +35,7 @@ describe("UIService", () => {
         getAll: vi.fn(),
         update: vi.fn(),
         remove: vi.fn(),
+        getCurrent: vi.fn(),
       },
     }
     const uiService = new UIService(browser)

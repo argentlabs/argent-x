@@ -8,7 +8,7 @@ import {
   ensureArray,
   stripAddressZeroPadding,
 } from "@argent/x-shared"
-import { GatewayError, stark } from "starknet"
+import { stark, LibraryError } from "starknet"
 import {
   getMockNetwork,
   getMockNetworkWithoutMulticall,
@@ -29,8 +29,8 @@ import type { INetworkRepo } from "../../../network/store"
 import { MockFnRepository } from "../../../storage/__new/__test__/mockFunctionImplementation"
 import { equalToken } from "../utils"
 import { TokenService } from "./TokenService"
-import { getMockSigner } from "../../../../../test/account.mock"
 import { getAccountIdentifier } from "../../../utils/accountIdentifier"
+import { getMockSigner } from "../../../../../test/signer.mock"
 
 const BASE_INFO_ENDPOINT = "https://token.info.argent47.net/v1"
 const BASE_PRICES_ENDPOINT = "https://token.prices.argent47.net/v1"
@@ -690,7 +690,7 @@ describe("TokenService", () => {
         .mockResolvedValueOnce(getMockNetwork())
       tokenService.fetchTokenDetailsWithMulticall = vi
         .fn()
-        .mockRejectedValueOnce(new GatewayError("NOT_FOUND", "500"))
+        .mockRejectedValueOnce(new LibraryError("NOT_FOUND"))
       await expect(
         tokenService.fetchTokenDetails(mockBaseToken),
       ).rejects.toThrowError(
@@ -708,7 +708,7 @@ describe("TokenService", () => {
         .mockResolvedValueOnce(getMockNetworkWithoutMulticall())
       tokenService.fetchTokenDetailsWithoutMulticall = vi
         .fn()
-        .mockRejectedValueOnce(new GatewayError("NOT_FOUND", "500"))
+        .mockRejectedValueOnce(new LibraryError("NOT_FOUND"))
       await expect(
         tokenService.fetchTokenDetails(mockBaseToken),
       ).rejects.toThrowError(

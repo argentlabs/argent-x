@@ -169,9 +169,14 @@ export const WithSmartAccountVerified: FC<WithSmartAccountVerifiedProps> = ({
             }
           }
         } else {
+          if (state === SmartAccountVerifiedState.VERIFIED) {
+            return
+          }
           const isTokenExpired = isRemoveGuardian
             ? await getVerifiedEmailIsExpiredForRemoval()
-            : await clientArgentAccountService.isTokenExpired()
+            : await clientArgentAccountService.isTokenExpired({
+                initiator: "WithSmartAccountVerified/useEffect",
+              })
           if (isTokenExpired) {
             // this ref guards against this flow re-running and sending > 1 emails
             if (isTokenExpiryFlow.current) {

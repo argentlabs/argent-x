@@ -1,4 +1,4 @@
-import { IStatusMessage } from "@argent-x/extension/src/shared/statusMessage/types"
+import type { IStatusMessage } from "@argent-x/extension/src/shared/statusMessage/types"
 
 import dangerStatusMessage from "./danger.json"
 import warningStatusMessage from "./warning.json"

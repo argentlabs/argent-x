@@ -1,10 +1,12 @@
-import { B3, buttonHoverStyle, L2 } from "@argent/x-ui"
+import { B3, L2 } from "@argent/x-ui"
 import type { MenuListProps } from "@chakra-ui/react"
 import { Flex, MenuItem, MenuList, Text } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import type { Network, ColorStatus } from "../../../shared/network"
 import { StatusIndicator } from "../../components/StatusIndicator"
+
+import { buttonHoverStyle } from "@argent/x-ui/theme"
 
 export interface NetworkSwitcherListProps extends MenuListProps {
   networkId: string

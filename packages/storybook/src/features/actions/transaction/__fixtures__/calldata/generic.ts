@@ -1,4 +1,4 @@
-import { Call } from "starknet"
+import type { Call } from "starknet"
 
 export const frenslandCalls: Call[] = [
   {

@@ -1,13 +1,13 @@
 import type { BoxProps } from "@chakra-ui/react"
 import { IconWrapper } from "./IconWrapper"
-import type { IconKeys } from "@argent/x-ui"
-import { icons } from "@argent/x-ui"
+import { transactionIcons } from "../../../transaction/getTransactionIcon"
+import type { TransactionIconKeys } from "../../../../../../shared/actionQueue/schema"
 
 export const KnownIcon = ({
   iconKey,
   ...rest
-}: BoxProps & { iconKey: IconKeys }) => {
-  const IconComponent = icons[iconKey]
+}: BoxProps & { iconKey: TransactionIconKeys }) => {
+  const IconComponent = transactionIcons[iconKey]
   return (
     <IconWrapper rounded="2xl" {...rest}>
       <IconComponent fontSize={"xl"} color="neutrals.900" />

@@ -1,15 +1,10 @@
-import {
-  BarBackButton,
-  CellStack,
-  NavigationContainer,
-  logos,
-} from "@argent/x-ui"
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
 import type { FC, ReactEventHandler } from "react"
 
 import { SettingsMenuItem } from "../ui/SettingsMenuItem"
 import { SettingsRadioIcon } from "../ui/SettingsRadioIcon"
 
-const { DappsBrotheridLogo, DappsStarknetidLogo } = logos
+import { DappsBrotheridLogo, DappsStarknetidLogo } from "@argent/x-ui/logos"
 
 interface IdProviderSettingsScreenProps {
   onBack: ReactEventHandler

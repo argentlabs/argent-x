@@ -1,3 +1,4 @@
+import { MessageSecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   BarCloseButton,
@@ -5,15 +6,13 @@ import {
   CellStack,
   FieldError,
   FlowHeader,
-  icons,
-  Input,
   NavigationContainer,
   useToast,
 } from "@argent/x-ui"
 import type { FC } from "react"
 import { useForm } from "react-hook-form"
 
-import { Box, Link, Text } from "@chakra-ui/react"
+import { Box, Link, Text, Input } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { voidify } from "@argent/x-shared"
 
@@ -24,8 +23,6 @@ import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 import { clientArgentAccountService } from "../../services/argentAccount"
 import type { ArgentAccountBaseEmailScreenProps } from "./argentAccountBaseEmailScreen.model"
 import { emailSchema } from "./argentAccountBaseEmailScreen.model"
-
-const { MessageSecondaryIcon } = icons
 
 const screenContent = {
   toggleSmartAccount: {

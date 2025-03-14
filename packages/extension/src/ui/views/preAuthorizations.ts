@@ -11,6 +11,7 @@ import {
 } from "../../shared/utils/accountsEqual"
 import type { BaseWalletAccount } from "../../shared/wallet.model"
 import { atomFromRepo } from "./implementation/atomFromRepo"
+import { atomWithDebugLabel } from "./atomWithDebugLabel"
 
 /**
  * @internal use `allPreAuthorizationsView` instead
@@ -24,45 +25,57 @@ export const allPreAuthorizationsView = atom(async (get) => {
 
 export const preAuthorizationsGroupedByAccountIdentifierForNetworkId =
   atomFamily((networkId: string) => {
-    return atom(async (get) => {
-      const all = await get(preAuthorizationsForNetworkId(networkId))
-      const grouped = groupBy(all, ({ account }) => account.id)
-      return grouped
-    })
+    return atomWithDebugLabel(
+      atom(async (get) => {
+        const all = await get(preAuthorizationsForNetworkId(networkId))
+        const grouped = groupBy(all, ({ account }) => account.id)
+        return grouped
+      }),
+      `preAuthorizationsGroupedByAccountIdentifierForNetworkId-${networkId}`,
+    )
   })
 
 export const preAuthorizationsForNetworkId = atomFamily((networkId: string) => {
-  return atom(async (get) => {
-    const all = await get(allPreAuthorizationsView)
-    const filtered = all.filter(
-      (preAuthorization) => networkId === preAuthorization.account.networkId,
-    )
-    return filtered
-  })
+  return atomWithDebugLabel(
+    atom(async (get) => {
+      const all = await get(allPreAuthorizationsView)
+      const filtered = all.filter(
+        (preAuthorization) => networkId === preAuthorization.account.networkId,
+      )
+      return filtered
+    }),
+    `preAuthorizationsForNetworkId-${networkId}`,
+  )
 })
 
 export const preAuthorizationsForAccount = atomFamily(
   (account?: BaseWalletAccount) => {
-    return atom(async (get) => {
-      const all = await get(allPreAuthorizationsView)
-      const filtered = all.filter((preAuthorization) =>
-        accountsEqual(preAuthorization.account, account),
-      )
-      return filtered
-    })
+    return atomWithDebugLabel(
+      atom(async (get) => {
+        const all = await get(allPreAuthorizationsView)
+        const filtered = all.filter((preAuthorization) =>
+          accountsEqual(preAuthorization.account, account),
+        )
+        return filtered
+      }),
+      `preAuthorizationsForAccount-${account?.id}`,
+    )
   },
   atomFamilyAccountsEqual,
 )
 
 export const isPreauthorized = atomFamily(
   (maybePreAuthorization: Partial<PreAuthorization>) => {
-    return atom(async (get) => {
-      const all = await get(allPreAuthorizationsView)
-      const result = all.some((preAuthorization) =>
-        isEqualPreAuthorization(maybePreAuthorization, preAuthorization),
-      )
-      return result
-    })
+    return atomWithDebugLabel(
+      atom(async (get) => {
+        const all = await get(allPreAuthorizationsView)
+        const result = all.some((preAuthorization) =>
+          isEqualPreAuthorization(maybePreAuthorization, preAuthorization),
+        )
+        return result
+      }),
+      `isPreauthorized-${maybePreAuthorization?.account?.id}`,
+    )
   },
   isEqualPreAuthorization,
 )

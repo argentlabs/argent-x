@@ -1,6 +1,6 @@
 import { NftInput } from "@argent-x/extension/src/ui/features/send/NftInput"
 import { CellStack } from "@argent/x-ui"
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 
 export default {
   component: NftInput,

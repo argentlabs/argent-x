@@ -1,7 +1,6 @@
-import { logosDeprecated } from "@argent/x-ui"
+import { ArgentXLogo } from "@argent/x-ui/logos-deprecated"
 import type { BoxProps } from "@chakra-ui/react"
 import { Box } from "@chakra-ui/react"
-const { ArgentXLogo } = logosDeprecated
 
 export const Panel = (props: BoxProps) => (
   <Box

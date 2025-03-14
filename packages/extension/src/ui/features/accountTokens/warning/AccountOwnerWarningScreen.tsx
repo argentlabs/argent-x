@@ -1,7 +1,7 @@
+import { ExpandIcon } from "@argent/x-ui/icons"
 import {
   BarCloseButton,
   Button,
-  icons,
   NavigationContainer,
   Warning,
 } from "@argent/x-ui"
@@ -12,8 +12,6 @@ import { routes } from "../../../../shared/ui/routes"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { selectedNetworkIdView } from "../../../views/network"
 import { useView } from "../../../views/implementation/react"
-
-const { ExpandIcon } = icons
 
 export const AccountOwnerWarningScreen = () => {
   const onBack = useNavigateReturnToOrBack()

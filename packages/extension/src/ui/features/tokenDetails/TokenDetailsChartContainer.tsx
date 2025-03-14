@@ -3,10 +3,10 @@ import { useMemo } from "react"
 import type { CrosshairMoveProps, TokenDetailsChartProps } from "@argent/x-ui"
 import {
   DetailsSidePanelChartRangeButtons,
-  theme,
   TokenDetailsChart,
   TokenDetailsChartTooltip,
 } from "@argent/x-ui"
+import { theme } from "@argent/x-ui/theme"
 
 import { getChartOptions, getSeriesConfig } from "./config"
 import { isEmpty } from "lodash-es"

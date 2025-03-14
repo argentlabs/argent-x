@@ -1,4 +1,4 @@
-import { Address } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
 
 export const tokensInfo = [
   {

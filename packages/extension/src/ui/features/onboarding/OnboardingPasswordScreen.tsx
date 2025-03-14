@@ -101,22 +101,25 @@ export const OnboardingPasswordScreen: FC<OnboardingPasswordScreenProps> = ({
         /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
         onSubmit={handleForm}
       >
-        <ControlledInput
-          name="password"
-          control={control}
-          autoFocus
-          type="password"
-          placeholder="Password"
-          isDisabled={isSubmitting}
-        />
-        <PasswordStrengthIndicator password={watch("password")} showAlways />
-        <ControlledInput
-          name="repeatPassword"
-          control={control}
-          type="password"
-          placeholder="Repeat password"
-          isDisabled={isSubmitting}
-        />
+        <PasswordStrengthIndicator password={watch("password")}>
+          <ControlledInput
+            name="password"
+            control={control}
+            autoFocus
+            type="password"
+            placeholder="Password"
+            isDisabled={isSubmitting}
+          />
+          <PasswordStrengthIndicator.Label />
+          <ControlledInput
+            name="repeatPassword"
+            control={control}
+            type="password"
+            placeholder="Repeat password"
+            isDisabled={isSubmitting}
+          />
+          <PasswordStrengthIndicator.Comment />
+        </PasswordStrengthIndicator>
         <Box>
           <OnboardingButton
             mt={12}

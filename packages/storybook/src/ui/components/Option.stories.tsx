@@ -1,11 +1,15 @@
 import { Option } from "@argent-x/extension/src/ui/components/Option"
 import { TrackingLink } from "@argent-x/extension/src/ui/components/TrackingLink"
 import { formatTruncatedAddress } from "@argent/x-shared"
-import { icons, storybookCellStackDecorator } from "@argent/x-ui"
+import { storybookCellStackDecorator } from "@argent/x-ui"
 
 const L1_BRIDGE_CONTRACT_ADDRESS = "0xaea4513378eb6023cf9ce730a26255d0e3f075b9"
 
-const { CardSecondaryIcon, ChevronRightSecondaryIcon, DocumentIcon } = icons
+import {
+  CardSecondaryIcon,
+  ChevronRightSecondaryIcon,
+  DocumentIcon,
+} from "@argent/x-ui/icons"
 
 export default {
   component: Option,

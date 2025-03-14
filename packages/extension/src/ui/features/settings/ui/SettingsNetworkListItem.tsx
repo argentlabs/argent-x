@@ -1,7 +1,6 @@
-import { Button, H5, icons } from "@argent/x-ui"
+import { MinusPrimaryIcon } from "@argent/x-ui/icons"
+import { Button, H5 } from "@argent/x-ui"
 import type { FC } from "react"
-
-const { MinusPrimaryIcon } = icons
 
 interface SettingsNetworkListItemProps {
   host: string

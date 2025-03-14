@@ -6,7 +6,6 @@ import copy from "copy-to-clipboard"
 
 import { ExportPublicKeyScreen } from "./ExportPublicKeyScreen"
 import { defaultNetwork } from "../../../../shared/network"
-import { encodeBase58 } from "ethers"
 import * as routesFile from "../../../hooks/useRoute"
 
 const accountAddress =
@@ -39,21 +38,19 @@ describe("ExportPublicKeyScreen", () => {
       </BrowserRouter>,
     )
 
-    const encodedPublicKey = encodeBase58(publicKey)
-
     /** check the text displayed on screen */
-    expect(await screen.findByText(encodedPublicKey)).toBeInTheDocument()
+    expect(await screen.findByText(publicKey)).toBeInTheDocument()
 
     /** check the attribute passed into the qr code */
     const qrCode = container.querySelector(`[data-testid="qr-code"]`)
     if (!qrCode) {
       throw new Error("QR code not found")
     }
-    expect(qrCode.getAttribute("data-key")).toEqual(encodedPublicKey)
+    expect(qrCode.getAttribute("data-key")).toEqual(publicKey)
 
     /** check the value copied to clipboard */
     const copyButton = screen.getByRole("button", { name: /copy/i })
     await user.click(copyButton)
-    expect(copy).toHaveBeenCalledWith(encodedPublicKey)
+    expect(copy).toHaveBeenCalledWith(publicKey)
   })
 })

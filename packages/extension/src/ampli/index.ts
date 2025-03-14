@@ -8,7 +8,7 @@
  * To update run 'ampli pull argent-x'
  *
  * Required dependencies: @amplitude/analytics-browser@^1.3.0
- * Tracking Plan Version: 61
+ * Tracking Plan Version: 80
  * Build: 1.0.0
  * Runtime: browser:typescript-ampli-v2
  *
@@ -30,10 +30,10 @@ export const ApiKey: Record<Environment, string> = {
  */
 export const DefaultConfiguration: BrowserOptions = {
   plan: {
-    version: "61",
+    version: "80",
     branch: "main",
     source: "argent-x",
-    versionId: "73703ce7-e97a-4b27-84da-d72d0085c68e",
+    versionId: "c003eea8-ba9d-401b-92cf-82d5f6c98911",
   },
   ...{
     ingestionMetadata: {
@@ -217,6 +217,15 @@ export interface AccountDeployedProperties {
    * | Enum Values | browser extension, mobile, web, telegram |
    */
   "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
+}
+
+export interface AccountIconChangedProperties {
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | emoji, initials |
+   */
+  "account icon": "emoji" | "initials"
 }
 
 export interface ActivityTabClickedProperties {
@@ -705,6 +714,21 @@ export interface OnboardingVerificationCodeResentProperties {
   "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
+export interface SidebarEnabledProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web, telegram |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
+}
+
 export interface SwapQuoteFailedProperties {
   /**
    * "swap" error type
@@ -732,7 +756,30 @@ export interface SwapQuoteFailedProperties {
   "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
 }
 
+export interface SwapSlippageSettingClickedProperties {
+  /**
+   * This is a REQUIRED property, and it must be fired for ALL events on this project.
+   *
+   *  This property defines from which wallet platform (Argent Mobile, Web Wallet, or Argent X) the event is fired from.
+   *
+   *  You may use this for figuring out MAU per wallet, or filtering out a specific Event per wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | browser extension, mobile, web, telegram |
+   */
+  "wallet platform": "browser extension" | "mobile" | "web" | "telegram"
+}
+
 export interface SwapTabClickedProperties {
+  /**
+   * This property defines from which flow user entered the Swap UI.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | swap tab, home tab, token details page |
+   */
+  "swap entered from"?: "swap tab" | "home tab" | "token details page"
   /**
    * This is a REQUIRED property, and it must be fired for ALL events on this project.
    *
@@ -778,9 +825,17 @@ export interface TestnetAccountImportFailedProperties {
 
 export interface TransactionReviewedProperties {
   /**
+   * Represents the base token of a swap transaction using the token ticker e.g. STRK not Starknet, ETH not Ethereum
+   */
+  "base token"?: string
+  /**
    * Describes host part of an URL e.g. app.ekubo.org for <https://app.ekubo.org/positions/0x1/0x1/123>
    */
   host?: string
+  /**
+   * Represents the quote token of a swap transaction using the token ticker e.g. STRK not Starknet, ETH not Ethereum
+   */
+  "quote token"?: string
   /**
    * References the "Key" e.g. **insufficient token received**
    */
@@ -791,14 +846,28 @@ export interface TransactionReviewedProperties {
   "simulation error message"?: string
   "simulation succeeded"?: boolean
   /**
+   * Describes the slippage used for swap in percentage representation (`1% = 1`, `2.5% = 2.5`)
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  slippage?: number
+  /**
    * Used for Staking related transaction type only.
    *  Staking providers are \[argent, nethermind, ...\]
    */
   "staking provider"?: string
   /**
+   * This property fires the pair of the swap. It is beneficial because hainv base/quote token  event alone doesn't help us track this well on amplitude.
+   *
+   *  E.g "ETH/STRK" (base/quote)
+   */
+  "swap pair"?: string
+  /**
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain, stake, claim staked rewards, initialise withdraw, finalise withdraw |
+   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain, stake, claim staked rewards, initialise withdraw, finalise withdraw, liquid stake |
    */
   "transaction type"?:
     | "inapp swap"
@@ -824,6 +893,15 @@ export interface TransactionReviewedProperties {
     | "claim staked rewards"
     | "initialise withdraw"
     | "finalise withdraw"
+    | "liquid stake"
+  /**
+   * representing the usd value of associated transaction
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  "usd value"?: number
   /**
    * This is a REQUIRED property, and it must be fired for ALL events on this project.
    *
@@ -862,10 +940,26 @@ export interface TransactionSubmittedProperties {
    */
   "account type": "standard" | "smart" | "multisig"
   /**
+   * Represents the base token of a swap transaction using the token ticker e.g. STRK not Starknet, ETH not Ethereum
+   */
+  "base token"?: string
+  /**
    * Describes host part of an URL e.g. app.ekubo.org for <https://app.ekubo.org/positions/0x1/0x1/123>
    */
   host?: string
   "is deployment"?: boolean
+  /**
+   * Represents the quote token of a swap transaction using the token ticker e.g. STRK not Starknet, ETH not Ethereum
+   */
+  "quote token"?: string
+  /**
+   * Describes the slippage used for swap in percentage representation (`1% = 1`, `2.5% = 2.5`)
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  slippage?: number
   /**
    * Used for Staking related transaction type only.
    *  Staking providers are \[argent, nethermind, ...\]
@@ -877,10 +971,11 @@ export interface TransactionSubmittedProperties {
    * | Item Type | string |
    */
   "token addresses"?: string[]
+  "token pair"?: string
   /**
    * | Rule | Value |
    * |---|---|
-   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain, stake, claim staked rewards, initialise withdraw, finalise withdraw |
+   * | Enum Values | inapp swap, inapp send, upgrade contract, enable smart account, disable smart account, keep smart account, deploy user account, deploy multisig account, add owner, remove owner, set confirmation, submit transaction intent, dapp, declare contract, deploy contract, replace owner, remove guardian, add guardian, reject onchain, stake, claim staked rewards, initialise withdraw, finalise withdraw, liquid stake |
    */
   "transaction type"?:
     | "inapp swap"
@@ -906,6 +1001,15 @@ export interface TransactionSubmittedProperties {
     | "claim staked rewards"
     | "initialise withdraw"
     | "finalise withdraw"
+    | "liquid stake"
+  /**
+   * representing the usd value of associated transaction
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  "usd value"?: number
   /**
    * This is a REQUIRED property, and it must be fired for ALL events on this project.
    *
@@ -978,6 +1082,18 @@ export class AccountDeployed implements BaseEvent {
   constructor(public event_properties: AccountDeployedProperties) {
     this.event_properties = event_properties
   }
+}
+
+export class AccountIconChanged implements BaseEvent {
+  event_type = "Account Icon Changed"
+
+  constructor(public event_properties: AccountIconChangedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class AccountNameRenamed implements BaseEvent {
+  event_type = "Account Name Renamed"
 }
 
 export class ActivityTabClicked implements BaseEvent {
@@ -1156,6 +1272,14 @@ export class OnboardingVerificationCodeResent implements BaseEvent {
   }
 }
 
+export class SidebarEnabled implements BaseEvent {
+  event_type = "Sidebar Enabled"
+
+  constructor(public event_properties: SidebarEnabledProperties) {
+    this.event_properties = event_properties
+  }
+}
+
 export class StakingEditButtonClicked implements BaseEvent {
   event_type = "Staking Edit Button Clicked"
 }
@@ -1164,6 +1288,14 @@ export class SwapQuoteFailed implements BaseEvent {
   event_type = "Swap Quote Failed"
 
   constructor(public event_properties: SwapQuoteFailedProperties) {
+    this.event_properties = event_properties
+  }
+}
+
+export class SwapSlippageSettingClicked implements BaseEvent {
+  event_type = "Swap Slippage Setting Clicked"
+
+  constructor(public event_properties: SwapSlippageSettingClickedProperties) {
     this.event_properties = event_properties
   }
 }
@@ -1401,6 +1533,41 @@ export class Ampli {
     options?: EventOptions,
   ) {
     return this.track(new AccountDeployed(properties), options);
+  }
+
+  /**
+   * Account Icon Changed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Account%20Icon%20Changed)
+   *
+   * This event is fired when: User switches the icon style between Emoji and Letter 
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. account icon)
+   * @param options Amplitude event options.
+   */
+  accountIconChanged(
+    properties: AccountIconChangedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new AccountIconChanged(properties), options);
+  }
+
+  /**
+   * Account Name Renamed
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Account%20Name%20Renamed)
+   *
+   * This event is fired when: The user renames the account name (e.g. Fantastic Fox -> Savings")
+   *
+   * @param options Amplitude event options.
+   */
+  accountNameRenamed(
+    options?: EventOptions,
+  ) {
+    return this.track(new AccountNameRenamed(), options);
   }
 
   /**
@@ -1930,6 +2097,31 @@ export class Ampli {
   }
 
   /**
+   * Sidebar Enabled
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Sidebar%20Enabled)
+   *
+   * **AX:**
+   *
+   * This event is fired when: the user clicks the "sidebar" button at the top right (which enables the sidebar mode) 
+   *
+   *
+   *
+   *  Screenshot:  
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
+   * @param options Amplitude event options.
+   */
+  sidebarEnabled(
+    properties: SidebarEnabledProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new SidebarEnabled(properties), options);
+  }
+
+  /**
    * Staking Edit Button Clicked
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Staking%20Edit%20Button%20Clicked)
@@ -1975,13 +2167,35 @@ export class Ampli {
   }
 
   /**
+   * Swap Slippage Setting Clicked
+   *
+   * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Swap%20Slippage%20Setting%20Clicked)
+   *
+   * This event is fired when: The slippage setting at the top right of the swap screen is clicked  
+   *
+   *  Screenshot: 
+   *
+   *
+   *
+   *
+   * @param properties The event's properties (e.g. wallet platform)
+   * @param options Amplitude event options.
+   */
+  swapSlippageSettingClicked(
+    properties: SwapSlippageSettingClickedProperties,
+    options?: EventOptions,
+  ) {
+    return this.track(new SwapSlippageSettingClicked(properties), options);
+  }
+
+  /**
    * Swap Tab Clicked
    *
    * [View in Tracking Plan](https://data.eu.amplitude.com/argent/Argent%20(dev)/events/main/latest/Swap%20Tab%20Clicked)
    *
-   * This is fired when: A user clicks on the swap tab.
+   * This is fired when: A user opens the swap tab.
    *
-   * Relevant properties: n/a
+   * Relevant properties: "Swap entered from" that track entry point
    *
    * Other comments: This tab only exists on Argent X.
    *
@@ -1992,7 +2206,7 @@ export class Ampli {
    *
    * Owner: Ko Sakuma
    *
-   * @param properties The event's properties (e.g. wallet platform)
+   * @param properties The event's properties (e.g. swap entered from)
    * @param options Amplitude event options.
    */
   swapTabClicked(
@@ -2053,7 +2267,7 @@ export class Ampli {
    *
    * Owner: Ko Sakuma
    *
-   * @param properties The event's properties (e.g. host)
+   * @param properties The event's properties (e.g. base token)
    * @param options Amplitude event options.
    */
   transactionReviewed(

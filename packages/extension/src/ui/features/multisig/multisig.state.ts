@@ -21,6 +21,7 @@ import type {
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   MultisigWalletAccount,
+  WalletAccount,
 } from "../../../shared/wallet.model"
 import { isNetworkOnlyPlaceholderAccount } from "../../../shared/wallet.model"
 import { allAccountsView, selectedBaseAccountView } from "../../views/account"
@@ -29,33 +30,9 @@ import {
   multisigBaseWalletView,
   pendingMultisigsView,
 } from "../../views/multisig"
-import { Multisig } from "./Multisig"
 import { isEqualAddress } from "@argent/x-shared"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-
-export const mapMultisigWalletAccountsToMultisig = (
-  walletAccounts: MultisigWalletAccount[],
-): Multisig[] => {
-  return walletAccounts.map(
-    (walletAccount) =>
-      new Multisig({
-        id: walletAccount.id,
-        name: walletAccount.name,
-        address: walletAccount.address,
-        network: walletAccount.network,
-        signer: walletAccount.signer,
-        hidden: walletAccount.hidden,
-        type: walletAccount.type,
-        guardian: walletAccount.guardian,
-        escape: walletAccount.escape,
-        needsDeploy: walletAccount.needsDeploy,
-        signers: walletAccount.signers,
-        threshold: walletAccount.threshold,
-        creator: walletAccount.creator,
-        publicKey: walletAccount.publicKey,
-      }),
-  )
-}
+import { atomWithDebugLabel } from "../../views/atomWithDebugLabel"
 
 export function useBaseMultisigAccounts() {
   return useView(multisigBaseWalletView)
@@ -108,83 +85,101 @@ export const selectedMultisigView = atom(async (get) => {
 
 export const multisigView = atomFamily(
   (account?: BaseWalletAccount) =>
-    atom(async (get) => {
-      const accounts = await get(allAccountsView)
-      const baseMultisigAccounts = await get(multisigBaseWalletView)
+    atomWithDebugLabel(
+      atom(async (get) => {
+        const accounts = await get(allAccountsView)
+        const baseMultisigAccounts = await get(multisigBaseWalletView)
 
-      const baseMultisigAccount = baseMultisigAccounts.find((multisigAccount) =>
-        accountsEqual(multisigAccount, account),
-      )
+        const baseMultisigAccount = baseMultisigAccounts.find(
+          (multisigAccount) => accountsEqual(multisigAccount, account),
+        )
 
-      const walletAccount = accounts.find((walletAccount) =>
-        accountsEqual(walletAccount, account),
-      )
+        const walletAccount = accounts.find((walletAccount) =>
+          accountsEqual(walletAccount, account),
+        )
 
-      if (!walletAccount || !baseMultisigAccount) {
-        return
-      }
+        if (!walletAccount || !baseMultisigAccount) {
+          return
+        }
 
-      return new Multisig({
-        ...walletAccount,
-        ...baseMultisigAccount,
-      })
-    }),
+        const multisigWalletAccount: MultisigWalletAccount = {
+          ...walletAccount,
+          ...baseMultisigAccount,
+          type: "multisig",
+        }
+
+        return multisigWalletAccount
+      }),
+      `multisigView-${account?.id || "unknown"}`,
+    ),
   atomFamilyAccountsEqual,
 )
 
 export const multisigByIdView = atomFamily(
   (accountId?: AccountId) =>
-    atom(async (get) => {
-      const accounts = await get(allAccountsView)
-      const baseMultisigAccounts = await get(multisigBaseWalletView)
+    atomWithDebugLabel(
+      atom(async (get) => {
+        const accounts = await get(allAccountsView)
+        const baseMultisigAccounts = await get(multisigBaseWalletView)
 
-      const baseMultisigAccount = baseMultisigAccounts.find((multisigAccount) =>
-        isEqualAccountIds(multisigAccount.id, accountId),
-      )
+        const baseMultisigAccount = baseMultisigAccounts.find(
+          (multisigAccount) => isEqualAccountIds(multisigAccount.id, accountId),
+        )
 
-      const walletAccount = accounts.find((walletAccount) =>
-        isEqualAccountIds(walletAccount.id, accountId),
-      )
+        const walletAccount = accounts.find((walletAccount) =>
+          isEqualAccountIds(walletAccount.id, accountId),
+        )
 
-      if (!walletAccount || !baseMultisigAccount) {
-        return
-      }
+        if (!walletAccount || !baseMultisigAccount) {
+          return
+        }
 
-      return new Multisig({
-        ...walletAccount,
-        ...baseMultisigAccount,
-      })
-    }),
+        const multisigWalletAccount: MultisigWalletAccount = {
+          ...walletAccount,
+          ...baseMultisigAccount,
+          type: "multisig",
+        }
+
+        return multisigWalletAccount
+      }),
+      `multisigByIdView-${accountId || "unknown"}`,
+    ),
   atomFamilyIsEqualAccountIds,
 )
 
 export const baseMultisigView = atomFamily(
   (account?: BaseWalletAccount) =>
-    atom(async (get) => {
-      const baseMultisigAccounts = await get(multisigBaseWalletView)
+    atomWithDebugLabel(
+      atom(async (get) => {
+        const baseMultisigAccounts = await get(multisigBaseWalletView)
 
-      const baseMultisigAccount = baseMultisigAccounts.find((multisigAccount) =>
-        accountsEqual(multisigAccount, account),
-      )
+        const baseMultisigAccount = baseMultisigAccounts.find(
+          (multisigAccount) => accountsEqual(multisigAccount, account),
+        )
 
-      return baseMultisigAccount
-    }),
+        return baseMultisigAccount
+      }),
+      `baseMultisigView-${account?.id || "unknown"}`,
+    ),
   atomFamilyAccountsEqual,
 )
 
 export const isSignerInMultisigView = atomFamily(
   (account?: BaseWalletAccount) =>
-    atom(async (get) => {
-      const multisig = await get(baseMultisigView(account))
-      if (!multisig) {
-        return false
-      }
-      const isSigner = multisig.signers.some((signer) =>
-        isEqualAddress(signer, multisig.publicKey),
-      )
-      const hasPendingSignerChange = !!multisig.pendingSigner
-      return isSigner || hasPendingSignerChange
-    }),
+    atomWithDebugLabel(
+      atom(async (get) => {
+        const multisig = await get(baseMultisigView(account))
+        if (!multisig) {
+          return false
+        }
+        const isSigner = multisig.signers.some((signer) =>
+          isEqualAddress(signer, multisig.publicKey),
+        )
+        const hasPendingSignerChange = !!multisig.pendingSigner
+        return isSigner || hasPendingSignerChange
+      }),
+      `isSignerInMultisigView-${account?.id || "unknown"}`,
+    ),
   atomFamilyAccountsEqual,
 )
 
@@ -252,3 +247,9 @@ export function usePendingMultisig(base?: BasePendingMultisig) {
 }
 
 export const isHiddenPendingMultisig = (pm: PendingMultisig) => !!pm.hidden
+
+export const multisigIsPending = (
+  multisig: WalletAccount | PendingMultisig,
+): multisig is PendingMultisig => {
+  return "publicKey" in multisig && !("address" in multisig)
+}

@@ -3,11 +3,11 @@ import { Center, Flex, Image } from "@chakra-ui/react"
 import type { FC, MouseEvent } from "react"
 
 import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
-import type { Multisig } from "./Multisig"
 import { MultisigHideModal } from "./MultisigHideModal"
+import type { MultisigWalletAccount } from "../../../shared/wallet.model"
 
 export interface RemovedMultisigSettingsScreenProps {
-  multisig: Multisig
+  multisig: MultisigWalletAccount
   accountName: string
   onHideMultisigModalOpen: () => void
   onHideMultisigModalClose: () => void

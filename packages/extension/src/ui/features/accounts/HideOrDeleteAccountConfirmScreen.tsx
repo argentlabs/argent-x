@@ -1,26 +1,25 @@
-import {
-  BarBackButton,
-  H4,
-  icons,
-  NavigationContainer,
-  P2,
-  P3,
-} from "@argent/x-ui"
+import { InfoCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { BarBackButton, H4, NavigationContainer, P2, P3 } from "@argent/x-ui"
 import { Button, Center, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useMemo } from "react"
 
-import { formatFullAddress, getNetworkAccountImageUrl } from "@argent/x-shared"
+import { formatFullAddress } from "@argent/x-shared"
 import { AccountAvatar } from "./AccountAvatar"
 import { upperFirst } from "lodash-es"
-import type { WalletAccountType } from "../../../shared/wallet.model"
+import type {
+  AvatarMeta,
+  WalletAccountType,
+} from "../../../shared/wallet.model"
 
-const { InfoCircleSecondaryIcon } = icons
+import { typographyStyles } from "@argent/x-ui/theme"
 
 export interface HideOrDeleteAccountConfirmScreenProps {
+  accountId: string
   accountName: string
   accountAddress: string
   accountType: WalletAccountType
+  avatarMeta?: AvatarMeta
   onSubmit: () => void
   onReject: () => void
   networkId: string
@@ -31,12 +30,12 @@ export const HideOrDeleteAccountConfirmScreen: FC<
   HideOrDeleteAccountConfirmScreenProps
 > = ({
   mode,
+  accountId,
   accountName,
   accountAddress,
   accountType,
   onSubmit,
   onReject,
-  networkId,
 }) => {
   const subtext = useMemo(() => {
     if (mode === "hide") {
@@ -71,11 +70,11 @@ export const HideOrDeleteAccountConfirmScreen: FC<
           <AccountAvatar
             outlined={false}
             size={12}
-            src={getNetworkAccountImageUrl({
-              accountName,
-              accountAddress,
-              networkId,
-            })}
+            accountId={accountId}
+            accountName={accountName}
+            accountType={accountType}
+            emojiStyle={typographyStyles.H2}
+            initialsStyle={typographyStyles.H4}
           />
 
           <H4>{accountName}</H4>

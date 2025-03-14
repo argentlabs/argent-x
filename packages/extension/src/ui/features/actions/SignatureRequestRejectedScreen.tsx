@@ -3,10 +3,9 @@ import React from "react"
 
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { Circle, Flex } from "@chakra-ui/react"
-import { H4, icons, P3 } from "@argent/x-ui"
+import { WarningCirclePrimaryIcon, SignIcon } from "@argent/x-ui/icons"
+import { H4, P3 } from "@argent/x-ui"
 import type { WalletAccount } from "../../../shared/wallet.model"
-
-const { WarningCirclePrimaryIcon, SignIcon } = icons
 
 interface SignatureRequestRejectedScreenProps {
   selectedAccount?: WalletAccount

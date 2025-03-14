@@ -1,8 +1,8 @@
-import type { StrkStakingCalldataWithAccountType } from "./types"
 import type {
   StrkStakingCalldata,
   StrkStakingCalldataResponse,
 } from "@argent/x-shared"
+import type { StrkStakingCalldataWithAccountType } from "./types"
 
 export interface IStakingService {
   getStakeCalldata: (

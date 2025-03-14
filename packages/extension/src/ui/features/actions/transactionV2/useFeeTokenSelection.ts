@@ -4,23 +4,18 @@ import {
   ETH_TOKEN_ADDRESS,
   isEqualAddress,
 } from "@argent/x-shared"
-import type { EstimatedFee, EstimatedFees } from "@argent/x-shared/simulation"
-import { useEffect, useState } from "react"
-import { num } from "starknet"
+import type { EstimatedFeesV2 } from "@argent/x-shared/simulation"
+import { useEffect, useMemo, useState } from "react"
 import { equalToken } from "../../../../shared/token/__new/utils"
 import type { WalletAccount } from "../../../../shared/wallet.model"
 import { hasFeeTokenEnoughBalance } from "./utils/hasFeeTokenEnoughBalance"
-import type { TokenWithBalance as TokenWithStringBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
+import { useFeeFromEstimatedFees } from "./useFeeFromEstimatedFees"
 
-interface FeeTokenSelectionProps {
-  isFeeTokenSelectionReady: boolean
-  setIsFeeTokenSelectionReady: (isReady: boolean) => void
-  fee?: EstimatedFees | EstimatedFee | bigint
-  setFeeToken: (feeToken: TokenWithBalance) => void
+interface UseFeeTokenSelectionParams {
+  fees?: EstimatedFeesV2[]
   account?: WalletAccount
-  feeToken: TokenWithBalance
   defaultFeeToken: TokenWithBalance
-  feeTokens: TokenWithStringBalance[]
+  availableFeeTokens: TokenWithBalance[]
 }
 
 /**
@@ -31,66 +26,83 @@ interface FeeTokenSelectionProps {
  * 4. If the account doesn't support tx v3, use ETH as the fee token
  */
 export const useFeeTokenSelection = ({
-  isFeeTokenSelectionReady,
-  setIsFeeTokenSelectionReady,
-  feeToken,
-  setFeeToken,
   account,
-  fee,
+  fees,
   defaultFeeToken,
-  feeTokens,
-}: FeeTokenSelectionProps) => {
-  // helper array of fee tokens, because we need to check the default fee token first
-  const [uncheckedFeeTokens] = useState<TokenWithBalance[]>(
-    () =>
-      feeTokens
-        ?.map((token) => ({
-          ...token,
-          balance: num.toBigInt(token.balance ?? 0),
-        }))
-        .sort((a, b) => {
-          if (equalToken(a, defaultFeeToken)) return -1
-          if (equalToken(b, defaultFeeToken)) return 1
-          return 0
-        }) || [],
+  availableFeeTokens = [],
+}: UseFeeTokenSelectionParams) => {
+  const [isReady, setIsReady] = useState(false)
+  const [feeToken, setFeeToken] = useState(defaultFeeToken)
+
+  const fee = useFeeFromEstimatedFees(fees, feeToken)
+
+  // Memoize sorted tokens instead of using state
+  const sortedFeeTokens = useMemo(() => {
+    return availableFeeTokens.sort(
+      (a, b) =>
+        Number(equalToken(b, defaultFeeToken)) -
+        Number(equalToken(a, defaultFeeToken)),
+    )
+  }, [availableFeeTokens, defaultFeeToken])
+
+  // Handle non-V3 accounts separately
+  const shouldUseEth = useMemo(
+    () => !classHashSupportsTxV3(account?.classHash),
+    [account?.classHash],
   )
 
+  const ethToken = useMemo(
+    () =>
+      sortedFeeTokens.find((t) => isEqualAddress(t.address, ETH_TOKEN_ADDRESS)),
+    [sortedFeeTokens],
+  )
+
+  // Main effect for fee token selection logic
   useEffect(() => {
-    if (isFeeTokenSelectionReady) return
-    if (!classHashSupportsTxV3(account?.classHash)) {
-      const ethToken = uncheckedFeeTokens.find((token) =>
-        isEqualAddress(token.address, ETH_TOKEN_ADDRESS),
-      )
+    if (isReady) return
+
+    if (shouldUseEth) {
       if (ethToken) {
-        setFeeToken({
-          ...ethToken,
-          balance: num.toBigInt(ethToken.balance ?? 0),
-        })
+        setFeeToken(ethToken)
       }
-      setIsFeeTokenSelectionReady(true)
-    } else if (feeToken && fee) {
-      const feeTokenNeedsUpdate = !hasFeeTokenEnoughBalance(feeToken, fee)
-      if (feeTokenNeedsUpdate && uncheckedFeeTokens.length) {
-        const index = uncheckedFeeTokens.findIndex((token) =>
-          equalToken(token, feeToken),
-        )
-        const newFeeToken = uncheckedFeeTokens[index + 1] || defaultFeeToken
-        setFeeToken(newFeeToken)
-        // If we have iterated through all the fee tokens and none have enough balance, we are ready
-        setIsFeeTokenSelectionReady(index === uncheckedFeeTokens.length - 1)
-      } else {
-        setIsFeeTokenSelectionReady(true)
-      }
+      setIsReady(true)
+      return
     }
+
+    if (!feeToken || !fee) {
+      return
+    }
+
+    if (hasFeeTokenEnoughBalance(feeToken, fee)) {
+      setIsReady(true)
+      return
+    }
+
+    // find the first token with enough balance
+    const tokenWithSufficientBalance = sortedFeeTokens.find((t) =>
+      fees?.some(
+        (f) =>
+          isEqualAddress(f.transactions.feeTokenAddress, t.address) &&
+          hasFeeTokenEnoughBalance(t, f),
+      ),
+    )
+
+    if (tokenWithSufficientBalance) {
+      setFeeToken(tokenWithSufficientBalance)
+    }
+
+    setIsReady(true)
   }, [
-    account?.type,
-    account?.classHash,
-    defaultFeeToken,
+    shouldUseEth,
+    ethToken,
     feeToken,
-    isFeeTokenSelectionReady,
     fee,
-    uncheckedFeeTokens,
-    setFeeToken,
-    setIsFeeTokenSelectionReady,
+    sortedFeeTokens,
+    isReady,
+    setIsReady,
+    defaultFeeToken,
+    fees,
   ])
+
+  return { isFeeTokenSelectionReady: isReady, feeToken, setFeeToken, fee }
 }

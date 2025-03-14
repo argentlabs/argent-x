@@ -23,6 +23,8 @@ import { getAccountIdentifier } from "../../utils/accountIdentifier"
 import type { IAccountService } from "../../account/service/accountService/IAccountService"
 import { ampli } from "../../analytics"
 import type { TestnetAccountImportFailedProperties } from "../../../ampli"
+import { getAccountMeta } from "../../accountNameGenerator"
+import { isArgentAccountClassHash } from "../../utils/isExternalAccount"
 
 export class AccountImportSharedService implements IAccountImportSharedService {
   constructor(
@@ -38,6 +40,7 @@ export class AccountImportSharedService implements IAccountImportSharedService {
   ): Promise<ImportValidationResult> {
     const network = await this.networkService.getById(networkId)
     const provider = getProvider(network)
+    const isMainnet = networkId === "mainnet-alpha"
 
     let classHash: string
     let importedAccount: ImportedAccount
@@ -46,6 +49,13 @@ export class AccountImportSharedService implements IAccountImportSharedService {
 
     try {
       classHash = await provider.getClassHashAt(address)
+
+      if (isMainnet && !isArgentAccountClassHash(classHash)) {
+        success = false
+        errorType = AccountImportError.IS_NOT_ARGENT
+        this.trackImportEvent({ success, errorType }, undefined)
+        return { success, errorType }
+      }
     } catch {
       success = false
       errorType = AccountImportError.ACCOUNT_NOT_FOUND
@@ -145,12 +155,14 @@ export class AccountImportSharedService implements IAccountImportSharedService {
 
     await this.pkManager.storeEncryptedKey(pk, password, accountId)
 
+    const { name } = getAccountMeta(accountId, "imported")
+
     const wa: WalletAccount = {
       id: accountId,
+      name,
       address,
       networkId,
       signer: { type: SignerType.PRIVATE_KEY, derivationPath },
-      name: `Imported Account ${allImportedAccounts.length + 1}`,
       type: "imported",
       network,
       needsDeploy: false,
@@ -200,7 +212,7 @@ export class AccountImportSharedService implements IAccountImportSharedService {
 
   private buildTransferCall(tokenAddress: Address, amount: bigint) {
     return {
-      type: TransactionType.INVOKE as const,
+      type: TransactionType.INVOKE,
       contractAddress: tokenAddress,
       entrypoint: "transfer",
       calldata: CallData.compile(

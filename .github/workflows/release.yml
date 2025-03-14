@@ -7,7 +7,7 @@ on:
     tags:
       - "**"
 env:
-  PNPM_VERSION: 9
+  PNPM_VERSION: 10.2
   NODE_VERSION: 18.x
 jobs:
   build:

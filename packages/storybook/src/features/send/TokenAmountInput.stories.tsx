@@ -1,6 +1,7 @@
 import { TokenAmountInput } from "@argent-x/extension/src/ui/features/send/TokenAmountInput"
 import { CellStack } from "@argent/x-ui"
-import { ComponentProps, FC, useState } from "react"
+import type { ComponentProps, FC } from "react"
+import { useState } from "react"
 
 import { tokenWithBalance } from "../../tokens"
 

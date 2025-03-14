@@ -1,6 +1,5 @@
 import type { Mocked } from "vitest"
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { getMockAccount } from "../../../../test/account.mock"
 import {
   getAccountStoreMock,
   getMultisigStoreMock,
@@ -16,6 +15,7 @@ import type { KeyValueStorage } from "../../../shared/storage"
 import type { ISettingsStorage } from "../../../shared/settings/types"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import type { MockFnRepository } from "../../../shared/storage/__new/__test__/mockFunctionImplementation"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 
 describe("ClientAccountService", () => {
   describe("autoSelectAccountOnNetwork", () => {
@@ -23,7 +23,7 @@ describe("ClientAccountService", () => {
     let accountRepo: MockFnRepository<WalletAccount>
     let clientAccountService: IClientAccountService
 
-    const mockAccount = getMockAccount()
+    const mockAccount = getMockWalletAccount()
 
     const multisigService = {
       addAccount: vi.fn(),
@@ -63,7 +63,7 @@ describe("ClientAccountService", () => {
     })
 
     it("should select existing account on network if available", async () => {
-      const selectedAccount = getMockAccount()
+      const selectedAccount = getMockWalletAccount()
       const visibleAccounts = [selectedAccount]
 
       vi.spyOn(accountRepo, "get").mockResolvedValue(visibleAccounts)
@@ -88,7 +88,7 @@ describe("ClientAccountService", () => {
     })
 
     it("should select last used account on network if available", async () => {
-      const lastUsedAccount = getMockAccount()
+      const lastUsedAccount = getMockWalletAccount()
       const visibleAccounts = [lastUsedAccount]
 
       vi.spyOn(walletStoreMock, "get").mockResolvedValue({
@@ -112,7 +112,7 @@ describe("ClientAccountService", () => {
     })
 
     it("should select first visible account when no existing or last used account is available", async () => {
-      const firstVisibleAccount = getMockAccount()
+      const firstVisibleAccount = getMockWalletAccount()
       const visibleAccounts = [firstVisibleAccount]
 
       vi.mocked(walletStoreMock.get).mockResolvedValue({})

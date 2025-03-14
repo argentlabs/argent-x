@@ -1,4 +1,5 @@
-import { EventEmitterProvider, SetDarkMode } from "@argent/x-ui"
+import { EventEmitterProvider } from "@argent/x-ui"
+import { SetDarkMode } from "@argent/x-ui/theme"
 import Emittery from "emittery"
 import type { FC } from "react"
 import { useRef } from "react"
@@ -23,6 +24,12 @@ import { DevUI } from "./features/dev/DevUI"
 import { AppThemeProvider } from "./AppThemeProvider"
 import { Toaster } from "sonner"
 import { DarkMode, Portal } from "@chakra-ui/react"
+import { I18N_ENABLED } from "../shared/i18n/constants"
+
+if (I18N_ENABLED) {
+  console.warn("I18N_ENABLED is true, uncomment the import in App.tsx")
+  // import("./i18n")
+}
 
 export const App: FC = () => {
   const emitter = useRef(new Emittery()).current

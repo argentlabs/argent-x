@@ -68,6 +68,11 @@ export const withLedgerSignerSchema = z.object({
 
 export const cairoVersionSchema = z.union([z.literal("0"), z.literal("1")])
 
+export const avatarMetaSchema = z.object({
+  emoji: z.string().nullable().optional(),
+  bgColor: z.string().optional(),
+})
+
 export const walletAccountSchema = z
   .object({
     name: z.string(),
@@ -83,6 +88,7 @@ export const walletAccountSchema = z
     owner: z.string().optional(),
     index: z.number().optional(),
     salt: addressSchema.optional(),
+    avatarMeta: avatarMetaSchema.optional(),
   })
   .merge(withSignerSchema)
   .merge(baseWalletAccountSchema)
@@ -159,6 +165,8 @@ export type RecoveredLedgerMultisig = z.infer<
   typeof recoveredLedgerMultisigSchema
 >
 export type ImportedLedgerAccount = z.infer<typeof importedLedgerAccountSchema>
+
+export type AvatarMeta = z.infer<typeof avatarMetaSchema>
 
 export function isNetworkOnlyPlaceholderAccount(
   walletAccount: unknown,

@@ -1,6 +1,6 @@
 import "fake-indexeddb/auto"
 import { fireEvent, render, screen, act } from "@testing-library/react"
-import { Swap, spin } from "./Swap"
+import { Swap, fadeIn, reverseSwapAnimation, swapAnimation } from "./Swap"
 import * as useSwapInfoModule from "./hooks/useSwapInfo"
 import * as useSwapStateModule from "./state/fields"
 import * as useSwapActionHandlersModule from "./hooks/useSwapActionHandler"
@@ -80,6 +80,7 @@ describe("Swap Component Tests", () => {
         tokenAddress:
           "0x053b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
       },
+      isFiatInput: false,
     })
 
     const defaultSwapState = {
@@ -141,6 +142,12 @@ describe("Swap Component Tests", () => {
     })
 
     fireEvent.click(screen.getByLabelText("Switch input and output"))
+
+    // waiting for the swap to be triggered
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 500))
+    })
+
     expect(onSwitchTokensMock).toHaveBeenCalled()
   })
 
@@ -158,12 +165,15 @@ describe("Swap Component Tests", () => {
       )
     })
 
-    fireEvent.change(await screen.findByTestId("swap-input-pay-panel"), {
-      target: { value: "100" },
-    })
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 500))
-    })
+    const payInput = document.getElementById("swap-input-pay-panel")
+    if (payInput) {
+      fireEvent.change(payInput, {
+        target: { value: "100" },
+      })
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 500))
+      })
+    }
     expect(onUserInputMock).toHaveBeenCalledWith("PAY", "100")
   })
 
@@ -181,12 +191,15 @@ describe("Swap Component Tests", () => {
       )
     })
 
-    fireEvent.change(await screen.findByTestId("swap-input-receive-panel"), {
-      target: { value: "100" },
-    })
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 500))
-    })
+    const receiveInput = document.getElementById("swap-input-receive-panel")
+    if (receiveInput) {
+      fireEvent.change(receiveInput, {
+        target: { value: "100" },
+      })
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 500))
+      })
+    }
     expect(onUserInputMock).toHaveBeenCalledWith("RECEIVE", "100")
   })
 
@@ -196,7 +209,7 @@ describe("Swap Component Tests", () => {
       return setup({}, {}, { onUserInput: onUserInputMock })
     })
 
-    fireEvent.click(await screen.findByText("Max"))
+    fireEvent.click(await screen.findByText("100%"))
     expect(onUserInputMock).toHaveBeenCalled()
   })
 
@@ -266,7 +279,7 @@ describe("Swap Component Tests", () => {
   })
 
   // Test for checking if the switch direction button triggers the rotation animation
-  it("triggers rotation animation on switch direction button click", async () => {
+  it("triggers icon animation on switch direction button click", async () => {
     await act(async () => {
       return setup(
         {},
@@ -275,36 +288,49 @@ describe("Swap Component Tests", () => {
         },
       )
     })
-    const switchDirectionButton = await screen.findByLabelText(
-      "Switch input and output",
-    )
-    fireEvent.click(switchDirectionButton)
-    expect(switchDirectionButton).toHaveStyle(
-      `animation: ${spin.name} 0.125s linear`,
-    )
-  })
 
-  // Test for checking if the switch direction button resets rotation after animation
-  it("resets rotation after switch direction button animation", async () => {
-    vi.useFakeTimers()
-    await act(async () => {
-      return setup(
-        {},
-        {
-          switchTokens: vi.fn(),
-        },
-      )
-    })
     const switchDirectionButton = screen.getByLabelText(
       "Switch input and output",
     )
     fireEvent.click(switchDirectionButton)
-    act(() => {
-      vi.runAllTimers()
-    })
-    expect(switchDirectionButton).not.toHaveStyle(
-      `animation: ${spin.name} 0.125s linear`,
+
+    const switchDirectionIcon = await screen.findByTestId(
+      "switch-direction-icon",
     )
-    vi.useRealTimers()
+    expect(switchDirectionIcon).toHaveStyle(
+      `animation: ${fadeIn.name} 0.3s ease-in forwards`,
+    )
+  })
+
+  // Test for checking if the switch direction button resets rotation after animation
+  it("swap inputs do not have animation styles by default", async () => {
+    await act(async () => {
+      return setup(
+        {},
+        {
+          switchTokens: vi.fn(),
+        },
+      )
+    })
+
+    const payInputBox = screen.getByTestId("swap-input-pay-panel-box")
+    const receiveInputBox = screen.getByTestId("swap-input-receive-panel-box")
+    expect(payInputBox).not.toHaveStyle(
+      `animation: ${swapAnimation.name} 0.5s ease-in-out forwards`,
+    )
+    expect(receiveInputBox).not.toHaveStyle(
+      `animation: ${reverseSwapAnimation.name} 0.5s ease-in-out forwards`,
+    )
+    const switchDirectionButton = screen.getByLabelText(
+      "Switch input and output",
+    )
+    fireEvent.click(switchDirectionButton)
+
+    expect(payInputBox).toHaveStyle(
+      `animation: ${swapAnimation.name} 0.5s ease-in-out forwards`,
+    )
+    expect(receiveInputBox).toHaveStyle(
+      `animation: ${reverseSwapAnimation.name} 0.5s ease-in-out forwards`,
+    )
   })
 })

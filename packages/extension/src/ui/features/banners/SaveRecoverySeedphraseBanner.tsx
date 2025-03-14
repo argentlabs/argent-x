@@ -1,4 +1,5 @@
-import { H5, icons, P3Bold } from "@argent/x-ui"
+import { PasscodePrimaryIcon } from "@argent/x-ui/icons"
+import { H5, P3Bold } from "@argent/x-ui"
 import type { CenterProps } from "@chakra-ui/react"
 import { Button, Center, Circle } from "@chakra-ui/react"
 import type { FC } from "react"
@@ -8,8 +9,6 @@ import { routes } from "../../../shared/ui/routes"
 import { needsToSaveRecoverySeedphraseView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { useIsMainnet } from "../networks/hooks/useIsMainnet"
-
-const { PasscodePrimaryIcon } = icons
 
 export const useShowSaveRecoverySeedphraseBanner = () => {
   const needsToSaveRecoverySeedphrase = useView(

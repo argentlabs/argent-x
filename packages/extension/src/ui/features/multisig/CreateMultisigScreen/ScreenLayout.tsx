@@ -1,4 +1,5 @@
-import { icons, logosDeprecated, MassiveTitle, P1 } from "@argent/x-ui"
+import { ArrowLeftPrimaryIcon } from "@argent/x-ui/icons"
+import { MassiveTitle, P1 } from "@argent/x-ui"
 import { Box, Button } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import type { FC, PropsWithChildren, ReactNode } from "react"
@@ -6,8 +7,7 @@ import type { FC, PropsWithChildren, ReactNode } from "react"
 import { ContentWrapper } from "../../../components/FullScreenPage"
 import { StepIndicator } from "../../../components/StepIndicator"
 
-const { ArrowLeftPrimaryIcon } = icons
-const { ArgentXLogo } = logosDeprecated
+import { ArgentXLogo } from "@argent/x-ui/logos-deprecated"
 
 export interface CreateMultisigScreen extends PropsWithChildren {
   back?: boolean

@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { Component, cloneElement } from "react"
 import type { RouterProps } from "react-router-dom"
 

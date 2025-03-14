@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 import { BarBackButton, BarCloseButton } from "@argent/x-ui"
 
 import { AccountDetailsNavigationBar } from "@argent-x/extension/src/ui/features/navigation/AccountDetailsNavigationBar"

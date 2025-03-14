@@ -1,4 +1,5 @@
-import { H5, icons, P2, P3, TokenIcon } from "@argent/x-ui"
+import { HideSecondaryIcon, ShowSecondaryIcon } from "@argent/x-ui/icons"
+import { H5, P2, P3, TokenIcon } from "@argent/x-ui"
 import type { ButtonProps } from "@chakra-ui/react"
 import { Flex, Tooltip } from "@chakra-ui/react"
 import type { FC } from "react"
@@ -7,8 +8,6 @@ import { prettifyCurrencyValue } from "@argent/x-shared"
 import type { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
 import { prettifyTokenBalance } from "../../../shared/token/prettifyTokenBalance"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
-
-const { HideSecondaryIcon, ShowSecondaryIcon } = icons
 
 export type TokenListItemVariant = "default" | "no-currency"
 

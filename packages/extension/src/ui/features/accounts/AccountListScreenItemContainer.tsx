@@ -73,7 +73,7 @@ export const AccountListScreenItemContainer: FC<
         ? routes.multisigRemovedSettings(account.id)
         : routes.settingsAccount(account.id)
 
-      navigate(routeTo)
+      void navigate(routeTo)
     } else {
       await clientAccountService.select(account.id)
 
@@ -83,7 +83,7 @@ export const AccountListScreenItemContainer: FC<
         return navigate(routes.accountTokens())
       }
 
-      navigate(returnTo || routes.accountTokens())
+      void navigate(returnTo || routes.accountTokens())
     }
   }, [
     account,
@@ -121,6 +121,7 @@ export const AccountListScreenItemContainer: FC<
       accountId={account.id}
       accountAddress={account.address}
       accountExtraInfo={accountExtraInfo}
+      avatarMeta={account.avatarMeta}
       networkId={account.networkId}
       accountType={account.type}
       isSmartAccount={Boolean(account.guardian)}

@@ -15,18 +15,29 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
-    "@playwright/test": "^1.48.1",
-    "@types/node": "^22.0.0",
-    "@types/uuid": "^10.0.0",
-    "dotenv": "^16.3.1",
+    "@playwright/test": "1.50.0",
+    "@slack/web-api": "7.8.0",
+    "@types/axios": "0.14.4",
+    "@types/cors": "2.8.17",
+    "@types/express": "5.0.0",
+    "@types/node": "22.8.7",
+    "@types/uuid": "10.0.0",
+    "dotenv": "16.4.5",
     "starknet": "6.11.0",
-    "uuid": "^11.0.0"
+    "uuid": "11.0.2",
+    "@fastify/cors": "10.0.2",
+    "fastify": "5.2.1"
   },
   "scripts": {
     "test:upgrade": "pnpm playwright test --grep '@upgrade'",
     "test:mainnet": "pnpm playwright test --grep '@prodOnly|@all'",
     "test:tx": "pnpm playwright test --grep '@tx'",
-    "test": "pnpm playwright test --grep-invert '@prodOnly|@tx|@upgrade'"
+    "test:performance": "playwright test --grep @performance",
+    "test": "pnpm playwright test --grep-invert '@prodOnly|@tx|@upgrade|@performance'"
+  },
+  "dependencies": {
+    "cors": "2.8.4",
+    "express": "4.21.1",
+    "path-to-regexp": "0.1.10"
   }
 }

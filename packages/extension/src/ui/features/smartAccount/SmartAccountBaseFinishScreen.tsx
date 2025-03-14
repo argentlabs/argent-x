@@ -1,5 +1,13 @@
 import type { FlowHeaderProps } from "@argent/x-ui"
-import { Button, CellStack, FlowHeader, icons } from "@argent/x-ui"
+
+import {
+  CheckmarkSecondaryIcon,
+  WarningCircleSecondaryIcon,
+  ShieldSecondaryIcon,
+  NoShieldSecondaryIcon,
+} from "@argent/x-ui/icons"
+
+import { Button, CellStack, FlowHeader } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useCallback, useEffect, useState } from "react"
@@ -8,13 +16,6 @@ import { useNavigate } from "react-router-dom"
 
 import type { LiveAccountGuardianState } from "./usePendingChangingGuardian"
 import { ChangeGuardian } from "../../../shared/smartAccount/changeGuardianCallDataToType"
-
-const {
-  CheckmarkSecondaryIcon,
-  WarningCircleSecondaryIcon,
-  ShieldSecondaryIcon,
-  NoShieldSecondaryIcon,
-} = icons
 
 export interface GetFlowHeaderProps {
   accountName?: string

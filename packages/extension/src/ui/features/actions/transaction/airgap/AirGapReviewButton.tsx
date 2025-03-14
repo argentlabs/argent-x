@@ -1,10 +1,11 @@
-import { B3, icons } from "@argent/x-ui"
+import { QrIcon } from "@argent/x-ui/icons"
+import { B3 } from "@argent/x-ui"
 import { Button } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useCallback } from "react"
 import type { BaseWalletAccount } from "../../../../../shared/wallet.model"
 import type { BigNumberish, Call } from "starknet"
-import type { EstimatedFees } from "@argent/x-shared/simulation"
+import type { EstimatedFeesV2 } from "@argent/x-shared/simulation"
 import { useKeyValueStorage } from "../../../../hooks/useStorage"
 import { settingsStore } from "../../../../../shared/settings"
 import { useAirGapData } from "../../transactionV2/useAirGapData"
@@ -13,12 +14,10 @@ import { useIsLedgerSigner } from "../../../ledger/hooks/useIsLedgerSigner"
 import { multisigView } from "../../../multisig/multisig.state"
 import { useView } from "../../../../views/implementation/react"
 
-const { QrIcon } = icons
-
 interface AirGapReviewButtonProps {
   selectedAccount?: BaseWalletAccount
   transactions: Call | Call[]
-  estimatedFees?: EstimatedFees
+  estimatedFees?: EstimatedFeesV2
   nonce?: BigNumberish
 }
 

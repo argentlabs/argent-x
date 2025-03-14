@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 
-import type { IKeyValueStorage } from "../keyvalue"
+import type { IKeyValueStorage } from "../types/IKeyValueStorage"
 import { KeyValueStorage } from "../keyvalue"
 import type { AreaName, StorageArea } from "../types"
 import { MockStorage } from "./chrome-storage.mock"
@@ -91,7 +91,7 @@ describe.each<TestDataType>([
       expect(handler).toHaveBeenCalledTimes(1)
       expect(handler).toHaveBeenCalledWith("baz", {
         newValue: "baz",
-        oldValue: undefined,
+        oldValue: "bar",
       })
 
       expect(allHandler).toHaveBeenCalledTimes(1)
@@ -99,7 +99,9 @@ describe.each<TestDataType>([
         newValue: {
           foo: "baz",
         },
-        oldValue: {},
+        oldValue: {
+          foo: "bar",
+        },
       })
 
       const value = await store.get("foo")
@@ -117,12 +119,14 @@ describe.each<TestDataType>([
       expect(handler).toHaveBeenCalledTimes(1)
       expect(handler).toHaveBeenCalledWith("bar", {
         oldValue: "baz",
-        newValue: undefined,
+        newValue: "bar",
       })
 
       expect(allHandler).toHaveBeenCalledTimes(1)
       expect(allHandler).toHaveBeenCalledWith({
-        newValue: {},
+        newValue: {
+          foo: "bar",
+        },
         oldValue: {
           foo: "baz",
         },

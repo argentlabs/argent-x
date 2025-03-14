@@ -21,12 +21,15 @@ export const useToggleSmartAccountRoute = () => {
           setIsLoading(true)
           const isExpired = account?.guardian
             ? await getVerifiedEmailIsExpiredForRemoval()
-            : await clientArgentAccountService.isTokenExpired()
+            : await clientArgentAccountService.isTokenExpired({
+                initiator:
+                  "useToggleSmartAccountRoute/startToggleSmartAccountFlow",
+              })
           if (isExpired) {
             await resetDevice()
             await clientArgentAccountService.requestEmail(verifiedEmail)
             if (account?.address) {
-              navigate(
+              void navigate(
                 routes.smartAccountOTP(
                   account.id,
                   verifiedEmail,
@@ -35,7 +38,7 @@ export const useToggleSmartAccountRoute = () => {
               )
             }
           } else {
-            navigate(routes.smartAccountAction(account?.id))
+            void navigate(routes.smartAccountAction(account?.id))
           }
         } catch {
           toast({
@@ -47,7 +50,9 @@ export const useToggleSmartAccountRoute = () => {
           setIsLoading(false)
         }
       } else {
-        navigate(routes.argentAccountEmail(account?.id, "toggleSmartAccount"))
+        void navigate(
+          routes.argentAccountEmail(account?.id, "toggleSmartAccount"),
+        )
       }
     },
     [navigate, toast, verifiedEmail],

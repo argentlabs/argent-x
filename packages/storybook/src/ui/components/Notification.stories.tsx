@@ -1,6 +1,6 @@
 import { Notification } from "@argent-x/extension/src/ui/components/Notification"
 import { storybookCellStackDecorator } from "@argent/x-ui"
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
 const meta: Meta<typeof Notification> = {
   component: Notification,

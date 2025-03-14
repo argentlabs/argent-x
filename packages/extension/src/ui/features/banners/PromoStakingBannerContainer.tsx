@@ -37,14 +37,14 @@ export const PromoStakingBannerContainer: FC<BannerProps> = (props) => {
   const navigate = useNavigate()
 
   const onClick = useCallback(() => {
-    navigate(routes.staking())
+    void navigate(routes.staking())
   }, [navigate])
 
   const onClose = useCallback(() => {
     setHasDismissedPromoStakingBanner(true)
   }, [setHasDismissedPromoStakingBanner])
 
-  const apyPercentage = useKeyValueStorage(stakingStore, "apyPercentage")
+  const apyPercentage = useKeyValueStorage(stakingStore, "nativeApyPercentage")
 
   return (
     <PromoStakingBanner

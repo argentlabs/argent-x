@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react"
 
-import type { Multisig } from "./Multisig"
 import { getMockMultisig } from "./multisig.mock"
 import { RemovedMultisigSettingsScreen } from "./RemovedMultisigSettingsScreen"
+import type { MultisigWalletAccount } from "../../../shared/wallet.model"
 
 const mockMultisig = {
   ...getMockMultisig({ name: "Test Multisig" }),
-} as Multisig
+} as MultisigWalletAccount
 
 test("renders account name", () => {
   render(

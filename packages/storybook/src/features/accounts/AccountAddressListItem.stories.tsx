@@ -1,6 +1,6 @@
 import { AccountAddressListItem } from "@argent-x/extension/src/ui/features/accounts/AccountAddressListItem"
 import { CellStack } from "@argent/x-ui"
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 
 export default {
   component: AccountAddressListItem,

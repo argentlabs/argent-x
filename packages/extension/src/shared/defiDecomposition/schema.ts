@@ -1,5 +1,6 @@
 import { productGroupsSchema, stakerInfoSchema } from "@argent/x-shared"
 import { z } from "zod"
+import type { BaseToken } from "../token/__new/types/token.model"
 import { BaseTokenSchema } from "../token/__new/types/token.model"
 
 const positionBaseTokenSchema = BaseTokenSchema.extend({
@@ -146,6 +147,7 @@ export type ParsedCollateralizedDebtPositionsWithUsdValue = z.infer<
 
 const parsedStakingPositionSchema = z.object({
   id: z.string(),
+  investmentId: z.string().optional(),
   apy: z.string(),
   totalApy: z.string().optional(),
   token: positionBaseTokenSchema,
@@ -172,7 +174,7 @@ export type ParsedStakingPositionsWithUsdValue = z.infer<
 
 const parsedStrkDelegatedStakingPositionSchema = z.object({
   id: z.string(),
-  investmentId: z.string(),
+  investmentId: z.string().optional(),
   stakerInfo: stakerInfoSchema,
   pendingWithdrawal: z
     .object({
@@ -359,3 +361,10 @@ export const isConcentratedLiquidityPosition = (
 ): position is ParsedConcentratedLiquidityPosition => {
   return parsedConcentratedLiquidityPositionSchema.safeParse(position).success
 }
+
+export type ParsedPositionWithUsdValueAndTitleAndLiquidityTokens =
+  ParsedPositionWithUsdValue & {
+    title: string
+    titleDetails: string
+    liquidityTokens: BaseToken[]
+  }

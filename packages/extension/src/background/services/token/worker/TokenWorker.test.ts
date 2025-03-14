@@ -194,13 +194,13 @@ describe("TokenWorker", () => {
       ])
       expect(mockTokenService.updateTokens).toHaveBeenNthCalledWith(2, [
         {
-          ...mockApiTokens[1], // from api
-          ...mockTokens[1],
-        },
-        {
           ...mockApiTokens[1], // from tradable
           ...mockTokens[1],
           networkId: "invalid-backend-network",
+        },
+        {
+          ...mockApiTokens[1], // from api
+          ...mockTokens[1],
         },
       ])
     })

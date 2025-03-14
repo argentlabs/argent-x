@@ -1,9 +1,8 @@
-import { icons, L1Bold } from "@argent/x-ui"
+import { ExpandIcon } from "@argent/x-ui/icons"
+import { L1Bold } from "@argent/x-ui"
 import type { ButtonProps, GridProps } from "@chakra-ui/react"
 import { Flex, Button, Grid, GridItem, Image, Center } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { ExpandIcon } = icons
 
 interface LinkButtonProps extends ButtonProps {
   href: string

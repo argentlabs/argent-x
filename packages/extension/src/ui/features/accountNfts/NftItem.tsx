@@ -1,8 +1,9 @@
-import { buttonHoverStyle, H5, icons, ImageOptimized } from "@argent/x-ui"
+import { NoImageSecondaryIcon } from "@argent/x-ui/icons"
+import { H5, ImageOptimized } from "@argent/x-ui"
 import { Box, Center, Image } from "@chakra-ui/react"
 import type { FC } from "react"
 
-const { NoImageSecondaryIcon } = icons
+import { buttonHoverStyle } from "@argent/x-ui/theme"
 
 interface NftItemProps {
   name: string

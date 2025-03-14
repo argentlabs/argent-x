@@ -44,7 +44,8 @@ export const DefiPositionAlertBanner: FC<DefiPositionAlertBannerProps> = ({
   const content = useMemo(() => {
     if (
       isStrkDelegatedStakingPosition(position) &&
-      position.pendingWithdrawal
+      position.pendingWithdrawal &&
+      position.investmentId
     ) {
       const title = tokenAmountToCcyCallback(
         position.token,
@@ -67,6 +68,10 @@ export const DefiPositionAlertBanner: FC<DefiPositionAlertBannerProps> = ({
       }
 
       const onWithdraw = () => {
+        if (!position.investmentId) {
+          return
+        }
+
         void unstakeAction({
           accountAddress: account.address as Address,
           accountType: account.type,
@@ -76,7 +81,7 @@ export const DefiPositionAlertBanner: FC<DefiPositionAlertBannerProps> = ({
           investmentId: position.investmentId,
         })
 
-        navigate(defiRoute)
+        void navigate(defiRoute)
       }
 
       return {

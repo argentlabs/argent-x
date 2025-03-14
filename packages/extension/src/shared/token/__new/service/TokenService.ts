@@ -5,19 +5,20 @@ import type {
   IHttpService,
 } from "@argent/x-shared"
 import {
+  apiAccountTokenBalancesSchema,
   apiPriceDataResponseSchema,
   apiTokensInfoResponseSchema,
   bigDecimal,
   convertTokenAmountToCurrencyValue,
   ensureArray,
   isEqualAddress,
-  stripAddressZeroPadding,
   retryUntilInitialised,
-  apiAccountTokenBalancesSchema,
+  stripAddressZeroPadding,
 } from "@argent/x-shared"
+import type retry from "async-retry"
 import { groupBy, isEmpty, uniq } from "lodash-es"
 import type { AllowArray } from "starknet"
-import { shortString, uint256 } from "starknet"
+import { uint256 } from "starknet"
 import urlJoin from "url-join"
 import { ARGENT_API_BASE_URL } from "../../../api/constants"
 import { argentApiNetworkForNetwork } from "../../../api/headers"
@@ -41,9 +42,8 @@ import type {
   TokenWithBalanceAndPrice,
 } from "../types/tokenPrice.model"
 import { equalToken } from "../utils"
-import type { ITokenService, FetchedTokenDetails } from "./ITokenService"
-import type retry from "async-retry"
 import { decodeShortStringArray } from "../utils/decodeShortStringArray"
+import type { FetchedTokenDetails, ITokenService } from "./ITokenService"
 
 /**
  * TokenService class implements ITokenService interface.
@@ -132,6 +132,18 @@ export class TokenService implements ITokenService {
   async updateTokenPrices(
     tokenPrices: AllowArray<TokenPriceDetails>,
   ): Promise<void> {
+    const cachedTokenPrices = await this.db.tokenPrices.toArray()
+    const newTokenPrices = ensureArray(tokenPrices)
+    const tokenPricesToRemove = cachedTokenPrices.filter(
+      (tp) => !newTokenPrices.some((ntp) => equalToken(tp, ntp)),
+    )
+
+    // remove token prices that are not in the new token prices
+    // this is to prevent stale token prices from being stored
+    await this.db.tokenPrices.bulkDelete(
+      tokenPricesToRemove.map((t) => [t.address, t.networkId]),
+    )
+
     await this.db.tokenPrices.bulkPut(ensureArray(tokenPrices))
   }
 
@@ -409,8 +421,6 @@ export class TokenService implements ITokenService {
         options: { context: { decimals } },
       })
     }
-
-    console.log("decimals", [name, symbol, decimals])
 
     const fetchedToken = {
       address: baseToken.address,

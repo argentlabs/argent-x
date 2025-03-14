@@ -2,9 +2,7 @@ import { Box, Circle } from "@chakra-ui/react"
 
 import type { FC } from "react"
 import { Panel } from "../layout/Panel"
-import { icons } from "@argent/x-ui"
-
-const { CheckmarkSecondaryIcon } = icons
+import { CheckmarkSecondaryIcon } from "@argent/x-ui/icons"
 
 export const RestoreMultisigSidePanel: FC<{ found?: boolean }> = ({
   found = false,

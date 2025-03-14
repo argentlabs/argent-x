@@ -28,6 +28,10 @@ export class MockStorage implements StorageArea, chrome.storage.StorageArea {
 
   constructor(private readonly area: AreaName) {}
 
+  getKeys(): Promise<string[]> {
+    return Promise.resolve(Array.from(this.store.keys()))
+  }
+
   clear(): Promise<void>
   clear(callback?: (() => void) | undefined): void
   clear(callback?: unknown): void | Promise<void> {

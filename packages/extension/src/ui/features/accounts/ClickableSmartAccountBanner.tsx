@@ -1,12 +1,11 @@
-import { icons, L2Bold } from "@argent/x-ui"
+import { ShieldSecondaryIcon } from "@argent/x-ui/icons"
+import { L2Bold } from "@argent/x-ui"
 
 import { Button, Flex, Text } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
 import { useToggleSmartAccountRoute } from "../smartAccount/useToggleSmartAccountRoute"
 import type { WalletAccount } from "../../../shared/wallet.model"
-
-const { ShieldSecondaryIcon } = icons
 
 export const ClickableSmartAccountBanner = ({
   account,

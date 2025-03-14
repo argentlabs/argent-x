@@ -2,7 +2,7 @@ import {
   messageStream,
   sendMessage,
   waitForMessage,
-} from "../../shared/messages"
+} from "../../shared/messages/messages"
 import { IS_DEV } from "../../shared/utils/dev"
 
 export const getMessagingPublicKey = async () => {

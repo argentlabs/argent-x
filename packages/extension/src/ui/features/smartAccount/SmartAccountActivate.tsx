@@ -1,12 +1,15 @@
-import { FlowHeader, icons } from "@argent/x-ui"
+import {
+  ResetPrimaryIcon,
+  LockPrimaryIcon,
+  MobileIcon,
+  ShieldSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { FlowHeader } from "@argent/x-ui"
 import { Box, Center, Divider, VStack } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import { SmartAccountIconRow } from "./ui/SmartAccountIconRow"
 import { SmartAccountLearnMoreButton } from "./ui/SmartAccountLearnMoreButton"
-
-const { ResetPrimaryIcon, LockPrimaryIcon, MobileIcon, ShieldSecondaryIcon } =
-  icons
 
 export const SmartAccountActivate: FC = () => {
   return (

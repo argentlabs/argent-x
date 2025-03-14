@@ -8,6 +8,9 @@ export enum TRANSACTION_ERROR_MESSAGE {
   SIMULATION_ERROR = "Transaction simulation failed",
   DEPRECATED_ACCOUNT = "Deprecated account",
   NO_PRE_COMPUTED_FEES = "There was an issue computing fees - please reject this transaction and try again",
+  PAYMASTER_FEES_NOT_SUPPORTED = "Paymaster fees not supported",
+  INVALID_PAYMASTER_SIGNATURE = "Invalid paymaster signature",
+  INVALID_FEE_TYPE = "Invalid fee type",
 }
 
 export type TransactionErrorMessage = keyof typeof TRANSACTION_ERROR_MESSAGE

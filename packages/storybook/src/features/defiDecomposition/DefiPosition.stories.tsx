@@ -1,9 +1,7 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
-import {
-  DefiPosition,
-  DefiPositionProps,
-} from "@argent-x/extension/src/ui/features/defi/defiDecomposition/DefiPosition"
+import type { DefiPositionProps } from "@argent-x/extension/src/ui/features/defi/defiDecomposition/DefiPosition"
+import { DefiPosition } from "@argent-x/extension/src/ui/features/defi/defiDecomposition/DefiPosition"
 import { storybookCellStackDecorator } from "@argent/x-ui"
 import { ArgentDbDecorator } from "../../decorators/db/argentDbDecorator"
 import { parsedPositionsWithUsdValue } from "./__fixtures__/parsedDefiDecompositionWithUsdValue"

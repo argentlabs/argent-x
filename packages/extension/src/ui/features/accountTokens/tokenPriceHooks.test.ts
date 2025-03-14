@@ -2,7 +2,11 @@ import { renderHook } from "@testing-library/react"
 import { describe, expect, test } from "vitest"
 
 import {
+  prettifyCurrenvyValueForSwap,
+  prettifyTokenAmountValueForSwap,
+  useCurrencyValueToTokenAmount,
   useSumTokenBalancesToCurrencyValue,
+  useTokenAmountToCurrencyFormatted,
   useTokenBalanceToCurrencyValue,
   useTokenPriceDetails,
 } from "./tokenPriceHooks"
@@ -68,10 +72,35 @@ describe("tokenPriceHooks", () => {
         const { result } = renderHook(() =>
           useSumTokenBalancesToCurrencyValue(
             mockTokensWithBalance,
+            undefined,
             useMockPriceAndTokenData,
           ),
         )
         expect(result.current).toEqual("1103.596564")
+      })
+    })
+
+    describe("useTokenValueConverter()", () => {
+      test("should convert currency to token amount", () => {
+        const { result } = renderHook(() =>
+          useCurrencyValueToTokenAmount(
+            "1102.594564",
+            mockTokensWithBalance[0],
+            useMockPriceAndTokenData,
+          ),
+        )
+        expect(result.current).toEqual("1.0")
+      })
+
+      test("should convert token amount to currency", () => {
+        const { result } = renderHook(() =>
+          useTokenAmountToCurrencyFormatted(
+            "1000000000000000000",
+            mockTokensWithBalance[0],
+            useMockPriceAndTokenData,
+          ),
+        )
+        expect(result.current).toEqual("1102.59")
       })
     })
   })
@@ -99,6 +128,7 @@ describe("tokenPriceHooks", () => {
         const { result } = renderHook(() =>
           useSumTokenBalancesToCurrencyValue(
             mockTokensWithBalance,
+            undefined,
             usePriceAndTokenDataImpl,
           ),
         )
@@ -132,12 +162,49 @@ describe("tokenPriceHooks", () => {
         const { result } = renderHook(() =>
           useSumTokenBalancesToCurrencyValue(
             mockTokensWithBalance,
+            "sepolia-alpha",
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             usePriceAndTokenDataImpl,
           ),
         )
         expect(result.current).toBeUndefined()
+      })
+    })
+  })
+})
+
+describe("formatting functions", () => {
+  describe("prettifyTokenAmountValueForSwap", () => {
+    test("should format token amounts correctly", () => {
+      const testCases = [
+        { input: "1.23456789", expected: "1.234567" },
+        { input: "0.00123456", expected: "0.001234" },
+        { input: "123456.789123456", expected: "123456.7891" },
+        { input: "1000", expected: "1000.0" },
+        { input: undefined, expected: "0" },
+        { input: "0", expected: "0" },
+      ]
+
+      testCases.forEach(({ input, expected }) => {
+        expect(prettifyTokenAmountValueForSwap(input)).toBe(expected)
+      })
+    })
+  })
+
+  describe("prettifyCurrenvyValueForSwap", () => {
+    test("should format currency values correctly", () => {
+      const testCases = [
+        { input: "1.23456789", expected: "1.23" },
+        { input: "0.00123456", expected: "0.0012" },
+        { input: "123456.789123456", expected: "123456.78" },
+        { input: "1000.5", expected: "1000.50" },
+        { input: undefined, expected: undefined },
+        { input: "999999.99", expected: "999999.99" },
+      ]
+
+      testCases.forEach(({ input, expected }) => {
+        expect(prettifyCurrenvyValueForSwap(input)).toBe(expected)
       })
     })
   })

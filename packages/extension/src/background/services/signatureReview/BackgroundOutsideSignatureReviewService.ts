@@ -49,15 +49,10 @@ export default class BackgroundOutsideSignatureReviewService
     return { payload: calls, type: TransactionType.INVOKE }
   }
 
-  simulateAndReview({
-    signature,
-    feeTokenAddress,
-    appDomain,
-  }: SimulateAndReviewPayload) {
+  simulateAndReview({ signature, appDomain }: SimulateAndReviewPayload) {
     const transaction = this.adaptSignature(signature)
     return this.transactionReviewService.simulateAndReview({
       transaction,
-      feeTokenAddress,
       appDomain,
     })
   }

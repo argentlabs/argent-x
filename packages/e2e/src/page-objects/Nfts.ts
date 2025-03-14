@@ -8,7 +8,7 @@ export default class Nfts extends Navigation {
   }
 
   collection(name: string) {
-    return this.page.locator(`h5:text-is("${name}")`)
+    return this.page.getByRole("heading", { name })
   }
 
   ntf(name: string) {

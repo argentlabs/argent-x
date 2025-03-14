@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { useMemo, type FC } from "react"
 
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useAccountGuardianIsSelf } from "../smartAccount/useAccountGuardian"
@@ -8,16 +8,21 @@ import {
   useAccountHasPendingCancelEscape,
   useLiveAccountEscape,
 } from "../smartAccount/escape/useAccountEscape"
-import { accountHasEscape } from "../smartAccount/escape/accountHasEscape"
 
 interface EscapeBannerContainerProps {
   account: WalletAccount
 }
 
 export const useShowEscapeBanner = (account: WalletAccount) => {
-  const hasEscape = accountHasEscape(account)
+  const escape = useLiveAccountEscape(account)
+
+  const isEscapeActive = useMemo(() => {
+    if (!escape) return false
+    return escape.expiresFromNowMs > 0
+  }, [escape])
+
   const accountGuardianIsSelf = useAccountGuardianIsSelf(account)
-  return hasEscape || accountGuardianIsSelf
+  return isEscapeActive || accountGuardianIsSelf
 }
 
 export const EscapeBannerContainer: FC<EscapeBannerContainerProps> = ({

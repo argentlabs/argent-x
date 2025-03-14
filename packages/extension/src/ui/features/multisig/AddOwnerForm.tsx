@@ -1,11 +1,11 @@
-import { FieldError, icons, P2, scrollbarStyleThin } from "@argent/x-ui"
+import { PlusSecondaryIcon, MinusPrimaryIcon } from "@argent/x-ui/icons"
+import { FieldError, P2 } from "@argent/x-ui"
+import { scrollbarStyleThin } from "@argent/x-ui/theme"
 import { Box, Button, Center, Flex, Input, InputGroup } from "@chakra-ui/react"
 import { useCallback, useEffect, useRef } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 
 import type { FieldValuesCreateMultisigForm } from "./hooks/useCreateMultisigForm"
-
-const { PlusSecondaryIcon, MinusPrimaryIcon } = icons
 
 interface AddOwnerFormProps {
   nextOwnerIndex: number

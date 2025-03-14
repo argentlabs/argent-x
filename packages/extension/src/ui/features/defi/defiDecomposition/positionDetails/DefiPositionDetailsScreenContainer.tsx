@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { useRouteAccountDefi } from "../../../../hooks/useRoute"
 import { selectedAccountView } from "../../../../views/account"
 import { useView } from "../../../../views/implementation/react"
-import { investmentPositionUsdValueViewFindByIdAtom } from "../../../../views/investments"
+import { investmentPositionViewFindByIdAtom } from "../../../../views/investments"
 import { DefiPositionDetailsScreen } from "./DefiPositionDetailsScreen"
 
 export const DefiPositionDetailsScreenContainer: FC = () => {
@@ -20,8 +20,7 @@ export const DefiPositionDetailsScreenContainer: FC = () => {
   }
 
   const positionWithUsdValue = useView(
-    investmentPositionUsdValueViewFindByIdAtom({
-      account: selectedAccount,
+    investmentPositionViewFindByIdAtom({
       positionId,
     }),
   )

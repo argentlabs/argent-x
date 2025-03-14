@@ -1,20 +1,22 @@
-import { icons } from "@argent/x-ui"
+import { NoShieldSecondaryIcon, ShieldPrimaryIcon } from "@argent/x-ui/icons"
 import { Circle, Tooltip } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import { getEscapeDisplayAttributes } from "../smartAccount/escape/getEscapeDisplayAttributes"
-import type { LiveAccountEscapeProps } from "../smartAccount/escape/useAccountEscape"
-
-const { ShieldSecondaryIcon } = icons
+import {
+  hasAccountEscapeExpired,
+  type LiveAccountEscapeProps,
+} from "../smartAccount/escape/useAccountEscape"
 
 interface AccountListItemSmartAccountBadgeProps {
   liveAccountEscape?: LiveAccountEscapeProps
+  size?: number | string
 }
 
 export const AccountListItemSmartAccountBadge: FC<
   AccountListItemSmartAccountBadgeProps
-> = ({ liveAccountEscape }) => {
-  if (liveAccountEscape) {
+> = ({ liveAccountEscape, size = 5 }) => {
+  if (liveAccountEscape && !hasAccountEscapeExpired(liveAccountEscape)) {
     const { colorScheme, title } = getEscapeDisplayAttributes(liveAccountEscape)
     return (
       <Tooltip label={title}>
@@ -22,14 +24,14 @@ export const AccountListItemSmartAccountBadge: FC<
           position={"absolute"}
           right={-0.5}
           bottom={-0.5}
-          size={5}
+          size={size}
           bg={`${colorScheme}.500`}
           border={"2px solid"}
           borderColor={"neutrals.800"}
           color={"neutrals.900"}
           fontSize={"2xs"}
         >
-          <ShieldSecondaryIcon />
+          <NoShieldSecondaryIcon />
         </Circle>
       </Tooltip>
     )
@@ -40,13 +42,13 @@ export const AccountListItemSmartAccountBadge: FC<
         position={"absolute"}
         right={-0.5}
         bottom={-0.5}
-        size={5}
+        size={size}
         bg={"neutrals.800"}
         color={"white"}
         fontSize={"2xs"}
         data-testid="smart-account-on-settings"
       >
-        <ShieldSecondaryIcon />
+        <ShieldPrimaryIcon />
       </Circle>
     </Tooltip>
   )

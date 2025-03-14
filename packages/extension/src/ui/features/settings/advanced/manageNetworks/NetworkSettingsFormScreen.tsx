@@ -1,9 +1,9 @@
+import { ChevronRightSecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   CellStack,
   FieldError,
   HeaderCell,
-  icons,
   NavigationContainer,
   SpacerCell,
 } from "@argent/x-ui"
@@ -14,8 +14,6 @@ import type { Control, FieldErrors } from "react-hook-form"
 import type { Network } from "../../../../../shared/network"
 import { ConfirmScreen } from "../../../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { ControlledInput } from "../../../../components/ControlledInput"
-
-const { ChevronRightSecondaryIcon } = icons
 
 interface NetworkSettingsFormScreenProps {
   mode: "add" | "edit"

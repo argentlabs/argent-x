@@ -1,17 +1,14 @@
 import type { FC } from "react"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { getErrorMessageAndLabelFromSimulation } from "@argent/x-shared/simulation"
 import { ActionScreenErrorFooter, Label } from "@argent/x-ui"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../../shared/ui/routes"
-import { DeployAccountScreenContainer } from "../../accounts/DeployAccountScreenContainer"
-import { useIsAccountDeploying } from "../../accountTokens/useIsAccountDeploying"
 import { RemovedMultisigWarningScreen } from "../../multisig/RemovedMultisigWarningScreen"
 import { WithSmartAccountVerified } from "../../smartAccount/WithSmartAccountVerified"
 import { useDappDisplayAttributes } from "../../../services/knownDapps/useDappDisplayAttributes"
 import { ExecuteFromOutsideScreen } from "../ExecuteFromOutsideScreen"
 import { useActionScreen } from "../hooks/useActionScreen"
-import { useDefaultFeeToken } from "../useDefaultFeeToken"
 import { SignActionScreenV2 } from "./SignActionScreenV2"
 import { useSignatureReview } from "./useTransactionReviewV2"
 import { ampli } from "../../../../shared/analytics"
@@ -26,6 +23,7 @@ import useValidateOutsideExecution from "../transaction/executeFromOutside/useVa
 import { transactionHashFindAtom } from "../../../views/transactionHashes"
 import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { validateSignatureChainId } from "../../../../shared/utils/validateSignatureChainId"
+import { useNativeFeeToken } from "../useNativeFeeToken"
 
 export const SignActionScreenContainerV2: FC = () => {
   const {
@@ -36,6 +34,7 @@ export const SignActionScreenContainerV2: FC = () => {
     reject,
     rejectWithoutClose,
     clearLastActionError,
+    updateTransactionReview,
   } = useActionScreen()
   if (action?.type !== "SIGN") {
     throw new Error(
@@ -46,11 +45,10 @@ export const SignActionScreenContainerV2: FC = () => {
   const navigate = useNavigate()
   const multisig = useView(multisigView(selectedAccount))
   const signerIsInMultisig = useView(isSignerInMultisigView(selectedAccount))
-  const isAccountDeploying = useIsAccountDeploying(selectedAccount)
 
   const host = action.meta.origin || ""
   const dappDisplayAttributes = useDappDisplayAttributes(host)
-  const feeToken = useDefaultFeeToken(selectedAccount)
+  const feeToken = useNativeFeeToken(selectedAccount)
   const dataToSign = action.payload.typedData
   const {
     data: review,
@@ -63,7 +61,6 @@ export const SignActionScreenContainerV2: FC = () => {
   })
   const isOutsideExecution =
     dataToSign.domain.name === "Account.execute_from_outside"
-  const skipDeployWarning = action.payload.options?.skipDeploy
 
   const isValidOutsideExecution = useValidateOutsideExecution(
     action.payload.typedData,
@@ -111,6 +108,10 @@ export const SignActionScreenContainerV2: FC = () => {
     navigate,
   ])
 
+  useEffect(() => {
+    void updateTransactionReview(review)
+  }, [review, updateTransactionReview])
+
   const transactionReviewSimulationError = useMemo(() => {
     const errorMessageAndLabel = getErrorMessageAndLabelFromSimulation(review)
     if (!errorMessageAndLabel) {
@@ -147,18 +148,6 @@ export const SignActionScreenContainerV2: FC = () => {
       />
     )
   }, [dataToSign, selectedAccount])
-
-  if (
-    !skipDeployWarning &&
-    selectedAccount?.needsDeploy &&
-    !isAccountDeploying
-  ) {
-    return (
-      <WithSmartAccountVerified>
-        <DeployAccountScreenContainer onReject={() => void reject()} />
-      </WithSmartAccountVerified>
-    )
-  }
 
   if (multisig && !signerIsInMultisig) {
     return (

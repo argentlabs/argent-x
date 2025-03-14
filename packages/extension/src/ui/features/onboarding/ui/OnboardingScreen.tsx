@@ -1,4 +1,8 @@
-import { Button, H1, icons, P1 } from "@argent/x-ui"
+import {
+  HelpCircleSecondaryIcon,
+  ArrowLeftPrimaryIcon,
+} from "@argent/x-ui/icons"
+import { Button, H1, P1 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import { isNumber } from "lodash-es"
 import type { FC, MouseEventHandler, PropsWithChildren, ReactNode } from "react"
@@ -9,8 +13,6 @@ import {
   OnboardingContainer,
 } from "./OnboardingContainer"
 import { StepIndicator } from "../../../components/StepIndicator"
-
-const { HelpCircleSecondaryIcon, ArrowLeftPrimaryIcon } = icons
 
 interface OnboardingScreenProps extends PropsWithChildren {
   title?: string

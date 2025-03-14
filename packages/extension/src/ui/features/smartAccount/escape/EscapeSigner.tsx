@@ -1,4 +1,5 @@
-import { Button, FlowHeader, icons, P3 } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { Button, FlowHeader, P3 } from "@argent/x-ui"
 import { Flex, VStack } from "@chakra-ui/react"
 import type { FC } from "react"
 
@@ -11,8 +12,6 @@ import {
 } from "../ui/SmartAccountExternalLinkButton"
 import { getEscapeDisplayAttributes } from "./getEscapeDisplayAttributes"
 import type { LiveAccountEscapeProps } from "./useAccountEscape"
-
-const { WarningCircleSecondaryIcon } = icons
 
 interface EscapeSignerProps {
   liveAccountEscape: LiveAccountEscapeProps

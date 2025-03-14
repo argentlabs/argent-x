@@ -9,17 +9,18 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.2",
-    "@types/eslint": "^9.0.0",
-    "@typescript-eslint/experimental-utils": "^5.59.7",
-    "eslint": "^8.7.0",
-    "minimatch": "^10.0.0",
-    "typescript": "^5.0.4"
+    "@tsconfig/node20": "20.1.4",
+    "@types/eslint": "9.6.1",
+    "@typescript-eslint/experimental-utils": "5.62.0",
+    "eslint": "9.15.0",
+    "globals": "16.0.0",
+    "minimatch": "10.0.1",
+    "typescript": "5.7.2"
   },
   "scripts": {
     "dev": "tsc --build --watch",
     "build": "tsc --build",
-    "lint": "eslint . --cache --ext .ts",
+    "lint": "eslint --cache",
     "setup": "pnpm build"
   }
 }

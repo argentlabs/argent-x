@@ -4,7 +4,7 @@ import {
 } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ledger/LedgerModalBottomDialog"
 
 import { decorators } from "../../decorators/routerDecorators"
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
 const meta = {
   component: LedgerModalBottomDialog,

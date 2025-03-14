@@ -1,4 +1,4 @@
-import { isEqualAddress } from "@argent/x-shared"
+import { ensureArray, isEqualAddress } from "@argent/x-shared"
 import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 
@@ -10,47 +10,59 @@ import { useNetworkFeeTokens } from "../features/accountTokens/tokens.state"
 import { visibleAccountsOnNetworkFamily } from "./account"
 import { useView } from "./implementation/react"
 import { allTokenBalancesView } from "./token"
+import { atomWithDebugLabel } from "./atomWithDebugLabel"
 import {
-  liquidityTokensInNetworkView,
-  liquidityTokensView,
+  investmentViewFindAtom,
+  investmentViewFindAtomByNetworkId,
 } from "./investments"
 
 export const tokenBalancesForNetworkViewFamily = atomFamily(
-  (networkId: string) => {
-    return atom(async (get) => {
-      const visibleAccounts = await get(
-        visibleAccountsOnNetworkFamily(networkId),
-      )
-      const allTokenBalances = await get(allTokenBalancesView)
-      const liquidityTokens = await get(liquidityTokensInNetworkView(networkId))
+  (networkId: string) =>
+    atomWithDebugLabel(
+      atom(async (get) => {
+        const visibleAccounts = await get(
+          visibleAccountsOnNetworkFamily(networkId),
+        )
+        const allTokenBalances = await get(allTokenBalancesView)
+        const investmentsInNetwork = await get(
+          investmentViewFindAtomByNetworkId(networkId),
+        )
+        const liquidityTokens = investmentsInNetwork.flatMap(
+          (investment) => investment.liquidityTokens,
+        )
 
-      return allTokenBalances.filter(
-        (tokenBalance) =>
-          !liquidityTokens.some((token) => equalToken(token, tokenBalance)) &&
-          tokenBalance.networkId === networkId &&
-          visibleAccounts.some((visibleAccount) =>
-            isEqualAddress(tokenBalance.account, visibleAccount.address),
-          ),
-      )
-    })
-  },
+        return allTokenBalances.filter(
+          (tokenBalance) =>
+            !liquidityTokens.some((token) => equalToken(token, tokenBalance)) &&
+            tokenBalance.networkId === networkId &&
+            visibleAccounts.some((visibleAccount) =>
+              isEqualAddress(tokenBalance.account, visibleAccount.address),
+            ),
+        )
+      }),
+      `tokenBalancesForNetworkViewFamily-${networkId}`,
+    ),
 )
 
 export const tokenBalancesForAccountViewFamily = atomFamily(
   (account?: BaseWalletAccount) => {
     const accountAddress = account?.address
     const networkId = account?.networkId
-    return atom(async (get) => {
-      const allTokenBalances = await get(allTokenBalancesView)
-      const liquidityTokens = await get(liquidityTokensView(account))
+    return atomWithDebugLabel(
+      atom(async (get) => {
+        const allTokenBalances = await get(allTokenBalancesView)
+        const investments = await get(investmentViewFindAtom(account))
+        const liquidityTokens = ensureArray(investments?.liquidityTokens)
 
-      return allTokenBalances.filter(
-        (tokenBalance) =>
-          !liquidityTokens.some((token) => equalToken(token, tokenBalance)) &&
-          tokenBalance.networkId === networkId &&
-          isEqualAddress(tokenBalance.account, accountAddress),
-      )
-    })
+        return allTokenBalances.filter(
+          (tokenBalance) =>
+            !liquidityTokens.some((token) => equalToken(token, tokenBalance)) &&
+            tokenBalance.networkId === networkId &&
+            isEqualAddress(tokenBalance.account, accountAddress),
+        )
+      }),
+      `tokenBalancesForAccountViewFamily-${account?.id}`,
+    )
   },
   atomFamilyAccountsEqual,
 )
@@ -65,15 +77,18 @@ export const tokenBalancesForAccountAndTokenView = atomFamily(
     const accountAddress = account?.address
     const networkId = account?.networkId
 
-    return atom(async (get) => {
-      const allTokenBalances = await get(allTokenBalancesView)
-      return allTokenBalances.find(
-        (tokenBalance) =>
-          networkId === tokenBalance.networkId &&
-          isEqualAddress(tokenBalance.account, accountAddress) &&
-          equalToken(tokenBalance, token),
-      )
-    })
+    return atomWithDebugLabel(
+      atom(async (get) => {
+        const allTokenBalances = await get(allTokenBalancesView)
+        return allTokenBalances.find(
+          (tokenBalance) =>
+            networkId === tokenBalance.networkId &&
+            isEqualAddress(tokenBalance.account, accountAddress) &&
+            equalToken(tokenBalance, token),
+        )
+      }),
+      `tokenBalancesForAccountAndTokenView-${account?.id}-${token?.address}`,
+    )
   },
   (a, b) =>
     atomFamilyAccountsEqual(a?.account, b?.account) &&

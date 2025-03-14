@@ -34,15 +34,13 @@ const MOCK_TOKEN_3: Token = {
 describe("shared/token/repository", () => {
   describe("mergeTokens", () => {
     test("merges tokens, keeping old values and updating new values", () => {
-      const firstToken: Token = {
-        ...MOCK_TOKEN_1,
-        pricingId: 1,
-      }
+      const firstToken = MOCK_TOKEN_1
       const secondToken: Token = {
         ...MOCK_TOKEN_1,
         name: "Mock1Updated",
+        pricingId: 1,
       }
-      expect(mergeTokens(firstToken, secondToken)).toEqual({
+      expect(mergeTokens(secondToken, firstToken)).toEqual({
         address: "0x1",
         decimals: 18,
         name: "Mock1Updated",
@@ -53,8 +51,11 @@ describe("shared/token/repository", () => {
     })
     test("when there are no tags", () => {
       const mockToken = getMockToken()
-      const mockApiToken = getMockApiTokenDetails()
-      const merged = mergeTokens(mockToken, mockApiToken)
+      const mockApiToken = {
+        ...getMockApiTokenDetails(),
+        networkId: "mainnet-alpha",
+      }
+      const merged = mergeTokens(mockApiToken, mockToken)
       expect(merged).toEqual({
         address: "0x123",
         category: "tokens",
@@ -74,14 +75,14 @@ describe("shared/token/repository", () => {
     })
     test("when there are tags in both", () => {
       const mockToken = getMockToken({ tags: ["defi"] })
-      const mockApiToken = getMockApiTokenDetails({ tags: ["defi", "scam"] })
-      const merged = mergeTokens(mockToken, mockApiToken)
+      const mockApiToken = getMockToken({ tags: ["defi", "scam"] })
+      const merged = mergeTokens(mockApiToken, mockToken)
       expect(merged.tags).toEqual(["defi", "scam"])
     })
     test("when there are tags locally, but not in api", () => {
       const mockToken = getMockToken({ tags: ["scam"] })
-      const mockApiToken = getMockApiTokenDetails()
-      const merged = mergeTokens(mockToken, mockApiToken)
+      const mockApiToken = getMockToken()
+      const merged = mergeTokens(mockApiToken, mockToken)
       expect(merged.tags).toBeUndefined()
     })
   })
@@ -105,7 +106,7 @@ describe("shared/token/repository", () => {
         {
           address: "0x1",
           decimals: 18,
-          name: "Mock1",
+          name: "Mock1Existing",
           networkId: "mainnet-alpha",
           pricingId: 1,
           symbol: "MOCK1",
@@ -114,7 +115,7 @@ describe("shared/token/repository", () => {
           address: "0x2",
           decimals: 18,
           iconUrl: "https://foo.bar",
-          name: "Mock2",
+          name: "Mock2Existing",
           networkId: "mainnet-alpha",
           symbol: "MOCK2",
         },

@@ -1,10 +1,8 @@
-import { icons } from "@argent/x-ui"
+import { NetworkSecondaryIcon } from "@argent/x-ui/icons"
 import type { BoxProps } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import { IconWrapper } from "./IconWrapper"
-
-const { NetworkSecondaryIcon } = icons
 
 export const UnknownDappIcon: FC<BoxProps> = (props) => {
   return (

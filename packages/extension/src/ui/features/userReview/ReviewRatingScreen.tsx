@@ -1,4 +1,5 @@
-import { BarIconButton, H1, H5, icons } from "@argent/x-ui"
+import { CrossSecondaryIcon } from "@argent/x-ui/icons"
+import { BarIconButton, H1, H5 } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
@@ -9,8 +10,6 @@ import {
   toggleUserHasReviewed,
 } from "../../../shared/userReview"
 import { StarRating } from "./StarRating"
-
-const { CrossSecondaryIcon } = icons
 
 export const ReviewRatingScreen: FC = () => {
   const navigate = useNavigate()

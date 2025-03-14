@@ -1,11 +1,5 @@
-/* eslint-disable react/prop-types */
-import {
-  Button,
-  icons,
-  L2Bold,
-  TokenIcon,
-  typographyStyles,
-} from "@argent/x-ui"
+import { ChevronDownSecondaryIcon } from "@argent/x-ui/icons"
+import { Button, L2Bold, TokenIcon } from "@argent/x-ui"
 import type { InputProps } from "@chakra-ui/react"
 import { Flex, Spinner, chakra } from "@chakra-ui/react"
 import type { ReactNode } from "react"
@@ -16,7 +10,7 @@ import Measure from "react-measure"
 import { clientTokenService } from "../../services/tokens"
 import type { Token } from "../../../shared/token/__new/types/token.model"
 
-const { ChevronDownSecondaryIcon } = icons
+import { typographyStyles } from "@argent/x-ui/theme"
 
 interface TokenAmountInputProps extends InputProps {
   token: Token

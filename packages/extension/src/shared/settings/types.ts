@@ -13,6 +13,7 @@ export interface ISettingsStorage {
   disableAnimation: boolean
   airGapEnabled: boolean
   idProvider: "starknetid" | "brotherid"
+  sidePanelEnabled: boolean
 }
 
 export type SettingsStorageKey = keyof ISettingsStorage

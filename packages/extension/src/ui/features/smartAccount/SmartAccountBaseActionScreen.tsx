@@ -1,15 +1,13 @@
+import { WalletSecondaryIcon, ShieldSecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   Button,
   FlowHeader,
-  icons,
   NavigationContainer,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
-
-const { WalletSecondaryIcon, ShieldSecondaryIcon } = icons
 
 export interface SmartAccountBaseActionScreenProps {
   guardian?: string

@@ -1,4 +1,4 @@
-import type { MessageType, WindowMessageType } from "../shared/messages"
+import type { MessageType, WindowMessageType } from "../shared/messages/types"
 
 const extensionId = document
   .getElementById("argent-x-extension")

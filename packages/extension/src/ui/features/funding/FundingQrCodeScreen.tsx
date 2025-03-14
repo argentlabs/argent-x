@@ -1,9 +1,9 @@
+import { CopyPrimaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   BarCloseButton,
   CopyTooltip,
   H3,
-  icons,
   NavigationContainer,
   P1,
 } from "@argent/x-ui"
@@ -13,8 +13,6 @@ import { useCallback, useRef } from "react"
 
 import { formatFullAddress, normalizeAddress } from "@argent/x-shared"
 import { QrCode } from "../../components/QrCode"
-
-const { CopyPrimaryIcon } = icons
 
 interface FundingQrCodeScreenProps {
   onClose?: () => void

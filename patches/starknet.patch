@@ -1,0 +1,17 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index f23eb09368c9c26dde230d8389cda263db4981a2..d89f258fc74849693da88244b936e53900fe9775 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -3376,11 +3376,7 @@ function validateAndParseEthAddress(address) {
+ }
+ 
+ // src/utils/fetchPonyfill.ts
+-import makeFetchCookie from "fetch-cookie";
+-import isomorphicFetch from "isomorphic-fetch";
+-var fetchPonyfill_default = IS_BROWSER && window.fetch.bind(window) || // use built-in fetch in browser if available
+-!isUndefined(global) && makeFetchCookie(global.fetch) || // use built-in fetch in node, react-native and service worker if available
+-isomorphicFetch;
++var fetchPonyfill_default = globalThis.fetch.bind(globalThis);
+ 
+ // src/utils/provider.ts
+ var provider_exports = {};

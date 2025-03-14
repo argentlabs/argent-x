@@ -2,11 +2,11 @@ import { atom } from "jotai"
 import { atomFamily } from "jotai/utils"
 
 import { defaultNetwork } from "../../shared/network"
-import { networkRepo } from "../../shared/network/store"
-import { atomFromRepo } from "./implementation/atomFromRepo"
 import { networkStatusRepo } from "../../shared/network/statusStore"
+import { networkRepo } from "../../shared/network/store"
 import { selectedBaseAccountView } from "./account"
-import { useView } from "./implementation/react"
+import { atomWithDebugLabel } from "./atomWithDebugLabel"
+import { atomFromRepo } from "./implementation/atomFromRepo"
 
 export const allNetworksView = atomFromRepo(networkRepo)
 
@@ -44,20 +44,26 @@ export const allNetworksWithStatusesView = atom(async (get) => {
 })
 
 export const networkView = atomFamily((networkId?: string) =>
-  atom(async (get) => {
-    if (!networkId) {
-      return
-    }
-    const networks = await get(allNetworksView)
-    return networks.find((network) => network.id === networkId)
-  }),
+  atomWithDebugLabel(
+    atom(async (get) => {
+      if (!networkId) {
+        return
+      }
+      const networks = await get(allNetworksView)
+      return networks.find((network) => network.id === networkId)
+    }),
+    `networkView-${networkId}`,
+  ),
 )
 
 export const networkOrDefaultView = atomFamily((networkId: string) =>
-  atom(async (get) => {
-    const network = await get(networkView(networkId))
-    return network || defaultNetwork
-  }),
+  atomWithDebugLabel(
+    atom(async (get) => {
+      const network = await get(networkView(networkId))
+      return network || defaultNetwork
+    }),
+    `networkOrDefaultView-${networkId}`,
+  ),
 )
 
 export const selectedNetworkIdView = atom(async (get) => {

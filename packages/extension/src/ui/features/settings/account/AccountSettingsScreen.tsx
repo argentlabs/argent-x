@@ -1,23 +1,18 @@
+import { EditPrimaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   CellStack,
+  H2,
+  IconButton,
   NavigationContainer,
-  SpacerCell,
 } from "@argent/x-ui"
 import { Center, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
-import React, { useCallback, useState } from "react"
+import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
-
-import {
-  accountService,
-  accountSharedService,
-} from "../../../../shared/account/service"
 import { StarknetIdOrAddressCopyButton } from "../../../components/StarknetIdOrAddressCopyButton"
 import { useReturnTo } from "../../../hooks/useRoute"
-import { AccountAvatar } from "../../accounts/AccountAvatar"
 import { AccountListItemLedgerBadge } from "../../accounts/AccountListItemLedgerBadge"
-import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
 import {
   UpgradeBannerContainer,
   useShowUpgradeBanner,
@@ -25,7 +20,12 @@ import {
 import { useIsLedgerSigner } from "../../ledger/hooks/useIsLedgerSigner"
 import { useRouteWalletAccount } from "../../smartAccount/useRouteWalletAccount"
 import { AccountEditButtonsContainer } from "./AccountEditButtons/AccountEditButtonsContainer"
-import { AccountEditName } from "./AccountEditName"
+import { routes } from "../../../../shared/ui/routes"
+import { AccountAvatar } from "../../accounts/AccountAvatar"
+
+import { typographyStyles } from "@argent/x-ui/theme"
+import { useShowLegacyVersionBanner } from "../../banners/useShowLegacyVersionBanner"
+import { LegacyVersionBannerContainer } from "../../banners/LegacyVersionBannerContainer"
 
 export const AccountSettingsScreen: FC = () => {
   const account = useRouteWalletAccount()
@@ -33,11 +33,9 @@ export const AccountSettingsScreen: FC = () => {
   const returnTo = useReturnTo()
   const accountName = account ? account.name : "Not found"
   const showUpgradeBanner = useShowUpgradeBanner(account)
+  const showLegacyVersionBanner = useShowLegacyVersionBanner(account)
 
   const isLedger = useIsLedgerSigner(account?.id)
-
-  const [liveEditingAccountName, setLiveEditingAccountName] =
-    useState(accountName)
 
   const onClose = useCallback(() => {
     if (returnTo) {
@@ -47,49 +45,28 @@ export const AccountSettingsScreen: FC = () => {
     }
   }, [navigate, returnTo])
 
-  const onChangeName = useCallback((name: string) => {
-    setLiveEditingAccountName(name)
-  }, [])
-
-  const onSubmitChangeName = useCallback(() => {
-    if (!account) {
-      return
-    }
-
-    void accountService.setName(liveEditingAccountName, account.id)
-    if (account.type === "smart") {
-      void accountSharedService.sendAccountNameToBackend({
-        address: account.address,
-        name: liveEditingAccountName,
-      })
-    }
-  }, [account, liveEditingAccountName])
-
-  const onCancelChangeName = useCallback(() => {
-    setLiveEditingAccountName(accountName)
-  }, [accountName])
-
   if (!account) {
     return <></>
   }
 
-  const testId = `account-settings-${liveEditingAccountName?.replaceAll(/ /g, "") ?? "unknown"}`
+  const testId = `account-settings-${accountName?.replaceAll(/ /g, "") ?? "unknown"}`
 
   return (
     <>
       <NavigationContainer
         leftButton={<BarBackButton onClick={onClose} />}
-        title={liveEditingAccountName}
+        title="Account settings"
         data-testid={testId}
       >
         <Center p={4}>
           <AccountAvatar
-            size={20}
-            src={getNetworkAccountImageUrl({
-              accountName: liveEditingAccountName,
-              accountId: account.id,
-              backgroundColor: account?.hidden ? "333332" : undefined,
-            })}
+            size={16}
+            accountId={account.id}
+            accountName={accountName}
+            accountType={account.type}
+            emojiStyle={typographyStyles.H1}
+            initialsStyle={typographyStyles.H3}
+            avatarMeta={account.avatarMeta}
           >
             {isLedger && (
               <AccountListItemLedgerBadge
@@ -103,31 +80,34 @@ export const AccountSettingsScreen: FC = () => {
             )}
           </AccountAvatar>
         </Center>
-        <CellStack>
-          <Flex direction={"column"} boxShadow={"menu"}>
-            <AccountEditName
-              value={liveEditingAccountName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                onChangeName(e.target.value)
-              }
-              onSubmit={onSubmitChangeName}
-              onCancel={onCancelChangeName}
-              borderBottomLeftRadius={0}
-              borderBottomRightRadius={0}
-            />
-            <Center
-              border={"1px solid"}
-              borderColor={"border"}
-              borderTop={"none"}
-              borderBottomRadius="lg"
-              bg="surface-elevated"
-              p={2}
-            >
-              <StarknetIdOrAddressCopyButton account={account} />
-            </Center>
+        <Flex justify="center" gap="3">
+          <IconButton
+            icon={<EditPrimaryIcon />}
+            p={2}
+            minH={0}
+            visibility="hidden" // Required for centering
+          />
+          <Flex direction="column" align="center" mb="2">
+            <H2 color="text-primary" mb="2">
+              {accountName}
+            </H2>
+            <StarknetIdOrAddressCopyButton account={account} p={2} />
           </Flex>
-          <SpacerCell />
-          {showUpgradeBanner && <UpgradeBannerContainer account={account} />}
+          <IconButton
+            data-testid="edit-account-label"
+            icon={<EditPrimaryIcon />}
+            p={2}
+            minH={0}
+            onClick={() => navigate(routes.editAccountLabel(account.id))}
+          />
+        </Flex>
+        <CellStack>
+          {showUpgradeBanner && !showLegacyVersionBanner && (
+            <UpgradeBannerContainer account={account} />
+          )}
+          {showLegacyVersionBanner && (
+            <LegacyVersionBannerContainer account={account} />
+          )}
           <AccountEditButtonsContainer account={account} />
         </CellStack>
       </NavigationContainer>

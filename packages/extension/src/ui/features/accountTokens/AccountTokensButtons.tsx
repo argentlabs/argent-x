@@ -1,16 +1,16 @@
-import { icons } from "@argent/x-ui"
+import {
+  PlusSecondaryIcon,
+  SendSecondaryIcon,
+  HideSecondaryIcon,
+  SwapPrimaryIcon,
+  PieSecondaryIcon,
+} from "@argent/x-ui/icons"
+
 import { Center, Skeleton } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import { MultisigHideModal } from "../multisig/MultisigHideModal"
 import { ActionButton } from "../../components/ActionButton"
-
-const {
-  PlusSecondaryIcon,
-  SendSecondaryIcon,
-  HideSecondaryIcon,
-  SwapPrimaryIcon,
-} = icons
 
 export interface AccountTokensButtonsProps {
   hasNonZeroBalance: boolean
@@ -21,15 +21,18 @@ export interface AccountTokensButtonsProps {
   onHideMultisigModalOpen: () => void
   onSend: () => void
   onSwap: () => void
+  onPortfolio: () => void
   showAddFundsButton: boolean
   showHideMultisigButton?: boolean
   showSendButton: boolean
   showSwapButton: boolean
+  showPortfolioButton: boolean
 }
 
 export const AccountTokensButtonsSkeleton: FC = () => {
   return (
-    <Center gap={10} pb={6}>
+    <Center gap={8} pb={6}>
+      <Skeleton rounded="full" w={12} h={12} />
       <Skeleton rounded="full" w={12} h={12} />
       <Skeleton rounded="full" w={12} h={12} />
       <Skeleton rounded="full" w={12} h={12} />
@@ -46,22 +49,25 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
   onHideMultisigModalOpen,
   onSend,
   onSwap,
+  onPortfolio,
   showAddFundsButton,
   showHideMultisigButton,
   showSendButton,
   showSwapButton,
+  showPortfolioButton,
 }) => {
   if (
     !showAddFundsButton &&
     !showSendButton &&
     !showSwapButton &&
-    !showHideMultisigButton
+    !showHideMultisigButton &&
+    !showPortfolioButton
   ) {
     return null
   }
   return (
     <>
-      <Center gap={9}>
+      <Center gap={8}>
         {showAddFundsButton && (
           <ActionButton
             colorScheme="primary"
@@ -84,6 +90,14 @@ export const AccountTokensButtons: FC<AccountTokensButtonsProps> = ({
             colorScheme={hasNonZeroBalance ? "primary" : undefined}
             icon={<SwapPrimaryIcon />}
             label="Swap"
+          />
+        )}
+        {showPortfolioButton && (
+          <ActionButton
+            onClick={onPortfolio}
+            colorScheme={hasNonZeroBalance ? "primary" : undefined}
+            icon={<PieSecondaryIcon />}
+            label="Portfolio"
           />
         )}
         {showHideMultisigButton && (

@@ -1,13 +1,13 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
 import {
   ESCAPE_TYPE_GUARDIAN,
   ESCAPE_TYPE_SIGNER,
 } from "@argent-x/extension/src/shared/account/details/escape.model"
 import { EscapeBanner } from "@argent-x/extension/src/ui/features/banners/EscapeBanner"
-import { LiveAccountEscapeProps } from "@argent-x/extension/src/ui/features/smartAccount/escape/useAccountEscape"
+import type { LiveAccountEscapeProps } from "@argent-x/extension/src/ui/features/smartAccount/escape/useAccountEscape"
 import { getActiveFromNow } from "@argent-x/extension/src/shared/utils/getActiveFromNow"
-import { PendingChangeGuardian as PendingChangeGuardianType } from "@argent-x/extension/src/ui/features/smartAccount/usePendingChangingGuardian"
+import type { PendingChangeGuardian as PendingChangeGuardianType } from "@argent-x/extension/src/ui/features/smartAccount/usePendingChangingGuardian"
 import { decorators } from "../../decorators/routerDecorators"
 import { accounts } from "@argent-x/extension/src/ui/features/actions/__fixtures__"
 

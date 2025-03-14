@@ -1,14 +1,17 @@
 import {
+  SearchPrimaryIcon,
+  PlusSecondaryIcon,
+  AddressBookIcon,
+} from "@argent/x-ui/icons"
+import {
   BarAddButton,
   BarBackButton,
   CellStack,
   Empty,
   EmptyButton,
-  icons,
-  Input,
   NavigationContainer,
 } from "@argent/x-ui"
-import { InputGroup, InputLeftElement } from "@chakra-ui/react"
+import { InputGroup, InputLeftElement, Input } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
@@ -18,7 +21,7 @@ import type { Network } from "../../../../shared/network"
 import { useAutoFocusInputRef } from "../../../hooks/useAutoFocusInputRef"
 import { AccountListItem } from "../../accounts/AccountListItem"
 
-const { SearchPrimaryIcon, PlusSecondaryIcon, AddressBookIcon } = icons
+import { typographyStyles } from "@argent/x-ui/theme"
 
 interface AddressBookSettingsScreenProps {
   contacts: AddressBookContact[]
@@ -112,6 +115,8 @@ export const AddressBookSettingsScreen: FC<AddressBookSettingsScreenProps> = ({
               key={contact.id}
               accountId={contact.id}
               avatarSize={9}
+              emojiStyle={typographyStyles.H3}
+              initialsStyle={typographyStyles.H4}
               accountAddress={contact.address}
               networkId={contact.networkId}
               accountName={contact.name}

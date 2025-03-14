@@ -5,7 +5,6 @@ import {
   H5,
   L2Bold,
   NavigationContainer,
-  typographyStyles,
 } from "@argent/x-ui"
 import {
   Box,
@@ -32,6 +31,8 @@ import { useNavigateReturnToOr } from "../../hooks/useNavigateReturnTo"
 import { useView } from "../../views/implementation/react"
 import { selectedNetworkView } from "../../views/network"
 import { clientAccountService } from "../../services/account"
+
+import { typographyStyles } from "@argent/x-ui/theme"
 
 const importPrivateKeySchema = z.object({
   address: addressSchema,

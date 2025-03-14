@@ -1,6 +1,9 @@
 import useSWRImmutable from "swr/immutable"
 
-import type { EstimatedFee } from "@argent/x-shared/simulation"
+import {
+  nativeEstimatedFeeSchema,
+  type NativeEstimatedFee,
+} from "@argent/x-shared/simulation"
 import { isString } from "lodash-es"
 import type { ErrorObject } from "../../../../shared/utils/error"
 import type { BaseWalletAccount } from "../../../../shared/wallet.model"
@@ -8,7 +11,7 @@ import { getAccountDeploymentEstimatedFee } from "../../../services/backgroundTr
 import { useRef } from "react"
 
 interface UseMaxAccountDeploymentFeeEstimationReturnProps {
-  fee: EstimatedFee | undefined
+  fee: NativeEstimatedFee | undefined
   error: ErrorObject | undefined
   loading: boolean
 }
@@ -19,7 +22,13 @@ export const useMaxAccountDeploymentFeeEstimation = (
   feeTokenAddress?: string,
 ): UseMaxAccountDeploymentFeeEstimationReturnProps => {
   const fetcher = feeTokenAddress
-    ? () => getAccountDeploymentEstimatedFee(feeTokenAddress, account)
+    ? async () => {
+        const fee = await getAccountDeploymentEstimatedFee(
+          feeTokenAddress,
+          account,
+        )
+        return nativeEstimatedFeeSchema.parse(fee) // Account deployment fee is always native
+      }
     : null
 
   // CacheBust is needed to force when the component is mounted, as actionHash will be same because
@@ -45,7 +54,10 @@ export const useMaxAccountDeploymentFeeEstimation = (
   return { fee, error, loading: !fee && isValidating }
 }
 
-export function getTooltipText(maxFee?: bigint, feeTokenBalance?: bigint) {
+export function getTooltipText(
+  maxFee?: bigint,
+  feeTokenBalance?: bigint | string,
+) {
   if (!maxFee || !feeTokenBalance) {
     return "Network fee is still loading."
   }

@@ -11,9 +11,11 @@ import { removeOwnerProcedure } from "./removeOwner"
 import { replaceOwnerProcedure } from "./replaceOwner"
 import { retryTransactionExecutionProcedure } from "./retryTransactionExecution"
 import { updateThresholdProcedure } from "./updateThreshold"
+import { validateSignersProcedure } from "./validateSigners"
 import { waitForOffchainSignaturesProcedure } from "./waitForOffchainSignatures"
 
 export const multisigRouter = router({
+  validateSigners: validateSignersProcedure,
   addAccount: addAccountProcedure,
   addPendingAccount: addPendingAccountProcedure,
   addOwner: addOwnerProcedure,

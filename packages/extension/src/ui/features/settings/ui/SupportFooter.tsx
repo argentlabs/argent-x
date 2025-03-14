@@ -1,4 +1,5 @@
-import { Button, icons, L2, logosDeprecated, P3 } from "@argent/x-ui"
+import { HelpIcon } from "@argent/x-ui/icons"
+import { Button, L2, P3 } from "@argent/x-ui"
 import type { ButtonProps, StackProps } from "@chakra-ui/react"
 import { Flex, forwardRef, Link, SimpleGrid, VStack } from "@chakra-ui/react"
 import type { FC } from "react"
@@ -8,8 +9,7 @@ import {
   ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL,
 } from "../../../../shared/api/constants"
 
-const { HelpIcon } = icons
-const { DiscordLogo, GithubLogo, XLogo } = logosDeprecated
+import { DiscordLogo, GithubLogo, XLogo } from "@argent/x-ui/logos-deprecated"
 
 interface SupportFooterProps extends StackProps {
   privacyStatement?: boolean

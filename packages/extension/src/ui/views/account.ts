@@ -17,6 +17,7 @@ import { accountHasEscape } from "../features/smartAccount/escape/accountHasEsca
 import { atomFromRepo } from "./implementation/atomFromRepo"
 import { atomFromStore } from "./implementation/atomFromStore"
 import { hasSavedRecoverySeedphraseAtom } from "../features/recovery/hasSavedRecoverySeedphraseAtom"
+import { atomWithDebugLabel } from "./atomWithDebugLabel"
 
 // Accounts repo views
 
@@ -51,21 +52,21 @@ export const allAccountsWithGuardianView = atom(async (get) => {
 })
 
 const accountsOnNetworkFamilyFactory = (view: Atom<Promise<WalletAccount[]>>) =>
-  atomFamily(
-    (networkId?: string) => {
-      return atom(async (get) => {
+  atomFamily((networkId?: string) =>
+    atomWithDebugLabel(
+      atom(async (get) => {
         const accounts = await get(view)
         return accounts.filter((account) => account.networkId === networkId)
-      })
-    },
-    (a, b) => a === b,
+      }),
+      `accountsOnNetworkFamily(${networkId})`,
+    ),
   )
 
 const accountsWithEscapeOnNetworkFamilyFactory = (
   view: Atom<Promise<WalletAccount[]>>,
 ) =>
-  atomFamily(
-    (networkId?: string) =>
+  atomFamily((networkId?: string) =>
+    atomWithDebugLabel(
       atom(async (get) => {
         const accounts = await get(view)
         return accounts.filter(
@@ -73,7 +74,8 @@ const accountsWithEscapeOnNetworkFamilyFactory = (
             account.networkId === networkId && accountHasEscape(account),
         )
       }),
-    (a, b) => a === b,
+      `accountsWithEscapeOnNetwork(${networkId})`,
+    ),
   )
 
 export const visibleAccountsOnNetworkFamily =
@@ -90,12 +92,15 @@ export const hiddenAccountsOnNetworkFamily =
 
 export const accountFindFamily = atomFamily(
   (accountId?: AccountId) =>
-    atom(async (get) => {
-      const accounts = await get(allAccountsView)
-      return accounts.find((account) =>
-        isEqualAccountIds(account.id, accountId),
-      )
-    }),
+    atomWithDebugLabel(
+      atom(async (get) => {
+        const accounts = await get(allAccountsView)
+        return accounts.find((account) =>
+          isEqualAccountIds(account.id, accountId),
+        )
+      }),
+      `accountFindFamily(${accountId})`,
+    ),
   atomFamilyIsEqualAccountIds,
 )
 
@@ -122,10 +127,11 @@ export const selectedAccountView = atom(async (get) => {
   }
   const accounts = await get(visibleAccountsView)
 
-  return accounts.find(
+  const result = accounts.find(
     (account) =>
       selectedBaseAccount && accountsEqual(account, selectedBaseAccount),
   )
+  return result
 })
 
 export const needsToSaveRecoverySeedphraseView = atom(async (get) => {

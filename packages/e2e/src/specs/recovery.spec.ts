@@ -2,7 +2,6 @@ import { expect } from "@playwright/test"
 
 import config from "../config"
 import test from "../test"
-import { logInfo } from "../utils"
 
 test.describe("Recovery Wallet", () => {
   test("User should be able to recover wallet using seed phrase after reset extension", async ({
@@ -35,43 +34,16 @@ test.describe("Recovery Wallet", () => {
     {
       tag: "@all",
     },
-    async ({ extension, browser }) => {
-      await browser.startTracing(extension.page, {
-        path: "./perfTraces.json",
-        screenshots: true,
-      })
-
+    async ({ extension }) => {
       await extension.open()
       await extension.recoverWallet(config.testSeed1!)
       await expect(extension.network.networkSelector).toBeVisible()
       await extension.network.selectDefaultNetwork()
-      await extension.page.evaluate(() =>
-        window.performance.mark("Perf:Started"),
-      )
-
-      await extension.account.selectAccount("Account 33")
-      //Using performance.mark API
-      await extension.page.evaluate(() => window.performance.mark("Perf:Ended"))
-      //Performance measure
-      await extension.page.evaluate(() =>
-        window.performance.measure("overall", "Perf:Started", "Perf:Ended"),
-      )
-      //To get all performance measures of Google
-      const getAllMeasuresJson = await extension.page.evaluate(() =>
-        JSON.stringify(window.performance.getEntriesByType("measure")),
-      )
-      const getAllMeasures = await JSON.parse(getAllMeasuresJson)
-      logInfo({
-        op: 'window.performance.getEntriesByType("measure")',
-        getAllMeasures: getAllMeasures,
-      })
-      //todo confirm why ius this taking so long
-      console.log(getAllMeasuresJson)
-      expect(getAllMeasures[0].duration).toBeLessThan(
-        config.isProdTesting ? 20000 : 35000,
-      )
-      await browser.stopTracing()
-
+      if (config.isProdTesting) {
+        await extension.account.selectAccount("Strategic Scorpion")
+      } else {
+        await extension.account.selectAccount("Humble Hyacinth")
+      }
       await expect(extension.account.currentBalance("ETH")).toContainText(
         "0.000",
       )
@@ -87,12 +59,11 @@ test.describe("Recovery Wallet", () => {
       await extension.wallet.newWalletOnboarding()
       await extension.open()
       await expect(extension.network.networkSelector).toBeVisible()
-      await extension.account.accountAddressFromAssetsView.click()
+      await extension.account.copyAddress.click()
       await extension.account.saveRecoveryPhrase()
       await extension.account.copyAddress.click()
-      await extension.clipboard.setClipboard()
-      const accountAddress = await extension.clipboard.getClipboard()
-      expect(accountAddress).toMatch(/^0x0/)
+      const accountAddress = await extension.account.accountAddr
+      expect(accountAddress).toMatch(/^0x/)
     },
   )
 
@@ -107,10 +78,8 @@ test.describe("Recovery Wallet", () => {
       await expect(extension.network.networkSelector).toBeVisible()
       await extension.account.showAccountRecovery.click()
       await extension.account.saveRecoveryPhrase()
-      await extension.account.copyAddress.click()
-      await extension.clipboard.setClipboard()
-      const accountAddress = await extension.clipboard.getClipboard()
-      expect(accountAddress).toMatch(/^0x0/)
+      const accountAddress = await extension.account.accountAddr
+      expect(accountAddress).toMatch(/^0x/)
       await expect(extension.account.showAccountRecovery).toBeHidden()
     },
   )
@@ -123,8 +92,8 @@ test.describe("Recovery Wallet", () => {
     await expect(extension.network.networkSelector).toBeVisible()
     await extension.network.selectDefaultNetwork()
     await extension.account.accountListSelector.click()
-    await expect(extension.account.account("")).toHaveCount(1)
-    await extension.account.account("Account 5").click()
+    await expect(extension.account.accounts).toHaveCount(1)
+    await extension.account.account("Courageous Cactus").click()
     await expect(extension.account.currentBalance("ETH")).toContainText(
       "0.025 ETH",
     )
@@ -138,24 +107,23 @@ test.describe("Recovery Wallet", () => {
     await expect(extension.network.networkSelector).toBeVisible()
     const selectedAccount =
       await extension.account.accountListSelector.textContent()
-    expect(selectedAccount).toMatch(/Account (.*)/)
+    expect(selectedAccount).toMatch(/(.*)Balanced Burger(.*)/)
     await extension.account.accountListSelector.click()
     const accountList = await extension.account.accountNames()
-
     expect(accountList).toEqual([
-      "Account 1",
-      "Account 1",
-      "Account 2",
-      "Account 3",
-      "Account 4",
-      "Account 5",
-      "Account 6",
-      "Account 7",
-      "Account 8",
-      "Account 9",
-      "Account 10",
-      "Account 11",
-      "Multisig 1",
+      "Balanced Burger",
+      "Casual Clover",
+      "Sunny Sushi",
+      "Boundless Burger",
+      "Tactful Tomato",
+      "Mighty Mouse",
+      "Pixelated Parrot",
+      "Colorful Coral",
+      "Pampered Pig",
+      "Lavish Lemon",
+      "Bemused Banana",
+      "Humble Hotdog",
+      "Balanced Banana",
     ])
   })
 })

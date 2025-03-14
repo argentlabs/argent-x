@@ -1,10 +1,10 @@
 import type { ReactNode } from "react"
 
-import { CopyTooltip, H5, icons, P4 } from "@argent/x-ui"
+import { CopyPrimaryIcon } from "@argent/x-ui/icons"
+
+import { CopyTooltip, H5, P4 } from "@argent/x-ui"
 import type { ButtonProps } from "@chakra-ui/react"
 import { Box, Button, Circle, Flex, forwardRef } from "@chakra-ui/react"
-
-const { CopyPrimaryIcon } = icons
 
 interface OptionProps extends Omit<ButtonProps, "title" | "rightIcon"> {
   icon: ReactNode

@@ -1,4 +1,4 @@
-export function bytesToUft8(array: ArrayBuffer): string {
+export function bytesToUft8(array: Uint8Array<ArrayBufferLike>): string {
   return new TextDecoder("utf-8").decode(array)
 }
 
@@ -9,7 +9,7 @@ export function bytesToUft8(array: ArrayBuffer): string {
  * @param array - The array to convert to a string.
  * @returns The string representation of the array with mistakes.
  */
-export function BUGGY_bytesToUft8(array: ArrayBuffer): string {
+export function BUGGY_bytesToUft8(array: Uint8Array<ArrayBufferLike>): string {
   return new Uint8Array(array).reduce(
     (data, byte) => data + String.fromCharCode(byte),
     "",

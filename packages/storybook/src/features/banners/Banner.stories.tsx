@@ -1,10 +1,9 @@
-import { Meta, StoryObj } from "@storybook/react"
-import { icons } from "@argent/x-ui"
+import type { Meta, StoryObj } from "@storybook/react"
 
 import { Banner } from "@argent-x/extension/src/ui/features/banners/Banner"
 import { decorators } from "../../decorators/routerDecorators"
 
-const { WarningCircleSecondaryIcon } = icons
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
 
 const meta: Meta<typeof Banner> = {
   component: Banner,

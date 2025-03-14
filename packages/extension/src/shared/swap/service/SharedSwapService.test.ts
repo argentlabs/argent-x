@@ -1,19 +1,19 @@
-import { SwapOrderResponseSchema } from "../model/order.model"
-import { sampleQuoteJson } from "./quote.mock"
+import { addressSchema } from "@argent/x-shared"
 import { HttpResponse, http } from "msw"
 import { setupServer } from "msw/node"
-import { SharedSwapService } from "./SharedSwapService"
-import type { ISharedSwapService } from "./ISharedSwapService"
-import { getMockTrade } from "../../../../test/trade.mock"
-import { getMockToken } from "../../../../test/token.mock"
-import { SwapError } from "../../errors/swap"
-import { SwapQuoteResponseSchema } from "../model/quote.model"
 import { stark } from "starknet"
-import { addressSchema } from "@argent/x-shared"
-import { sampleOrderResponse } from "./order.mock"
+import { getMockToken } from "../../../../test/token.mock"
+import { getMockTrade } from "../../../../test/trade.mock"
+import { SwapError } from "../../errors/swap"
 import { httpService } from "../../http/singleton"
+import { SwapOrderResponseSchema } from "../model/order.model"
+import { SwapQuoteResponseSchema } from "../model/quote.model"
 import { TradeType } from "../model/trade.model"
 import { calculateTotalFee } from "../utils"
+import type { ISharedSwapService } from "./ISharedSwapService"
+import { sampleOrderResponse } from "./order.mock"
+import { sampleQuoteJson } from "./quote.mock"
+import { SharedSwapService } from "./SharedSwapService"
 
 const mockPayTokenAddress = addressSchema.parse(stark.randomAddress())
 const mockReceiveTokenAddress = addressSchema.parse(stark.randomAddress())
@@ -23,11 +23,13 @@ const mockAccountAddress = addressSchema.parse(stark.randomAddress())
  * @vitest-environment happy-dom
  */
 
+const swapBaseUrl = "https://www.mock-api.com"
+
 const server = setupServer(
-  http.get("*/quote", () => {
+  http.get(`${swapBaseUrl}/quote`, () => {
     return HttpResponse.json(sampleQuoteJson)
   }),
-  http.post("*/order", () => {
+  http.post(`${swapBaseUrl}/order`, () => {
     return HttpResponse.json(sampleOrderResponse)
   }),
 )
@@ -45,7 +47,6 @@ describe("SharedSwapService", () => {
     getById: vi.fn(),
   } as any
 
-  const swapBaseUrl = "https://www.mock-api.com"
   let sharedSwapService: ISharedSwapService
 
   beforeEach(() => {

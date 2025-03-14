@@ -1,4 +1,5 @@
-import { AccordionIcon, icons, P3 } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { AccordionIcon, P3 } from "@argent/x-ui"
 import {
   Accordion,
   AccordionButton,
@@ -10,8 +11,6 @@ import type { FC } from "react"
 
 import type { FeeEstimationProps } from "../feeEstimation.model"
 import { CopyErrorIcon } from "./CopyErrorIcon"
-
-const { WarningCircleSecondaryIcon } = icons
 
 export const TransactionFailureAccordion: FC<
   Pick<FeeEstimationProps, "parsedFeeEstimationError">

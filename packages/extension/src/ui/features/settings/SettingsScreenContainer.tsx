@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import { type FC } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSmartAccountEnabled } from "../../../shared/smartAccount/useSmartAccountEnabled"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
@@ -24,18 +24,18 @@ export const SettingsScreenContainer: FC = () => {
   const navigate = useNavigate()
   const stopSession = useStopSession()
   const verifiedEmail = useSmartAccountVerifiedEmail()
-  const isSignedIn = useIsSignedIn()
-  const isSmartAccountEnabled = useSmartAccountEnabled()
+  const isSignedIn = useIsSignedIn({ initiator: "SettingsScreenContainer" })
+  const isSmartAccountEnabled = useSmartAccountEnabled(account?.networkId)
   const isLedgerSigner = useIsLedgerSigner(account?.id)
 
   const onSignIn = () => {
-    navigate(
+    void navigate(
       routes.argentAccountEmail(selectedAccount?.id, "argentAccount", returnTo),
     )
   }
 
   const onNavigateToAccount = () => {
-    navigate(routes.argentAccountLoggedIn(selectedAccount?.id))
+    void navigate(routes.argentAccountLoggedIn(selectedAccount?.id))
   }
 
   const onLock = () => void stopSession(true)

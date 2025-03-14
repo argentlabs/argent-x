@@ -8,6 +8,7 @@ import {
 
 import { getBackendTimeNowSeconds } from "./backend/time"
 import { idb } from "./idb"
+import { smartAccountService } from "."
 
 /** important that signingKey stays not 'extractable' from browser */
 
@@ -24,6 +25,7 @@ const createDevice = async (): Promise<Device> => {
 
 export const resetDevice = async () => {
   await idb.devices.delete(0)
+  await smartAccountService.handleDeviceUpdate(undefined)
 }
 
 export const getDevice = async () => {
@@ -33,6 +35,7 @@ export const getDevice = async () => {
   }
   const newDevice = await createDevice()
   await idb.devices.put(newDevice)
+  await smartAccountService.handleDeviceUpdate(newDevice)
   return newDevice
 }
 

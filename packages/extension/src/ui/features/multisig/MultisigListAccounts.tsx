@@ -3,15 +3,17 @@ import type { FC } from "react"
 import { useMemo } from "react"
 
 import type { PendingMultisig } from "../../../shared/multisig/types"
-import type { BaseWalletAccount } from "../../../shared/wallet.model"
-import type { Account } from "../accounts/Account"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { AccountListScreenItemContainer } from "../accounts/AccountListScreenItemContainer"
-import { multisigIsPending } from "./Multisig"
+import { multisigIsPending } from "./multisig.state"
 import { PendingMultisigListScreenItem } from "./PendingMultisigListScreenItem"
 import { sortMultisigAndPendingMultisigAccounts } from "../../../shared/utils/accountsMultisigSort"
 
 export interface MultisigListAccountsProps {
-  accounts: Account[]
+  accounts: WalletAccount[]
   pendingMultisigs: PendingMultisig[]
   selectedAccount?: BaseWalletAccount
   returnTo?: string

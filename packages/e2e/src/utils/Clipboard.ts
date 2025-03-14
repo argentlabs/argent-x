@@ -1,46 +1,110 @@
 import type { Page } from "@playwright/test"
+import { v4 as uuid } from "uuid"
 
 export default class Clipboard {
-  page: Page
-  private static clipboards: Map<number, string> = new Map()
-  private readonly workerIndex: number
+  public page: Page
+  private static clipboardContents = new Map<string, string>()
+  private readonly clipboardId: string
 
   constructor(page: Page) {
     this.page = page
-    this.workerIndex = Number(process.env.workerIndex)
+    this.clipboardId = `${process.env.workerIndex || "0"}-${uuid()}`
   }
 
-  async setClipboard(): Promise<void> {
-    const text = String(
-      await this.page.evaluate(`navigator.clipboard.readText()`),
-    )
-    Clipboard.clipboards.set(this.workerIndex, text)
+  private getContent(): string {
+    return Clipboard.clipboardContents.get(this.clipboardId) || ""
+  }
+
+  private setContent(content: string): void {
+    Clipboard.clipboardContents.set(this.clipboardId, content)
+  }
+
+  async getSystemClipboard(): Promise<string> {
+    try {
+      const clipText = await this.page.evaluate(async () => {
+        try {
+          // Try Clipboard API first
+          if (navigator.clipboard?.readText) {
+            return await navigator.clipboard.readText()
+          }
+
+          // Fallback to execCommand
+          const textarea = document.createElement("textarea")
+          textarea.style.position = "fixed"
+          textarea.style.opacity = "0"
+          document.body.appendChild(textarea)
+          textarea.focus()
+
+          try {
+            document.execCommand("paste")
+            return textarea.value
+          } finally {
+            textarea.remove()
+          }
+        } catch (e) {
+          return ""
+        }
+      })
+
+      if (clipText) {
+        this.setContent(clipText)
+      }
+      return clipText
+    } catch (error) {
+      console.warn("Failed to read system clipboard:", error)
+      return this.getContent()
+    }
   }
 
   async setClipboardText(text: string): Promise<void> {
-    Clipboard.clipboards.set(this.workerIndex, text)
+    this.setContent(String(text))
+
+    try {
+      // Try using the Clipboard API first
+      await this.page.evaluate(async (text) => {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text)
+          return
+        }
+
+        // Fallback to execCommand
+        const textarea = document.createElement("textarea")
+        textarea.value = text
+        textarea.style.position = "fixed"
+        textarea.style.opacity = "0"
+        document.body.appendChild(textarea)
+        textarea.select()
+
+        try {
+          document.execCommand("copy")
+        } finally {
+          textarea.remove()
+        }
+      }, text)
+    } catch (error) {
+      console.warn("Failed to write to system clipboard:", error)
+      // Continue since we've already updated internal clipboard state
+    }
+
+    await this.page.waitForTimeout(100)
   }
 
   async getClipboard(): Promise<string> {
-    return Clipboard.clipboards.get(this.workerIndex) || ""
+    return this.getContent()
   }
 
   async paste(): Promise<void> {
-    const content = Clipboard.clipboards.get(this.workerIndex) || ""
-    await this.page.evaluate(
-      (text) => navigator.clipboard.writeText(text),
-      content,
-    )
     const key = process.platform === "darwin" ? "Meta" : "Control"
     await this.page.keyboard.press(`${key}+v`)
+    await this.page.waitForTimeout(100)
   }
 
   async clear(): Promise<void> {
-    Clipboard.clipboards.delete(this.workerIndex)
+    Clipboard.clipboardContents.delete(this.clipboardId)
   }
 
-  // Optional: method to clear all clipboards
-  static clearAll(): void {
-    Clipboard.clipboards.clear()
+  // For debugging purposes
+  logClipboard(): void {
+    console.log(`[Clipboard ${this.clipboardId}] Content:`, this.getContent())
   }
 }

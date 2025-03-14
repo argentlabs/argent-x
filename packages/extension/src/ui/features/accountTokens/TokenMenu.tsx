@@ -1,4 +1,4 @@
-import { icons } from "@argent/x-ui"
+import { MoreSecondaryIcon } from "@argent/x-ui/icons"
 import { Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react"
 import type { FC } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
@@ -9,8 +9,6 @@ import {
 } from "../../services/blockExplorer.service"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { normalizeAddress } from "@argent/x-shared"
-
-const { MoreSecondaryIcon } = icons
 
 export interface TokenMenuProps {
   tokenAddress: string

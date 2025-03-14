@@ -2,14 +2,13 @@ import {
   BarIconButton,
   ButtonCell,
   CellStack,
-  icons,
   NavigationContainer,
   SpacerCell,
 } from "@argent/x-ui"
 import { useCallback } from "react"
 import { Link } from "react-router-dom"
 
-const { ExpandIcon, SettingsSecondaryIcon } = icons
+import { ExpandIcon, SettingsSecondaryIcon } from "@argent/x-ui/icons"
 
 export function Home() {
   const onOpenWindow = useCallback(() => {

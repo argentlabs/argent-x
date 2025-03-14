@@ -7,12 +7,11 @@ import {
 } from "@argent/x-ui"
 import { Button, Center, Flex } from "@chakra-ui/react"
 import copy from "copy-to-clipboard"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
 import { QrCode } from "../../../components/QrCode"
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
 import { usePublicKey } from "../../accounts/usePublicKey"
-import { encodeBase58 } from "@argent/x-shared"
 import { useRouteAccountId } from "../../../hooks/useRoute"
 
 export const ExportPublicKeyScreen = () => {
@@ -23,19 +22,12 @@ export const ExportPublicKeyScreen = () => {
 
   const publicKey = usePublicKey(accountId)
 
-  const encodedPublicKey = useMemo(() => {
-    if (!publicKey) {
-      return null
-    }
-    return encodeBase58(publicKey)
-  }, [publicKey])
-
-  if (!encodedPublicKey) {
+  if (!publicKey) {
     return null
   }
 
   const onCopy = () => {
-    copy(encodedPublicKey)
+    copy(publicKey)
     setPublicKeyCopied(true)
     setTimeout(() => {
       setPublicKeyCopied(false)
@@ -61,18 +53,14 @@ export const ExportPublicKeyScreen = () => {
           </L2Bold>
         </Flex>
         <Center overflow={"hidden"} flexDirection={"column"} gap={6} px={6}>
-          <QrCode
-            size={208}
-            data={encodedPublicKey}
-            data-key={encodedPublicKey}
-          />
+          <QrCode size={208} data={publicKey} data-key={publicKey} />
           <P2
             aria-label="Public key"
             textAlign={"center"}
             fontWeight={"semibold"}
             w={"full"}
           >
-            {encodedPublicKey}
+            {publicKey}
           </P2>
         </Center>
         <Button

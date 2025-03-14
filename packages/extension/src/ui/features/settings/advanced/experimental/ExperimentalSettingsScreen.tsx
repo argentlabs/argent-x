@@ -3,9 +3,10 @@ import {
   ButtonCell,
   CellStack,
   NavigationContainer,
-  Switch,
 } from "@argent/x-ui"
 import type { FC, ReactEventHandler } from "react"
+
+import { Switch } from "@chakra-ui/react"
 
 interface ExperimentalSettingsScreenProps {
   experimentalAllowChooseAccount: boolean

@@ -1,6 +1,10 @@
 import type { IChainService } from "../../../chain/service/IChainService"
 import type { AllowArray, SelectorFn } from "../../../storage/__new/interface"
-import type { AccountId, ArgentWalletAccount } from "../../../wallet.model"
+import type {
+  AccountId,
+  ArgentWalletAccount,
+  AvatarMeta,
+} from "../../../wallet.model"
 import {
   type BaseWalletAccount,
   type WalletAccount,
@@ -99,6 +103,26 @@ export class AccountService implements IAccountService {
     return this.update(
       (account) => isEqualAccountIds(account.id, accountId),
       (account) => ({ ...account, name }),
+    )
+  }
+
+  async setAvatarMeta(
+    avatarMeta: AvatarMeta | undefined,
+    accountId: AccountId,
+  ): Promise<void> {
+    if (!avatarMeta) {
+      return
+    }
+
+    return this.update(
+      (account) => isEqualAccountIds(account.id, accountId),
+      (account) => ({
+        ...account,
+        avatarMeta: {
+          ...account.avatarMeta,
+          ...avatarMeta,
+        },
+      }),
     )
   }
 

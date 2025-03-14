@@ -2,8 +2,10 @@ import type { Page } from "@playwright/test"
 
 import { lang } from "../languages"
 import Clipboard from "../utils/Clipboard"
+import { decreaseMajorVersion } from "../utils"
 
 export default class Navigation extends Clipboard {
+  private static _version: string = ""
   constructor(page: Page) {
     super(page)
   }
@@ -136,5 +138,40 @@ export default class Navigation extends Clipboard {
 
   get upgradeLocator() {
     return this.page.locator(`button:text-is("${lang.common.upgrade}")`)
+  }
+
+  //used by upgrade version tests
+  static get version(): string {
+    return Navigation._version
+  }
+
+  static set version(value: string) {
+    Navigation._version = value
+  }
+
+  isUIBreakVersion(storeVersion: string): boolean {
+    //if storeVersion is not set, we consider it's not a UI break
+    if (!storeVersion) return false
+    const vStoreParts = storeVersion.split(".").map(Number)
+    const vUIBreakParts = "5.20.9".split(".").map(Number)
+    for (
+      let i = 0;
+      i < Math.max(vStoreParts.length, vUIBreakParts.length);
+      i++
+    ) {
+      const vUiBreakPart = vUIBreakParts[i] || 0
+      const vStorePart = vStoreParts[i] || 0
+      if (vUiBreakPart > vStorePart) return true
+      if (vUiBreakPart < vStorePart) return false
+    }
+    return false
+  }
+
+  setMigVersion(version: string) {
+    Navigation._version = decreaseMajorVersion(version)
+  }
+
+  get isOldUI() {
+    return this.isUIBreakVersion(Navigation._version)
   }
 }

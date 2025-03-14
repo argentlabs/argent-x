@@ -1,4 +1,4 @@
-import { H4, logosDeprecated, P2 } from "@argent/x-ui"
+import { H4, P2 } from "@argent/x-ui"
 import type { FC } from "react"
 import { useMemo } from "react"
 
@@ -16,8 +16,7 @@ import { useIsLedgerSigner } from "../ledger/hooks/useIsLedgerSigner"
 import { multisigView } from "./multisig.state"
 import { MultisigOwner } from "./MultisigOwner"
 import type { WalletAccount } from "../../../shared/wallet.model"
-
-const { LedgerLogo } = logosDeprecated
+import { LedgerLogo } from "@argent/x-ui/logos-deprecated"
 
 interface MultisigTransactionConfirmationsScreenProps {
   account?: WalletAccount

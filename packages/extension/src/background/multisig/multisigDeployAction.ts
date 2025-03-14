@@ -50,6 +50,10 @@ export const addMultisigDeployAction = async (
     throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
   }
 
+  if (preComputedFees.type === "paymaster") {
+    throw new TransactionError({ code: "PAYMASTER_FEES_NOT_SUPPORTED" })
+  }
+
   const deployDetails = {
     version,
     ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),

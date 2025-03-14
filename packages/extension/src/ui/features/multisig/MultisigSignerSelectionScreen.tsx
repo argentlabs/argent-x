@@ -1,9 +1,8 @@
+import { PasscodePrimaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   BarCloseButton,
   H5,
-  icons,
-  logosDeprecated,
   NavigationContainer,
   P3,
 } from "@argent/x-ui"
@@ -18,9 +17,7 @@ import { useOnArgentSignerSelection } from "./hooks/useOnArgentSignerSelection"
 import { useIsFirefox } from "../../hooks/useUserAgent"
 import { selectedNetworkIdView } from "../../views/network"
 import { useView } from "../../views/implementation/react"
-
-const { PasscodePrimaryIcon } = icons
-const { LedgerLogo } = logosDeprecated
+import { LedgerLogo } from "@argent/x-ui/logos-deprecated"
 
 type SignerSelectionOptionType = "argent" | "ledger"
 

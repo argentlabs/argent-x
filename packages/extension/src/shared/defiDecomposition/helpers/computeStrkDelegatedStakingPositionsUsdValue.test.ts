@@ -1,4 +1,4 @@
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { strkDelegatedStakingPositions } from "../__fixtures__/strkDelegatedStakingPositions"
 import { tokenPrices } from "../__fixtures__/tokenPrices"
 import { tokens } from "../__fixtures__/tokens"
@@ -10,7 +10,7 @@ import {
 import { parseStrkDelegatedStakingPositions } from "./parseStrkDelegatedStakingPositions"
 
 describe("computeStrkDelegatedStakingPositionsUsdValue", () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

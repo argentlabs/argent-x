@@ -9,7 +9,7 @@ import type { JWTHeaderParameters } from "jose"
 import { importPKCS8, SignJWT } from "jose"
 
 export class OnRampService implements IOnRampService {
-  async getTopperUrl(address: Address) {
+  async getTopperUrl(address: Address, assetSymbol?: string) {
     const createBootstrapTokenSigner = async (
       widgetId: string,
       keyId: string,
@@ -70,7 +70,7 @@ export class OnRampService implements IOnRampService {
       },
       target: {
         address,
-        asset: "ETH",
+        asset: assetSymbol ?? "ETH",
         allowedAssets: [
           {
             asset: "ETH",

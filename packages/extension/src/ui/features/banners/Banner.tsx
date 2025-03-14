@@ -1,12 +1,13 @@
-import { buttonHoverStyle, H5, icons, P4 } from "@argent/x-ui"
+import { CrossSecondaryIcon } from "@argent/x-ui/icons"
+import { H5, P4 } from "@argent/x-ui"
 import type { ButtonProps } from "@chakra-ui/react"
 import { Circle, Flex, Link } from "@chakra-ui/react"
-import type { FC, ReactNode } from "react"
+import type { FC, MouseEvent, ReactNode } from "react"
 
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import type { IStatusMessageLevel } from "../../../shared/statusMessage/types"
 
-const { CrossSecondaryIcon } = icons
+import { buttonHoverStyle } from "@argent/x-ui/theme"
 
 export interface BannerProps extends Omit<ButtonProps, "title"> {
   colorScheme?: IStatusMessageLevel | "success"
@@ -16,6 +17,7 @@ export interface BannerProps extends Omit<ButtonProps, "title"> {
   icon?: ReactNode
   linkTitle?: string
   linkUrl?: string
+  iconColor?: string
 }
 
 const LinkTitle: FC<Pick<BannerProps, "linkTitle" | "linkUrl">> = ({
@@ -50,7 +52,7 @@ const LinkTitle: FC<Pick<BannerProps, "linkTitle" | "linkUrl">> = ({
       _hover={{
         color: "text-primary",
       }}
-      onClick={(e) => {
+      onClick={(e: MouseEvent) => {
         e.stopPropagation()
       }}
     >
@@ -68,20 +70,21 @@ export const Banner: FC<BannerProps> = ({
   icon,
   linkTitle,
   linkUrl,
+  iconColor,
   ...rest
 }) => {
   const hasIcon = Boolean(icon)
   const hasLinkTitle = Boolean(linkTitle)
-  const iconColor = colorScheme
-    ? `surface-${colorScheme}-vibrant`
-    : "surface-brand"
+  iconColor =
+    iconColor ??
+    (colorScheme ? `surface-${colorScheme}-vibrant` : "surface-brand")
+
   return (
     <CustomButtonCell
       w="full"
       justifyContent="flex-start"
       minHeight={24.5}
-      border="2px solid"
-      borderColor="surface-sunken"
+      boxShadow="elevated"
       {...rest}
     >
       {hasIcon && (

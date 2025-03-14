@@ -1,8 +1,8 @@
+import { WarningCirclePrimaryIcon, HideSecondaryIcon } from "@argent/x-ui/icons"
 import {
   B3,
   BarBackButton,
   CellStack,
-  icons,
   L2Bold,
   NavigationContainer,
   P2,
@@ -18,8 +18,6 @@ import type { PasswordFormProps } from "../../lock/PasswordForm"
 import { QrCode } from "../../../components/QrCode"
 import { PasswordWarningForm } from "../ui/PasswordWarningForm"
 import { upperFirst } from "lodash-es"
-
-const { WarningCirclePrimaryIcon, HideSecondaryIcon } = icons
 
 export interface ExportPrivateKeyScreenProps
   extends Pick<PasswordFormProps, "verifyPassword"> {

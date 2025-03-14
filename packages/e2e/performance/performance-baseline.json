@@ -1,0 +1,10 @@
+{
+  "create-new-wallet": {
+    "totalDuration": 9000,
+    "fps": 50
+  },
+  "recovery-wallet-33-accounts": {
+    "totalDuration": 35000,
+    "fps": 50
+  }
+}

@@ -14,7 +14,10 @@ import {
   extendInvocationsByAccountDeploy,
   estimatedFeesToResponse,
 } from "./helpers"
-import { estimatedFeesSchema } from "@argent/x-shared/simulation"
+import {
+  estimatedFeesSchema,
+  nativeEstimatedFeesSchema,
+} from "@argent/x-shared/simulation"
 import { AccountError } from "../../../../shared/errors/account"
 
 const estimateRequestSchema = z.object({
@@ -26,7 +29,7 @@ const estimateRequestSchema = z.object({
 export const estimateTransactionProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
   .input(estimateRequestSchema)
-  .output(estimatedFeesSchema)
+  .output(nativeEstimatedFeesSchema)
   .query(
     async ({
       input: { account, feeTokenAddress, transactions },

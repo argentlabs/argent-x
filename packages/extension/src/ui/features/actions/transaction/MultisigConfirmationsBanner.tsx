@@ -1,12 +1,14 @@
-import { icons, P3, SplitProgress } from "@argent/x-ui"
+import {
+  MultisigSecondaryIcon,
+  ChevronRightSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { P3, SplitProgress } from "@argent/x-ui"
 import { Box, Flex, Progress } from "@chakra-ui/react"
 
 import { useMemo } from "react"
 import type { WalletAccount } from "../../../../shared/wallet.model"
 import { useView } from "../../../views/implementation/react"
 import { multisigView } from "../../multisig/multisig.state"
-
-const { MultisigSecondaryIcon, ChevronRightSecondaryIcon } = icons
 
 export interface MultisigConfirmationsBannerProps {
   confirmations?: number

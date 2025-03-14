@@ -1,8 +1,7 @@
-import { BarIconButton, H1, H5, icons } from "@argent/x-ui"
+import { HeartPrimaryIcon, CrossSecondaryIcon } from "@argent/x-ui/icons"
+import { BarIconButton, H1, H5 } from "@argent/x-ui"
 import { Button, Center, Circle, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { HeartPrimaryIcon, CrossSecondaryIcon } = icons
 
 interface ReviewFeedbackScreenProps {
   onSubmit: () => void

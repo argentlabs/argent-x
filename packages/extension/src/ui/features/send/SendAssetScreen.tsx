@@ -1,8 +1,12 @@
 import {
+  SearchPrimaryIcon,
+  WalletSecondaryIcon,
+  NftIcon,
+} from "@argent/x-ui/icons"
+import {
   BarCloseButton,
   CellStack,
   Empty,
-  icons,
   NavigationContainer,
 } from "@argent/x-ui"
 import {
@@ -28,8 +32,6 @@ import { TokenList } from "../accountTokens/TokenList"
 import { useSendQuery } from "./useSendQuery"
 import { useFilteredCollections } from "./useFilteredCollections"
 import { useFilteredTokens } from "./useFilteredTokens"
-
-const { SearchPrimaryIcon, WalletSecondaryIcon, NftIcon } = icons
 
 export const SendAssetScreen: FC = () => {
   const { recipientAddress, tokenId, amount, returnTo } = useSendQuery()

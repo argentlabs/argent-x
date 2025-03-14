@@ -3,20 +3,17 @@ import { useMemo } from "react"
 import type { Token } from "../../../shared/token/__new/types/token.model"
 import type { TokenWithOptionalBigIntBalance } from "../../../shared/token/__new/types/tokenBalance.model"
 import { equalToken } from "../../../shared/token/__new/utils"
-import type { Account } from "../accounts/Account"
-import {
-  tokenBalancesForAccountAndTokenView,
-  tokenBalancesForAccountViewFamily,
-} from "../../views/tokenBalances"
+import { tokenBalancesForAccountAndTokenView } from "../../views/tokenBalances"
 import { ethTokenOnNetworkView } from "../../views/token"
 import { useView } from "../../views/implementation/react"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
 /**
  * Interface for the arguments of useTokenBalanceForAccount function
  */
 interface UseTokenBalanceForAccountArgs {
   token?: Token
-  account?: Pick<Account, "id" | "network" | "address" | "networkId">
+  account?: Pick<WalletAccount, "id" | "address" | "networkId">
 }
 
 /**

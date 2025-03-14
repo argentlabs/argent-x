@@ -1,14 +1,13 @@
 import type { FC } from "react"
 import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { ButtonCell, icons } from "@argent/x-ui"
+import { HideSecondaryIcon, BinSecondaryIcon } from "@argent/x-ui/icons"
+import { ButtonCell } from "@argent/x-ui"
 
 import { routes } from "../../../../../../shared/ui/routes"
 import { isDeprecated } from "../../../../../../shared/wallet.service"
 import type { WalletAccount } from "../../../../../../shared/wallet.model"
 import { upperFirst } from "lodash-es"
-
-const { HideSecondaryIcon, BinSecondaryIcon } = icons
 
 export const HideOrDeleteAccountButtonContainer: FC<{
   account: WalletAccount

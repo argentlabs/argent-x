@@ -1,10 +1,9 @@
-import { Button, icons } from "@argent/x-ui"
+import { PlusSecondaryIcon } from "@argent/x-ui/icons"
+import { Button } from "@argent/x-ui"
 import type { ComponentProps, FC } from "react"
 import { Link } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
-
-const { PlusSecondaryIcon } = icons
 
 export const NewTokenButton: FC<ComponentProps<typeof Button>> = (props) => {
   return (

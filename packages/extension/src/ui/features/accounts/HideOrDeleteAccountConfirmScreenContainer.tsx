@@ -49,6 +49,7 @@ export const HideOrDeleteAccountConfirmScreenContainer: FC = () => {
       mode={mode}
       onSubmit={() => void handleSubmit()}
       onReject={onReject}
+      accountId={routeAccount.id}
       accountName={routeAccount.name}
       accountAddress={routeAccount.address}
       accountType={routeAccount.type}

@@ -4,13 +4,12 @@ import {
   ButtonCell,
   CellStack,
   HeaderCell,
-  icons,
   NavigationContainer,
   SpacerCell,
 } from "@argent/x-ui"
 import { Link, useNavigate, useParams } from "react-router-dom"
 
-const { MoreSecondaryIcon } = icons
+import { MoreSecondaryIcon } from "@argent/x-ui/icons"
 
 export function Account() {
   const { id } = useParams()

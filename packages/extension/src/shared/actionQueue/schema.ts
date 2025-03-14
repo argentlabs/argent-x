@@ -1,9 +1,7 @@
 import { z } from "zod"
-// just using types here
-// eslint-disable-next-line @argent/local/code-import-patterns
-import { iconKeysSchema } from "@argent/x-ui"
-import { simulateAndReviewSchema } from "@argent/x-shared/simulation"
 import { addressSchema, investmentMetaSchema } from "@argent/x-shared"
+import { simulateAndReviewSchema } from "@argent/x-shared/simulation"
+import { swapReviewTradeSchema } from "../swap/model/trade.model"
 
 export const actionHashSchema = z.string()
 export type ActionHash = z.infer<typeof actionHashSchema>
@@ -18,6 +16,30 @@ export const actionItemExtraSchema = deployActionExtraSchema
 
 export type ActionItemExtra = z.infer<typeof actionItemExtraSchema>
 
+export const transactionIconKeysSchema = z.enum([
+  "DocumentIcon",
+  "RocketSecondaryIcon",
+  "MultisigSecondaryIcon",
+  "RemoveContactSecondaryIcon",
+  "AddContactSecondaryIcon",
+  "ApproveIcon",
+  "CrossSecondaryIcon",
+  "ShieldSecondaryIcon",
+  "NoShieldSecondaryIcon",
+  "SendSecondaryIcon",
+  "SwapPrimaryIcon",
+  "NftIcon",
+  "NetworkSecondaryIcon",
+  "MultisigReplaceIcon",
+  "UpgradeSecondaryIcon",
+  "InvestSecondaryIcon",
+  "ArrowDownPrimaryIcon",
+  "SparkleSecondaryIcon",
+  "LegalPrimaryIcon",
+])
+
+export type TransactionIconKeys = z.infer<typeof transactionIconKeysSchema>
+
 export const actionQueueItemMetaSchema = z.object({
   hash: actionHashSchema,
   expires: z.number(),
@@ -27,9 +49,10 @@ export const actionQueueItemMetaSchema = z.object({
   title: z.string().optional(),
   shortTitle: z.string().optional(),
   subtitle: z.string().optional(),
-  icon: iconKeysSchema.optional(),
+  icon: transactionIconKeysSchema.optional(),
   transactionReview: simulateAndReviewSchema.optional(),
   investment: investmentMetaSchema.optional(),
+  reviewTrade: swapReviewTradeSchema.optional(),
 })
 
 export type ActionQueueItemMeta = z.infer<typeof actionQueueItemMetaSchema>

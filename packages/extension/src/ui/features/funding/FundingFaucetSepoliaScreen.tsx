@@ -2,7 +2,6 @@ import {
   BarBackButton,
   BarCloseButton,
   CellStack,
-  logosDeprecated,
   NavigationContainer,
 } from "@argent/x-ui"
 import type { FC } from "react"
@@ -11,8 +10,7 @@ import { useNavigate } from "react-router-dom"
 import { Option } from "../../components/Option"
 import { routes } from "../../../shared/ui/routes"
 import { TrackingLink } from "../../components/TrackingLink"
-
-const { StarknetLogo, BlastLogo } = logosDeprecated
+import { StarknetLogo, BlastLogo } from "@argent/x-ui/logos-deprecated"
 
 export const FundingFaucetSepoliaScreen: FC = () => {
   const navigate = useNavigate()

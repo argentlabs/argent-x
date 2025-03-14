@@ -1,4 +1,4 @@
-import { icons } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
 import type { FC } from "react"
 import type { To } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
@@ -8,8 +8,6 @@ import { useIsDeprecatedTxV0 } from "../accounts/accountUpgradeCheck"
 import type { BannerProps } from "./Banner"
 import { Banner } from "./Banner"
 import type { BannerRouteState } from "./UpgradeBanner"
-
-const { WarningCircleSecondaryIcon } = icons
 
 export interface UpgradeBannerProps extends BannerProps {
   to: To

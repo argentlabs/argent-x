@@ -1,12 +1,11 @@
-import { B3, H1, icons, logosDeprecated, P1 } from "@argent/x-ui"
+import { HelpCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { B3, H1, P1 } from "@argent/x-ui"
 import { Box, Button, Center, VStack } from "@chakra-ui/react"
 import { isString } from "lodash-es"
 import type { FC, PropsWithChildren, ReactNode } from "react"
 import { ContentWrapper } from "../../../components/FullScreenPage"
 import { StepIndicator } from "../../../components/StepIndicator"
-
-const { HelpCircleSecondaryIcon } = icons
-const { ArgentXLogoFull } = logosDeprecated
+import { ArgentXLogoFull } from "@argent/x-ui/logos-deprecated"
 
 export interface LedgerScreenLayoutProps extends PropsWithChildren {
   back?: boolean

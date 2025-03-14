@@ -1,11 +1,10 @@
 import type { ButtonProps } from "@chakra-ui/react"
 import { Flex, Text } from "@chakra-ui/react"
-import { H4, H5, icons, L1, L1Bold } from "@argent/x-ui"
+import { ChevronRightSecondaryIcon } from "@argent/x-ui/icons"
+import { H4, H5, L1, L1Bold } from "@argent/x-ui"
 import type { FC } from "react"
 
 import { CustomButtonCell } from "../../../components/CustomButtonCell"
-
-const { ChevronRightSecondaryIcon } = icons
 
 interface StakingButtonCellProps extends ButtonProps {
   title: string

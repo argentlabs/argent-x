@@ -1,6 +1,6 @@
 import { AccountSelect } from "@argent-x/extension/src/ui/features/accounts/AccountSelect"
 import { P2 } from "@argent/x-ui"
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 
 export default {
   component: AccountSelect,

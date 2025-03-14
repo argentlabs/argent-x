@@ -3,11 +3,11 @@ import { UnknownDappIcon } from "./UnknownDappIcon"
 import { DappIcon } from "./DappIcon"
 import { KnownIcon } from "./KnownIcon"
 import type { BoxProps } from "@chakra-ui/react"
-import type { IconKeys } from "@argent/x-ui"
+import type { TransactionIconKeys } from "../../../../../../shared/actionQueue/schema"
 
 export interface TransactionIconProps extends BoxProps {
   dappLogoUrl?: string
-  iconKey?: IconKeys
+  iconKey?: TransactionIconKeys
 }
 
 export const TransactionIcon: FC<TransactionIconProps> = ({

@@ -11,7 +11,6 @@ import {
   isHiddenPendingMultisig,
 } from "../multisig/multisig.state"
 import { AccountList } from "./AccountList"
-import { mapWalletAccountsToAccounts } from "./accounts.state"
 import { usePartitionedAccountsByType } from "./usePartitionedAccountsByType"
 import { routes } from "../../../shared/ui/routes"
 import { useNavigate } from "react-router-dom"
@@ -40,10 +39,8 @@ export const AccountListContainer: FC<AccountListContainerProps> = ({
     isHiddenPendingMultisig,
   )
 
-  const accounts = mapWalletAccountsToAccounts(visibleAccounts)
-
   const { multisigAccounts, standardAccounts, importedAccounts } =
-    usePartitionedAccountsByType(accounts)
+    usePartitionedAccountsByType(visibleAccounts)
 
   const onAddAccount = useCallback(async () => {
     /** Make sure to activate the current network selection before starting the account creation process */

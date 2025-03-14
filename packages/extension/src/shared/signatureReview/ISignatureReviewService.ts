@@ -1,5 +1,5 @@
 import type { Address } from "@argent/x-shared"
-import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type { EnrichedSimulateAndReviewV2 } from "@argent/x-shared/simulation"
 import type { OutsideSignature } from "./schema"
 
 export type SimulateAndReviewPayload = {
@@ -13,5 +13,5 @@ export interface ISignatureReviewService {
     signature,
     feeTokenAddress,
     appDomain,
-  }: SimulateAndReviewPayload): Promise<EnrichedSimulateAndReview>
+  }: SimulateAndReviewPayload): Promise<EnrichedSimulateAndReviewV2>
 }

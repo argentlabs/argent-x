@@ -1,11 +1,10 @@
-import { ButtonCell, icons, P3 } from "@argent/x-ui"
+import { ChevronRightSecondaryIcon, MinusPrimaryIcon } from "@argent/x-ui/icons"
+import { ButtonCell, P3 } from "@argent/x-ui"
 import type { ButtonProps } from "@chakra-ui/react"
 import { Box, Button, Flex, Text } from "@chakra-ui/react"
 import type { FC, PropsWithChildren, ReactEventHandler } from "react"
 import type { LinkProps } from "react-router-dom"
 import { Link } from "react-router-dom"
-
-const { ChevronRightSecondaryIcon, MinusPrimaryIcon } = icons
 
 export interface SettingsMenuItemProps extends ButtonProps {
   title: string

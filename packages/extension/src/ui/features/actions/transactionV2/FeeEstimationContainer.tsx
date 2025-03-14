@@ -2,19 +2,11 @@ import { isFunction } from "lodash-es"
 import type { FC } from "react"
 import { useEffect, useMemo } from "react"
 import type { TokenWithBalance } from "@argent/x-shared"
-import {
-  estimatedFeesToTotal,
-  estimatedFeesToMaxFeeTotal,
-} from "@argent/x-shared"
+import { estimatedFeesToMaxFeeTotalV2 } from "@argent/x-shared"
 import { useWalletAccount } from "../../accounts/accounts.state"
-import {
-  useCurrencyDisplayEnabled,
-  useTokenAmountToCurrencyValue,
-} from "../../accountTokens/tokenPriceHooks"
 import { FeeEstimation } from "../feeEstimation/FeeEstimation"
-import type { ParsedFeeError } from "../feeEstimation/feeError"
 import { getParsedFeeError } from "../feeEstimation/feeError"
-import type { EstimatedFees } from "@argent/x-shared/simulation"
+import type { EstimatedFeesV2 } from "@argent/x-shared/simulation"
 import type { AccountId } from "../../../../shared/wallet.model"
 
 export interface FeeEstimationContainerProps {
@@ -26,11 +18,12 @@ export interface FeeEstimationContainerProps {
   transactionSimulationFeeError?: Error
   needsDeploy?: boolean
   error?: any
-  fee?: EstimatedFees
+  fee?: EstimatedFeesV2
   feeToken?: TokenWithBalance
   onOpenFeeTokenPicker?: () => void
   allowFeeTokenSelection?: boolean
   isSendingMoreThanBalanceAndGas?: boolean
+  isSubsidised?: boolean
 }
 
 export const FeeEstimationContainer: FC<FeeEstimationContainerProps> = ({
@@ -44,6 +37,7 @@ export const FeeEstimationContainer: FC<FeeEstimationContainerProps> = ({
   onOpenFeeTokenPicker,
   allowFeeTokenSelection = true,
   isSendingMoreThanBalanceAndGas,
+  isSubsidised,
 }) => {
   const account = useWalletAccount(accountId)
   if (!account) {
@@ -51,68 +45,66 @@ export const FeeEstimationContainer: FC<FeeEstimationContainerProps> = ({
   }
 
   const enoughBalance = useMemo(() => {
+    if (isSubsidised) {
+      return true // If the transaction is subsidised, we don't need to check the balance
+    }
     if (!feeToken || !fee) {
       return false
     }
-    return feeToken.balance >= estimatedFeesToMaxFeeTotal(fee)
-  }, [feeToken, fee])
+    return feeToken.balance >= estimatedFeesToMaxFeeTotalV2(fee)
+  }, [feeToken, fee, isSubsidised])
 
-  const showFeeError = Boolean(
-    fee &&
-      typeof feeToken?.balance === "bigint" &&
-      (!enoughBalance || isSendingMoreThanBalanceAndGas),
-  )
+  const showInsufficientFeeError = useMemo(() => {
+    if (isSubsidised || !fee || typeof feeToken?.balance !== "bigint") {
+      return false
+    }
+    return !enoughBalance || Boolean(isSendingMoreThanBalanceAndGas)
+  }, [
+    enoughBalance,
+    fee,
+    feeToken?.balance,
+    isSendingMoreThanBalanceAndGas,
+    isSubsidised,
+  ])
+
   const showEstimateError = Boolean(error)
-  const showError = showFeeError || showEstimateError
+  const showError = showInsufficientFeeError || showEstimateError
 
   const hasError = !fee || !enoughBalance || showError
+
   useEffect(() => {
     onErrorChange?.(hasError)
   }, [hasError, onErrorChange])
 
   useEffect(() => {
-    if (!isFunction(onFeeErrorChange)) {
-      return
+    if (isFunction(onFeeErrorChange)) {
+      onFeeErrorChange(showInsufficientFeeError)
     }
-    onFeeErrorChange(showFeeError)
-  }, [showFeeError, onFeeErrorChange])
+  }, [showInsufficientFeeError, onFeeErrorChange])
 
-  let parsedFeeEstimationError: ParsedFeeError | undefined
-  if (showEstimateError) {
-    if (error) {
-      parsedFeeEstimationError = getParsedFeeError(error)
+  const parsedFeeEstimationError = useMemo(() => {
+    if (showEstimateError && error) {
+      return getParsedFeeError(error)
     }
+    return undefined
+  }, [error, showEstimateError])
+
+  if (!feeToken) {
+    return null
   }
 
-  const showCurrencyValue = useCurrencyDisplayEnabled()
-
-  const amountCurrencyValue = useTokenAmountToCurrencyValue(
-    showCurrencyValue && feeToken ? feeToken : undefined,
-    fee && estimatedFeesToTotal(fee),
-  ) // will return undefined if no feeToken or showCurrencyValue is false
-
-  const suggestedMaxFeeCurrencyValue = useTokenAmountToCurrencyValue(
-    showCurrencyValue && feeToken ? feeToken : undefined,
-    fee && estimatedFeesToMaxFeeTotal(fee),
-  )
-
   return (
-    <>
-      {feeToken && (
-        <FeeEstimation
-          amountCurrencyValue={amountCurrencyValue}
-          fee={fee}
-          feeToken={feeToken}
-          parsedFeeEstimationError={parsedFeeEstimationError}
-          showError={showError}
-          showEstimateError={showEstimateError}
-          showFeeError={showFeeError}
-          suggestedMaxFeeCurrencyValue={suggestedMaxFeeCurrencyValue}
-          needsDeploy={needsDeploy}
-          onOpenFeeTokenPicker={onOpenFeeTokenPicker}
-          allowFeeTokenSelection={allowFeeTokenSelection}
-        />
-      )}
-    </>
+    <FeeEstimation
+      fee={fee}
+      feeToken={feeToken}
+      parsedFeeEstimationError={parsedFeeEstimationError}
+      showError={showError}
+      showEstimateError={showEstimateError}
+      showInsufficientFeeError={showInsufficientFeeError}
+      needsDeploy={needsDeploy}
+      onOpenFeeTokenPicker={onOpenFeeTokenPicker}
+      allowFeeTokenSelection={allowFeeTokenSelection}
+      isSubsidised={isSubsidised}
+    />
   )
 }

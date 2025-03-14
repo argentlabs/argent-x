@@ -9,20 +9,28 @@ import { Flex } from "@chakra-ui/react"
 
 import { AccountNavigationBarContainer } from "../navigation/AccountNavigationBarContainer"
 import { RootTabsContainer } from "./RootTabsContainer"
+import {
+  AccountListScreenContainerPreload,
+  AccountListScreenPreloadProvider,
+} from "../accounts/AccountListScreenContainerPreload"
 
 interface RootTabsScreeenProps extends PropsWithChildren {
   scrollKey: string
+  hideAccountNavigationBar?: boolean
 }
 
-export const RootTabsScreeen: FC<RootTabsScreeenProps> = ({
+export const RootTabsScreen: FC<RootTabsScreeenProps> = ({
   scrollKey,
   children,
+  hideAccountNavigationBar,
 }) => {
   const { scrollRef, scroll } = useScrollRestoration(scrollKey)
   return (
-    <>
+    <AccountListScreenPreloadProvider>
       <Suspense fallback={<NavigationBarSkeleton />}>
-        <AccountNavigationBarContainer scroll={scroll} />
+        {!hideAccountNavigationBar && (
+          <AccountNavigationBarContainer scroll={scroll} />
+        )}
       </Suspense>
       <Suspense fallback={<Flex flex={1} />}>
         <ScrollContainer ref={scrollRef}>{children}</ScrollContainer>
@@ -30,6 +38,7 @@ export const RootTabsScreeen: FC<RootTabsScreeenProps> = ({
       <Suspense>
         <RootTabsContainer />
       </Suspense>
-    </>
+      <AccountListScreenContainerPreload />
+    </AccountListScreenPreloadProvider>
   )
 }

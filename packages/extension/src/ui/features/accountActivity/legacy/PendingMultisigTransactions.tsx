@@ -1,4 +1,8 @@
-import { CellStack, icons } from "@argent/x-ui"
+import {
+  MultisigSecondaryIcon,
+  InfoCircleSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { CellStack } from "@argent/x-ui"
 import type { FlexProps } from "@chakra-ui/react"
 import { Box, Center, Divider, Flex, Text, Tooltip } from "@chakra-ui/react"
 import type { FC } from "react"
@@ -20,14 +24,14 @@ import {
   getNativeActivitySubtitleForTransaction,
 } from "../../../../shared/transactions/utils"
 import { routes } from "../../../../shared/ui/routes"
-import type { Multisig } from "../../multisig/Multisig"
 import { multisigView } from "../../multisig/multisig.state"
 import { OffchainSignatureListItem } from "./OffchainSignatureListItem"
-import type { WalletAccount } from "../../../../shared/wallet.model"
+import type {
+  MultisigWalletAccount,
+  WalletAccount,
+} from "../../../../shared/wallet.model"
 import { useView } from "../../../views/implementation/react"
 import { isMultisigTransactionRejectedAndNonceNotConsumed } from "../../../../shared/multisig/utils/getMultisigTransactionType"
-
-const { MultisigSecondaryIcon, InfoCircleSecondaryIcon } = icons
 
 interface PendingMultisigActionsProps extends FlexProps {
   pendingMultisigActions: (
@@ -74,7 +78,7 @@ export const PendingMultisigTransactions: FC<PendingMultisigActionsProps> = ({
 
 interface PendingMultisigActionsContainerProps
   extends PendingMultisigActionsProps {
-  multisig: Multisig
+  multisig: MultisigWalletAccount
 }
 
 export const PendingMultisigActionsContainer: FC<

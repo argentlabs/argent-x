@@ -9,7 +9,7 @@ export const ConnectedDappButtonContainer: FC<{ account: WalletAccount }> = ({
 }) => {
   const navigate = useNavigate()
   const onClick = () => {
-    navigate(routes.settingsDappConnectionsAccount(account?.id))
+    navigate(routes.settingsAuthorizedDappsAccount(account.id))
   }
 
   return <ConnectedDappsButton onClick={onClick} />

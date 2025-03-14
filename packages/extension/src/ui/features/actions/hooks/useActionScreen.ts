@@ -7,7 +7,10 @@ import { selectedAccountView } from "../../../views/account"
 import { currentActionView, isLastActionView } from "../../../views/actions"
 import { useView } from "../../../views/implementation/react"
 import { focusExtensionTab, useExtensionIsInTab } from "../../browser/tabs"
-import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type {
+  EnrichedSimulateAndReview,
+  EnrichedSimulateAndReviewV2,
+} from "@argent/x-shared/simulation"
 import type { ActionItemExtra } from "../../../../shared/actionQueue/schema"
 
 export const useActionScreen = () => {
@@ -24,7 +27,11 @@ export const useActionScreen = () => {
   }, [isLastAction])
 
   const updateTransactionReview = useCallback(
-    async (transactionReview?: EnrichedSimulateAndReview) => {
+    async (
+      transactionReview?:
+        | EnrichedSimulateAndReview // Signature review
+        | EnrichedSimulateAndReviewV2, // Transaction review
+    ) => {
       if (!action || !transactionReview) {
         return
       }

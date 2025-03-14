@@ -3,7 +3,7 @@ import { PKManager } from "./PKManager"
 import type { AccountId } from "../../wallet.model"
 import type { IPKStore } from "../types"
 import { MockFnObjectStore } from "../../storage/__new/__test__/mockFunctionImplementation"
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 
 describe("PKManager", () => {
   let pkManager: PKManager
@@ -40,7 +40,7 @@ describe("PKManager", () => {
   })
 
   it("should retrieve and decrypt a stored key", async () => {
-    const accountId = getMockAccount().id
+    const accountId = getMockWalletAccount().id
     const privateKey = "0xabcdef1234567890"
     const password = "testpassword"
 

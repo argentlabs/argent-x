@@ -1,10 +1,8 @@
-import { icons } from "@argent/x-ui"
+import { InvestSecondaryIcon } from "@argent/x-ui/icons"
 import type { FC } from "react"
 
 import type { BannerProps } from "./Banner"
 import { Banner } from "./Banner"
-
-const { InvestSecondaryIcon } = icons
 
 interface PromoStakingBannerProps extends BannerProps {
   apyPercentage: string

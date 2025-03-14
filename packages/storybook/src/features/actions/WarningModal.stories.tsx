@@ -1,8 +1,8 @@
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 import type { Warning } from "@argent/x-shared/simulation"
 
 import { WarningModal } from "@argent-x/extension/src/ui/features/actions/warning/WarningModal"
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
 const meta: Meta<typeof WarningModal> = {
   component: WarningModal,

@@ -5,6 +5,7 @@ import {
 } from "../wallet.model"
 import {
   isEqualPreAuthorization,
+  preAuthorizationHostSchema,
   preAuthorizationSchema,
   type PreAuthorization,
 } from "./schema"
@@ -38,8 +39,18 @@ export class PreAuthorizationService implements IPreAuthorizationService {
   }
 
   async remove(preAuthorization: PreAuthorization) {
-    preAuthorizationSchema.parse(preAuthorization)
-    await this.preAuthorizationRepo.remove(preAuthorization)
+    if (
+      preAuthorizationSchema.safeParse(preAuthorization).success || // Check if its fully valid
+      // Check if the host is valid but the account doesn't have an id.
+      // This case will be handled by the accountsEqual function
+      (preAuthorizationHostSchema.safeParse(preAuthorization.host).success &&
+        !("id" in preAuthorization.account))
+    ) {
+      await this.preAuthorizationRepo.remove(preAuthorization)
+      return
+    }
+
+    throw new Error("Invalid preAuthorization")
   }
 
   async removeAll(account: BaseWalletAccount) {

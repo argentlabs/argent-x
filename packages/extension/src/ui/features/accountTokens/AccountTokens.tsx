@@ -61,6 +61,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
   const showSaveRecoverySeedphraseBanner = useShowSaveRecoverySeedphraseBanner()
   const banners = useBanners(account)
   const hasBanners = banners.length > 0 || showSaveRecoverySeedphraseBanner
+
   return (
     <Flex direction={"column"} data-testid="account-tokens" flex={1}>
       <VStack spacing={6} mt={hasBanners ? 8 : 14} mb={hasBanners ? 6 : 14}>
@@ -87,16 +88,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
       <Tabs isLazy index={tabIndex} onChange={setTabIndex}>
         <TabList>
           <Tab aria-label="Coins">Coins</Tab>
-          <Tab
-            aria-label="NFTs"
-            onClick={() =>
-              void ampli.swapTabClicked({
-                "wallet platform": "browser extension",
-              })
-            }
-          >
-            NFTs
-          </Tab>
+          <Tab aria-label="NFTs">NFTs</Tab>
           {showDefiTab && <Tab aria-label="DeFi">DeFi</Tab>}
         </TabList>
         <TabPanels mt={4}>
@@ -108,7 +100,7 @@ export const AccountTokens: FC<AccountTokensProps> = ({ account }) => {
           </TabPanel>
           {showDefiTab && (
             <TabPanel>
-              <WalletDefiTabContainer account={account} />
+              <WalletDefiTabContainer />
             </TabPanel>
           )}
         </TabPanels>

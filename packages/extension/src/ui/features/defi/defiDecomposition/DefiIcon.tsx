@@ -1,7 +1,7 @@
 import type { Address } from "@argent/x-shared"
 import { B1, TokenIcon, UnknownTokenIcon, useToken } from "@argent/x-ui"
 import type { SquareProps } from "@chakra-ui/react"
-import { Box, Flex, Square, Tooltip } from "@chakra-ui/react"
+import { Box, Square, Tooltip } from "@chakra-ui/react"
 import type { FC } from "react"
 import type {
   ParsedCollateralizedDebtPosition,
@@ -76,11 +76,10 @@ const ConcentratedLiquidityIcon = ({
       <TokenDefiIcon
         address={position.token0.address}
         networkId={position.token0.networkId}
-        size={size > 8 ? 6 : 4}
+        size={size > 8 ? 6.5 : 4}
         fontSize="sm"
         position="absolute"
         left={0}
-        top={0}
       />
       <TokenDefiIcon
         address={position.token1.address}
@@ -89,8 +88,7 @@ const ConcentratedLiquidityIcon = ({
         fontSize="sm"
         position="absolute"
         right={0}
-        bottom={0}
-        filter="drop-shadow(-1px -1px var(--chakra-colors-surface-elevated))"
+        filter="drop-shadow(-1px 0px var(--chakra-colors-surface-elevated))"
       />
     </Square>
   )

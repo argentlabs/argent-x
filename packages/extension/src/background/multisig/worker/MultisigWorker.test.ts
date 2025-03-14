@@ -21,13 +21,13 @@ import type { IBackgroundUIService } from "../../services/ui/IBackgroundUIServic
 import { SignerType } from "./../../../shared/wallet.model"
 import { MultisigWorker } from "./MultisigWorker"
 import { MockFnRepository } from "../../../shared/storage/__new/__test__/mockFunctionImplementation"
-import { getMockAccount } from "../../../../test/account.mock"
 import {
   getAccountIdentifier,
   getRandomAccountIdentifier,
 } from "../../../shared/utils/accountIdentifier"
 import { getDerivationPathForIndex } from "../../../shared/signer/utils"
 import { stark } from "starknet"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 
 const mockAccount: MultisigWalletAccount = {
   address: "0x2418f74a90c5f8488d011c811a6d40148ca3f3491965cf247fb03a85ba88213",
@@ -207,13 +207,13 @@ describe("MultisigWorker", () => {
 
     it("should update base multisig wallets with missing IDs", async () => {
       const walletAccounts = [
-        getMockAccount({
+        getMockWalletAccount({
           id: randId1,
           address: randAddress1,
           networkId: defaultNetwork,
           signer: signer1,
         }),
-        getMockAccount({
+        getMockWalletAccount({
           id: randId2,
           address: randAddress2,
           networkId: defaultNetwork,
@@ -282,12 +282,12 @@ describe("MultisigWorker", () => {
 
     it("should not update base multisig wallets if all have IDs", async () => {
       const walletAccounts = [
-        getMockAccount({
+        getMockWalletAccount({
           id: randId1,
           address: randAddress1,
           signer: { type: SignerType.LOCAL_SECRET, derivationPath: "m/1/2" },
         }),
-        getMockAccount({
+        getMockWalletAccount({
           id: randId2,
           address: randAddress2,
           signer: { type: SignerType.LOCAL_SECRET, derivationPath: "m/3/4" },

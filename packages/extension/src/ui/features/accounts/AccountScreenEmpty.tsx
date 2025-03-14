@@ -1,9 +1,12 @@
-import { Empty, EmptyButton, icons } from "@argent/x-ui"
+import {
+  WalletSecondaryIcon,
+  PlusSecondaryIcon,
+  HideSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { Empty, EmptyButton } from "@argent/x-ui"
 import type { FC, ReactEventHandler } from "react"
 
 import { AccountListFooter } from "./AccountListFooter"
-
-const { WalletSecondaryIcon, PlusSecondaryIcon, HideSecondaryIcon } = icons
 
 interface AccountScreenEmptyProps {
   hasHiddenAccounts: boolean

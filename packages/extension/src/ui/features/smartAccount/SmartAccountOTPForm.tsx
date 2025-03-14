@@ -1,34 +1,32 @@
-import { FieldError, icons, useToast } from "@argent/x-ui"
+import { getMessageFromTrpcError } from "@argent/x-shared"
+import { MessageSecondaryIcon, RefreshPrimaryIcon } from "@argent/x-ui/icons"
+import { FieldError, useToast } from "@argent/x-ui"
 import { Button, Center, HStack, PinInputField } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { FormEvent, MouseEvent } from "react"
 import { useCallback, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { accountSharedService } from "../../../shared/account/service"
+import { ampli } from "../../../shared/analytics"
+import type { Flow } from "../../../shared/argentAccount/schema"
+import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
+import { browserExtensionSentryWithScope } from "../../../shared/sentry/scope"
 import type { EmailVerificationStatus } from "../../../shared/smartAccount/backend/account"
 import {
   emailVerificationStatusErrorSchema,
   getVerificationErrorMessage,
 } from "../../../shared/smartAccount/backend/account"
+import { getAddBackendAccountErrorFromBackendError } from "../../../shared/smartAccount/validation/addBackendAccount"
+import { getSmartAccountValidationErrorFromBackendError } from "../../../shared/smartAccount/validation/validateAccount"
+import { getVerificationErrorFromBackendError } from "../../../shared/smartAccount/validation/verification"
+import { updateVerifiedEmail } from "../../../shared/smartAccount/verifiedEmail"
 import { coerceErrorToString } from "../../../shared/utils/error"
+import { SignerType } from "../../../shared/wallet.model"
 import { ControlledPinInput } from "../../components/ControlledPinInput"
 import { useAction } from "../../hooks/useAction"
 import { clientAccountService } from "../../services/account"
 import { clientArgentAccountService } from "../../services/argentAccount"
-import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
-import { getAddBackendAccountErrorFromBackendError } from "../../../shared/smartAccount/validation/addBackendAccount"
-import { getVerificationErrorFromBackendError } from "../../../shared/smartAccount/validation/verification"
-import { updateVerifiedEmail } from "../../../shared/smartAccount/verifiedEmail"
-import { getSmartAccountValidationErrorFromBackendError } from "../../../shared/smartAccount/validation/validateAccount"
-import type { Flow } from "../../../shared/argentAccount/schema"
-import { accountSharedService } from "../../../shared/account/service"
-import { SignerType } from "../../../shared/wallet.model"
-import { ampli } from "../../../shared/analytics"
-import { browserExtensionSentryWithScope } from "../../../shared/sentry/scope"
-import { getMessageFromTrpcError } from "@argent/x-shared"
-
-const { MessageSecondaryIcon, RefreshPrimaryIcon } = icons
 
 const schema = z.object({
   otp: z
@@ -44,6 +42,7 @@ interface SmartAccountOTPFormProps {
   onValidationError: (error: SmartAccountValidationErrorMessage) => void
   flow: Flow
   pinInputWidth?: number
+  networkId: string
 }
 
 const errorSchema = z.object({
@@ -66,6 +65,7 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
     onValidationError,
     flow,
     pinInputWidth,
+    networkId,
   } = props
 
   const formRef = useRef<HTMLFormElement>(null)
@@ -74,8 +74,6 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
   const { action: addAccount } = useAction(
     clientAccountService.create.bind(clientAccountService),
   )
-  const network = useCurrentNetwork()
-
   const onResendEmail = useCallback(
     async (e: MouseEvent) => {
       e.preventDefault()
@@ -207,7 +205,7 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
           if (flow === "toggleSmartAccount") {
             await clientArgentAccountService.addGuardianToAccount()
           } else if (flow === "createSmartAccount") {
-            await addAccount("smart", SignerType.LOCAL_SECRET, network.id)
+            await addAccount("smart", SignerType.LOCAL_SECRET, networkId)
           }
 
           //TODO; trigger here the salt update for all accounts in storage
@@ -218,7 +216,9 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
           await accountSharedService.syncAccountNamesWithBackend()
 
           // Make /account call, to update amplitude
-          await clientArgentAccountService.isTokenExpired()
+          await clientArgentAccountService.isTokenExpired({
+            initiator: "SmartAccountOTPForm/onSubmit",
+          })
 
           // Only trigger this event if the account was successfully validated
           ampli.onboardingVerificationCodeAccepted({
@@ -231,6 +231,7 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
           ampli.onboardingVerificationCodeRejected({
             "wallet platform": "browser extension",
           })
+
           handleSubmitError(e)
         }
       })(e)
@@ -241,7 +242,7 @@ const SmartAccountOTPForm = (props: SmartAccountOTPFormProps) => {
       flow,
       handleSubmit,
       handleSubmitError,
-      network.id,
+      networkId,
       onOTPConfirmed,
     ],
   )

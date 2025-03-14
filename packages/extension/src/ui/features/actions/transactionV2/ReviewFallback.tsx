@@ -1,10 +1,9 @@
-import { CallDataModal, icons, P3 } from "@argent/x-ui"
+import { WarningCirclePrimaryIcon } from "@argent/x-ui/icons"
+import { CallDataModal, P3 } from "@argent/x-ui"
 import type { FlexProps } from "@chakra-ui/react"
 import { Flex, useDisclosure } from "@chakra-ui/react"
 import type { Call } from "starknet"
 import type { FC } from "react"
-
-const { WarningCirclePrimaryIcon } = icons
 
 interface ReviewFallbackProps extends FlexProps {
   calls: Call[]

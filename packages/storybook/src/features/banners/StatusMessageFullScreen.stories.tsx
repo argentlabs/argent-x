@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
 import { StatusMessageFullScreen } from "@argent-x/extension/src/ui/features/statusMessage/StatusMessageFullScreen"
 

@@ -6,15 +6,14 @@ import { createContext, useCallback, useContext, useMemo } from "react"
 import type { To } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 
-import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
-import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
 import type { SendQuery } from "../../../shared/send/schema"
 import { isSendQuery } from "../../../shared/send/schema"
 import { useIsAccountDeploying } from "./useIsAccountDeploying"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useHasNonZeroBalance } from "./useHasNonZeroBalance"
+import { useNativeFeeTokenAddress } from "../actions/useNativeFeeToken"
 
 interface AddFundsDialogContextProps {
   onSend: (queryOrTo?: SendQuery | To) => void
@@ -41,7 +40,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
   const accountIsDeploying = useIsAccountDeploying(account)
   const returnTo = useCurrentPathnameWithQuery()
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const bestFeeToken = useDefaultFeeToken(account)
+  const feeTokenAddress = useNativeFeeTokenAddress(account)
 
   const hasNonZeroBalance = useHasNonZeroBalance(account)
 
@@ -65,7 +64,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
           navigate(
             routes.sendRecipientScreen({
               returnTo,
-              tokenAddress: bestFeeToken?.address ?? ETH_TOKEN_ADDRESS,
+              tokenAddress: feeTokenAddress,
             }),
           )
         }
@@ -75,7 +74,7 @@ export const AddFundsDialogProvider: FC<AddFundsDialogProviderProps> = ({
     },
     [
       accountIsDeploying,
-      bestFeeToken?.address,
+      feeTokenAddress,
       hasNonZeroBalance,
       navigate,
       onOpen,

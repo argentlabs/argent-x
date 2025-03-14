@@ -1,5 +1,3 @@
-import { debounce } from "lodash-es"
-
 import type { KeyValueStorage } from "../keyvalue"
 import type { IObjectStore, StorageChange } from "./interface"
 
@@ -42,12 +40,32 @@ export function adaptKeyValue<T extends Record<string, any>>(
       callback: (value: StorageChange<Partial<T>>) => void,
     ): () => void {
       /** coalesce changes in same event loop */
-      const debounceTickCallback = debounce(
-        () => this.get().then(callback),
-        0,
-        { leading: false },
-      )
-      const unsub = storage.subscribe(debounceTickCallback)
+      let oldValue: T | undefined
+      let isScheduled = false
+
+      const queuedCallback = () => {
+        void this.get().then((newValue) => {
+          callback({
+            oldValue,
+            newValue,
+          })
+          oldValue = newValue
+          isScheduled = false
+        })
+      }
+
+      const unsub = storage.subscribe(() => {
+        if (!isScheduled) {
+          isScheduled = true
+          queueMicrotask(queuedCallback)
+        }
+      })
+
+      // Initialize oldValue
+      void this.get().then((value) => {
+        oldValue = value
+      })
+
       return unsub
     },
   }

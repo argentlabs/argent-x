@@ -4,11 +4,10 @@ import type { WalletAccount } from "../../../shared/wallet.model"
 import { SignatureRequestRejectedScreen } from "../actions/SignatureRequestRejectedScreen"
 import { ConfirmScreen } from "../actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { Circle, VStack } from "@chakra-ui/react"
-import { H2, icons, P2, SpacerCell } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { H2, P2, SpacerCell } from "@argent/x-ui"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
-
-const { WarningCircleSecondaryIcon } = icons
 
 interface MultisigSignatureScreenWarningProps {
   selectedAccount?: WalletAccount

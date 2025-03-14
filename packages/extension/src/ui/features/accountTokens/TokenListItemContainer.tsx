@@ -1,15 +1,19 @@
 import type { FC } from "react"
 
-import type { Account } from "../accounts/Account"
-import type { TokenListItemProps } from "./TokenListItem"
+import type { TokenListItemVariant } from "./TokenListItem"
 import { TokenListItem } from "./TokenListItem"
 import { useTokenBalanceForAccount } from "./useTokenBalanceForAccount"
 import type { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
+import type { WalletAccount } from "../../../shared/wallet.model"
+import { prettifyCurrencyValue } from "@argent/x-shared"
+import { prettifyTokenBalance } from "../../../shared/token/prettifyTokenBalance"
+import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
 
-export interface TokenListItemContainerProps
-  extends Omit<TokenListItemProps, "currencyValue" | "token"> {
+export interface TokenListItemContainerProps extends CustomButtonCellProps {
   token: TokenWithBalanceAndPrice
-  account: Pick<Account, "id" | "network" | "address" | "networkId">
+  account: Pick<WalletAccount, "id" | "network" | "address" | "networkId">
+  variant?: TokenListItemVariant
+  showTokenSymbol?: boolean
 }
 
 /**
@@ -19,6 +23,7 @@ export interface TokenListItemContainerProps
 export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
   token,
   account,
+  variant,
   ...rest
 }) => {
   const tokenWithBalance = useTokenBalanceForAccount({
@@ -35,12 +40,23 @@ export const TokenListItemContainer: FC<TokenListItemContainerProps> = ({
     return null
   }
 
+  const { name, iconUrl, symbol } = token
+  const balance = prettifyTokenBalance(token)
+  const currencyValue = prettifyCurrencyValue(token.usdValue, undefined, {
+    allowLeadingZerosInDecimalPart: false,
+  })
+
+  const tokenName = name === "Ether" ? "Ethereum" : name
+
   return (
     <TokenListItem
-      token={token}
-      currencyValue={token.usdValue}
-      isLoading={false}
       {...rest}
+      name={tokenName}
+      iconUrl={iconUrl}
+      symbol={symbol}
+      balance={balance}
+      currencyValue={currencyValue}
+      isLoading={false}
     />
   )
 }

@@ -3,11 +3,10 @@ import test from "../test"
 import config from "../config"
 import { sleep } from "../utils"
 
-const ethInitialBalance = 0.002 * Number(config.initialBalanceMultiplier)
+const strkInitialBalance = "10.0"
 
 test.describe("Multisig", { tag: "@tx" }, () => {
   test.skip(config.skipTXTests === "true")
-  test.slow()
   test("add and activate 1/1 multisig", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [],
@@ -17,20 +16,22 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     await expect(
       extension.page.locator('[data-testid="activate-multisig"]'),
     ).toBeHidden()
+    const { accountName: accountNameMulti1 } =
+      await extension.account.lastAccountInfo()
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti1!,
+      balance: strkInitialBalance,
     })
     await expect(
       extension.page.locator('[data-testid="activate-multisig"]'),
     ).toBeVisible()
-    await extension.activateMultisig(extension.account.accountNameMulti1)
+    await extension.activateMultisig(accountNameMulti1!)
 
     const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
-      originAccountName: extension.account.accountNameMulti1,
+      originAccountName: accountNameMulti1!,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
-      amount: 0.0009,
+      token: "STRK",
+      amount: 1.01,
     })
     const txHash = await extension.activity.getLastTxHash()
     await extension.validateTx({
@@ -43,8 +44,8 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     await extension.navigation.menuTokensLocator.click()
 
     //ensure that balance is updated
-    await expect(extension.account.currentBalance("ETH")).not.toContainText(
-      ethInitialBalance.toString(),
+    await expect(extension.account.currentBalance("STRK")).not.toContainText(
+      strkInitialBalance.toString(),
     )
 
     await extension.account.accountListSelector.click()
@@ -67,21 +68,20 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     const pubKey = await secondExtension.account.joinMultisig()
     await extension.account.addMultisigAccount({ signers: [pubKey] })
     await extension.navigation.closeLocator.click()
+    const { accountName: accountNameMulti1 } =
+      await extension.account.lastAccountInfo()
+
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti1!,
+      balance: strkInitialBalance,
     })
-    await extension.activateMultisig(extension.account.accountNameMulti1)
+    await extension.activateMultisig(accountNameMulti1!)
 
     await expect(
-      secondExtension.account.accountListConfirmations(
-        secondExtension.account.accountNameMulti1,
-      ),
+      secondExtension.account.accountListConfirmations(accountNameMulti1!),
     ).toHaveText("1/2")
     await secondExtension.navigation.closeLocator.click()
-    await secondExtension.account.selectAccount(
-      secondExtension.account.accountNameMulti1,
-    )
+    await secondExtension.account.selectAccount(accountNameMulti1!)
     await Promise.all([
       expect(extension.account.accountViewConfirmations).toHaveText(
         "1/2 multisig",
@@ -92,10 +92,10 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     ])
 
     const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
-      originAccountName: extension.account.accountNameMulti1,
+      originAccountName: accountNameMulti1!,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
-      amount: 0.0009,
+      token: "STRK",
+      amount: "MAX",
     })
     const txHash = await extension.activity.getLastTxHash()
     await extension.validateTx({
@@ -109,11 +109,11 @@ test.describe("Multisig", { tag: "@tx" }, () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(extension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
       ),
-      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(secondExtension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
       ),
     ])
     await secondExtension.validateTx({
@@ -141,21 +141,20 @@ test.describe("Multisig", { tag: "@tx" }, () => {
       confirmations: 2,
     })
     await extension.navigation.closeLocator.click()
+    const { accountName: accountNameMulti1 } =
+      await extension.account.lastAccountInfo()
+
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti1!,
+      balance: strkInitialBalance,
     })
-    await extension.activateMultisig(extension.account.accountNameMulti1)
+    await extension.activateMultisig(accountNameMulti1!)
 
     await expect(
-      secondExtension.account.accountListConfirmations(
-        secondExtension.account.accountNameMulti1,
-      ),
+      secondExtension.account.accountListConfirmations(accountNameMulti1!),
     ).toHaveText("2/2")
     await secondExtension.navigation.closeLocator.click()
-    await secondExtension.account.selectAccount(
-      secondExtension.account.accountNameMulti1,
-    )
+    await secondExtension.account.selectAccount(accountNameMulti1!)
     await Promise.all([
       expect(extension.account.accountViewConfirmations).toHaveText(
         "2/2 multisig",
@@ -166,10 +165,10 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     ])
 
     const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
-      originAccountName: extension.account.accountNameMulti1,
+      originAccountName: accountNameMulti1!,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
-      amount: 0.0009,
+      token: "STRK",
+      amount: "MAX",
     })
     await extension.navigation.menuActivityLocator.click()
     const txHash = await extension.activity.getLastTxHash()
@@ -179,7 +178,6 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     await expect(
       secondExtension.activity.menuPendingTransactionsIndicatorLocator,
     ).toBeVisible()
-
     await secondExtension.account.acceptTx(txHash!)
 
     await extension.validateTx({
@@ -194,11 +192,11 @@ test.describe("Multisig", { tag: "@tx" }, () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(extension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
       ),
-      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(secondExtension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
       ),
     ])
   })
@@ -207,6 +205,7 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     extension,
     secondExtension,
   }) => {
+    test.slow()
     await extension.setupWallet({
       accountsToSetup: [],
     })
@@ -219,21 +218,20 @@ test.describe("Multisig", { tag: "@tx" }, () => {
       confirmations: 2,
     })
     await extension.navigation.closeLocator.click()
+    const { accountName: accountNameMulti1 } =
+      await extension.account.lastAccountInfo()
+
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti1!,
+      balance: strkInitialBalance,
     })
-    await extension.activateMultisig(extension.account.accountNameMulti1)
+    await extension.activateMultisig(accountNameMulti1!)
 
     await expect(
-      secondExtension.account.accountListConfirmations(
-        secondExtension.account.accountNameMulti1,
-      ),
+      secondExtension.account.accountListConfirmations(accountNameMulti1!),
     ).toHaveText("2/2")
     await secondExtension.navigation.closeLocator.click()
-    await secondExtension.account.selectAccount(
-      secondExtension.account.accountNameMulti1,
-    )
+    await secondExtension.account.selectAccount(accountNameMulti1!)
     await Promise.all([
       expect(extension.account.accountViewConfirmations).toHaveText(
         "2/2 multisig",
@@ -244,10 +242,7 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     ])
 
     //set threshold (confirmations) to 1
-    await extension.account.setConfirmations(
-      extension.account.accountNameMulti1,
-      1,
-    )
+    await extension.account.setConfirmations(accountNameMulti1!, 1)
     let txHash = await extension.activity.getLastTxHash()
 
     await secondExtension.account.acceptTx(txHash!)
@@ -274,10 +269,10 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     ])
     //transfer
     const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
-      originAccountName: extension.account.accountNameMulti1,
+      originAccountName: accountNameMulti1!,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
-      amount: 0.0009,
+      token: "STRK",
+      amount: "MAX",
     })
     txHash = await extension.activity.getLastTxHash()
     //wait for events to be updated
@@ -313,11 +308,11 @@ test.describe("Multisig", { tag: "@tx" }, () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(extension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
       ),
-      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(secondExtension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
       ),
     ])
   })
@@ -338,21 +333,20 @@ test.describe("Multisig", { tag: "@tx" }, () => {
       confirmations: 1,
     })
     await extension.navigation.closeLocator.click()
+    const { accountName: accountNameMulti1 } =
+      await extension.account.lastAccountInfo()
+
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti1!,
+      balance: strkInitialBalance,
     })
-    await extension.activateMultisig(extension.account.accountNameMulti1)
+    await extension.activateMultisig(accountNameMulti1!)
 
     await expect(
-      secondExtension.account.accountListConfirmations(
-        secondExtension.account.accountNameMulti1,
-      ),
+      secondExtension.account.accountListConfirmations(accountNameMulti1!),
     ).toHaveText("1/2")
     await secondExtension.navigation.closeLocator.click()
-    await secondExtension.account.selectAccount(
-      secondExtension.account.accountNameMulti1,
-    )
+    await secondExtension.account.selectAccount(accountNameMulti1!)
     await Promise.all([
       expect(extension.account.accountViewConfirmations).toHaveText(
         "1/2 multisig",
@@ -362,10 +356,7 @@ test.describe("Multisig", { tag: "@tx" }, () => {
       ),
     ])
 
-    await extension.account.removeMultiSigOwner(
-      extension.account.accountNameMulti1,
-      pubKey,
-    )
+    await extension.account.removeMultiSigOwner(accountNameMulti1!, pubKey)
     await expect(
       extension.account.menuPendingTransactionsIndicatorLocator,
     ).toBeHidden()
@@ -381,21 +372,12 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     await extension.recoverWallet(config.testSeed3!)
     await expect(extension.network.networkSelector).toBeVisible()
     await extension.network.selectDefaultNetwork()
-
     await extension.account.accountListSelector.click()
     await Promise.all([
-      expect(
-        extension.account.account(extension.account.accountName1),
-      ).toBeVisible(),
-      expect(
-        extension.account.account(extension.account.accountNameMulti1),
-      ).toBeVisible(),
-      expect(
-        extension.account.account(extension.account.accountNameMulti6),
-      ).toBeHidden(),
-      expect(
-        extension.account.account(extension.account.accountNameMulti3),
-      ).toBeVisible(),
+      expect(extension.account.account("Helpful Hotdog")).toBeVisible(),
+      expect(extension.account.account("Easygoing Egg")).toBeVisible(),
+      expect(extension.account.account("Silly Squirrel")).toBeHidden(),
+      expect(extension.account.account("Sublime Sunflower")).toBeVisible(),
     ])
   })
 
@@ -406,35 +388,28 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     },
     async ({ extension }) => {
       await extension.open()
+
       await extension.recoverWallet(config.testSeed1!)
       await expect(extension.network.networkSelector).toBeVisible()
       await extension.network.selectDefaultNetwork()
-
-      await extension.account.selectAccount(extension.account.accountNameMulti1)
+      const accountNameMulti1 = "Perfect Pizza"
+      await extension.account.selectAccount(accountNameMulti1)
       await extension.navigation.showSettingsLocator.click()
-      await extension.settings
-        .account(extension.account.accountNameMulti1)
-        .click()
+      await extension.settings.account(accountNameMulti1).click()
       await extension.settings.hideAccount.click()
       await extension.settings.confirmHide.click()
 
-      await expect(
-        extension.account.account(extension.account.accountNameMulti1),
-      ).toBeHidden()
+      await expect(extension.account.account(accountNameMulti1)).toBeHidden()
       await extension.navigation.closeButtonLocator.click()
       await extension.navigation.showSettingsLocator.click()
       await extension.settings.preferences.click()
       await extension.settings.hiddenAccounts.click()
-      await extension.settings
-        .unhideAccount(extension.account.accountNameMulti1)
-        .click()
+      await extension.settings.unhideAccount(accountNameMulti1).click()
       await extension.navigation.backLocator.click()
       await extension.navigation.backLocator.click()
       await extension.navigation.closeLocator.click()
       await extension.account.accountListSelector.click()
-      await expect(
-        extension.account.account(extension.account.accountNameMulti1),
-      ).toBeVisible()
+      await expect(extension.account.account(accountNameMulti1)).toBeVisible()
     },
   )
 
@@ -455,22 +430,25 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     ])
 
     await extension.navigation.closeLocator.click()
+    const { accountName: accountNameMulti1 } =
+      await extension.account.lastAccountInfo()
+
     await expect(
       extension.page.locator('[data-testid="activate-multisig"]'),
     ).toBeHidden()
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti1!,
+      balance: strkInitialBalance,
     })
     await expect(
       extension.page.locator('[data-testid="activate-multisig"]'),
     ).toBeVisible()
-    await extension.activateMultisig(extension.account.accountNameMulti1)
+    await extension.activateMultisig(accountNameMulti1!)
 
     const pubKey = await secondExtension.account.joinMultisig()
 
     await extension.account.addOwnerToMultisig({
-      accountName: extension.account.accountNameMulti1,
+      accountName: accountNameMulti1!,
       pubKey,
       confirmations: 2,
     })
@@ -482,14 +460,10 @@ test.describe("Multisig", { tag: "@tx" }, () => {
       })
 
     await expect(
-      secondExtension.account.accountListConfirmations(
-        secondExtension.account.accountNameMulti1,
-      ),
+      secondExtension.account.accountListConfirmations(accountNameMulti1!),
     ).toHaveText("2/2")
     await secondExtension.navigation.closeLocator.click()
-    await secondExtension.account.selectAccount(
-      secondExtension.account.accountNameMulti1,
-    )
+    await secondExtension.account.selectAccount(accountNameMulti1!)
     await Promise.all([
       expect(extension.account.accountViewConfirmations).toHaveText(
         "2/2 multisig",
@@ -500,10 +474,10 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     ])
 
     const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
-      originAccountName: extension.account.accountNameMulti1,
+      originAccountName: accountNameMulti1!,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
-      amount: 0.0009,
+      token: "STRK",
+      amount: 2.5,
     })
     const txHash = await extension.activity.getLastTxHash()
     await extension.navigation.menuTokensLocator.click()
@@ -550,78 +524,87 @@ test.describe("Multisig", { tag: "@tx" }, () => {
 
     //ensure that balance is updated
     await Promise.all([
-      expect(extension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(extension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
         {
           timeout: 120000,
         },
       ),
-      expect(secondExtension.account.currentBalance("ETH")).not.toContainText(
-        ethInitialBalance.toString(),
+      expect(secondExtension.account.currentBalance("STRK")).not.toContainText(
+        strkInitialBalance.toString(),
         { timeout: 120000 },
       ),
     ])
   })
 
-  test("create 3 multisig with same keys, owner should all, others should see only the first", async ({
+  test("create 3 multisig with same keys, owner should see all, others should see only the first", async ({
     extension,
     secondExtension,
     thirdExtension,
   }) => {
-    await extension.setupWallet({
+    const { accountNames: account1 } = await extension.setupWallet({
       accountsToSetup: [],
     })
-    await secondExtension.setupWallet({
+    const accountName11 = account1![0]
+
+    const { accountNames: accountName2 } = await secondExtension.setupWallet({
       accountsToSetup: [],
     })
-    await thirdExtension.setupWallet({
+    const accountName21 = accountName2![0]
+
+    const { accountNames: accountName3 } = await thirdExtension.setupWallet({
       accountsToSetup: [],
     })
+    const accountName31 = accountName3![0]
+
     const pubKey = await secondExtension.account.joinMultisig()
     const pubKey2 = await thirdExtension.account.joinMultisig()
     await extension.account.addMultisigAccount({ signers: [pubKey, pubKey2] })
     await extension.navigation.closeLocator.click()
+    //get new account name
+
+    const { accountName: accountNameMulti1 } =
+      await extension.account.lastAccountInfo()
+
     await extension.account.addMultisigAccount({ signers: [pubKey, pubKey2] })
     await extension.navigation.closeLocator.click()
+    const { accountName: accountNameMulti2 } =
+      await extension.account.lastAccountInfo()
+
     await extension.account.addMultisigAccount({ signers: [pubKey, pubKey2] })
     await extension.navigation.closeLocator.click()
+    const { accountName: accountNameMulti3 } =
+      await extension.account.lastAccountInfo()
 
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti1,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti1!,
+      balance: strkInitialBalance,
     })
-    await extension.activateMultisig(extension.account.accountNameMulti1)
+
+    await extension.activateMultisig(accountNameMulti1!)
 
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti2,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti2!,
+      balance: strkInitialBalance,
     })
-    await extension.activateMultisig(extension.account.accountNameMulti2)
+    await extension.activateMultisig(accountNameMulti2!)
 
     await extension.fundMultisigAccount({
-      accountName: extension.account.accountNameMulti3,
-      balance: ethInitialBalance,
+      accountName: accountNameMulti3!,
+      balance: strkInitialBalance,
     })
-    await extension.activateMultisig(extension.account.accountNameMulti3)
+    await extension.activateMultisig(accountNameMulti3!)
 
     await expect(
-      secondExtension.account.accountListConfirmations(
-        secondExtension.account.accountNameMulti1,
-      ),
+      secondExtension.account.accountListConfirmations(accountNameMulti1!),
     ).toHaveText("1/3")
     await secondExtension.navigation.closeLocator.click()
-    await secondExtension.account.selectAccount(
-      secondExtension.account.accountNameMulti1,
-    )
+    await secondExtension.account.selectAccount(accountNameMulti1!)
     await expect(
-      thirdExtension.account.accountListConfirmations(
-        thirdExtension.account.accountNameMulti1,
-      ),
+      thirdExtension.account.accountListConfirmations(accountNameMulti1!),
     ).toHaveText("1/3")
     await thirdExtension.navigation.closeLocator.click()
-    await thirdExtension.account.selectAccount(
-      thirdExtension.account.accountNameMulti1,
-    )
+    await thirdExtension.account.selectAccount(accountNameMulti1!)
 
     await Promise.all([
       expect(extension.account.accountViewConfirmations).toHaveText(
@@ -638,17 +621,17 @@ test.describe("Multisig", { tag: "@tx" }, () => {
     await extension.account.accountListSelector.click()
     let accountList = await extension.account.accountNames()
     expect(accountList).toEqual([
-      "Account 1",
-      "Multisig 1",
-      "Multisig 2",
-      "Multisig 3",
+      accountName11,
+      accountNameMulti1,
+      accountNameMulti2,
+      accountNameMulti3,
     ])
     await secondExtension.account.accountListSelector.click()
     accountList = await secondExtension.account.accountNames()
-    expect(accountList).toEqual(["Account 1", "Multisig 1"])
+    expect(accountList).toEqual([accountName21, accountNameMulti1])
 
     await thirdExtension.account.accountListSelector.click()
     accountList = await thirdExtension.account.accountNames()
-    expect(accountList).toEqual(["Account 1", "Multisig 1"])
+    expect(accountList).toEqual([accountName31, accountNameMulti1])
   })
 })

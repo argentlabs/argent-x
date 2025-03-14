@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { sendMessage } from "../../shared/messages"
+import { sendMessage } from "../../shared/messages/messages"
 import { routes } from "../../shared/ui/routes"
 import { argentDb } from "../../shared/idb/argentDb"
 

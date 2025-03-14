@@ -6,10 +6,8 @@ import Navigation from "./Navigation"
 import { sleep } from "../utils"
 
 export default class Wallet extends Navigation {
-  upgradeTest: boolean
-  constructor(page: Page, upgradeTest: boolean = false) {
+  constructor(page: Page) {
     super(page)
-    this.upgradeTest = upgradeTest
   }
   get banner() {
     return this.page.locator(`div h1:text-is("${lang.wallet.banner1}")`)
@@ -123,7 +121,7 @@ export default class Wallet extends Navigation {
     pin: string = "111111",
     success: boolean = true,
   ) {
-    if (!this.upgradeTest) {
+    if (!this.isOldUI) {
       await Promise.all([
         expect(this.banner).toBeVisible(),
         expect(this.description).toBeVisible(),
@@ -132,20 +130,38 @@ export default class Wallet extends Navigation {
     }
     await this.createNewWallet.click()
     await this.agreeLoc.click()
-    if (!this.upgradeTest) {
+    if (!this.isOldUI) {
       await Promise.all([
         expect(this.banner3).toBeVisible(),
         expect(this.description3).toBeVisible(),
       ])
     }
+    if (!this.isOldUI) {
+      await expect(
+        this.page.getByText("The password must contain at least 8 characters"),
+      ).toBeVisible()
+    }
+    await expect(this.continueLocator).toBeVisible()
+    await expect(this.continueLocator).toBeDisabled()
+    await expect(this.password).toBeEnabled()
+    await expect(this.repeatPassword).toBeEnabled()
+    await expect(this.continueLocator).toBeDisabled()
     await this.password.fill(config.password)
     await this.repeatPassword.fill(config.password)
     await this.continueLocator.click()
     if (!email) {
       await this.addStandardAccountFromNewAccountScreen.click()
+      if (!this.isOldUI)
+        await expect(
+          this.page.locator("[data-testid='selected-standard-account']"),
+        ).toBeVisible()
       await this.continueLocator.click()
     } else {
       await this.addSmartAccountFromNewAccountScreen.click()
+      if (!this.isOldUI)
+        await expect(
+          this.page.locator("[data-testid='selected-smart-account']"),
+        ).toBeVisible()
       await this.continueLocator.click()
       await this.fillEmail(email)
       await this.continueLocator.click()
@@ -156,17 +172,19 @@ export default class Wallet extends Navigation {
         ).toBeVisible()
       }
     }
-    if (success && !this.upgradeTest) {
-      await Promise.all([
-        expect(this.banner4).toBeVisible(),
-        expect(this.download).toBeVisible(),
-        expect(this.twitter).toBeVisible(),
-        expect(this.dapps).toBeVisible(),
+    //todo mig tests, remove when we not needed to test old UI
+    if (success) {
+      await Promise.race([
+        Promise.all([
+          expect(this.banner4).toBeVisible(),
+          expect(this.download).toBeVisible(),
+          expect(this.twitter).toBeVisible(),
+          expect(this.dapps).toBeVisible(),
+        ]),
+        expect(
+          this.page.getByRole("heading", { name: "Your wallet is ready!" }),
+        ).toBeVisible(),
       ])
-    } else if (success && this.upgradeTest) {
-      await expect(
-        this.page.getByRole("heading", { name: "Your wallet is ready!" }),
-      ).toBeVisible()
     }
   }
 }

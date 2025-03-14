@@ -4,6 +4,7 @@ import fetch, { Headers, Request, Response } from "cross-fetch"
 import dotenv from "dotenv"
 import { noop } from "lodash-es"
 import { vi } from "vitest"
+import { Crypto, CryptoKey } from "@peculiar/webcrypto"
 
 import { chromeStorageMock } from "../src/shared/storage/__test__/chrome-storage.mock"
 
@@ -13,6 +14,8 @@ Node.prototype.isSameNode = function (otherNode) {
 
 dotenv.config()
 
+vi.stubGlobal("CryptoKey", CryptoKey)
+vi.stubGlobal("crypto", new Crypto())
 vi.stubGlobal("fetch", fetch)
 vi.stubGlobal("Headers", Headers)
 vi.stubGlobal("Request", Request)

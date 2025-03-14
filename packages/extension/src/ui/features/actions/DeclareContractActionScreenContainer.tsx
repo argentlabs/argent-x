@@ -29,6 +29,7 @@ export const DeclareContractActionScreenContainer: FC = () => {
       "DeclareContractActionScreenContainer used with incompatible action.type",
     )
   }
+
   const navigate = useNavigate()
   const onSubmit = useCallback(async () => {
     const result = await approve()
@@ -36,15 +37,9 @@ export const DeclareContractActionScreenContainer: FC = () => {
       // stay on error screen
     } else {
       void closePopupIfLastAction()
-      const { payload } = action
-      navigate(
-        routes.settingsSmartContractDeclareOrDeploySuccess(
-          "declare",
-          payload.classHash,
-        ),
-      )
+      navigate(routes.accounts())
     }
-  }, [approve, closePopupIfLastAction, action, navigate])
+  }, [approve, closePopupIfLastAction, navigate])
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />

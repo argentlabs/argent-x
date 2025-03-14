@@ -1,10 +1,10 @@
+import { AddressBookIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   BarCloseButton,
   Button,
   CellStack,
   HeaderCell,
-  icons,
   NavigationContainer,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
@@ -14,8 +14,6 @@ import { AccountAddressListItem } from "../accounts/AccountAddressListItem"
 import type { SendQuery } from "../../../shared/send/schema"
 import { SendModalAddContactScreen } from "./SendModalAddContactScreen"
 import type { AddressBookContact } from "../../../shared/addressBook/type"
-
-const { AddressBookIcon } = icons
 
 export interface SendAmountAndAssetScreenProps extends SendQuery {
   input?: ReactNode

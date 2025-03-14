@@ -3,6 +3,7 @@ import { atomFamily } from "jotai/utils"
 
 import { addressBookRepo } from "../../shared/addressBook/store"
 import { atomFromRepo } from "./implementation/atomFromRepo"
+import { atomWithDebugLabel } from "./atomWithDebugLabel"
 
 /**
  * @internal use `allAddressBookContactsView` instead
@@ -15,17 +16,23 @@ export const allAddressBookContactsView = atom(async (get) => {
 })
 
 export const addressBookContactIdView = atomFamily((contactId?: string) => {
-  return atom(async (get) => {
-    const contacts = await get(allAddressBookContactsAtom)
-    return contacts.find((c) => c.id === contactId)
-  })
+  return atomWithDebugLabel(
+    atom(async (get) => {
+      const contacts = await get(allAddressBookContactsAtom)
+      return contacts.find((c) => c.id === contactId)
+    }),
+    `addressBookContactIdView-${contactId}`,
+  )
 })
 
 export const addressBookContactsOnNetworkView = atomFamily(
   (networkId?: string) => {
-    return atom(async (get) => {
-      const contacts = await get(allAddressBookContactsAtom)
-      return contacts.filter((c) => c.networkId === networkId)
-    })
+    return atomWithDebugLabel(
+      atom(async (get) => {
+        const contacts = await get(allAddressBookContactsAtom)
+        return contacts.filter((c) => c.networkId === networkId)
+      }),
+      `addressBookContactsOnNetworkView-${networkId}`,
+    )
   },
 )

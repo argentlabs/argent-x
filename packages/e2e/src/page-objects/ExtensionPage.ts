@@ -18,16 +18,17 @@ import Swap from "./Swap"
 import TokenDetails from "./TokenDetails"
 
 import {
-  transferTokens,
   AccountsToSetup,
   validateTx,
   isScientific,
   convertScientificToDecimal,
   FeeTokens,
   logInfo,
-  Clipboard,
-  unzip,
   getVersion,
+  decreaseMajorVersion,
+  requestFunds,
+  TokenSymbol,
+  sleep,
 } from "../utils"
 
 export default class ExtensionPage {
@@ -44,7 +45,6 @@ export default class ExtensionPage {
   dapps: Dapps
   nfts: Nfts
   preferences: Preferences
-  clipboard: Clipboard
   swap: Swap
   tokenDetails: TokenDetails
 
@@ -53,17 +53,17 @@ export default class ExtensionPage {
    * @type {string}
    */
   currentBranchVersion: string
-  upgradeTest: boolean = false
+  isUpgradeTest: boolean = false
 
   constructor(
     page: Page,
     private extensionUrl: string,
-    upgradeTest: boolean = false,
+    isUpgradeTest: boolean = false,
   ) {
     this.page = page
-    this.wallet = new Wallet(page, upgradeTest)
+    this.wallet = new Wallet(page)
     this.network = new Network(page)
-    this.account = new Account(page, upgradeTest)
+    this.account = new Account(page)
     this.extensionUrl = extensionUrl
     this.messages = new Messages(page)
     this.activity = new Activity(page)
@@ -74,16 +74,16 @@ export default class ExtensionPage {
     this.dapps = new Dapps(page)
     this.nfts = new Nfts(page)
     this.preferences = new Preferences(page)
-    this.clipboard = new Clipboard(page)
     this.swap = new Swap(page)
     this.currentBranchVersion = getVersion()
     this.tokenDetails = new TokenDetails(page)
-    this.upgradeTest = upgradeTest
+    this.isUpgradeTest = isUpgradeTest
   }
 
   async open() {
     await this.page.setViewportSize(config.viewportSize)
     await this.page.goto(this.extensionUrl)
+    await this.page.waitForLoadState("networkidle")
   }
 
   async resetExtension() {
@@ -95,19 +95,26 @@ export default class ExtensionPage {
     await this.navigation.confirmResetLocator.click()
   }
 
-  async pasteSeed() {
-    await this.page.locator('[data-testid="seed-input-0"]').focus()
-    await this.clipboard.paste()
+  async fillSeed(seed: string) {
+    const words = seed.split(" ")
+    for (let i = 0; i < words.length; i++) {
+      await this.page.locator(`[data-testid="seed-input-${i}"]`).fill(words[i])
+    }
   }
 
   async recoverWallet(seed: string, password?: string) {
     await this.page.setViewportSize({ width: 1080, height: 720 })
-
     await this.wallet.restoreExistingWallet.click()
     await this.wallet.agreeLoc.click()
-    await this.clipboard.setClipboardText(seed)
-    await this.pasteSeed()
+    await this.fillSeed(seed)
     await this.navigation.continueLocator.click()
+    if (!this.navigation.isOldUI) {
+      await expect(
+        this.page.getByText("The password must contain at least 8 characters"),
+      ).toBeVisible()
+    }
+    await expect(this.navigation.continueLocator).toBeVisible()
+    await expect(this.navigation.continueLocator).toBeDisabled()
 
     await this.wallet.password.fill(password ?? config.password)
     await this.wallet.repeatPassword.fill(password ?? config.password)
@@ -121,15 +128,6 @@ export default class ExtensionPage {
 
     await this.open()
     await expect(this.network.networkSelector).toBeVisible()
-  }
-
-  async addAccount() {
-    await this.account.addAccount({ firstAccount: false })
-    await this.account.copyAddress.click()
-    await this.clipboard.setClipboard()
-    const accountAddress = await this.clipboard.getClipboard()
-    expect(accountAddress).toMatch(/^0x0/)
-    return accountAddress
   }
 
   async deployAccount(accountName: string, feeToken?: FeeTokens) {
@@ -189,13 +187,15 @@ export default class ExtensionPage {
       expect(
         this.activity.menuPendingTransactionsIndicatorLocator,
       ).toBeHidden(),
+      //todo this selector is not unique, we need to find a better one
       expect(
-        this.page.locator('[data-testid="smart-account-on-account-view"]'),
+        this.page.locator('[data-testid="smart-account-on-settings"]').first(),
       ).toBeVisible(),
     ])
     await this.navigation.showSettingsLocator.click()
+    await this.page.waitForLoadState("networkidle")
     await expect(
-      this.page.locator('[data-testid="smart-account-on-settings"]'),
+      this.page.locator('[data-testid="smart-account-on-settings"]').first(),
     ).toBeVisible()
     await this.settings.account(accountName).click()
     await expect(
@@ -238,46 +238,60 @@ export default class ExtensionPage {
     await this.account.ensureSmartAccountNotEnabled(accountName)
   }
 
-  async fundAccount(
-    acc: AccountsToSetup,
-    accountAddress: string,
-    accIndex: number,
-  ) {
-    let expectedTokenValue
+  async fundAccount({
+    acc,
+    accountAddress,
+    accountName,
+  }: {
+    acc: AccountsToSetup
+    accountAddress: string
+    accountName: string
+  }) {
     for (const [assetIndex, asset] of acc.assets.entries()) {
       logInfo({
         op: "fundAccount",
         assetIndex,
         asset,
+        accountName,
         isProdTesting: config.isProdTesting,
       })
-      if (asset.balance > 0) {
-        await transferTokens(
-          asset.balance,
+      if (Number(asset.balance) > 0) {
+        await requestFunds(
           accountAddress, // receiver wallet address
+          asset.balance,
           asset.token,
-        )
-
-        if (isScientific(asset.balance)) {
-          expectedTokenValue = `${convertScientificToDecimal(asset.balance)}`
-        } else {
-          expectedTokenValue = `${asset.balance}`
-        }
-        if (!expectedTokenValue.includes(".")) {
-          expectedTokenValue += ".0"
-        }
-        expectedTokenValue += ` ${asset.token}`
-        await this.account.ensureAsset(
-          `Account ${accIndex + 1}`,
-          asset.token,
-          expectedTokenValue,
         )
       }
     }
+  }
 
-    if (acc.deploy) {
-      await this.deployAccount(`Account ${accIndex + 1}`, acc.feeToken)
+  async ensureBalanceUpdated({
+    balance,
+    token,
+    accountName,
+    accountAddress,
+  }: {
+    balance: number | string
+    token: TokenSymbol
+    accountName: string
+    accountAddress: string
+  }) {
+    let expectedTokenValue
+    if (isScientific(balance)) {
+      expectedTokenValue = `${convertScientificToDecimal(balance)}`
+    } else {
+      expectedTokenValue = `${balance}`
     }
+    if (!expectedTokenValue.includes(".")) {
+      expectedTokenValue += ".0"
+    }
+    expectedTokenValue += ` ${token}`
+    await this.account.ensureAsset({
+      accountName,
+      accountAddress,
+      token: token,
+      value: expectedTokenValue,
+    })
   }
 
   async setupWallet({
@@ -297,35 +311,78 @@ export default class ExtensionPage {
     }
     await this.open()
     const seed = await this.account.setupRecovery()
-    //await this.network.selectDefaultNetwork()
+    console.log({ seed })
     const noAccount = await this.account.noAccountBanner.isVisible({
       timeout: 1000,
     })
     const accountAddresses: string[] = []
-    for (const [accIndex, acc] of accountsToSetup.entries()) {
-      if (noAccount) {
-        await this.account.addAccount({ firstAccount: true })
-      } else if (accIndex !== 0) {
-        await this.account.addAccount({ firstAccount: false })
+    const accountNames: string[] = []
+
+    // First, set up all accounts and collect their info
+    for (const [accIndex, _] of accountsToSetup.entries()) {
+      let accountName, accountAddress
+      if (accIndex > 0) {
+        ;({ accountName, accountAddress } = await this.account.addAccount({
+          firstAccount: noAccount ? true : false,
+        }))
+      } else {
+        ;({ accountName, accountAddress } =
+          await this.account.lastAccountInfo())
       }
-      await this.account.copyAddress.click()
-      await this.clipboard.setClipboard()
-      const accountAddress = await this.clipboard
-        .getClipboard()
-        .then((adr) => String(adr))
-      expect(accountAddress).toMatch(/^0x0/)
-      accountAddresses.push(accountAddress)
-      if (acc.assets[0].balance > 0) {
-        await this.fundAccount(acc, accountAddress, accIndex)
+      accountNames.push(accountName!)
+      accountAddresses.push(accountAddress!)
+    }
+
+    // Handle case with no accounts to setup
+    if (accountsToSetup.length === 0) {
+      const { accountName, accountAddress } =
+        await this.account.lastAccountInfo()
+      accountNames.push(accountName!)
+      accountAddresses.push(accountAddress!)
+    }
+
+    // Fund accounts in parallel
+    await Promise.all(
+      accountsToSetup.map((acc, index) => {
+        if (acc.assets.some((asset) => Number(asset.balance) > 0)) {
+          return this.fundAccount({
+            acc,
+            accountAddress: accountAddresses[index],
+            accountName: accountNames[index],
+          })
+        }
+        return Promise.resolve()
+      }),
+    )
+
+    // Run balance updates sequentially
+    for (const [index, acc] of accountsToSetup.entries()) {
+      for (const asset of acc.assets) {
+        await this.ensureBalanceUpdated({
+          balance: asset.balance,
+          token: asset.token,
+          accountName: accountNames[index],
+          accountAddress: accountAddresses[index],
+        })
       }
     }
+
+    //deploy accounts sequentially
+    for (const [index, acc] of accountsToSetup.entries()) {
+      if (acc.deploy) {
+        await this.deployAccount(accountNames[index], acc.feeToken)
+      }
+    }
+
+    await this.account.ensureSelectedAccount(accountNames[0])
+
     logInfo({
       op: "setupWallet",
       accountsNbr: accountAddresses.length,
       accountAddresses,
       seed,
     })
-    return { accountAddresses, seed }
+    return { accountAddresses, seed, accountNames }
   }
 
   async validateTx({
@@ -360,7 +417,7 @@ export default class ExtensionPage {
       })
     if (sendAmountFE) {
       const activityAmountLocator = this.page.locator(
-        `button[data-tx-hash$="${txHash.substring(3)}"] [data-value]`,
+        `button[data-tx-hash$="${txHash.substring(10)}"] [data-value]`,
       )
       let activityAmountElement = activityAmountLocator
       if (uniqLocator) {
@@ -380,7 +437,7 @@ export default class ExtensionPage {
       if (sendAmountFE.toString().length > 6) {
         expect(activityAmount).toBe(
           parseFloat(sendAmountFE.toString())
-            .toFixed(4)
+            .toFixed(5)
             .toString()
             .match(/[\d\\.]+[^0]+/)?.[0],
         )
@@ -397,34 +454,54 @@ export default class ExtensionPage {
   async fundMultisigAccount({
     accountName,
     balance,
+    token = "STRK",
   }: {
     accountName: string
-    balance: number
+    balance: number | string
+    token?: TokenSymbol
   }) {
     await this.account.ensureSelectedAccount(accountName)
     await this.account.copyAddress.click()
-    await this.clipboard.setClipboard()
-    const accountAddress = await this.clipboard
-      .getClipboard()
-      .then((adr) => String(adr))
-    await transferTokens(
+    const accountAddress = this.isUpgradeTest
+      ? await this.navigation.getSystemClipboard()
+      : (await this.account.accountAddr) || undefined
+    await requestFunds(
+      accountAddress!, // receiver wallet address
       balance,
-      accountAddress, // receiver wallet address
+      token,
     )
-    await this.account.ensureAsset(accountName, "ETH", `${balance} ETH`)
+    await this.account.ensureAsset({
+      accountName,
+      accountAddress,
+      token,
+      value: `${balance} ${token}`,
+    })
   }
 
   async activateMultisig(accountName: string) {
     await this.account.ensureSelectedAccount(accountName)
-    await expect(
-      this.page.locator("label:has-text('Add ETH or STRK and activate')"),
-    ).toBeVisible()
+    if (this.isUpgradeTest) {
+      await expect(
+        this.page.locator(
+          'label:has-text("Add ETH or STRK and activate"), label:has-text("Add STRK and activate")',
+        ),
+      ).toBeVisible()
+    } else {
+      await expect(
+        this.page.locator("label:has-text('Add STRK and activate')"),
+      ).toBeVisible()
+    }
     await this.page.locator('[data-testid="activate-multisig"]').click()
-    await this.account.confirmTransaction()
-    await expect(
-      this.page.locator('[data-testid="activating-multisig"]'),
-    ).toBeVisible()
     await Promise.all([
+      this.account.confirmTransaction(),
+      expect(
+        this.page.locator('[data-testid="activating-multisig"]'),
+      ).toBeVisible(),
+    ])
+    await Promise.all([
+      expect(
+        this.page.locator("label:has-text('Add STRK and activate')"),
+      ).toBeHidden(),
       expect(
         this.page.locator("label:has-text('Add ETH or STRK and activate')"),
       ).toBeHidden(),
@@ -432,6 +509,7 @@ export default class ExtensionPage {
         this.page.locator('[data-testid="activating-multisig"]'),
       ).toBeHidden(),
     ])
+    await sleep(3000)
   }
 
   async removeMultisigOwner(accountName: string) {
@@ -449,8 +527,7 @@ export default class ExtensionPage {
       .catch(() => "unknown")
   }
 
-  async setExtensionVersion(version: string) {
-    const currentVersionDir = await unzip(version)
+  async setExtensionVersion(version: string, currentVersionDir: string) {
     await fs.remove(config.migVersionDir)
     await fs.copy(currentVersionDir, config.migVersionDir)
     // Reload Extension
@@ -465,7 +542,8 @@ export default class ExtensionPage {
 
     //open extension
     await this.open()
-    await expect(this.version).resolves.toBe(version)
+    await expect(this.version).resolves.toBe(decreaseMajorVersion(version))
+    console.log(`Loaded Version: ${decreaseMajorVersion(version)}`)
   }
 
   async restoreExtensionVersion() {
@@ -490,7 +568,9 @@ export default class ExtensionPage {
     //unlock extension
     await this.account.password.fill(config.password)
     await this.navigation.unlockLocator.click()
+    await this.page.waitForLoadState("networkidle")
     //check extension version
     await expect(this.version).resolves.toBe(newVersion)
+    console.log("Loaded Version:", newVersion)
   }
 }

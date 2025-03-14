@@ -1,5 +1,5 @@
 import { DappIcon } from "@argent-x/extension/src/ui/features/actions/connectDapp/DappIcon"
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 
 export default {
   component: DappIcon,

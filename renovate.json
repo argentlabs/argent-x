@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": ["config:recommended", ":pinAllExceptPeerDependencies"],
   "schedule": ["every 2 weeks on Monday"],
   "timezone": "Europe/London",
   "rebaseWhen": "never",
@@ -25,7 +25,8 @@
     "starknet",
     "starknet4-deprecated",
     "starknet4",
-    "starknet5"
+    "starknet5",
+    "framer-motion"
   ],
   "packageRules": [
     {

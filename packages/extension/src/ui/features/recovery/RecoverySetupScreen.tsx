@@ -1,8 +1,8 @@
+import { ResetPrimaryIcon } from "@argent/x-ui/icons"
 import {
   BarCloseButton,
   CellStack,
   H1,
-  icons,
   NavigationContainer,
   P2,
 } from "@argent/x-ui"
@@ -14,8 +14,6 @@ import { useReturnTo } from "../../hooks/useRoute"
 import { routes } from "../../../shared/ui/routes"
 import { CircleIconContainer } from "./ui/CircleIconContainer"
 import { ComingSoonIcon } from "./ui/ComingSoonIcon"
-
-const { ResetPrimaryIcon } = icons
 
 export const RecoverySetupScreen: FC = () => {
   const navigate = useNavigate()

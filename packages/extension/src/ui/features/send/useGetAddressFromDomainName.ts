@@ -1,11 +1,9 @@
 import type { Address, StarknetDomainName } from "@argent/x-shared"
-import {
-  isStarknetDomainName,
-  isValidAddress,
-  trpcErrorSchema,
-} from "@argent/x-shared"
+import { isValidAddress, trpcErrorSchema } from "@argent/x-shared"
 import { useDebouncedValue } from "@argent/x-ui"
 import useSWR from "swr"
+import { z } from "zod"
+import { starknetId } from "starknet"
 
 import { clientStarknetAddressService } from "../../services/address"
 
@@ -15,6 +13,13 @@ type AddressFromDomainNameResult = {
   /** an error string that can be displayed */
   error?: string
 }
+
+const starknetDomainSchema = z
+  .string()
+  .refine(
+    (value) => value === value.toLowerCase(),
+    "Starknet domain names must be lowercase",
+  )
 
 /** debounced version of `useGetAddressFromDomainName` suitable for user input */
 
@@ -33,11 +38,26 @@ export function useGetAddressFromDomainName(
   const { data, isValidating: isLoading } = useSWR(
     [domainName, networkId],
     async (): Promise<AddressFromDomainNameResult> => {
-      if (!isStarknetDomainName(domainName)) {
+      if (!domainName.includes(".")) {
         return {
           result: undefined,
         }
       }
+
+      if (!starknetId.isStarkDomain(domainName)) {
+        return {
+          result: undefined,
+          error: `${domainName} not found`,
+        }
+      }
+
+      const domainValidation = starknetDomainSchema.safeParse(domainName)
+      if (!domainValidation.success) {
+        return {
+          error: domainValidation.error.errors[0].message,
+        }
+      }
+
       try {
         const domainAddress =
           await clientStarknetAddressService.getAddressFromDomainName(
@@ -60,8 +80,8 @@ export function useGetAddressFromDomainName(
       }
     },
     {
-      dedupingInterval: 1000 * 60 * 60 * 1,
-      refreshInterval: 1000 * 60 * 60 * 1,
+      dedupingInterval: 1000 * 60 * 5 * 1,
+      refreshInterval: 1000 * 60 * 5 * 1,
     },
   )
 

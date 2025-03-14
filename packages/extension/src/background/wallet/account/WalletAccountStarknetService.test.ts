@@ -120,7 +120,7 @@ describe("AccountStarknetService", () => {
 
       expect(result).toEqual(
         expect.objectContaining({
-          name: "Multisig 1",
+          name: "Multisig (Awaiting setup)",
           networkId: mockNetworkId,
           signer: {
             type: signerType,

@@ -23,6 +23,7 @@ import {
   allTokenPricesView,
   allTokensView,
 } from "./token"
+import { atomWithDebugLabel } from "./atomWithDebugLabel"
 
 export const addCurrencyValueToTokensList = (
   tokensWithBalance: BaseTokenWithBalance[],
@@ -59,28 +60,33 @@ export const addCurrencyValueToTokensList = (
 
 const tokenBalancesAndOptionalPricesViewFamily = atomFamily(
   (account?: BaseWalletAccount) => {
-    return atom(async (get) => {
-      const accountAddress = account?.address
-      const networkId = account?.networkId
-      if (!accountAddress || !networkId) {
-        return []
-      }
-      const [allTokenBalances, allTokenPrices, allTokens] = await Promise.all([
-        get(allTokenBalancesView),
-        get(allTokenPricesView),
-        get(allTokensView),
-      ])
-      const tokenBalances = allTokenBalances.filter(
-        (tokenBalance) =>
-          isEqualAddress(tokenBalance.account, accountAddress) &&
-          tokenBalance.networkId === networkId,
-      )
-      return addCurrencyValueToTokensList(
-        tokenBalances,
-        allTokenPrices,
-        allTokens,
-      )
-    })
+    return atomWithDebugLabel(
+      atom(async (get) => {
+        const accountAddress = account?.address
+        const networkId = account?.networkId
+        if (!accountAddress || !networkId) {
+          return []
+        }
+        const [allTokenBalances, allTokenPrices, allTokens] = await Promise.all(
+          [
+            get(allTokenBalancesView),
+            get(allTokenPricesView),
+            get(allTokensView),
+          ],
+        )
+        const tokenBalances = allTokenBalances.filter(
+          (tokenBalance) =>
+            isEqualAddress(tokenBalance.account, accountAddress) &&
+            tokenBalance.networkId === networkId,
+        )
+        return addCurrencyValueToTokensList(
+          tokenBalances,
+          allTokenPrices,
+          allTokens,
+        )
+      }),
+      `tokenBalancesAndOptionalPricesViewFamily-${account?.id}`,
+    )
   },
   atomFamilyAccountsEqual,
 )

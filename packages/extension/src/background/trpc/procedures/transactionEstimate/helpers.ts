@@ -6,7 +6,10 @@ import type {
 } from "starknet"
 import { TransactionType } from "starknet"
 import { isAccountDeployed } from "../../../accountDeploy"
-import type { EstimatedFees } from "@argent/x-shared/simulation"
+import type {
+  EstimatedFees,
+  NativeEstimatedFees,
+} from "@argent/x-shared/simulation"
 import type { WalletAccount } from "../../../../shared/wallet.model"
 import type { Wallet } from "../../../wallet"
 import type { Address } from "@argent/x-shared"
@@ -24,7 +27,7 @@ export function callsToInvocation(calls: Call[]): Invocation {
 export function estimatedFeesToResponse(
   estimatedFees: EstimateFeeBulk,
   feeTokenAddress: Address,
-): EstimatedFees {
+): NativeEstimatedFees {
   if (estimatedFees.length !== 1 && estimatedFees.length !== 2) {
     throw new Error("estimatedFeesToResponse: length must be 1 or 2")
   }
@@ -74,7 +77,7 @@ export function estimatedFeesToResponse(
     dataGasPrice: data_gas_price,
   }
 
-  return fees
+  return { type: "native", ...fees }
 }
 
 export async function extendInvocationsByAccountDeploy(

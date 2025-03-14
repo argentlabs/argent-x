@@ -1,14 +1,13 @@
 import { H2, P3 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { Meta, StoryObj } from "@storybook/react"
-import { cloneElement, FC, isValidElement, ReactElement, useState } from "react"
+import type { Meta, StoryObj } from "@storybook/react"
+import type { FC, ReactElement } from "react"
+import { cloneElement, isValidElement, useState } from "react"
 
 import { ESCAPE_TYPE_GUARDIAN } from "@argent-x/extension/src/shared/account/details/escape.model"
 import { accounts } from "@argent-x/extension/src/ui/features/actions/__fixtures__"
-import {
-  AccountBanners,
-  AccountBannersProps,
-} from "@argent-x/extension/src/ui/features/banners/AccountBanners"
+import type { AccountBannersProps } from "@argent-x/extension/src/ui/features/banners/AccountBanners"
+import { AccountBanners } from "@argent-x/extension/src/ui/features/banners/AccountBanners"
 import { AccountDeprecatedBanner } from "@argent-x/extension/src/ui/features/banners/AccountDeprecatedBanner"
 import { AccountOwnerBanner } from "@argent-x/extension/src/ui/features/banners/AccountOwnerBanner"
 import { EscapeBanner } from "@argent-x/extension/src/ui/features/banners/EscapeBanner"
@@ -16,7 +15,7 @@ import { MultisigBanner } from "@argent-x/extension/src/ui/features/banners/Mult
 import { StatusMessageBanner } from "@argent-x/extension/src/ui/features/banners/StatusMessageBanner"
 import { UpgradeBanner } from "@argent-x/extension/src/ui/features/banners/UpgradeBanner"
 import { PromoStakingBanner } from "@argent-x/extension/src/ui/features/banners/PromoStakingBanner"
-import { LiveAccountEscapeProps } from "@argent-x/extension/src/ui/features/smartAccount/escape/useAccountEscape"
+import type { LiveAccountEscapeProps } from "@argent-x/extension/src/ui/features/smartAccount/escape/useAccountEscape"
 import { getActiveFromNow } from "@argent-x/extension/src/shared/utils/getActiveFromNow"
 
 import { decorators } from "../../decorators/routerDecorators"

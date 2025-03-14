@@ -2,13 +2,15 @@ import { KeyValueStorage } from "../storage"
 
 export interface IStakingStore {
   enabled: boolean
-  apyPercentage: string
+  nativeApyPercentage: string
+  liquidApyPercentage: string
 }
 
 export const stakingStore = new KeyValueStorage<IStakingStore>(
   {
     enabled: false,
-    apyPercentage: "0",
+    nativeApyPercentage: "0",
+    liquidApyPercentage: "0",
   },
   "core:staking",
 )

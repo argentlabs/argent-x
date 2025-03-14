@@ -48,21 +48,39 @@ export function maxAmountSpend(
   return tokenAmount?.amount
 }
 
+type ProviderInfo = {
+  name: string
+  dappId?: string
+}
+
 /**
- * Extracts provider names from a trade route.
+ * Extracts provider names and dappIds from a trade route, keeping existing entries for duplicates.
  * @param route - The trade route to parse.
- * @returns {string[]} - An array of provider names.
+ * @returns {ProviderInfo[]} - An array of provider information.
  */
-export function getProvidersFromTradeRoute(route: SwapQuoteRoute): string[] {
-  // As SwapQuoteRoute is any, let's parse it with zod to ensure we have the right data
+export function getProvidersFromTradeRoute(
+  route?: SwapQuoteRoute,
+): ProviderInfo[] {
+  if (!route) {
+    return []
+  }
+
   const parsedRoute = SwapQuoteRouteSchema.parse(route)
 
-  const providers: string[] = [
-    parsedRoute.name,
-    ...parsedRoute.routes.map(getProvidersFromTradeRoute),
-  ]
+  const providers = new Map<string, ProviderInfo>()
 
-  return providers.flat()
+  const addProvider = (info: ProviderInfo) => {
+    const existing = providers.get(info.name)
+    // Keep the entry with dappId if it exists
+    if (!existing || (!existing.dappId && info.dappId)) {
+      providers.set(info.name, info)
+    }
+  }
+
+  addProvider({ name: parsedRoute.name, dappId: parsedRoute.dappId })
+  parsedRoute.routes.map(getProvidersFromTradeRoute).flat().forEach(addProvider)
+
+  return Array.from(providers.values())
 }
 
 /**

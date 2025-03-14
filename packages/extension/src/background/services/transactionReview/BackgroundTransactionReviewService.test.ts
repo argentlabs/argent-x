@@ -122,7 +122,6 @@ describe("BackgroundTransactionReviewService", () => {
           const {
             backgroundTransactionReviewService,
             httpService,
-            feeTokenAddress,
             nonceManagementService,
           } = makeService()
 
@@ -136,24 +135,54 @@ describe("BackgroundTransactionReviewService", () => {
           const result =
             await backgroundTransactionReviewService.simulateAndReview({
               transaction,
-              feeTokenAddress,
             })
           expect(result).toMatchObject(sendFixture)
 
           expect(result.enrichedFeeEstimation).toMatchInlineSnapshot(`
-            {
-              "deployment": undefined,
-              "transactions": {
-                "amount": 2788n,
-                "dataGasConsumed": 0n,
-                "dataGasPrice": 0n,
-                "feeTokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
-                "max": {
-                  "maxFee": 447452402228894n,
+            [
+              {
+                "deployment": undefined,
+                "transactions": {
+                  "amount": 21n,
+                  "dataGasConsumed": 0n,
+                  "dataGasPrice": 0n,
+                  "feeTokenAddress": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+                  "max": {
+                    "amount": 42n,
+                    "pricePerUnit": 3458002953105856n,
+                  },
+                  "pricePerUnit": 2305335302099180n,
                 },
-                "pricePerUnit": 80246126522n,
+                "type": "native",
               },
-            }
+              {
+                "deployment": undefined,
+                "transactions": {
+                  "feeTokenAddress": "0x0030058f19ed447208015f6430f0102e8ab82d6c291566d7e73fe8e613c3d2ed",
+                  "maxFee": 2328n,
+                  "overallFee": 776n,
+                },
+                "type": "paymaster",
+              },
+              {
+                "deployment": undefined,
+                "transactions": {
+                  "feeTokenAddress": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                  "maxFee": 12970632528043n,
+                  "overallFee": 4323550018745n,
+                },
+                "type": "paymaster",
+              },
+              {
+                "deployment": undefined,
+                "transactions": {
+                  "feeTokenAddress": "0x053b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
+                  "maxFee": 43695n,
+                  "overallFee": 14565n,
+                },
+                "type": "paymaster",
+              },
+            ]
           `)
         })
       })
@@ -162,13 +191,12 @@ describe("BackgroundTransactionReviewService", () => {
           const {
             backgroundTransactionReviewService,
             httpService,
-            feeTokenAddress,
             starknetAccount,
             nonceManagementService,
           } = makeService()
 
           const transaction = {
-            type: TransactionType.INVOKE as const,
+            type: TransactionType.INVOKE,
             payload: [],
           }
 
@@ -184,7 +212,6 @@ describe("BackgroundTransactionReviewService", () => {
           nonceManagementService.getNonce.mockResolvedValueOnce("0x2")
           await backgroundTransactionReviewService.simulateAndReview({
             transaction,
-            feeTokenAddress,
           })
 
           expect(getEnrichedFeeEstimationSpy).not.toHaveBeenCalledOnce()
@@ -197,13 +224,12 @@ describe("BackgroundTransactionReviewService", () => {
           const {
             backgroundTransactionReviewService,
             httpService,
-            feeTokenAddress,
             baseStarknetAccount,
             nonceManagementService,
           } = makeService()
 
           const transaction = {
-            type: TransactionType.INVOKE as const,
+            type: TransactionType.INVOKE,
             payload: [],
           }
 
@@ -219,7 +245,6 @@ describe("BackgroundTransactionReviewService", () => {
           const result =
             await backgroundTransactionReviewService.simulateAndReview({
               transaction,
-              feeTokenAddress,
             })
 
           expect(fallbackToOnchainFeeEstimationSpy).toHaveBeenCalledOnce()
@@ -228,13 +253,15 @@ describe("BackgroundTransactionReviewService", () => {
 
           expect(result).toMatchObject({
             isBackendDown: true,
-            enrichedFeeEstimation: {
-              transactions: {
-                amount: 123n,
-                feeTokenAddress,
-                pricePerUnit: 456n,
+            enrichedFeeEstimation: [
+              {
+                type: "native",
+                transactions: {
+                  amount: 123n,
+                  pricePerUnit: 456n,
+                },
               },
-            },
+            ],
           })
         })
       })

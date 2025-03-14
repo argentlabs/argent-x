@@ -1,10 +1,16 @@
 import { addressSchema } from "@argent/x-shared"
 import { extensionOnlyProcedure } from "../permissions"
 import { openSessionMiddleware } from "../../middleware/session"
+import { z } from "zod"
+
+const getTopperUrlInputSchema = z.object({
+  address: addressSchema,
+  assetSymbol: z.string().optional(),
+})
 
 export const getTopperUrlProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
-  .input(addressSchema)
+  .input(getTopperUrlInputSchema)
   .query(
     async ({
       input,
@@ -12,6 +18,6 @@ export const getTopperUrlProcedure = extensionOnlyProcedure
         services: { onRampService },
       },
     }) => {
-      return await onRampService.getTopperUrl(input)
+      return await onRampService.getTopperUrl(input.address, input.assetSymbol)
     },
   )

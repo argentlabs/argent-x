@@ -1,9 +1,7 @@
-import { logosDeprecated } from "@argent/x-ui"
 import type { SquareProps } from "@chakra-ui/react"
 import { Circle, Tooltip } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { LedgerLogo } = logosDeprecated
+import { LedgerLogo } from "@argent/x-ui/logos-deprecated"
 
 export const AccountListItemLedgerBadge: FC<SquareProps> = (props) => (
   <Tooltip label="Controlled by a Ledger">

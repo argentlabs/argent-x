@@ -1,5 +1,6 @@
 import type { Address, Collection } from "@argent/x-shared"
-import { Empty, H3, icons } from "@argent/x-ui"
+import { NftIcon } from "@argent/x-ui/icons"
+import { Empty, H3 } from "@argent/x-ui"
 import type { FC, ReactNode } from "react"
 
 import type { BaseWalletAccount } from "../../../shared/wallet.model"
@@ -8,8 +9,6 @@ import type { AccountCollectionsProps } from "./AccountCollections"
 import { AccountCollections } from "./AccountCollections"
 import { useCollectionsByAccountAndNetwork } from "./nfts.state"
 import { nftService } from "../../../shared/nft"
-
-const { NftIcon } = icons
 
 interface AccountCollectionsContainerProps
   extends Omit<AccountCollectionsProps, "collections"> {

@@ -5,19 +5,29 @@
   "repository": "github:argentlabs/argent-x",
   "homepage": "https://github.com/argentlabs/argent-x/#readme",
   "devDependencies": {
-    "@changesets/cli": "^2.26.1",
-    "@lavamoat/allow-scripts": "^3.0.0",
-    "@lavamoat/preinstall-always-fail": "^2.0.0",
-    "husky": "^9.0.0",
-    "lint-staged": "^15.0.0",
-    "patch-package": "^8.0.0",
-    "prettier": "^3.2.5",
-    "prettier-plugin-import-sort": "^0.0.7",
-    "ts-node": "^10.9.1"
+    "@changesets/cli": "2.27.9",
+    "@lavamoat/allow-scripts": "3.3.0",
+    "@lavamoat/preinstall-always-fail": "2.1.0",
+    "husky": "9.1.6",
+    "lint-staged": "15.2.10",
+    "patch-package": "8.0.0",
+    "prettier": "3.3.3",
+    "prettier-plugin-import-sort": "0.0.7",
+    "ts-node": "10.9.2"
   },
   "resolutions": {
     "@babel/preset-react": "7.25.9",
-    "@babel/plugin-transform-react-jsx": "7.25.9"
+    "@babel/plugin-transform-react-jsx": "7.25.9",
+    "body-parser": "1.20.3",
+    "path-to-regexp": "8.2.0",
+    "http-proxy-middleware": "3.0.3",
+    "cross-spawn": "7.0.6",
+    "micromatch": "4.0.8",
+    "next": "15.0.3",
+    "serve-static": "1.16.2",
+    "express": "4.21.1",
+    "send": "1.1.0",
+    "cookie-parser": "1.4.7"
   },
   "scripts": {
     "format": "prettier --loglevel warn --write \"**/*.{js,jsx,ts,tsx,css,md,yml,json}\"",
@@ -37,6 +47,7 @@
     "test:e2e:mainnet": "pnpm run --filter @argent-x/e2e test:mainnet",
     "test:e2e:tx": "pnpm run --filter @argent-x/e2e test:tx",
     "test:e2e:upgrade": "pnpm run --filter @argent-x/e2e test:upgrade",
+    "test:e2e:performance": "pnpm run --filter @argent-x/e2e test:performance",
     "setup": "pnpm install --frozen-lockfile && pnpm allow-scripts && husky install && patch-package && pnpm run -r --stream setup",
     "test:ci": "pnpm run --stream --parallel test:ci",
     "storybook": "cd packages/storybook && pnpm run storybook",
@@ -54,7 +65,7 @@
   "license": "GPL-3.0-only",
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md,yml,json}": "prettier --write",
-    "*.{ts,tsx}": "eslint --cache --ext .ts,.tsx"
+    "*.{ts,tsx}": "pnpm lint"
   },
   "lavamoat": {
     "allowScripts": {
@@ -67,6 +78,11 @@
       "lerna>nx": false,
       "lerna>nx>@nrwl/cli>nx": false,
       "ts-node>@swc/core": false
+    }
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "starknet": "patches/starknet.patch"
     }
   }
 }

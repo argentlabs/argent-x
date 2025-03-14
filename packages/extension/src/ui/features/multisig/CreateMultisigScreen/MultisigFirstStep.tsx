@@ -6,6 +6,7 @@ import { AddOwnersForm } from "../AddOwnerForm"
 import type { FieldValuesCreateMultisigForm } from "../hooks/useCreateMultisigForm"
 import { ScreenLayout } from "./ScreenLayout"
 import { ActionButton } from "../../../components/FullScreenPage"
+import { multisigService } from "../../../services/multisig"
 
 interface MultisigFirstStepProps {
   index: number
@@ -22,10 +23,21 @@ export const MultisigFirstStep = ({
   totalSteps,
   filledIndicator = false,
 }: MultisigFirstStepProps) => {
-  const { register, trigger } = useFormContext<FieldValuesCreateMultisigForm>()
+  const { register, trigger, getValues, setError } =
+    useFormContext<FieldValuesCreateMultisigForm>()
   const handleNavigationToConfirmationScreen = async () => {
-    const isValid = await trigger("signerKeys")
-    if (isValid) {
+    const isValidSignerFormat = await trigger("signerKeys")
+    const isValidSigners = await multisigService.validateSigners(
+      getValues("signerKeys").map((signer) => signer.key),
+    )
+    if (!isValidSigners) {
+      setError("signerKeys", {
+        type: "validate",
+        message:
+          "One or more of the signers is invalid. Please make sure you have the correct signer pubkeys.",
+      })
+    }
+    if (isValidSignerFormat && isValidSigners) {
       goNext()
     }
   }

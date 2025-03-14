@@ -28,3 +28,8 @@ export const logInfo = (message: string | object) => {
 }
 
 export const generateEmail = () => `e2e_2fa_${uuid()}@mail.com`
+export function decreaseMajorVersion(version: string): string {
+  const [major, minor, patch] = version.split(".").map(Number)
+  const newMajor = major - 1
+  return `${newMajor}.${minor}.${patch}`
+}

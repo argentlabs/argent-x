@@ -8,15 +8,21 @@ test.describe("Invalid addresses", { tag: "@all" }, () => {
     await extension.recoverWallet(config.senderSeed!)
     await expect(extension.network.networkSelector).toBeVisible()
     await extension.account.send.click()
+
+    //non existing starknet id
     await extension.account.fillRecipientAddress({
       recipientAddress: "e2e-test5345346eertgegeggfgdgdgdfgdgdf.stark",
       validAddress: false,
+      checkError: true,
     })
-    await expect(
-      extension.account.invalidStarkIdError(
-        "e2e-test5345346eertgegeggfgdgdgdfgdgdf.stark",
-      ),
-    ).toBeVisible()
+    await extension.account.recipientAddressQuery.clear()
+
+    // case check
+    await extension.account.fillRecipientAddress({
+      recipientAddress: "QAteste2e.stark",
+      validAddress: false,
+      checkError: true,
+    })
   })
 
   test("Invalid address (short address)", async ({ extension }) => {

@@ -1,4 +1,5 @@
-import { Button, FlowHeader, icons, P3 } from "@argent/x-ui"
+import { NoShieldSecondaryIcon } from "@argent/x-ui/icons"
+import { Button, FlowHeader, P3 } from "@argent/x-ui"
 import { Center, Flex, ListItem, OrderedList } from "@chakra-ui/react"
 import type { FC } from "react"
 
@@ -8,8 +9,6 @@ import {
 } from "../ui/SmartAccountExternalLinkButton"
 import { getEscapeDisplayAttributes } from "./getEscapeDisplayAttributes"
 import type { LiveAccountEscapeProps } from "./useAccountEscape"
-
-const { ShieldSecondaryIcon } = icons
 
 interface EscapeGuardianProps {
   liveAccountEscape: LiveAccountEscapeProps
@@ -26,10 +25,10 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
   return (
     <Flex flexDirection={"column"} flex={1} px={4} pt={8} pb={4}>
       <FlowHeader
-        icon={ShieldSecondaryIcon}
+        icon={NoShieldSecondaryIcon}
         title={title}
         subtitle={
-          "An action to remove Argent as a guardian was started. If this wasn’t you, someone could be trying to gain access to your account."
+          "You’ve started the process of removing Argent as a guardian.If this wasn’t you, someone may be trying to access your account."
         }
         variant={colorScheme}
       />
@@ -51,6 +50,7 @@ export const EscapeGuardian: FC<EscapeGuardianProps> = ({
           Detailed instructions
         </SmartAccountExternalLinkButton>
       </Center>
+
       <Flex flex={1} />
       <Button
         colorScheme={"primary"}

@@ -21,7 +21,8 @@ const CustomButtonCellRaw: FC<CustomButtonCellProps> = ({
   return (
     <Button
       gap={3}
-      p={4}
+      px={4}
+      py={3.5}
       h={"initial"}
       textAlign={"left"}
       fontWeight={"initial"}

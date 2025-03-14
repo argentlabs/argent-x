@@ -1,12 +1,11 @@
-import { CellStack, Empty, H3, icons, SpacerCell } from "@argent/x-ui"
+import { NetworkSecondaryIcon } from "@argent/x-ui/icons"
+import { CellStack, Empty, H3, SpacerCell } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import type { FC } from "react"
 
 import type { NewsItem } from "../../../shared/discover/schema"
 import { NewsItemCardCollection } from "./ui/NewsItemCardCollection"
-
-const { NetworkSecondaryIcon } = icons
 
 interface AccountDiscoverScreenProps {
   newsItems?: NewsItem[]

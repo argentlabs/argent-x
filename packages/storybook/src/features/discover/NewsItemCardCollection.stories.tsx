@@ -1,6 +1,6 @@
 import { CellStack } from "@argent/x-ui"
-import { StoryObj } from "@storybook/react"
-import { ComponentProps } from "react"
+import type { StoryObj } from "@storybook/react"
+import type { ComponentProps } from "react"
 
 import { decorators } from "../../decorators/routerDecorators"
 

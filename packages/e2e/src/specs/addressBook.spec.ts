@@ -3,14 +3,14 @@ import { expect } from "@playwright/test"
 import config from "../config"
 import test from "../test"
 
-const ethInitialBalance = 0.002 * Number(config.initialBalanceMultiplier)
+const strkInitialBalance = "2.1"
 
 test.describe("Address Book", { tag: "@tx" }, () => {
   test.skip(config.skipTXTests === "true")
   test("Add, update, use and delete address", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [
-        { assets: [{ token: "ETH", balance: ethInitialBalance }] },
+        { assets: [{ token: "STRK", balance: strkInitialBalance }] },
       ],
     })
 
@@ -41,6 +41,8 @@ test.describe("Address Book", { tag: "@tx" }, () => {
     await extension.account.send.click()
     await extension.addressBook.addressBook.click()
     await extension.addressBook.addressByName("New name").click()
+    await extension.account.selectTokenButton.click()
+    await extension.account.token("STRK").click()
     await extension.account.sendMax.click()
     await extension.navigation.reviewSendLocator.click()
     await extension.account.confirmTransaction()
@@ -67,7 +69,7 @@ test.describe("Address Book", { tag: "@tx" }, () => {
   test("Add address after typing", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [
-        { assets: [{ token: "ETH", balance: ethInitialBalance }] },
+        { assets: [{ token: "STRK", balance: strkInitialBalance }] },
       ],
     })
 
@@ -83,7 +85,8 @@ test.describe("Address Book", { tag: "@tx" }, () => {
     await extension.addressBook.name.fill("My address")
     await extension.addressBook.saveLocator.click()
     await extension.account.contact("My address").click()
-
+    await extension.account.selectTokenButton.click()
+    await extension.account.token("STRK").click()
     await extension.account.sendMax.click()
     await extension.navigation.reviewSendLocator.click()
     await extension.account.confirmTransaction()
@@ -97,7 +100,7 @@ test.describe("Address Book", { tag: "@tx" }, () => {
   test("Add address from send window", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [
-        { assets: [{ token: "ETH", balance: ethInitialBalance }] },
+        { assets: [{ token: "STRK", balance: strkInitialBalance }] },
       ],
     })
 
@@ -105,9 +108,9 @@ test.describe("Address Book", { tag: "@tx" }, () => {
     await extension.network.selectDefaultNetwork()
 
     await extension.account.send.click()
-    await extension.clipboard.setClipboardText(config.account1Seed2!)
     await extension.account.recipientAddressQuery.focus()
-    await extension.clipboard.paste()
+    await extension.account.recipientAddressQuery.fill(config.account1Seed2!)
+    await extension.account.recipientAddressQuery.press("Enter")
 
     await extension.account.saveAddress.click()
     await expect(extension.addressBook.address).toHaveText(
@@ -115,6 +118,11 @@ test.describe("Address Book", { tag: "@tx" }, () => {
     )
     await extension.addressBook.name.fill("My address")
     await extension.addressBook.saveLocator.click()
+    await extension.account.selectTokenButton.click()
+    await extension.account.token("STRK").click()
+    await expect(extension.account.sendMax).toBeVisible()
+    await expect(extension.account.reviewSendLocator).toBeVisible()
+    await expect(extension.navigation.closeLocator).toHaveCount(1)
 
     await extension.account.sendMax.click()
     await extension.navigation.reviewSendLocator.click()
@@ -130,7 +138,7 @@ test.describe("Address Book", { tag: "@tx" }, () => {
   test("Add address - starknet.id", async ({ extension }) => {
     await extension.setupWallet({
       accountsToSetup: [
-        { assets: [{ token: "ETH", balance: ethInitialBalance }] },
+        { assets: [{ token: "STRK", balance: strkInitialBalance }] },
       ],
     })
 
@@ -144,7 +152,8 @@ test.describe("Address Book", { tag: "@tx" }, () => {
     await extension.addressBook.name.fill("My address")
     await extension.addressBook.saveLocator.click()
     await extension.account.contact("My address").click()
-
+    await extension.account.selectTokenButton.click()
+    await extension.account.token("STRK").click()
     await extension.account.sendMax.click()
     await extension.navigation.reviewSendLocator.click()
     await extension.account.confirmTransaction()

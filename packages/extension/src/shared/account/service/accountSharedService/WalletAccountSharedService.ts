@@ -1,25 +1,43 @@
-import { find, partition } from "lodash-es"
-
-import type { IHttpService } from "@argent/x-shared"
+import type {
+  BackendAccount,
+  BackendResponsePageable,
+  BackendSession,
+  IHttpService,
+} from "@argent/x-shared"
 import {
   addressSchemaArgentBackend,
   BaseError,
   ensureArray,
   getLatestArgentMultisigClassHash,
+  HttpError,
 } from "@argent/x-shared"
+import { find, partition } from "lodash-es"
+import urlJoin from "url-join"
+
 import { ARGENT_ACCOUNT_URL, ARGENT_ACCOUNTS_URL } from "../../../api/constants"
+import { argentApiNetworkForNetwork } from "../../../api/headers"
 import { AccountError } from "../../../errors/account"
 import type { PendingMultisig } from "../../../multisig/types"
 import { defaultNetwork } from "../../../network"
+import { getBaseDerivationPath } from "../../../signer/utils"
+import { generateJwt } from "../../../smartAccount/jwt"
 import type {
   IObjectStore,
   IRepository,
 } from "../../../storage/__new/interface"
-import { accountsEqual, isEqualAccountIds } from "../../../utils/accountsEqual"
-import { getIndexForPath, getPathForIndex } from "../../../utils/derivationPath"
+import { getAccountIdentifier } from "../../../utils/accountIdentifier"
+import {
+  accountsEqual,
+  accountsEqualByAddress,
+  isEqualAccountIds,
+} from "../../../utils/accountsEqual"
+import { getPathForIndex } from "../../../utils/derivationPath"
+import { walletAccountToArgentAccount } from "../../../utils/isExternalAccount"
+import { urlWithQuery } from "../../../utils/url"
 import type {
   AccountId,
   ArgentWalletAccount,
+  AvatarMeta,
   BaseMultisigWalletAccount,
   BaseWalletAccount,
   CreateAccountType,
@@ -35,20 +53,14 @@ import {
 } from "../../../wallet.model"
 import type { WalletStorageProps } from "../../../wallet/walletStore"
 import { withHiddenSelector } from "../../selectors"
-
-import urlJoin from "url-join"
-import { getBaseDerivationPath } from "../../../signer/utils"
-import { SMART_ACCOUNT_NETWORK_ID } from "../../../smartAccount/constants"
-import { generateJwt } from "../../../smartAccount/jwt"
-import type { IAccountService } from "../accountService/IAccountService"
-import { walletAccountToArgentAccount } from "../../../utils/isExternalAccount"
-import { getAccountIdentifier } from "../../../utils/accountIdentifier"
 import { toBaseWalletAccount } from "../../utils"
-
-export interface WalletSession {
-  secret: string
-  password: string
-}
+import type { IAccountService } from "../accountService/IAccountService"
+import type { ISmartAccountService } from "../../../smartAccount/ISmartAccountService"
+import type { IKeyValueStorage } from "../../../storage"
+import type { ISessionStore } from "../../../session/storage"
+import { getAccountMeta } from "../../../accountNameGenerator"
+import { starknetNetworkToNetworkId } from "../../../utils/starknetNetwork"
+import { getDefaultNetworkId } from "../../../network/utils"
 
 interface GetAccountArgs
   extends Pick<
@@ -65,11 +77,12 @@ export class WalletAccountSharedService {
   constructor(
     public readonly store: IObjectStore<WalletStorageProps>,
     public readonly walletStore: IRepository<WalletAccount>,
-    public readonly sessionStore: IObjectStore<WalletSession | null>,
+    public readonly sessionStorage: IKeyValueStorage<ISessionStore>,
     public readonly multisigStore: IRepository<BaseMultisigWalletAccount>,
     public readonly pendingMultisigStore: IRepository<PendingMultisig>,
     private readonly httpService: IHttpService,
     public readonly accountService: IAccountService,
+    public readonly smartAccountService: ISmartAccountService,
   ) {}
 
   public async getDefaultAccountName(
@@ -103,7 +116,6 @@ export class WalletAccountSharedService {
     address,
     network,
     needsDeploy,
-    name,
     classHash,
     signerType = SignerType.LOCAL_SECRET,
     signer: providedSigner,
@@ -115,9 +127,12 @@ export class WalletAccountSharedService {
       derivationPath: getPathForIndex(index, baseDerivationPath),
     }
 
+    const id = getAccountIdentifier(address, network.id, signer)
+    const { name } = getAccountMeta(id, "standard")
+
     return {
-      id: getAccountIdentifier(address, network.id, signer),
-      name: name || `Account ${index + 1}`,
+      id,
+      name,
       address,
       network,
       networkId: network.id,
@@ -133,7 +148,6 @@ export class WalletAccountSharedService {
     address,
     network,
     needsDeploy,
-    name,
     classHash,
     signerType = SignerType.LOCAL_SECRET,
     signer: providedSigner,
@@ -144,9 +158,12 @@ export class WalletAccountSharedService {
       derivationPath: getPathForIndex(index, baseDerivationPath),
     }
 
+    const id = getAccountIdentifier(address, network.id, signer, false)
+    const { name } = getAccountMeta(id, "smart")
+
     return {
-      id: getAccountIdentifier(address, network.id, signer, false),
-      name: name || `Account ${index + 1}`,
+      id,
+      name,
       address,
       network,
       networkId: network.id,
@@ -162,7 +179,6 @@ export class WalletAccountSharedService {
     address,
     network,
     needsDeploy,
-    name,
     signerType = SignerType.LOCAL_SECRET,
     signer: providedSigner,
   }: GetAccountArgs): ArgentWalletAccount {
@@ -173,9 +189,12 @@ export class WalletAccountSharedService {
       derivationPath: getPathForIndex(index, baseDerivationPath),
     }
 
+    const id = getAccountIdentifier(address, network.id, signer)
+    const { name } = getAccountMeta(id, "multisig")
+
     return {
-      id: getAccountIdentifier(address, network.id, signer),
-      name: name || `Multisig ${index + 1}`,
+      id,
+      name,
       address,
       networkId: network.id,
       network,
@@ -211,7 +230,7 @@ export class WalletAccountSharedService {
 
   public async getSelectedAccount(): Promise<WalletAccount | undefined> {
     // Replace with session service once instantiated
-    if ((await this.sessionStore.get()) === null) {
+    if (!(await this.sessionStorage.get("isUnlocked"))) {
       return
     }
     const accounts = await this.walletStore.get()
@@ -316,21 +335,25 @@ export class WalletAccountSharedService {
     }
   }
 
-  public async sendAccountNameToBackend({
+  public async sendAccountLabelToBackend({
     address,
     name,
+    networkId,
+    avatarMeta,
   }: {
     address: string
     name: string
+    networkId: string
+    avatarMeta?: AvatarMeta
   }) {
     try {
-      const jwt = await generateJwt()
       if (!ARGENT_ACCOUNT_URL) {
         throw new BaseError({ message: "ARGENT_ACCOUNTS_URL is not defined" })
       }
-      const url = urlJoin(
-        ARGENT_ACCOUNT_URL,
-        addressSchemaArgentBackend.parse(address),
+      const jwt = await generateJwt()
+      const url = urlWithQuery(
+        [ARGENT_ACCOUNT_URL, addressSchemaArgentBackend.parse(address)],
+        { network: argentApiNetworkForNetwork(networkId) },
       )
       const currentValue = await this.httpService.get<{ version: number }>(
         url,
@@ -346,6 +369,8 @@ export class WalletAccountSharedService {
         method: "PUT",
         body: JSON.stringify({
           name,
+          icon: avatarMeta?.emoji,
+          colour: avatarMeta?.bgColor,
           version: currentValue.version,
         }),
         headers: {
@@ -358,65 +383,53 @@ export class WalletAccountSharedService {
     }
   }
 
-  public async sendSmartAccountsNamesToBackend() {
-    const accounts = await this.walletStore.get()
-    await Promise.all(
-      accounts
-        .filter((acc) => acc.type === "smart")
-        // we only save the name if it's different from the default, to avoid overriding account names set before a recovery
-        .filter((acc) => {
-          const baseDerivationPath = getBaseDerivationPath(
-            "smart",
-            acc.signer.type,
-          )
-          const accountIndex = getIndexForPath(
-            acc.signer.derivationPath,
-            baseDerivationPath,
-          )
-          return !!acc.name && acc.name !== `Account ${accountIndex + 1}`
-        })
-        .map((account) =>
-          this.sendAccountNameToBackend({
-            address: account.address,
-            name: account.name,
-          }),
-        ),
-    )
-  }
-
-  public async getAccountNamesFromBackend(): Promise<WalletAccount[]> {
+  public async fetchBackendAccounts(): Promise<BackendAccount[]> {
     try {
-      const jwt = await generateJwt()
       if (!ARGENT_ACCOUNTS_URL) {
         throw new BaseError({ message: "ARGENT_ACCOUNTS_URL is not defined" })
       }
+      const jwt = await generateJwt()
       const url = urlJoin(ARGENT_ACCOUNTS_URL)
       return (
-        await this.httpService.get<{ accounts: WalletAccount[] }>(url, {
+        await this.httpService.get<{ accounts: BackendAccount[] }>(url, {
           headers: {
             Authorization: `Bearer ${jwt}`,
             "Content-Type": "application/json",
           },
         })
-      ).accounts.map((account) => {
-        // BE does not retrieve the networkId because smart accounts are not multi-network. E.g. in prod you cannot add smart accounts on Sepolia
-        return { ...account, networkId: SMART_ACCOUNT_NETWORK_ID }
-      })
+      ).accounts
     } catch {
       throw new BaseError({ message: "Failed to send account name to backend" })
     }
   }
 
   public async syncAccountNamesWithBackend() {
-    await this.sendSmartAccountsNamesToBackend()
-
-    const accounts = await this.getAccountNamesFromBackend()
+    const backendAccounts = await this.fetchBackendAccounts()
 
     // Not using Promise.all because using it we call setName concurrently for multiple accounts,
     // and each call to update attempts to read, modify, and write the accounts array in the accountRepo almost simultaneously.
     // This can lead to race conditions where some updates overwrite others because they all read the accounts array before any of them has a chance to write their updates back.
-    for (const account of accounts) {
-      await this.accountService.setName(account.name, account.id)
+    for (const account of backendAccounts) {
+      const wa = await this.getWalletAccountFromBackendSmartAccount(account)
+      if (!wa) continue
+
+      if (account.version && account.version < 2) {
+        // WalletAccount contains generated labels
+        // It's okay to do this sequentially
+        await this.sendAccountLabelToBackend({
+          address: account.address,
+          name: wa.name,
+          networkId: wa.networkId,
+          avatarMeta: wa.avatarMeta,
+        })
+      } else {
+        // Otherwise, respect user's changes and change the local state instead
+        await this.accountService.setName(account.name ?? wa.name, wa.id)
+        await this.accountService.setAvatarMeta(
+          { bgColor: account.colour, emoji: account.icon },
+          wa.id,
+        )
+      }
     }
   }
 
@@ -424,5 +437,105 @@ export class WalletAccountSharedService {
     const lastUsedAccountByNetwork = (await this.store.get())
       .lastUsedAccountByNetwork
     return lastUsedAccountByNetwork?.[networkId]
+  }
+
+  async getActiveSessions({
+    account,
+    page = 0,
+    size = 100,
+  }: {
+    account?: BaseWalletAccount
+    page?: number
+    size?: number
+  }): Promise<BackendSession[] | undefined> {
+    // Only supported on default network
+    if (!account || account.networkId !== defaultNetwork.id) {
+      return
+    }
+    // Can't get sessions if not signed in
+    if (!this.smartAccountService.isSignedIn) {
+      return
+    }
+    // Only smart accounts have sessions
+    const [walletAccount] = await this.accountService.getFromBaseWalletAccounts(
+      [account],
+    )
+    if (walletAccount.type !== "smart") {
+      return
+    }
+    if (!ARGENT_ACCOUNT_URL) {
+      throw new BaseError({ message: "ARGENT_ACCOUNT_URL is not defined" })
+    }
+    const jwt = await generateJwt()
+    const url = urlWithQuery(
+      [
+        ARGENT_ACCOUNT_URL,
+        addressSchemaArgentBackend.parse(account.address),
+        "sessions",
+      ],
+      {
+        page,
+        size,
+        network: argentApiNetworkForNetwork(account.networkId),
+      },
+    )
+    try {
+      const json = await this.httpService.get<
+        BackendResponsePageable<BackendSession>
+      >(url, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          "Content-Type": "application/json",
+        },
+      })
+      return json.content
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 403) {
+        // 403 when the token is expired, or it's not actually a smart account
+        return
+      }
+      throw error
+    }
+  }
+
+  async revokeSession(session: BackendSession) {
+    if (!ARGENT_ACCOUNT_URL) {
+      throw new BaseError({ message: "ARGENT_ACCOUNT_URL is not defined" })
+    }
+    const jwt = await generateJwt()
+    const url = urlJoin(
+      ARGENT_ACCOUNT_URL,
+      addressSchemaArgentBackend.parse(session.accountAddress),
+      "sessions",
+      session.sessionKey,
+    )
+    await this.httpService.delete(url, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        "Content-Type": "application/json",
+      },
+    })
+  }
+
+  async getWalletAccountFromBackendSmartAccount({
+    address,
+    network,
+  }: Pick<BackendAccount, "address" | "network">) {
+    const networkId = network
+      ? starknetNetworkToNetworkId(network)
+      : getDefaultNetworkId()
+
+    const accounts = await this.accountService.get(
+      (acc) => acc.type === "smart",
+    )
+
+    // This should be safe because Smart Account are unique by address and network
+    const account = accounts.find((acc) =>
+      accountsEqualByAddress(acc, { address, networkId }),
+    )
+    if (!account) {
+      return
+    }
+    return account
   }
 }

@@ -144,7 +144,17 @@ export class MultisigWorker {
         return
       }
 
-      const address = content[0].address
+      // the BE returns the multisigs from where the signer was removed too. So the content length can be > 1.
+      // This can happen especially if you join a multisig, are removed, restore then try to join another multisig. The pub key is likely to be the same as the one from your first multisig
+      const validMultisigData = content.find((c) =>
+        c.signers.some((s) => isEqualAddress(s, pendingMultisig.publicKey)),
+      )
+
+      if (!validMultisigData) {
+        return
+      }
+
+      const address = validMultisigData.address
       const networkId = pendingMultisig.networkId
 
       const accountId = getAccountIdentifier(
@@ -157,9 +167,9 @@ export class MultisigWorker {
         id: accountId,
         address,
         networkId,
-        signers: content[0].signers,
-        threshold: content[0].threshold,
-        creator: content[0].creator,
+        signers: validMultisigData.signers,
+        threshold: validMultisigData.threshold,
+        creator: validMultisigData.creator,
         publicKey: pendingMultisig.publicKey,
         updatedAt: Date.now(),
       }

@@ -1,10 +1,8 @@
 import type { Token } from "@argent/x-shared"
-import { icons } from "@argent/x-ui"
+import { DropdownDownIcon } from "@argent/x-ui/icons"
 
 import { Flex, Img } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { DropdownDownIcon } = icons
 
 interface TokenPickerProps {
   selected: Token

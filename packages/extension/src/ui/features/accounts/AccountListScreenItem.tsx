@@ -1,10 +1,8 @@
-import { icons } from "@argent/x-ui"
+import { ChevronRightSecondaryIcon } from "@argent/x-ui/icons"
 import type { FC, ReactEventHandler } from "react"
 
 import { AccountListItem } from "./AccountListItem"
 import type { AccountListItemProps } from "./accountListItem.model"
-
-const { ChevronRightSecondaryIcon } = icons
 
 interface AccountListScreenItemProps extends AccountListItemProps {
   clickNavigateSettings?: boolean

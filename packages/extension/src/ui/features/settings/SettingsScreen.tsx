@@ -1,11 +1,24 @@
 import { formatTruncatedString } from "@argent/x-shared"
 import type { NavigationContainerProps } from "@argent/x-ui"
+
+import {
+  LockPrimaryIcon,
+  ExpandIcon,
+  LinkPrimaryIcon,
+  MessageSecondaryIcon,
+  ChevronRightSecondaryIcon,
+  FilterSecondaryIcon,
+  ShieldSecondaryIcon,
+  AddressBookIcon,
+  CodeIcon,
+  ExtendedIcon,
+} from "@argent/x-ui/icons"
+
 import {
   BarCloseButton,
   Button,
   CellStack,
   HeaderCell,
-  icons,
   NavigationContainer,
   SpacerCell,
 } from "@argent/x-ui"
@@ -25,19 +38,6 @@ import {
   SettingsMenuItemLink,
 } from "./ui/SettingsMenuItem"
 import { SupportFooter } from "./ui/SupportFooter"
-
-const {
-  LockPrimaryIcon,
-  ExpandIcon,
-  LinkPrimaryIcon,
-  MessageSecondaryIcon,
-  ChevronRightSecondaryIcon,
-  FilterSecondaryIcon,
-  ShieldSecondaryIcon,
-  AddressBookIcon,
-  CodeIcon,
-  ExtendedIcon,
-} = icons
 
 interface SettingsScreenProps extends NavigationContainerProps {
   onBack: ReactEventHandler
@@ -69,7 +69,7 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
   return (
     <>
       <NavigationContainer
-        rightButton={<BarCloseButton onClick={onBack} />}
+        leftButton={<BarCloseButton onClick={onBack} />}
         title={"Settings"}
         scrollKey={"settings/SettingsScreen"}
       >
@@ -92,7 +92,9 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
               </Flex>
             </>
           )}
-          <HeaderCell>Global settings</HeaderCell>
+          <SpacerCell />
+
+          <HeaderCell>General account settings</HeaderCell>
           <SettingsMenuItemGroup>
             <SettingsMenuItemLink
               leftIcon={<FilterSecondaryIcon />}
@@ -113,8 +115,8 @@ export const SettingsScreen: FC<SettingsScreenProps> = ({
             )}
             <SettingsMenuItemLink
               leftIcon={<LinkPrimaryIcon />}
-              to={routes.settingsDappConnectionsAccountList()}
-              title="Authorised dapps"
+              to={routes.settingsAuthorizedDappsAccountList()}
+              title="Authorized dapps"
             />
           </SettingsMenuItemGroup>
           <SpacerCell />

@@ -22,12 +22,13 @@ import { MultisigBackendService } from "../shared/multisig/service/backend/Multi
 import { ARGENT_MULTISIG_URL } from "../shared/api/constants"
 import type { Events as RecoverySharedEvents } from "./wallet/recovery/IWalletRecoveryService"
 import { accountSharedService } from "../shared/account/service"
-import { sessionRepo } from "../shared/account/store/session"
 import { ampli } from "../shared/analytics"
 import { referralService } from "./services/referral"
 import { ledgerSharedService } from "../shared/ledger/service"
 import { accountImportSharedService } from "../shared/accountImport/service"
 import { pkManager } from "../shared/accountImport/pkManager"
+import { sessionStore } from "../shared/session/storage"
+import { secretStorageService } from "./wallet/session"
 
 const isDev = process.env.NODE_ENV === "development"
 const isTest = process.env.NODE_ENV === "test"
@@ -50,7 +51,7 @@ const backupService = new WalletBackupService(
 
 export const cryptoStarknetService = new WalletCryptoStarknetService(
   accountRepo,
-  sessionRepo,
+  secretStorageService,
   pendingMultisigRepo,
   accountSharedService,
   ledgerSharedService,
@@ -70,7 +71,7 @@ export const recoverySharedService = new WalletRecoverySharedService(
   walletRecoverySharedServiceEmitter,
   walletStore,
   accountRepo,
-  sessionRepo,
+  secretStorageService,
   networkService,
   recoveryStarknetService,
 )
@@ -78,7 +79,8 @@ export const recoverySharedService = new WalletRecoverySharedService(
 export const sessionService = new WalletSessionService(
   walletSessionServiceEmitter,
   walletStore,
-  sessionRepo,
+  sessionStore,
+  secretStorageService,
   backupService,
   recoverySharedService,
   SCRYPT_N,
@@ -93,13 +95,14 @@ export const accountStarknetService = new WalletAccountStarknetService(
   multisigBackendService,
   ledgerSharedService,
   accountImportSharedService,
+  secretStorageService,
 )
 
 const deployStarknetService = new WalletDeploymentStarknetService(
   accountRepo,
   multisigBaseWalletRepo,
   sessionService,
-  sessionRepo,
+  secretStorageService,
   accountSharedService,
   accountStarknetService,
   cryptoStarknetService,
@@ -110,7 +113,7 @@ const deployStarknetService = new WalletDeploymentStarknetService(
 )
 
 const cryptoSharedService = new WalletCryptoSharedService(
-  sessionRepo,
+  secretStorageService,
   sessionService,
   backupService,
   recoverySharedService,

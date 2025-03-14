@@ -6,14 +6,14 @@ on:
   pull_request:
 
 env:
-  PNPM_VERSION: 9
+  PNPM_VERSION: 10.2
   NODE_VERSION: 18.x
 
 jobs:
   build-alpha:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     strategy:
       matrix:
         env: [hydrogen]
@@ -54,14 +54,14 @@ jobs:
       NEW_CAIRO_0_ENABLED: false
       TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
       # Refresh intervals
-      FAST: 20 # 20s
-      MEDIUM: 60 # 60s
-      SLOW: 60 * 5 # 5m
-      VERY_SLOW: 24 * 60 * 60 # 1d
+      REFRESH_INTERVAL_FAST: 2 # 2s
+      REFRESH_INTERVAL_MEDIUM: 2 # 2s
+      REFRESH_INTERVAL_SLOW: 60 # 1m
+      REFRESH_INTERVAL_VERY_SLOW: 5 * 60 # 5m
       MIN_LEDGER_APP_VERSION: 2.2.1
 
       #For testing only
-      FEE_OVERHEAD: 2
+      FEE_OVERHEAD: 10
 
     steps:
       # Setup Project
@@ -85,7 +85,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v4.2.0
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -115,7 +115,7 @@ jobs:
         run: pnpm check-bundle-size
 
       - name: Use Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ./*
           key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
@@ -137,9 +137,9 @@ jobs:
           retention-days: 3
 
   build-beta:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     strategy:
       matrix:
         env: [prod]
@@ -180,14 +180,14 @@ jobs:
       NEW_CAIRO_0_ENABLED: false
       TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
       # Refresh intervals
-      FAST: 20 # 20s
-      MEDIUM: 60 # 60s
-      SLOW: 60 * 5 # 5m
-      VERY_SLOW: 24 * 60 * 60 # 1d
+      REFRESH_INTERVAL_FAST: 2 # 2s
+      REFRESH_INTERVAL_MEDIUM: 2 # 2s
+      REFRESH_INTERVAL_SLOW: 60 # 1m
+      REFRESH_INTERVAL_VERY_SLOW: 5 * 60 # 5m
       MIN_LEDGER_APP_VERSION: 2.2.1
 
       #For testing only
-      FEE_OVERHEAD: 2
+      FEE_OVERHEAD: 10
 
     steps:
       # Setup Project
@@ -211,7 +211,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v4.2.0
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -241,7 +241,7 @@ jobs:
         run: pnpm check-bundle-size
 
       - name: Use Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ./*
           key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
@@ -263,9 +263,9 @@ jobs:
           retention-days: 3
 
   build-all-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     strategy:
       matrix:
         env: [prod, staging, hydrogen, dev]
@@ -306,14 +306,14 @@ jobs:
       NEW_CAIRO_0_ENABLED: false
       TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
       # Refresh intervals
-      FAST: 20 # 20s
-      MEDIUM: 60 # 60s
-      SLOW: 60 * 5 # 5m
-      VERY_SLOW: 24 * 60 * 60 # 1d
+      REFRESH_INTERVAL_FAST: 2 # 2s
+      REFRESH_INTERVAL_MEDIUM: 2 # 2s
+      REFRESH_INTERVAL_SLOW: 60 # 1m
+      REFRESH_INTERVAL_VERY_SLOW: 5 * 60 # 5m
       MIN_LEDGER_APP_VERSION: 2.2.1
 
       #For testing only
-      FEE_OVERHEAD: 2
+      FEE_OVERHEAD: 10
 
     steps:
       # Setup Project
@@ -337,7 +337,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v4.2.0
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -367,7 +367,7 @@ jobs:
         run: pnpm check-bundle-size
 
       - name: Use Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ./*
           key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
@@ -389,11 +389,15 @@ jobs:
           retention-days: 3
 
   test-unit:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     needs: [build-all-artifacts]
     environment: "hydrogen" # test-unit is always run against hydrogen
+    strategy:
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
 
     env:
       ARGENT_API_BASE_URL: ${{ vars.ARGENT_API_BASE_URL }}
@@ -427,7 +431,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -435,19 +439,64 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-hydrogen # test-unit is always run against chrome-hydrogen build
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm run lint
 
       - name: Run tests
-        run: pnpm run test:ci
+        run: pnpm run test:ci --reporter=default --reporter=blob --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shardIndex }}
+          path: packages/extension/.vitest-reports/*
+          include-hidden-files: true
+          retention-days: 1
+          if-no-files-found: error
+
+  merge-reports-unit:
+    if: ${{ !cancelled() }}
+    needs: [test-unit]
+
+    runs-on: warp-ubuntu-latest-x64-4x
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        id: pnpm-install
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: packages/extension/.vitest-reports/
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge reports
+        run: npx vitest --merge-reports packages/extension/.vitest-reports/
+
       - name: SonarCloud Scan
-        # TODO replace with master as soon as sonarcloud fixes the issue with action https://community.sonarsource.com/t/sonarsource-sonarcloud-github-action-failing-with-node-js-12-error/89664/2
-        uses: SonarSource/sonarcloud-github-action@v3.1.0
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         with:
           projectBaseDir: ./packages/extension
         env:
@@ -455,9 +504,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
 
   test-e2e:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     needs: [build-all-artifacts]
     strategy:
       matrix:
@@ -491,15 +540,11 @@ jobs:
       E2E_MIG_ACCOUNT_ADDRESS: ${{ secrets.E2E_MIG_ACCOUNT_ADDRESS }}
       E2E_ACCOUNT_TO_IMPORT_AND_TX: ${{ secrets.E2E_ACCOUNT_TO_IMPORT_AND_TX }}
       E2E_ACCOUNTS_TO_IMPORT: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT }}
+      E2E_ACCOUNTS_TO_IMPORT_PROD: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT_PROD }}
       E2E_QA_UTILS_AUTH_TOKEN: ${{ secrets.E2E_QA_UTILS_AUTH_TOKEN }}
       E2E_QA_UTILS_URL: ${{ secrets.E2E_QA_UTILS_URL }}
       E2E_MIG_VERSIONS: ${{ secrets.E2E_MIG_VERSIONS }}
       E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
-      # Refresh intervals
-      REFRESH_INTERVAL_FAST: 20 # 1s
-      REFRESH_INTERVAL_MEDIUM: 20 # 5s
-      REFRESH_INTERVAL_SLOW: 20 # 20s
-      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
     steps:
       - uses: actions/checkout@v4
@@ -513,11 +558,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 18.x
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -525,10 +570,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }} # test-e2e is always run against chrome-hydrogen build
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run e2e tests
         run: xvfb-run --auto-servernum pnpm test:e2e --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
@@ -552,9 +600,9 @@ jobs:
           retention-days: 5
 
   test-e2e-prod:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     needs: [build-all-artifacts]
     strategy:
       matrix:
@@ -569,16 +617,12 @@ jobs:
       E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS }}
       ARGENT_MAINNET_RPC_URL: ${{ secrets.ARGENT_MAINNET_RPC_URL }}
       ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
+      E2E_ACCOUNTS_TO_IMPORT_PROD: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT_PROD }}
 
       E2E_MAINNET_SEED1: ${{ secrets.E2E_MAINNET_SEED1 }}
       ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
       E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
       E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
-      # Refresh intervals
-      REFRESH_INTERVAL_FAST: 20 # 20s
-      REFRESH_INTERVAL_MEDIUM: 20 # 20s
-      REFRESH_INTERVAL_SLOW: 20 # 20s
-      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
 
       E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
     steps:
@@ -597,7 +641,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -605,10 +649,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Restore cached build
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run e2e prod tests
         run: xvfb-run --auto-servernum pnpm test:e2e:mainnet --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
@@ -632,15 +679,16 @@ jobs:
           retention-days: 5
 
   test-e2e-tx:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
+    # if: github.event_name == 'push'
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     needs: [build-all-artifacts]
     strategy:
       matrix:
         project: [ArgentX]
-        shardIndex: [1, 2, 3, 4]
-        shardTotal: [4]
+        shardIndex: [1, 2, 3, 4, 5, 6, 7, 8]
+        shardTotal: [8]
     env:
       #default
       ARGENT_X_ENVIRONMENT: "hydrogen"
@@ -668,16 +716,13 @@ jobs:
       E2E_MIG_ACCOUNT_ADDRESS: ${{ secrets.E2E_MIG_ACCOUNT_ADDRESS }}
       E2E_ACCOUNT_TO_IMPORT_AND_TX: ${{ secrets.E2E_ACCOUNT_TO_IMPORT_AND_TX }}
       E2E_ACCOUNTS_TO_IMPORT: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT }}
+      E2E_ACCOUNTS_TO_IMPORT_PROD: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT_PROD }}
       E2E_QA_UTILS_AUTH_TOKEN: ${{ secrets.E2E_QA_UTILS_AUTH_TOKEN }}
       E2E_QA_UTILS_URL: ${{ secrets.E2E_QA_UTILS_URL }}
       INITIAL_BALANCE_MULTIPLIER: ${{ secrets.INITIAL_BALANCE_MULTIPLIER }}
       E2E_MIG_VERSIONS: ${{ secrets.E2E_MIG_VERSIONS }}
       E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
-      # Refresh intervals
-      REFRESH_INTERVAL_FAST: 20 # 1s
-      REFRESH_INTERVAL_MEDIUM: 20 # 5s
-      REFRESH_INTERVAL_SLOW: 20 # 20s
-      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
+
     steps:
       - uses: actions/checkout@v4
 
@@ -694,17 +739,20 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - name: Restore cached build
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ./*
           key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run e2e tx tests
         run: xvfb-run --auto-servernum pnpm test:e2e:tx --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
@@ -727,7 +775,7 @@ jobs:
           path: packages/e2e/blob-report/
           retention-days: 5
   test-notify-low-balance:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     if: always()
     needs: [build-all-artifacts, test-e2e, test-e2e-prod]
     env:
@@ -744,13 +792,13 @@ jobs:
       - name: Slack notifications
         run: node packages/e2e/src/utils/slackNotif.js
 
-  merge-reports:
+  merge-reports-e2e:
     needs: [test-e2e, test-e2e-prod, test-e2e-tx]
     if: always()
 
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     container:
-      image: mcr.microsoft.com/playwright:v1.48.2-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
     steps:
       - uses: actions/checkout@v4
 
@@ -767,7 +815,7 @@ jobs:
           cache: "pnpm"
 
       - name: Restore pnpm cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4.2.0
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -792,7 +840,7 @@ jobs:
           retention-days: 14
 
   add_pr_comments:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
     needs: [build-all-artifacts, test-unit, test-e2e, test-e2e-prod]
 
@@ -804,7 +852,7 @@ jobs:
           gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body "[Builds for local testing](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
 
   slack_notif:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     if: always()
     needs: [test-unit, test-e2e]
 
@@ -831,13 +879,13 @@ jobs:
           BUILD_STATUS: ${{ needs.test-unit.result == 'success' && needs.test-e2e.result == 'success' && 'good' || 'danger' }}
 
   check-ampli:
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-4x
     needs: [build-all-artifacts]
     container:
       image: amplitudeinc/ampli
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Verify analytics implementation and update status in Data
         run: pwd && ampli status -t ${{secrets.AMPLI_TOKEN}} --update

@@ -1,3 +1,4 @@
+import { TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import type { Network } from "../src/shared/network"
 import { ETH_TOKEN_ADDRESS } from "../src/shared/network/constants"
 import type {
@@ -38,6 +39,7 @@ const defaultWalletAccount: WalletAccount = {
   needsDeploy: false,
   hidden: false,
   salt: "0x0",
+  classHash: TXV3_ACCOUNT_CLASS_HASH,
 }
 
 export const getMockWalletAccount = (overrides?: Partial<WalletAccount>) => ({

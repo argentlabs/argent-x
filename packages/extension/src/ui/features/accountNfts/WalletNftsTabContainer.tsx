@@ -2,12 +2,11 @@ import type { FC } from "react"
 import { Suspense } from "react"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { AccountCollectionsContainer } from "./AccountCollectionsContainer"
-import { CellStack, icons } from "@argent/x-ui"
+import { ChevronRightSecondaryIcon, NftIcon } from "@argent/x-ui/icons"
+import { CellStack } from "@argent/x-ui"
 import { Option } from "../../components/Option"
 import { TrackingLink } from "../../components/TrackingLink"
 import { ActivityRowSkeleton } from "@argent/x-ui/simulation"
-
-const { ChevronRightSecondaryIcon, NftIcon } = icons
 
 export interface WalletNftsTabContainerProps {
   account: WalletAccount

@@ -1,4 +1,5 @@
-import { ButtonCell, icons } from "@argent/x-ui"
+import { ExpandIcon } from "@argent/x-ui/icons"
+import { ButtonCell } from "@argent/x-ui"
 import type { FC } from "react"
 import {
   openBlockExplorerAddress,
@@ -6,8 +7,6 @@ import {
 } from "../../../../../services/blockExplorer.service"
 import { useCurrentNetwork } from "../../../../networks/hooks/useCurrentNetwork"
 import type { WalletAccount } from "../../../../../../shared/wallet.model"
-
-const { ExpandIcon } = icons
 
 export const ViewOnExplorerButtonContainer: FC<{ account: WalletAccount }> = ({
   account,

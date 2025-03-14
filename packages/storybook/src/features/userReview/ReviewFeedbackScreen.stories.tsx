@@ -1,5 +1,5 @@
 import { ReviewFeedbackScreen } from "@argent-x/extension/src/ui/features/userReview/ReviewFeedbackScreen"
-import { StoryObj } from "@storybook/react"
+import type { StoryObj } from "@storybook/react"
 
 import { decorators } from "../../decorators/routerDecorators"
 

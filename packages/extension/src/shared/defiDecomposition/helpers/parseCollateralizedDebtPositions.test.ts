@@ -1,4 +1,4 @@
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { collateralizedDebtPositions } from "../__fixtures__/collateralizedDebtPositions"
 import { concentratedLiquidityPositions } from "../__fixtures__/concentratedLiquidityPositions"
 import {
@@ -8,7 +8,7 @@ import {
 import { parseCollateralizedDebtPositions } from "./parseCollateralizedDebtPositions"
 
 describe("parseCollateralizedDebtPositions", () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

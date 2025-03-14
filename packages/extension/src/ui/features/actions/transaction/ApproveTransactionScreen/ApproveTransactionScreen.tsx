@@ -6,7 +6,6 @@ import {
   isNotTransactionSimulationError,
   warningSchema,
 } from "@argent/x-shared/simulation"
-import type { IconKeys } from "@argent/x-ui"
 import { P3 } from "@argent/x-ui"
 import {
   TransactionReviewActions,
@@ -29,6 +28,8 @@ import type { ApproveTransactionScreenProps } from "./approveTransactionScreen.m
 import { getTransactionIcon } from "../getTransactionIcon"
 import { getTransactionTitle } from "../getTransactionTitle"
 import { LedgerActionModal } from "./ledger/LedgerActionModal"
+import { getDeclareTransactionReview } from "../getDeclareTransactionReview"
+import { AccountDetailsNavigationBarContainer } from "../../../navigation/AccountDetailsNavigationBarContainer"
 
 export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   actionHash,
@@ -55,6 +56,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
   isUpgradeAccount,
   nonce,
   txNeedsRetry,
+  fee,
   ...rest
 }) => {
   const { action } = useActionScreen()
@@ -77,6 +79,24 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         </P3>
       )
     }
+
+    if (
+      isEmpty(transactionReview?.transactions) &&
+      transactionAction.type === "DECLARE"
+    ) {
+      const declareTransactionReview = getDeclareTransactionReview(
+        transactionAction.payload,
+      )
+      return (
+        <TransactionReviewActions
+          key={`declare-review`}
+          reviewOfTransaction={declareTransactionReview}
+          initiallyExpanded={true}
+          networkId={networkId}
+        />
+      )
+    }
+
     return transactionReview?.transactions?.map((transaction, index) => {
       return (
         <TransactionReviewActions
@@ -87,7 +107,13 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         />
       )
     })
-  }, [isRejectOnChain, transactionReview?.transactions, networkId])
+  }, [
+    isRejectOnChain,
+    transactionReview?.transactions,
+    transactionAction.type,
+    transactionAction.payload,
+    networkId,
+  ])
 
   const warnings = useMemo(
     () =>
@@ -203,18 +229,18 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     )
   }, [transactionReview, networkId])
 
-  const { title, subtitle, dappLogoUrl, dappHost, iconKey } = useMemo(() => {
+  const data = useMemo(() => {
     if (isRejectOnChain) {
       return {
         title: "On-chain rejection",
-        iconKey: "CrossSecondaryIcon" as IconKeys,
-      }
+        iconKey: "CrossSecondaryIcon",
+      } as const
     }
     if (isUpgradeAccount) {
       return {
         title: "Upgrade account",
-        iconKey: "UpgradeSecondaryIcon" as IconKeys,
-      }
+        iconKey: "UpgradeSecondaryIcon",
+      } as const
     }
     if (action) {
       return {
@@ -248,11 +274,15 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
     transactionReview,
   ])
 
+  const { title, subtitle, dappLogoUrl, dappHost, iconKey } = data
+
   const txHash = useView(transactionHashFindAtom(actionHash))
 
   return (
     <Suspense fallback={null}>
       <ConfirmScreen
+        navigationBar={<AccountDetailsNavigationBarContainer />}
+        showHeader={false}
         confirmButtonText={confirmButtonLabel}
         confirmButtonIsLoading={actionIsApproving}
         confirmButtonLoadingText={confirmButtonText}
@@ -264,7 +294,6 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         onSubmit={() => {
           onSubmit(transactionAction)
         }}
-        showHeader={true}
         onReject={onReject}
         {...rest}
       >
@@ -275,6 +304,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
           subtitle={subtitle}
           dappHost={dappHost}
           iconKey={iconKey}
+          transactionType={transactionAction.type}
         />
         {rejectOnChainBanner}
         {multisigBannerProps && (
@@ -285,7 +315,7 @@ export const ApproveTransactionScreen: FC<ApproveTransactionScreenProps> = ({
         {transactionReviewActions}
         <AirGapReviewButtonContainer
           transactions={transactions}
-          estimatedFees={transactionReview?.enrichedFeeEstimation}
+          estimatedFees={fee}
           selectedAccount={selectedAccount}
           nonce={nonce}
         />

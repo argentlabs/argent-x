@@ -1,9 +1,8 @@
-import { B3, icons } from "@argent/x-ui"
+import { HideSecondaryIcon } from "@argent/x-ui/icons"
+import { B3 } from "@argent/x-ui"
 import { Box, Center, Flex } from "@chakra-ui/react"
 import type { FC, PropsWithChildren } from "react"
 import { useState } from "react"
-
-const { HideSecondaryIcon } = icons
 
 export const SeedPhraseGrid: FC<PropsWithChildren> = ({
   children,

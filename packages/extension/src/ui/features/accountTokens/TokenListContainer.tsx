@@ -1,4 +1,5 @@
-import { CellStack, Empty, icons } from "@argent/x-ui"
+import { MultisigSecondaryIcon } from "@argent/x-ui/icons"
+import { CellStack, Empty } from "@argent/x-ui"
 import { noop } from "lodash-es"
 import type { FC } from "react"
 import type { WalletAccount } from "../../../shared/wallet.model"
@@ -10,8 +11,6 @@ import {
 import { TokenList } from "./TokenList"
 import { useCurrencyDisplayEnabled } from "./tokenPriceHooks"
 import { AddFundsDialogProvider } from "./useAddFundsDialog"
-
-const { MultisigSecondaryIcon } = icons
 
 export interface TokenListContainerProps {
   account: WalletAccount

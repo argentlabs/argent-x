@@ -4,7 +4,7 @@ import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
 import { baseWalletAccountSchema } from "../../../../shared/wallet.model"
 import { addressSchema } from "@argent/x-shared"
-import { estimatedFeeSchema } from "@argent/x-shared/simulation"
+import { estimatedFeeV2Schema } from "@argent/x-shared/simulation"
 import { AccountError } from "../../../../shared/errors/account"
 import { getErrorObject } from "../../../../shared/utils/error"
 import { walletAccountToArgentAccount } from "../../../../shared/utils/isExternalAccount"
@@ -17,7 +17,7 @@ const estimateRequestSchema = z.object({
 export const estimateAccountDeployProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
   .input(estimateRequestSchema)
-  .output(estimatedFeeSchema)
+  .output(estimatedFeeV2Schema)
   .query(
     async ({
       input: { account: providedAccount, feeTokenAddress },

@@ -1,7 +1,6 @@
-import { H4, icons } from "@argent/x-ui"
+import { SwapPrimaryIcon } from "@argent/x-ui/icons"
+import { H4 } from "@argent/x-ui"
 import { Flex, Text } from "@chakra-ui/react"
-
-const { SwapPrimaryIcon } = icons
 
 export function NoSwap() {
   return (

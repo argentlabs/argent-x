@@ -4,17 +4,9 @@ import type { FC } from "react"
 import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { FullscreenQrCode } from "../../../../components/QrCode"
-import {
-  B3,
-  CopyTooltip,
-  icons,
-  L1Bold,
-  P3,
-  ScrollContainer,
-} from "@argent/x-ui"
+import { CheckmarkSecondaryIcon } from "@argent/x-ui/icons"
+import { B3, CopyTooltip, L1Bold, P3, ScrollContainer } from "@argent/x-ui"
 import { ScreenLayout } from "../../../ledger/layout/ScreenLayout"
-
-const { CheckmarkSecondaryIcon } = icons
 
 export const AirGapReviewScreen: FC = () => {
   const { data } = useParams<{ data: string }>()

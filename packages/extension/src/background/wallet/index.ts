@@ -179,6 +179,11 @@ export class Wallet {
       networkId,
     )
   }
+
+  public async getAccountSigners() {
+    return this.walletCryptoStarknetService.getAccountSigners()
+  }
+
   public async getPublicKeysBufferForMultisig(start: number, buffer: number) {
     return this.walletCryptoStarknetService.getPublicKeysBufferForMultisig(
       start,

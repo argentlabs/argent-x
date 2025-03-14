@@ -9,6 +9,7 @@ const parsedFeeEstimationError1 = getParsedFeeError(
 
 export const feeEstimationFixture1: FeeEstimationProps = {
   fee: {
+    type: "native",
     transactions: {
       amount: 6568907063569n,
       pricePerUnit: 32n,
@@ -20,12 +21,13 @@ export const feeEstimationFixture1: FeeEstimationProps = {
   feeToken: feeTokenWithBalance,
   showError: false,
   showEstimateError: false,
-  showFeeError: false,
+  showInsufficientFeeError: false,
   userClickedAddFunds: false,
 }
 
 export const feeEstimationFixture2: FeeEstimationProps = {
   fee: {
+    type: "native",
     transactions: {
       amount: 1051n,
       pricePerUnit: 20n,
@@ -37,12 +39,13 @@ export const feeEstimationFixture2: FeeEstimationProps = {
   feeToken: feeTokenWithBalance,
   showError: false,
   showEstimateError: false,
-  showFeeError: false,
+  showInsufficientFeeError: false,
   userClickedAddFunds: false,
 }
 
 export const feeEstimationFixture3: FeeEstimationProps = {
   fee: {
+    type: "native",
     transactions: {
       amount: 1051n,
       pricePerUnit: 20n,
@@ -51,15 +54,17 @@ export const feeEstimationFixture3: FeeEstimationProps = {
       feeTokenAddress: ETH_TOKEN_ADDRESS,
     },
   },
+
   feeToken: feeTokenWithBalance,
   showError: true,
   showEstimateError: false,
-  showFeeError: true,
+  showInsufficientFeeError: true,
   userClickedAddFunds: false,
 }
 
 export const feeEstimationFixture4: FeeEstimationProps = {
   fee: {
+    type: "native",
     transactions: {
       amount: 1051n,
       pricePerUnit: 20n,
@@ -70,7 +75,7 @@ export const feeEstimationFixture4: FeeEstimationProps = {
   parsedFeeEstimationError: parsedFeeEstimationError1,
   showError: true,
   showEstimateError: true,
-  showFeeError: false,
+  showInsufficientFeeError: false,
   userClickedAddFunds: false,
 }
 
@@ -80,7 +85,7 @@ export const feeEstimationFixture5: FeeEstimationProps = {
   parsedFeeEstimationError: parsedFeeEstimationError1,
   showError: true,
   showEstimateError: true,
-  showFeeError: false,
+  showInsufficientFeeError: false,
   userClickedAddFunds: false,
 }
 
@@ -90,6 +95,6 @@ export const feeEstimationFixture6: FeeEstimationProps = {
   parsedFeeEstimationError: parsedFeeEstimationError1,
   showError: true,
   showEstimateError: true,
-  showFeeError: true,
+  showInsufficientFeeError: true,
   userClickedAddFunds: true,
 }

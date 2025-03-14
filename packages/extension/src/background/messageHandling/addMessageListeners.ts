@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill"
 import { StarknetMethodArgumentsSchemas } from "@argent/x-window"
-import type { MessageType } from "../../shared/messages"
+import type { MessageType } from "../../shared/messages/types"
 import { handleMessage } from "./handle"
 import {
   isSessionKeyTypedData,

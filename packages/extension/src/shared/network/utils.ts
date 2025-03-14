@@ -124,3 +124,16 @@ export function getPublicRPCNodeUrls(network: Network) {
 
   return nodeUrls
 }
+
+export function isProdOrStagingEnv() {
+  const argentXEnv = process.env.ARGENT_X_ENVIRONMENT
+
+  if (!argentXEnv) {
+    throw new Error("ARGENT_X_ENVIRONMENT not set")
+  }
+
+  return (
+    argentXEnv.toLowerCase() === "prod" ||
+    argentXEnv.toLowerCase() === "staging"
+  )
+}

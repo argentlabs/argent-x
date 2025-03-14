@@ -42,7 +42,9 @@ export const AddNewAccountScreenContainer: FC = () => {
   const handleSmartAccountCreate = useCallback(async () => {
     if (verifiedEmail) {
       try {
-        const isExpired = await clientArgentAccountService.isTokenExpired()
+        const isExpired = await clientArgentAccountService.isTokenExpired({
+          initiator: "AddNewAccountScreenContainer/handleSmartAccountCreate",
+        })
 
         if (isExpired) {
           await resetDevice()

@@ -1,20 +1,15 @@
-import {
-  BarBackButton,
-  CellStack,
-  NavigationContainer,
-  icons,
-} from "@argent/x-ui"
+import { ExpandIcon } from "@argent/x-ui/icons"
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
 import type { FC, ReactEventHandler } from "react"
 
 import { routes } from "../../../../shared/ui/routes"
 import { SettingsMenuItem, SettingsMenuItemLink } from "../ui/SettingsMenuItem"
 
-const { ExpandIcon } = icons
-
 interface AdvancedSettingsScreenProps {
   showBetaFeatures: boolean
   showExperimentalSettings: boolean
   extensionIsInTab: boolean
+  extensionIsInSidePanel: boolean
   openExtensionInTab: ReactEventHandler
 }
 
@@ -22,6 +17,7 @@ export const AdvancedSettingsScreen: FC<AdvancedSettingsScreenProps> = ({
   showBetaFeatures,
   showExperimentalSettings,
   extensionIsInTab,
+  extensionIsInSidePanel,
   openExtensionInTab,
 }) => {
   return (
@@ -30,7 +26,7 @@ export const AdvancedSettingsScreen: FC<AdvancedSettingsScreenProps> = ({
       title={"Advanced settings"}
     >
       <CellStack>
-        {!extensionIsInTab && (
+        {!extensionIsInTab && !extensionIsInSidePanel && (
           <SettingsMenuItem
             rightIcon={<ExpandIcon />}
             onClick={openExtensionInTab}
@@ -67,7 +63,7 @@ export const AdvancedSettingsScreen: FC<AdvancedSettingsScreenProps> = ({
         />
         <SettingsMenuItemLink
           rightIcon={<ExpandIcon />}
-          to={"https://www.stark-utils.xyz/declare"}
+          to={"https://demo-dapp-starknet.vercel.app/?section=declare"}
           title="Declare & deploy"
           target="_blank"
         />

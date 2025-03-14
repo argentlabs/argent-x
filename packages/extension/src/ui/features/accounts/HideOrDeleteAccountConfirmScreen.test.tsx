@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 
 import { renderWithLegacyProviders } from "../../test/utils"
 import { HideOrDeleteAccountConfirmScreen } from "./HideOrDeleteAccountConfirmScreen"
+import { getRandomAccountIdentifier } from "../../../shared/utils/accountIdentifier"
 
 describe("HideOrDeleteAccountConfirmScreen", () => {
   it("Calls expected methods when buttons are clicked", async () => {
@@ -12,6 +13,7 @@ describe("HideOrDeleteAccountConfirmScreen", () => {
     renderWithLegacyProviders(
       <HideOrDeleteAccountConfirmScreen
         mode={"hide"}
+        accountId={getRandomAccountIdentifier()}
         accountName={"Foo bar account"}
         accountAddress={"0x123"}
         accountType="standard"

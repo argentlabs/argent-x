@@ -2,7 +2,11 @@ import { bipsToPercent } from "."
 import type { Trade } from "../../../../shared/swap/model/trade.model"
 import { TradeType } from "../../../../shared/swap/model/trade.model"
 import type { BigDecimal } from "@argent/x-shared"
-import { bigDecimal, prettifyTokenAmount } from "@argent/x-shared"
+import {
+  abbreviateNumber,
+  bigDecimal,
+  prettifyTokenAmount,
+} from "@argent/x-shared"
 import { Field } from "../state/fields"
 
 /**
@@ -63,7 +67,7 @@ export function formatExecutionPrice({
   trade,
   includeFee = true,
   inverted = false,
-  separator = "~",
+  separator = "≈",
 }: FormatExecutionPriceOptions) {
   if (!trade) {
     return ""
@@ -89,15 +93,15 @@ export function formatExecutionPrice({
     trade.receiveToken.decimals,
   )
 
+  const formattedPrice = inverted
+    ? formattedExecutionPrice(payTokenAmount, receiveTokenAmount)
+    : formattedExecutionPrice(receiveTokenAmount, payTokenAmount)
+
+  const abbreviatedValue = abbreviateNumber(formattedPrice ?? undefined)
+
   return inverted
-    ? `1 ${trade.receiveToken.symbol} ${separator} ${formattedExecutionPrice(
-        payTokenAmount,
-        receiveTokenAmount,
-      )} ${trade.payToken.symbol}`
-    : `1 ${trade.payToken.symbol} ${separator} ${formattedExecutionPrice(
-        receiveTokenAmount,
-        payTokenAmount,
-      )} ${trade.receiveToken.symbol}`
+    ? `1 ${trade.receiveToken.symbol} ${separator} ${abbreviatedValue} ${trade.payToken.symbol}`
+    : `1 ${trade.payToken.symbol} ${separator} ${abbreviatedValue} ${trade.receiveToken.symbol}`
 }
 
 /**

@@ -1,9 +1,7 @@
-import { icons } from "@argent/x-ui"
+import { EditPrimaryIcon } from "@argent/x-ui/icons"
 import type { ButtonProps } from "@chakra-ui/react"
 import { Button } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { EditPrimaryIcon } = icons
 
 export const AccountListItemEditAccessory: FC<ButtonProps> = ({
   onClick,

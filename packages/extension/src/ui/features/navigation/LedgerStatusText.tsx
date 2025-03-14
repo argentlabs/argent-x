@@ -1,4 +1,5 @@
-import { IconButton, icons } from "@argent/x-ui"
+import { RefreshPrimaryIcon } from "@argent/x-ui/icons"
+import { IconButton } from "@argent/x-ui"
 import type { TextProps } from "@chakra-ui/react"
 import { Text } from "@chakra-ui/react"
 import type { FC } from "react"
@@ -7,8 +8,6 @@ import {
   type WalletAccountType,
 } from "../../../shared/wallet.model"
 import { useOnLedgerStart } from "../ledger/hooks/useOnLedgerStart"
-
-const { RefreshPrimaryIcon } = icons
 
 export interface LedgerStatusTextProps extends TextProps {
   isConnected?: boolean

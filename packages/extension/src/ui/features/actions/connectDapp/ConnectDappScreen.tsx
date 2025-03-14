@@ -1,4 +1,5 @@
-import { H5, icons, L2Bold, P3 } from "@argent/x-ui"
+import { CheckmarkSecondaryIcon, LinkPrimaryIcon } from "@argent/x-ui/icons"
+import { H5, L2Bold, P3 } from "@argent/x-ui"
 import { Box, Flex, List, ListIcon, ListItem, Text } from "@chakra-ui/react"
 import type { FC, PropsWithChildren, ReactNode } from "react"
 
@@ -11,8 +12,6 @@ import { ConnectDappAccountSelect } from "./ConnectDappAccountSelect"
 import type { DappDisplayAttributes } from "../../../services/knownDapps/types"
 import { DappActionHeader } from "./DappActionHeader"
 import { getDefaultSortedAccounts } from "../../accounts/getDefaultSortedAccount"
-
-const { CheckmarkSecondaryIcon, LinkPrimaryIcon } = icons
 
 export interface ConnectDappScreenProps extends PropsWithChildren {
   isConnected: boolean

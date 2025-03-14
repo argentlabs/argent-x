@@ -7,19 +7,19 @@ import config from "./../config"
 import { lang } from "../languages"
 
 const generateEmail = () => `e2e_2fa_${uuid()}@mail.com`
-const ethInitialBalance = 0.002 * Number(config.initialBalanceMultiplier)
+const strkInitialBalance = "2.0"
 
 test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
   test.skip(config.skipTXTests === "true")
-  test.slow()
   test("User should not be able to upgrade to smart account for a non deployed account", async ({
     extension,
   }) => {
-    await extension.setupWallet({
-      accountsToSetup: [{ assets: [{ token: "ETH", balance: 0 }] }],
+    const { accountNames } = await extension.setupWallet({
+      accountsToSetup: [{ assets: [{ token: "STRK", balance: 0 }] }],
     })
+    const accountName1 = accountNames![0]
     await extension.navigation.showSettingsLocator.click()
-    await extension.settings.account(extension.account.accountName1).click()
+    await extension.settings.account(accountName1).click()
     await extension.settings.smartAccountButton.click()
     await expect(extension.account.deployNeededWarning).toBeVisible()
   })
@@ -28,23 +28,25 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
     extension,
   }) => {
     const email = generateEmail()
-    await extension.setupWallet({
+    const { accountNames } = await extension.setupWallet({
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
-        { assets: [{ token: "ETH", balance: 0 }] },
+        { assets: [{ token: "STRK", balance: 0 }] },
       ],
     })
+    const accountName1 = accountNames![0]
+    const accountName2 = accountNames![1]
     await extension.activateSmartAccount({
-      accountName: extension.account.accountName1,
+      accountName: accountName1,
       email,
     })
     await extension.account.transfer({
-      originAccountName: extension.account.accountName1,
+      originAccountName: accountName1,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
+      token: "STRK",
       amount: "MAX",
     })
     //todo: check activity
@@ -53,46 +55,46 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
     //await extension.navigation.menuTokensLocator.click()
 
     //other accounts should have independent Argent Shield
-    await extension.account.ensureSmartAccountNotEnabled(
-      extension.account.accountName2,
-    )
+    await extension.account.ensureSmartAccountNotEnabled(accountName2)
   })
 
   test("User should be able to upgrade/downgrade all accounts to smart account", async ({
     extension,
   }) => {
     const email = generateEmail()
-    await extension.setupWallet({
+    const { accountNames } = await extension.setupWallet({
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
       ],
     })
+    const accountName1 = accountNames![0]
+    const accountName2 = accountNames![1]
     await extension.activateSmartAccount({
-      accountName: extension.account.accountName1,
+      accountName: accountName1,
       email,
     })
     await extension.activateSmartAccount({
-      accountName: extension.account.accountName2,
+      accountName: accountName2,
       email,
       validSession: true,
     })
 
     await extension.changeToStandardAccount({
-      accountName: extension.account.accountName1,
+      accountName: accountName1,
       email,
       validSession: true,
     })
     await extension.navigation.backLocator.click()
     await extension.navigation.closeLocator.click()
     await extension.changeToStandardAccount({
-      accountName: extension.account.accountName2,
+      accountName: accountName2,
       email,
       validSession: true,
     })
@@ -102,7 +104,7 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
     extension,
   }) => {
     await extension.recoverWallet(config.senderSeed!)
-    await extension.account.ensureSelectedAccount("Account 11")
+    await extension.account.ensureSelectedAccount("Humble Hotdog")
     await extension.account.send.click()
     await extension.account.fillRecipientAddress({
       recipientAddress: config.destinationAddress!,
@@ -110,6 +112,8 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
     await extension.account.email.fill(config.guardianEmail!)
     await extension.navigation.nextLocator.first().click()
     await extension.account.fillPin()
+    await extension.account.selectTokenButton.click()
+    await extension.account.token("STRK").click()
     await Promise.all([
       expect(extension.account.balance).toBeVisible(),
       expect(extension.account.sendMax).toBeVisible(),
@@ -123,17 +127,18 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
     extension,
   }) => {
     const email = generateEmail()
-    await extension.setupWallet({
+    const { accountNames } = await extension.setupWallet({
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
       ],
     })
+    const accountName1 = accountNames![0]
 
     await extension.activateSmartAccount({
-      accountName: extension.account.accountName1,
+      accountName: accountName1,
       email,
     })
     await expireBESession(email)
@@ -142,6 +147,8 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
       recipientAddress: config.destinationAddress!,
     })
     await extension.account.fillPin()
+    await extension.account.selectTokenButton.click()
+    await extension.account.token("STRK").click()
     await Promise.all([
       expect(extension.account.balance).toBeVisible(),
       expect(extension.account.sendMax).toBeVisible(),
@@ -156,19 +163,18 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
   test("Try to upgrade to smart account with an email already in use", async ({
     extension,
   }) => {
-    await extension.setupWallet({
+    const { accountNames } = await extension.setupWallet({
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
       ],
     })
-    await extension.account.ensureSelectedAccount(
-      extension.account.accountName1,
-    )
+    const accountName1 = accountNames![0]
+    await extension.account.ensureSelectedAccount(accountName1)
     await extension.navigation.showSettingsLocator.click()
-    await extension.settings.account(extension.account.accountName1).click()
+    await extension.settings.account(accountName1).click()
     await extension.settings.smartAccountButton.click()
     await extension.navigation.nextLocator.click()
     await extension.account.email.fill("registeredemail@argent.xyz")
@@ -182,20 +188,20 @@ test.describe("Default account to Smart Account", { tag: "@tx" }, () => {
   test("Verify error message when user insert wrong code 3 times", async ({
     extension,
   }) => {
-    await extension.setupWallet({
+    const { accountNames } = await extension.setupWallet({
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
       ],
     })
+
+    const accountName1 = accountNames![0]
     const email = generateEmail()
-    await extension.account.ensureSelectedAccount(
-      extension.account.accountName1,
-    )
+    await extension.account.ensureSelectedAccount(accountName1)
     await extension.navigation.showSettingsLocator.click()
-    await extension.settings.account(extension.account.accountName1).click()
+    await extension.settings.account(accountName1).click()
     await extension.settings.smartAccountButton.click()
     await extension.navigation.nextLocator.click()
     await extension.account.email.fill(email)

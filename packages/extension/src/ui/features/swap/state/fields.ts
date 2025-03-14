@@ -10,6 +10,7 @@ export enum Field {
 }
 
 export interface SwapState {
+  readonly isFiatInput: boolean
   readonly independentField: Field
   readonly typedValue: string
   readonly [Field.PAY]: {
@@ -21,12 +22,13 @@ export interface SwapState {
 
   // actions
   selectToken: (params: SelectToken) => void
-  switchTokens: () => void
+  switchTokens: (params: SwitchTokens) => void
   typeInput: (params: TypeInput) => void
   replaceSwapState: (params: ReplaceSwapState) => void
   resetIndependentField: () => void
   resetTypedValue: () => void
   setDefaultPayToken: (defaultPayToken: Address) => void
+  setIsFiatInput: (isFiatInput: boolean) => void
 }
 
 type SelectToken = {
@@ -46,6 +48,10 @@ type ReplaceSwapState = {
   receiveTokenAddress?: Address
 }
 
+type SwitchTokens = {
+  independentFieldInput: string
+}
+
 const defaultNetworkChainId =
   defaultNetwork.id === "mainnet-alpha"
     ? constants.StarknetChainId.SN_MAIN
@@ -60,6 +66,7 @@ export const createInitialState = (defaultPayToken?: Address) => ({
   [Field.RECEIVE]: {
     tokenAddress: USDC[defaultNetworkChainId].address,
   },
+  isFiatInput: false,
 })
 
 export const useSwapState = create<SwapState>((set) => {
@@ -97,11 +104,12 @@ export const useSwapState = create<SwapState>((set) => {
       }),
 
     // Switch Currencies
-    switchTokens: () =>
+    switchTokens: ({ independentFieldInput }: SwitchTokens) =>
       set((state) => ({
         ...state,
         independentField:
           state.independentField === Field.PAY ? Field.RECEIVE : Field.PAY,
+        typedValue: independentFieldInput,
         [Field.PAY]: { tokenAddress: state[Field.RECEIVE].tokenAddress },
         [Field.RECEIVE]: { tokenAddress: state[Field.PAY].tokenAddress },
       })),
@@ -140,6 +148,12 @@ export const useSwapState = create<SwapState>((set) => {
       set((state) => ({
         ...state,
         typedValue: "",
+      })),
+
+    setIsFiatInput: (isFiatInput: boolean) =>
+      set((state) => ({
+        ...state,
+        isFiatInput,
       })),
   }
 })

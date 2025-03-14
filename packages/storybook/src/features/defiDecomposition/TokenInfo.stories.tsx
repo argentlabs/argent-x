@@ -1,18 +1,16 @@
+import type { ParsedPositionWithUsdValue } from "@argent-x/extension/src/shared/defiDecomposition/schema"
 import {
   isCollateralizedDebtBorrowingPosition,
   isCollateralizedDebtLendingPosition,
   isConcentratedLiquidityPosition,
   isStakingPosition,
   isStrkDelegatedStakingPosition,
-  ParsedPositionWithUsdValue,
 } from "@argent-x/extension/src/shared/defiDecomposition/schema"
-import { BaseWalletAccount } from "@argent-x/extension/src/shared/wallet.model"
-import {
-  TokenInfo,
-  TokenInfoProps,
-} from "@argent-x/extension/src/ui/features/defi/TokenInfo"
+import type { BaseWalletAccount } from "@argent-x/extension/src/shared/wallet.model"
+import type { TokenInfoProps } from "@argent-x/extension/src/ui/features/defi/TokenInfo"
+import { TokenInfo } from "@argent-x/extension/src/ui/features/defi/TokenInfo"
 import { storybookCellStackDecorator } from "@argent/x-ui"
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 import { ArgentDbDecorator } from "../../decorators/db/argentDbDecorator"
 import { parsedPositionsWithUsdValue } from "./__fixtures__/parsedDefiDecompositionWithUsdValue"
 

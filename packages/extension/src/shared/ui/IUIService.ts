@@ -22,6 +22,16 @@ export interface IUIService {
   unsetDefaultPopup(): Promise<void>
 
   /**
+   * The equivalent of setting or unsetting side panel `default_path` in the manifest
+   */
+  setDefaultSidePanel(path?: string): Promise<void>
+
+  /**
+   * Unsets side panel so that side panel click event can be captured
+   */
+  unsetDefaultSidePanel(): Promise<void>
+
+  /**
    * Creates a tab with the provided path
    * @returns tab
    */

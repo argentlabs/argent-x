@@ -1,4 +1,4 @@
-import { Preview } from "@storybook/react"
+import type { Preview } from "@storybook/react"
 import { MemoryRouter, Routes, Route } from "react-router-dom"
 
 export const decorators: Preview["decorators"] = [

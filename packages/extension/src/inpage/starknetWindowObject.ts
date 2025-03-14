@@ -9,9 +9,7 @@ import { assertNever } from "../shared/utils/assertNever"
 import { sendMessage, waitForMessage } from "./messageActions"
 import { getIsPreauthorized } from "./messaging"
 import { requestMessageHandler } from "./requestMessageHandlers"
-import { ArgentXAccount4 } from "./ArgentXAccount4"
 import { ArgentXAccount5 } from "./ArgentXAccount5"
-import { ArgentXProviderV4 } from "./ArgentXProvider4"
 import { ArgentXProvider5 } from "./ArgentXProvider5"
 
 const VERSION = `${process.env.VERSION}`
@@ -64,11 +62,6 @@ export const starknetWindowObject: BackwardsCompatibleStarknetWindowObject = {
       const provider = new ArgentXProvider5(network)
       starknet.provider = provider
       starknet.account = new ArgentXAccount5(address, provider)
-    } else if (starknetVersion === "v4") {
-      ;(starknet as any).starknetJsVersion = "v4"
-      const provider = new ArgentXProviderV4(network)
-      starknet.provider = provider
-      starknet.account = new ArgentXAccount4(address, provider)
     } else {
       // Ideally this should never happen, but if dApp uses get-starknet with starknetVersion = v3,
       // we want to throw an error instead of silently falling back to v4.

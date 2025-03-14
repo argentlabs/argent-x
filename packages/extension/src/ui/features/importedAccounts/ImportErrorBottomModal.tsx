@@ -1,11 +1,10 @@
 import type { FC } from "react"
-import { B2, B3, H3, icons, ModalBottomDialog, P2 } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { B2, B3, H3, ModalBottomDialog, P2 } from "@argent/x-ui"
 import { Box, Button, Center, Divider, Flex } from "@chakra-ui/react"
 import { isEmpty } from "lodash-es"
 import { pluralise } from "@argent/x-shared"
 import type { AccountImportError } from "../../../shared/accountImport/types"
-
-const { WarningCircleSecondaryIcon } = icons
 
 interface ImportErrorBottomModalProps {
   onClose: () => void

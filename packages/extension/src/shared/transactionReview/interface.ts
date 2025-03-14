@@ -1,9 +1,8 @@
 import type {
-  EnrichedSimulateAndReview,
-  EstimatedFees,
+  EnrichedSimulateAndReviewV2,
+  EstimatedFeesV2,
 } from "@argent/x-shared/simulation"
 import type {
-  Address,
   ITransactionReviewBase,
   ITransactionReviewLabel,
   ITransactionReviewWarning,
@@ -17,21 +16,19 @@ export interface ITransactionReviewService extends ITransactionReviewBase {
   simulateAndReview({
     transaction,
     accountDeployTransaction,
-    feeTokenAddress,
     appDomain,
     maxSendEstimate,
   }: {
     transaction: TransactionAction
-    feeTokenAddress: Address
     accountDeployTransaction?: AccountDeployTransaction
     appDomain?: string
     maxSendEstimate?: boolean
-  }): Promise<EnrichedSimulateAndReview>
+  }): Promise<EnrichedSimulateAndReviewV2>
 
   getCompressedTransactionPayload(
     baseAccount: BaseWalletAccount,
     calls: Call | Call[],
-    estimatedFee?: EstimatedFees,
+    estimatedFee?: EstimatedFeesV2,
     providedNonce?: BigNumberish,
   ): Promise<string | null>
 }

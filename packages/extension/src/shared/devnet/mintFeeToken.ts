@@ -16,6 +16,10 @@ export const tryToMintFeeToken = async (
       throw new Error("Minting Unit is required")
     }
 
+    if (account.networkId !== "localhost") {
+      return false
+    }
+
     const network = await (networkService || argentNetworkService).getById(
       account.networkId,
     )
@@ -27,7 +31,7 @@ export const tryToMintFeeToken = async (
       },
       body: JSON.stringify({
         address: account.address.toLowerCase().replace("0x0", "0x"),
-        amount: 1e18,
+        amount: 10e18,
         unit,
       }),
     })

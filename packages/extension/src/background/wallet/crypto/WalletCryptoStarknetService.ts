@@ -23,10 +23,7 @@ import {
   getBaseDerivationPath,
   getDerivationPathForIndex,
 } from "../../../shared/signer/utils"
-import type {
-  IObjectStore,
-  IRepository,
-} from "../../../shared/storage/__new/interface"
+import type { IRepository } from "../../../shared/storage/__new/interface"
 import {
   getIndexForPath,
   getPathForIndex,
@@ -46,11 +43,11 @@ import {
   getPreDeployedAccount,
 } from "../../devnet/declareAccounts"
 import type { LoadContracts } from "../loadContracts"
-import type { WalletSession } from "../session/walletSession.model"
 import { PrivateKeySigner } from "../../../shared/signer/PrivateKeySigner"
 import { deserializeAccountIdentifier } from "../../../shared/utils/accountIdentifier"
 import type { IPKManager } from "../../../shared/accountImport/pkManager/IPKManager"
 import memoize, { type Memoized } from "memoizee"
+import type { ISecretStorageService } from "../session/interface"
 
 const { getSelectorFromName, calculateContractAddressFromHash } = hash
 
@@ -63,7 +60,7 @@ export class WalletCryptoStarknetService {
 
   constructor(
     private readonly walletStore: IRepository<WalletAccount>,
-    private readonly sessionStore: IObjectStore<WalletSession | null>,
+    private readonly secretStorageService: ISecretStorageService,
     private readonly pendingMultisigStore: IRepository<PendingMultisig>,
     private readonly accountSharedService: WalletAccountSharedService,
     private readonly ledgerService: ILedgerSharedService,
@@ -77,11 +74,12 @@ export class WalletCryptoStarknetService {
   }
 
   public async getArgentPubKeyByDerivationPath(derivationPath: string) {
-    const session = await this.sessionStore.get()
-    if (!session?.secret) {
+    const decrypted = await this.secretStorageService.decrypt()
+    if (!decrypted) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
-    const signer = new ArgentSigner(session.secret, derivationPath)
+    const { secret } = decrypted
+    const signer = new ArgentSigner(secret, derivationPath)
     return signer.getPubKey()
   }
 
@@ -107,10 +105,11 @@ export class WalletCryptoStarknetService {
     accountId: AccountId,
     type: WalletAccountType,
   ): Promise<BaseSignerInterface> {
-    const session = await this.sessionStore.get()
-    if (!session?.secret) {
+    const decrypted = await this.secretStorageService.decrypt()
+    if (!decrypted) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
+    const { secret, password } = decrypted
     const { signer } = deserializeAccountIdentifier(accountId)
     const derivationPath = getDerivationPathForIndex(
       signer.index,
@@ -119,12 +118,12 @@ export class WalletCryptoStarknetService {
     )
     switch (signer.type) {
       case SignerType.LOCAL_SECRET:
-        return new ArgentSigner(session.secret, derivationPath)
+        return new ArgentSigner(secret, derivationPath)
       case SignerType.LEDGER:
         return this.ledgerService.getSigner(derivationPath)
       case SignerType.PRIVATE_KEY: {
         const pk = await this.pkManager.retrieveDecryptedKey(
-          session.password,
+          password,
           accountId,
         )
         return new PrivateKeySigner(pk)
@@ -135,8 +134,8 @@ export class WalletCryptoStarknetService {
   }
 
   public async getPrivateKey(accountId: AccountId): Promise<string> {
-    const session = await this.sessionStore.get()
-    if (session === null || !session?.secret) {
+    const decrypted = await this.secretStorageService.decrypt()
+    if (!decrypted) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
 
@@ -173,9 +172,9 @@ export class WalletCryptoStarknetService {
     signerType: SignerType,
     networkId: string,
   ): Promise<{ index: number; derivationPath: string; publicKey: string }> {
-    const session = await this.sessionStore.get()
+    const decrypted = await this.secretStorageService.decrypt()
 
-    if (!session?.secret) {
+    if (!decrypted) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
 
@@ -193,7 +192,6 @@ export class WalletCryptoStarknetService {
       ...filteredAccounts,
       ...pendingMultisigs,
     ]
-
     const derivationPathsBySignerType = accountsOrPendingMultisigs
       .filter((account) => account.networkId === networkId)
       .reduce(
@@ -211,9 +209,16 @@ export class WalletCryptoStarknetService {
       )
 
     const baseDerivationPath = getBaseDerivationPath(accountType, signerType)
-    const usedIndices = ensureArray(
-      derivationPathsBySignerType[signerType],
-    ).map((path) => getIndexForPath(path, baseDerivationPath))
+
+    const usedIndices = ensureArray(derivationPathsBySignerType[signerType])
+      .map((path) => {
+        try {
+          return getIndexForPath(path, baseDerivationPath)
+        } catch {
+          return
+        }
+      })
+      .filter((index) => index !== undefined)
 
     // We consider all signers when determining the next available index to ensure that any changes in signers are accounted for, preventing the reuse of an index linked to a previously assigned address, which would result in a duplicate.
     const nextIndex = accountsOrPendingMultisigs.length
@@ -223,7 +228,6 @@ export class WalletCryptoStarknetService {
     switch (signerType) {
       case SignerType.LOCAL_SECRET: {
         const publicKey = await this.getArgentPubKeyByDerivationPath(path)
-
         return {
           index: nextIndex,
           derivationPath: path,
@@ -280,14 +284,16 @@ export class WalletCryptoStarknetService {
     start: number,
     buffer: number,
   ): Promise<string[]> {
-    const session = await this.sessionStore.get()
+    const decrypted = await this.secretStorageService.decrypt()
 
-    if (!session?.secret) {
+    if (!decrypted) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
 
+    const { secret } = decrypted
+
     const keys = ArgentSigner.generatePublicKeys(
-      session.secret,
+      secret,
       start,
       buffer,
       getBaseDerivationPath("multisig", SignerType.LOCAL_SECRET),
@@ -413,6 +419,25 @@ export class WalletCryptoStarknetService {
       deployMultisigPayload.constructorCalldata,
       0,
     )
+  }
+
+  public async getAccountSigners(): Promise<
+    {
+      type: WalletAccountType
+      publicKey: string
+    }[]
+  > {
+    const accounts = await this.walletStore.get(withHiddenSelector)
+    const signers = []
+    for (const account of accounts) {
+      try {
+        const { publicKey } = await this.memoizedGetPublicKey(account)
+        signers.push({ type: account.type, publicKey })
+      } catch {
+        continue
+      }
+    }
+    return signers
   }
 
   private async _getPublicKey(account: WalletAccount) {

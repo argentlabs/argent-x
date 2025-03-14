@@ -1,13 +1,18 @@
+import { z } from "zod"
+import { flowSchema } from "../../../../shared/argentAccount/schema"
 import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
-import { flowSchema } from "../../../../shared/argentAccount/schema"
+
+const validateAccountInputSchema = z.object({
+  flow: flowSchema,
+})
 
 export const validateAccountProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
-  .input(flowSchema)
+  .input(validateAccountInputSchema)
   .mutation(
     async ({
-      input: flow,
+      input: { flow },
       ctx: {
         services: { argentAccountService },
       },

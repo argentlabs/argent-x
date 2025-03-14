@@ -1,9 +1,9 @@
+import { DocumentIcon } from "@argent/x-ui/icons"
 import {
   Alert,
   BarBackButton,
   BarCloseButton,
   CellStack,
-  icons,
   NavigationContainer,
 } from "@argent/x-ui"
 import type { FC } from "react"
@@ -14,8 +14,6 @@ import { routes } from "../../../shared/ui/routes"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { TrackingLink } from "../../components/TrackingLink"
 import { formatTruncatedAddress } from "@argent/x-shared"
-
-const { DocumentIcon } = icons
 
 const L1_BRIDGE_CONTRACT_ADDRESS = "0xaea4513378eb6023cf9ce730a26255d0e3f075b9"
 

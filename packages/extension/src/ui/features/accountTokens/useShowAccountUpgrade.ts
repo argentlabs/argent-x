@@ -8,7 +8,6 @@ import {
 import { useWalletAccount } from "../accounts/accounts.state"
 import { useIsMultisigDeploying } from "../multisig/hooks/useIsMultisigDeploying"
 import { multisigView } from "../multisig/multisig.state"
-import { useHasFeeTokenBalance } from "./useFeeTokenBalance"
 import { useView } from "../../views/implementation/react"
 import {
   isArgentAccount,
@@ -25,8 +24,6 @@ export const useShowAccountUpgrade = (baseAccount?: BaseWalletAccount) => {
   const isMultisigDeploying = useIsMultisigDeploying(multisig)
   const needsUpgrade = useCheckUpgradeAvailable(account)
 
-  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
-
   const isDeprecated = useIsDeprecatedTxV0(account)
 
   const isUpgradableAccount = useMemo(
@@ -38,7 +35,6 @@ export const useShowAccountUpgrade = (baseAccount?: BaseWalletAccount) => {
   return useMemo(
     () =>
       account && // account is loaded
-      hasFeeTokenBalance && // account has enough balance to pay the fee
       needsUpgrade && // account needs upgrade
       isUpgradableAccount && // account is not an imported non-Argent account
       !account.needsDeploy && // account is deployed
@@ -47,7 +43,6 @@ export const useShowAccountUpgrade = (baseAccount?: BaseWalletAccount) => {
       !isDeprecated, // account is not deprecated
     [
       account,
-      hasFeeTokenBalance,
       hasPendingUpgradeTransactions,
       isDeprecated,
       isMultisigDeploying,

@@ -3,17 +3,18 @@ import { expect } from "@playwright/test"
 import config from "../config"
 import test from "../test"
 import {
-  downloadFile,
+  downloadGitHubRelease,
   generateEmail,
   getBalance,
-  transferTokens,
+  requestFunds,
+  unzip,
 } from "../utils"
 
-const ethInitialBalance = 0.01 * Number(config.initialBalanceMultiplier)
-const versions = ["5.19.4"]
+const strkInitialBalance = 5.1
+const versions = ["6.19.5", "6.20.5"]
 const downloadBuild = async (version: string) => {
   try {
-    await downloadFile(version)
+    await downloadGitHubRelease(version)
   } catch (err) {
     if (err instanceof Error) {
       console.error("Error:", err.message)
@@ -22,19 +23,27 @@ const downloadBuild = async (version: string) => {
     }
   }
 }
+let currentVersionDir = ""
 test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
   versions.forEach((version) => {
-    test.slow()
+    test.beforeAll(async () => {
+      await downloadBuild(version)
+      currentVersionDir = (await unzip(version)).replace(/\/[^\/]+$/, "")
+    })
+
     test(`${version}: After upgrade, tokens and balances should be the same`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
       //fetch balance from blockchain
       const [ethBalance, strkBalance] = await Promise.all([
         getBalance(config.migAccountAddress!, "ETH"),
         getBalance(config.migAccountAddress!, "STRK"),
       ])
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
 
       await upgradeExtension.recoverWallet(config.testSeed3!)
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
@@ -74,54 +83,63 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
     test(`${version}: Create a Smart account, leave it unfunded and undeployed`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
-
-      await upgradeExtension.setExtensionVersion(version)
-
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
       const email = generateEmail()
-      const { accountAddresses } = await upgradeExtension.setupWallet({
-        email,
-        accountsToSetup: [{ assets: [{ token: "ETH", balance: 0 }] }],
-      })
+      const { accountAddresses, accountNames } =
+        await upgradeExtension.setupWallet({
+          email,
+          accountsToSetup: [{ assets: [{ token: "ETH", balance: 0 }] }],
+        })
+      const accountName1 = accountNames![0]
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
       //upgrade extension
       await upgradeExtension.upgradeExtension(
         upgradeExtension.currentBranchVersion,
       )
-      await transferTokens(ethInitialBalance, accountAddresses[0], "ETH")
-      await upgradeExtension.deployAccount(
-        upgradeExtension.account.accountName1,
+      await requestFunds(accountAddresses[0], strkInitialBalance, "STRK")
+      await expect(upgradeExtension.account.currentBalance("STRK")).toHaveText(
+        `${strkInitialBalance} STRK`,
       )
+      await upgradeExtension.deployAccount(accountName1)
     })
 
     test(`${version}: Create regular account, deploy, upgrade, do a TX, add and deploy new account`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
 
-      await upgradeExtension.setupWallet({
+      const { accountNames } = await upgradeExtension.setupWallet({
         accountsToSetup: [
           {
-            assets: [{ token: "ETH", balance: ethInitialBalance }],
+            assets: [{ token: "STRK", balance: strkInitialBalance }],
             deploy: true,
           },
         ],
       })
+      const accountName1 = accountNames![0]
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
       //upgrade extension
       await upgradeExtension.upgradeExtension(
         upgradeExtension.currentBranchVersion,
       )
-      const { accountAddress } = await upgradeExtension.account.addAccount({
-        firstAccount: false,
-      })
+      const { accountAddress, accountName: accountName2 } =
+        await upgradeExtension.account.addAccount({
+          firstAccount: false,
+        })
 
       const { sendAmountTX, sendAmountFE } =
         await upgradeExtension.account.transfer({
-          originAccountName: upgradeExtension.account.accountName1,
+          originAccountName: accountName1,
           recipientAddress: accountAddress!,
-          token: "ETH",
+          token: "STRK",
           amount: "MAX",
         })
 
@@ -133,14 +151,12 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
         sendAmountTX,
       })
 
-      await upgradeExtension.deployAccount(
-        upgradeExtension.account.accountName2,
-      )
+      await upgradeExtension.deployAccount(accountName2!)
 
       await upgradeExtension.account.transfer({
-        originAccountName: upgradeExtension.account.accountName2,
+        originAccountName: accountName2!,
         recipientAddress: config.destinationAddress!,
-        token: "ETH",
+        token: "STRK",
         amount: "MAX",
       })
     })
@@ -148,29 +164,32 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
     test(`${version}: Create a Smart account, deploy it, upgrade, do a TX`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
-
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
 
       const email = generateEmail()
-      await upgradeExtension.setupWallet({
+      const { accountNames } = await upgradeExtension.setupWallet({
         email,
         accountsToSetup: [
           {
-            assets: [{ token: "ETH", balance: ethInitialBalance }],
+            assets: [{ token: "STRK", balance: strkInitialBalance }],
             deploy: true,
           },
         ],
       })
+      const accountName1 = accountNames![0]
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
       //upgrade extension
       await upgradeExtension.upgradeExtension(
         upgradeExtension.currentBranchVersion,
       )
       await upgradeExtension.account.transfer({
-        originAccountName: upgradeExtension.account.accountName1,
+        originAccountName: accountName1,
         recipientAddress: config.destinationAddress!,
-        token: "ETH",
+        token: "STRK",
         amount: "MAX",
       })
     })
@@ -179,18 +198,22 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
       upgradeExtension,
     }) => {
       const usdcAmount = "0.000002"
-      await downloadBuild(version)
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
 
-      const { accountAddresses } = await upgradeExtension.setupWallet({
-        accountsToSetup: [
-          { assets: [{ token: "ETH", balance: ethInitialBalance }] },
-        ],
-      })
-      await transferTokens(+usdcAmount, accountAddresses[0], "USDC")
+      const { accountAddresses, accountNames } =
+        await upgradeExtension.setupWallet({
+          accountsToSetup: [
+            { assets: [{ token: "STRK", balance: strkInitialBalance }] },
+          ],
+        })
+      const accountName1 = accountNames![0]
+      await requestFunds(accountAddresses[0], +usdcAmount, "USDC")
       await expect(upgradeExtension.account.currentBalance("USDC")).toHaveText(
         `${usdcAmount} USDC`,
-        { timeout: 180 * 1000 },
       )
       //upgrade extension
       await upgradeExtension.upgradeExtension(
@@ -199,16 +222,13 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
 
       await expect(upgradeExtension.account.currentBalance("USDC")).toHaveText(
         `${usdcAmount} USDC`,
-        { timeout: 180 * 1000 },
       )
-      await upgradeExtension.deployAccount(
-        upgradeExtension.account.accountName1,
-      )
+      await upgradeExtension.deployAccount(accountName1)
 
       await upgradeExtension.account.transfer({
-        originAccountName: upgradeExtension.account.accountName1,
+        originAccountName: accountName1,
         recipientAddress: config.destinationAddress!,
-        token: "ETH",
+        token: "STRK",
         amount: "MAX",
       })
     })
@@ -216,17 +236,21 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
     test(`${version}: Create regular account, deploy it, login with a valid email, upgrade, activate 2FA, do a TX`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
 
-      await upgradeExtension.setupWallet({
+      const { accountNames } = await upgradeExtension.setupWallet({
         accountsToSetup: [
           {
-            assets: [{ token: "ETH", balance: ethInitialBalance }],
+            assets: [{ token: "STRK", balance: strkInitialBalance }],
             deploy: true,
           },
         ],
       })
+      const accountName1 = accountNames![0]
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
 
       // login with a valid email
@@ -239,13 +263,13 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
         upgradeExtension.currentBranchVersion,
       )
       await upgradeExtension.activateSmartAccount({
-        accountName: upgradeExtension.account.accountName1,
+        accountName: accountName1,
         validSession: true,
       })
       await upgradeExtension.account.transfer({
-        originAccountName: upgradeExtension.account.accountName1,
+        originAccountName: accountName1,
         recipientAddress: config.destinationAddress!,
-        token: "ETH",
+        token: "STRK",
         amount: "MAX",
       })
     })
@@ -253,10 +277,13 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
     test(`${version}: Create regular accounts, edit account names, upgrade, check account names`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
 
-      await upgradeExtension.setupWallet({
+      const { accountNames } = await upgradeExtension.setupWallet({
         accountsToSetup: [
           {
             assets: [{ token: "ETH", balance: 0 }],
@@ -266,15 +293,12 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
           },
         ],
       })
+      const accountName1 = accountNames![0]
+      const accountName2 = accountNames![1]
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
-      await upgradeExtension.account.ensureSelectedAccount(
-        upgradeExtension.account.accountName1,
-      )
-
+      await upgradeExtension.account.ensureSelectedAccount(accountName1)
       await upgradeExtension.navigation.showSettingsLocator.click()
-      await upgradeExtension.settings
-        .account(upgradeExtension.account.accountName1)
-        .click()
+      await upgradeExtension.settings.account(accountName1).click()
       await upgradeExtension.settings.setAccountName("My new account name 1")
       await expect(upgradeExtension.settings.accountName).toHaveValue(
         "My new account name 1",
@@ -285,14 +309,10 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
       await upgradeExtension.account.ensureSelectedAccount(
         "My new account name 1",
       )
-      await upgradeExtension.account.ensureSelectedAccount(
-        upgradeExtension.account.accountName2,
-      )
+      await upgradeExtension.account.ensureSelectedAccount(accountName2)
 
       await upgradeExtension.navigation.showSettingsLocator.click()
-      await upgradeExtension.settings
-        .account(upgradeExtension.account.accountName2)
-        .click()
+      await upgradeExtension.settings.account(accountName2).click()
       await upgradeExtension.settings.setAccountName("My new account name 2")
       await expect(upgradeExtension.settings.accountName).toHaveValue(
         "My new account name 2",
@@ -319,8 +339,11 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
     test(`${version}: create Multisig 1/1 account, upgrade, do tx`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
       await upgradeExtension.setupWallet({
         accountsToSetup: [],
       })
@@ -329,16 +352,16 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
       await expect(
         upgradeExtension.page.locator('[data-testid="activate-multisig"]'),
       ).toBeHidden()
+      const { accountName } = await upgradeExtension.account.lastAccountInfo()
       await upgradeExtension.fundMultisigAccount({
-        accountName: upgradeExtension.account.accountNameMulti1,
-        balance: ethInitialBalance,
+        accountName: accountName!,
+        balance: strkInitialBalance,
+        token: "STRK",
       })
       await expect(
         upgradeExtension.page.locator('[data-testid="activate-multisig"]'),
       ).toBeVisible()
-      await upgradeExtension.activateMultisig(
-        upgradeExtension.account.accountNameMulti1,
-      )
+      await upgradeExtension.activateMultisig(accountName!)
 
       //upgrade extension
       await upgradeExtension.upgradeExtension(
@@ -347,9 +370,9 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
 
       const { sendAmountTX, sendAmountFE } =
         await upgradeExtension.account.transfer({
-          originAccountName: upgradeExtension.account.accountNameMulti1,
+          originAccountName: accountName!,
           recipientAddress: config.destinationAddress!,
-          token: "ETH",
+          token: "STRK",
           amount: "MAX",
         })
       const txHash = await upgradeExtension.activity.getLastTxHash()
@@ -365,8 +388,11 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
     test(`${version}: Create regular account, deploy, recover, add new account, fund, do not deploy, upgrade, deploy account`, async ({
       upgradeExtension,
     }) => {
-      await downloadBuild(version)
-      await upgradeExtension.setExtensionVersion(version)
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
 
       const { seed } = await upgradeExtension.setupWallet({
         accountsToSetup: [
@@ -376,12 +402,15 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
         ],
       })
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
-      const { accountAddress } = await upgradeExtension.account.addAccount({
-        firstAccount: false,
-      })
+      const { accountAddress, accountName: accountName2 } =
+        await upgradeExtension.account.addAccount({
+          firstAccount: false,
+        })
 
-      await transferTokens(ethInitialBalance, accountAddress!, "ETH")
-
+      await requestFunds(accountAddress!, strkInitialBalance, "STRK")
+      await expect(upgradeExtension.account.currentBalance("STRK")).toHaveText(
+        `${strkInitialBalance} STRK`,
+      )
       await upgradeExtension.resetExtension()
       await upgradeExtension.recoverWallet(seed)
       await expect(upgradeExtension.network.networkSelector).toBeVisible()
@@ -390,17 +419,100 @@ test.describe.serial("Upgrade Extension", { tag: "@upgrade" }, () => {
       await upgradeExtension.upgradeExtension(
         upgradeExtension.currentBranchVersion,
       )
-
-      await upgradeExtension.deployAccount(
-        upgradeExtension.account.accountName2,
-      )
+      await upgradeExtension.deployAccount(accountName2!)
 
       await upgradeExtension.account.transfer({
-        originAccountName: upgradeExtension.account.accountName2,
+        originAccountName: accountName2!,
         recipientAddress: config.destinationAddress!,
-        token: "ETH",
+        token: "STRK",
         amount: "MAX",
       })
+    })
+
+    test(`${version}: Create a new wallet, deploy account and mint NFT, upgrade, NFT is visible and can be transfer`, async ({
+      upgradeExtension,
+      dappPage,
+    }) => {
+      upgradeExtension.account.setMigVersion(version)
+      await upgradeExtension.setExtensionVersion(
+        version,
+        `${currentVersionDir}/${version}`,
+      )
+      const spokCampaignName = `${config.spokCampaignName!}`
+      const { accountAddresses, accountNames } =
+        await upgradeExtension.setupWallet({
+          accountsToSetup: [
+            {
+              assets: [{ token: "STRK", balance: 3 }],
+              deploy: true,
+              feeToken: "STRK",
+            },
+            { assets: [{ token: "ETH", balance: 0 }] },
+          ],
+        })
+
+      const accountName1 = accountNames![0]
+      const accountName2 = accountNames![1]
+      await upgradeExtension.account.ensureSelectedAccount(accountName1)
+      await dappPage.claimSpok()
+      await upgradeExtension.dapps.knownDappButton.click()
+      await upgradeExtension.dapps.ensureKnowDappText()
+      await upgradeExtension.dapps.closeButtonDappInfoLocator.click()
+      await upgradeExtension.dapps.accept.click()
+      await dappPage.page.getByRole("button", { name: "Claim now" }).click()
+      await Promise.all([
+        upgradeExtension.navigation.confirmLocator.click(),
+        expect(
+          upgradeExtension.activity.menuPendingTransactionsIndicatorLocator,
+        ).toBeVisible(),
+      ])
+      await expect(
+        upgradeExtension.activity.menuPendingTransactionsIndicatorLocator,
+      ).toBeHidden()
+
+      await upgradeExtension.navigation.menuNTFsLocator.click()
+      await upgradeExtension.nfts.collection(spokCampaignName).click()
+      await upgradeExtension.nfts.nftByPosition().click()
+      await upgradeExtension.account.send.click()
+
+      //upgrade extension
+      await upgradeExtension.upgradeExtension(
+        upgradeExtension.currentBranchVersion,
+      )
+      await upgradeExtension.navigation.menuNTFsLocator.click()
+      await upgradeExtension.nfts.collection(spokCampaignName).click()
+      await upgradeExtension.nfts.nftByPosition().click()
+      await upgradeExtension.account.send.click()
+      await upgradeExtension.account.fillRecipientAddress({
+        recipientAddress: accountAddresses[1],
+      })
+      await upgradeExtension.nfts.reviewSendLocator.click()
+      await Promise.all([
+        upgradeExtension.account.confirmLocator.click(),
+        expect(
+          upgradeExtension.activity.menuPendingTransactionsIndicatorLocator,
+        ).toBeVisible(),
+      ])
+      const txHash = await upgradeExtension.activity.getLastTxHash()
+      await expect(
+        upgradeExtension.activity.menuPendingTransactionsIndicatorLocator,
+      ).toBeHidden()
+      await upgradeExtension.validateTx({
+        txHash: txHash!,
+        receiver: accountAddresses[1],
+        txType: "nft",
+      })
+
+      await upgradeExtension.navigation.menuTokensLocator.click()
+      await upgradeExtension.navigation.menuNTFsLocator.click()
+      await expect(
+        upgradeExtension.nfts.collection(spokCampaignName),
+      ).toBeHidden()
+
+      await upgradeExtension.account.ensureSelectedAccount(accountName2)
+      await upgradeExtension.navigation.menuNTFsLocator.click()
+      await upgradeExtension.nfts.collection(spokCampaignName).click()
+      await upgradeExtension.nfts.nftByPosition().click()
     })
   })
 })

@@ -1,15 +1,16 @@
-import { useMemo } from "react"
 import { classHashSupportsTxV3 } from "@argent/x-shared"
+import { useMemo } from "react"
 import { selectedAccountView } from "../../views/account"
+import { executeFromOutsidePendingActivityForAccountView } from "../../views/activityCache"
+import { discoverDataView, discoverViewedAtView } from "../../views/discover"
 import { useView } from "../../views/implementation/react"
+import { useAccountTransactions } from "../accounts/accountTransactions.state"
 import {
   isSignerInMultisigView,
   multisigView,
 } from "../multisig/multisig.state"
-import { useMultisigPendingTransactionsAwaitingConfirmation } from "../multisig/multisigTransactions.state"
-import { useAccountTransactions } from "../accounts/accountTransactions.state"
-import { discoverDataView, discoverViewedAtView } from "../../views/discover"
 import { useMultisigPendingOffchainSignaturesByAccount } from "../multisig/multisigOffchainSignatures.state"
+import { useMultisigPendingTransactionsAwaitingConfirmation } from "../multisig/multisigTransactions.state"
 import { RootTabs } from "./RootTabs"
 
 export const RootTabsContainer = () => {
@@ -26,13 +27,18 @@ export const RootTabsContainer = () => {
   const pendingMultisigOffchainSignatures =
     useMultisigPendingOffchainSignaturesByAccount(account)
 
+  // these activities don't have related pending transactions
+  const pendingExecuteFromOutsideActivities = useView(
+    executeFromOutsidePendingActivityForAccountView(account),
+  )
+
   const accountSupportsTxV3 = classHashSupportsTxV3(account?.classHash)
 
   const showActivateBanner = Boolean(multisig?.needsDeploy) // False if multisig is undefined
 
   const activateAccountTokens = showActivateBanner
     ? accountSupportsTxV3
-      ? "ETH or STRK"
+      ? "STRK"
       : "ETH"
     : undefined
 
@@ -45,7 +51,8 @@ export const RootTabsContainer = () => {
   const totalPendingTransactions =
     pendingTransactions.length +
     pendingMultisigTransactions.length +
-    pendingMultisigOffchainSignatures.length
+    pendingMultisigOffchainSignatures.length +
+    (pendingExecuteFromOutsideActivities?.length ?? 0)
 
   const discoverViewedAt = useView(discoverViewedAtView)
   const discoverData = useView(discoverDataView)

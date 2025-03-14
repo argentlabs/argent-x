@@ -1,4 +1,3 @@
-import type { WalletSession } from "./WalletAccountSharedService"
 import { WalletAccountSharedService } from "./WalletAccountSharedService"
 import type { WalletStorageProps } from "../../../wallet/walletStore"
 
@@ -16,19 +15,22 @@ import {
   accountServiceMock,
   getMultisigStoreMock,
   getPendingMultisigStoreMock,
-  getSessionStoreMock,
   getStoreMock,
   getWalletStoreMock,
   httpServiceMock,
+  smartAccountServiceMock,
 } from "../../../test.utils"
+import type { IKeyValueStorage } from "../../../storage"
+import { KeyValueStorage } from "../../../storage"
+import type { ISessionStore } from "../../../session/storage"
 
 describe("WalletAccountSharedService", () => {
   let service: WalletAccountSharedService
   let storeMock: IObjectStore<WalletStorageProps>
   let walletStoreMock: IRepository<WalletAccount>
-  let sessionStoreMock: IObjectStore<WalletSession | null>
   let multisigStoreMock: IRepository<BaseMultisigWalletAccount>
   let pendingMultisigStoreMock: IRepository<PendingMultisig>
+  let sessionStore: IKeyValueStorage<ISessionStore>
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -45,18 +47,24 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve(accountsMock)),
       })
-      sessionStoreMock = getSessionStoreMock()
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       const result = await service.getAccount(accountMock.id)
@@ -75,18 +83,24 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve(accountsMock)),
       })
-      sessionStoreMock = getSessionStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       await expect(service.getAccount(accountMock.id)).rejects.toThrow(
@@ -97,7 +111,6 @@ describe("WalletAccountSharedService", () => {
 
   describe("getSelectedAccount", () => {
     it("should return the selected account when session is set and selected account exists", async () => {
-      const sessionMock = { secret: "secret", password: "password" }
       const accountsMock = [
         { address: "address1", networkId: "networkId1" },
         { address: "address2", networkId: "networkId2" },
@@ -116,25 +129,35 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve(accountsMock)),
       })
-      sessionStoreMock = getSessionStoreMock({
-        get: vi.fn(() => Promise.resolve(sessionMock)),
-      })
+
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
+
+      const secureSessionStoreSpy = vi
+        .spyOn(sessionStore, "get")
+        .mockImplementation(() => Promise.resolve(true))
+
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       const result = await service.getSelectedAccount()
 
-      expect(sessionStoreMock.get).toHaveBeenCalled()
+      expect(secureSessionStoreSpy).toHaveBeenCalled()
       expect(walletStoreMock.get).toHaveBeenCalled()
       expect(storeMock.get).toHaveBeenCalled()
       expect(result).toEqual(accountsMock[0])
@@ -155,23 +178,35 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve([])),
       })
-      sessionStoreMock = getSessionStoreMock()
+
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
+
+      const secureSessionStoreSpy = vi
+        .spyOn(sessionStore, "get")
+        .mockImplementation(() => Promise.resolve(true))
+
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       const result = await service.getSelectedAccount()
 
-      expect(sessionStoreMock.get).toHaveBeenCalled()
+      expect(secureSessionStoreSpy).toHaveBeenCalled()
       expect(result).toBeUndefined()
     })
   })
@@ -182,18 +217,24 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve([])),
       })
-      sessionStoreMock = getSessionStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       await service.selectAccount()
@@ -212,18 +253,24 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve(accountsMock)),
       })
-      sessionStoreMock = getSessionStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       await expect(service.selectAccount("abc")).rejects.toThrow(
@@ -248,18 +295,25 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve(accountsMock)),
       })
-      sessionStoreMock = getSessionStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
+
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       const result = await service.selectAccount(accountIdentifierMock)
@@ -303,7 +357,13 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve([walletAccountMock])),
       })
-      sessionStoreMock = getSessionStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
+
       multisigStoreMock = getMultisigStoreMock({
         get: vi.fn(() => Promise.resolve([multisigBaseWalletAccountMock])),
       })
@@ -312,11 +372,12 @@ describe("WalletAccountSharedService", () => {
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       const result = await service.getMultisigAccount(accountIdentifierMock.id)
@@ -343,7 +404,13 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve([walletAccountMock])),
       })
-      sessionStoreMock = getSessionStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
+
       multisigStoreMock = getMultisigStoreMock({
         get: vi.fn(() => Promise.resolve([])),
       })
@@ -352,11 +419,12 @@ describe("WalletAccountSharedService", () => {
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       await expect(
@@ -396,24 +464,34 @@ describe("WalletAccountSharedService", () => {
       walletStoreMock = getWalletStoreMock({
         get: vi.fn(() => Promise.resolve(accountsMock)),
       })
-      sessionStoreMock = getSessionStoreMock()
+      sessionStore = new KeyValueStorage<ISessionStore>(
+        {
+          isUnlocked: false,
+        },
+        { namespace: "core:sessionStore", areaName: "session" },
+      )
+      const secureSessionStoreSpy = vi
+        .spyOn(sessionStore, "get")
+        .mockImplementation(() => Promise.resolve(true))
+
       multisigStoreMock = getMultisigStoreMock()
       pendingMultisigStoreMock = getPendingMultisigStoreMock()
 
       service = new WalletAccountSharedService(
         storeMock,
         walletStoreMock,
-        sessionStoreMock,
+        sessionStore,
         multisigStoreMock,
         pendingMultisigStoreMock,
         httpServiceMock,
         accountServiceMock,
+        smartAccountServiceMock,
       )
 
       await service.selectAccount(accountsMock[0].id)
       const result = await service.getSelectedAccount()
 
-      expect(sessionStoreMock.get).toHaveBeenCalled()
+      expect(secureSessionStoreSpy).toHaveBeenCalled()
       expect(walletStoreMock.get).toHaveBeenCalled()
       expect(storeMock.get).toHaveBeenCalled()
 

@@ -1,23 +1,21 @@
 import { isFeatureEnabled } from "@argent/x-shared"
-import { icons, logosDeprecated } from "@argent/x-ui"
-import { isFunction } from "lodash-es"
-import { useMemo } from "react"
 
-import { ARGENT_API_ENABLED } from "../../../shared/api/constants"
-import { type Network } from "../../../shared/network"
-import { getDefaultNetworkId } from "../../../shared/network/utils"
-import { AccountTypeId, type AccountType } from "./AddNewAccountScreen"
-import { SmartAccountDetailedDescription } from "./SmartAccountDetailsDescription"
-import { Link } from "@chakra-ui/react"
-
-const {
+import {
   WalletSecondaryIcon,
   MultisigSecondaryIcon,
   ShieldSecondaryIcon,
   ImportIcon,
-} = icons
+} from "@argent/x-ui/icons"
 
-const { LedgerLogo } = logosDeprecated
+import { LedgerLogo } from "@argent/x-ui/logos-deprecated"
+import { isFunction } from "lodash-es"
+import { useMemo } from "react"
+
+import { Link } from "@chakra-ui/react"
+import { type Network } from "../../../shared/network"
+import { isSmartAccountEnabled } from "../../../shared/smartAccount/useSmartAccountEnabled"
+import { AccountTypeId, type AccountType } from "./AddNewAccountScreen"
+import { SmartAccountDetailedDescription } from "./SmartAccountDetailsDescription"
 
 const ICON_SIZE = 6
 
@@ -26,28 +24,29 @@ type AccountTypeWithEnabled = AccountType & {
   onboarding: boolean
 }
 
+const SmartAccountSubtitle = () => (
+  <>
+    Designed for those who value security and easy of use.{" "}
+    <Link
+      href="https://www.argent.xyz/blog/smart-wallet-features"
+      target="_blank"
+      color="text-brand"
+    >
+      Learn more
+    </Link>
+  </>
+)
+
 const getAllAccountTypes = (): AccountTypeWithEnabled[] => [
   {
     id: AccountTypeId.SMART_ACCOUNT,
     type: "smart",
     title: "Smart Account",
-    subtitle: (
-      <>
-        Designed for those who value security and easy of use.{" "}
-        <Link
-          href="https://www.argent.xyz/blog/smart-wallet-features"
-          target="_blank"
-          color="text-brand"
-        >
-          Learn more
-        </Link>
-      </>
-    ),
+    subtitle: <SmartAccountSubtitle />,
     detailedDescription: <SmartAccountDetailedDescription />,
     label: "Recommended",
     icon: <ShieldSecondaryIcon height={ICON_SIZE} width={ICON_SIZE} />,
-    enabled: (network: Network) =>
-      ARGENT_API_ENABLED && getDefaultNetworkId() === network.id,
+    enabled: (network: Network) => isSmartAccountEnabled(network.id),
     onboarding: true,
   },
   {
@@ -82,9 +81,9 @@ const getAllAccountTypes = (): AccountTypeWithEnabled[] => [
     id: AccountTypeId.IMPORTED,
     type: "imported",
     title: "Import from private key",
+    subtitle: "Import existing Argent accounts",
     icon: <ImportIcon height={ICON_SIZE} width={ICON_SIZE} />,
-    enabled: (network: Network) =>
-      network.id === "sepolia-alpha" || network.id === "localhost",
+    enabled: true,
     onboarding: false,
   },
   {

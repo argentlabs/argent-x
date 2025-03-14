@@ -1,7 +1,10 @@
 import type { Address } from "@argent/x-shared"
 import type { SwapOrderResponse } from "../../../shared/swap/model/order.model"
 import type { SwapQuoteResponse } from "../../../shared/swap/model/quote.model"
-import type { Trade } from "../../../shared/swap/model/trade.model"
+import type {
+  SwapReviewTrade,
+  Trade,
+} from "../../../shared/swap/model/trade.model"
 import type { Call } from "starknet"
 
 export interface ISwapService {
@@ -25,5 +28,6 @@ export interface ISwapService {
     transaction: Call[],
     title: string,
     tokenAddresses: [Address, Address],
+    reviewTrade: SwapReviewTrade,
   ): Promise<void>
 }

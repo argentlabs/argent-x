@@ -1,9 +1,12 @@
-import type { StrkDelegatedStakingInvestment } from "@argent/x-shared"
+import type {
+  LiquidStakingInvestment,
+  StrkDelegatedStakingInvestment,
+} from "@argent/x-shared"
 import type { FC } from "react"
 import { useCallback } from "react"
 
 import { useNavigateReturnToOrBack } from "../../../hooks/useNavigateReturnTo"
-import { NativeStakingProviderSelectScreen } from "./NativeStakingProviderSelectScreen"
+import { StakingProviderSelectScreen } from "./StakingProviderSelectScreen"
 import {
   useSelectedStrkDelegatedStakingInvestment,
   useStrkDelegatedStakingInvestments,
@@ -17,9 +20,11 @@ export const NativeStakingProviderSelectScreenContainer: FC = () => {
   const isLoading = investments === undefined && isValidating
 
   const [, selectInvestment] = useSelectedStrkDelegatedStakingInvestment()
-
   const onInvestmentClick = useCallback(
-    (investment: StrkDelegatedStakingInvestment) => {
+    (investment: StrkDelegatedStakingInvestment | LiquidStakingInvestment) => {
+      if (investment.category !== "strkDelegatedStaking") {
+        return
+      }
       selectInvestment(investment)
       onBack()
     },
@@ -27,7 +32,7 @@ export const NativeStakingProviderSelectScreenContainer: FC = () => {
   )
 
   return (
-    <NativeStakingProviderSelectScreen
+    <StakingProviderSelectScreen
       investments={investments}
       onBack={onBack}
       onInvestmentClick={onInvestmentClick}

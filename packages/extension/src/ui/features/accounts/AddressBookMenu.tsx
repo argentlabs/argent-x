@@ -9,6 +9,8 @@ import type { WalletAccount } from "../../../shared/wallet.model"
 import type { AddressBook } from "../../hooks/useAddressBook"
 import { AccountListItem } from "./AccountListItem"
 
+import { typographyStyles } from "@argent/x-ui/theme"
+
 const StyledTab = ({ children, ...rest }: TabProps) => (
   <Tab
     rounded={"lg"}
@@ -47,6 +49,11 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
       return accounts.map((account) => {
         const accountName = account.name
 
+        const avatarMeta =
+          "avatarMeta" in account && account.avatarMeta
+            ? account.avatarMeta
+            : undefined
+
         return (
           <AccountListItem
             key={account.id}
@@ -58,8 +65,11 @@ export const AddressBookMenu: FC<AddressBookMenuProps> = ({
             onClick={() => onAddressSelect(account)}
             width={"full"}
             avatarSize={9}
+            emojiStyle={typographyStyles.H3}
+            initialsStyle={typographyStyles.H4}
             _hover={{ bg: "neutrals.600" }}
             rounded={"none"}
+            avatarMeta={avatarMeta}
           />
         )
       })

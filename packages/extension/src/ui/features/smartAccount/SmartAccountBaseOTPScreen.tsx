@@ -1,9 +1,5 @@
-import {
-  BarBackButton,
-  FlowHeader,
-  icons,
-  NavigationContainer,
-} from "@argent/x-ui"
+import { MessageSecondaryIcon } from "@argent/x-ui/icons"
+import { BarBackButton, FlowHeader, NavigationContainer } from "@argent/x-ui"
 
 import type { FC } from "react"
 import { useCallback, useState } from "react"
@@ -12,8 +8,7 @@ import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/
 import { useRouteFlow } from "../../hooks/useRoute"
 import SmartAccountOTPForm from "./SmartAccountOTPForm"
 import { SmartAccountValidationErrorScreen } from "./SmartAccountValidationErrorScreen"
-
-const { MessageSecondaryIcon } = icons
+import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
 export interface SmartAccountBaseOTPScreenProps {
   onBack: () => void
@@ -34,6 +29,8 @@ export const SmartAccountBaseOTPScreen: FC<SmartAccountBaseOTPScreenProps> = ({
   const onSmartAccountValdationErrorDone = useCallback(() => {
     onOTPReEnterEmail()
   }, [onOTPReEnterEmail])
+
+  const network = useCurrentNetwork()
 
   if (smartAccountValdationError) {
     return (
@@ -60,6 +57,7 @@ export const SmartAccountBaseOTPScreen: FC<SmartAccountBaseOTPScreenProps> = ({
         onOTPConfirmed={onOTPConfirmed}
         onValidationError={setSmartAccountValdationError}
         flow={flow}
+        networkId={network.id}
       />
     </NavigationContainer>
   )

@@ -1,4 +1,8 @@
-import { icons } from "@argent/x-ui"
+import {
+  WarningCircleSecondaryIcon,
+  ShieldSecondaryIcon,
+  NoShieldSecondaryIcon,
+} from "@argent/x-ui/icons"
 import { Spinner } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
@@ -14,12 +18,6 @@ import type { LiveAccountEscapeProps } from "../smartAccount/escape/useAccountEs
 import type { PendingChangeGuardian } from "../smartAccount/usePendingChangingGuardian"
 import type { BannerProps } from "./Banner"
 import { Banner } from "./Banner"
-
-const {
-  WarningCircleSecondaryIcon,
-  ShieldSecondaryIcon,
-  NoShieldSecondaryIcon,
-} = icons
 
 interface EscapeBannerProps extends BannerProps {
   account: WalletAccount
@@ -66,6 +64,11 @@ export const EscapeBanner: FC<EscapeBannerProps> = ({
       />
     )
   }
+
+  if (liveAccountEscape?.expiresFromNowMs === 0) {
+    return null
+  }
+
   if (liveAccountEscape?.activeFromNowMs === 0 || accountGuardianIsSelf) {
     const step = accountGuardianIsSelf ? 2 : 1
     const title = `(${step}/2) Remove guardian now`
@@ -90,10 +93,11 @@ export const EscapeBanner: FC<EscapeBannerProps> = ({
     return null
   }
   const { type } = liveAccountEscape
-  const { colorScheme, title } = getEscapeDisplayAttributes(liveAccountEscape)
+  const { colorScheme, title, bgScheme } =
+    getEscapeDisplayAttributes(liveAccountEscape)
   const icon =
     type === ESCAPE_TYPE_GUARDIAN ? (
-      <ShieldSecondaryIcon />
+      <NoShieldSecondaryIcon />
     ) : (
       <WarningCircleSecondaryIcon />
     )
@@ -101,6 +105,7 @@ export const EscapeBanner: FC<EscapeBannerProps> = ({
   return (
     <Banner
       colorScheme={colorScheme}
+      bgColor={bgScheme}
       title={title}
       description="If this was not you, click this banner"
       icon={icon}

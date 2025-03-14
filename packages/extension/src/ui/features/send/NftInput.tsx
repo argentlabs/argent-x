@@ -1,6 +1,7 @@
 import type { Address } from "@argent/x-shared"
 import { addressSchema, getNftPicture } from "@argent/x-shared"
-import { H5, icons, ImageOptimized, P3 } from "@argent/x-ui"
+import { ChevronDownSecondaryIcon } from "@argent/x-ui/icons"
+import { H5, ImageOptimized, P3 } from "@argent/x-ui"
 import { Circle, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 
@@ -8,8 +9,6 @@ import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
 import { CustomButtonCell } from "../../components/CustomButtonCell"
 import { useNft } from "../accountNfts/nfts.state"
 import { useRemoteNft } from "../accountNfts/useRemoteNft"
-
-const { ChevronDownSecondaryIcon } = icons
 
 interface NftInputProps extends CustomButtonCellProps {
   contractAddress?: Address

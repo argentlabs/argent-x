@@ -11,7 +11,7 @@ import { tokenPrices } from "../defiDecomposition/__fixtures__/tokenPrices"
 import { tokens } from "../defiDecomposition/__fixtures__/tokens"
 import { parseDefiDecomposition } from "../defiDecomposition/helpers/parseDefiDecomposition"
 import { defiDecomposition } from "../defiDecomposition/__fixtures__/defiDecomposition"
-import { getMockAccount } from "../../../test/account.mock"
+import { getMockWalletAccount } from "../../../test/walletAccount.mock"
 import type { AccountInvestments } from "../investments/types"
 
 const mockTokensWithBalance = [
@@ -325,7 +325,7 @@ describe("migrate ArgentDatabase", () => {
     const strkOnLocalHost = {
       id: 2,
       address:
-        "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+        "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
       name: "Starknet",
       symbol: "STRK",
       decimals: 18,
@@ -340,10 +340,11 @@ describe("migrate ArgentDatabase", () => {
     await db.open()
 
     const tokens = await db.tokens.toArray()
+    // console.log("🚀 ~ it ~ tokens:", tokens)
 
     expect(tokens).toContainEqual({
       address:
-        "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
       networkId: "sepolia-alpha",
       network: "sepolia-alpha",
       iconUrl: "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
@@ -368,7 +369,7 @@ describe("migrate ArgentDatabase", () => {
     db = new ArgentDatabase({ version: 7, skipAddressNormalizer: true })
     await db.open()
 
-    const mockAccount = getMockAccount({
+    const mockAccount = getMockWalletAccount({
       address: "0x123",
       networkId: "sepolia-alpha",
     })

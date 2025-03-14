@@ -1,17 +1,19 @@
 import {
-  CellStack,
-  H5,
-  icons,
-  MassiveTitle,
-  ScrollContainer,
-} from "@argent/x-ui"
+  WalletSecondaryIcon,
+  MultisigSecondaryIcon,
+  ImportIcon,
+  PlusSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { CellStack, H5, MassiveTitle, ScrollContainer } from "@argent/x-ui"
 import { Center, Flex, Skeleton } from "@chakra-ui/react"
 import { isEmpty, some } from "lodash-es"
 import type { FC } from "react"
 
 import type { PendingMultisig } from "../../../shared/multisig/types"
-import type { BaseWalletAccount } from "../../../shared/wallet.model"
-import type { Account } from "./Account"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { AccountListScreenItemContainer } from "./AccountListScreenItemContainer"
 import { DeprecatedAccountsWarning } from "./DeprecatedAccountsWarning"
 import { GroupedAccountList } from "./GroupedAccountList"
@@ -19,13 +21,6 @@ import { AccountScreenEmptyContainer } from "./AccountScreenEmptyContainer"
 import { PrettyBalanceForNetwork } from "../accountTokens/PrettyBalance"
 import { AccountListItemSkeleton } from "./AccountListItemSkeleton"
 import { AccountListFooter } from "./AccountListFooter"
-
-const {
-  WalletSecondaryIcon,
-  MultisigSecondaryIcon,
-  ImportIcon,
-  PlusSecondaryIcon,
-} = icons
 
 export const AccountListSkeleton: FC = () => {
   return (
@@ -46,13 +41,13 @@ export const AccountListSkeleton: FC = () => {
 }
 
 interface AccountListProps {
-  deprecatedAccounts?: Account[] // deprecated accounts are different from upgradeable accounts. Should remove this prop in future
-  multisigAccounts: Account[]
+  deprecatedAccounts?: WalletAccount[] // deprecated accounts are different from upgradeable accounts. Should remove this prop in future
+  multisigAccounts: WalletAccount[]
   pendingMultisigs: PendingMultisig[]
   returnTo?: string
   selectedAccount?: BaseWalletAccount
-  standardAccounts: Account[]
-  importedAccounts: Account[]
+  standardAccounts: WalletAccount[]
+  importedAccounts: WalletAccount[]
   visiblePendingMultisigs: PendingMultisig[]
   networkId: string
   onAddAccount: () => void

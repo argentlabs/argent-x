@@ -52,7 +52,7 @@ export type ExtendedTransactionType =
   | MultisigTransactionType
   | "ADD_GUARDIAN"
   | "REMOVE_GUARDIAN"
-
+  | "UPDATE_SECURITY_PERIOD"
 export interface TransactionMeta extends Partial<ActionQueueItemMeta> {
   // title?: string
   subTitle?: string
@@ -64,6 +64,7 @@ export interface TransactionMeta extends Partial<ActionQueueItemMeta> {
   transactions?: Call | Call[]
   type?: ExtendedTransactionType
   ampliProperties?: TransactionSubmittedProperties
+  isInAppSecurityChange?: boolean
   // transactionReview?: EnrichedSimulateAndReview
 }
 

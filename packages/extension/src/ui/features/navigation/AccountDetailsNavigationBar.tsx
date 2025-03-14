@@ -11,12 +11,19 @@ import { Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import { LedgerStatusText } from "./LedgerStatusText"
 import { AccountAvatar } from "../accounts/AccountAvatar"
-import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
+import type {
+  AvatarMeta,
+  WalletAccountType,
+} from "../../../shared/wallet.model"
+
+import { typographyStyles } from "@argent/x-ui/theme"
 
 export interface AccountDetailsNavigationBarProps extends NavigationBarProps {
   accountAddress?: string
   accountName?: string
   accountId?: string
+  avatarMeta?: AvatarMeta
+  accountType?: WalletAccountType
   networkName?: string
   isLedgerConnected?: boolean
 }
@@ -27,10 +34,12 @@ export const AccountDetailsNavigationBar: FC<
   accountAddress,
   accountName,
   accountId,
+  accountType,
   networkName,
   isLedgerConnected,
   leftButton,
   rightButton,
+  avatarMeta,
   ...rest
 }) => {
   return (
@@ -56,10 +65,12 @@ export const AccountDetailsNavigationBar: FC<
           {accountName && accountId && (
             <AccountAvatar
               size={6}
-              src={getNetworkAccountImageUrl({
-                accountName,
-                accountId,
-              })}
+              accountId={accountId}
+              accountName={accountName}
+              accountType={accountType}
+              emojiStyle={typographyStyles.P3}
+              initialsStyle={typographyStyles.P4}
+              avatarMeta={avatarMeta}
             />
           )}
           <Flex direction="column" gap={0.5} overflow="hidden">

@@ -11,13 +11,12 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react"
-import { FieldError, H2, icons, P2, P3, useNavigateBack } from "@argent/x-ui"
+import { ResetPrimaryIcon } from "@argent/x-ui/icons"
+import { FieldError, H2, P2, P3, useNavigateBack } from "@argent/x-ui"
 import type { ControllerRenderProps } from "react-hook-form"
 import { Controller, useForm } from "react-hook-form"
 import { isEmpty } from "lodash-es"
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
-
-const { ResetPrimaryIcon } = icons
 
 type ResetWalletFormValues = {
   validationString: string

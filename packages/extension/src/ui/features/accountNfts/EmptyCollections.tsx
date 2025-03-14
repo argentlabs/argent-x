@@ -1,10 +1,10 @@
-import { Button, Empty, icons, L2Bold, logosDeprecated, P2 } from "@argent/x-ui"
+import { NftIcon } from "@argent/x-ui/icons"
+import { Button, Empty, L2Bold, P2 } from "@argent/x-ui"
 import type { FlexProps } from "@chakra-ui/react"
 import { Box, Flex, Text } from "@chakra-ui/react"
 import type { FC, ReactNode } from "react"
 
-const { NftIcon } = icons
-const { UnframedLogo, ElementLogo } = logosDeprecated
+import { UnframedLogo, ElementLogo } from "@argent/x-ui/logos-deprecated"
 
 const ButtonLink: FC<{ href: string; icon: ReactNode; title: string }> = ({
   icon,

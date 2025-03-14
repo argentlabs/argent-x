@@ -151,3 +151,7 @@ export const ARGENT_TOKENS_INFO_URL = ARGENT_API_ENABLED
 export const ARGENT_TOKENS_DEFI_INVESTMENTS_URL = ARGENT_API_ENABLED
   ? urlJoin(ARGENT_API_BASE_URL, "/tokens/defi")
   : undefined
+
+export const ARGENT_RELAYER_URL = ARGENT_API_ENABLED
+  ? urlJoin(ARGENT_API_BASE_URL, "/relayer/paymaster")
+  : undefined

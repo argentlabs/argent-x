@@ -1,20 +1,18 @@
-import type {
-  IHttpService,
-  StakerInfo,
-  StrkStakingCalldata,
-  StrkStakingCalldataResponse,
+import type { BuildSellOpts } from "@argent/x-shared"
+import {
+  type IHttpService,
+  type StakerInfo,
+  type StrkStakingCalldata,
+  type StrkStakingCalldataResponse,
 } from "@argent/x-shared"
 import urlJoin from "url-join"
 
 import type { IStakingService } from "../../../shared/staking/IStakingService"
+import type { StrkStakingCalldataWithAccountType } from "../../../shared/staking/types"
+import { sanitizeAccountType } from "../../../shared/utils/sanitizeAccountType"
+import type { WalletAccountType } from "../../../shared/wallet.model"
 import type { IBackgroundActionService } from "../action/IBackgroundActionService"
 import type { IBackgroundInvestmentService } from "../investments/IBackgroundInvestmentService"
-import type { WalletAccountType } from "../../../shared/wallet.model"
-import { sanitizeAccountType } from "../../../shared/utils/sanitizeAccountType"
-import type {
-  BuildSellOpts,
-  StrkStakingCalldataWithAccountType,
-} from "../../../shared/staking/types"
 
 export class StakingService implements IStakingService {
   constructor(
@@ -61,7 +59,9 @@ export class StakingService implements IStakingService {
           transactions: calls,
           meta: {
             ampliProperties: this.buildAmpliProperties(
-              "stake",
+              input.investmentType === "strkDelegatedStaking"
+                ? "stake"
+                : "liquid stake",
               input.stakerInfo,
               input.accountType,
             ),
@@ -73,6 +73,7 @@ export class StakingService implements IStakingService {
         shortTitle: "Stake",
         icon: "InvestSecondaryIcon",
         investment: {
+          investmentId: input.investmentId,
           stakingAction: "stake",
           stakerInfo: input.stakerInfo,
           tokenAddress: input.tokenAddress,
@@ -140,10 +141,12 @@ export class StakingService implements IStakingService {
         shortTitle: "Initiate withdraw",
         icon: "ArrowDownPrimaryIcon",
         investment: {
+          investmentId: input.investmentId,
           stakingAction: "initiateWithdraw",
           stakerInfo: input.stakerInfo,
           tokenAddress: input.tokenAddress,
           amount: input.amount,
+          useFullBalance: true,
         },
       },
     )
@@ -173,10 +176,12 @@ export class StakingService implements IStakingService {
         shortTitle: "Withdraw",
         icon: "ArrowDownPrimaryIcon",
         investment: {
+          investmentId: input.investmentId,
           stakingAction: "withdraw",
           stakerInfo: input.stakerInfo,
           tokenAddress: input.tokenAddress,
           amount: input.amount,
+          subsequentTransaction: true,
         },
       },
     )
@@ -222,6 +227,7 @@ export class StakingService implements IStakingService {
         shortTitle: "Claim",
         icon: "SparkleSecondaryIcon",
         investment: {
+          investmentId: input.investmentId,
           stakingAction: "claim",
           stakerInfo: input.stakerInfo,
           tokenAddress: input.tokenAddress,
@@ -236,6 +242,7 @@ export class StakingService implements IStakingService {
   buildAmpliProperties(
     type:
       | "stake"
+      | "liquid stake"
       | "claim staked rewards"
       | "initialise withdraw"
       | "finalise withdraw",

@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest"
 
 import type { PendingMultisig } from "../../../shared/multisig/types"
 import { renderWithLegacyProviders } from "../../test/utils"
-import type { Account } from "./Account"
 import { AccountListHiddenScreen } from "./AccountListHiddenScreen"
 import { stark } from "starknet"
+import type { WalletAccount } from "../../../shared/wallet.model"
 import { SignerType } from "../../../shared/wallet.model"
 
 const mockLocalSigner = {
@@ -55,7 +55,7 @@ export const mockAccounts = [
     type: "ledger",
     signer: mockLedgerSigner,
   },
-] as Account[]
+] as WalletAccount[]
 
 const pendingMultisigAccounts: PendingMultisig[] = [
   {

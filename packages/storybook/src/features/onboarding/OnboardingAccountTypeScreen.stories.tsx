@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 import { OnboardingAccountTypeScreen } from "@argent-x/extension/src/ui/features/onboarding/OnboardingAccountTypeScreen"
 import { getAccountTypesForOnboarding } from "@argent-x/extension/src/ui/features/accounts/useAccountTypesForNetwork"
 import { defaultNetwork } from "@argent-x/extension/src/shared/network"

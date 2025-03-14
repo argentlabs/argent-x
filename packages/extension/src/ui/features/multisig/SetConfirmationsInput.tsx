@@ -1,10 +1,9 @@
-import { FieldError, icons, MassiveTitle } from "@argent/x-ui"
+import { PlusSecondaryIcon, MinusPrimaryIcon } from "@argent/x-ui/icons"
+import { FieldError, MassiveTitle } from "@argent/x-ui"
 import { Box, Button, Center, Flex } from "@chakra-ui/react"
 import { Controller, useFormContext } from "react-hook-form"
 
 import type { FieldValuesThresholdForm } from "./hooks/useUpdateThreshold"
-
-const { PlusSecondaryIcon, MinusPrimaryIcon } = icons
 
 export const SetConfirmationsInput = ({
   existingThreshold,

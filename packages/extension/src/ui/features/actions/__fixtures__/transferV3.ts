@@ -121,6 +121,15 @@ export const transferV3: TransactionActionFixture = {
             unit: "WEI",
             maxFee: 8363998255470,
           },
+          feeEstimations: [
+            {
+              overallFee: 2788000019516,
+              gasPrice: 1000000007,
+              gasUsage: 2788,
+              unit: "WEI",
+              maxFee: 8363998255470,
+            },
+          ],
         },
       },
     ],

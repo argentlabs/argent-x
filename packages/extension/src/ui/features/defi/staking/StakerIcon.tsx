@@ -1,9 +1,7 @@
 import type { SquareProps } from "@chakra-ui/react"
 import { Square, Image } from "@chakra-ui/react"
-import { icons } from "@argent/x-ui"
+import { ValidatorSecondaryIcon } from "@argent/x-ui/icons"
 import type { FC } from "react"
-
-const { NoImageSecondaryIcon } = icons
 
 interface StakerIconProps extends SquareProps {
   iconUrl?: string
@@ -27,7 +25,7 @@ export const StakerIcon: FC<StakerIconProps> = ({
       <Image
         fit="cover"
         src={iconUrl}
-        fallback={<NoImageSecondaryIcon fontSize="xl" />}
+        fallback={<ValidatorSecondaryIcon fontSize={"small"} />}
       />
     </Square>
   )

@@ -1,11 +1,10 @@
-import { icons, MassiveTitle } from "@argent/x-ui"
+import { SuccessSecondaryIcon } from "@argent/x-ui/icons"
+import { MassiveTitle } from "@argent/x-ui"
 import { Box, HStack } from "@chakra-ui/react"
 import type { FC } from "react"
 import { ActionButton } from "../../components/FullScreenPage"
 import { SidePanel } from "./layout/Panel"
 import { ScreenLayout } from "./layout/ScreenLayout"
-
-const { SuccessSecondaryIcon } = icons
 
 export const LedgerReconnectSuccess: FC<{
   index: number

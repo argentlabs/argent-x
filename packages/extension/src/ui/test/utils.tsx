@@ -1,7 +1,5 @@
-import {
-  EventEmitterProvider,
-  ThemeProvider as ArgentTheme,
-} from "@argent/x-ui"
+import { EventEmitterProvider } from "@argent/x-ui"
+import { ThemeProvider as ArgentTheme } from "@argent/x-ui/theme"
 import type { RenderOptions } from "@testing-library/react"
 import { render } from "@testing-library/react"
 import Emittery from "emittery"

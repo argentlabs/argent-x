@@ -26,16 +26,14 @@ import type { Address } from "@argent/x-shared"
 import {
   addressSchema,
   ensureArray,
+  findImplementationForAccount,
+  getArgentAccountClassHashes,
   isContractDeployed,
   isEqualAddress,
-  getArgentAccountClassHashes,
-  findImplementationForAccount,
+  urlWithQuery,
 } from "@argent/x-shared"
 import { z } from "zod"
-import {
-  ARGENT_API_ENABLED,
-  ARGENT_SMART_ACCOUNT_DISCOVERY_URL,
-} from "../../../shared/api/constants"
+import { ARGENT_SMART_ACCOUNT_DISCOVERY_URL } from "../../../shared/api/constants"
 import {
   argentApiNetworkForNetwork,
   argentXHeaders,
@@ -44,24 +42,25 @@ import { RecoveryError } from "../../../shared/errors/recovery"
 import type { ILedgerSharedService } from "../../../shared/ledger/service/ILedgerSharedService"
 import type { ApiMultisigDataForSigner } from "../../../shared/multisig/multisig.model"
 import type { IMultisigBackendService } from "../../../shared/multisig/service/backend/IMultisigBackendService"
-import { getDefaultNetworkId } from "../../../shared/network/utils"
 import { ArgentSigner } from "../../../shared/signer"
 import type { PublicKeyWithIndex } from "../../../shared/signer/types"
 import { getBaseDerivationPath } from "../../../shared/signer/utils"
-import { getStandardAccountDiscoveryUrl } from "../../../shared/utils/getStandardAccountDiscoveryUrl"
-import {
-  getCairo0AccountContractAddress,
-  getCairo1AccountContractAddress,
-} from "../../../shared/utils/getContractAddress"
+import { isSmartAccountEnabled } from "../../../shared/smartAccount/useSmartAccountEnabled"
+import type { IRepository } from "../../../shared/storage/__new/interface"
 import {
   sortAccountsByDerivationPath,
   sortMultisigByDerivationPath,
 } from "../../../shared/utils/accountsMultisigSort"
-import type { IRepository } from "../../../shared/storage/__new/interface"
+import {
+  getCairo0AccountContractAddress,
+  getCairo1AccountContractAddress,
+} from "../../../shared/utils/getContractAddress"
+import { getStandardAccountDiscoveryUrl } from "../../../shared/utils/getStandardAccountDiscoveryUrl"
 import type { WalletCryptoStarknetService } from "../crypto/WalletCryptoStarknetService"
 import type { IWalletRecoveryService } from "./IWalletRecoveryService"
 import { getPathForIndex } from "../../../shared/utils/derivationPath"
 import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
+import { getAccountMeta } from "../../../shared/accountNameGenerator"
 
 const INITIAL_PUB_KEY_COUNT = 20
 
@@ -182,10 +181,8 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
   }
 
   private getSmartAccountDiscoveryUrl(network: Network) {
-    const defaultNetworkId = getDefaultNetworkId()
-    const isSmartAccountEnabled =
-      defaultNetworkId === network.id && ARGENT_API_ENABLED
-    if (!isSmartAccountEnabled) {
+    const smartAccountEnabled = isSmartAccountEnabled(network.id)
+    if (!smartAccountEnabled) {
       return
     }
 
@@ -203,8 +200,9 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
     if (!backendNetwork || !ARGENT_SMART_ACCOUNT_DISCOVERY_URL) {
       return
     }
-
-    return ARGENT_SMART_ACCOUNT_DISCOVERY_URL
+    return urlWithQuery(ARGENT_SMART_ACCOUNT_DISCOVERY_URL, {
+      network: backendNetwork,
+    })
   }
 
   private async buildTempAccounts(
@@ -545,15 +543,20 @@ export class WalletRecoveryStarknetService implements IWalletRecoveryService {
       const hasGuardian = !isEmpty(validAccount?.guardianAddresses)
 
       if (validAccount) {
+        const validId = getAccountIdentifier(
+          validAccount.account,
+          network.id,
+          account.signer,
+        )
+
+        const { name } = getAccountMeta(validId, "smart")
+
         const isSmartAccount = hasGuardian && validAccount.salt
         const accountWithDetails = {
           ...account,
           address: validAccount.account,
-          id: getAccountIdentifier(
-            validAccount.account,
-            network.id,
-            account.signer,
-          ),
+          id: validId,
+          name,
           guardian: hasGuardian
             ? validAccount.guardianAddresses?.[0]
             : undefined,

@@ -20,39 +20,36 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint . --cache --ext .ts,.tsx",
+    "lint": "eslint --cache",
     "dev": "NODE_ENV=development vite build --mode development --watch",
     "setup": "vite build",
     "build": "vite build",
-    "example": "cd example && react-scripts start"
+    "example": "vite --config example/vite.config.ts"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.6",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^8.7.0",
-    "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "react-scripts": "5.0.1",
-    "typescript": "^5.0.4",
-    "vite": "^5.0.0",
-    "vite-plugin-dts": "^4.0.0",
-    "vitest": "2.1.4"
+    "@types/lodash-es": "4.17.12",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "eslint": "9.15.0",
+    "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-react-hooks": "5.0.0",
+    "typescript": "5.7.2",
+    "typescript-eslint": "8.16.0",
+    "vite": "6.0.2",
+    "vite-plugin-dts": "4.3.0",
+    "vitest": "3.0.4"
   },
   "peerDependencies": {
-    "@argent/x-ui": "^1.80.1",
+    "@argent/x-ui": "1.92.0",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "11.13.0",
     "@emotion/styled": "11.13.0",
     "colord": "^2.9.2",
-    "framer-motion": "^11.0.5",
+    "framer-motion": "11.0.5",
     "history": "^5.3.0",
     "lodash-es": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-router-dom": "6.27.0"
+    "react-router-dom": "6.28.0"
   }
 }

@@ -53,10 +53,10 @@ export default class Network extends Navigation {
     await this.page.locator('[data-testid="network-switcher-button"]').click()
     await this.networkOption(networkName).click()
     const accounts = await this.page
-      .locator('[aria-label^="Select A"]')
+      .locator('[aria-label^="Select "]')
       .allInnerTexts()
     if (accounts.length > 0) {
-      await this.page.locator('[aria-label^="Select A"]').first().click()
+      await this.page.locator('[aria-label^="Select "]').first().click()
     } else {
       await this.closeButtonLocator.click()
     }

@@ -9,13 +9,14 @@ import type {
 } from "../../multisig.model"
 import { MultisigBackendService } from "./MultisigBackendService"
 import { getMultisigAccountFromBaseWallet } from "../../utils/baseMultisig"
-import { getMockAccount, getMockSigner } from "../../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../../test/walletAccount.mock"
 import { chainIdToStarknetNetwork } from "../../../utils/starknetNetwork"
 import { addressSchema } from "@argent/x-shared"
 import {
   getAccountIdentifier,
   getRandomAccountIdentifier,
 } from "../../../utils/accountIdentifier"
+import { getMockSigner } from "../../../../../test/signer.mock"
 
 vi.mock("../../utils/baseMultisig")
 vi.mock("../../pendingTransactionsStore")
@@ -268,7 +269,7 @@ describe("MultisigBackendService", () => {
         "0x03ae16dac8ab10a29cb58a96051ba6b3b10d66afc327887105fd90c05486c24b"
 
       mockGetMultisigAccountFromBaseWallet.mockResolvedValueOnce({
-        ...getMockAccount({
+        ...getMockWalletAccount({
           address,
         }),
         threshold: 1,
@@ -377,7 +378,7 @@ describe("MultisigBackendService", () => {
       const id = getRandomAccountIdentifier(address)
 
       mockGetMultisigAccountFromBaseWallet.mockResolvedValueOnce({
-        ...getMockAccount({
+        ...getMockWalletAccount({
           id,
           address,
         }),
@@ -515,7 +516,7 @@ describe("MultisigBackendService", () => {
       const id = getRandomAccountIdentifier(address)
 
       mockGetMultisigAccountFromBaseWallet.mockResolvedValueOnce({
-        ...getMockAccount({
+        ...getMockWalletAccount({
           id,
           address,
         }),
@@ -638,7 +639,7 @@ describe("MultisigBackendService", () => {
       const address = "0x1"
 
       mockGetMultisigAccountFromBaseWallet.mockResolvedValueOnce({
-        ...getMockAccount({
+        ...getMockWalletAccount({
           address,
         }),
         threshold: 1,

@@ -1,10 +1,9 @@
-import { Button, icons, P2 } from "@argent/x-ui"
+import { RocketSecondaryIcon } from "@argent/x-ui/icons"
+import { Button, P2 } from "@argent/x-ui"
 import type { FC, ReactEventHandler } from "react"
 
 import type { DeployAccountScreenContainerProps } from "./deployAccountScreen.model"
 import { StarknetAccountMessage } from "./ui/StarknetAccountMessage"
-
-const { RocketSecondaryIcon } = icons
 
 interface DeployAccountScreenProps extends DeployAccountScreenContainerProps {
   onActivate: ReactEventHandler

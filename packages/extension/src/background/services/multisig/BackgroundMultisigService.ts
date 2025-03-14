@@ -65,6 +65,23 @@ export default class BackgroundMultisigService
     private actionService: IBackgroundActionService,
   ) {}
 
+  async validateSigners(signers: string[]): Promise<boolean> {
+    const accountSigners = await this.wallet.getAccountSigners()
+    const decodedSigners = decodeBase58Array(signers)
+
+    const nonMultisigSigners = accountSigners
+      .filter((s) => s.type !== "multisig")
+      .map((s) => s.publicKey)
+
+    // Decoded signers should not be in the list of non-multisig signers
+    return decodedSigners.every(
+      (signer) =>
+        !nonMultisigSigners.some((nonMultisigSigner) =>
+          isEqualAddress(nonMultisigSigner, signer),
+        ),
+    )
+  }
+
   async addAccount(payload: AddAccountPayload): Promise<AddAccountResponse> {
     const {
       networkId,
@@ -92,6 +109,7 @@ export default class BackgroundMultisigService
         derivationPath,
       },
     )
+
     await tryToMintAllFeeTokens(account)
 
     const accounts = await getMultisigAccounts()
@@ -491,6 +509,10 @@ export default class BackgroundMultisigService
         message:
           "The signature of the transaction is not valid anymore - please reject this transaction and try again",
       })
+    }
+
+    if (preComputedFees.type === "paymaster") {
+      throw new TransactionError({ code: "PAYMASTER_FEES_NOT_SUPPORTED" })
     }
 
     const transaction = await acc.execute(

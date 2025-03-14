@@ -32,7 +32,7 @@ describe("prices utils", () => {
         includeFee: true,
         inverted: false,
       })
-      expect(result).toEqual("1 ETH ~ 2.0019 DAI")
+      expect(result).toEqual("1 ETH ≈ 2.0019 DAI")
     })
 
     it("should return the correct execution price (with fees) with inversion", () => {
@@ -41,7 +41,7 @@ describe("prices utils", () => {
         includeFee: true,
         inverted: true,
       })
-      expect(result).toEqual("1 DAI ~ 0.4995 ETH")
+      expect(result).toEqual("1 DAI ≈ 0.4995 ETH")
     })
 
     it("should return the correct execution price (without fees) without inversion", () => {
@@ -50,7 +50,7 @@ describe("prices utils", () => {
         includeFee: false,
         inverted: false,
       })
-      expect(result).toEqual("1 ETH ~ 2.0 DAI")
+      expect(result).toEqual("1 ETH ≈ 2 DAI")
     })
 
     it("should return the correct execution price (without fees)  with inversion", () => {
@@ -59,7 +59,7 @@ describe("prices utils", () => {
         includeFee: false,
         inverted: true,
       })
-      expect(result).toEqual("1 DAI ~ 0.5 ETH")
+      expect(result).toEqual("1 DAI ≈ 0.5 ETH")
     })
 
     it("should handle custom separators", () => {
@@ -92,7 +92,7 @@ describe("prices utils", () => {
         receiveAmount: "5000000000000000000000000000",
       }
       const result = formatExecutionPrice({ trade: largeTrade })
-      expect(result).toContain(`1 ETH ~`)
+      expect(result).toContain(`1 ETH ≈`)
       expect(result).toContain(`DAI`)
     })
   })

@@ -1,6 +1,6 @@
 import type { WalletAccount } from "../wallet.model"
 
-export type PreAuthorisationMessage =
+export type PreAuthorizationMessage =
   | { type: "CONNECT_DAPP"; data?: { silent?: boolean } }
   | { type: "CONNECT_DAPP_RES"; data: WalletAccount }
   | { type: "IS_PREAUTHORIZED" }

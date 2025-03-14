@@ -1,5 +1,9 @@
 import codeImportPatterns from "./code-import-patterns"
 
-exports.rules = {
-  "code-import-patterns": codeImportPatterns,
+const plugin = {
+  rules: {
+    "code-import-patterns": codeImportPatterns,
+  },
 }
+
+module.exports = plugin

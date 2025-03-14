@@ -1,4 +1,5 @@
 import { addressSchema, type Address } from "@argent/x-shared"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
 import {
   B2,
   BarBackButton,
@@ -6,7 +7,6 @@ import {
   CellStack,
   H3,
   HeaderCell,
-  icons,
   ModalBottomDialog,
   NavigationContainer,
   P2,
@@ -23,8 +23,6 @@ import { ampli } from "../../../shared/analytics"
 import type { RequestToken } from "../../../shared/token/__new/types/token.model"
 import { RequestTokenSchema } from "../../../shared/token/__new/types/token.model"
 import { ControlledInput } from "../../components/ControlledInput"
-
-const { WarningCircleSecondaryIcon } = icons
 
 interface ScamWarningModalProps {
   onClose: () => void

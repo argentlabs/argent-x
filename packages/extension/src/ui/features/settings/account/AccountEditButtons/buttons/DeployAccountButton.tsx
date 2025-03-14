@@ -1,14 +1,14 @@
 import { ButtonCell } from "@argent/x-ui"
 import type { FC } from "react"
 import { useMemo } from "react"
-import { useHasFeeTokenBalance } from "../../../../accountTokens/useFeeTokenBalance"
+import { useHasNativeFeeTokenBalance } from "../../../../accountTokens/useFeeTokenBalance"
 import { clientAccountService } from "../../../../../services/account"
 import type { WalletAccount } from "../../../../../../shared/wallet.model"
 
 export const DeployAccountButtonContainer: FC<{ account: WalletAccount }> = ({
   account,
 }) => {
-  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
+  const hasFeeTokenBalance = useHasNativeFeeTokenBalance(account)
   const canDeployAccount = useMemo(
     () => account.needsDeploy && hasFeeTokenBalance,
     [account?.needsDeploy, hasFeeTokenBalance],

@@ -7,6 +7,15 @@ import {
   voidify,
 } from "@argent/x-shared"
 import type { CrosshairMoveProps, TimeFrameOption } from "@argent/x-ui"
+
+import {
+  PlusPrimaryIcon,
+  SwapPrimaryIcon,
+  SendSecondaryIcon,
+  InfoCircleSecondaryIcon,
+  InvestSecondaryIcon,
+} from "@argent/x-ui/icons"
+
 import {
   B3,
   BarBackButton,
@@ -14,15 +23,14 @@ import {
   formatDateTime,
   H1,
   H5,
-  icons,
   L1Bold,
   NavigationBar,
   P2,
   P3,
-  scrollbarStyle,
   TokenIcon,
   useToast,
 } from "@argent/x-ui"
+import { scrollbarStyle } from "@argent/x-ui/theme"
 import {
   Box,
   Center,
@@ -57,14 +65,7 @@ import { TokenDetailsChartContainer } from "./TokenDetailsChartContainer"
 import { useTokenActivities } from "./hooks/useTokenActivities"
 import { useKeyValueStorage } from "../../hooks/useStorage"
 import { stakingStore } from "../../../shared/staking/storage"
-
-const {
-  PlusPrimaryIcon,
-  SwapPrimaryIcon,
-  SendSecondaryIcon,
-  InfoCircleSecondaryIcon,
-  InvestSecondaryIcon,
-} = icons
+import { ampli } from "../../../shared/analytics"
 
 const activityTabIndex = 0
 const aboutTabIndex = 1
@@ -173,6 +174,10 @@ export const TokenDetailsScreen: FC = () => {
 
   const onClickSwap = useCallback(() => {
     if (token) {
+      void ampli.swapTabClicked({
+        "wallet platform": "browser extension",
+        "swap entered from": "token details page",
+      })
       navigate(routes.swapToken(token.address, returnTo))
     }
   }, [navigate, returnTo, token])

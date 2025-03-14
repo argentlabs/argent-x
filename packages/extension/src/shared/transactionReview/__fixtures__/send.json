@@ -103,12 +103,79 @@
         ],
         "calculatedNonce": "0x2d",
         "feeEstimation": {
-          "overallFee": "223726200743336",
-          "gasPrice": "80246126522",
-          "gasUsage": "2788",
-          "unit": "WEI",
-          "maxFee": "447452402228894"
-        }
+          "overallFee": "48412045421297628",
+          "gasPrice": "2305335302099180",
+          "gasUsage": "21",
+          "unit": "FRI",
+          "maxAmount": "42",
+          "maxPricePerUnit": "3458002953105856",
+          "token": {
+            "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+            "name": "Starknet Token",
+            "symbol": "STRK",
+            "decimals": 18,
+            "unknown": false,
+            "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+            "type": "ERC20"
+          }
+        },
+        "feeEstimations": [
+          {
+            "overallFee": "48412045421297628",
+            "gasPrice": "2305335302099180",
+            "gasUsage": "21",
+            "unit": "FRI",
+            "maxAmount": "42",
+            "maxPricePerUnit": "3458002953105856",
+            "token": {
+              "address": "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+              "name": "Starknet Token",
+              "symbol": "STRK",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/strk.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "overallFee": "776",
+            "maxFee": "2328",
+            "token": {
+              "address": "0x0030058f19ed447208015f6430f0102e8ab82d6c291566d7e73fe8e613c3d2ed",
+              "name": "Standard Weighted Adalian Yield",
+              "symbol": "SWAY",
+              "decimals": 6,
+              "unknown": false,
+              "type": "ERC20"
+            }
+          },
+          {
+            "overallFee": "4323550018745",
+            "maxFee": "12970632528043",
+            "token": {
+              "address": "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+              "name": "Ether",
+              "symbol": "ETH",
+              "decimals": 18,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/eth.png",
+              "type": "ERC20"
+            }
+          },
+          {
+            "overallFee": "14565",
+            "maxFee": "43695",
+            "token": {
+              "address": "0x053b40a647cedfca6ca84f542a0fe36736031905a9639a7f19a3c1e66bfd5080",
+              "name": "USDC",
+              "symbol": "USDC",
+              "decimals": 6,
+              "unknown": false,
+              "iconUrl": "https://dv3jj1unlp2jl.cloudfront.net/128/color/usdc.png",
+              "type": "ERC20"
+            }
+          }
+        ]
       }
     }
   ]

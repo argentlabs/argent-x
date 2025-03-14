@@ -15,11 +15,11 @@ import {
 } from "../../hooks/useRoute"
 import { activityForTransactionHashView } from "../../views/activityCache"
 import { useView } from "../../views/implementation/react"
-import type { Multisig } from "./Multisig"
 import { multisigView } from "./multisig.state"
 import { MultisigTransactionConfirmationsScreen } from "./MultisigTransactionConfirmationsScreen"
 import { useRouteWalletAccount } from "../smartAccount/useRouteWalletAccount"
 import { isMultisigTransactionRejectedAndNonceNotConsumed } from "../../../shared/multisig/utils/getMultisigTransactionType"
+import type { MultisigWalletAccount } from "../../../shared/wallet.model"
 
 export const MultisigTransactionConfirmationsScreenContainer = () => {
   const selectedAccount = useRouteWalletAccount()
@@ -135,7 +135,7 @@ const TransactionConfirmationsScreenSubtitle = ({
   approvedSignersLength,
   isPendingTx,
 }: {
-  multisig?: Multisig
+  multisig?: MultisigWalletAccount
   approvedSignersLength: number
   isPendingTx: boolean
 }) => {

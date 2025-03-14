@@ -5,29 +5,31 @@ import type {
   IRepository,
 } from "../../../shared/storage/__new/interface"
 import type { WalletAccount } from "../../../shared/wallet.model"
-import type { WalletSession } from "../session/walletSession.model"
 import type { Events, IWalletRecoveryService } from "./IWalletRecoveryService"
 import { Recovered } from "./IWalletRecoveryService"
 import { WalletError } from "../../../shared/errors/wallet"
 import type Emittery from "emittery"
 import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 import { isEqualAddress } from "@argent/x-shared"
+import type { ISecretStorageService } from "../session/interface"
 
 export class WalletRecoverySharedService {
   constructor(
     readonly emitter: Emittery<Events>,
     public readonly store: IObjectStore<WalletStorageProps>,
     private readonly walletStore: IRepository<WalletAccount>,
-    public readonly sessionStore: IObjectStore<WalletSession | null>,
+    public readonly secretStorageService: ISecretStorageService,
     private readonly networkService: Pick<INetworkService, "getById">,
     private readonly chainRecoveryService: IWalletRecoveryService,
   ) {}
 
   public async discoverAccounts() {
-    const session = await this.sessionStore.get()
-    if (!session?.secret) {
+    const decrypted = await this.secretStorageService.decrypt()
+    if (!decrypted) {
       throw new WalletError({ code: "NOT_INITIALIZED" })
     }
+
+    const { secret } = decrypted
 
     const networks = defaultNetworks.map((network) => network.id)
 
@@ -37,7 +39,7 @@ export class WalletRecoverySharedService {
       const network = await this.networkService.getById(networkId)
       const accountResults =
         await this.chainRecoveryService.restoreAccountsFromWallet(
-          session.secret,
+          secret,
           network,
         )
       accounts.push(...accountResults)

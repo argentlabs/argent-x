@@ -1,13 +1,13 @@
-import { Button, CellStack, icons } from "@argent/x-ui"
-import { StoryObj } from "@storybook/react"
-import { ComponentProps } from "react"
+import { Button, CellStack } from "@argent/x-ui"
+import type { StoryObj } from "@storybook/react"
+import type { ComponentProps } from "react"
 
 import { AccountListItem } from "@argent-x/extension/src/ui/features/accounts/AccountListItem"
 import { AccountListItemEditAccessory } from "@argent-x/extension/src/ui/features/accounts/AccountListItemEditAccessory"
 
 import { decorators } from "../../decorators/routerDecorators"
 
-const { WalletSecondaryIcon, AddressBookIcon } = icons
+import { WalletSecondaryIcon, AddressBookIcon } from "@argent/x-ui/icons"
 
 export default {
   component: AccountListItem,

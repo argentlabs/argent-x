@@ -1,15 +1,13 @@
 import type { FC } from "react"
 import { useNavigateReturnToOrBack } from "../../hooks/useNavigateReturnTo"
+import { ExpandIcon, ActivitySecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   Empty,
   EmptyButton,
-  icons,
   useBlockExplorer,
 } from "@argent/x-ui"
 import { AccountDetailsNavigationContainer } from "../navigation/AccountDetailsNavigationContainer"
-
-const { ExpandIcon, ActivitySecondaryIcon } = icons
 
 interface ActivityDetailsScreenEmptyProps {
   txHash?: string

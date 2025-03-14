@@ -11,4 +11,8 @@ export class InvestmentService implements IInvestmentService {
   async getStrkDelegatedStakingInvestments() {
     return this.trpcMessageClient.investments.getStrkDelegatedStakingInvestments.query()
   }
+
+  async getStrkLiquidStakingInvestments() {
+    return this.trpcMessageClient.investments.getStrkLiquidStakingInvestments.query()
+  }
 }

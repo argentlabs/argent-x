@@ -1,12 +1,13 @@
 import {
-  CellStack,
-  CopyTooltip,
-  H4,
-  icons,
-  P3,
-  scrollbarStyleThin,
-  useToast,
-} from "@argent/x-ui"
+  WarningCircleSecondaryIcon,
+  CopyPrimaryIcon,
+  RefreshPrimaryIcon,
+  BroomIcon,
+  DropdownDownIcon,
+} from "@argent/x-ui/icons"
+
+import { CellStack, CopyTooltip, H4, P3, useToast } from "@argent/x-ui"
+import { scrollbarStyleThin } from "@argent/x-ui/theme"
 import type { FC } from "react"
 import { useCallback, useEffect, useMemo } from "react"
 
@@ -28,14 +29,6 @@ import {
 } from "@chakra-ui/react"
 import { ClearStorageModal } from "./ClearStorageModal"
 import { browserExtensionSentryWithScope } from "../../shared/sentry/scope"
-
-const {
-  WarningCircleSecondaryIcon,
-  CopyPrimaryIcon,
-  RefreshPrimaryIcon,
-  BroomIcon,
-  DropdownDownIcon,
-} = icons
 
 const version = process.env.VERSION
 const fallbackErrorPayload = `v${version}

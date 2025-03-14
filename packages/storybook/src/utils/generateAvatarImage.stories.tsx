@@ -1,6 +1,6 @@
 import { generateAvatarImage } from "@argent/x-shared"
 import { Box, Img, SimpleGrid } from "@chakra-ui/react"
-import { PropsWithChildren } from "react"
+import type { PropsWithChildren } from "react"
 
 export default {
   component: Box,

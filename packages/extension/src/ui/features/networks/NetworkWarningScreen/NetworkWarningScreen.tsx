@@ -1,8 +1,7 @@
-import { H2, icons, P2 } from "@argent/x-ui"
+import { NetworkSecondaryIcon } from "@argent/x-ui/icons"
+import { H2, P2 } from "@argent/x-ui"
 import { Button, Center, Circle, Text } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { NetworkSecondaryIcon } = icons
 
 type NetworkWarningScreenProps = {
   onClick?: () => void

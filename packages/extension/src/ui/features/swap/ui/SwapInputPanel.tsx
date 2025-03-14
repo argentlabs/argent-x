@@ -1,67 +1,103 @@
-import { debounce } from "lodash-es"
-import type { FC } from "react"
-import { useCallback, useEffect, useMemo, useState } from "react"
-
 import {
+  bigDecimal,
   isAllowedNumericInputValue,
   prettifyTokenAmount,
 } from "@argent/x-shared"
-import { TokenValue } from "./TokenValue"
-import { SwapTokensModal } from "./SwapTokensModal"
+import { CompoundInput } from "@argent/x-ui"
+import { Flex, useDisclosure } from "@chakra-ui/react"
+import { debounce } from "lodash-es"
+import type { FC } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import type { PriceImpactResult } from "../../../../shared/swap/model/trade.model"
 import type { Token } from "../../../../shared/token/__new/types/token.model"
 import type { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
-import { useDisclosure, Flex, Input, Button } from "@chakra-ui/react"
-import { H5, icons, L2Bold, LoadingPulse, P3, TokenIcon } from "@argent/x-ui"
+import {
+  useCurrencyValueToTokenAmount,
+  useTokenAmountToCurrencyFormatted,
+} from "../../accountTokens/tokenPriceHooks"
+import { SwapTokensModal } from "./SwapTokensModal"
 
-const { ChevronDownSecondaryIcon } = icons
-
-interface SwapInputPanelProps {
-  value: string
-  type: "pay" | "receive"
-  onUserInput: (value: string) => void
-  onMax?: () => void
-  token?: Token | undefined
-  showMaxButton?: boolean
-  onTokenSelect?: (token: Token) => void
-  currentBalance?: TokenWithOptionalBigIntBalance
-  otherToken?: Token | null
+interface SwapInputProps {
   id: string
-  tradeLoading: boolean
+  type: "pay" | "receive"
+  value: string
+  onChange: (value: string) => void
+  isReadOnly?: boolean
+  isFiatInput?: boolean
+  setIsFiatInput?: (value: boolean) => void
+  onPercentageClick?: (percentage: number) => void
+  onTokenSelect: (token: Token) => void
+  isLoading: boolean
+  tokenWithBalance?: TokenWithOptionalBigIntBalance
   insufficientBalance?: boolean
+  priceImpact?: PriceImpactResult
 }
 
-const SwapInputPanel: FC<SwapInputPanelProps> = ({
+const SwapInputPanel: FC<SwapInputProps> = ({
   id,
-  value,
-  onUserInput,
   type,
-  token,
-  currentBalance,
+  value,
+  onChange,
+  onPercentageClick,
   onTokenSelect,
-  onMax,
-  showMaxButton = false,
-  tradeLoading,
+  isLoading,
+  isFiatInput = false,
+  setIsFiatInput,
+  tokenWithBalance,
   insufficientBalance,
+  priceImpact,
 }) => {
+  const [inputValue, setInputValue] = useState<string | undefined>()
+
+  const prettyBalance = useMemo(() => {
+    const significantDigits = 6
+
+    if (!tokenWithBalance) {
+      return "0"
+    }
+
+    const { balance, decimals } = tokenWithBalance
+
+    const prettyBalance = prettifyTokenAmount({
+      amount: balance ?? 0n,
+      decimals,
+      prettyConfigOverrides: {
+        minDecimalSignificantDigits: significantDigits,
+      },
+    })
+
+    return prettyBalance ?? "0"
+  }, [tokenWithBalance])
+
   const {
     isOpen: isTokenListOpen,
     onOpen: onOpenTokenList,
     onClose: onCloseTokenList,
   } = useDisclosure()
 
-  const [inputValue, setInputValue] = useState("")
+  const tokenAmount = useCurrencyValueToTokenAmount(
+    inputValue,
+    tokenWithBalance,
+  )
 
-  const onMaxCheck = useCallback(() => {
-    onMax?.()
-  }, [onMax])
+  const currencyValue = useTokenAmountToCurrencyFormatted(
+    bigDecimal.parseUnits(inputValue ?? "0", tokenWithBalance?.decimals).value,
+    tokenWithBalance,
+  )
+
+  const convertedAmount = isFiatInput ? tokenAmount : currencyValue
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const delayedOnChange = useCallback(
     debounce((nextValue) => {
-      onUserInput(nextValue)
+      onChange(nextValue)
     }, 500),
-    [onUserInput],
+    [onChange],
   )
+
+  useEffect(() => {
+    setInputValue(value)
+  }, [value])
 
   useEffect(() => {
     return () => {
@@ -69,126 +105,88 @@ const SwapInputPanel: FC<SwapInputPanelProps> = ({
     }
   }, [delayedOnChange])
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isAllowedNumericInputValue(e.target.value)) {
-      setInputValue(e.target.value)
-      delayedOnChange(e.target.value)
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    if (isAllowedNumericInputValue(value, tokenWithBalance?.decimals)) {
+      setInputValue(value)
+      delayedOnChange(value)
     }
   }
 
-  const prettyBalance = useMemo(() => {
-    const significantDigits = 6
-
-    if (!currentBalance) {
-      return "0"
+  const handleFiatAmountSwitch = () => {
+    setIsFiatInput?.(!isFiatInput)
+    // not using handleOnChange because we don't need the debounce
+    if (
+      convertedAmount &&
+      isAllowedNumericInputValue(convertedAmount, tokenWithBalance?.decimals)
+    ) {
+      setInputValue(convertedAmount)
+      onChange(convertedAmount)
     }
+  }
 
-    const { balance, decimals } = currentBalance
-
-    return prettifyTokenAmount({
-      amount: balance ?? 0n,
-      decimals,
-      prettyConfigOverrides: {
-        minDecimalSignificantDigits: significantDigits,
-      },
-    })
-  }, [currentBalance])
-
-  useEffect(() => {
-    setInputValue(value)
-  }, [value])
+  const isPayInput = type === "pay"
+  const fiatSymbol = "$"
 
   return (
     <>
-      <Flex
-        position="relative"
-        flexDirection="column"
-        gap="2px"
-        padding="16px 20px"
-        backgroundColor="neutrals.800"
-        width="100%"
-        borderRadius={type === "pay" ? "12px 12px 0 0" : "0 0 12px 12px"}
-        id={id}
-      >
-        <Flex>
-          <P3 color="neutrals.400">{type === "pay" ? "Pay" : "Receive"}</P3>
-        </Flex>
-
-        <Flex justifyContent="space-between" alignItems="center">
-          <LoadingPulse isLoading={tradeLoading && !value} mr="3">
-            <Input
-              color={insufficientBalance ? "error.500" : "white"}
-              p="0"
-              minH="min-content"
-              variant="flat"
-              placeholder="0"
-              fontSize="24px"
-              fontWeight="600"
-              lineHeight="26px"
-              value={inputValue}
-              onChange={onChange}
-              data-testid={id}
-              _disabled={{ opacity: 1, cursor: "default" }}
-            />
-          </LoadingPulse>
-
-          {token && (
-            <Flex alignItems="center">
-              <Button
-                data-testid="swap-token-button"
-                height="min-content"
-                minH="min-content"
-                width="min-content"
-                backgroundColor="neutrals.900"
-                rounded={"full"}
-                onClick={onOpenTokenList}
-                leftIcon={
-                  <TokenIcon
-                    name={token?.name || "?"}
-                    url={token?.iconUrl}
-                    size="5"
-                  />
-                }
-                px="1"
-                py="1"
-                rightIcon={<ChevronDownSecondaryIcon />}
-              >
-                <H5>{token?.symbol}</H5>
-              </Button>
+      {tokenWithBalance && (
+        <CompoundInput
+          amount={{
+            value: inputValue,
+            onChange: handleOnChange,
+            onPercentageClick: onPercentageClick,
+            hasError: insufficientBalance,
+            isFiatInput: isFiatInput,
+            fiatSymbol: fiatSymbol,
+            onSwitchClick: isPayInput ? handleFiatAmountSwitch : undefined,
+            conversionValue: {
+              value: convertedAmount,
+              approx: !isPayInput,
+              symbol: isFiatInput ? tokenWithBalance.symbol : fiatSymbol,
+            },
+            priceImpact: priceImpact,
+          }}
+          token={{
+            selected: {
+              name: tokenWithBalance.name,
+              iconUrl: tokenWithBalance.iconUrl ?? "",
+              symbol: tokenWithBalance.symbol,
+              balance: prettyBalance,
+              onBalanceClick: isPayInput
+                ? () => onPercentageClick?.(100)
+                : undefined,
+            },
+            onClick: onOpenTokenList,
+          }}
+          isLoading={isLoading}
+        >
+          <CompoundInput.Container>
+            <Flex flexDirection="column" gap="2">
+              <Flex justifyContent="space-between" alignItems="center">
+                <CompoundInput.InputToken>
+                  Select token
+                </CompoundInput.InputToken>
+                <CompoundInput.InputAmount id={id} />
+              </Flex>
+              <Flex gap="3">
+                <CompoundInput.TokenBalance />
+                <CompoundInput.PercentageButton percentage={50} />
+                <CompoundInput.PercentageButton percentage={100} />
+                <Flex gap="2" marginLeft="auto" alignItems="center">
+                  <CompoundInput.SwitchButton />
+                  <CompoundInput.ConversionValue />
+                  <CompoundInput.PriceImpact priceImpact={priceImpact} />
+                </Flex>
+              </Flex>
             </Flex>
-          )}
-        </Flex>
-
-        <Flex justifyContent="space-between">
-          <Flex flexDirection="column">
-            {showMaxButton && (
-              <L2Bold
-                data-testid="use-max-button"
-                onClick={onMaxCheck}
-                fontWeight="500"
-                color="primary.500"
-                cursor="pointer"
-              >
-                Max
-              </L2Bold>
-            )}
-            {value && token && (
-              <TokenValue
-                amount={value}
-                token={token}
-                approx={type === "receive"}
-              />
-            )}
-          </Flex>
-          <L2Bold fontWeight="500" color="neutrals.400">
-            {`Balance: ${prettyBalance}`}
-          </L2Bold>
-        </Flex>
-      </Flex>
+          </CompoundInput.Container>
+        </CompoundInput>
+      )}
       <SwapTokensModal
         isOpen={isTokenListOpen}
         onClose={onCloseTokenList}
-        isPay={type === "pay"}
+        isPay={isPayInput}
         onTokenSelect={onTokenSelect}
       />
     </>

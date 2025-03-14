@@ -4,10 +4,8 @@ import { useCallback, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { hideMultisig } from "../../../shared/multisig/utils/baseMultisig"
-import { ETH_TOKEN_ADDRESS } from "../../../shared/network/constants"
 import { routes } from "../../../shared/ui/routes"
 import { useView } from "../../views/implementation/react"
-import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
 import {
   isSignerInMultisigView,
   multisigView,
@@ -15,13 +13,15 @@ import {
 import { AccountTokensButtons } from "./AccountTokensButtons"
 import { useToken } from "./tokens.state"
 import { useAddFundsDialogSend } from "./useAddFundsDialog"
-import { useHasFeeTokenBalance } from "./useFeeTokenBalance"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { selectedNetworkIdView } from "../../views/network"
 import { clientAccountService } from "../../services/account"
 import { useIsDefaultNetwork } from "../networks/hooks/useIsDefaultNetwork"
 import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 import { useHasNonZeroBalance } from "./useHasNonZeroBalance"
+import { usePortfolioUrl } from "../actions/hooks/usePortfolioUrl"
+import { ampli } from "../../../shared/analytics"
+import { useNativeFeeTokenAddress } from "../actions/useNativeFeeToken"
 
 interface AccountTokensButtonsContainerProps {
   account?: WalletAccount
@@ -34,16 +34,15 @@ export const AccountTokensButtonsContainer: FC<
   const selectedNetworkId = useView(selectedNetworkIdView)
   const multisig = useView(multisigView(account))
   const signerIsInMultisig = useView(isSignerInMultisigView(account))
-  const feeToken = useDefaultFeeToken(account)
+  const feeTokenAddress = useNativeFeeTokenAddress(account)
   const isDefaultNetwork = useIsDefaultNetwork()
   const returnTo = useCurrentPathnameWithQuery()
   const hasNonZeroBalance = useHasNonZeroBalance(account)
 
   const sendToken = useToken({
-    address: feeToken?.address ?? ETH_TOKEN_ADDRESS,
+    address: feeTokenAddress,
     networkId: selectedNetworkId,
   })
-  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
 
   const addFundsDialogSend = useAddFundsDialogSend()
 
@@ -52,15 +51,12 @@ export const AccountTokensButtonsContainer: FC<
   }, [navigate])
 
   const showSendButton = useMemo(() => {
-    if (
-      (multisig && (multisig.needsDeploy || !signerIsInMultisig)) ||
-      !hasFeeTokenBalance
-    ) {
+    if (multisig && (multisig.needsDeploy || !signerIsInMultisig)) {
       return false
     }
 
     return Boolean(sendToken)
-  }, [multisig, sendToken, signerIsInMultisig, hasFeeTokenBalance])
+  }, [multisig, sendToken, signerIsInMultisig])
 
   const showAddFundsButton = useMemo(() => {
     if (multisig && !signerIsInMultisig) {
@@ -72,6 +68,10 @@ export const AccountTokensButtonsContainer: FC<
   const showSwapButton = showAddFundsButton && isDefaultNetwork
 
   const onSwap = useCallback(() => {
+    void ampli.swapTabClicked({
+      "wallet platform": "browser extension",
+      "swap entered from": "home tab",
+    })
     navigate(routes.swapToken(undefined, returnTo))
   }, [navigate, returnTo])
 
@@ -102,6 +102,16 @@ export const AccountTokensButtonsContainer: FC<
 
   const onSend = () => addFundsDialogSend()
 
+  const portfolioUrl = usePortfolioUrl(account)
+
+  const onPortfolio = useCallback(() => {
+    if (portfolioUrl) {
+      window.open(portfolioUrl, "_blank")?.focus()
+    }
+  }, [portfolioUrl])
+
+  const showPortfolioButton = Boolean(portfolioUrl)
+
   return (
     <AccountTokensButtons
       hasNonZeroBalance={hasNonZeroBalance}
@@ -112,10 +122,12 @@ export const AccountTokensButtonsContainer: FC<
       onHideMultisigModalOpen={onHideMultisigModalOpen}
       onSend={onSend}
       onSwap={onSwap}
+      onPortfolio={onPortfolio}
       showAddFundsButton={showAddFundsButton}
       showHideMultisigButton={showHideMultisigButton}
       showSendButton={showSendButton}
       showSwapButton={showSwapButton}
+      showPortfolioButton={showPortfolioButton}
     />
   )
 }

@@ -1,4 +1,5 @@
-import { B2, H3, icons, P2 } from "@argent/x-ui"
+import { AddContactSecondaryIcon } from "@argent/x-ui/icons"
+import { B2, H3, P2 } from "@argent/x-ui"
 import { Box, Button, Divider, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useNavigate } from "react-router-dom"
@@ -14,8 +15,6 @@ import { useView } from "../../views/implementation/react"
 import { isEqualAddress } from "@argent/x-shared"
 import { multisigService } from "../../services/multisig"
 import type { WalletAccount } from "../../../shared/wallet.model"
-
-const { AddContactSecondaryIcon } = icons
 
 export const MultisigOwnersScreen: FC = () => {
   const account = useRouteWalletAccount()

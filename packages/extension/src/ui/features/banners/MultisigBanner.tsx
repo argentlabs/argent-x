@@ -1,10 +1,8 @@
-import { icons } from "@argent/x-ui"
+import { MultisigSecondaryIcon } from "@argent/x-ui/icons"
 import { Spinner } from "@chakra-ui/react"
 import type { FC } from "react"
 import type { BannerProps } from "./Banner"
 import { Banner } from "./Banner"
-
-const { MultisigSecondaryIcon } = icons
 
 interface MultisigBannerProps extends BannerProps {
   showActivateMultisigBanner: boolean

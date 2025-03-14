@@ -8,15 +8,17 @@ import type { Call } from "starknet"
 import { starknetId } from "starknet"
 import useSWR from "swr"
 
-import { getMulticallForNetwork } from "../../shared/multicall"
-import { networkService } from "../../shared/network/service"
-import type { BaseWalletAccount } from "../../shared/wallet.model"
+import { ARGENT_NAME_RESOLUTION_API_BASE_URL } from "../../shared/api/constants"
 import {
   argentApiHeadersForNetwork,
   argentApiNetworkForNetwork,
 } from "../../shared/api/headers"
-import { ARGENT_NAME_RESOLUTION_API_BASE_URL } from "../../shared/api/constants"
+import { getMulticallForNetwork } from "../../shared/multicall"
+import { defaultNetwork } from "../../shared/network"
+import { networkService } from "../../shared/network/service"
+import { isProdOrStagingEnv } from "../../shared/network/utils"
 import { settingsStore } from "../../shared/settings"
+import type { BaseWalletAccount } from "../../shared/wallet.model"
 import { useKeyValueStorage } from "../hooks/useStorage"
 
 const BROTHER_ID_CONTRACT_ADDRESS =
@@ -48,6 +50,7 @@ export function useStarknetId(account?: BaseWalletAccount) {
     {
       revalidateOnMount: true,
       dedupingInterval: 1000 * 60 * 5, // 5 minutes
+      shouldRetryOnError: false,
     },
   )
 }
@@ -107,8 +110,15 @@ export async function getStarknetId(account: BaseWalletAccount) {
   }
 }
 
+// The API is not enabled on hydrogen for non-default networks
 export async function getStarknetIdFromBackend(account: BaseWalletAccount) {
+  const isProdOrStaging = isProdOrStagingEnv()
+
   const network = await networkService.getById(account.networkId)
+
+  if (!isProdOrStaging && network.id !== defaultNetwork.id) {
+    return
+  }
 
   if (!ARGENT_NAME_RESOLUTION_API_BASE_URL) {
     throw new Error("Argent name resolution API base URL not found")

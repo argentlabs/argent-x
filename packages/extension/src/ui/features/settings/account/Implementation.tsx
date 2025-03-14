@@ -1,9 +1,12 @@
-import { H5, icons } from "@argent/x-ui"
+import {
+  WalletSecondaryIcon,
+  StackSecondaryIcon,
+  PluginIcon,
+} from "@argent/x-ui/icons"
+import { H5 } from "@argent/x-ui"
 import type { ArgentAccountType } from "../../../../shared/wallet.model"
 import type { FC, ReactNode } from "react"
 import { Box } from "@chakra-ui/react"
-
-const { WalletSecondaryIcon, StackSecondaryIcon, PluginIcon } = icons
 
 export interface Implementation {
   id: ArgentAccountType

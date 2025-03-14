@@ -4,7 +4,10 @@ import {
 } from "@argent/x-shared/simulation"
 import { describe, expect, test } from "vitest"
 
-import { mergeAndSortActivities } from "./mergeAndSortActivities"
+import {
+  isExecuteFromOutsideMatch,
+  mergeAndSortActivities,
+} from "./mergeAndSortActivities"
 
 describe("services/activity/cache", () => {
   describe("mergeAndSortActivities", () => {
@@ -207,6 +210,250 @@ describe("services/activity/cache", () => {
           type: "native",
         },
       ])
+    })
+  })
+
+  describe("isExecuteFromOutsideMatch", () => {
+    test("should match when transfer summaries are identical", () => {
+      const activityA = {
+        type: NativeActivityTypeNative,
+        status: "pending",
+        meta: {
+          isExecuteFromOutside: true,
+        },
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      const activityB = {
+        type: NativeActivityTypeNative,
+        status: "pending",
+        transaction: {
+          hash: "0x1",
+        },
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      expect(isExecuteFromOutsideMatch(activityA, activityB)).toBe(true)
+    })
+
+    test("should not match when activity is not execute from outside", () => {
+      const activityA = {
+        type: NativeActivityTypeNative,
+        meta: {
+          isExecuteFromOutside: false,
+        },
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      const activityB = {
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      expect(isExecuteFromOutsideMatch(activityA, activityB)).toBe(false)
+    })
+
+    test("should not match when transfer summaries differ", () => {
+      const activityA = {
+        type: NativeActivityTypeNative,
+        meta: {
+          isExecuteFromOutside: true,
+        },
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      const activityB = {
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "200", // Different amount
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      expect(isExecuteFromOutsideMatch(activityA, activityB)).toBe(false)
+    })
+
+    test("should handle empty transfer summaries", () => {
+      const activityA = {
+        type: NativeActivityTypeNative,
+        meta: {
+          isExecuteFromOutside: true,
+        },
+        transferSummary: [],
+      } as unknown as AnyActivity
+
+      const activityB = {
+        transferSummary: [],
+      } as unknown as AnyActivity
+
+      expect(isExecuteFromOutsideMatch(activityA, activityB)).toBe(false)
+    })
+
+    test("should match multiple transfer summary items", () => {
+      const activityA = {
+        type: NativeActivityTypeNative,
+        meta: {
+          isExecuteFromOutside: true,
+        },
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+          {
+            asset: {
+              type: "ETH",
+              amount: "1",
+              tokenAddress: "0x0",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      const activityB = {
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+          {
+            asset: {
+              type: "ETH",
+              amount: "1",
+              tokenAddress: "0x0",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      expect(isExecuteFromOutsideMatch(activityA, activityB)).toBe(true)
+    })
+
+    test("should match when activity A has extra transfer summary items", () => {
+      const activityA = {
+        type: NativeActivityTypeNative,
+        meta: {
+          isExecuteFromOutside: true,
+        },
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+          {
+            asset: {
+              type: "ETH",
+              amount: "0.01",
+              tokenAddress: "0x0",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      const activityB = {
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      expect(isExecuteFromOutsideMatch(activityA, activityB)).toBe(true)
+    })
+
+    test("should not match when activity B has extra transfer summary items", () => {
+      const activityA = {
+        type: NativeActivityTypeNative,
+        meta: {
+          isExecuteFromOutside: true,
+        },
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      const activityB = {
+        transferSummary: [
+          {
+            asset: {
+              type: "ERC20",
+              amount: "100",
+              tokenAddress: "0x123",
+            },
+          },
+          {
+            asset: {
+              type: "ETH",
+              amount: "0.01",
+              tokenAddress: "0x0",
+            },
+          },
+        ],
+      } as unknown as AnyActivity
+
+      expect(isExecuteFromOutsideMatch(activityA, activityB)).toBe(false)
     })
   })
 })

@@ -1,7 +1,7 @@
 import { ConfirmScreen } from "@argent-x/extension/src/ui/features/actions/transaction/ApproveTransactionScreen/ConfirmScreen"
 import { H4, ModalBottomDialog, P2, P3 } from "@argent/x-ui"
 import { Center } from "@chakra-ui/layout"
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 
 import { decorators } from "../../decorators/routerDecorators"
 

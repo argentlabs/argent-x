@@ -2,20 +2,29 @@ import type { TokenWithBalance } from "@argent/x-shared"
 import {
   ETH_TOKEN_ADDRESS,
   getLatestArgentMultisigClassHash,
-  TXV1_MULTISIG_CLASS_HASH,
+  STRK_TOKEN_ADDRESS,
+  TXV1_ACCOUNT_CLASS_HASH,
+  TXV3_ACCOUNT_CLASS_HASH,
 } from "@argent/x-shared"
 import { num } from "starknet"
-import { getMockAccount } from "../../../../../test/account.mock"
 import { getMockToken } from "../../../../../test/token.mock"
 import { useFeeTokenSelection } from "./useFeeTokenSelection"
 import { renderHook } from "../../../test/utils"
 import { equalToken } from "../../../../shared/token/__new/utils"
+import { getMockWalletAccount } from "../../../../../test/walletAccount.mock"
+import {
+  getMockEstimatedFees,
+  getMockPaymasterFee,
+} from "../../../../../test/fees.mock"
+import { USDC_TOKEN_ADDRESS } from "../../../../shared/network/constants"
 
 describe("useFeeTokenSelection", () => {
   const tokenWithBalance: TokenWithBalance = {
-    ...getMockToken({ address: "0x1" }),
+    ...getMockToken({ address: USDC_TOKEN_ADDRESS }),
     balance: num.toBigInt(1000),
   }
+
+  const mockAccount = getMockWalletAccount()
 
   const ethToken = {
     ...getMockToken({
@@ -24,150 +33,172 @@ describe("useFeeTokenSelection", () => {
     balance: num.toBigInt(1),
   }
 
-  const tokenWithNoBalance = {
-    ...getMockToken({ address: "0x2" }),
-    balance: num.toBigInt(1),
+  const strkToken = {
+    ...getMockToken({
+      address: STRK_TOKEN_ADDRESS,
+    }),
+    balance: num.toBigInt(10),
   }
 
-  it("selects token with balance for upgraded multisig accounts", () => {
-    const feeTokens = [tokenWithBalance, tokenWithNoBalance, ethToken].map(
-      (ft) => ({
-        ...ft,
-        balance: ft.balance.toString(),
-        account: getMockAccount(),
+  it("should use ETH for non-V3 accounts", () => {
+    const { result } = renderHook(() =>
+      useFeeTokenSelection({
+        account: getMockWalletAccount({
+          classHash: TXV1_ACCOUNT_CLASS_HASH,
+        }),
+        fees: getMockEstimatedFees({ txVersion: "1" }),
+        defaultFeeToken: tokenWithBalance,
+        availableFeeTokens: [tokenWithBalance, ethToken].map((t) => ({
+          ...t,
+          account: mockAccount,
+        })),
       }),
     )
 
-    let feeToken = tokenWithBalance
-    const setFeeToken = (token: TokenWithBalance) => {
-      feeToken = token
+    expect(equalToken(result.current.feeToken, ethToken)).toBeTruthy()
+    expect(result.current.isFeeTokenSelectionReady).toBe(true)
+  })
+
+  it("should keep default token if it has sufficient balance", () => {
+    const { result } = renderHook(() =>
+      useFeeTokenSelection({
+        account: getMockWalletAccount({
+          classHash: TXV3_ACCOUNT_CLASS_HASH,
+        }),
+        fees: getMockEstimatedFees({
+          txVersion: "3",
+          nativeFeeOverrides: {
+            amount: num.toBigInt(5),
+            dataGasConsumed: num.toBigInt(2),
+          },
+        }),
+        defaultFeeToken: strkToken,
+        availableFeeTokens: [strkToken, ethToken, tokenWithBalance].map(
+          (t) => ({
+            ...t,
+            account: mockAccount,
+          }),
+        ),
+      }),
+    )
+
+    expect(equalToken(result.current.feeToken, strkToken)).toBeTruthy()
+    expect(result.current.isFeeTokenSelectionReady).toBe(true)
+  })
+
+  it("should switch to token with sufficient balance when default is insufficient", () => {
+    const { result } = renderHook(() =>
+      useFeeTokenSelection({
+        account: getMockWalletAccount({
+          classHash: TXV3_ACCOUNT_CLASS_HASH,
+        }),
+        fees: getMockEstimatedFees({
+          txVersion: "3",
+          nativeFeeOverrides: { amount: num.toBigInt(10000000000) },
+        }),
+        defaultFeeToken: strkToken,
+        availableFeeTokens: [strkToken, tokenWithBalance, ethToken].map(
+          (t) => ({
+            ...t,
+            account: mockAccount,
+          }),
+        ),
+      }),
+    )
+
+    expect(equalToken(result.current.feeToken, tokenWithBalance)).toBeTruthy()
+    expect(result.current.isFeeTokenSelectionReady).toBe(true)
+  })
+
+  it("should fallback to default token when no tokens have sufficient balance", () => {
+    const { result } = renderHook(() =>
+      useFeeTokenSelection({
+        account: getMockWalletAccount({
+          classHash: TXV3_ACCOUNT_CLASS_HASH,
+        }),
+        fees: getMockEstimatedFees({
+          txVersion: "3",
+          nativeFeeOverrides: { amount: num.toBigInt(10000000000) },
+          paymasterFeeOverrides: { maxFee: num.toBigInt(10000000000) },
+        }),
+        defaultFeeToken: strkToken,
+        availableFeeTokens: [strkToken, tokenWithBalance].map((t) => ({
+          ...t,
+          account: mockAccount,
+        })),
+      }),
+    )
+
+    expect(equalToken(result.current.feeToken, strkToken)).toBeTruthy()
+    expect(result.current.isFeeTokenSelectionReady).toBe(true)
+  })
+
+  it("should prioritize tokens in sorted order when selecting alternative", () => {
+    const alternativeToken = {
+      ...getMockToken({ address: ETH_TOKEN_ADDRESS }),
+      balance: num.toBigInt(1500),
     }
 
-    renderHook(() =>
+    const fees = getMockEstimatedFees({
+      txVersion: "3",
+      nativeFeeOverrides: { amount: num.toBigInt(10) },
+      additionalFees: [
+        {
+          type: "paymaster",
+          transactions: getMockPaymasterFee({
+            maxFee: num.toBigInt(10),
+            feeTokenAddress: alternativeToken.address,
+          }),
+        },
+      ],
+    })
+
+    const tokenWithLessBalance = {
+      ...tokenWithBalance,
+      balance: num.toBigInt(1),
+    }
+
+    const { result } = renderHook(() =>
       useFeeTokenSelection({
-        isFeeTokenSelectionReady: false,
-        setIsFeeTokenSelectionReady: vi.fn(),
-        feeToken,
-        setFeeToken,
-        account: getMockAccount({
-          type: "multisig",
+        account: getMockWalletAccount({
+          classHash: TXV3_ACCOUNT_CLASS_HASH,
+        }),
+        fees,
+        defaultFeeToken: strkToken,
+        availableFeeTokens: [
+          strkToken,
+          tokenWithLessBalance,
+          alternativeToken,
+        ].map((t) => ({
+          ...t,
+          account: mockAccount,
+        })),
+      }),
+    )
+
+    expect(equalToken(result.current.feeToken, alternativeToken)).toBeTruthy()
+    expect(result.current.isFeeTokenSelectionReady).toBe(true)
+  })
+
+  it("should fallback to default token when all available tokens have insufficient balance", () => {
+    const { result } = renderHook(() =>
+      useFeeTokenSelection({
+        account: getMockWalletAccount({
           classHash: getLatestArgentMultisigClassHash(),
         }),
-        fee: num.toBigInt(100),
-        defaultFeeToken: tokenWithBalance,
-        feeTokens,
-      }),
-    )
-
-    expect(equalToken(feeToken, tokenWithBalance)).toBeTruthy()
-  })
-
-  it("selects eth token v1 multisig accounts", () => {
-    const feeTokens = [tokenWithBalance, tokenWithNoBalance, ethToken].map(
-      (ft) => ({
-        ...ft,
-        balance: ft.balance.toString(),
-        account: getMockAccount(),
-      }),
-    )
-
-    let feeToken = tokenWithBalance
-    const setFeeToken = (token: TokenWithBalance) => {
-      feeToken = token
-    }
-
-    renderHook(() =>
-      useFeeTokenSelection({
-        isFeeTokenSelectionReady: false,
-        setIsFeeTokenSelectionReady: vi.fn(),
-        feeToken,
-        setFeeToken,
-        account: getMockAccount({
-          type: "multisig",
-          classHash: TXV1_MULTISIG_CLASS_HASH,
+        fees: getMockEstimatedFees({
+          txVersion: "3",
+          nativeFeeOverrides: { amount: num.toBigInt(10000000000) },
         }),
-        fee: num.toBigInt(100),
         defaultFeeToken: tokenWithBalance,
-        feeTokens,
+        availableFeeTokens: [tokenWithBalance, ethToken].map((t) => ({
+          ...t,
+          account: mockAccount,
+        })),
       }),
     )
 
-    expect(equalToken(feeToken, ethToken)).toBeTruthy()
-  })
-
-  it("keeps default fee token if it has enough balance", () => {
-    let feeToken = tokenWithBalance
-    const setFeeToken = (token: TokenWithBalance) => {
-      feeToken = token
-    }
-    const feeTokens = [tokenWithNoBalance, tokenWithBalance].map((ft) => ({
-      ...ft,
-      balance: ft.balance.toString(),
-      account: getMockAccount(),
-    }))
-
-    renderHook(() =>
-      useFeeTokenSelection({
-        isFeeTokenSelectionReady: false,
-        setIsFeeTokenSelectionReady: vi.fn(),
-        feeToken,
-        setFeeToken,
-        account: getMockAccount(),
-        fee: num.toBigInt(100),
-        defaultFeeToken: tokenWithBalance,
-        feeTokens,
-      }),
-    )
-    expect(equalToken(feeToken, tokenWithBalance)).toBeTruthy()
-  })
-
-  it("selects the next token with sufficient balance if the default does not have enough", () => {
-    let feeToken = ethToken
-    const setFeeToken = (token: TokenWithBalance) => {
-      feeToken = token
-    }
-    const feeTokens = [ethToken, tokenWithBalance].map((ft) => ({
-      ...ft,
-      balance: ft.balance.toString(),
-      account: getMockAccount(),
-    }))
-    renderHook(() =>
-      useFeeTokenSelection({
-        isFeeTokenSelectionReady: false,
-        setIsFeeTokenSelectionReady: vi.fn(),
-        feeToken,
-        setFeeToken,
-        account: getMockAccount(),
-        fee: num.toBigInt(100),
-        defaultFeeToken: ethToken,
-        feeTokens,
-      }),
-    )
-    expect(equalToken(feeToken, tokenWithBalance)).toBeTruthy()
-  })
-
-  it("selects the last token if all have insufficient balance", () => {
-    let feeToken = ethToken
-    const setFeeToken = (token: TokenWithBalance) => {
-      feeToken = token
-    }
-    const feeTokens = [ethToken, tokenWithNoBalance].map((ft) => ({
-      ...ft,
-      balance: ft.balance.toString(),
-      account: getMockAccount(),
-    }))
-    renderHook(() =>
-      useFeeTokenSelection({
-        isFeeTokenSelectionReady: false,
-        setIsFeeTokenSelectionReady: vi.fn(),
-        feeToken,
-        setFeeToken,
-        account: getMockAccount(),
-        fee: num.toBigInt(100),
-        defaultFeeToken: ethToken,
-        feeTokens,
-      }),
-    )
-    expect(equalToken(feeToken, tokenWithNoBalance)).toBeTruthy()
+    expect(equalToken(result.current.feeToken, tokenWithBalance)).toBeTruthy()
+    expect(result.current.isFeeTokenSelectionReady).toBe(true)
   })
 })

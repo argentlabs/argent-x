@@ -1,10 +1,10 @@
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { delegatedTokensPositions } from "../__fixtures__/delegatedTokensPositions"
 import { concentratedLiquidityPositions } from "../__fixtures__/concentratedLiquidityPositions"
 import { parseDelegatedTokensPositions } from "./parseDelegatedTokensPositions"
 
 describe("parseDelegatedTokensPositions", () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

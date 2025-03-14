@@ -1,4 +1,4 @@
 import type { ChromeRepository } from "../../storage/__new/chrome"
-import type { EstimatedFeesEnriched } from "@argent/x-shared/simulation"
+import type { EstimatedFeesV2Enriched } from "@argent/x-shared/simulation"
 
-export type IEstimatedFeesRepository = ChromeRepository<EstimatedFeesEnriched>
+export type IEstimatedFeesRepository = ChromeRepository<EstimatedFeesV2Enriched>

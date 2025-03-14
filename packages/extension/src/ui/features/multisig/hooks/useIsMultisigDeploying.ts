@@ -7,9 +7,9 @@
 import { useMemo } from "react"
 
 import { useDeployAccountTransactions } from "../../accounts/accountTransactions.state"
-import type { Multisig } from "../Multisig"
+import type { MultisigWalletAccount } from "../../../../shared/wallet.model"
 
-export const useIsMultisigDeploying = (multisig?: Multisig) => {
+export const useIsMultisigDeploying = (multisig?: MultisigWalletAccount) => {
   const { pendingTransactions } = useDeployAccountTransactions(multisig)
   return useMemo(() => {
     if (!multisig) {

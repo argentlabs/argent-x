@@ -162,7 +162,7 @@ export const ImportLedgerAccounts: FC<ImportLedgerAccountsProps> = ({
                     isDisabled={isAccountPresent(acc)}
                     _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
                   />
-                  <Tooltip label={acc.address}>
+                  <Tooltip label={acc.address} placement="right-end">
                     <P2 fontWeight="bold" color="white">
                       {`${i + 1 + pageIndex * PAGE_SIZE}. ${acc.address.substring(0, 6)}...${acc.address.substring(acc.address.length - 4)}`}
                     </P2>

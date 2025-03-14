@@ -1,6 +1,6 @@
 import type { Collection, NftItem } from "@argent/x-shared"
 import { isEqualAddress } from "@argent/x-shared"
-import browser from "webextension-polyfill"
+import { browserStorage } from "../storage/browser"
 
 import { ChromeRepository } from "../storage/__new/chrome"
 import type { IRepository } from "../storage/__new/interface"
@@ -15,7 +15,7 @@ export type INftsCollectionsRepository = IRepository<Collection>
 export type INftsContractsRepository = IRepository<ContractAddress>
 
 export const nftsRepository: INftsRepository = new ChromeRepository<NftItem>(
-  browser,
+  browserStorage,
   {
     areaName: "local",
     namespace: "nfts_v2",
@@ -29,7 +29,7 @@ export const nftsRepository: INftsRepository = new ChromeRepository<NftItem>(
 )
 
 export const nftsCollectionsRepository: INftsCollectionsRepository =
-  new ChromeRepository<Collection>(browser, {
+  new ChromeRepository<Collection>(browserStorage, {
     areaName: "local",
     namespace: "nftsCollections_v2",
     compare(a: Collection, b: Collection) {
@@ -38,7 +38,7 @@ export const nftsCollectionsRepository: INftsCollectionsRepository =
   })
 
 export const nftsContractsRepository: INftsContractsRepository =
-  new ChromeRepository<ContractAddress>(browser, {
+  new ChromeRepository<ContractAddress>(browserStorage, {
     areaName: "local",
     namespace: "nftsContracts_v2",
     compare(a: ContractAddress, b: ContractAddress) {

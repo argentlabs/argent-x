@@ -21,7 +21,7 @@ export default class Settings extends Navigation {
 
   get authorizedDapps() {
     return this.page.locator(
-      `//a//*[text()="${lang.settings.account.authorisedDapps.authorisedDapps}"]`,
+      `//a//*[text()="${lang.settings.account.authorizedDapps.authorizedDapps}"]`,
     )
   }
 
@@ -57,13 +57,17 @@ export default class Settings extends Navigation {
   }
 
   account(accountName: string) {
-    return this.page.locator(`[aria-label="Select ${accountName}"]`)
+    return this.page.locator(`[aria-label^="Select ${accountName}"]`)
   }
 
   async setAccountName(newAccountName: string) {
-    await this.accountName.click()
+    await this.page
+      .locator('[data-testid=edit-account-label], [placeholder="Account name"]')
+      .first()
+      .click()
     await this.accountName.fill(newAccountName)
-    await this.page.locator("form button").click()
+    await this.page.keyboard.press("Enter")
+    await expect(this.page.getByText(newAccountName)).toBeVisible()
   }
 
   get confirmHide() {

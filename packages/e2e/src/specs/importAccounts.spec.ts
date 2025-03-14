@@ -1,14 +1,11 @@
 import { expect } from "@playwright/test"
 import config from "../config"
 import test from "../test"
-import { TokenSymbol, transferTokens } from "../utils"
+import { TokenSymbol, requestFunds } from "../utils"
 const accountsToImport = JSON.parse(config.accountsToImport || "[]")
 const txAccountAddress = config.accountToImportAndTx![0]
 const txAccountPK = config.accountToImportAndTx![1]
-
-test.afterAll(({}) => {
-  transferTokens(0.01, config.accountToImportAndTx![0], "ETH")
-})
+const accountsToImportProd = JSON.parse(config.accountsToImportProd || "[]")
 
 test.describe("Import accounts", () => {
   for (let i = 0; i < accountsToImport.length; i++) {
@@ -18,13 +15,13 @@ test.describe("Import accounts", () => {
     }) => {
       await extension.wallet.newWalletOnboarding()
       await extension.open()
+      await extension.account.setupRecovery()
       await extension.account.importAccount({
         address: account.address,
         privateKey: account.pk,
       })
-      await extension.account.selectAccount(
-        extension.account.importedAccountName1,
-      )
+      const { accountName } = await extension.account.lastAccountInfo()
+      await extension.account.selectAccount(accountName!)
       const promises: Promise<void>[] = []
       for (const [token, amount] of Object.entries(account.balance)) {
         promises.push(
@@ -43,10 +40,12 @@ test.describe("Import accounts", () => {
     async ({ extension }) => {
       await extension.wallet.newWalletOnboarding()
       await extension.open()
+      await extension.account.setupRecovery()
       await extension.account.importAccount({
         address: txAccountAddress,
         privateKey: txAccountPK,
       })
+      const { accountName } = await extension.account.lastAccountInfo()
       await extension.account.accountListSelector.click()
 
       await Promise.all([
@@ -57,19 +56,22 @@ test.describe("Import accounts", () => {
       ])
       await extension.navigation.closeButtonLocator.click()
       const { sendAmountTX, sendAmountFE } = await extension.account.transfer({
-        originAccountName: extension.account.importedAccountName1,
+        originAccountName: accountName!,
         recipientAddress: config.senderAddrs![0],
         token: "ETH",
         amount: 0.005,
         feeToken: "ETH",
       })
       const txHash = await extension.activity.getLastTxHash()
-      await extension.validateTx({
-        txHash: txHash!,
-        receiver: config.senderAddrs![0],
-        sendAmountFE,
-        sendAmountTX,
-      })
+      await Promise.all([
+        extension.validateTx({
+          txHash: txHash!,
+          receiver: config.senderAddrs![0],
+          sendAmountFE,
+          sendAmountTX,
+        }),
+        requestFunds(txAccountAddress, 0.01, "ETH"),
+      ])
     },
   )
 
@@ -84,4 +86,25 @@ test.describe("Import accounts", () => {
       validPK: false,
     })
   })
+
+  test(
+    `User should be able to import only Argent X account on prod`,
+    { tag: "@prodOnly" },
+    async ({ extension }) => {
+      await extension.wallet.newWalletOnboarding()
+      await extension.open()
+      await extension.account.importAccount({
+        address: accountsToImportProd[0].address,
+        privateKey: accountsToImportProd[0].pk,
+      })
+      await extension.account.selectAccount("Logical Lizard")
+      await extension.account.importAccount({
+        address: accountsToImportProd[1].address,
+        privateKey: accountsToImportProd[1].pk,
+      })
+      await expect(
+        extension.page.getByText("This account is not an Argent account"),
+      ).toBeVisible()
+    },
+  )
 })

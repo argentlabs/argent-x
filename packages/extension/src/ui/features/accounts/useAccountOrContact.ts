@@ -1,9 +1,6 @@
 import type { AddressOrDomain } from "@argent/x-shared"
-import {
-  isEqualAddress,
-  isEqualStarknetDomainName,
-  isStarknetDomainName,
-} from "@argent/x-shared"
+import { isEqualAddress, isEqualStarknetDomainName } from "@argent/x-shared"
+import { starknetId } from "starknet"
 import { useMemo } from "react"
 import { visibleAccountsOnNetworkFamily } from "../../views/account"
 import { addressBookContactsOnNetworkView } from "../../views/addressBook"
@@ -29,12 +26,12 @@ export const useAccountOrContactOnNetworkId = ({
   address?: AddressOrDomain
   networkId: string
 }) => {
-  const isStarknetDomainNameAddress = isStarknetDomainName(address)
+  const isStarknetDomainNameAddress = starknetId.isStarkDomain(address ?? "")
 
   const contacts = useView(addressBookContactsOnNetworkView(networkId))
   const contact = useMemo(() => {
     return contacts.find((contact) => {
-      if (isStarknetDomainNameAddress) {
+      if (isStarknetDomainNameAddress && address) {
         return isEqualStarknetDomainName(address, contact.address)
       }
       return isEqualAddress(contact.address, address)

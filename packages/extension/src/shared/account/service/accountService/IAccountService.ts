@@ -3,6 +3,7 @@ import type { AllowArray, SelectorFn } from "../../../storage/__new/interface"
 import type {
   AccountId,
   ArgentWalletAccount,
+  AvatarMeta,
   BaseWalletAccount,
   WalletAccount,
 } from "../../../wallet.model"
@@ -32,6 +33,11 @@ export interface IAccountService {
   // mutations/updates
   setHide(hidden: boolean, accountId: AccountId): Promise<void>
   setName(name: string, accountId: AccountId): Promise<void>
+
+  setAvatarMeta(
+    avatarMeta: AvatarMeta | undefined,
+    accountId: AccountId,
+  ): Promise<void>
 
   // getters
   getDeployed(baseAccount: BaseWalletAccount): Promise<boolean>

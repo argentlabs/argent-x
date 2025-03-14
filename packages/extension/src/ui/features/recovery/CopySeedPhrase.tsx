@@ -3,9 +3,9 @@ import type { FC } from "react"
 import { useEffect, useState } from "react"
 import CopyToClipboard from "react-copy-to-clipboard"
 
-import { icons, L2Bold } from "@argent/x-ui"
+import { WarningCirclePrimaryIcon } from "@argent/x-ui/icons"
 
-const { WarningCirclePrimaryIcon } = icons
+import { L2Bold } from "@argent/x-ui"
 
 export const CopySeedPhrase: FC<{ seedPhrase?: string }> = ({ seedPhrase }) => {
   const [seedPhraseCopied, setSeedPhraseCopied] = useState(false)

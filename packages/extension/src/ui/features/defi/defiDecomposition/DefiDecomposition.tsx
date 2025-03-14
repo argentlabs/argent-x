@@ -92,6 +92,7 @@ const ProductItem: FC<{
   if (!account) {
     return null
   }
+
   return (
     <ListGroup
       title={product.name}

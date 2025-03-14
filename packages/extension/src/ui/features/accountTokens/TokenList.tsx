@@ -14,7 +14,6 @@ import { useSortedTokensWithBalances } from "../../views/tokenPrices"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
 import { ENABLE_TOKEN_DETAILS } from "../../../shared/ui/constants"
-import { liquidityTokensView } from "../../views/investments"
 
 interface TokenListProps {
   tokenList?: Token[]
@@ -53,7 +52,6 @@ export const TokenList: FC<TokenListProps> = ({
   )
 
   const sortedTokensWithBalance = useSortedTokensWithBalances(account)
-  const liquidityTokensInDefiDecomp = useView(liquidityTokensView(account))
 
   const tokens = useMemo(
     () =>
@@ -61,11 +59,8 @@ export const TokenList: FC<TokenListProps> = ({
         ? sortedTokensWithBalance.filter((token) =>
             tokenList.some((t) => equalToken(t, token)),
           )
-        : sortedTokensWithBalance.filter(
-            (token) =>
-              !liquidityTokensInDefiDecomp?.some((t) => equalToken(t, token)),
-          ),
-    [tokenList, sortedTokensWithBalance, liquidityTokensInDefiDecomp],
+        : sortedTokensWithBalance,
+    [tokenList, sortedTokensWithBalance],
   )
 
   if (!account) {

@@ -1,13 +1,19 @@
 import type { BigDecimal } from "@argent/x-shared"
 import { bigDecimal } from "@argent/x-shared"
-import { FieldError, icons, Input, ModalDialog, P2 } from "@argent/x-ui"
-import { Button, Flex, InputGroup, InputRightElement } from "@chakra-ui/react"
+import { CheckmarkSecondaryIcon } from "@argent/x-ui/icons"
+import { FieldError, ModalDialog, P2 } from "@argent/x-ui"
+import {
+  Button,
+  Flex,
+  InputGroup,
+  InputRightElement,
+  Input,
+} from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { FC } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-const { CheckmarkSecondaryIcon } = icons
 const { createUnitsSchema } = bigDecimal
 
 interface AmountEditModalFormProps {

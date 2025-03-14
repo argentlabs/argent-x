@@ -1,7 +1,8 @@
 import "./trpc/router"
 import "./migrations"
+import "./i18n"
 
-import { messageStream } from "../shared/messages"
+import { messageStream } from "../shared/messages/messages"
 import { initWorkers } from "./workers"
 import { initBadgeText } from "./transactions/badgeText"
 import { transactionTrackerWorker } from "./services/transactionTracker/worker"

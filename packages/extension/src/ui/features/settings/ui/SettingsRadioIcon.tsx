@@ -1,9 +1,7 @@
-import { icons } from "@argent/x-ui"
+import { RadioEmptyIcon, SuccessPrimaryIcon } from "@argent/x-ui/icons"
 import type { ComponentProps, FC } from "react"
 
-const { RadioFilledIcon, RadioEmptyIcon } = icons
-
-type SettingsRadioIconProps = ComponentProps<typeof RadioFilledIcon> & {
+type SettingsRadioIconProps = ComponentProps<typeof SuccessPrimaryIcon> & {
   checked: boolean
 }
 
@@ -12,7 +10,7 @@ export const SettingsRadioIcon: FC<SettingsRadioIconProps> = ({
   ...rest
 }) => {
   if (checked) {
-    return <RadioFilledIcon fontSize="3xl" color="primary.500" {...rest} />
+    return <SuccessPrimaryIcon fontSize="3xl" color="icon-brand" {...rest} />
   }
   return <RadioEmptyIcon fontSize="3xl" color="text-secondary" {...rest} />
 }

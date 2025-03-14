@@ -118,12 +118,12 @@ export class ArgentXAccount extends Account {
     const result = await Promise.race([
       waitForMessage(
         "DECLARE_CONTRACT_ACTION_SUBMITTED",
-        11 * 60 * 1000,
+        21 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       ),
       waitForMessage(
         "DECLARE_CONTRACT_ACTION_FAILED",
-        10 * 60 * 1000,
+        20 * 60 * 1000,
         (x) => x.data.actionHash === actionHash,
       )
         .then(() => "error" as const)

@@ -13,7 +13,7 @@ export default class Swap extends Navigation {
   }
 
   get valueLoc() {
-    return this.page.locator('[data-testid="swap-input-pay-panel"]')
+    return this.page.locator('[id="swap-input-pay-panel"]')
   }
 
   get switchInOutLoc() {
@@ -21,15 +21,19 @@ export default class Swap extends Navigation {
   }
 
   get maxLoc() {
-    return this.page.locator('label:has-text("Max")')
+    return this.page.locator('//label[@role="button" and text()="Max"]')
   }
 
   get payTokenLoc() {
-    return this.page.locator('[data-testid="swap-token-button"]').nth(0)
+    return this.page.locator(
+      '(//input[@id="swap-input-pay-panel"]/parent::div/following-sibling::div/button)[1]',
+    )
   }
 
   get receiveTokenLoc() {
-    return this.page.locator('[data-testid="swap-token-button"]').nth(1)
+    return this.page.locator(
+      '//input[@id="swap-input-receive-panel"]/parent::div/following-sibling::div/button',
+    )
   }
 
   get reviewSwapLoc() {
@@ -69,7 +73,7 @@ export default class Swap extends Navigation {
     await this.setReceiveToken(receiveToken)
     if (amount === "MAX") {
       await this.maxLoc.click()
-      await this.useMaxLoc.click()
+      // await this.useMaxLoc.click()
     } else {
       await this.valueLoc.fill(amount.toString())
     }
@@ -93,3 +97,5 @@ export default class Swap extends Navigation {
     return sendAmountFEText
   }
 }
+////input[@id="swap-input-receive-panel"]/parent::div/following-sibling::div/button
+//(//input[@id="swap-input-pay-panel"]/parent::div/following-sibling::div/button)[1]

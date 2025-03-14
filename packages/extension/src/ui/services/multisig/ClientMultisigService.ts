@@ -28,6 +28,10 @@ import {
 export class ClientMultisigService implements IClientMultisigService {
   constructor(private trpcMessageClient: typeof messageClient) {}
 
+  async validateSigners(signers: string[]): Promise<boolean> {
+    return await this.trpcMessageClient.multisig.validateSigners.mutate(signers)
+  }
+
   async addAccount(payload: AddAccountPayload): Promise<AddAccountResponse> {
     const decodedSigners = decodeBase58Array(payload.signers)
     return await this.trpcMessageClient.multisig.addAccount.mutate({

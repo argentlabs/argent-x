@@ -2,9 +2,7 @@ import { Box, Circle } from "@chakra-ui/react"
 
 import type { FC } from "react"
 import { Panel } from "../layout/Panel"
-import { icons } from "@argent/x-ui"
-
-const { ShareIcon } = icons
+import { ShareIcon } from "@argent/x-ui/icons"
 
 export const JoinMultisigSidePanel: FC = () => {
   return (

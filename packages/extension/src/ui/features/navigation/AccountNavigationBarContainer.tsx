@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import type { FC, ReactEventHandler } from "react"
 import { useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -10,15 +10,21 @@ import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 import type { NavigationBarProps } from "@argent/x-ui"
 import { multisigView } from "../../features/multisig/multisig.state"
 import { useIsLedgerSigner } from "../../features/ledger/hooks/useIsLedgerSigner"
-import { usePortfolioUrl } from "../actions/hooks/usePortfolioUrl"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
+import { ENABLE_SIDE_PANEL } from "../../../shared/ui/constants"
+import { settingsStore } from "../../../shared/settings/store"
+import { useExtensionIsInSidePanel } from "../browser/tabs"
+import { useGetSetKeyValueStorage } from "../../hooks/useStorage"
+import { useOpenExtensionInSidePanel } from "../browser/tabs"
+import { ampli } from "../../../shared/analytics"
 
 const argentXEnv = process.env.ARGENT_X_ENVIRONMENT || ""
 
 export interface AccountNavigationBarContainerProps
   extends Pick<NavigationBarProps, "scroll"> {
   showSettingsButton?: boolean
-  showPortfolioButton?: boolean
+  showSidePanelButton?: boolean
+  onSidePanelClick?: ReactEventHandler
 }
 
 export const AccountNavigationBarContainer: FC<
@@ -29,8 +35,6 @@ export const AccountNavigationBarContainer: FC<
   const currentNetwork = useCurrentNetwork()
 
   const account = useView(selectedAccountView)
-  const hasAccount = Boolean(account)
-
   const multisig = useView(multisigView(account))
 
   const isGuardian = Boolean(account?.guardian)
@@ -42,13 +46,20 @@ export const AccountNavigationBarContainer: FC<
     navigate(routes.accounts(returnTo))
   }, [returnTo, navigate])
 
-  const portfolioUrl = usePortfolioUrl(account)
-
-  const onPortfolio = useCallback(() => {
-    if (portfolioUrl) {
-      window.open(portfolioUrl, "_blank")?.focus()
+  const openExtensionInSidePanel = useOpenExtensionInSidePanel()
+  const extensionIsInSidePanel = useExtensionIsInSidePanel()
+  const [sidePanelEnabled, setSidePanelEnabled] = useGetSetKeyValueStorage(
+    settingsStore,
+    "sidePanelEnabled",
+  )
+  const onEnableSidePanelClick = useCallback(() => {
+    setSidePanelEnabled(!sidePanelEnabled)
+    if (!sidePanelEnabled) {
+      void openExtensionInSidePanel()
     }
-  }, [portfolioUrl])
+  }, [sidePanelEnabled, setSidePanelEnabled, openExtensionInSidePanel])
+
+  const showSidePanelButton = ENABLE_SIDE_PANEL
 
   const envLabel = argentXEnv === "hydrogen" ? "Hydrogen" : undefined
 
@@ -56,14 +67,17 @@ export const AccountNavigationBarContainer: FC<
     <AccountNavigationBar
       accountName={account?.name}
       accountId={account?.id}
+      accountType={account?.type}
       isSmartAccount={isGuardian}
       isMultisig={isMultisig}
       isLedgerAccount={isLedgerAccount}
       onAccountList={onAccountList}
-      showPortfolioButton={hasAccount}
-      onPortfolio={() => void onPortfolio()}
+      showSidePanelButton={showSidePanelButton}
+      onSidePanelClick={onEnableSidePanelClick}
+      extensionIsInSidePanel={extensionIsInSidePanel}
       envLabel={envLabel}
       networkName={currentNetwork?.name}
+      avtarMeta={account?.avatarMeta}
       {...props}
     />
   )

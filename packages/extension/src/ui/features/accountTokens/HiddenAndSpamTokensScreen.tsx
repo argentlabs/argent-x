@@ -1,8 +1,11 @@
 import {
+  InfoCircleSecondaryIcon,
+  CheckmarkSecondaryIcon,
+} from "@argent/x-ui/icons"
+import {
   BarBackButton,
   CellStack,
   Empty,
-  icons,
   NavigationContainer,
   P3,
   SegmentedButtons,
@@ -14,12 +17,6 @@ import { useMemo, useState } from "react"
 import type { TokenWithBalanceAndPrice } from "../../../shared/token/__new/types/tokenPrice.model"
 import { sortTokensByPrice } from "../../views/tokenPrices"
 import { HideTokenListItem } from "./HideTokenListItem"
-import { useView } from "../../views/implementation/react"
-import { defiDecompositionTokensViewAtom } from "../../views/investments"
-import { selectedAccountView } from "../../views/account"
-import { equalToken } from "../../../shared/token/__new/utils"
-
-const { InfoCircleSecondaryIcon, CheckmarkSecondaryIcon } = icons
 
 interface HiddenAndSpamSettingsScreenProps {
   onBack: ReactEventHandler
@@ -34,17 +31,11 @@ export const HiddenAndSpamTokensScreen: FC<
     t.tags?.includes("scam"),
   )
   const [isTokensTab, setIsTokensTab] = useState(true)
-  const account = useView(selectedAccountView)
-  const tokensInDefiDecomposition = useView(
-    defiDecompositionTokensViewAtom(account),
-  )
 
   const displayedTokens = useMemo(() => {
     const unfilteredTokens = isTokensTab ? nonSpamTokens : spamTokens
     const filteredTokens = unfilteredTokens.filter(
-      (token) =>
-        (token.showAlways || token.custom || token?.balance > 0n) &&
-        !tokensInDefiDecomposition?.some((t) => equalToken(t, token)),
+      (token) => token.showAlways || token.custom || token?.balance > 0n,
     )
 
     const sortedTokens = sortTokensByPrice(filteredTokens)
@@ -52,7 +43,7 @@ export const HiddenAndSpamTokensScreen: FC<
     const [alwaysVisible, others] = partition(sortedTokens, (t) => t.showAlways)
 
     return [...alwaysVisible, ...others]
-  }, [isTokensTab, nonSpamTokens, spamTokens, tokensInDefiDecomposition])
+  }, [isTokensTab, nonSpamTokens, spamTokens])
 
   return (
     <NavigationContainer

@@ -180,7 +180,7 @@ export class ClientAccountService implements IClientAccountService {
     const { calldata, classHash, salt } =
       await this.getAccountDeploymentPayload(account)
     return {
-      type: TransactionType.DEPLOY_ACCOUNT as const,
+      type: TransactionType.DEPLOY_ACCOUNT,
       payload: {
         constructorCalldata: calldata,
         classHash,

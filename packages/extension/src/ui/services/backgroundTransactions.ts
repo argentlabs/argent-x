@@ -1,6 +1,6 @@
 import type { Call } from "starknet"
 
-import { sendMessage } from "../../shared/messages"
+import { sendMessage } from "../../shared/messages/messages"
 import type { ExecuteTransactionRequest } from "../../shared/messages/TransactionMessage"
 import type { BaseWalletAccount } from "../../shared/wallet.model"
 import { messageClient } from "./trpc"

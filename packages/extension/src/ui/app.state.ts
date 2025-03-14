@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { create } from "zustand"
 
-import { messageStream } from "../shared/messages"
+import { messageStream } from "../shared/messages/messages"
 
 interface State {
   error?: string

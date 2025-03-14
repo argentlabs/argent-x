@@ -45,7 +45,6 @@ export class NetworkWorker {
   })
 
   private async onSelectedAccountChange(val?: SelectedWalletStoreAccount) {
-
     if (!val) {
       return
     }

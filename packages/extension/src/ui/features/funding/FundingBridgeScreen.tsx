@@ -2,7 +2,6 @@ import {
   BarBackButton,
   BarCloseButton,
   CellStack,
-  logosDeprecated,
   NavigationContainer,
 } from "@argent/x-ui"
 import type { FC } from "react"
@@ -16,9 +15,12 @@ import { selectedAccountView } from "../../views/account"
 import { useView } from "../../views/implementation/react"
 import { isFeatureEnabled } from "@argent/x-shared"
 import { getLayerSwapUrl } from "./utils"
-
-const { EthereumLogo, OrbiterLogo, LayerswapLogo, RhinoFiLogo } =
-  logosDeprecated
+import {
+  EthereumLogo,
+  OrbiterLogo,
+  LayerswapLogo,
+  RhinoFiLogo,
+} from "@argent/x-ui/logos-deprecated"
 
 export const FundingBridgeScreen: FC = () => {
   const account = useView(selectedAccountView)

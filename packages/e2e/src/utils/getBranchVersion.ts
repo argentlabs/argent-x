@@ -11,9 +11,6 @@ export const getBranchVersion = (): string => {
 
     // Execute the script synchronously
     const stdout = execSync(`bash ${scriptPath}`, { encoding: "utf8" })
-
-    console.log(`Version:${stdout}`)
-
     return stdout.trim()
   } catch (error) {
     console.error(`getVersion Error: ${error}`)

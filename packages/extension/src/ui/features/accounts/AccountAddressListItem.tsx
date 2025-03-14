@@ -3,20 +3,18 @@ import {
   normalizeAddress,
   formatTruncatedAddress,
   isValidAddress,
-  isStarknetDomainName,
 } from "@argent/x-shared"
-import { icons } from "@argent/x-ui"
+import { WalletSecondaryIcon } from "@argent/x-ui/icons"
 import type { FC, ReactNode } from "react"
 import { useEffect, useMemo, useState } from "react"
-
+import { starknetId } from "starknet"
 import { AccountListItem } from "../accounts/AccountListItem"
 import { AccountListItemWithBalance } from "../accounts/AccountListItemWithBalance"
 import { useAccountOrContact } from "./useAccountOrContact"
 import { useGetAddressFromDomainName } from "../send/useGetAddressFromDomainName"
 import { useView } from "../../views/implementation/react"
 import { selectedNetworkIdView } from "../../views/network"
-
-const { WalletSecondaryIcon } = icons
+import { P4 } from "@argent/x-ui"
 
 interface AccountAddressListItemProps {
   accountAddress: AddressOrDomain
@@ -34,7 +32,7 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
   const [addressFromDomain, setAddressFromDomain] = useState("")
   const selectedNetworkId = useView(selectedNetworkIdView)
 
-  const isStarknetDomainNameAddress = isStarknetDomainName(accountAddress)
+  const isStarknetDomainNameAddress = starknetId.isStarkDomain(accountAddress)
 
   const { result, error } = useGetAddressFromDomainName(
     accountAddress,
@@ -85,11 +83,13 @@ export const AccountAddressListItem: FC<AccountAddressListItemProps> = ({
       <AccountListItemWithBalance
         key={account.id}
         account={account}
+        accountType={account.type}
         avatarSize={9}
         accountAddress={account.address}
         networkId={account.networkId}
         accountId={account.id}
         accountName={account.name}
+        avatarMeta={account.avatarMeta}
         onClick={onClick}
         isSmartAccount={account.type === "smart"}
         isLedger={account.signer.type === "ledger"}

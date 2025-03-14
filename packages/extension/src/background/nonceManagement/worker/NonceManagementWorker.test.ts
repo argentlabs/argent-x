@@ -9,7 +9,7 @@ import type { Transaction } from "../../../shared/transactions"
 import type { AccountId } from "../../../shared/wallet.model"
 import { getChangedStatusTransactions } from "../../../shared/transactions/getChangedStatusTransactions"
 import { getTransactionStatus } from "../../../shared/transactions/utils"
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 
 vi.mock("../../../shared/transactions/getChangedStatusTransactions", () => ({
   getChangedStatusTransactions: vi.fn(),
@@ -72,7 +72,7 @@ describe("NonceManagementWorker", () => {
 
     it("should call onRejectedTransaction for rejected transactions", () => {
       const rejectedTransaction = {
-        account: getMockAccount(),
+        account: getMockWalletAccount(),
       } as any
       const changedStatusTransactions = [rejectedTransaction]
       const getChangedStatusTransactionsMock = vi.mocked(
@@ -97,7 +97,7 @@ describe("NonceManagementWorker", () => {
 
     it("should not call onRejectedTransaction for non-rejected transactions", () => {
       const nonRejectedTransaction = {
-        account: getMockAccount(),
+        account: getMockWalletAccount(),
       } as any
 
       const changedStatusTransactions = [nonRejectedTransaction]

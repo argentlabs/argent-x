@@ -1,4 +1,3 @@
-import { buttonHoverStyle } from "@argent/x-ui"
 import type { ButtonProps } from "@chakra-ui/react"
 import { Button, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
@@ -10,7 +9,8 @@ import { DefiPositionDescription } from "./DefiPositionDescription"
 import { DefiPositionSkeleton } from "./DefiPositionSkeleton"
 import { DefiPositionTitle } from "./DefiPositionTitle"
 import { useView } from "../../../views/implementation/react"
-import { positionTitleFindAtom } from "../../../views/investments"
+import { investmentPositionViewFindByIdAtom } from "../../../views/investments"
+import { buttonHoverStyle } from "@argent/x-ui/theme"
 
 export interface DefiPositionProps extends ButtonProps {
   parsedPosition: ParsedPositionWithUsdValue
@@ -25,7 +25,11 @@ export const DefiPosition: FC<DefiPositionProps> = ({
   onClick,
   ...rest
 }) => {
-  const title = useView(positionTitleFindAtom(parsedPosition))
+  const position = useView(
+    investmentPositionViewFindByIdAtom({ positionId: parsedPosition.id }),
+  )
+
+  const title = position?.title
 
   const boxShadow = isHighlighted ? buttonHoverStyle.boxShadow : undefined
   return (

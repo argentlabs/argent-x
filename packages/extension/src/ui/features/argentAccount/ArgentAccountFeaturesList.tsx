@@ -1,8 +1,7 @@
-import { H5, icons } from "@argent/x-ui"
+import { ShieldSecondaryIcon } from "@argent/x-ui/icons"
+import { H5 } from "@argent/x-ui"
 import { Flex, Text, Tooltip } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { ShieldSecondaryIcon } = icons
 
 type ArgentAccountFeaturesListProps = {
   isLoggedIn: boolean

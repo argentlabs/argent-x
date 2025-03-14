@@ -1,7 +1,4 @@
 import {
-  Account,
-  uint256,
-  TransactionExecutionStatus,
   RpcProvider,
   constants,
   TransactionFinalityStatus,
@@ -42,7 +39,7 @@ export type FeeTokens = "ETH" | "STRK"
 export interface AccountsToSetup {
   assets: {
     token: TokenSymbol
-    balance: number
+    balance: number | string
   }[]
   deploy?: boolean
   feeToken?: FeeTokens
@@ -98,52 +95,12 @@ export const getTokenInfo = (tkn: string) => {
   return tokenInfo
 }
 
-const maxRetries = 4
-
 const formatAmount = (amount: string) => {
   return parseInt(amount, 16)
 }
 
 export const formatAmountBase18 = (amount: number) => {
   return amount * Math.pow(10, 18)
-}
-
-const getAccount = async (amount: string, token: TokenSymbol) => {
-  const log: string[] = []
-  const maxAttempts = 5
-  let i = 0
-  while (i < maxAttempts) {
-    i++
-    const randomAccountPosition = Math.floor(
-      Math.random() * commonConfig.senderKeys!.length,
-    )
-    const acc = new Account(
-      provider,
-      commonConfig.senderAddrs![randomAccountPosition],
-      commonConfig.senderKeys![randomAccountPosition],
-      "1",
-    )
-    const initialBalance = await getBalance(acc.address, token)
-    const initialBalanceFormatted =
-      parseFloat(initialBalance) * Math.pow(10, 18)
-    if (initialBalanceFormatted < parseInt(amount)) {
-      log.push(
-        `${
-          commonConfig.senderAddrs![randomAccountPosition]
-        } Not enough balance ${initialBalanceFormatted} ${token} < ${amount}`,
-      )
-    } else {
-      logInfo({
-        op: "getAccount",
-        randomAccountPosition,
-        address: acc.address,
-        balance: `initialBalance ${initialBalanceFormatted} ${token}`,
-      })
-      return acc
-    }
-  }
-  console.error(log.join("\n"))
-  throw new Error("No account with enough balance")
 }
 
 const isTXProcessed = async (txHash: string) => {
@@ -193,87 +150,6 @@ const getTXData = async (txHash: string) => {
   return { nodeUpdated, txData }
 }
 
-export async function transferTokens(
-  amount: number,
-  to: string,
-  token: TokenSymbol = "ETH",
-) {
-  const tokenInfo = getTokenInfo(token)
-  const amountToTransfer = `${amount * Math.pow(10, tokenInfo.decimals)}`
-  logInfo({ op: "transferTokens", amount, amountToTransfer, to, token })
-
-  const { low, high } = uint256.bnToUint256(amountToTransfer)
-  let placeTXAttempt = 0
-  let txHash: string | null = null
-  let account
-  while (placeTXAttempt < maxRetries) {
-    account = await getAccount(amountToTransfer, token)
-    /** timeout if we don't receive a valid execution response */
-    const placeTXTimeout = setTimeout(() => {
-      throw new Error(`Place tx timed out: ${txHash}`)
-    }, 60 * 1000) /** 60 seconds */
-    try {
-      placeTXAttempt++
-      const tx = await account.execute({
-        contractAddress: tokenInfo.address,
-        entrypoint: "transfer",
-        calldata: [to, low, high],
-      })
-      txHash = tx.transaction_hash
-      const { txProcessed, txStatusResponse } = await isTXProcessed(
-        tx.transaction_hash,
-      )
-      if (txProcessed) {
-        logInfo({
-          TxStatus: TransactionExecutionStatus.SUCCEEDED,
-          transaction_hash: tx.transaction_hash,
-        })
-        return tx.transaction_hash
-      }
-
-      console.error(
-        `[Failed to place TX] ${tx.transaction_hash} ${JSON.stringify(txStatusResponse)}`,
-      )
-    } catch (e) {
-      if (e instanceof Error) {
-        //for debug only
-        console.error(
-          `placeTXAttempt: ${placeTXAttempt}, Exception: ${txHash}`,
-          e,
-        )
-      }
-    } finally {
-      clearTimeout(placeTXTimeout)
-    }
-    console.warn("Transfer failed, going to try again ")
-  }
-  return null
-}
-
-export async function getBalance(
-  accountAddress: string,
-  token: TokenSymbol = "ETH",
-) {
-  const tokenInfo = getTokenInfo(token)
-  logInfo({ op: "getBalance", accountAddress, token, tokenInfo })
-  const balanceOfCall = {
-    contractAddress: tokenInfo.address,
-    entrypoint: "balanceOf",
-    calldata: [accountAddress],
-  }
-  const [low] = await provider.callContract(balanceOfCall)
-  const balance = (
-    parseInt(low, 16) / Math.pow(10, tokenInfo.decimals)
-  ).toFixed(4)
-
-  logInfo({
-    op: "getBalance",
-    balance,
-    formattedBalance: balance,
-  })
-  return balance
-}
-
 export async function validateTx({
   txHash,
   receiver,
@@ -310,8 +186,13 @@ export async function validateTx({
   }
   logInfo(log)
   let accAdd
+  //todo add a function to this
+  const isPaymasterTx = txData.calldata.length > 10
+
   txType === "token"
-    ? (accAdd = txData.calldata[4].toString())
+    ? (accAdd = isPaymasterTx
+        ? txData.calldata[25].toString()
+        : txData.calldata[4].toString()) // TODO: This only works with paymaster. Support native deployment too
     : (accAdd = txData.calldata[5].toString())
 
   if (accAdd.length === 65) {
@@ -319,16 +200,22 @@ export async function validateTx({
   }
   expect(isEqualAddress(accAdd, receiver)).toBe(true)
   if (amount) {
-    expect(formatAmount(txData.calldata[5].toString())).toBe(amount)
+    expect(
+      formatAmount(
+        isPaymasterTx
+          ? txData.calldata[26].toString()
+          : txData.calldata[5].toString(),
+      ),
+    ).toBe(amount) // TODO: This only works with paymaster. Support native deployment too
   }
 }
 
-export function isScientific(num: number) {
+export function isScientific(num: number | string) {
   const scientificPattern = /(.*)([eE])(.*)$/
   return scientificPattern.test(String(num))
 }
 
-export function convertScientificToDecimal(num: number) {
+export function convertScientificToDecimal(num: number | string) {
   const exponent = String(num).split("e")[1]
   return Number(num).toFixed(Math.abs(Number(exponent)))
 }

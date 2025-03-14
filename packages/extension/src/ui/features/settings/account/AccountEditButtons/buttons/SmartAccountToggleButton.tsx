@@ -5,11 +5,10 @@ import { useLiveAccountGuardianState } from "../../../../smartAccount/usePending
 import { ChangeGuardian } from "../../../../../../shared/smartAccount/changeGuardianCallDataToType"
 import { useSmartAccountEnabled } from "../../../../../../shared/smartAccount/useSmartAccountEnabled"
 import { useToggleSmartAccountRoute } from "../../../../smartAccount/useToggleSmartAccountRoute"
-import { ButtonCell, icons, P3 } from "@argent/x-ui"
+import { WalletSecondaryIcon, ShieldSecondaryIcon } from "@argent/x-ui/icons"
+import { ButtonCell, P3 } from "@argent/x-ui"
 import { routes } from "../../../../../../shared/ui/routes"
 import type { WalletAccount } from "../../../../../../shared/wallet.model"
-
-const { WalletSecondaryIcon, ShieldSecondaryIcon } = icons
 
 export const SmartAccountToggleButtonContainer: FC<{
   account: WalletAccount
@@ -17,7 +16,7 @@ export const SmartAccountToggleButtonContainer: FC<{
   const navigate = useNavigate()
 
   const liveAccountGuardianState = useLiveAccountGuardianState(account)
-  const isSmartAccountEnabled = useSmartAccountEnabled()
+  const isSmartAccountEnabled = useSmartAccountEnabled(account.networkId)
 
   const { startToggleSmartAccountFlow } = useToggleSmartAccountRoute()
 
@@ -58,7 +57,7 @@ export const SmartAccountToggleButtonContainer: FC<{
 
   const onStartSmartAccountFlow = async () => {
     if (!hasGuardian) {
-      navigate(routes.smartAccountStart(account.id))
+      void navigate(routes.smartAccountStart(account.id))
     } else {
       await startToggleSmartAccountFlow(account)
     }

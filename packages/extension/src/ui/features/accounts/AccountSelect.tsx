@@ -1,9 +1,10 @@
+import { ChevronDownSecondaryIcon } from "@argent/x-ui/icons"
 import {
+  scrollbarStyleThin,
   buttonBaseStyle,
   buttonHoverStyle,
-  icons,
-  scrollbarStyleThin,
-} from "@argent/x-ui"
+  typographyStyles,
+} from "@argent/x-ui/theme"
 import { Box, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useCallback } from "react"
@@ -19,8 +20,6 @@ import ReactSelect, {
 
 import { AccountListItem } from "./AccountListItem"
 import type { AccountListItemProps } from "./accountListItem.model"
-
-const { ChevronDownSecondaryIcon } = icons
 
 const Control = ({
   children,
@@ -122,6 +121,8 @@ const Option = ({
       <AccountListItem
         {...data}
         avatarSize={9}
+        emojiStyle={typographyStyles.H3}
+        initialsStyle={typographyStyles.H4}
         width={"full"}
         rounded={"none"}
         _active={{

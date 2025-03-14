@@ -1,9 +1,4 @@
-import {
-  BarBackButton,
-  CellStack,
-  NavigationContainer,
-  Switch,
-} from "@argent/x-ui"
+import { BarBackButton, CellStack, NavigationContainer } from "@argent/x-ui"
 import type { FC, ReactEventHandler } from "react"
 
 import type { NftMarketplace } from "../../../../shared/nft/marketplaces"
@@ -12,6 +7,8 @@ import { routes } from "../../../../shared/ui/routes"
 import { SettingsMenuItem, SettingsMenuItemLink } from "../ui/SettingsMenuItem"
 import { selectedNetworkIdView } from "../../../views/network"
 import { useView } from "../../../views/implementation/react"
+
+import { Switch } from "@chakra-ui/react"
 
 interface PreferencesSettingsProps {
   onBack: ReactEventHandler
@@ -37,7 +34,6 @@ export const PreferencesSettings: FC<PreferencesSettingsProps> = ({
   selectedIdProvider,
 }) => {
   const selectedNetworkId = useView(selectedNetworkIdView)
-
   return (
     <NavigationContainer
       leftButton={<BarBackButton onClick={onBack} />}

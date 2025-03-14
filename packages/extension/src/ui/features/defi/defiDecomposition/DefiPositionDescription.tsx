@@ -3,11 +3,13 @@ import type { ParsedPositionWithUsdValue } from "../../../../shared/defiDecompos
 import {
   isCollateralizedDebtBorrowingPosition,
   isConcentratedLiquidityPosition,
+  isStakingPosition,
   isStrkDelegatedStakingPosition,
 } from "../../../../shared/defiDecomposition/schema"
 import { CollateralizedDebtStatus } from "./CollateralizedDebtStatus"
 import { ConcentratedLiquidityStatus } from "./ConcentratedLiquidityStatus"
 import { StrkDelegatedStakingStatus } from "./StrkDelegatedStakingStatus"
+import { StrkStakingStatus } from "./StrkStakingStatus"
 
 interface DefiPositionDescriptionProps {
   position: ParsedPositionWithUsdValue
@@ -25,6 +27,9 @@ export const DefiPositionDescription: FC<DefiPositionDescriptionProps> = ({
   }
   if (isStrkDelegatedStakingPosition(position)) {
     return <StrkDelegatedStakingStatus position={position} />
+  }
+  if (isStakingPosition(position)) {
+    return <StrkStakingStatus position={position} />
   }
   return
 }

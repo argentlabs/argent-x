@@ -55,6 +55,7 @@ export const chainIdToArgentNetwork = (chainId: constants.StarknetChainId) => {
 }
 
 export const starknetNetworkToNetworkId = (network: string) => {
+  network = network.toLowerCase()
   switch (network) {
     case "mainnet":
       return "mainnet-alpha"

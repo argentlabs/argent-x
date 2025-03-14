@@ -1,4 +1,4 @@
-import { ParsedDefiDecomposition } from "@argent-x/extension/src/shared/defiDecomposition/schema"
+import type { ParsedDefiDecomposition } from "@argent-x/extension/src/shared/defiDecomposition/schema"
 
 export const parsedDefiDecomposition: ParsedDefiDecomposition = [
   {

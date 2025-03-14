@@ -1,26 +1,26 @@
 import type { FC } from "react"
 import { selectedAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
-import { defiDecompositionWithUsdValueAtom } from "../../../views/investments"
 import { DefiDecomposition } from "./DefiDecomposition"
 import type { FlexProps } from "@chakra-ui/react"
 import { Flex, Skeleton } from "@chakra-ui/react"
 import { DefiPositionSkeleton } from "./DefiPositionSkeleton"
+import { investmentViewFindAtom } from "../../../views/investments"
 
 export const DefiDecompositionContainer: FC = () => {
   const selectedAccount = useView(selectedAccountView)
 
-  const defiDecompositionWithUsdValue = useView(
-    defiDecompositionWithUsdValueAtom(selectedAccount),
+  const investmentWithUsdValue = useView(
+    investmentViewFindAtom(selectedAccount),
   )
 
-  if (!defiDecompositionWithUsdValue || !selectedAccount) {
+  if (!investmentWithUsdValue || !selectedAccount) {
     return null
   }
 
   return (
     <DefiDecomposition
-      defiDecomposition={defiDecompositionWithUsdValue}
+      defiDecomposition={investmentWithUsdValue.defiDecomposition}
       account={selectedAccount}
     />
   )
@@ -28,16 +28,17 @@ export const DefiDecompositionContainer: FC = () => {
 
 export const StakedStrkOnlyDecompositionContainer: FC = () => {
   const selectedAccount = useView(selectedAccountView)
-  const defiDecompositionWithUsdValue = useView(
-    defiDecompositionWithUsdValueAtom(selectedAccount),
+  const investmentWithUsdValue = useView(
+    investmentViewFindAtom(selectedAccount),
   )
 
-  if (!defiDecompositionWithUsdValue || !selectedAccount) {
+  if (!investmentWithUsdValue || !selectedAccount) {
     return null
   }
 
-  const strkOnlyDefiDecomp = defiDecompositionWithUsdValue.filter((defi) =>
-    defi.products.some((product) => product.type === "strkDelegatedStaking"),
+  const strkOnlyDefiDecomp = investmentWithUsdValue.defiDecomposition.filter(
+    (defi) =>
+      defi.products.some((product) => product.type === "strkDelegatedStaking"),
   )
 
   return (

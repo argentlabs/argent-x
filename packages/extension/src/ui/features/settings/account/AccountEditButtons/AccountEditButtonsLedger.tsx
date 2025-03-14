@@ -1,4 +1,5 @@
-import { AlertDialog, ButtonCell, icons, P3, SpacerCell } from "@argent/x-ui"
+import { BinSecondaryIcon, InfoCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { AlertDialog, ButtonCell, P3, SpacerCell } from "@argent/x-ui"
 
 import { Flex, useDisclosure } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom"
@@ -7,8 +8,6 @@ import { accountService } from "../../../../../shared/account/service"
 import { routes } from "../../../../../shared/ui/routes"
 import type { WalletAccount } from "../../../../../shared/wallet.model"
 import { clientAccountService } from "../../../../services/account"
-
-const { BinSecondaryIcon, InfoCircleSecondaryIcon } = icons
 
 export const AccountEditButtonsLedger: FC<{
   account: WalletAccount | undefined

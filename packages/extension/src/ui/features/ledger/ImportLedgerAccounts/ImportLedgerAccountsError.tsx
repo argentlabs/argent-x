@@ -1,7 +1,6 @@
-import { H3, icons } from "@argent/x-ui"
+import { WarningCirclePrimaryIcon } from "@argent/x-ui/icons"
+import { H3 } from "@argent/x-ui"
 import { Center, VStack } from "@chakra-ui/react"
-
-const { WarningCirclePrimaryIcon } = icons
 
 export const ImportLedgerAccountsError = () => {
   return (

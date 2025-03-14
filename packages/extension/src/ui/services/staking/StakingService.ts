@@ -1,7 +1,7 @@
-import type { messageClient } from "../trpc"
+import type { StrkStakingCalldata } from "@argent/x-shared"
 import type { IStakingService } from "../../../shared/staking/IStakingService"
 import type { StrkStakingCalldataWithAccountType } from "../../../shared/staking/types"
-import type { StrkStakingCalldata } from "@argent/x-shared"
+import type { messageClient } from "../trpc"
 
 export class StakingService implements IStakingService {
   constructor(private trpcMessageClient: typeof messageClient) {}

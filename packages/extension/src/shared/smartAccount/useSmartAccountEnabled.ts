@@ -1,11 +1,19 @@
-import { useIsDefaultNetwork } from "../../ui/features/networks/hooks/useIsDefaultNetwork"
+import type { ArgentNetworkId } from "@argent/x-shared"
 import { ARGENT_API_ENABLED } from "../api/constants"
 
-/**
- * Smart Account is enabled only on the default network of each environment
- */
-export const useSmartAccountEnabled = () => {
-  const isDefaultNetwork = useIsDefaultNetwork()
+export const SMART_ACCOUNT_NETWORKS = [
+  "sepolia-alpha" as ArgentNetworkId,
+  "mainnet-alpha" as ArgentNetworkId,
+]
 
-  return ARGENT_API_ENABLED && isDefaultNetwork
+export const useSmartAccountEnabled = (networkId?: string): boolean => {
+  return isSmartAccountEnabled(networkId)
+}
+
+export const isSmartAccountEnabled = (networkId?: string): boolean => {
+  return (
+    !!ARGENT_API_ENABLED &&
+    !!networkId &&
+    SMART_ACCOUNT_NETWORKS.includes(networkId as ArgentNetworkId)
+  )
 }

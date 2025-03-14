@@ -1,12 +1,11 @@
 import type { FC } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { icons, logosDeprecated } from "@argent/x-ui"
+import { CardSecondaryIcon } from "@argent/x-ui/icons"
 import { Option } from "../../components/Option"
 import { routes } from "../../../shared/ui/routes"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 
-const { CardSecondaryIcon } = icons
-const { StarknetLogo } = logosDeprecated
+import { StarknetLogo } from "@argent/x-ui/logos-deprecated"
 
 interface FundingOnRampOptionProps {
   allowFiatPurchase: boolean
@@ -34,8 +33,8 @@ export const FundingOnRampOption: FC<FundingOnRampOptionProps> = ({
         icon={<CardSecondaryIcon />}
         description={
           isBanxaEnabled
-            ? "Provided by Ramp, Banxa and Topper"
-            : "Provided by Ramp and Topper"
+            ? "Provided by Ramp Network, Banxa and Topper"
+            : "Provided by Ramp Network and Topper"
         }
       />
     )

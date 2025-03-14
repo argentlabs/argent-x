@@ -1,3 +1,4 @@
+import { NetworkSecondaryIcon, ResetPrimaryIcon } from "@argent/x-ui/icons"
 import {
   AlertDialog,
   BarAddButton,
@@ -5,7 +6,6 @@ import {
   Button,
   CellStack,
   Empty,
-  icons,
   NavigationContainer,
   StickyGroup,
 } from "@argent/x-ui"
@@ -16,8 +16,6 @@ import {
   SettingsMenuItem,
   SettingsMenuItemRemove,
 } from "../../ui/SettingsMenuItem"
-
-const { NetworkSecondaryIcon, ResetPrimaryIcon } = icons
 
 interface NetworkSettingsScreenProps {
   onBack: ReactEventHandler

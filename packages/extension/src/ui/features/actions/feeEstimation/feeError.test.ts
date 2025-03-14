@@ -1,4 +1,4 @@
-import { GatewayError } from "starknet"
+import { LibraryError } from "starknet"
 import { describe, expect, test } from "vitest"
 
 import { fetcherError } from "../../../../shared/api/fetcher"
@@ -18,13 +18,8 @@ describe("features/actions/feeEstimation/feeError", () => {
       })
     })
     test("returns expected error shape for GatewayError", () => {
-      expect(
-        getParsedFeeError(
-          new GatewayError("foo", "StarknetErrorCode.FOO_BAR_BAZ"),
-        ),
-      ).toEqual({
+      expect(getParsedFeeError(new LibraryError("foo"))).toEqual({
         message: "foo",
-        title: "Foo bar baz",
       })
     })
     test("returns expected error shape for FetcherError", () => {

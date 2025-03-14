@@ -14,6 +14,10 @@ import {
 
 import mock from "./webextension-polyfill-mock"
 
+import "../src/i18n/i18n"
+import { i18nGlobalTypes } from "../src/i18n/globalTypes"
+import { storybookI18nDecorator } from "../src/i18n/storybookI18nDecorator"
+
 const storybookDecorator = makeStorybookDecorator(AppThemeProvider)
 
 /** FIXME: remove when Storybooks gets BigInt support (v8.0) https://github.com/storybookjs/storybook/issues/22452 */
@@ -73,8 +77,15 @@ const preview: Preview = {
       showPanel: true,
     },
   },
-  globalTypes: storybookGlobalTypes,
-  decorators: [storybookDecorator, storybookUIProviderDecorator],
+  globalTypes: {
+    ...storybookGlobalTypes,
+    ...i18nGlobalTypes,
+  },
+  decorators: [
+    storybookI18nDecorator,
+    storybookDecorator,
+    storybookUIProviderDecorator,
+  ],
 }
 
 export default preview

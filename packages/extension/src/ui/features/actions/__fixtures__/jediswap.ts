@@ -378,6 +378,15 @@ export const jediswap: TransactionActionFixture = {
             unit: "WEI",
             maxFee: 91053000052888,
           },
+          feeEstimations: [
+            {
+              overallFee: 30351000212457,
+              gasPrice: 1000000007,
+              gasUsage: 30351,
+              unit: "WEI",
+              maxFee: 91053000052888,
+            },
+          ],
         },
       },
     ],

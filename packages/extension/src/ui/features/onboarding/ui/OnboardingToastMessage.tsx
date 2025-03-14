@@ -1,9 +1,9 @@
-import { H5, icons, logosDeprecated, P2 } from "@argent/x-ui"
+import { ChromeExtensionIcon, PinIcon } from "@argent/x-ui/icons"
+import { H5, P2 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 
-const { ChromeExtensionIcon, PinIcon } = icons
-const { ArgentXLogo } = logosDeprecated
+import { ArgentXLogo } from "@argent/x-ui/logos-deprecated"
 
 export const OnboardingToastMessage: FC = () => {
   return (

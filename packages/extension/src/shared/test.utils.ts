@@ -1,3 +1,4 @@
+import type { Mocked } from "vitest"
 import type { IHttpService } from "@argent/x-shared"
 import {
   MockFnObjectStore,
@@ -6,7 +7,6 @@ import {
 import type { IObjectStore } from "./storage/__new/interface"
 import type { WalletStorageProps } from "./wallet/walletStore"
 import type { BaseMultisigWalletAccount, WalletAccount } from "./wallet.model"
-import type { WalletSession } from "./account/service/accountSharedService/WalletAccountSharedService"
 import { WalletAccountSharedService } from "./account/service/accountSharedService/WalletAccountSharedService"
 import type { IPKStore } from "./accountImport/types"
 import type { PendingMultisig } from "./multisig/types"
@@ -16,6 +16,9 @@ import { StarknetChainService } from "./chain/service/StarknetChainService"
 import { AccountService } from "./account/service/accountService/AccountService"
 import { LedgerSharedService } from "./ledger/service/LedgerSharedService"
 import type { ISettingsStorage } from "./settings/types"
+import type { ISmartAccountService } from "./smartAccount/ISmartAccountService"
+import type { ISessionStore } from "./session/storage"
+import { KeyValueStorage } from "./storage"
 
 const isDev = true
 const isTest = true
@@ -77,10 +80,6 @@ export const getWalletStoreMock = (
   overrides?: Partial<MockFnRepository<WalletAccount>>,
 ) => getArrayStorage<WalletAccount>(overrides)
 
-export const getSessionStoreMock = (
-  overrides?: Partial<IObjectStore<WalletSession>>,
-) => getObjectStorage<WalletSession>(overrides)
-
 export const getPKStoreMock = (overrides?: Partial<IObjectStore<IPKStore>>) =>
   getKeyValueStorage<IPKStore>(overrides)
 
@@ -136,14 +135,22 @@ export const accountServiceMock = new AccountService(
   pkManagerMock,
 )
 
+export const smartAccountServiceMock = {} as Mocked<ISmartAccountService>
+
 export const accountSharedServiceMock = new WalletAccountSharedService(
   getStoreMock(),
   getWalletStoreMock(),
-  getSessionStoreMock(),
+  new KeyValueStorage<ISessionStore>(
+    {
+      isUnlocked: false,
+    },
+    "test:wallet",
+  ),
   getMultisigStoreMock(),
   getPendingMultisigStoreMock(),
   httpServiceMock,
   accountServiceMock,
+  smartAccountServiceMock,
 )
 
 export const ledgerServiceMock = new LedgerSharedService(

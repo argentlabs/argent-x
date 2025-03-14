@@ -1,15 +1,8 @@
-import {
-  BarCloseButton,
-  H5,
-  icons,
-  Input,
-  NavigationContainer,
-} from "@argent/x-ui"
+import { LogOutIcon } from "@argent/x-ui/icons"
+import { BarCloseButton, H5, NavigationContainer } from "@argent/x-ui"
 import type { FC } from "react"
-import { Box, Button, Divider, Flex } from "@chakra-ui/react"
+import { Box, Button, Divider, Flex, Input } from "@chakra-ui/react"
 import { ArgentAccountFeaturesList } from "./ArgentAccountFeaturesList"
-
-const { LogOutIcon } = icons
 
 type ArgentAccountLoggedInScreenProps = {
   handleClose: () => void

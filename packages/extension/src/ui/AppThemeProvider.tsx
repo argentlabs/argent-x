@@ -1,4 +1,4 @@
-import { theme as baseTheme } from "@argent/x-ui"
+import { theme as baseTheme } from "@argent/x-ui/theme"
 import {
   ChakraProvider,
   type ChakraProviderProps,

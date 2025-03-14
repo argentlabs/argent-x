@@ -1,7 +1,6 @@
 import type { EmptyProps } from "@argent/x-ui"
-import { Empty, icons } from "@argent/x-ui"
-
-const { ActivitySecondaryIcon } = icons
+import { ActivitySecondaryIcon } from "@argent/x-ui/icons"
+import { Empty } from "@argent/x-ui"
 
 export function EmptyAccountActivity(props: EmptyProps) {
   return (

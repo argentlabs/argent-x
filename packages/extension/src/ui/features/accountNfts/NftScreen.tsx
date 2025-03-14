@@ -1,11 +1,11 @@
 import type { NftItem } from "@argent/x-shared"
 import { getNftPicture } from "@argent/x-shared"
+import { SendSecondaryIcon, ShowSecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarCloseButton,
   Button,
   CellStack,
   H4,
-  icons,
   NavigationContainer,
   P3,
 } from "@argent/x-ui"
@@ -22,8 +22,6 @@ import type { FC } from "react"
 
 import { TokenMenu } from "../accountTokens/TokenMenu"
 import { NftImage } from "./NftImage"
-
-const { SendSecondaryIcon, ShowSecondaryIcon } = icons
 
 interface NftScreenProps {
   nft: NftItem

@@ -14,6 +14,10 @@ type MinimalBrowser = DeepPick<
   | "windows.update"
   | "windows.remove"
   | "windows.getAll"
+  | "windows.getCurrent"
+  | "sidePanel.setOptions"
+  | "sidePanel.setPanelBehavior"
+  | "sidePanel.open"
 > &
   MinimalActionBrowser
 
@@ -29,6 +33,26 @@ export default class UIService implements IUIService {
 
   unsetDefaultPopup() {
     return this.setDefaultPopup("")
+  }
+
+  async setDefaultSidePanel(path = "index.html") {
+    const enabled = Boolean(path)
+    await this.browser.sidePanel.setOptions({ path, enabled })
+    await this.browser.sidePanel.setPanelBehavior({
+      openPanelOnActionClick: enabled,
+    })
+  }
+
+  async unsetDefaultSidePanel() {
+    return this.setDefaultSidePanel("")
+  }
+
+  async openSidePanel() {
+    const window = await this.browser.windows.getCurrent()
+    if (!window?.id) {
+      return
+    }
+    await this.browser.sidePanel.open({ windowId: window.id })
   }
 
   async createTab(path = "index.html") {

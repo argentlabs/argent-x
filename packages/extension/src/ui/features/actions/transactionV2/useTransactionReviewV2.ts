@@ -6,17 +6,14 @@ import type { TypedData } from "starknet"
 import { TransactionType } from "starknet"
 import { isEmpty } from "lodash-es"
 import { clientAccountService } from "../../../services/account"
-import type { Address, TransactionAction } from "@argent/x-shared"
+import { type Address, type TransactionAction } from "@argent/x-shared"
 import { accountService } from "../../../../shared/account/service"
 import type { BaseWalletAccount } from "../../../../shared/wallet.model"
 import { accountsEqual } from "../../../../shared/utils/accountsEqual"
 import { outsideSignatureSchema } from "../../../../shared/signatureReview/schema"
 import { signatureReviewService } from "../../../services/signatureReview"
-import { clientTokenService } from "../../../services/tokens"
-import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
 
 export interface IUseTransactionReviewV2 {
-  feeTokenAddress?: Address
   transaction: TransactionAction
   actionHash: string
   selectedAccount: BaseWalletAccount | undefined
@@ -25,7 +22,6 @@ export interface IUseTransactionReviewV2 {
 }
 
 export const getReviewForTransactions = async ({
-  feeTokenAddress,
   transaction,
   selectedAccount,
   appDomain,
@@ -35,7 +31,7 @@ export const getReviewForTransactions = async ({
     accountsEqual(account, selectedAccount),
   )
 
-  if (isEmpty(accountList) || !feeTokenAddress) {
+  if (isEmpty(accountList)) {
     return
   }
 
@@ -48,7 +44,6 @@ export const getReviewForTransactions = async ({
   const result = await clientTransactionReviewService.simulateAndReview({
     transaction,
     accountDeployTransaction,
-    feeTokenAddress,
     appDomain,
     maxSendEstimate,
   })
@@ -56,7 +51,6 @@ export const getReviewForTransactions = async ({
 }
 
 export const useTransactionReviewV2 = ({
-  feeTokenAddress,
   transaction,
   actionHash,
   selectedAccount,
@@ -70,40 +64,25 @@ export const useTransactionReviewV2 = ({
   )
 
   const transactionReviewFetcher = useCallback(async () => {
+    if (!selectedAccount) return undefined
+
     const response = await getReviewForTransactions({
-      feeTokenAddress,
       transaction,
       selectedAccount,
       appDomain,
     })
 
-    if (
-      !response ||
-      !response.result ||
-      !response.currentAccount ||
-      !feeTokenAddress
-    ) {
-      return undefined
-    }
-    const isSendingMoreThanBalanceAndGas = await checkGasFeeBalance(
-      response.result,
-      feeTokenAddress,
-      response.currentAccount,
-    )
-    return { ...response.result, isSendingMoreThanBalanceAndGas }
-  }, [appDomain, transaction, feeTokenAddress, selectedAccount])
+    return response?.result
+  }, [appDomain, transaction, selectedAccount])
 
   /** only fetch a tx simulate and review one time since e.g. a swap may expire */
   return useSWRImmutable(
-    feeTokenAddress
-      ? [
-          actionHash,
-          "useTransactionReviewV2",
-          "simulateAndReview",
-          feeTokenAddress,
-          useCacheBust ? cacheBust.current : undefined,
-        ]
-      : null,
+    [
+      actionHash,
+      "useTransactionReviewV2",
+      "simulateAndReview",
+      useCacheBust ? cacheBust.current : undefined,
+    ],
     transactionReviewFetcher,
     {
       shouldRetryOnError: false,
@@ -147,73 +126,4 @@ export const useSignatureReview = ({
       shouldRetryOnError: false,
     },
   )
-}
-export const checkGasFeeBalance = async (
-  result: EnrichedSimulateAndReview,
-  feeTokenAddress: Address,
-  currentAccount: BaseWalletAccount,
-) => {
-  let isSendingMoreThanBalanceAndGas = false
-  const sendTransaction = result.transactions?.find((t) =>
-    t?.simulation?.summary?.find((s) => s.sent),
-  )
-  if (!sendTransaction || !sendTransaction.simulation?.summary) {
-    return isSendingMoreThanBalanceAndGas
-  }
-
-  const tokensSentAddresses = sendTransaction.simulation.summary
-    .filter((s) => s.sent)
-    .map((s) => s.token.address)
-
-  const shouldCheckIfAccountHasEnoughBalance =
-    result.enrichedFeeEstimation?.transactions.feeTokenAddress &&
-    tokensSentAddresses.includes(
-      result.enrichedFeeEstimation?.transactions.feeTokenAddress,
-    )
-  if (
-    !shouldCheckIfAccountHasEnoughBalance ||
-    !result.enrichedFeeEstimation?.transactions?.max
-  ) {
-    return isSendingMoreThanBalanceAndGas
-  }
-
-  const feeAmount =
-    "amount" in result.enrichedFeeEstimation.transactions.max
-      ? result.enrichedFeeEstimation.transactions.max.amount
-      : "maxFee" in result.enrichedFeeEstimation.transactions.max
-        ? result.enrichedFeeEstimation.transactions.max.maxFee
-        : undefined
-
-  const sentAmount = sendTransaction.simulation.summary.find(
-    (s) => s.sent && s.token.address === feeTokenAddress,
-  )?.value
-
-  if (!feeAmount || !sentAmount) {
-    return isSendingMoreThanBalanceAndGas
-  }
-
-  // optimistically use balance from storage
-  const feeTokenBalance = await clientTokenService.getTokenBalance(
-    feeTokenAddress,
-    currentAccount.address as Address,
-    currentAccount.networkId,
-  )
-
-  // fetching on-chain typically adds 500ms+ overhead
-  // const feeTokenBalance = await clientTokenService.fetchTokenBalance(
-  //   feeTokenAddress,
-  //   currentAccount.address as Address,
-  //   currentAccount.networkId,
-  // )
-
-  if (!feeTokenBalance) {
-    return isSendingMoreThanBalanceAndGas
-  }
-
-  const hasEnoughToPayGas =
-    BigInt(feeTokenBalance) > feeAmount + BigInt(sentAmount)
-  if (!hasEnoughToPayGas) {
-    isSendingMoreThanBalanceAndGas = true
-  }
-  return isSendingMoreThanBalanceAndGas
 }

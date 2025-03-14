@@ -3,10 +3,9 @@ import { useMemo } from "react"
 import type { ParsedCollateralizedDebtBorrowingPosition } from "../../../../shared/defiDecomposition/schema"
 import { DefiPositionSubtitle } from "./DefiPositionSubtitle"
 import { DefiPositionTitle } from "./DefiPositionTitle"
-import { icons } from "@argent/x-ui"
+import { RadioFilledIcon } from "@argent/x-ui/icons"
+import { Label2 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-
-const { RadioFilledIcon } = icons
 
 interface CollateralizedDebtStatusProps {
   position: ParsedCollateralizedDebtBorrowingPosition
@@ -35,6 +34,13 @@ export const CollateralizedDebtStatus: FC<CollateralizedDebtStatusProps> = ({
     return { status: "Healthy", color: "text-success" }
   }, [position?.healthRatio])
 
+  const description = useMemo(() => {
+    if (position?.healthRatio && +position.healthRatio < 2.5) {
+      return "Supply more collateral or repay debt to avoid liquidation"
+    }
+    return ""
+  }, [position?.healthRatio])
+
   if (!status || !color) {
     return null
   }
@@ -42,10 +48,15 @@ export const CollateralizedDebtStatus: FC<CollateralizedDebtStatusProps> = ({
   return (
     <>
       {isTitle ? (
-        <Flex alignItems="center">
-          <RadioFilledIcon color={color} mr={1} />
-          <DefiPositionTitle color={color}>{status}</DefiPositionTitle>
-        </Flex>
+        <>
+          <Flex alignItems="center">
+            <RadioFilledIcon color={color} mr={1} />
+            <DefiPositionTitle color={color}>{status}</DefiPositionTitle>
+          </Flex>
+          <Label2 width="156px" color="text-secondary" textAlign="right">
+            {description}
+          </Label2>
+        </>
       ) : (
         <DefiPositionSubtitle color={color}>{status}</DefiPositionSubtitle>
       )}

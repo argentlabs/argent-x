@@ -1,5 +1,5 @@
 import { isEqualAddress } from "@argent/x-shared"
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { collateralizedDebtPositions } from "../__fixtures__/collateralizedDebtPositions"
 import { concentratedLiquidityPositions } from "../__fixtures__/concentratedLiquidityPositions"
 import { tokens } from "../__fixtures__/tokens"
@@ -14,7 +14,7 @@ vi.mock("../../../ui/features/accountTokens/tokens.state", () => ({
 }))
 
 describe("parseConcentratedLiquidityPositions", async () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

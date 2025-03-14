@@ -11,6 +11,7 @@ import { TransactionReviewActions } from "@argent/x-ui/simulation"
 import type { ReviewOfTransaction } from "@argent/x-shared/simulation"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import type { TokenWithBalance } from "@argent/x-shared"
+import { TransactionType } from "starknet"
 
 export interface ApproveDeployAccountScreenProps
   extends Omit<ConfirmPageProps, "onSubmit">,
@@ -97,7 +98,12 @@ export const ApproveDeployAccountScreen: FC<
       isLedger={isLedger}
       {...rest}
     >
-      <TransactionHeader px={0} title={title} iconKey={iconKey} />
+      <TransactionHeader
+        px={0}
+        title={title}
+        iconKey={iconKey}
+        transactionType={TransactionType.DEPLOY_ACCOUNT}
+      />
       {transactionReviewActions}
     </ConfirmScreen>
   )

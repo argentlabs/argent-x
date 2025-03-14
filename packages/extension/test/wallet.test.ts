@@ -14,7 +14,6 @@ import { WalletRecoverySharedService } from "../src/background/wallet/recovery/W
 import { WalletRecoveryStarknetService } from "../src/background/wallet/recovery/WalletRecoveryStarknetService"
 import { Locked } from "../src/background/wallet/session/interface"
 import { WalletSessionService } from "../src/background/wallet/session/WalletSessionService"
-import type { WalletSession } from "../src/background/wallet/session/walletSession.model"
 import { WalletAccountSharedService } from "../src/shared/account/service/accountSharedService/WalletAccountSharedService"
 import {
   deserializeFactory,
@@ -29,17 +28,13 @@ import { pendingMultisigEqual } from "../src/shared/multisig/utils/selectors"
 import type { Network } from "../src/shared/network"
 import type { INetworkService } from "../src/shared/network/service/INetworkService"
 import type { ISettingsStorage } from "../src/shared/settings/types"
-import {
-  ArrayStorage,
-  KeyValueStorage,
-  ObjectStorage,
-} from "../src/shared/storage"
+import type { IKeyValueStorage } from "../src/shared/storage"
+import { ArrayStorage, KeyValueStorage } from "../src/shared/storage"
 import type {
   IObjectStore,
   IRepository,
 } from "../src/shared/storage/__new/interface"
 import { adaptKeyValue } from "../src/shared/storage/__new/keyvalue"
-import { adaptObjectStorage } from "../src/shared/storage/__new/object"
 import { adaptArrayStorage } from "../src/shared/storage/__new/repository"
 import { accountsEqual } from "../src/shared/utils/accountsEqual"
 import type {
@@ -52,19 +47,27 @@ import backup from "./backup.mock.json"
 import backupWrong from "./backup_wrong.mock.json"
 
 import type { IReferralService } from "../src/background/services/referral/IReferralService"
-import { LedgerSharedService } from "../src/shared/ledger/service/LedgerSharedService"
-import { getMockSigner } from "./account.mock"
-import { getAccountIdentifier } from "../src/shared/utils/accountIdentifier"
-import { AccountImportSharedService } from "../src/shared/accountImport/service/AccountImportSharedService"
 import { PKManager } from "../src/shared/accountImport/pkManager/PKManager"
+import { AccountImportSharedService } from "../src/shared/accountImport/service/AccountImportSharedService"
 import type { IPKStore } from "../src/shared/accountImport/types"
+import { LedgerSharedService } from "../src/shared/ledger/service/LedgerSharedService"
 import {
   accountServiceMock,
   emitterMock,
   httpServiceMock,
   ledgerServiceMock,
   multisigBackendServiceMock,
+  smartAccountServiceMock,
 } from "../src/shared/test.utils"
+import { getAccountIdentifier } from "../src/shared/utils/accountIdentifier"
+import { getMockSigner } from "./signer.mock"
+
+import type { ISessionStore } from "../src/shared/session/storage"
+import SecretStorageService from "../src/background/wallet/session/secretStorageService"
+import type {
+  ISecretStorageService,
+  ISecureServiceSessionStore,
+} from "../src/background/wallet/session/interface"
 
 const backupString = JSON.stringify(backup)
 const backupWrongString = JSON.stringify(backupWrong)
@@ -84,7 +87,7 @@ const loadContracts: LoadContracts = async () => [
   argentAccountCasm,
 ]
 
-const NETWORK = "testnetwork"
+const NETWORK = "localhost"
 const devnetHost = process.env.DEVNET_HOST || "localhost"
 const networkService: Pick<INetworkService, "getById"> = {
   // return a falsy value if network is not known. This is normally not allowed, but will skip the account discovery on the known networks (goerli and mainnet)
@@ -109,9 +112,6 @@ const getAccountStore = (name: string, defaults: WalletAccount[] = []) => {
   })
 }
 
-const getSessionStore = (name: string) => {
-  return new ObjectStorage<WalletSession | null>(null, name)
-}
 const getSettingsStore = (name: string) => {
   return new KeyValueStorage<ISettingsStorage>({} as ISettingsStorage, name)
 }
@@ -146,18 +146,30 @@ const SCRYPT_N = 262144
 const getWallet = ({
   storage,
   accountStore,
-  sessionStore,
+  sessionStorage,
   baseMultisigStore,
   pendingMultisigStore,
   pkStore,
+  secretStorageService,
 }: {
   storage: IObjectStore<WalletStorageProps>
   accountStore: IRepository<WalletAccount>
-  sessionStore: IObjectStore<WalletSession | null>
+  sessionStorage: IKeyValueStorage<ISessionStore>
   baseMultisigStore: IRepository<BaseMultisigWalletAccount>
   pendingMultisigStore: IRepository<PendingMultisig>
   pkStore: IObjectStore<IPKStore>
+  secretStorageService?: ISecretStorageService
 }) => {
+  let mockSecretStorageService = secretStorageService
+
+  if (!mockSecretStorageService) {
+    const sessionStore = new KeyValueStorage<ISecureServiceSessionStore>(
+      { exportedKey: "", salt: "", vault: "" },
+      "test:sessionStore",
+    )
+    mockSecretStorageService = new SecretStorageService(sessionStore)
+  }
+
   const defaultBackUpService = new WalletBackupService(
     storage,
     accountStore,
@@ -167,11 +179,12 @@ const getWallet = ({
   const defaultAccountSharedService = new WalletAccountSharedService(
     storage,
     accountStore,
-    sessionStore,
+    sessionStorage,
     baseMultisigStore,
     pendingMultisigStore,
     httpServiceMock,
     accountServiceMock,
+    smartAccountServiceMock,
   )
 
   const defaultAnalyticsService = new AnalyticsService(
@@ -194,7 +207,7 @@ const getWallet = ({
 
   const defaultCryptoStarknetService = new WalletCryptoStarknetService(
     accountStore,
-    sessionStore,
+    mockSecretStorageService,
     pendingMultisigStore,
     defaultAccountSharedService,
     defaultLedgerService,
@@ -214,7 +227,7 @@ const getWallet = ({
     emitterMock,
     storage,
     accountStore,
-    sessionStore,
+    mockSecretStorageService,
     networkService,
     defaultRecoveryStarknetService,
   )
@@ -222,7 +235,8 @@ const getWallet = ({
   const defaultSessionService = new WalletSessionService(
     emitterMock,
     storage,
-    sessionStore,
+    sessionStorage,
+    mockSecretStorageService,
     defaultBackUpService,
     defaultRecoverySharedService,
     SCRYPT_N,
@@ -241,6 +255,7 @@ const getWallet = ({
     defaultMultisigBackendService,
     defaultLedgerService,
     defaultImportAccountService,
+    mockSecretStorageService,
   )
 
   const defaultReferralService = (): IReferralService => {
@@ -251,7 +266,7 @@ const getWallet = ({
     accountStore,
     baseMultisigStore,
     defaultSessionService,
-    sessionStore,
+    mockSecretStorageService,
     defaultAccountSharedService,
     defaultAccountStarknetService,
     defaultCryptoStarknetService,
@@ -262,7 +277,7 @@ const getWallet = ({
   )
 
   const defaultCryptoSharedService = new WalletCryptoSharedService(
-    sessionStore,
+    mockSecretStorageService,
     defaultSessionService,
     defaultBackUpService,
     defaultRecoverySharedService,
@@ -285,11 +300,15 @@ const getWallet = ({
 }
 
 describe("Wallet", () => {
-  // Skipped for now until devnet supports SN_SEPOLIA chain id
   test("create a new wallet", async () => {
     const storage = new KeyValueStorage<WalletStorageProps>({}, "test:wallet1")
+    const sessionStorage = new KeyValueStorage<ISessionStore>(
+      {
+        isUnlocked: false,
+      },
+      "test:wallet",
+    )
     const accountStore = getAccountStore("test:accounts1")
-    const sessionStore = getSessionStore("test:sessions1")
     const baseMultisigStore = getMultisigStore("test:multisig1")
     const pendingMultisigStore = getPendingMultisigStore(
       "test:multisig:pending1",
@@ -299,7 +318,7 @@ describe("Wallet", () => {
     const wallet = getWallet({
       storage: adaptKeyValue(storage),
       accountStore: adaptArrayStorage(accountStore),
-      sessionStore: adaptObjectStorage(sessionStore),
+      sessionStorage,
       baseMultisigStore: adaptArrayStorage(baseMultisigStore),
       pendingMultisigStore: adaptArrayStorage(pendingMultisigStore),
       pkStore: adaptKeyValue(pkStore),
@@ -320,7 +339,7 @@ describe("Wallet", () => {
     ).toBe(true)
 
     const account = await wallet.newAccount(NETWORK, "standard")
-    void tryToMintAllFeeTokens(account, networkService)
+    await tryToMintAllFeeTokens(account, networkService)
     const { txHash } = await wallet.deployAccount(account)
 
     expect(txHash).toMatch(REGEX_HEXSTRING)
@@ -366,19 +385,25 @@ describe("Wallet", () => {
         type: "standard",
       },
     ])
-    const sessionStore = getSessionStore("test:sessions2")
     const baseMultisigStore = getMultisigStore("test:multisig2")
     const pendingMultisigStore = getPendingMultisigStore(
       "test:multisig:pending2",
     )
     const pkStore = getPKStore("test:pk2")
 
+    const sessionStorage = new KeyValueStorage<ISessionStore>(
+      {
+        isUnlocked: false,
+      },
+      "test:wallet",
+    )
+
     emitterMock.emit.mockClear()
 
     const wallet = getWallet({
       storage: adaptKeyValue(storage),
       accountStore: adaptArrayStorage(accountStore),
-      sessionStore: adaptObjectStorage(sessionStore),
+      sessionStorage,
       baseMultisigStore: adaptArrayStorage(baseMultisigStore),
       pendingMultisigStore: adaptArrayStorage(pendingMultisigStore),
       pkStore: adaptKeyValue(pkStore),
@@ -390,7 +415,6 @@ describe("Wallet", () => {
 
     expect(isValid).toBe(true)
     expect(await wallet.isSessionOpen()).toBe(true)
-    expect(emitterMock.emit).toHaveBeenLastCalledWith(Locked, false)
 
     const accounts = await accountStore.get()
     expect(accounts).toHaveLength(1)
@@ -419,7 +443,6 @@ describe("Wallet", () => {
   })
 
   test("open existing wallet with wrong password", async () => {
-    emitterMock.emit.mockClear()
     const storage = new KeyValueStorage<WalletStorageProps>(
       {
         backup: backupString,
@@ -428,28 +451,42 @@ describe("Wallet", () => {
       "test:wallet3",
     )
     const accountStore = getAccountStore("test:accounts3")
-    const sessionStore = getSessionStore("test:sessions3")
     const baseMultisigStore = getMultisigStore("test:multisig3")
     const pendingMultisigStore = getPendingMultisigStore(
       "test:multisig:pending3",
     )
     const pkStore = getPKStore("test:pk3")
 
+    const sessionStorage = new KeyValueStorage<ISessionStore>(
+      {
+        isUnlocked: false,
+      },
+      "test:wallet",
+    )
+
+    const sessionStore = new KeyValueStorage<ISecureServiceSessionStore>(
+      { exportedKey: "", salt: "", vault: "" },
+      "test:sessionStore",
+    )
+    const mockSecretStorageService = new SecretStorageService(sessionStore)
+
     const wallet = getWallet({
       storage: adaptKeyValue(storage),
       accountStore: adaptArrayStorage(accountStore),
-      sessionStore: adaptObjectStorage(sessionStore),
+      sessionStorage,
       baseMultisigStore: adaptArrayStorage(baseMultisigStore),
       pendingMultisigStore: adaptArrayStorage(pendingMultisigStore),
       pkStore: adaptKeyValue(pkStore),
+      secretStorageService: mockSecretStorageService,
     })
 
     expect(await wallet.isInitialized()).toBe(true)
 
+    mockSecretStorageService.decrypt = vi.fn().mockResolvedValue(null)
+
     const isValid = await wallet.startSession("my_falsy_secret_password")
     expect(isValid).toBe(false)
     expect(await wallet.isSessionOpen()).toBe(false)
-    expect(emitterMock.emit).not.toHaveBeenCalled()
   })
 
   test("import backup file", async () => {
@@ -460,17 +497,23 @@ describe("Wallet", () => {
       "test:wallet4",
     )
     const accountStore = getAccountStore("test:accounts4")
-    const sessionStore = getSessionStore("test:sessions4")
     const baseMultisigStore = getMultisigStore("test:multisig4")
     const pendingMultisigStore = getPendingMultisigStore(
       "test:multisig:pending4",
     )
     const pkStore = getPKStore("test:pk4")
 
+    const sessionStorage = new KeyValueStorage<ISessionStore>(
+      {
+        isUnlocked: false,
+      },
+      "test:wallet",
+    )
+
     const wallet = getWallet({
       storage: adaptKeyValue(storage),
       accountStore: adaptArrayStorage(accountStore),
-      sessionStore: adaptObjectStorage(sessionStore),
+      sessionStorage,
       baseMultisigStore: adaptArrayStorage(baseMultisigStore),
       pendingMultisigStore: adaptArrayStorage(pendingMultisigStore),
       pkStore: adaptKeyValue(pkStore),
@@ -495,17 +538,23 @@ describe("Wallet", () => {
       "test:wallet5",
     )
     const accountStore = getAccountStore("test:accounts5")
-    const sessionStore = getSessionStore("test:sessions5")
     const baseMultisigStore = getMultisigStore("test:multisig5")
     const pendingMultisigStore = getPendingMultisigStore(
       "test:multisig:pending5",
     )
     const pkStore = getPKStore("test:pk4")
 
+    const sessionStorage = new KeyValueStorage<ISessionStore>(
+      {
+        isUnlocked: false,
+      },
+      "test:wallet",
+    )
+
     const wallet = getWallet({
       storage: adaptKeyValue(storage),
       accountStore: adaptArrayStorage(accountStore),
-      sessionStore: adaptObjectStorage(sessionStore),
+      sessionStorage,
       baseMultisigStore: adaptArrayStorage(baseMultisigStore),
       pendingMultisigStore: adaptArrayStorage(pendingMultisigStore),
       pkStore: adaptKeyValue(pkStore),

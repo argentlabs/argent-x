@@ -1,4 +1,7 @@
-import type { AnyActivity } from "@argent/x-shared/simulation"
+import {
+  NativeActivityTypeNative,
+  type AnyActivity,
+} from "@argent/x-shared/simulation"
 import { CellStack, H5 } from "@argent/x-ui"
 import {
   ActivityRowSkeleton,
@@ -78,6 +81,13 @@ export const ActivityListContainer: FC<ActivityListContainerProps> = ({
 
   const onActivityClick = useCallback(
     (activity: AnyActivity) => {
+      // the flag isExecuteFromOutside is used to identify the transaction intent, so there is no tx hash yet
+      if (
+        activity.type === NativeActivityTypeNative &&
+        activity.meta?.isExecuteFromOutside
+      ) {
+        return
+      }
       if (openTxExplorerStatuses.includes(activity.status)) {
         void onBlockExplorerOpenTransaction({
           hash: activity.transaction.hash,

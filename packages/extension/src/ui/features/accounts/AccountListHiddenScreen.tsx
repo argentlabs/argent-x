@@ -43,6 +43,7 @@ export const AccountListHiddenScreen: FC<AccountListHiddenScreenProps> = ({
             showRightElements
             isLedger={account.signer.type === "ledger"}
             isSmartAccount={account.type === "smart"}
+            avatarMeta={account.avatarMeta}
           />
         ))}
         {pendingMultisigAccounts.map((pendingMultisig) => (

@@ -13,7 +13,7 @@ import { NftFigure } from "./NftFigure"
 import { NftItem } from "./NftItem"
 import { useCollectionNftsByAccountAndNetwork } from "./nfts.state"
 import type { BaseWalletAccount } from "../../../shared/wallet.model"
-import { theme } from "@argent/x-ui"
+import { theme } from "@argent/x-ui/theme"
 import { useCurrentPathnameWithQuery } from "../../hooks/useRoute"
 
 interface AccountCollectionProps {

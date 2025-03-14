@@ -1,4 +1,4 @@
-import { icons } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
 import type { FC } from "react"
 import type { LinkProps } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
@@ -8,9 +8,6 @@ import { useAccountOwnerIsSelf } from "../accounts/useAccountOwner"
 import type { BannerProps } from "./Banner"
 import { Banner } from "./Banner"
 
-const { WarningCircleSecondaryIcon } = icons
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AccountOwnerBannerProps
   extends Pick<LinkProps, "to" | "state">,
     BannerProps {}

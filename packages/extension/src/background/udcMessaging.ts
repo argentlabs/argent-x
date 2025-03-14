@@ -5,7 +5,6 @@ import { UnhandledMessage } from "./background"
 
 export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
   msg,
-  origin,
   background: { wallet, actionService },
   respond,
 }) => {
@@ -24,8 +23,8 @@ export const handleUdcMessaging: HandleMessage<UdcMessage> = async ({
           payload,
         },
         {
-          origin,
-          icon: "DocumentIcon",
+          title: "Declare Contract",
+          icon: "LegalPrimaryIcon",
         },
       )
 

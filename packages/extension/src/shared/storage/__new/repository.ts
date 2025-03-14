@@ -7,9 +7,11 @@ import type {
   StorageChange,
   UpsertResult,
 } from "./interface"
-import type { ArrayStorage } from ".."
+import type { IArrayStorage } from ".."
 
-export function adaptArrayStorage<T>(storage: ArrayStorage<T>): IRepository<T> {
+export function adaptArrayStorage<T>(
+  storage: IArrayStorage<T>,
+): IRepository<T> {
   return {
     namespace: storage.namespace,
 

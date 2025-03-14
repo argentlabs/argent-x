@@ -1,12 +1,10 @@
 import { useMemo } from "react"
 import type { WalletAccount } from "../../../shared/wallet.model"
-import { mapWalletAccountsToAccounts } from "./accounts.state"
 import { getPartitionedAccountsByType } from "./usePartitionedAccountsByType"
 
 export const getSortedAccounts = (accounts: WalletAccount[]) => {
-  const walletAccounts = mapWalletAccountsToAccounts(accounts)
   const { multisigAccounts, standardAccounts, importedAccounts } =
-    getPartitionedAccountsByType(walletAccounts)
+    getPartitionedAccountsByType(accounts)
 
   return [...standardAccounts, ...importedAccounts, ...multisigAccounts]
 }

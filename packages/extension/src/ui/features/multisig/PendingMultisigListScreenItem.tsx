@@ -1,4 +1,8 @@
-import { Button, icons } from "@argent/x-ui"
+import {
+  ChevronRightSecondaryIcon,
+  MoreSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { Button } from "@argent/x-ui"
 import { Circle, Flex } from "@chakra-ui/react"
 import type { FC, MouseEvent } from "react"
 import { useCallback, useMemo, useRef } from "react"
@@ -9,8 +13,6 @@ import { routes } from "../../../shared/ui/routes"
 import { AccountListScreenItemAccessory } from "../accounts/AccountListScreenItemAccessory"
 import { PendingMultisigListItem } from "./PendingMultisigListItem"
 import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
-
-const { ChevronRightSecondaryIcon, MoreSecondaryIcon } = icons
 
 /** TODO: refactor - this should use AccoutListScreenItem */
 

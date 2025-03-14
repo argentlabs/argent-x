@@ -1,5 +1,5 @@
 import { Route, Routes, RoutesConfig } from "@argent/stack-router"
-import { FC } from "react"
+import type { FC } from "react"
 
 import { About } from "../screens/About"
 import { Account } from "../screens/Account"

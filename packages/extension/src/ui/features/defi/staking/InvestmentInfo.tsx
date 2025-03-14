@@ -1,21 +1,29 @@
-import type { StrkDelegatedStakingInvestment } from "@argent/x-shared"
+import type {
+  LiquidStakingInvestment,
+  StrkDelegatedStakingInvestment,
+} from "@argent/x-shared"
 import { prettifyCurrencyValue } from "@argent/x-shared"
 import { bigDecimal, prettifyCurrencyNumber } from "@argent/x-shared"
-import { CellStack, icons, P3Bold } from "@argent/x-ui"
+import {
+  InfoCircleSecondaryIcon,
+  NoImageSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { CellStack, P3Bold } from "@argent/x-ui"
 import type { BoxProps } from "@chakra-ui/react"
 import { Box, Flex, HStack, Image, Square, Tooltip } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { InfoCircleSecondaryIcon, NoImageSecondaryIcon } = icons
+import { useInvestmentProviderInfo } from "./hooks/useInvestmentProviderInfo"
 
 interface InvestmentInfoProps extends BoxProps {
-  investment?: StrkDelegatedStakingInvestment
+  investment?: StrkDelegatedStakingInvestment | LiquidStakingInvestment
 }
 
 export const InvestmentInfo: FC<InvestmentInfoProps> = ({
   investment,
   ...rest
 }) => {
+  const providerInfo = useInvestmentProviderInfo(investment)
+
   if (!investment) {
     return null
   }
@@ -64,11 +72,11 @@ export const InvestmentInfo: FC<InvestmentInfoProps> = ({
             >
               <Image
                 fit="cover"
-                src={investment.stakerInfo.iconUrl}
+                src={providerInfo?.iconUrl}
                 fallback={<NoImageSecondaryIcon fontSize="xl" />}
               />
             </Square>
-            <P3Bold>{investment.stakerInfo.name}</P3Bold>
+            <P3Bold>{providerInfo?.name}</P3Bold>
           </HStack>
         </HStack>
         <HStack justify="space-between" py="1.5">

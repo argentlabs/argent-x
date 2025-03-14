@@ -19,6 +19,7 @@ export interface AddAccountResponse {
 }
 
 export interface IMultisigService {
+  validateSigners(signers: string[]): Promise<boolean>
   addAccount(payload: AddAccountPayload): Promise<AddAccountResponse>
   addOwner(payload: AddOwnerMultisigPayload): Promise<void>
   removeOwner(payload: RemoveOwnerMultisigPayload): Promise<void>

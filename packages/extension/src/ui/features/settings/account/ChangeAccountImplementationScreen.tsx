@@ -1,9 +1,9 @@
+import { CheckmarkSecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   ButtonCell,
   CellStack,
   H5,
-  icons,
   NavigationContainer,
   P3,
 } from "@argent/x-ui"
@@ -19,8 +19,6 @@ import { useRouteWalletAccount } from "../../smartAccount/useRouteWalletAccount"
 import type { Implementation, ImplementationItemProps } from "./Implementation"
 import { CurrentImplementation, implementations } from "./Implementation"
 import { clientAccountService } from "../../../services/account"
-
-const { CheckmarkSecondaryIcon } = icons
 
 const ImplementationItem: FC<ImplementationItemProps> = ({
   title,

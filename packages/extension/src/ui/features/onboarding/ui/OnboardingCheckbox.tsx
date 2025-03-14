@@ -1,9 +1,8 @@
-import { icons, P2 } from "@argent/x-ui"
+import { RadioEmptyIcon, RadioFilledIcon } from "@argent/x-ui/icons"
+import { P2 } from "@argent/x-ui"
 import type { UseCheckboxProps } from "@chakra-ui/react"
 import { Flex, FormLabel, useCheckbox } from "@chakra-ui/react"
 import type { FC, PropsWithChildren } from "react"
-
-const { RadioEmptyIcon, RadioFilledIcon } = icons
 
 export const OnboardingCheckbox: FC<PropsWithChildren & UseCheckboxProps> = ({
   children,

@@ -1,6 +1,6 @@
 import {
   estimatedFeeToMaxResourceBounds,
-  getTxVersionFromFeeToken,
+  getAccountTxVersion,
 } from "@argent/x-shared"
 import type { ExtensionActionItemOfType } from "../shared/actionQueue/types"
 import { addTransaction } from "../shared/transactions/store"
@@ -11,22 +11,20 @@ import type { DeployActionExtra } from "../shared/actionQueue/schema"
 import { getEstimatedFees } from "../shared/transactionSimulation/fees/estimatedFeesRepository"
 import { TransactionType } from "starknet"
 import { TransactionError } from "../shared/errors/transaction"
+import type { EstimatedFeesV2 } from "@argent/x-shared/simulation"
+import { estimatedFeeSchema } from "@argent/x-shared/simulation"
+import type { WalletAccount } from "../shared/wallet.model"
 
 export const accountDeployAction = async (
   action: ExtensionActionItemOfType<"DEPLOY_ACCOUNT">,
   wallet: Wallet,
-  extra?: DeployActionExtra,
+  _?: DeployActionExtra,
 ) => {
   if (!(await wallet.isSessionOpen())) {
     throw Error("you need an open session")
   }
   const { account: baseAccount } = action.payload
 
-  if (!extra) {
-    throw Error("Missing fee token address data")
-  }
-
-  const { feeTokenAddress } = extra
   const selectedAccount = await wallet.getArgentAccount(baseAccount.id)
 
   const accountNeedsDeploy = selectedAccount?.needsDeploy
@@ -47,12 +45,7 @@ export const accountDeployAction = async (
     throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
   }
 
-  const version = getTxVersionFromFeeToken(feeTokenAddress)
-
-  const deployDetails = {
-    version,
-    ...estimatedFeeToMaxResourceBounds(preComputedFees.transactions),
-  }
+  const deployDetails = buildDeployDetails(selectedAccount, preComputedFees)
 
   const { account, txHash } = await wallet.deployAccount(
     selectedAccount,
@@ -83,4 +76,21 @@ export const accountDeployAction = async (
   })
 
   return txHash
+}
+
+export const buildDeployDetails = (
+  account: WalletAccount,
+  preComputedFees: EstimatedFeesV2,
+) => {
+  const version = getAccountTxVersion(account)
+  const parsedFees = estimatedFeeSchema.safeParse(preComputedFees.transactions)
+
+  if (!parsedFees.success) {
+    throw new TransactionError({ code: "PAYMASTER_FEES_NOT_SUPPORTED" })
+  }
+
+  return {
+    version,
+    ...estimatedFeeToMaxResourceBounds(parsedFees.data),
+  }
 }

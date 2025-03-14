@@ -44,6 +44,7 @@ export const AccountTypesList: FC<AccountTypesListProps> = ({
       {accountTypes.map(
         ({
           id,
+          type,
           title,
           subtitle,
           icon,
@@ -53,6 +54,11 @@ export const AccountTypesList: FC<AccountTypesListProps> = ({
         }) => (
           <CustomButtonCell
             key={`account-type-${id}`}
+            data-testid={
+              selectedAccountTypeId === id
+                ? `selected-${type}-account`
+                : `${type}-account`
+            }
             aria-label={title}
             aria-describedby={typeof subtitle === "string" ? subtitle : label}
             p={4}

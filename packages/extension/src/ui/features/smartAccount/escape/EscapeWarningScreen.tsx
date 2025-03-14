@@ -1,7 +1,7 @@
+import { ShieldSecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarCloseButton,
   FlowHeader,
-  icons,
   NavigationContainer,
   useToast,
 } from "@argent/x-ui"
@@ -27,8 +27,6 @@ import {
 } from "./useAccountEscape"
 import { accountMessagingService } from "../../../services/accountMessaging"
 
-const { ShieldSecondaryIcon } = icons
-
 export const EscapeWarningScreen: FC = () => {
   const navigate = useNavigate()
   const account = useRouteWalletAccount()
@@ -36,7 +34,7 @@ export const EscapeWarningScreen: FC = () => {
     if (account) {
       await hideEscapeWarning(account)
     }
-    navigate(routes.accountTokens())
+    void navigate(routes.accountTokens(), { replace: true })
   }, [account, navigate])
   const toast = useToast()
   const liveAccountEscape = useLiveAccountEscape(account)

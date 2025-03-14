@@ -1,18 +1,10 @@
 import { isString } from "lodash-es"
 
+import type { OnlyOptionalPropertiesOf, RequiredPropertiesOf } from "./types"
 import type {
-  AreaName,
-  OnlyOptionalPropertiesOf,
-  RequiredPropertiesOf,
-} from "./types"
-
-export interface StorageOptions {
-  namespace: string
-  areaName?: AreaName
-}
-export type StorageOptionsOrNameSpace<
-  T extends StorageOptions = StorageOptions,
-> = string | T
+  StorageOptions,
+  StorageOptionsOrNameSpace,
+} from "./types/StorageOptions"
 
 export function getOptionsWithDefaults<T extends StorageOptions>(
   options: StorageOptionsOrNameSpace<T>,

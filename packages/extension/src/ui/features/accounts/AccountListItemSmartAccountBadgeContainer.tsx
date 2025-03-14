@@ -8,14 +8,19 @@ import { useWalletAccount } from "./accounts.state"
 type AccountListItemSmartAccountBadgeContainerProps = Pick<
   AccountListItemProps,
   "accountId"
->
+> & {
+  size?: number | string
+}
 
 export const AccountListItemSmartAccountBadgeContainer: FC<
   AccountListItemSmartAccountBadgeContainerProps
-> = ({ accountId }) => {
+> = ({ accountId, size }) => {
   const account = useWalletAccount(accountId)
   const liveAccountEscape = useLiveAccountEscape(account)
   return (
-    <AccountListItemSmartAccountBadge liveAccountEscape={liveAccountEscape} />
+    <AccountListItemSmartAccountBadge
+      liveAccountEscape={liveAccountEscape}
+      size={size}
+    />
   )
 }

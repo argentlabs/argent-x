@@ -245,8 +245,8 @@ export const routes = {
     "/settings/advanced/networks/:networkId/edit",
   ),
   settingsRemoveCustomNetwork: route("/settings/advanced/networks/remove"),
-  settingsDappConnectionsAccountList: route("/settings/dapp-connections"),
-  settingsDappConnectionsAccount: route(
+  settingsAuthorizedDappsAccountList: route("/settings/dapp-connections"),
+  settingsAuthorizedDappsAccount: route(
     (accountId) => `/settings/dapp-connections/${accountId}`,
     "/settings/dapp-connections/:accountId",
   ),
@@ -258,6 +258,8 @@ export const routes = {
   settingsExperimental: route("/settings/advanced/experimental"),
   settingsBetaFeatures: route("/settings/advanced/beta-features"),
   settingsAddressBook: route("/settings/addressbook"),
+  settingsSecurityPeriod: route(`/settings/security-period`),
+  settingsRemoveGuardian: route(`/settings/remove-guardian`),
   settingsAddressBookAddOrEdit: route(
     (contact?: AddressBookContact) =>
       `/settings/addressbook/add-or-edit?${qs(contact)}`,
@@ -266,17 +268,6 @@ export const routes = {
   settingsClearLocalStorage: route("/settings/clear-local-storage"),
   settingsDownloadLogs: route("/settings/download-logs"),
   deploymentData: route("/settings/deployment-data"),
-  settingsSmartContractDeclare: route(
-    "/settings/smart-contract-development/declare",
-  ),
-  settingsSmartContractDeploy: route(
-    "/settings/smart-contract-development/deploy",
-  ),
-  settingsSmartContractDeclareOrDeploySuccess: route(
-    (type: "declare" | "deploy", classHashOrDeployedAddress) =>
-      `/settings/smart-contract-development/${type}/success/${classHashOrDeployedAddress}`,
-    "/settings/smart-contract-development/:type/success/:classHashOrDeployedAddress",
-  ),
   networkWarning: routeWithReturnTo("/network-warning"),
   backupDownload: route(
     (isFromSettings?: boolean) =>
@@ -402,25 +393,43 @@ export const routes = {
         : `/swap${tokenAddress ? `/${tokenAddress}` : ""}`,
     "/swap/:tokenAddress?",
   ),
+  swapSettings: routeWithReturnTo("/swap-settings"),
 
   // Staking
   staking: routeWithReturnTo("/staking"),
   nativeStakingIndex: routeWithReturnTo("/staking/native"), // allows router to resolve without investmentId
   nativeStaking: route(
-    (investmentId: string, returnTo?: string) =>
+    (investmentId?: string, returnTo?: string) =>
       returnTo
-        ? `/staking/native/${investmentId}?returnTo=${encodeURIComponent(returnTo)}`
-        : `/staking/native/${investmentId}`,
-    "/staking/native/:investmentId",
+        ? `/staking/native${investmentId ? `/${investmentId}` : ""}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/staking/native${investmentId ? `/${investmentId}` : ""}`,
+    "/staking/native/:investmentId?",
   ),
   nativeStakingSelect: routeWithReturnTo("/staking/native-select"),
+  liquidStakingIndex: routeWithReturnTo("/staking/liquid"), // allows router to resolve without investmentId
+  liquidStaking: route(
+    (investmentId?: string, returnTo?: string) =>
+      returnTo
+        ? `/staking/liquid${investmentId ? `/${investmentId}` : ""}?returnTo=${encodeURIComponent(
+            returnTo,
+          )}`
+        : `/staking/liquid${investmentId ? `/${investmentId}` : ""}`,
+    "/staking/liquid/:investmentId?",
+  ),
   liquidStakingSelect: routeWithReturnTo("/staking/liquid-select"),
-  unstake: route(
+  nativeUnstake: route(
     (investmentPositionId: string, returnTo?: string) =>
       returnTo
-        ? `/staking/unstake/${investmentPositionId}?returnTo=${encodeURIComponent(returnTo)}`
-        : `/staking/unstake/${investmentPositionId}`,
-    "/staking/unstake/:investmentPositionId",
+        ? `/staking/unstake-native/${investmentPositionId}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/staking/unstake-native/${investmentPositionId}`,
+    "/staking/unstake-native/:investmentPositionId",
+  ),
+  liquidUnstake: route(
+    (investmentPositionId: string, returnTo?: string) =>
+      returnTo
+        ? `/staking/unstake-liquid/${investmentPositionId}?returnTo=${encodeURIComponent(returnTo)}`
+        : `/staking/unstake-liquid/${investmentPositionId}`,
+    "/staking/unstake-liquid/:investmentPositionId",
   ),
 
   // Defi
@@ -432,5 +441,11 @@ export const routes = {
           )}`
         : `/defi/position/${positionId}/${dappId}`,
     "/defi/position/:positionId/:dappId",
+  ),
+
+  // Account Labels
+  editAccountLabel: route(
+    (accountId: AccountId) => `/account-labels/edit/${accountId}`,
+    "/account-labels/edit/:accountId",
   ),
 }

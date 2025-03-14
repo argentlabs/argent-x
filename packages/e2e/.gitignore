@@ -2,3 +2,4 @@ artifacts
 blob-report
 perfTraces.json
 mig
+perf-result.json

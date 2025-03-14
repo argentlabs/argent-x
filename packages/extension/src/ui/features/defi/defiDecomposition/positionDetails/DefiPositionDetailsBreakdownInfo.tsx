@@ -4,7 +4,12 @@ import {
   prettifyCurrencyValue,
   prettifyTokenAmount,
 } from "@argent/x-shared"
-import { CellStack, H5, Label2, P4, P4Bold, icons } from "@argent/x-ui"
+import {
+  InfoCircleSecondaryIcon,
+  ArrowUpRightPrimaryIcon,
+  ValidatorSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { CellStack, H5, P4, P4Bold } from "@argent/x-ui"
 import type { SquareProps } from "@chakra-ui/react"
 import {
   Box,
@@ -22,17 +27,12 @@ import {
   isStrkDelegatedStakingPosition,
   type ParsedPosition,
 } from "../../../../../shared/defiDecomposition/schema"
+import { checkHasRewards } from "../../../../../shared/staking/utils"
 import type { BaseWalletAccount } from "../../../../../shared/wallet.model"
 import { CollateralizedDebtStatus } from "../CollateralizedDebtStatus"
 import { ConcentratedLiquidityStatus } from "../ConcentratedLiquidityStatus"
 import { useDefiPositionBreakdownInfo } from "./useDefiPositionBreakdownInfo"
-import { checkHasRewards } from "../../../../../shared/staking/utils"
 
-const {
-  InfoCircleSecondaryIcon,
-  NoImageSecondaryIcon,
-  ArrowUpRightPrimaryIcon,
-} = icons
 interface PositionDetailsBreakdownInfoProps {
   position: ParsedPosition
   account: BaseWalletAccount
@@ -61,7 +61,7 @@ const ProviderIcon: FC<ProviderIconProps> = ({
       <Image
         fit="cover"
         src={iconUrl}
-        fallback={<NoImageSecondaryIcon fontSize="xl" />}
+        fallback={<ValidatorSecondaryIcon fontSize="small" />}
       />
     </Square>
   )
@@ -82,9 +82,6 @@ export const DefiPositionDetailsBreakdownInfo: FC<
             <HStack>
               <Flex flexDirection="column" gap="1" alignItems="flex-end">
                 <ConcentratedLiquidityStatus position={position} isTitle />
-                <Label2 width="156px" color="text-secondary" textAlign="right">
-                  Nearly out of range
-                </Label2>
               </Flex>
             </HStack>
           </HStack>
@@ -100,9 +97,6 @@ export const DefiPositionDetailsBreakdownInfo: FC<
             <HStack>
               <Flex flexDirection="column" gap="1" alignItems="flex-end">
                 <CollateralizedDebtStatus position={position} isTitle />
-                <Label2 width="156px" color="text-secondary" textAlign="right">
-                  Supply more collateral or repay debt to avoid liquidation
-                </Label2>
               </Flex>
             </HStack>
           </HStack>

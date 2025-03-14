@@ -17,6 +17,7 @@ import {
 import { getAccountIdentifier } from "../../utils/accountIdentifier"
 import { getAccountClassHashFromChain } from "../../account/details"
 import { accountsEqual } from "../../utils/accountsEqual"
+import { getAccountMeta } from "../../accountNameGenerator"
 
 export async function getAllPendingMultisigs(
   selector: SelectorFn<PendingMultisig> = withoutHiddenPendingMultisig,
@@ -71,10 +72,12 @@ export async function pendingMultisigToMultisig(
     pendingMultisig.signer,
   )
 
+  const { name } = getAccountMeta(id, "multisig")
+
   const fullMultisig: MultisigWalletAccount = {
     id,
     address: multisigData.address,
-    name: pendingMultisig.name,
+    name,
     type: "multisig",
     networkId: pendingMultisig.networkId,
     signer: pendingMultisig.signer,

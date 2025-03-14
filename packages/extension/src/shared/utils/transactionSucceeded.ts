@@ -11,7 +11,7 @@ export const hasSuccessfulTransaction = (
 
 export const getSuccessfulTransactions = (
   newTxs: Transaction[],
-  oldTxs?: Transaction[],
+  oldTxs: Transaction[] | undefined | null,
 ) => {
   const successfulTransactions = []
   for (const newTransaction of newTxs) {

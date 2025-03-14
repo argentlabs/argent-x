@@ -1,12 +1,14 @@
-import { icons, MassiveTitle, P3 } from "@argent/x-ui"
+import {
+  InfoCircleSecondaryIcon,
+  SuccessSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { MassiveTitle, P3 } from "@argent/x-ui"
 import { Flex, HStack } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useMemo } from "react"
 import { ActionButton } from "../../../components/FullScreenPage"
 import { SidePanel } from "../layout/Panel"
 import { ScreenLayout } from "../layout/ScreenLayout"
-
-const { InfoCircleSecondaryIcon, SuccessSecondaryIcon } = icons
 
 export const ImportedLedgerAccountsSuccess: FC<{
   index: number

@@ -64,6 +64,10 @@ export const udcDeclareContract = async (
     throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
   }
 
+  if (preComputedFees.type === "paymaster") {
+    throw new TransactionError({ code: "PAYMASTER_FEES_NOT_SUPPORTED" })
+  }
+
   const version = getTxVersionFromFeeTokenForDeclareContract(
     preComputedFees.transactions.feeTokenAddress,
     payload,
@@ -81,7 +85,8 @@ export const udcDeclareContract = async (
   if (
     isArgentAccount(selectedAccount) &&
     accountNeedsDeploy &&
-    preComputedFees.deployment
+    preComputedFees.deployment &&
+    preComputedFees.type === "native"
   ) {
     const deployDetails = {
       version,
@@ -185,6 +190,10 @@ export const udcDeployContract = async (
     throw new TransactionError({ code: "NO_PRE_COMPUTED_FEES" })
   }
 
+  if (preComputedFees.type === "paymaster") {
+    throw new TransactionError({ code: "PAYMASTER_FEES_NOT_SUPPORTED" })
+  }
+
   const version = getTxVersionFromFeeToken(
     preComputedFees.transactions.feeTokenAddress,
   )
@@ -201,7 +210,8 @@ export const udcDeployContract = async (
   if (
     isArgentAccount(selectedAccount) &&
     accountNeedsDeploy &&
-    preComputedFees.deployment
+    preComputedFees.deployment &&
+    preComputedFees.type === "native"
   ) {
     const deployDetails = {
       version,

@@ -16,5 +16,5 @@
     "jsx": "react-jsx",
     "isolatedModules": false
   },
-  "include": ["src"]
+  "include": ["src", "eslint.config.mjs"]
 }

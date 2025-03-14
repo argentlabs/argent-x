@@ -1,7 +1,9 @@
-import type { TokenWithBalance } from "@argent/x-shared"
+import type { Address } from "@argent/x-shared"
 import {
+  bigDecimal,
   classHashSupportsTxV3,
   ensureArray,
+  filterPaymasterEstimatedFees,
   formatAddress,
   getMessageFromTrpcError,
   getPrettyRpcError,
@@ -12,7 +14,6 @@ import {
   transferCalldataSchema,
 } from "@argent/x-shared"
 import { useDisclosure } from "@chakra-ui/react"
-import { formatUnits } from "ethers"
 import { useAtom } from "jotai"
 import { isEmpty, isObject } from "lodash-es"
 import type { FC } from "react"
@@ -39,7 +40,6 @@ import {
   TransactionReviewSimulation,
 } from "@argent/x-ui/simulation"
 import { num, TransactionType } from "starknet"
-import { isTransactionActionItem } from "../../../../shared/actionQueue/types"
 import { ampli } from "../../../../shared/analytics"
 import { removeMultisigPendingTransactionOnRejectOnChain } from "../../../../shared/multisig/pendingTransactionsStore"
 import { MultisigTransactionType } from "../../../../shared/multisig/types"
@@ -47,15 +47,13 @@ import type { BaseToken } from "../../../../shared/token/__new/types/token.model
 import { equalToken } from "../../../../shared/token/__new/utils"
 import { DAPP_TRANSACTION_TITLE } from "../../../../shared/transactions/utils"
 import { routes } from "../../../../shared/ui/routes"
-import { isSafeUpgradeTransaction } from "../../../../shared/utils/isSafeUpgradeTransaction"
 import { sanitizeAccountType } from "../../../../shared/utils/sanitizeAccountType"
-import { feeTokenService } from "../../../services/feeToken"
+import { useRouteAccountDefi } from "../../../hooks/useRoute"
 import { clientTokenService } from "../../../services/tokens"
 import { userClickedAddFundsAtom } from "../../../views/actions"
 import { useView } from "../../../views/implementation/react"
 import { transactionHashFindAtom } from "../../../views/transactionHashes"
-import { useFeeTokenBalances } from "../../accountTokens/useFeeTokenBalance"
-import { maxFeeEstimateForTransfer } from "../../accountTokens/useMaxFeeForTransfer"
+import { useTokenBalancesForFeeEstimates } from "../../accountTokens/useFeeTokenBalance"
 import { RemovedMultisigWarningScreen } from "../../multisig/RemovedMultisigWarningScreen"
 import { AccountDetailsNavigationBarContainer } from "../../navigation/AccountDetailsNavigationBarContainer"
 import { useCurrentNetwork } from "../../networks/hooks/useCurrentNetwork"
@@ -71,7 +69,7 @@ import { ConfirmScreen } from "../transaction/ApproveTransactionScreen/ConfirmSc
 import { WithActionScreenErrorFooter } from "../transaction/ApproveTransactionScreen/WithActionScreenErrorFooter"
 import { LedgerActionModal } from "../transaction/ApproveTransactionScreen/ledger/LedgerActionModal"
 import { AirGapReviewButtonContainer } from "../transaction/airgap/AirGapReviewButton"
-import { useDefaultFeeToken } from "../useDefaultFeeToken"
+import { getTransactionUsdValue } from "../transaction/getTransactionUsdValue"
 import { ConfirmationModal } from "../warning/ConfirmationModal"
 import { ReviewFooter } from "../warning/ReviewFooter"
 import { WarningBanner } from "../warning/WarningBanner"
@@ -82,11 +80,18 @@ import {
   TransactionReviewSkeleton,
 } from "./TransactionActionScreenSkeleton"
 import { TransactionHeader } from "./header"
-import { useFeeTokenSelection } from "./useFeeTokenSelection"
 import { useMultisigActionScreen } from "./useMultisigActionScreen"
 import { useTransactionReviewV2 } from "./useTransactionReviewV2"
 import { getRelatedTokensFromReview } from "./utils/getAmpliPayloadFromReview"
 import { parseTransferTokenCall } from "./utils/parseTransferTokenCall"
+import { useNativeFeeToken } from "../useNativeFeeToken"
+import { useFeeTokenSelection } from "./useFeeTokenSelection"
+import { addEstimatedFee } from "../../../../shared/transactionSimulation/fees/estimatedFeesRepository"
+import { transactionReviewHasSwap } from "../../../../shared/transactionReview.service"
+import { SwapTxReviewActions } from "../../swap/ui/SwapTxReviewActions"
+import { useCheckGasFeeBalance } from "./useCheckGasBalance"
+import { maxFeeEstimateForTransfer } from "../../accountTokens/useMaxFeeForTransfer"
+import { useSimulationFeesWithSubsidiy } from "./useSimulationFeesWithSubsidiy"
 
 interface TransactionActionScreenContainerProps extends ConfirmScreenProps {
   transactionContext?: "STANDARD_EXECUTE" | "MULTISIG_ADD_SIGNATURE"
@@ -151,17 +156,15 @@ export const TransactionActionScreenContainer: FC<
   const [hasSentTransactionReviewedEvent, setHasSentTransactionReviewedEvent] =
     useState(false)
 
-  const feeTokens = useFeeTokenBalances(selectedAccount)
-  const defaultFeeToken = useDefaultFeeToken(selectedAccount)
-  const [feeToken, setFeeToken] = useState<TokenWithBalance>(defaultFeeToken)
+  const nativeFeeToken = useNativeFeeToken(selectedAccount)
 
-  const [isFeeTokenSelectionReady, setIsFeeTokenSelectionReady] =
-    useState(false)
-
-  const transaction = {
-    type: TransactionType.INVOKE as const,
-    payload: action.payload.transactions,
-  }
+  const transaction = useMemo(
+    () => ({
+      type: TransactionType.INVOKE,
+      payload: action.payload.transactions,
+    }),
+    [action.payload.transactions],
+  )
 
   const {
     data: transactionReview,
@@ -170,21 +173,38 @@ export const TransactionActionScreenContainer: FC<
   } = useTransactionReviewV2({
     transaction,
     actionHash: action.meta.hash,
-    feeTokenAddress: feeToken?.address,
     selectedAccount,
     appDomain: action.meta.origin,
   })
 
-  useFeeTokenSelection({
-    isFeeTokenSelectionReady,
-    setIsFeeTokenSelectionReady,
-    feeToken,
-    setFeeToken,
-    account: selectedAccount,
-    fee: transactionReview?.enrichedFeeEstimation,
-    defaultFeeToken,
-    feeTokens,
+  const { simulationFees, isSubsidised } = useSimulationFeesWithSubsidiy(
+    transactionReview,
+    selectedAccount,
+    ensureArray(action.payload.transactions),
+  )
+
+  const feeTokens = useTokenBalancesForFeeEstimates(
+    selectedAccount,
+    simulationFees,
+  )
+
+  const { feeToken, setFeeToken, isFeeTokenSelectionReady, fee } =
+    useFeeTokenSelection({
+      account: selectedAccount,
+      fees: simulationFees,
+      defaultFeeToken: nativeFeeToken,
+      availableFeeTokens: feeTokens,
+    })
+
+  const isSendingMoreThanBalanceAndGas = useCheckGasFeeBalance({
+    result: transactionReview,
+    feeTokenWithBalance: feeToken,
   })
+
+  const isInAppSecurityChange = useMemo(
+    () => Boolean(action.payload.meta?.isInAppSecurityChange),
+    [action],
+  )
 
   const isRejectOnChain = useMemo(
     () =>
@@ -192,6 +212,13 @@ export const TransactionActionScreenContainer: FC<
       MultisigTransactionType.MULTISIG_REJECT_ON_CHAIN,
     [action],
   )
+  const reviewTrade = action.payload.meta?.reviewTrade
+  const isSwap =
+    transactionReview?.transactions?.some((t) =>
+      transactionReviewHasSwap(t.reviewOfTransaction),
+    ) && !!reviewTrade
+
+  const shrinkContent = isSwap
 
   useEffect(() => {
     if (!transactionReviewLoading && !hasSentTransactionReviewedEvent) {
@@ -201,7 +228,7 @@ export const TransactionActionScreenContainer: FC<
       const hasSimulationError = Boolean(
         errorMessageAndLabel?.label || errorMessageAndLabel?.message,
       )
-
+      const txUsdValue = getTransactionUsdValue(transactionReview)
       ampli.transactionReviewed({
         host: action.meta.origin,
         "simulation succeeded":
@@ -215,6 +242,14 @@ export const TransactionActionScreenContainer: FC<
         "simulation error message": errorMessageAndLabel?.message,
         "simulation error label":
           errorMessageAndLabel?.label ?? "Tx not executed",
+        "usd value": txUsdValue,
+        ...(isSwap && {
+          "base token": action?.payload?.meta?.ampliProperties?.["base token"],
+          "quote token":
+            action?.payload?.meta?.ampliProperties?.["quote token"],
+          slippage: action?.payload?.meta?.ampliProperties?.["slippage"],
+          "token pair": action?.payload?.meta?.ampliProperties?.["token pair"],
+        }),
       })
       setHasSentTransactionReviewedEvent(true)
     }
@@ -225,11 +260,17 @@ export const TransactionActionScreenContainer: FC<
     hasSentTransactionReviewedEvent,
     transactionReviewLoading,
     transactionReview,
+    isSwap,
+    reviewTrade?.baseToken?.symbol,
+    reviewTrade?.quoteToken?.symbol,
+    reviewTrade?.slippage,
   ])
 
+  const defiRoute = useRouteAccountDefi()
   const onSubmit = useCallback(async () => {
     const result = await approve()
 
+    const txUsdValue = getTransactionUsdValue(transactionReview)
     if (
       action.meta.title === DAPP_TRANSACTION_TITLE &&
       transactionReview?.transactions
@@ -244,11 +285,15 @@ export const TransactionActionScreenContainer: FC<
           transactionReview.transactions,
         ),
         "transaction type": "dapp",
+        "usd value": txUsdValue,
       })
     }
 
     if (action?.payload?.meta?.ampliProperties) {
-      void ampli.transactionSubmitted(action.payload.meta.ampliProperties)
+      void ampli.transactionSubmitted({
+        ...action.payload.meta.ampliProperties,
+        "usd value": txUsdValue,
+      })
     }
 
     // A reject on-chain tx needs to replace the one that was rejected
@@ -265,23 +310,26 @@ export const TransactionActionScreenContainer: FC<
       await rejectDeployIfPresent()
 
       if (location.pathname.includes(routes.swapToken())) {
-        navigate(routes.accountTokens())
+        void navigate(routes.accountTokens())
+      } else if (
+        location.pathname.includes(routes.nativeUnstake("")) ||
+        location.pathname.includes(routes.liquidUnstake(""))
+      ) {
+        void navigate(defiRoute)
       }
 
       closePopupIfLastAction()
     }
   }, [
     approve,
-    action.meta.title,
-    action.meta.origin,
-    action?.payload?.meta?.ampliProperties,
-    transactionReview?.transactions,
+    transactionReview,
+    action,
+    isRejectOnChain,
     selectedAccount,
     rejectDeployIfPresent,
     closePopupIfLastAction,
     navigate,
-    isRejectOnChain,
-    action.payload.transactionsDetail?.nonce,
+    defiRoute,
   ])
 
   useEffect(() => {
@@ -289,6 +337,9 @@ export const TransactionActionScreenContainer: FC<
   }, [transactionReview, updateTransactionReview])
 
   const transactionReviewSimulationError = useMemo(() => {
+    if (isInAppSecurityChange) {
+      return null
+    }
     const errorMessageAndLabel =
       getErrorMessageAndLabelFromSimulation(transactionReview)
     if (!errorMessageAndLabel) {
@@ -302,9 +353,12 @@ export const TransactionActionScreenContainer: FC<
         errorMessage={message}
       />
     )
-  }, [transactionReview])
+  }, [transactionReview, isInAppSecurityChange])
 
   const customErrorFooter = useMemo(() => {
+    if (isInAppSecurityChange) {
+      return null
+    }
     if (!error) {
       return null
     }
@@ -319,7 +373,7 @@ export const TransactionActionScreenContainer: FC<
       "Tx not executed"
     )
     return <ActionScreenErrorFooter title={title} errorMessage={message} />
-  }, [error])
+  }, [error, isInAppSecurityChange])
 
   const loadingOrErrorState = useMemo(() => {
     if (error) {
@@ -419,6 +473,7 @@ export const TransactionActionScreenContainer: FC<
       <TransactionReviewSimulation
         simulation={lastSimulation}
         networkId={networkId}
+        {...(shrinkContent && { gap: 1 })}
       />
     )
   }, [
@@ -426,6 +481,7 @@ export const TransactionActionScreenContainer: FC<
     isRejectOnChain,
     action.meta.investment?.stakingAction,
     networkId,
+    shrinkContent,
   ])
 
   const transactionReviewActions = useMemo(() => {
@@ -443,6 +499,11 @@ export const TransactionActionScreenContainer: FC<
         </P3>
       )
     }
+
+    if (isSwap) {
+      return <SwapTxReviewActions reviewTrade={reviewTrade} />
+    }
+
     const actions = transactionReview?.transactions?.map(
       (transaction, index) => {
         return (
@@ -456,7 +517,13 @@ export const TransactionActionScreenContainer: FC<
       },
     )
     return actions
-  }, [isRejectOnChain, networkId, transactionReview?.transactions])
+  }, [
+    isRejectOnChain,
+    isSwap,
+    networkId,
+    reviewTrade,
+    transactionReview?.transactions,
+  ])
 
   const warnings = transactionReview?.transactions?.flatMap((transaction) => {
     return transaction.reviewOfTransaction?.warnings
@@ -472,15 +539,9 @@ export const TransactionActionScreenContainer: FC<
     warningsWithoutUndefined.success &&
     getHighestSeverity(warningsWithoutUndefined.data)
 
-  const isUpgradeTransaction = useMemo(
-    () =>
-      isTransactionActionItem(action) &&
-      isSafeUpgradeTransaction(action.payload),
-    [action],
-  )
-
   useEffect(() => {
     if (
+      !isInAppSecurityChange &&
       highestSeverityWarning &&
       (highestSeverityWarning.severity === "critical" ||
         highestSeverityWarning.severity === "high")
@@ -488,9 +549,12 @@ export const TransactionActionScreenContainer: FC<
       setAskForConfirmation(true)
       setIsHighRisk(true)
     }
-  }, [highestSeverityWarning])
+  }, [highestSeverityWarning, isInAppSecurityChange])
 
   const transactionReviewWarnings = useMemo(() => {
+    if (isInAppSecurityChange) {
+      return null
+    }
     if (!warningsWithoutUndefined.success) {
       return null
     }
@@ -501,7 +565,7 @@ export const TransactionActionScreenContainer: FC<
         onConfirm={() => setHasAcceptedRisk(true)}
       />
     )
-  }, [warningsWithoutUndefined, reject])
+  }, [warningsWithoutUndefined, reject, isInAppSecurityChange])
 
   const transactionReviewFallback = useMemo(
     () =>
@@ -525,9 +589,9 @@ export const TransactionActionScreenContainer: FC<
   const { multisig, multisigBanner, signerIsInMultisig } =
     useMultisigActionScreen()
 
-  // Disable fee token selection if the transaction is an upgrade transaction
+  // Disable fee token selection if the account doesn't support tx v3
   const allowFeeTokenSelection =
-    !isUpgradeTransaction && classHashSupportsTxV3(selectedAccount?.classHash)
+    classHashSupportsTxV3(selectedAccount?.classHash) && !isSubsidised
 
   const onShowAddFunds = useCallback(
     (hasInsufficientFunds: boolean) => {
@@ -542,9 +606,12 @@ export const TransactionActionScreenContainer: FC<
     [setUserClickedAddFunds, userClickedAddFunds],
   )
 
-  const setPreferredFeeToken = useCallback(
+  const updateFeeToken = useCallback(
     async (token: BaseToken) => {
-      await feeTokenService.preferFeeToken(token.address)
+      if (isEqualAddress(token.address, feeToken?.address)) {
+        return setIsFeeTokenPickerOpen(false)
+      }
+
       const newFeeToken = feeTokens.find((t) => equalToken(token, t))
       if (newFeeToken) {
         setFeeToken({
@@ -569,31 +636,42 @@ export const TransactionActionScreenContainer: FC<
             "Max send detected, recreating transaction with new max amount",
           )
           const { recipient, tokenAddress } = transferTokenCall
-          const balance = await clientTokenService.fetchTokenBalance(
-            transferToken.address,
-            selectedAccount,
-          )
+          const balance =
+            (await clientTokenService.getTokenBalance(
+              transferToken.address,
+              selectedAccount.address as Address,
+              networkId,
+            )) ?? "0"
 
           const deductMaxFeeFromMaxAmount = isEqualAddress(
             tokenAddress,
             token.address,
           )
 
+          const feeWithToken = simulationFees?.find((fee) =>
+            isEqualAddress(fee.transactions.feeTokenAddress, tokenAddress),
+          )
+          if (!feeWithToken) {
+            throw new Error("Fee with token not found")
+          }
+
           const maxFeeForTransfer = await maxFeeEstimateForTransfer(
             token.address,
             tokenAddress,
             selectedAccount,
           )
+
           const maxAmount = deductMaxFeeFromMaxAmount
             ? BigInt(balance) - (maxFeeForTransfer ?? 0n)
             : BigInt(balance)
+
           if (!nonNullable(maxAmount)) {
             throw new Error("maxAmount could not be determined")
           }
-          const formattedMaxAmount = formatUnits(
-            maxAmount,
-            transferToken.decimals,
-          )
+          const formattedMaxAmount = bigDecimal.formatUnits({
+            value: maxAmount,
+            decimals: transferToken.decimals,
+          })
 
           await clientTokenService.send({
             to: tokenAddress,
@@ -616,9 +694,13 @@ export const TransactionActionScreenContainer: FC<
     [
       action.payload.meta?.isMaxSend,
       action.payload.transactions,
+      feeToken?.address,
       feeTokens,
+      networkId,
       reject,
       selectedAccount,
+      setFeeToken,
+      simulationFees,
     ],
   )
 
@@ -627,9 +709,28 @@ export const TransactionActionScreenContainer: FC<
     void onSubmit()
   }
 
-  const onSubmitWithChecks = () => {
+  const updateFees = useCallback(async () => {
+    if (!fee) return
+
+    if (isSubsidised) {
+      const paymasterFee = filterPaymasterEstimatedFees(simulationFees)[0]
+      if (paymasterFee) {
+        await addEstimatedFee(
+          { ...paymasterFee, type: "paymaster" },
+          transaction,
+          isSubsidised,
+        )
+      }
+
+      return
+    }
+    await addEstimatedFee(fee, transaction) // Should this be a service?
+  }, [fee, isSubsidised, simulationFees, transaction])
+
+  const onSubmitWithChecks = async () => {
+    await updateFees()
     if (hasInsufficientFunds) {
-      navigate(routes.funding(), { state: { showOnTop: true } })
+      void navigate(routes.funding(), { state: { showOnTop: true } })
       setUserClickedAddFunds(true)
       setHasInsufficientFunds(false)
       setDisableConfirm(true)
@@ -645,7 +746,7 @@ export const TransactionActionScreenContainer: FC<
       return onSubmitWithLedger()
     }
 
-    void onSubmit()
+    await onSubmit()
   }
   const onReject = useCallback(() => {
     setUserClickedAddFunds(false)
@@ -660,13 +761,11 @@ export const TransactionActionScreenContainer: FC<
     <Suspense fallback={<FeeEstimationBoxSkeleton />}>
       <WithActionScreenErrorFooter isTransaction>
         {isHighRisk && <ReviewFooter />}
-        {selectedAccount &&
-        transactionReview?.enrichedFeeEstimation &&
-        isFeeTokenSelectionReady ? (
+        {selectedAccount && simulationFees && isFeeTokenSelectionReady ? (
           <FeeEstimationContainer
             onErrorChange={setDisableConfirm}
             onFeeErrorChange={onShowAddFunds}
-            fee={transactionReview.enrichedFeeEstimation}
+            fee={fee}
             feeToken={feeToken}
             accountId={selectedAccount.id}
             needsDeploy={selectedAccount.needsDeploy}
@@ -674,12 +773,11 @@ export const TransactionActionScreenContainer: FC<
             allowFeeTokenSelection={allowFeeTokenSelection}
             transactionSimulationLoading={transactionReviewLoading}
             error={error}
-            isSendingMoreThanBalanceAndGas={
-              transactionReview?.isSendingMoreThanBalanceAndGas
-            }
+            isSendingMoreThanBalanceAndGas={isSendingMoreThanBalanceAndGas}
+            isSubsidised={isSubsidised}
           />
         ) : (
-          <FeeEstimationBoxSkeleton />
+          !transactionReviewSimulationError && <FeeEstimationBoxSkeleton />
         )}
         {transactionReviewSimulationError}
       </WithActionScreenErrorFooter>
@@ -735,6 +833,8 @@ export const TransactionActionScreenContainer: FC<
           subtitle={action.meta?.subtitle ?? action.meta.origin}
           dappHost={action.meta.origin}
           iconKey={action.meta?.icon}
+          transactionType={TransactionType.INVOKE}
+          hideIcon={shrinkContent}
         />
         <Suspense fallback={<TransactionReviewSkeleton px={0} />}>
           {rejectOnChainBanner}
@@ -748,7 +848,7 @@ export const TransactionActionScreenContainer: FC<
               <AirGapReviewButtonContainer
                 selectedAccount={selectedAccount}
                 transactions={action.payload.transactions}
-                estimatedFees={transactionReview?.enrichedFeeEstimation}
+                estimatedFees={fee}
                 nonce={rejectOnChainNonce}
               />
             </>
@@ -768,9 +868,11 @@ export const TransactionActionScreenContainer: FC<
         }}
         tokens={feeTokens}
         initialFocusRef={feeTokePickerRef}
-        onFeeTokenSelect={(token) => void setPreferredFeeToken(token)}
+        onFeeTokenSelect={(token) => void updateFeeToken(token)}
+        estimatedFees={simulationFees}
+        feeToken={nativeFeeToken}
       />
-      {isLedgerSigner && transactionReview?.enrichedFeeEstimation && (
+      {isLedgerSigner && simulationFees && (
         <LedgerActionModal
           isOpen={isLedgerApprovalOpen}
           onClose={onLedgerApprovalClose}

@@ -1,4 +1,4 @@
-import type { MessageType } from "../shared/messages"
+import type { MessageType } from "../shared/messages/types"
 import {
   sendMessageToActiveTabsAndUi,
   sendMessageToHost,

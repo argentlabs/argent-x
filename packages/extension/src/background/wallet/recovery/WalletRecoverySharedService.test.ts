@@ -12,23 +12,23 @@ import type {
   IRepository,
 } from "../../../shared/storage/__new/interface"
 import type { WalletAccount } from "../../../shared/wallet.model"
-import type { WalletSession } from "../../../shared/account/service/accountSharedService/WalletAccountSharedService"
 import { WalletRecoverySharedService } from "./WalletRecoverySharedService"
 import type { WalletRecoveryStarknetService } from "./WalletRecoveryStarknetService"
 import { WalletError } from "../../../shared/errors/wallet"
 import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 import {
   emitterMock,
-  getSessionStoreMock,
   getStoreMock,
   getWalletStoreMock,
 } from "../../../shared/test.utils"
+import { KeyValueStorage } from "../../../shared/storage"
+import type { ISecureServiceSessionStore } from "../session/interface"
+import SecretStorageService from "../session/secretStorageService"
 
 describe("WalletRecoverySharedService", () => {
   let service: WalletRecoverySharedService
   let storeMock: IObjectStore<WalletStorageProps>
   let walletStoreMock: IRepository<WalletAccount>
-  let sessionStoreMock: IObjectStore<WalletSession | null>
   let chainRecoveryServiceMock: WalletRecoveryStarknetService
   let networkServiceMock: { getById: Mock }
   beforeEach(() => {
@@ -41,13 +41,17 @@ describe("WalletRecoverySharedService", () => {
   it("should throw an error when session secret is not defined", async () => {
     storeMock = getStoreMock()
     walletStoreMock = getWalletStoreMock()
-    sessionStoreMock = getSessionStoreMock()
+    const sessionStore = new KeyValueStorage<ISecureServiceSessionStore>(
+      { exportedKey: "", salt: "", vault: "" },
+      "test:sessionStore",
+    )
+    const mockSecretStorageService = new SecretStorageService(sessionStore)
 
     service = new WalletRecoverySharedService(
       emitterMock,
       storeMock,
       walletStoreMock,
-      sessionStoreMock,
+      mockSecretStorageService,
       networkServiceMock,
       chainRecoveryServiceMock,
     )
@@ -70,16 +74,25 @@ describe("WalletRecoverySharedService", () => {
     const grindedKey = grindKey(preGrindPrivateKey)
     const paddedKey = grindedKey.padStart(64, "0")
     const privateKey = hexToBytes(encode.removeHexPrefix(paddedKey))
-    const mockSession = {
-      secret: encode.addHexPrefix(bytesToHex(privateKey)),
-      password: "password",
-    }
 
     storeMock = getStoreMock()
     walletStoreMock = getWalletStoreMock()
-    sessionStoreMock = getSessionStoreMock({
-      get: vi.fn(() => Promise.resolve(mockSession)),
-    })
+
+    const sessionStore = new KeyValueStorage<ISecureServiceSessionStore>(
+      { exportedKey: "", salt: "", vault: "" },
+      "test:sessionStore",
+    )
+    const mockSecretStorageService = new SecretStorageService(sessionStore)
+
+    vi.spyOn(mockSecretStorageService, "decrypt").mockImplementation(
+      async () => {
+        return {
+          secret: encode.addHexPrefix(bytesToHex(privateKey)),
+          password: "password",
+        }
+      },
+    )
+
     const mockAccount = { name: "mockAccount" }
     networkServiceMock = {
       getById: vi.fn().mockResolvedValue({ networkId: "networkId" }),
@@ -93,7 +106,7 @@ describe("WalletRecoverySharedService", () => {
       emitterMock,
       storeMock,
       walletStoreMock,
-      sessionStoreMock,
+      mockSecretStorageService,
       networkServiceMock,
       chainRecoveryServiceMock,
     )

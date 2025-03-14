@@ -79,15 +79,18 @@ export class SmartAccount extends BaseStarknetAccount {
     )
   }
 
-  async signMessage(typedData: TypedData): Promise<Signature> {
+  async signMessage(
+    typedData: TypedData,
+    skipCosign = false,
+  ): Promise<Signature> {
     const ownerSignature = await this.signer.signMessage(
       typedData,
       this.address,
     )
-    const guardianSignature = await this.guardian.signMessage(
-      typedData,
-      this.address,
-    )
+
+    const guardianSignature = !skipCosign
+      ? await this.guardian.signMessage(typedData, this.address)
+      : []
 
     return this.mergeOwnerGuardianSignatures(ownerSignature, guardianSignature)
   }

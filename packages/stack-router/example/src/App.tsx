@@ -1,6 +1,6 @@
 import { SetDarkMode, ThemeProvider as ArgentTheme } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
-import { FC } from "react"
+import type { FC } from "react"
 import { BrowserRouter as Router } from "react-router-dom"
 
 import { RootRoutes } from "./routes/RootRoutes"

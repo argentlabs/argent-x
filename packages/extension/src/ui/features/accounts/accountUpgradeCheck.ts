@@ -10,7 +10,6 @@ import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { STANDARD_CAIRO_0_ACCOUNT_CLASS_HASH } from "../../../shared/network/constants"
 import { useMemo } from "react"
 import { useWalletAccount } from "./accounts.state"
-import type { Account } from "./Account"
 import { isEqualAddress } from "@argent/x-shared"
 
 export function checkIfUpgradeAvailable(
@@ -99,7 +98,7 @@ export const usePartitionDeprecatedAccounts = (
   )
 }
 
-export const useCheckUpgradeAvailable = (account?: Account | WalletAccount) => {
+export const useCheckUpgradeAvailable = (account?: WalletAccount) => {
   const { accountClassHash } = useCurrentNetwork()
 
   if (!account) {

@@ -5,13 +5,17 @@ import { extensionOnlyProcedure } from "../permissions"
 
 export const isTokenExpiredProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
+  .input(z.object({ initiator: z.string() }))
   .output(z.boolean())
   .query(
     async ({
+      input,
       ctx: {
         services: { argentAccountService },
       },
     }) => {
-      return await argentAccountService.isTokenExpired()
+      return await argentAccountService.isTokenExpired({
+        initiator: input.initiator,
+      })
     },
   )

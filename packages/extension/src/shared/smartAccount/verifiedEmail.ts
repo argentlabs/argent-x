@@ -1,13 +1,18 @@
 import { idb } from "./idb"
 import { getDevice } from "./jwt"
+import { smartAccountService } from "."
 
 export const updateVerifiedEmail = async (email?: string) => {
+  let device = null
   await idb.transaction("rw", idb.devices, async () => {
-    const device = await getDevice()
+    device = await getDevice()
     device.verifiedEmail = email
     device.verifiedAt = new Date().toISOString()
     await idb.devices.put(device)
   })
+  if (device) {
+    await smartAccountService.handleDeviceUpdate(device)
+  }
 }
 
 export const getVerifiedEmail = async () => {

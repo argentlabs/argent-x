@@ -76,7 +76,7 @@ testParams.forEach((params) => {
           balance: params.strkAmount,
         })
       }
-      await extension.setupWallet({
+      const { accountNames } = await extension.setupWallet({
         accountsToSetup: [
           {
             assets,
@@ -85,9 +85,7 @@ testParams.forEach((params) => {
           },
         ],
       })
-      await extension.account.ensureSelectedAccount(
-        extension.account.accountName1,
-      )
+      await extension.account.ensureSelectedAccount(accountNames![0])
       await extension.navigation.menuSwapsLocator.click()
       const swappedAmount = await extension.swap.swapTokens({
         payToken,

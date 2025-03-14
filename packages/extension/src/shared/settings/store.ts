@@ -17,6 +17,7 @@ export const settingsStore = new KeyValueStorage<ISettingsStorage>(
     disableAnimation: false,
     airGapEnabled: false,
     idProvider: "starknetid",
+    sidePanelEnabled: false,
   },
   "core:settings",
 )

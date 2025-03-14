@@ -3,14 +3,13 @@ import { useState } from "react"
 import { ScreenLayout } from "../layout/ScreenLayout"
 import { JoinMultisigSidePanel } from "./JoinMultisigSidePanel"
 import { Box, Flex, Spinner } from "@chakra-ui/react"
-import { CopyTooltip, H5, icons, P2 } from "@argent/x-ui"
+import { CopyPrimaryIcon } from "@argent/x-ui/icons"
+import { CopyTooltip, H5, P2 } from "@argent/x-ui"
 import { useCreatePendingMultisig } from "../../multisig/hooks/useCreatePendingMultisig"
 import { useOnMountUnsafe } from "../../../hooks/useOnMountUnsafe"
 import { SignerType } from "../../../../shared/wallet.model"
 import { encodeBase58 } from "@argent/x-shared"
 import { ActionButton } from "../../../components/FullScreenPage"
-
-const { CopyPrimaryIcon } = icons
 
 interface JoinMultisigWithLedgerProps {
   networkId: string

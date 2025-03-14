@@ -5,10 +5,10 @@ import type { ParsedConcentratedLiquidityPosition } from "../../../../shared/def
 import { DefiPositionSubtitle } from "./DefiPositionSubtitle"
 import { DefiPositionTitle } from "./DefiPositionTitle"
 
-import { icons } from "@argent/x-ui"
-import { Flex } from "@chakra-ui/react"
+import { RadioFilledIcon } from "@argent/x-ui/icons"
 
-const { RadioFilledIcon } = icons
+import { Label2 } from "@argent/x-ui"
+import { Flex } from "@chakra-ui/react"
 
 export type ConcentratedLiquidityStatusValue = "Active" | "Inactive"
 
@@ -72,13 +72,28 @@ export const ConcentratedLiquidityStatus: FC<
     [isActive, statusPercentage],
   )
 
+  const description = useMemo(() => {
+    if (!isActive) {
+      return "Out of range"
+    }
+    if (isActive && (statusPercentage <= 10 || statusPercentage >= 90)) {
+      return "Nearly out of range"
+    }
+    return ""
+  }, [isActive, statusPercentage])
+
   return (
     <>
       {isTitle ? (
-        <Flex alignItems="center">
-          <RadioFilledIcon color={bgColor} mr={1} />
-          <DefiPositionTitle color={bgColor}>{label}</DefiPositionTitle>
-        </Flex>
+        <>
+          <Flex alignItems="center">
+            <RadioFilledIcon color={bgColor} mr={1} />
+            <DefiPositionTitle color={bgColor}>{label}</DefiPositionTitle>
+          </Flex>
+          <Label2 width="156px" color="text-secondary" textAlign="right">
+            {description}
+          </Label2>
+        </>
       ) : (
         <DefiPositionSubtitle color={bgColor}>{label}</DefiPositionSubtitle>
       )}

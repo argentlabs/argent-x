@@ -1,4 +1,4 @@
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { concentratedLiquidityPositions } from "../__fixtures__/concentratedLiquidityPositions"
 import { tokenPrices } from "../__fixtures__/tokenPrices"
 import { tokens } from "../__fixtures__/tokens"
@@ -10,7 +10,7 @@ import {
 import { parseConcentratedLiquidityPositions } from "./parseConcentratedLiquidityPositions"
 
 describe("computeConcentratedLiquidityPositionsUsdValue", async () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

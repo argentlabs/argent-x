@@ -1,9 +1,11 @@
-import { P3, typographyStyles } from "@argent/x-ui"
+import { P3 } from "@argent/x-ui"
 import { Flex, VStack } from "@chakra-ui/react"
 
 import type { WalletAccount } from "../../../../../shared/wallet.model"
 import { PrettyAccountAddressArgentX } from "../../../accounts/PrettyAccountAddressArgentX"
 import { formatTruncatedAddress } from "@argent/x-shared"
+
+import { typographyStyles } from "@argent/x-ui/theme"
 
 interface AccountNetworkInfoArgentXProps {
   account: WalletAccount

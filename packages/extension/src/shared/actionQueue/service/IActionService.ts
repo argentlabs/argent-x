@@ -1,5 +1,5 @@
 import type { SimulateAndReview } from "@argent/x-shared/simulation"
-import type { MessageType } from "../../messages"
+import type { MessageType } from "../../messages/types"
 import type { ActionHash, ActionItemExtra } from "../schema"
 
 /** Extract the 'data' type of each item in the union if it exists */

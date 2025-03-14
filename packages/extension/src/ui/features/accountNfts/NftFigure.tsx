@@ -1,6 +1,6 @@
-import { buttonHoverStyle } from "@argent/x-ui"
 import { Box } from "@chakra-ui/react"
 import type { FC, ReactNode } from "react"
+import { buttonHoverStyle } from "@argent/x-ui/theme"
 
 interface NftFigureProps {
   onClick: () => void

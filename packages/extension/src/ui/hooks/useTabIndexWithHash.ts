@@ -33,7 +33,7 @@ export function useTabIndexWithHash(
       if (newIndex >= 0 && newIndex < tabHashes.length) {
         setCurrentIndex(newIndex)
         const newHash = `#${tabHashes[newIndex]}`
-        navigate(`${location.pathname}${location.search}${newHash}`, {
+        void navigate(`${location.pathname}${location.search}${newHash}`, {
           replace: true,
         })
       }
@@ -41,13 +41,14 @@ export function useTabIndexWithHash(
     [navigate, location.pathname, location.search, tabHashes],
   )
 
-  // Sync the state with the URL hash
+  // Sync the initial state with the URL hash
   useEffect(() => {
     const indexFromHash = getIndexFromHash()
     if (indexFromHash !== currentIndex) {
       setCurrentIndex(indexFromHash)
     }
-  }, [location.hash, getIndexFromHash, currentIndex])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only run on mount, not on update
+  }, [])
 
   return [currentIndex, updateIndex]
 }

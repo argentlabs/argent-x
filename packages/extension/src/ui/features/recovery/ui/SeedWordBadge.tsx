@@ -1,7 +1,7 @@
-import { typographyStyles } from "@argent/x-ui"
 import type { FlexProps } from "@chakra-ui/react"
 import { Flex } from "@chakra-ui/react"
 import type { FC } from "react"
+import { typographyStyles } from "@argent/x-ui/theme"
 
 export const SeedWordBadge: FC<FlexProps> = (props) => {
   return (

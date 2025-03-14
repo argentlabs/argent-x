@@ -22,9 +22,9 @@ export const FeeEstimationBox: FC<FlexProps> = (props) => {
       pr={2}
       py={2}
       _dark={{
-        backgroundColor: "neutrals.900",
-        borderColor: "neutrals.500",
-        boxShadow: "menu",
+        backgroundColor: "surface-default",
+        borderColor: "stroke-subtle",
+        boxShadow: "elevated",
       }}
       {...props}
     />

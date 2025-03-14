@@ -1,11 +1,8 @@
-import {
-  BarCloseButton,
-  H2,
-  NavigationContainer,
-  typographyStyles,
-} from "@argent/x-ui"
+import { BarCloseButton, H2, NavigationContainer } from "@argent/x-ui"
 import { Box, Circle, Flex, Link } from "@chakra-ui/react"
 import type { FC, PropsWithChildren, ReactEventHandler, ReactNode } from "react"
+
+import { typographyStyles } from "@argent/x-ui/theme"
 
 interface StarknetAccountMessageProps extends PropsWithChildren {
   onClose?: ReactEventHandler

@@ -3,7 +3,7 @@ import { z } from "zod"
 import { openSessionMiddleware } from "../../middleware/session"
 import { extensionOnlyProcedure } from "../permissions"
 
-import { enrichedSimulateAndReviewSchema } from "@argent/x-shared/simulation"
+import { enrichedSimulateAndReviewV2Schema } from "@argent/x-shared/simulation"
 import { addressSchema } from "@argent/x-shared"
 import { outsideSignatureSchema } from "../../../../shared/signatureReview/schema"
 
@@ -16,7 +16,7 @@ const simulateAndReviewSchema = z.object({
 export const simulateAndReviewProcedure = extensionOnlyProcedure
   .use(openSessionMiddleware)
   .input(simulateAndReviewSchema)
-  .output(enrichedSimulateAndReviewSchema)
+  .output(enrichedSimulateAndReviewV2Schema)
   .query(async ({ input, ctx: { services } }) => {
     const { signatureReviewService } = services
     return signatureReviewService.simulateAndReview(input)

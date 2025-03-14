@@ -13,14 +13,14 @@ interface CommonApiTransactionProps {
 export type ApiTransaction = CommonApiTransactionProps &
   (
     | {
-        type: TransactionType.DEPLOY_ACCOUNT
+        type: typeof TransactionType.DEPLOY_ACCOUNT
         nonce: "0x0"
         calldata: Calldata
         classHash: Hex
         salt: Hex
       }
     | {
-        type: TransactionType.INVOKE
+        type: typeof TransactionType.INVOKE
         nonce: string
         calls: Call[]
       }

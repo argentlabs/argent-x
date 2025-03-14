@@ -1,66 +1,129 @@
-import { Button, CellStack, icons, L2Bold } from "@argent/x-ui"
-import { Box, chakra, Flex, IconButton, keyframes } from "@chakra-ui/react"
+import { Button, CellStack, L2Bold } from "@argent/x-ui"
+import { ArrowDownPrimaryIcon } from "@argent/x-ui/icons"
+import {
+  Box,
+  chakra,
+  Flex,
+  IconButton,
+  keyframes,
+  useDisclosure,
+} from "@chakra-ui/react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import type { Address } from "@argent/x-shared"
 import { bigDecimal, ensureDecimals } from "@argent/x-shared"
 import type { Token } from "../../../shared/token/__new/types/token.model"
 import { delay } from "../../../shared/utils/delay"
+import { usePriceImpact } from "./hooks/usePriceImpact"
 import { useSwapActionHandlers } from "./hooks/useSwapActionHandler"
 import { useSwapCallback } from "./hooks/useSwapCallback"
 import { SwapInputError, useSwapInfo } from "./hooks/useSwapInfo"
+import { useSwapPercentageInput } from "./hooks/useSwapPercentageInput"
 import { Field, useSwapState } from "./state/fields"
 import { useUserState } from "./state/user"
 import { SwapInputPanel } from "./ui/SwapInputPanel"
+import { SwapPriceImpact } from "./ui/SwapPriceImpact"
 import { SwapPricesInfo } from "./ui/SwapPricesInfo"
-import { SwapQuoteRefresh } from "./ui/SwapQuoteRefresh"
-import { SwapTradeLoading } from "./ui/SwapTradeLoading"
-import { maxAmountSpendFromTokenBalance } from "./utils"
-
-const { SwitchPrimaryIcon } = icons
+import {
+  prettifyCurrenvyValueForSwap,
+  prettifyTokenAmountValueForSwap,
+} from "../accountTokens/tokenPriceHooks"
+import { UnverifiedTokenWarningDialog } from "./ui/UnverifiedTokenWarningDialog"
+import { isTokenVerified } from "../accountTokens/tokens.state"
 
 const SwapContainer = chakra(CellStack, {
   baseStyle: {
     position: "relative",
     flexDirection: "column",
-    justifyContent: "center",
     alignItems: "center",
     flex: 1,
     py: "8px",
+    gap: "3",
   },
 })
 
 const SwitchDirectionButton = chakra(IconButton, {
+  isRound: true,
   baseStyle: {
-    backgroundColor: "neutrals.800",
+    backgroundColor: "surface-default",
     display: "flex",
-    border: "2px solid",
-    borderColor: "neutrals.900",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: "100px",
+    border: "4px solid",
+    borderColor: "surface-default",
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
+    maxHeight: "32px",
+    maxWidth: "32px",
     minHeight: "32px",
     minWidth: "32px",
-    padding: "10.25px",
+    zIndex: 2,
+    boxShadow: "none",
+    _hover: {
+      boxShadow: "none",
+    },
     _active: {
-      transform: "translate(-50%, -50%)",
+      transform: "translate(-50%, -50%)", // make sure the button stays centered
+      boxShadow: "none",
     },
   },
 })
 
-const StyledSwitchDirectionIcon = chakra(SwitchPrimaryIcon, {
-  baseStyle: {
-    color: "neutrals.300",
-  },
+export const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
+
+const StyledSwitchDirectionIcon = chakra(ArrowDownPrimaryIcon, {
+  shouldComponentUpdate: true,
 })
 
-export const spin = keyframes`
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(180deg); }
+const AnimatedSwitchDirectionIcon = ({
+  showAnimation,
+}: {
+  showAnimation: boolean
+}) => (
+  <StyledSwitchDirectionIcon
+    data-testid="switch-direction-icon"
+    color="icon-secondary"
+    width="100%"
+    height="100%"
+    padding="4px"
+    borderRadius="100%"
+    backgroundColor="surface-default"
+    _hover={{
+      color: "white",
+      backgroundColor: "button-secondary",
+    }}
+    _active={{
+      color: "white",
+    }}
+    animation={showAnimation ? `${fadeIn} 0.3s ease-in forwards` : undefined}
+  />
+)
+
+export const swapAnimation = keyframes`
+  0% {
+    transform: translateY(0);
+    z-index: 1;
+  }
+  100% {
+    transform: translateY(calc(100% + 4px));
+    z-index: 1;
+  }
+`
+
+export const reverseSwapAnimation = keyframes`
+  0% {
+    transform: translateY(0);
+    z-index: 0;
+  }
+  100% {
+    transform: translateY(calc(-100% - 4px));
+    z-index: 0;
+  }
 `
 
 const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
@@ -72,14 +135,27 @@ const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
     parsedAmount,
     inputError: swapInputError,
   } = useSwapInfo()
-  const { independentField, typedValue, resetTypedValue, setDefaultPayToken } =
-    useSwapState()
+  const {
+    independentField,
+    typedValue,
+    resetTypedValue,
+    setDefaultPayToken,
+    isFiatInput,
+    setIsFiatInput,
+  } = useSwapState()
   const { onTokenSelection, onUserInput, onSwitchTokens } =
     useSwapActionHandlers()
   const { userSlippageTolerance } = useUserState()
 
-  const [rotate, setRotate] = useState(false)
   const [swapUnavailable, setSwapUnavailable] = useState(false)
+  const [isSwapping, setIsSwapping] = useState(false)
+  const [showIconAnimation, setShowIconAnimation] = useState(false) // we set this to true on the first switch. Otherwise it the icon will load with animation when the screen is loaded too
+
+  const {
+    isOpen: isUnverifiedTokenWarningModalOpen,
+    onClose: onUnverifiedTokenWarningModalClose,
+    onOpen: onUnverifiedTokenWarningModalOpen,
+  } = useDisclosure()
 
   const payToken = tokens[Field.PAY]
   const receiveToken = tokens[Field.RECEIVE]
@@ -124,27 +200,43 @@ const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
   const dependentField: Field =
     independentField === Field.PAY ? Field.RECEIVE : Field.PAY
 
+  const formatUnits = useCallback(
+    (value: bigint, decimals: number) => {
+      const formattedValue = bigDecimal.formatUnits({
+        value,
+        decimals,
+      })
+      if (isFiatInput) {
+        return prettifyCurrenvyValueForSwap(formattedValue) ?? ""
+      } else {
+        return prettifyTokenAmountValueForSwap(formattedValue) ?? ""
+      }
+    },
+    [isFiatInput],
+  )
+
   const formattedAmounts = useMemo(
     () => ({
       [independentField]: typedValue,
-      [dependentField]: bigDecimal.formatUnits({
-        value: parsedAmounts[dependentField] ?? 0n,
-        decimals: ensureDecimals(tokens[dependentField]?.decimals),
-      }),
+      [dependentField]: formatUnits(
+        parsedAmounts[dependentField] ?? 0n,
+        ensureDecimals(tokens[dependentField]?.decimals),
+      ),
     }),
-    [dependentField, independentField, parsedAmounts, typedValue, tokens],
+    [
+      independentField,
+      typedValue,
+      dependentField,
+      formatUnits,
+      parsedAmounts,
+      tokens,
+    ],
   )
 
   const payTokenBalance = tokenBalances[Field.PAY]
   const payAmount = parsedAmounts[Field.PAY]
 
-  const maxAmountInput = maxAmountSpendFromTokenBalance(payTokenBalance)
-
   const hasZeroBalance = !payTokenBalance || payTokenBalance.balance === 0n
-
-  const atMaxAmountInput = Boolean(
-    maxAmountInput !== undefined && payAmount && payAmount === maxAmountInput,
-  )
 
   const handleInputSelect = useCallback(
     (payToken: Token) => {
@@ -154,22 +246,26 @@ const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
     [handleTypeInput, onTokenSelection],
   )
 
-  const handleMaxInput = useCallback(() => {
-    if (maxAmountInput !== undefined && payToken?.decimals) {
-      onUserInput(
-        Field.PAY,
-        bigDecimal.formatUnits({
-          value: maxAmountInput,
-          decimals: payToken.decimals,
-        }),
-      )
-    }
-  }, [maxAmountInput, onUserInput, payToken?.decimals])
+  const computePercentageValue = useSwapPercentageInput(
+    payTokenBalance,
+    isFiatInput,
+  )
+
+  const handlePercentageInput = (percentage: number) => {
+    computePercentageValue(percentage)
+  }
 
   const handleOutputSelect = useCallback(
-    (receiveToken: Token) => onTokenSelection(Field.RECEIVE, receiveToken),
-    [onTokenSelection],
+    (receiveToken: Token) => {
+      if (!isTokenVerified(receiveToken)) {
+        onUnverifiedTokenWarningModalOpen()
+      }
+      onTokenSelection(Field.RECEIVE, receiveToken)
+    },
+    [onTokenSelection, onUnverifiedTokenWarningModalOpen],
   )
+
+  const priceImpact = usePriceImpact(trade)
 
   const noRoute = !trade?.route
 
@@ -187,6 +283,12 @@ const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
 
   const isValid =
     !swapInputError && !insufficientLiquidityError && !swapUnavailable
+
+  const canShowSwapQuote =
+    (!swapInputError ||
+      swapInputError === SwapInputError.INSUFFICIENT_BALANCE) &&
+    !insufficientLiquidityError &&
+    !swapUnavailable
 
   const swapCallback = useSwapCallback(trade, userSlippageTolerance)
 
@@ -207,10 +309,15 @@ const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
     }
   }, [onUserInput, swapCallback])
 
-  const showMaxButton = useMemo(
-    () => !atMaxAmountInput && !formattedAmounts[Field.PAY] && !hasZeroBalance,
-    [atMaxAmountInput, formattedAmounts, hasZeroBalance],
-  )
+  const handleSwitchTokens = useCallback(() => {
+    setIsSwapping(true)
+    setShowIconAnimation(true)
+
+    setTimeout(() => {
+      setIsSwapping(false)
+      onSwitchTokens(formattedAmounts[Field.RECEIVE])
+    }, 450)
+  }, [formattedAmounts, onSwitchTokens])
 
   return (
     <>
@@ -220,66 +327,81 @@ const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
           flexDirection="column"
           gap="1"
           borderRadius="lg"
+          width={"full"}
+          height={"200px"} //we need to set a fixed height to avoid layout shifts when switching tokens
         >
-          <SwapInputPanel
-            type="pay"
-            id="swap-input-pay-panel"
-            token={payToken}
-            value={formattedAmounts[Field.PAY]}
-            onUserInput={handleTypeInput}
-            onTokenSelect={handleInputSelect}
-            showMaxButton={showMaxButton}
-            onMax={handleMaxInput}
-            otherToken={receiveToken}
-            currentBalance={payTokenBalance}
-            tradeLoading={tradeLoading}
-            insufficientBalance={!isValid && !!formattedAmounts[Field.PAY]}
-          />
-          <SwapInputPanel
-            type="receive"
-            id="swap-input-receive-panel"
-            token={receiveToken}
-            value={formattedAmounts[Field.RECEIVE]}
-            onUserInput={handleTypeOutput}
-            onTokenSelect={handleOutputSelect}
-            otherToken={payToken}
-            currentBalance={tokenBalances[Field.RECEIVE]}
-            tradeLoading={tradeLoading}
-          />
+          <Box
+            position="relative"
+            data-testid="swap-input-pay-panel-box"
+            animation={
+              isSwapping
+                ? `${swapAnimation} 0.5s ease-in-out forwards`
+                : undefined
+            }
+            zIndex={1}
+          >
+            <SwapInputPanel
+              type="pay"
+              id="swap-input-pay-panel"
+              value={formattedAmounts[Field.PAY]}
+              onChange={handleTypeInput}
+              onTokenSelect={handleInputSelect}
+              onPercentageClick={handlePercentageInput}
+              isLoading={tradeLoading}
+              tokenWithBalance={payTokenBalance}
+              insufficientBalance={!isValid && !!formattedAmounts[Field.PAY]}
+              isFiatInput={isFiatInput}
+              setIsFiatInput={setIsFiatInput}
+            />
+          </Box>
+          <Box
+            position="relative"
+            data-testid="swap-input-receive-panel-box"
+            animation={
+              isSwapping
+                ? `${reverseSwapAnimation} 0.5s ease-in-out forwards`
+                : undefined
+            }
+            zIndex={0}
+          >
+            <SwapInputPanel
+              type="receive"
+              id="swap-input-receive-panel"
+              value={formattedAmounts[Field.RECEIVE]}
+              onChange={handleTypeOutput}
+              onTokenSelect={handleOutputSelect}
+              isReadOnly
+              isLoading={tradeLoading}
+              tokenWithBalance={tokenBalances[Field.RECEIVE]}
+              isFiatInput={isFiatInput}
+              setIsFiatInput={setIsFiatInput}
+              priceImpact={priceImpact}
+            />
+          </Box>
           <SwitchDirectionButton
             aria-label="Switch input and output"
-            animation={rotate ? `${spin} 0.125s linear` : ""}
-            icon={<StyledSwitchDirectionIcon />}
-            onClick={() => {
-              setRotate(true)
-              setTimeout(() => setRotate(false), 150)
-              onSwitchTokens()
-            }}
+            icon={
+              !isSwapping ? (
+                <AnimatedSwitchDirectionIcon
+                  showAnimation={showIconAnimation}
+                />
+              ) : undefined
+            }
+            onClick={handleSwitchTokens}
           />
         </Flex>
 
-        {!trade && !swapInputError && tradeLoading && <SwapTradeLoading />}
+        <SwapPriceImpact priceImpact={priceImpact} />
 
-        {!trade && !isValid && (
-          <L2Bold color="neutrals.500" mt="2">
-            Powered by AVNU
-          </L2Bold>
-        )}
+        {!canShowSwapQuote ||
+          (!trade && !tradeLoading && (
+            <L2Bold color="neutrals.500" mt="2">
+              Powered by AVNU
+            </L2Bold>
+          ))}
 
-        {trade && isValid && (
-          <SwapPricesInfo
-            tokenIn={payToken}
-            tokenOut={receiveToken}
-            trade={trade}
-          />
-        )}
-
-        {isValid && (
-          <SwapQuoteRefresh
-            trade={trade}
-            tradeLoading={tradeLoading}
-            tradeError={swapInputError}
-          />
+        {canShowSwapQuote && (
+          <SwapPricesInfo trade={trade} isLoading={tradeLoading} />
         )}
       </SwapContainer>
       <Flex flex={1} />
@@ -323,6 +445,10 @@ const Swap = ({ tokenAddress }: { tokenAddress?: Address }) => {
           </Button>
         )}
       </Box>
+      <UnverifiedTokenWarningDialog
+        isOpen={isUnverifiedTokenWarningModalOpen}
+        onClose={onUnverifiedTokenWarningModalClose}
+      />
     </>
   )
 }

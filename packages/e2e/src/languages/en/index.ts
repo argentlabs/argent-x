@@ -114,12 +114,11 @@ const texts = {
       viewOnVoyager: "View on Voyager",
       hideAccount: "Hide account",
       deployAccount: "Deploy account",
-      authorisedDapps: {
-        authorisedDapps: "Authorised dapps",
+      authorizedDapps: {
+        authorizedDapps: "Authorized dapps",
         connect: "Connect",
         reject: "Reject",
-        disconnectAll: "Disconnect all",
-        noAuthorisedDapps: "No authorised dapps",
+        noAuthorizedDapps: "No authorized dapps",
       },
       exportPrivateKey: "Export private key",
     },

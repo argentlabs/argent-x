@@ -2,7 +2,6 @@ import {
   BarBackButton,
   BarCloseButton,
   CellStack,
-  logosDeprecated,
   NavigationContainer,
   P3,
 } from "@argent/x-ui"
@@ -28,8 +27,10 @@ import { useIsMainnet } from "../networks/hooks/useIsMainnet"
 import type { TextProps } from "@chakra-ui/react"
 import { PROVIDER_TOKENS } from "./constants"
 import { useRouteTokenAddress } from "../../hooks/useRoute"
+import { useToken } from "../accountTokens/tokens.state"
+import { selectedNetworkIdView } from "../../views/network"
 
-const { RampLogo, BanxaLogo, TopperLogo } = logosDeprecated
+import { RampLogo, BanxaLogo, TopperLogo } from "@argent/x-ui/logos-deprecated"
 
 function RecommendedText(props: TextProps) {
   return (
@@ -82,12 +83,24 @@ export const FundingProviderScreen: FC = () => {
   const isMainnet = useIsMainnet()
 
   const tokenAddress = useRouteTokenAddress()
+  const networkId = useView(selectedNetworkIdView)
+  const token = useToken({
+    address: tokenAddress as Address,
+    networkId,
+  })
 
   const allowFiatPurchase = account && isMainnet
   const normalizedAddress = account ? normalizeAddress(account.address) : ""
   const { data: topperUrl } = useSWR(["topperUrl", normalizedAddress], () => {
+    const isTopperToken = PROVIDER_TOKENS.topper.some((address) =>
+      isEqualAddress(address, tokenAddress),
+    )
     return (
-      normalizedAddress && clientOnRampService.getTopperUrl(normalizedAddress)
+      normalizedAddress &&
+      clientOnRampService.getTopperUrl(
+        normalizedAddress,
+        isTopperToken ? token?.symbol : undefined,
+      )
     )
   })
 
@@ -122,7 +135,7 @@ export const FundingProviderScreen: FC = () => {
             targetBlank
             title={
               <>
-                Ramp
+                Ramp Network
                 {showRecommended() && (
                   <RecommendedText>Recommended</RecommendedText>
                 )}

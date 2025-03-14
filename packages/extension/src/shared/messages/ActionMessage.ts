@@ -14,7 +14,14 @@ export type ActionMessage =
   | { type: "SIGNATURE_FAILURE"; data: { actionHash: string; error: string } }
   | {
       type: "SIGNATURE_SUCCESS"
-      data: { signature: ArraySignatureType; actionHash: string }
+      data: {
+        signature: ArraySignatureType
+        actionHash: string
+        accountAddress: string
+        networkId: string
+        accountId: string
+        txHash: string
+      }
     }
   | {
       type: "SIGNATURES_PENDING"

@@ -13,7 +13,7 @@ import type {
   SelectorFn,
 } from "../storage/__new/interface"
 import { ChromeRepository } from "../storage/__new/chrome"
-import browser from "webextension-polyfill"
+import { browserStorage } from "../storage/browser"
 import memoize from "memoizee"
 import { accountsEqual } from "../utils/accountsEqual"
 
@@ -39,7 +39,7 @@ export type IMultisigPendingOffchainSignaturesRepository =
   IRepository<MultisigPendingOffchainSignature>
 
 export const multisigPendingOffchainSignaturesStore: IMultisigPendingOffchainSignaturesRepository =
-  new ChromeRepository<MultisigPendingOffchainSignature>(browser, {
+  new ChromeRepository<MultisigPendingOffchainSignature>(browserStorage, {
     areaName: "local",
     namespace: "core:multisig:pendingOffchainSignatures",
     compare: (a, b) => a.requestId === b.requestId,

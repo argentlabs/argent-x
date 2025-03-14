@@ -1,12 +1,14 @@
 import { Outlet } from "react-router-dom"
 import type { PropsWithChildren } from "react"
 
-import { useIsLocked } from "../../hooks/appState"
 import { LockScreen } from "./LockScreen"
+import { useKeyValueStorage } from "../../hooks/useStorage"
+import { sessionStore } from "../../../shared/session/storage"
 
 export function WithLockScreen({ children }: PropsWithChildren) {
-  const isLocked = useIsLocked()
-  if (isLocked) {
+  const isUnlocked = useKeyValueStorage(sessionStore, "isUnlocked")
+
+  if (!isUnlocked) {
     return <LockScreen position="absolute" inset={0} />
   }
   return <>{children}</>

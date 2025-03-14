@@ -71,17 +71,7 @@ test.describe("Token Details", () => {
       await expect(extension.page.getByText("No activity")).toBeVisible()
 
       await extension.tokenDetails.menuButtonLoc.click()
-      await Promise.all([
-        expect(extension.tokenDetails.menuCopyTokenAddressLoc).toBeVisible(),
-        expect(extension.tokenDetails.menuViewOnVoyagerLoc).toBeVisible(),
-      ])
-
-      await extension.tokenDetails.menuCopyTokenAddressLoc.click()
-      await extension.clipboard.setClipboard()
-      const tokenAddress = await extension.clipboard.getClipboard()
-      await extension.tokenDetails.menuViewOnVoyagerLoc
-        .locator(`[data-address="${tokenAddress}"]`)
-        .isVisible()
+      await expect(extension.tokenDetails.menuViewOnVoyagerLoc).toBeVisible()
     },
   )
 

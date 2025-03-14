@@ -1,21 +1,14 @@
-import {
-  BarBackButton,
-  Button,
-  Empty,
-  icons,
-  NavigationContainer,
-} from "@argent/x-ui"
+import { ShieldSecondaryIcon } from "@argent/x-ui/icons"
+import { BarBackButton, Button, Empty, NavigationContainer } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 
-import { SMART_ACCOUNT_NETWORK_ID } from "../../../shared/smartAccount/constants"
+import { useSmartAccountEnabled } from "../../../shared/smartAccount/useSmartAccountEnabled"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { SmartAccountActivate } from "./SmartAccountActivate"
 import { SmartAccountNotReady } from "./SmartAccountNotReady"
 import { useRouteWalletAccount } from "./useRouteWalletAccount"
 import { useToggleSmartAccountRoute } from "./useToggleSmartAccountRoute"
-
-const { ShieldSecondaryIcon } = icons
 
 export const SmartAccountStartScreen: FC = () => {
   const account = useRouteWalletAccount()
@@ -23,7 +16,7 @@ export const SmartAccountStartScreen: FC = () => {
   const { isLoading, startToggleSmartAccountFlow } =
     useToggleSmartAccountRoute()
 
-  const isAvailable = network.id === SMART_ACCOUNT_NETWORK_ID
+  const isAvailable = useSmartAccountEnabled(network.id)
   const cannotProceed = account?.needsDeploy && account.type !== "smart"
 
   return (

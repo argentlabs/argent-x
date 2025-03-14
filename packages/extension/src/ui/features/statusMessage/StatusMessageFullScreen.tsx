@@ -1,11 +1,10 @@
-import { BarIconButton, H1, H5, icons } from "@argent/x-ui"
+import { CrossSecondaryIcon } from "@argent/x-ui/icons"
+import { BarIconButton, H1, H5 } from "@argent/x-ui"
 import { Button, Center, Circle, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import type { IStatusMessage } from "../../../shared/statusMessage/types"
 import { StatusMessageIcon } from "./StatusMessageIcon"
-
-const { CrossSecondaryIcon } = icons
 
 interface StatusMessageFullScreenProps {
   statusMessage: IStatusMessage | undefined

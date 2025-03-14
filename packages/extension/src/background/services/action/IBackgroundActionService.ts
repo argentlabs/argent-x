@@ -23,10 +23,19 @@ export interface IBackgroundActionService extends IActionService {
 }
 
 export const TransactionCreatedForAction = Symbol("TransactionCreatedForAction")
-
+export const TransactionIntentCreatedForAction = Symbol(
+  "TransactionIntentCreatedForAction",
+)
 export type Events = {
   [TransactionCreatedForAction]: {
     actionHash: ActionHash
     transactionHash: string
+  }
+  [TransactionIntentCreatedForAction]: {
+    actionHash: ActionHash
+    accountAddress: string
+    networkId: string
+    accountId: string
+    txHash: string
   }
 }

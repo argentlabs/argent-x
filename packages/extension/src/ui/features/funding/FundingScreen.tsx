@@ -1,8 +1,7 @@
+import { QrIcon, BridgeIcon } from "@argent/x-ui/icons"
 import {
   BarCloseButton,
   CellStack,
-  icons,
-  logosDeprecated,
   NavigationContainer,
   useToast,
 } from "@argent/x-ui"
@@ -19,8 +18,7 @@ import { isFeatureEnabled } from "@argent/x-shared"
 import { getLayerSwapUrl } from "./utils"
 import { FundingOnRampOption } from "./FundingOnRampOption"
 
-const { QrIcon, BridgeIcon } = icons
-const { EthereumLogo, CoinbaseLogo } = logosDeprecated
+import { EthereumLogo, CoinbaseLogo } from "@argent/x-ui/logos-deprecated"
 
 export const FundingScreen: FC = () => {
   const { state } = useLocation()

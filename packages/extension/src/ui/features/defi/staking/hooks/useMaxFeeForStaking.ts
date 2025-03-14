@@ -2,13 +2,16 @@ import { TransactionType } from "starknet"
 import useSWR from "swr"
 
 import type { Address, StakerInfo } from "@argent/x-shared"
-import { addressSchema } from "@argent/x-shared"
-import { estimatedFeesToMaxFeeTotal } from "@argent/x-shared"
+import {
+  addressSchema,
+  estimatedFeesToMaxFeeTotalV2,
+  getNativeEstimatedFeeByFeeToken,
+} from "@argent/x-shared"
 import { swrRefetchDisabledConfig } from "@argent/x-ui"
-import type { Account } from "../../../accounts/Account"
 import { getReviewForTransactions } from "../../../actions/transactionV2/useTransactionReviewV2"
 import { getEstimatedFee } from "../../../../services/backgroundTransactions"
 import { stakingService } from "../../../../services/staking"
+import type { WalletAccount } from "../../../../../shared/wallet.model"
 
 export const maxFeeEstimateForStaking = async ({
   feeTokenAddress,
@@ -21,7 +24,7 @@ export const maxFeeEstimateForStaking = async ({
   feeTokenAddress?: Address
   tokenAddress?: Address
   account?: Pick<
-    Account,
+    WalletAccount,
     "id" | "address" | "networkId" | "needsDeploy" | "classHash" | "type"
   >
   balance: bigint
@@ -49,22 +52,24 @@ export const maxFeeEstimateForStaking = async ({
   })
 
   const transaction = {
-    type: TransactionType.INVOKE as const,
+    type: TransactionType.INVOKE,
     payload: calls,
   }
 
   const reviewResult = await getReviewForTransactions({
     transaction,
-    feeTokenAddress,
     selectedAccount: account,
     maxSendEstimate: true,
   })
 
-  const estimatedFee =
-    reviewResult?.result.enrichedFeeEstimation ??
-    (await getEstimatedFee(calls, account, feeTokenAddress))
+  const estimatedFee = reviewResult?.result.enrichedFeeEstimation
+    ? getNativeEstimatedFeeByFeeToken(
+        reviewResult?.result.enrichedFeeEstimation,
+        feeTokenAddress,
+      )
+    : await getEstimatedFee(calls, account, feeTokenAddress)
 
-  return estimatedFeesToMaxFeeTotal(estimatedFee)
+  return estimatedFeesToMaxFeeTotalV2(estimatedFee)
 }
 
 export const useMaxFeeForStaking = ({
@@ -79,7 +84,7 @@ export const useMaxFeeForStaking = ({
   feeTokenAddress?: Address
   tokenAddress?: Address
   account?: Pick<
-    Account,
+    WalletAccount,
     "id" | "address" | "networkId" | "needsDeploy" | "classHash" | "type"
   >
   balance: bigint

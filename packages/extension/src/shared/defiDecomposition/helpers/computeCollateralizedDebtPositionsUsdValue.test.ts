@@ -1,5 +1,5 @@
 import { bigDecimal } from "@argent/x-shared"
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { collateralizedDebtPositions } from "../__fixtures__/collateralizedDebtPositions"
 import { tokenPrices } from "../__fixtures__/tokenPrices"
 import { tokens } from "../__fixtures__/tokens"
@@ -16,7 +16,7 @@ import {
 import { parseCollateralizedDebtPositions } from "./parseCollateralizedDebtPositions"
 
 describe("computeCollateralizedDebtPositionsUsdValue", () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

@@ -1,4 +1,4 @@
-import { icons } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
 import {
   Accordion,
   AccordionButton,
@@ -10,8 +10,6 @@ import type { FC } from "react"
 
 import type { FeeEstimationTextProps } from "./FeeEstimationText"
 import { FeeEstimationText } from "./FeeEstimationText"
-
-const { WarningCircleSecondaryIcon } = icons
 
 export const InsufficientFundsAccordion: FC<FeeEstimationTextProps> = (
   props,

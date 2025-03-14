@@ -1,6 +1,6 @@
 import "fake-indexeddb/auto"
 
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { ArgentDatabase } from "../../idb/db"
 import { stakingPositions } from "../__fixtures__/stakingPositions"
 import { tokenPrices } from "../__fixtures__/tokenPrices"
@@ -13,7 +13,7 @@ import {
 import { parseStakingPositions } from "./parseStakingPositions"
 
 describe("computeStakingPositionsUsdValue", () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

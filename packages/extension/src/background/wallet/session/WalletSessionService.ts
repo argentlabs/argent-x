@@ -13,11 +13,9 @@ import type { WalletRecoverySharedService } from "../recovery/WalletRecoveryShar
 import { walletToKeystore } from "../utils"
 import type { Events } from "./interface"
 import { Locked } from "./interface"
-
-export interface WalletSession {
-  secret: string
-  password: string
-}
+import type { IKeyValueStorage } from "../../../shared/storage"
+import type { ISessionStore } from "../../../shared/session/storage"
+import type { ISecretStorageService } from "./interface"
 
 export class WalletSessionService {
   private _locked = true
@@ -26,7 +24,8 @@ export class WalletSessionService {
   constructor(
     readonly emitter: Emittery<Events>,
     readonly store: IObjectStore<WalletStorageProps>,
-    readonly sessionStore: IObjectStore<WalletSession | null>,
+    private readonly sessionStore: IKeyValueStorage<ISessionStore>,
+    private readonly secretStorageService: ISecretStorageService,
     private readonly backupService: WalletBackupService,
     private readonly recoverySharedService: WalletRecoverySharedService,
     private SCRYPT_N: number,
@@ -39,16 +38,17 @@ export class WalletSessionService {
   }
 
   public async isSessionOpen(): Promise<boolean> {
-    return (await this.sessionStore.get()) !== null
+    const secret = await this.secretStorageService.decrypt()
+    return secret !== null && secret !== undefined
   }
 
-  public async startSession(
+  private async handleStartSession(
     password: string,
     progressCallback?: ProgressCallback,
   ): Promise<boolean> {
     // session has already started
-    const session = await this.sessionStore.get()
-    if (session) {
+    const secret = await this.secretStorageService.decrypt(password)
+    if (secret) {
       return true
     }
 
@@ -91,6 +91,24 @@ export class WalletSessionService {
     }
   }
 
+  public async startSession(
+    password: string,
+    progressCallback?: ProgressCallback,
+  ): Promise<boolean> {
+    try {
+      const isUnlocked = await this.handleStartSession(
+        password,
+        progressCallback,
+      )
+      this.locked = !isUnlocked
+      await this.sessionStore.set("isUnlocked", isUnlocked)
+      return isUnlocked
+    } catch {
+      this.locked = true
+      return false
+    }
+  }
+
   private async generateNewLocalSecret(
     password: string,
     progressCallback?: ProgressCallback,
@@ -112,17 +130,20 @@ export class WalletSessionService {
   }
 
   public async checkPassword(password: string): Promise<boolean> {
-    const session = await this.sessionStore.get()
-    return session?.password === password
+    const secret = await this.secretStorageService.decrypt(password)
+    return secret !== null && secret !== undefined
   }
 
   public async lock() {
-    await this.sessionStore.set(null)
+    await this.secretStorageService.clear()
+    await this.sessionStore.set("isUnlocked", false)
     this.locked = true
   }
 
   async setSession(secret: string, password: string) {
-    await this.sessionStore.set({ secret, password })
+    await this.secretStorageService.encrypt({ secret, password }, password)
+
+    await this.sessionStore.set("isUnlocked", true)
     this.locked = false
   }
 

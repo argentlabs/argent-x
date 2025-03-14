@@ -1,4 +1,5 @@
 import type { NavigationContainerProps, SelectOptions } from "@argent/x-ui"
+import { UserSecondaryIcon, BinSecondaryIcon } from "@argent/x-ui/icons"
 import {
   AlertDialog,
   BarBackButton,
@@ -7,14 +8,11 @@ import {
   CellStack,
   FieldError,
   H3,
-  icons,
   NavigationContainer,
   Select,
 } from "@argent/x-ui"
-import {
-  addressInputCharactersAndLengthSchema,
-  isStarknetDomainName,
-} from "@argent/x-shared"
+import { starknetId } from "starknet"
+import { addressInputCharactersAndLengthSchema } from "@argent/x-shared"
 import {
   Button,
   Center,
@@ -41,8 +39,6 @@ import { isAddressBookContact } from "../../../../shared/addressBook/type"
 import { ControlledInput } from "../../../components/ControlledInput"
 import { getNetworkAccountImageUrl } from "../../accounts/accounts.service"
 import { useGetAddressFromDomainNameInput } from "../../send/useGetAddressFromDomainName"
-
-const { UserSecondaryIcon, BinSecondaryIcon } = icons
 
 export interface AddressBookAddOrEditScreeProps
   extends NavigationContainerProps {
@@ -147,7 +143,7 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
     )
   }, [isEditingExistingContact])
 
-  const isStarknetDomainNameAddress = isStarknetDomainName(contactAddress)
+  const isStarknetDomainNameAddress = starknetId.isStarkDomain(contactAddress)
 
   useEffect(() => {
     if (isStarknetDomainNameAddress) {
@@ -194,7 +190,7 @@ export const AddressBookAddOrEditScreen: FC<AddressBookAddOrEditScreeProps> = ({
         <Center flexDirection={"column"} gap={6} pb={6}>
           <Circle
             overflow={"hidden"}
-            size={20}
+            size={16}
             bg={"neutrals.800"}
             alignItems={"center"}
           >

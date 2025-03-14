@@ -29,6 +29,7 @@ import { parseDefiDecomposition } from "../../../../shared/defiDecomposition/hel
 import { defaultNetwork } from "../../../../shared/network"
 import type { ITokenService } from "../../../../shared/token/__new/service/ITokenService"
 import type { ActivitiesPayload } from "../../../../shared/activity/types"
+import { isEmpty } from "lodash-es"
 
 export class InvestmentWorker {
   constructor(
@@ -102,7 +103,11 @@ export class InvestmentWorker {
   }
 
   // After detecting new successful activity, DeFi positions are fetched 5 times at 1-second intervals
-  async onActivity({ account }: ActivitiesPayload) {
+  async onActivity({ activities, account }: ActivitiesPayload) {
+    if (isEmpty(activities)) {
+      // this equates to 'activities fetched, but empty'. don't need to poll investments
+      return
+    }
     await this.pollInvestments(account)
   }
 
@@ -164,11 +169,19 @@ export class InvestmentWorker {
   )(async () => {
     const stakingInvestments =
       await this.investmentService.getStrkDelegatedStakingInvestments()
-    const stakingEnabled = stakingInvestments.some(
-      (investment) => investment.buyEnabled || investment.sellEnabled,
-    )
 
-    const apyPercentage =
+    const liquidStakingInvestments =
+      await this.investmentService.getStrkLiquidStakingInvestments()
+
+    const stakingEnabled =
+      stakingInvestments.some(
+        (investment) => investment.buyEnabled || investment.sellEnabled,
+      ) ||
+      liquidStakingInvestments.some(
+        (investment) => investment.buyEnabled || investment.sellEnabled,
+      )
+
+    const nativeApyPercentage =
       prettifyCurrencyNumber(
         bigDecimal.formatUnits(
           bigDecimal.mul(
@@ -180,7 +193,33 @@ export class InvestmentWorker {
         ),
       ) || "0"
 
+    const liquidApyPercentage =
+      prettifyCurrencyNumber(
+        bigDecimal.formatUnits(
+          bigDecimal.mul(
+            bigDecimal.parseUnits(
+              (liquidStakingInvestments.length > 0
+                ? Math.max(
+                    ...liquidStakingInvestments.map((investment) =>
+                      Number(investment.metrics.totalApy ?? 0),
+                    ),
+                  )
+                : 0
+              ).toString(),
+            ),
+            bigDecimal.toBigDecimal(100, 0),
+          ),
+        ),
+      ) || "0"
+
     void this.investmentService.updateStakingEnabled(stakingEnabled)
-    void this.investmentService.updateStakingApyPercentage(apyPercentage)
+    void this.investmentService.updateStakingApyPercentage(
+      nativeApyPercentage,
+      "native",
+    )
+    void this.investmentService.updateStakingApyPercentage(
+      liquidApyPercentage,
+      "liquid",
+    )
   })
 }

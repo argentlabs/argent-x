@@ -13,8 +13,8 @@ import type {
   BaseToken,
   Token,
 } from "../../../shared/token/__new/types/token.model"
-import type { Address } from "@argent/x-shared"
-import { isEqualAddress } from "@argent/x-shared"
+import type { Address, RequiredBy } from "@argent/x-shared"
+import { ensureArray, isEqualAddress } from "@argent/x-shared"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import {
   atomFamilyTokenEqual,
@@ -32,9 +32,10 @@ import type {
   BaseTokenWithBalance,
   TokenWithOptionalBigIntBalance,
 } from "../../../shared/token/__new/types/tokenBalance.model"
+import { atomWithDebugLabel } from "../../views/atomWithDebugLabel"
 import {
-  defiDecompositionTokenBalancesForNetworkViewAtom,
-  defiDecompositionTokenBalancesViewAtom,
+  investmentViewFindAtom,
+  investmentViewFindAtomByNetworkId,
 } from "../../views/investments"
 
 export const useNetworkFeeTokens = (networkId?: string) => {
@@ -42,15 +43,15 @@ export const useNetworkFeeTokens = (networkId?: string) => {
   return feeTokens
 }
 
-export const tokensInNetwork = atomFamily(
-  (networkId?: string) => {
-    return atom(async (get) => {
+export const tokensInNetwork = atomFamily((networkId?: string) => {
+  return atomWithDebugLabel(
+    atom(async (get) => {
       const allTokens = await get(allTokensView)
       return allTokens.filter((t) => t.networkId === networkId)
-    })
-  },
-  (a, b) => a === b,
-)
+    }),
+    `tokensInNetwork(${networkId})`,
+  )
+})
 
 export const useTokensInCurrentNetworkIncludingSpam = () => {
   const currentNetwork = useCurrentNetwork()
@@ -72,25 +73,42 @@ export const useTradableTokensInCurrentNetwork = () => {
   return useTokensWithHiddenFilter(rawTokens)
 }
 
+export const isTokenVerified = (token: Token) => {
+  return (
+    token.tags?.includes("verified") ||
+    token.tags?.includes("avnuVerified") ||
+    token.tags?.includes("communityVerified")
+  )
+}
+
 export const tokensFindFamily = atomFamily((baseToken?: BaseToken) => {
-  return atom(async (get) => {
-    const allTokens = await get(allTokensView)
-    return allTokens.find((token) => equalToken(token, baseToken))
-  })
+  return atomWithDebugLabel(
+    atom(async (get) => {
+      const allTokens = await get(allTokensView)
+      return allTokens.find((token) => equalToken(token, baseToken))
+    }),
+    `tokensFindFamily(${baseToken?.address})`,
+  )
 }, atomFamilyTokenEqual)
 
 export const tokensInfoFindFamily = atomFamily((baseToken?: BaseToken) => {
-  return atom(async (get) => {
-    const allTokensInfo = await get(allTokensInfoView)
-    return allTokensInfo.find((token) => equalToken(token, baseToken))
-  })
+  return atomWithDebugLabel(
+    atom(async (get) => {
+      const allTokensInfo = await get(allTokensInfoView)
+      return allTokensInfo.find((token) => equalToken(token, baseToken))
+    }),
+    `tokensInfoFindFamily(${baseToken?.address})`,
+  )
 }, atomFamilyTokenEqual)
 
 export const tokensPricesFindFamily = atomFamily((baseToken?: BaseToken) => {
-  return atom(async (get) => {
-    const allTokensPrices = await get(allTokenPricesView)
-    return allTokensPrices.find((token) => equalToken(token, baseToken))
-  })
+  return atomWithDebugLabel(
+    atom(async (get) => {
+      const allTokensPrices = await get(allTokenPricesView)
+      return allTokensPrices.find((token) => equalToken(token, baseToken))
+    }),
+    `tokensPricesFindFamily(${baseToken?.address})`,
+  )
 }, atomFamilyTokenEqual)
 
 export const useTokenOnCurrentNetworkByAddress = (address?: Address) => {
@@ -123,10 +141,11 @@ export const useTokensRecord = ({ cleanHex = false }) => {
   )
 }
 
-const useMapToRawTokens = (
+export const useMapToRawTokens = (
   tokens: Token[],
   accountBalances: BaseTokenWithBalance[],
-): TokenWithOptionalBigIntBalance[] => {
+  hideZeroBalances: boolean = true,
+): RequiredBy<TokenWithOptionalBigIntBalance, "balance">[] => {
   return useMemo(() => {
     return accountBalances
       .flatMap((accountBalance) => {
@@ -141,8 +160,11 @@ const useMapToRawTokens = (
           balance: BigInt(accountBalance.balance ?? 0n),
         }
       })
-      .filter((token) => token.showAlways || token.balance !== 0n)
-  }, [tokens, accountBalances])
+      .filter(
+        (token) =>
+          token.showAlways || (hideZeroBalances ? token.balance !== 0n : true),
+      )
+  }, [tokens, accountBalances, hideZeroBalances])
 }
 
 export const useTokensWithBalanceForAccount = (account?: BaseWalletAccount) => {
@@ -150,10 +172,10 @@ export const useTokensWithBalanceForAccount = (account?: BaseWalletAccount) => {
   const accountTokenBalances = useView(
     tokenBalancesForAccountViewFamily(account),
   )
-  const accountDefiTokenBalances = useView(
-    defiDecompositionTokenBalancesViewAtom(account),
+  const accountInvestments = useView(investmentViewFindAtom(account))
+  const accountBalances = accountTokenBalances.concat(
+    ensureArray(accountInvestments?.tokenBalances),
   )
-  const accountBalances = accountTokenBalances.concat(accountDefiTokenBalances)
   const rawTokens = useMapToRawTokens(tokens, accountBalances)
   return useTokensWithHiddenFilter(rawTokens)
 }
@@ -163,10 +185,12 @@ export const useTokensWithBalanceForNetwork = (networkId: string) => {
   const networkTokenBalances = useView(
     tokenBalancesForNetworkViewFamily(networkId),
   )
-  const networkDefiTokenBalances = useView(
-    defiDecompositionTokenBalancesForNetworkViewAtom(networkId),
+  const networkInvestments = useView(
+    investmentViewFindAtomByNetworkId(networkId),
   )
-  const networkBalances = networkTokenBalances.concat(networkDefiTokenBalances)
+  const networkBalances = networkTokenBalances.concat(
+    networkInvestments.flatMap((i) => i.tokenBalances),
+  )
   const rawTokens = useMapToRawTokens(tokens, networkBalances)
   return useTokensWithHiddenFilter(rawTokens)
 }

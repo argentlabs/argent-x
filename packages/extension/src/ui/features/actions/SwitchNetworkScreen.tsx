@@ -1,4 +1,5 @@
-import { B3, icons } from "@argent/x-ui"
+import { ChevronRightSecondaryIcon } from "@argent/x-ui/icons"
+import { B3 } from "@argent/x-ui"
 import { Center, Flex, Text } from "@chakra-ui/react"
 import type { FC, PropsWithChildren } from "react"
 
@@ -6,8 +7,6 @@ import { DappActionHeader } from "./connectDapp/DappActionHeader"
 import type { DappDisplayAttributes } from "../../services/knownDapps/types"
 import type { ConfirmScreenProps } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
 import { ConfirmScreen } from "./transaction/ApproveTransactionScreen/ConfirmScreen"
-
-const { ChevronRightSecondaryIcon } = icons
 
 export interface SwitchNetworkScreenProps extends ConfirmScreenProps {
   fromNetworkTitle?: string

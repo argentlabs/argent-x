@@ -1,7 +1,7 @@
-import browser from "webextension-polyfill"
 import { ChromeRepository } from "../../storage/__new/chrome"
 import type { Hex } from "@argent/x-shared"
 import { hexSchema } from "@argent/x-shared"
+import { browserStorage } from "../../storage/browser"
 
 export type TransactionHashMap = {
   actionHash: string
@@ -9,7 +9,7 @@ export type TransactionHashMap = {
 }
 
 export const transactionHashesRepo = new ChromeRepository<TransactionHashMap>(
-  browser,
+  browserStorage,
   {
     namespace: "core:transactionHashes",
     areaName: "session",

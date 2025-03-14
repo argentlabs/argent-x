@@ -1,0 +1,274 @@
+name: Run performance tests
+on:
+  workflow_dispatch:
+
+env:
+  PNPM_VERSION: 10.2
+  NODE_VERSION: 18.x
+
+jobs:
+  build-all-artifacts:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
+    strategy:
+      matrix:
+        env: [hydrogen]
+        extension_type: [chrome]
+
+    environment: ${{ matrix.env }}
+
+    env:
+      # FEATURE flags
+      FEATURE_PRIVACY_SETTINGS: "true"
+      FEATURE_EXPERIMENTAL_SETTINGS: "false"
+      FEATURE_BETA_FEATURES: "false"
+      FEATURE_BANXA: "true"
+      FEATURE_LAYERSWAP: "true"
+      FEATURE_ORBITER: "true"
+      FEATURE_MULTISIG: "true"
+      ENABLE_TOKEN_DETAILS: "true"
+      FEATURE_DEFI_DECOMPOSITION: "true"
+
+      # API URLs
+      # localhost:333 will be the host:port for the mock server
+      ARGENT_API_BASE_URL: "http://api.localhost:3333/v1"
+      ARGENT_X_STATUS_URL: "http://healthcheck.localhost:3333/argentx.status.json"
+      ARGENT_X_NEWS_URL: "http://api.localhost:3333/v1/portal/news/b13b2bf5-84a2-4bd5-963d-993f37571204"
+      # API ENVIRONMENT
+      ARGENT_X_ENVIRONMENT: ${{ matrix.env }}
+
+      # Sentry
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_ENVIRONMENT: "staging"
+
+      # Misc
+      RAMP_API_KEY: ${{ secrets.RAMP_API_KEY }}
+      SAFE_ENV_VARS: false
+      MULTICALL_MAX_BATCH_SIZE: 20
+      NEW_CAIRO_0_ENABLED: false
+      TOPPER_PEM_KEY: ${{ secrets.TOPPER_PEM_KEY }}
+      # Refresh intervals
+      FAST: 20 # 20s
+      MEDIUM: 60 # 60s
+      SLOW: 60 * 5 # 5m
+      VERY_SLOW: 24 * 60 * 60 # 1d
+      MIN_LEDGER_APP_VERSION: 2.1.1
+
+      #For testing only
+      FEE_OVERHEAD: 10
+
+      #Performance
+      E2E_PERFORMANCE_THRESHOLD_REGRESSION: ${{ secrets.E2E_PERFORMANCE_THRESHOLD_REGRESSION }}
+      E2E_PERFORMANCE_THRESHOLD_IMPROVEMENT: ${{ secrets.E2E_PERFORMANCE_THRESHOLD_IMPROVEMENT }}
+      E2E_PERFORMANCE_THRESHOLD_WARNING: ${{ secrets.E2E_PERFORMANCE_THRESHOLD_WARNING }}
+
+    steps:
+      # Setup Project
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup project
+        run: pnpm run setup
+
+      - name: Build extension for ${{ matrix.extension_type }}
+        run: |
+          if [ "${{ matrix.extension_type }}" = "firefox" ]; then
+            echo "Building extension using manifest v2"
+            MANIFEST_VERSION=v2 pnpm run build:extension
+          else
+            echo "Building extension using manifest v3"
+            MANIFEST_VERSION=v3 pnpm run build:extension
+          fi
+
+      - name: Check bundle size for ${{ matrix.extension_type }}
+        run: pnpm check-bundle-size
+
+      - name: Use Cache
+        uses: actions/cache@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-${{ matrix.extension_type }}-${{ matrix.env }}
+
+      - name: Set filename prefix
+        run: echo "FILENAME_PREFIX=$(echo argent-x-${{ matrix.env }}-${{ github.ref_name }} | tr / -)" >> $GITHUB_ENV
+
+      - name: Install zip
+        run: apt-get update && apt-get install -y zip
+
+      - name: Create ${{ matrix.extension_type }} zip
+        run: (cd ./packages/extension/dist && zip -r "../../../${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}" .)
+
+      - name: Upload ${{ matrix.extension_type }} extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILENAME_PREFIX }}-${{ matrix.extension_type }}
+          path: "*-${{ matrix.extension_type }}.zip"
+          retention-days: 3
+
+  test-performance:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.50.0-jammy
+    needs: [build-all-artifacts]
+    strategy:
+      matrix:
+        project: [ArgentX]
+        shardIndex: [1]
+        shardTotal: [1]
+    env:
+      #default
+      ARGENT_X_ENVIRONMENT: "hydrogen"
+      ARGENT_API_BASE_URL: ${{ secrets.ARGENT_API_BASE_URL }}
+
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_ADDRESSES: ${{ secrets.E2E_SENDER_ADDRESSES_SEPOLIA }}
+      E2E_SENDER_PRIVATEKEYS: ${{ secrets.E2E_SENDER_PRIVATEKEYS_SEPOLIA }}
+      ARGENT_SEPOLIA_RPC_URL: ${{ secrets.ARGENT_SEPOLIA_RPC_URL }}
+
+      E2E_TESTNET_SEED1: ${{ secrets.E2E_TESTNET_SEED1 }}
+      E2E_TESTNET_SEED3: ${{ secrets.E2E_TESTNET_SEED3 }}
+      E2E_TESTNET_SEED4: ${{ secrets.E2E_TESTNET_SEED4 }}
+      E2E_ACCOUNT_1_SEED2: ${{ secrets.E2E_ACCOUNT_1_SEED2 }}
+      E2E_EXTENSION_PASSWORD: ${{ secrets.E2E_EXTENSION_PASSWORD }}
+
+      ## BANK ACCOUNT, USED FOR FUND OTHER ACCOUNTS
+      E2E_SENDER_SEED: ${{ secrets.E2E_SENDER_SEED }}
+
+      E2E_SPOK_CAMPAIGN_URL: ${{ secrets.E2E_SPOK_CAMPAIGN_URL }}
+      E2E_SPOK_CAMPAIGN_NAME: ${{ secrets.E2E_SPOK_CAMPAIGN_NAME }}
+
+      E2E_USE_STRK_AS_FEE_TOKEN: ${{ secrets.E2E_USE_STRK_AS_FEE_TOKEN }}
+      E2E_SKIP_TX_TESTS: ${{ secrets.E2E_SKIP_TX_TESTS}}
+      E2E_LOG_INFO: ${{ secrets.E2E_LOG_INFO }}
+      E2E_GUARDIAN_EMAIL: ${{ secrets.E2E_GUARDIAN_EMAIL }}
+      E2E_MIG_ACCOUNT_ADDRESS: ${{ secrets.E2E_MIG_ACCOUNT_ADDRESS }}
+      E2E_ACCOUNT_TO_IMPORT_AND_TX: ${{ secrets.E2E_ACCOUNT_TO_IMPORT_AND_TX }}
+      E2E_ACCOUNTS_TO_IMPORT: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT }}
+      E2E_ACCOUNTS_TO_IMPORT_PROD: ${{ secrets.E2E_ACCOUNTS_TO_IMPORT_PROD }}
+      E2E_QA_UTILS_AUTH_TOKEN: ${{ secrets.E2E_QA_UTILS_AUTH_TOKEN }}
+      E2E_QA_UTILS_URL: ${{ secrets.E2E_QA_UTILS_URL }}
+      INITIAL_BALANCE_MULTIPLIER: ${{ secrets.INITIAL_BALANCE_MULTIPLIER }}
+      E2E_MIG_VERSIONS: ${{ secrets.E2E_MIG_VERSIONS }}
+      SLACK_TOKEN: ${{secrets.SLACK_TOKEN}}
+      SLACK_CHANNEL_ID_PERFORMANCE: ${{secrets.SLACK_CHANNEL_ID_PERFORMANCE}}
+      # Refresh intervals
+      REFRESH_INTERVAL_FAST: 20 # 1s
+      REFRESH_INTERVAL_MEDIUM: 20 # 5s
+      REFRESH_INTERVAL_SLOW: 20 # 20s
+      REFRESH_INTERVAL_VERY_SLOW: 60 * 10 # 10m
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: Restore pnpm cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Restore cached build
+        uses: actions/cache/restore@v4
+        with:
+          path: ./*
+          key: ${{ github.sha }}-chrome-${{ env.ARGENT_X_ENVIRONMENT }}
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm
+          pnpm install
+          apt-get update
+          apt-get install -y lsof
+
+      - name: Run performance tests
+        run: |
+          # Run tests
+          xvfb-run --auto-servernum pnpm test:e2e:performance --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+          # Cleanup
+          lsof -ti:3333 | xargs kill -9 || echo "No process on port 3333"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-artifacts-tx-${{ matrix.shardIndex }}
+          path: |
+            packages/e2e/artifacts/playwright/
+            !packages/e2e/artifacts/playwright/*.webm
+          retention-days: 5
+
+      - name: Upload blob report to GitHub Actions Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-blob-reports-tx-${{ matrix.shardIndex }}
+          path: packages/e2e/blob-report/
+          retention-days: 5
+
+      - name: Install GitHub CLI
+        if: always()
+        run: |
+          apt-get update
+          apt-get install -y gh
+
+      - name: Comment PR
+        if: always()
+        run: |
+          # Convert JSON to Markdown
+          node -e "
+          const fs = require('fs');
+          const jsonPath = 'packages/e2e/performance/perf-result.json';
+          const data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+
+          let markdown = '';
+          for (const result of data.results) {
+            markdown += result.message;
+          }
+
+          fs.writeFileSync('perf-result.md', markdown);
+          "
+
+          # Post comment
+          gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body-file perf-result.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

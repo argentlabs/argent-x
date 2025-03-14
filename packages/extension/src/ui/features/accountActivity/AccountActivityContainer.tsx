@@ -6,12 +6,6 @@ import { ActivityHistoryContainer } from "./ActivityHistoryContainer"
 import { MultisigAccountActivityContainer } from "./MultisigAccountActivityContainer"
 import type { WalletAccount } from "../../../shared/wallet.model"
 
-export const header = (
-  <Center px={4} pt={2} pb={6}>
-    <H3>Activity</H3>
-  </Center>
-)
-
 export interface AccountActivityContainerProps {
   account: WalletAccount
 }
@@ -19,6 +13,11 @@ export interface AccountActivityContainerProps {
 export const AccountActivityContainer: FC<AccountActivityContainerProps> = ({
   account,
 }) => {
+  const header = (
+    <Center px={4} pt={2} pb={6}>
+      <H3>Activity</H3>
+    </Center>
+  )
   if (account.type === "multisig") {
     return <MultisigAccountActivityContainer account={account} />
   }

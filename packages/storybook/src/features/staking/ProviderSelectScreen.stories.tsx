@@ -1,10 +1,9 @@
-import { NativeStakingProviderSelectScreen } from "@argent-x/extension/src/ui/features/defi/staking/NativeStakingProviderSelectScreen"
-
+import { StakingProviderSelectScreen } from "@argent-x/extension/src/ui/features/defi/staking/StakingProviderSelectScreen"
 import { decorators } from "../../decorators/routerDecorators"
 import { investments } from "./__fixtures__/starknet-staking-investments.json"
 
 export default {
-  component: NativeStakingProviderSelectScreen,
+  component: StakingProviderSelectScreen,
   decorators,
 }
 

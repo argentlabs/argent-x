@@ -10,8 +10,9 @@ import {
 
 const usePrettyTokenSumBalancesToCurrencyValue = (
   tokens: TokenWithOptionalBigIntBalance[],
+  networkId?: string,
 ) => {
-  const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokens)
+  const sumCurrencyValue = useSumTokenBalancesToCurrencyValue(tokens, networkId)
   if (sumCurrencyValue === undefined) {
     return
   }
@@ -30,6 +31,9 @@ export const usePrettyBalanceForAccount = (account?: BaseWalletAccount) => {
 
 export const usePrettyBalanceForNetwork = (networkId: string) => {
   const tokens = useTokensWithBalanceForNetwork(networkId)
-  const prettyBalance = usePrettyTokenSumBalancesToCurrencyValue(tokens)
+  const prettyBalance = usePrettyTokenSumBalancesToCurrencyValue(
+    tokens,
+    networkId,
+  )
   return prettyBalance
 }

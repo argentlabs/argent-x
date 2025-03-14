@@ -1,11 +1,16 @@
 import type { BigNumberish, Call } from "starknet"
 
 import type { TransactionAction } from "@argent/x-shared"
-import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
+import type {
+  EnrichedSimulateAndReviewV2,
+  EstimatedFeesV2,
+} from "@argent/x-shared/simulation"
 import type { UseDisclosureReturn } from "@chakra-ui/react"
 import type { ApiTransactionReviewTargettedDapp } from "../../../../../shared/transactionReview.service"
-import type { WalletAccount } from "../../../../../shared/wallet.model"
-import type { Multisig } from "../../../multisig/Multisig"
+import type {
+  MultisigWalletAccount,
+  WalletAccount,
+} from "../../../../../shared/wallet.model"
 import type { MultisigConfirmationsBannerProps } from "../MultisigConfirmationsBanner"
 import type { ApproveScreenType } from "../types"
 import type { ConfirmScreenProps } from "./ConfirmScreen"
@@ -31,20 +36,22 @@ export interface ApproveTransactionScreenContainerProps
   isUpgradeAccount?: boolean
   txNeedsRetry?: boolean
   nonce?: BigNumberish
+  txVersion?: string
 }
 
 export interface ApproveTransactionScreenProps
   extends ApproveTransactionScreenContainerProps,
     Omit<ConfirmScreenProps, "onSubmit"> {
   isMainnet: boolean
-  transactionReview?: EnrichedSimulateAndReview
+  transactionReview?: EnrichedSimulateAndReviewV2
   selectedAccount: WalletAccount
   disableConfirm: boolean
   verifiedDapp?: ApiTransactionReviewTargettedDapp
   hasPendingMultisigTransactions: boolean
-  multisig?: Multisig
+  multisig?: MultisigWalletAccount
   confirmButtonText?: string
   transactions: Call[]
   showTxDetails: boolean
   setShowTxDetails: (viewMoreDetails: boolean) => void
+  fee?: EstimatedFeesV2
 }

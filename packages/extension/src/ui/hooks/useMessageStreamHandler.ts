@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 
-import { messageStream } from "../../shared/messages"
+import { messageStream } from "../../shared/messages/messages"
 import { useResetAll } from "./useResetAll"
 import { useStopSession } from "../services/useStopSession"
 

@@ -1,44 +1,51 @@
 import { TXV3_ACCOUNT_CLASS_HASH } from "@argent/x-shared"
 import { stark } from "starknet"
 import { accountService } from "../shared/account/service"
-import type { ExtensionActionItem } from "../shared/actionQueue/types"
+import type { ActionItemExtra } from "../shared/actionQueue/schema"
+import type {
+  ExtensionActionItem,
+  ExtQueueItem,
+  TransactionActionPayload,
+} from "../shared/actionQueue/types"
 import { ampli } from "../shared/analytics"
-import type { MessageType } from "../shared/messages"
+import type { MessageType } from "../shared/messages/types"
 import { multisigArraySignatureSchema } from "../shared/multisig/multisig.model"
 import { networkSchema } from "../shared/network"
 import { networkService } from "../shared/network/service"
 import { preAuthorizationService } from "../shared/preAuthorization"
+import { addTransactionHash } from "../shared/transactions/transactionHashes/transactionHashesRepository"
 import { assertNever } from "../shared/utils/assertNever"
+import { validateSignatureChainId } from "../shared/utils/validateSignatureChainId"
+import { isNetworkOnlyPlaceholderAccount } from "../shared/wallet.model"
 import { isEqualWalletAddress } from "../shared/wallet.service"
 import { accountDeployAction } from "./accountDeployAction"
 import { addMultisigDeployAction } from "./multisig/multisigDeployAction"
-import type { TransactionAction } from "./transactions/transactionExecution"
-import { executeTransactionAction } from "./transactions/transactionExecution"
-import { udcDeclareContract, udcDeployContract } from "./udcAction"
-import type { Wallet } from "./wallet"
 import { respondToHost } from "./respond"
 import { backgroundUIService } from "./services/ui"
-import { isNetworkOnlyPlaceholderAccount } from "../shared/wallet.model"
-import type { ActionItemExtra } from "../shared/actionQueue/schema"
-import { validateSignatureChainId } from "../shared/utils/validateSignatureChainId"
-import { addTransactionHash } from "../shared/transactions/transactionHashes/transactionHashesRepository"
+import { udcDeclareContract, udcDeployContract } from "./udcAction"
+import type { Wallet } from "./wallet"
+import type { ITransactionExecutionService } from "./services/transactionExecution/ITransactionExecutionService"
+import { toBaseWalletAccount } from "../shared/account/utils"
+
+type TransactionAction = ExtQueueItem<{
+  type: "TRANSACTION"
+  payload: TransactionActionPayload
+}>
 
 const handleTransactionAction = async ({
   action,
-  wallet,
+  transactionExecutor,
 }: {
   action: TransactionAction
-  networkId: string
-  wallet: Wallet
+  transactionExecutor: ITransactionExecutionService
 }): Promise<MessageType> => {
   const actionHash = action.meta.hash
 
   try {
-    const response = await executeTransactionAction(action, wallet)
-
+    const txHash = await transactionExecutor.execute(action.payload)
     return {
       type: "TRANSACTION_SUBMITTED",
-      data: { txHash: response.transaction_hash, actionHash },
+      data: { txHash, actionHash },
     }
   } catch (error) {
     return {
@@ -51,11 +58,11 @@ const handleTransactionAction = async ({
 export const handleActionApproval = async (
   action: ExtensionActionItem,
   wallet: Wallet,
+  transactionExecutor: ITransactionExecutionService,
   extra?: ActionItemExtra,
 ): Promise<MessageType | undefined> => {
   const actionHash = action.meta.hash
   const selectedAccount = await wallet.getSelectedAccount()
-  const networkId = selectedAccount?.networkId || "unknown"
 
   switch (action.type) {
     case "CONNECT_DAPP": {
@@ -67,7 +74,7 @@ export const handleActionApproval = async (
       }
 
       await preAuthorizationService.add({
-        account: selectedAccount,
+        account: toBaseWalletAccount(selectedAccount), // Store only the base account
         host,
       })
       ampli.dappPreauthorized({
@@ -87,8 +94,7 @@ export const handleActionApproval = async (
     case "TRANSACTION": {
       return handleTransactionAction({
         action,
-        networkId,
-        wallet,
+        transactionExecutor,
       })
     }
 
@@ -169,6 +175,7 @@ export const handleActionApproval = async (
         const messageHash = await starknetAccount.hashMessage(typedData)
         await addTransactionHash(actionHash, messageHash)
         const signature = await starknetAccount.signMessage(typedData)
+
         let formattedSignature
 
         if (selectedAccount.type === "multisig") {
@@ -196,12 +203,15 @@ export const handleActionApproval = async (
         } else {
           formattedSignature = stark.signatureToDecimalArray(signature)
         }
-
         return {
           type: "SIGNATURE_SUCCESS",
           data: {
             signature: formattedSignature,
             actionHash,
+            accountAddress: selectedAccount.address,
+            networkId: selectedAccount.networkId,
+            accountId: selectedAccount.id,
+            txHash: messageHash,
           },
         }
       } catch (error) {

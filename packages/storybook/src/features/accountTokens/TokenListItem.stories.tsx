@@ -1,7 +1,7 @@
 import { TokenListItem } from "@argent-x/extension/src/ui/features/accountTokens/TokenListItem"
 import { CellStack } from "@argent/x-ui"
 import type { Meta, StoryObj } from "@storybook/react"
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 
 import { tokenWithBalance, tokenWithSymbol } from "../../tokens"
 

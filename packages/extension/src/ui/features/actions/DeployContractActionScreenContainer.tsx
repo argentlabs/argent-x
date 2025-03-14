@@ -1,7 +1,7 @@
 import { isObject } from "lodash-es"
 import type { FC } from "react"
 import { useCallback } from "react"
-import { Navigate, useNavigate } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 
 import { routes } from "../../../shared/ui/routes"
 import { WithSmartAccountVerified } from "../smartAccount/WithSmartAccountVerified"
@@ -23,23 +23,14 @@ export const DeployContractActionScreenContainer: FC = () => {
       "DeployContractActionScreenContainer used with incompatible action.type",
     )
   }
-  const navigate = useNavigate()
   const onSubmit = useCallback(async () => {
     const result = await approve()
     if (isObject(result) && "error" in result) {
       // stay on error screen
     } else {
       void closePopupIfLastAction()
-      if (isObject(result) && "deployedContractAddress" in result) {
-        navigate(
-          routes.settingsSmartContractDeclareOrDeploySuccess(
-            "deploy",
-            result.deployedContractAddress,
-          ),
-        )
-      }
     }
-  }, [approve, closePopupIfLastAction, navigate])
+  }, [approve, closePopupIfLastAction])
 
   if (!selectedAccount) {
     return <Navigate to={routes.accounts()} />

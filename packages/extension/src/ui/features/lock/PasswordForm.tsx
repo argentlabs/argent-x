@@ -1,4 +1,5 @@
-import { FieldError, icons, Input } from "@argent/x-ui"
+import { InfoCircleSecondaryIcon, BackupPrimaryIcon } from "@argent/x-ui/icons"
+import { FieldError } from "@argent/x-ui"
 import type { FlexProps } from "@chakra-ui/react"
 import {
   Box,
@@ -6,6 +7,7 @@ import {
   InputGroup,
   InputRightElement,
   Text,
+  Input,
 } from "@chakra-ui/react"
 import { isEmpty, isString } from "lodash-es"
 import type { FC, ReactNode } from "react"
@@ -15,8 +17,6 @@ import { Controller, useForm } from "react-hook-form"
 
 import { useAutoFocusInputRef } from "../../hooks/useAutoFocusInputRef"
 import useCapsLockStatus from "../../hooks/useCapsLockStatus"
-
-const { InfoCircleSecondaryIcon, BackupPrimaryIcon } = icons
 
 interface FieldValues {
   password: string

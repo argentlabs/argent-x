@@ -1,4 +1,4 @@
-import { SpacerCell } from "@argent/x-ui"
+import { HeaderCell } from "@argent/x-ui"
 import type { FC } from "react"
 import { AccountEditButtonsLedger } from "./AccountEditButtonsLedger"
 import { ConnectedDappButtonContainer } from "./buttons/ConnectedDappsButton"
@@ -8,6 +8,8 @@ import { PrivateKeyExportButtonContainer } from "./buttons/PrivateKeyExportButto
 import { PublicKeyExportButtonContainer } from "./buttons/PublicKeyExportButton"
 import { SmartAccountToggleButtonContainer } from "./buttons/SmartAccountToggleButton"
 import { ViewOnExplorerButtonContainer } from "./buttons/ViewOnExplorerButton"
+import { SecurityPeriodButtonContainer } from "./buttons/SecurityPeriodButton"
+import { RemoveGuardianButtonContainer } from "./buttons/RemoveGuardianButton"
 import type { WalletAccount } from "../../../../../shared/wallet.model"
 
 export const AccountEditButtons: FC<{
@@ -29,7 +31,14 @@ export const AccountEditButtons: FC<{
   return (
     <>
       <SmartAccountToggleButtonContainer account={account} />
-      <SpacerCell />
+      {account.type === "smart" && (
+        <HeaderCell mt={"4 !important"}>
+          Advanced smart account settings
+        </HeaderCell>
+      )}
+      <SecurityPeriodButtonContainer account={account} />
+      <RemoveGuardianButtonContainer account={account} />
+      <HeaderCell>General account settings</HeaderCell>
       <ViewOnExplorerButtonContainer account={account} />
       <HideOrDeleteAccountButtonContainer account={account} />
       <DeployAccountButtonContainer account={account} />

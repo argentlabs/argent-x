@@ -3,6 +3,7 @@ import type { FC } from "react"
 import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
 import SmartAccountOTPForm from "../smartAccount/SmartAccountOTPForm"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
+import { defaultNetwork } from "../../../shared/network"
 
 interface OnboardingSmartAccountOTPScreenProps {
   email: string
@@ -37,6 +38,7 @@ export const OnboardingSmartAccountOTPScreen: FC<
         onValidationError={setSmartAccountValidationError}
         flow="createSmartAccount"
         pinInputWidth={18}
+        networkId={defaultNetwork.id}
       />
     </OnboardingScreen>
   )

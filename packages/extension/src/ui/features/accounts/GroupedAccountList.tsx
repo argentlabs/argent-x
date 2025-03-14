@@ -4,14 +4,16 @@ import { isEmpty } from "lodash-es"
 import type { FC } from "react"
 
 import type { PendingMultisig } from "../../../shared/multisig/types"
-import type { BaseWalletAccount } from "../../../shared/wallet.model"
-import type { Account } from "./Account"
+import type {
+  BaseWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { AccountListScreenItemContainer } from "./AccountListScreenItemContainer"
 import { MultisigListScreenItemContainer } from "../multisig/MultisigListScreenItemContainer"
 
 export interface GroupedAccountListProps {
   title: string
-  accounts: Account[]
+  accounts: WalletAccount[]
   icon: React.ReactNode
   selectedAccount?: BaseWalletAccount
   returnTo?: string

@@ -1,17 +1,21 @@
-import { B3, L2Bold, MassiveTitle, typographyStyles } from "@argent/x-ui"
+import { B3, L2Bold, MassiveTitle } from "@argent/x-ui"
 import { Box, Center, Skeleton, Tooltip, VStack } from "@chakra-ui/react"
 import type { FC } from "react"
 
-import type { WalletAccount } from "../../../shared/wallet.model"
+import type {
+  MultisigWalletAccount,
+  WalletAccount,
+} from "../../../shared/wallet.model"
 import { StarknetIdOrAddressCopyButton } from "../../components/StarknetIdOrAddressCopyButton"
-import type { Multisig } from "../multisig/Multisig"
 import { PrettyBalanceOrNameForAccount } from "./PrettyBalance"
 import { LedgerStatusTextWithReconnect } from "../navigation/LedgerStatusText"
+
+import { typographyStyles } from "@argent/x-ui/theme"
 
 interface AccountTokensBalanceProps {
   account: WalletAccount
   isLedgerConnected?: boolean
-  multisig?: Multisig
+  multisig?: MultisigWalletAccount
   usesLedgerSigner: boolean
 }
 
@@ -67,9 +71,8 @@ export const AccountTokensBalance: FC<AccountTokensBalanceProps> = ({
       </Tooltip>
       <StarknetIdOrAddressCopyButton
         account={account}
-        pb={1}
-        pt={0.5}
-        {...typographyStyles.B2}
+        p={2}
+        {...typographyStyles.B3}
       />
     </VStack>
   )

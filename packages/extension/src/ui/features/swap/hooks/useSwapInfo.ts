@@ -1,10 +1,12 @@
 import { bigDecimal } from "@argent/x-shared"
 import { isUndefined } from "lodash-es"
+import { useMemo } from "react"
 import type { Trade } from "../../../../shared/swap/model/trade.model"
 import type { Token } from "../../../../shared/token/__new/types/token.model"
 import type { TokenWithOptionalBigIntBalance } from "../../../../shared/token/__new/types/tokenBalance.model"
 import { selectedAccountView } from "../../../views/account"
 import { useView } from "../../../views/implementation/react"
+import { useCurrencyValueToTokenAmount } from "../../accountTokens/tokenPriceHooks"
 import { useTokenOnCurrentNetworkByAddress } from "../../accountTokens/tokens.state"
 import { useTokenBalanceForAccount } from "../../accountTokens/useTokenBalanceForAccount"
 import { Field, useSwapState } from "../state/fields"
@@ -37,6 +39,7 @@ export function useSwapInfo(): SwapInfo {
     typedValue,
     [Field.PAY]: { tokenAddress: payTokenAddress },
     [Field.RECEIVE]: { tokenAddress: receiveTokenAddress },
+    isFiatInput,
   } = useSwapState()
 
   const { userSlippageTolerance } = useUserState()
@@ -54,12 +57,27 @@ export function useSwapInfo(): SwapInfo {
     account: selectedAccount,
   })
 
-  const isExactIn: boolean = independentField === Field.PAY
-  const tokenDecimals = isExactIn ? payToken?.decimals : receiveToken?.decimals
+  /** Determines if the swap is exact input (PAY) or exact output (RECEIVE) */
+  const isExactIn = independentField === Field.PAY
 
-  const parsedAmount = tokenDecimals
-    ? bigDecimal.parseUnits(typedValue, tokenDecimals).value
-    : undefined
+  /** Get the relevant token for decimal calculation */
+  const activeToken = isExactIn ? payToken : receiveToken
+
+  /** Convert fiat value to token amount if needed */
+  const tokenAmount = useCurrencyValueToTokenAmount(typedValue, activeToken)
+
+  const parsedAmount = useMemo(() => {
+    if (!activeToken?.decimals) {
+      return undefined
+    }
+
+    const amount = isFiatInput ? (tokenAmount ?? "") : typedValue
+    try {
+      return bigDecimal.parseUnits(amount, activeToken.decimals).value
+    } catch {
+      return undefined
+    }
+  }, [activeToken?.decimals, isFiatInput, tokenAmount, typedValue])
 
   const { paySwapQuote, paySwapQuoteLoading, paySwapQuoteError } =
     useSwapQuoteForPay({
@@ -87,7 +105,7 @@ export function useSwapInfo(): SwapInfo {
     inputError = SwapInputError.NO_ACCOUNT
   }
 
-  if (!parsedAmount) {
+  if (parsedAmount === undefined) {
     inputError = inputError ?? SwapInputError.NO_AMOUNT
   }
 

@@ -1,6 +1,5 @@
 import { bigNumberishSchema, callSchema } from "@argent/x-shared"
 import type { CompiledContract } from "starknet"
-import { TransactionType } from "starknet"
 import { z } from "zod"
 
 const declareContractPayloadSchema = z.object({
@@ -27,7 +26,7 @@ const universalDeployerContractPayloadSchema = z.object({
 })
 
 export const accountDeployTransactionSchema = z.object({
-  type: z.literal(TransactionType.DEPLOY_ACCOUNT),
+  type: z.literal("DEPLOY_ACCOUNT"),
   payload: deployAccountContractPayloadSchema,
 })
 
@@ -36,21 +35,21 @@ export type AccountDeployTransaction = z.infer<
 >
 
 export const invokeTransactionSchema = z.object({
-  type: z.literal(TransactionType.INVOKE),
+  type: z.literal("INVOKE_FUNCTION"),
   payload: z.array(callSchema).or(callSchema),
 })
 
 export type InvokeTransaction = z.infer<typeof invokeTransactionSchema>
 
 export const declareTransactionSchema = z.object({
-  type: z.literal(TransactionType.DECLARE),
+  type: z.literal("DECLARE"),
   payload: declareContractPayloadSchema,
 })
 
 export type DeclareTransaction = z.infer<typeof declareTransactionSchema>
 
 export const deployTransactionSchema = z.object({
-  type: z.literal(TransactionType.DEPLOY),
+  type: z.literal("DEPLOY"),
   payload: universalDeployerContractPayloadSchema,
 })
 

@@ -33,6 +33,11 @@ import {
   PromoStakingBannerContainer,
   useShowPromoStakingBanner,
 } from "./PromoStakingBannerContainer"
+import { useWstEthBanner, WstEthBannerContainer } from "./WstEthBannerContainer"
+import {
+  LegacyVersionBannerContainer,
+  useShowLegacyVersionBanner,
+} from "./LegacyVersionBannerContainer"
 
 export const useBanners = (account: WalletAccount) => {
   const returnTo = useCurrentPathnameWithQuery()
@@ -47,6 +52,9 @@ export const useBanners = (account: WalletAccount) => {
   const showAccountOwnerBanner = useShowAccountOwnerBanner(account)
   const showMultisigBanner = useShowMultisigBanner(account)
   const showPromoStakingBanner = useShowPromoStakingBanner()
+  const showLegacyVersionBanner = useShowLegacyVersionBanner(account)
+
+  const showWstETHBanner = useWstEthBanner(account)
 
   const banners = useMemo(() => {
     const banners: ReactNode[] = []
@@ -61,7 +69,7 @@ export const useBanners = (account: WalletAccount) => {
         banners.push(<StatusMessageBannerContainer />)
       }
     }
-    if (showUpgradeBanner) {
+    if (showUpgradeBanner && !showLegacyVersionBanner) {
       banners.push(<UpgradeBannerContainer account={account} />)
     }
     if (showDeprecatedBanner) {
@@ -80,9 +88,19 @@ export const useBanners = (account: WalletAccount) => {
     if (showMultisigBanner) {
       banners.push(<MultisigBannerContainer account={account} />)
     }
+
+    if (showWstETHBanner) {
+      banners.push(<WstEthBannerContainer account={account} />)
+    }
+
     if (showPromoStakingBanner) {
       banners.push(<PromoStakingBannerContainer />)
     }
+
+    if (showLegacyVersionBanner) {
+      banners.unshift(<LegacyVersionBannerContainer account={account} />)
+    }
+
     return banners
   }, [
     showEscapeBanner,
@@ -91,7 +109,9 @@ export const useBanners = (account: WalletAccount) => {
     showDeprecatedBanner,
     showAccountOwnerBanner,
     showMultisigBanner,
+    showWstETHBanner,
     showPromoStakingBanner,
+    showLegacyVersionBanner,
     account,
     isCriticalStatusMessage,
     returnTo,

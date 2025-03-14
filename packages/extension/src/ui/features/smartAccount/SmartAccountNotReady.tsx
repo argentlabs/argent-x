@@ -1,6 +1,6 @@
-import { FlowHeader, icons } from "@argent/x-ui"
+import { ShieldSecondaryIcon } from "@argent/x-ui/icons"
+import { FlowHeader } from "@argent/x-ui"
 import type { FC } from "react"
-const { ShieldSecondaryIcon } = icons
 interface SmartAccountNotReadyProps {
   needsUpgrade?: boolean
 }

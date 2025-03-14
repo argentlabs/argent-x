@@ -1,5 +1,5 @@
 import { assertNever } from "../shared/utils/assertNever"
-import type { WindowMessageType } from "../shared/messages"
+import type { WindowMessageType } from "../shared/messages/types"
 import { getProvider } from "../shared/network/provider"
 import { disconnectAccount } from "./account"
 import { ArgentXAccount } from "./ArgentXAccount"
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => attachHandler())
 document.addEventListener("readystatechange", () => attachHandler())
 
 const handleConnect = async (account: WalletAccount, silent: boolean) => {
-  const starknet = window.starknet as BackwardsCompatibleStarknetWindowObject
+  const starknet = window.starknet as any
   const walletAccount =
     await inpageMessageClient.dappMessaging.connectDapp.mutate({
       origin: window.location.origin,
@@ -89,7 +89,7 @@ window.addEventListener(
       return
     }
 
-    const starknet = window.starknet as BackwardsCompatibleStarknetWindowObject
+    const starknet = window.starknet as any
 
     if (
       data.type === "CONNECT_ACCOUNT_RES" ||

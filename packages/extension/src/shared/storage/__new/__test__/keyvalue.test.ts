@@ -69,7 +69,10 @@ describe.each<TestDataType>([
 
       await adaptedStore.set({ foo: "bar" })
 
-      expect(callback).toHaveBeenCalledWith({ foo: "bar", bar: 3 })
+      expect(callback).toHaveBeenCalledWith({
+        oldValue: { foo: null, bar: 3 },
+        newValue: { foo: "bar", bar: 3 },
+      })
     })
 
     it("should batch multiple changes into one callback", async () => {
@@ -81,7 +84,10 @@ describe.each<TestDataType>([
       await adaptedStore.set({ foo: "baz", bar: 4 })
 
       expect(callback).toHaveBeenCalledTimes(1)
-      expect(callback).toHaveBeenCalledWith({ foo: "baz", bar: 4 })
+      expect(callback).toHaveBeenCalledWith({
+        oldValue: { foo: "bar", bar: 3 },
+        newValue: { foo: "baz", bar: 4 },
+      })
     })
 
     it("should subscribe to the store with initially undefined value", async () => {
@@ -91,7 +97,10 @@ describe.each<TestDataType>([
       await adaptedStore.set({ baz: "foo" })
 
       expect(callback).toHaveBeenCalledTimes(1)
-      expect(callback).toHaveBeenCalledWith({ foo: "baz", bar: 4, baz: "foo" })
+      expect(callback).toHaveBeenCalledWith({
+        oldValue: { foo: "baz", bar: 4 },
+        newValue: { foo: "baz", bar: 4, baz: "foo" },
+      })
     })
   },
 )

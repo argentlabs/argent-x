@@ -10,6 +10,9 @@ export const atomFromKeyValueStore = <
 ) => {
   return atomWithSubscription(
     () => store.get(key),
-    (next) => store.subscribe(key, () => store.get(key).then(next)),
+    // storage.get can be either a Promise or a direct value,
+    // wrap the value in Promise.resolve() to handle both cases
+    (next) =>
+      store.subscribe(key, () => Promise.resolve(store.get(key)).then(next)),
   )
 }

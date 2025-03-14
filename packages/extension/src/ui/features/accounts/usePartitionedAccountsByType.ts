@@ -5,13 +5,13 @@ import {
   sortMultisigAccounts,
   sortStandardAccounts,
 } from "../../../shared/utils/accountsMultisigSort"
-import type { Account } from "./Account"
+import type { WalletAccount } from "../../../shared/wallet.model"
 
-export const getPartitionedAccountsByType = (accounts: Account[]) => {
+export const getPartitionedAccountsByType = (accounts: WalletAccount[]) => {
   const partitionedAccounts = accounts.reduce<{
-    multisig: Account[]
-    standard: Account[]
-    imported: Account[]
+    multisig: WalletAccount[]
+    standard: WalletAccount[]
+    imported: WalletAccount[]
   }>(
     (acc, account) => {
       if (account.type === "multisig") {
@@ -33,6 +33,6 @@ export const getPartitionedAccountsByType = (accounts: Account[]) => {
   }
 }
 
-export const usePartitionedAccountsByType = (accounts: Account[]) => {
+export const usePartitionedAccountsByType = (accounts: WalletAccount[]) => {
   return useMemo(() => getPartitionedAccountsByType(accounts), [accounts])
 }

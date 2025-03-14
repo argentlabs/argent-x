@@ -1,8 +1,7 @@
-/* eslint-disable react/prop-types */
+import { LockPrimaryIcon } from "@argent/x-ui/icons"
 import {
   Button,
   H5,
-  icons,
   P2,
   ScrollContainer,
   StickyGroup,
@@ -16,8 +15,6 @@ import Measure from "react-measure"
 
 import type { WalletAccount } from "../../../../../shared/wallet.model"
 import { formatTruncatedAddress } from "@argent/x-shared"
-
-const { LockPrimaryIcon } = icons
 
 export interface ConfirmPageProps {
   onSubmit?: (e: FormEvent<HTMLFormElement>) => void

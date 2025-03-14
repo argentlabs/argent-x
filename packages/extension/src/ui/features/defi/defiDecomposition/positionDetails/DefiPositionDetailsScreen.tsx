@@ -1,10 +1,6 @@
-import { ensureArray, isConcentratedLiquidityPosition } from "@argent/x-shared"
-import {
-  BarBackButton,
-  CellStack,
-  NavigationBar,
-  scrollbarStyle,
-} from "@argent/x-ui"
+import { ensureArray } from "@argent/x-shared"
+import { BarBackButton, CellStack, NavigationBar } from "@argent/x-ui"
+import { scrollbarStyle } from "@argent/x-ui/theme"
 import { Box, Flex, Tab, TabList, Tabs } from "@chakra-ui/react"
 
 import {
@@ -18,6 +14,7 @@ import {
 import {
   isCollateralizedDebtBorrowingPosition,
   isCollateralizedDebtLendingPosition,
+  isConcentratedLiquidityPosition,
   isDelegatedTokensPosition,
   isStakingPosition,
   isStrkDelegatedStakingPosition,
@@ -34,7 +31,7 @@ import { DefiPositionAlertBanner } from "./DefiPositionAlertBanner"
 import { useTokenActivities } from "../../../tokenDetails/hooks/useTokenActivities"
 import { ActivityListContainer } from "../../../accountActivity/ActivityListContainer"
 import { useView } from "../../../../views/implementation/react"
-import { liquidityTokensForPositionView } from "../../../../views/investments"
+import { investmentPositionViewFindByIdAtom } from "../../../../views/investments"
 
 interface PositionDetailsScreenProps {
   onBack: () => void
@@ -105,9 +102,10 @@ export const DefiPositionDetailsScreen: FC<PositionDetailsScreenProps> = ({
       isCollateralizedDebtLendingPosition(position)
     ) {
       amount = position.token.usdValue
-    } else if (isConcentratedLiquidityPosition(position)) {
-      amount = position.totalUsdValue
-    } else if (isCollateralizedDebtBorrowingPosition(position)) {
+    } else if (
+      isConcentratedLiquidityPosition(position) ||
+      isCollateralizedDebtBorrowingPosition(position)
+    ) {
       amount = position.totalUsdValue
     }
     return amount
@@ -172,9 +170,10 @@ const PositionActivities: FC<{
   scrollContainerRef: HTMLElement | undefined
   position: ParsedPositionWithUsdValue
 }> = ({ position, account, scrollContainerRef }) => {
-  const liquidTokens = useView(
-    liquidityTokensForPositionView({ account, position }),
+  const investmentPosition = useView(
+    investmentPositionViewFindByIdAtom({ positionId: position.id }),
   )
+  const liquidTokens = ensureArray(investmentPosition?.liquidityTokens)
 
   // This will have to be changed when we will support activities for positions with multiple tokens
   const liquidTokenAddress =

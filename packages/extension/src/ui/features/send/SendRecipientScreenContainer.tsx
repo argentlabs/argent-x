@@ -1,9 +1,9 @@
 import {
   addressInputSchema,
   addressOrDomainInputSchema,
-  isStarknetDomainName,
   normalizeAddressOrDomain,
 } from "@argent/x-shared"
+import { starknetId } from "starknet"
 import { useDisclosure } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { FC } from "react"
@@ -31,7 +31,6 @@ import { useFilteredContacts } from "./useFilteredContacts"
 import { useGetAddressFromDomainNameInput } from "./useGetAddressFromDomainName"
 import { selectedNetworkIdView } from "../../views/network"
 import { usePartitionedAccountsByType } from "../accounts/usePartitionedAccountsByType"
-import { mapWalletAccountsToAccounts } from "../accounts/accounts.state"
 
 export const SendRecipientScreenContainer: FC = () => {
   const returnTo = useCurrentPathnameWithQuery()
@@ -69,7 +68,7 @@ export const SendRecipientScreenContainer: FC = () => {
 
   const selectAddress = useCallback(
     (address: string) => {
-      const isStarknetDomainNameQuery = isStarknetDomainName(query)
+      const isStarknetDomainNameQuery = starknetId.isStarkDomain(query)
       if (isStarknetDomainNameQuery && (isLoading || !starknetAddressIsValid)) {
         return
       }
@@ -127,9 +126,7 @@ export const SendRecipientScreenContainer: FC = () => {
     : accounts.length > 1
 
   const { multisigAccounts, importedAccounts, standardAccounts } =
-    usePartitionedAccountsByType(
-      mapWalletAccountsToAccounts(allFilteredAccounts),
-    )
+    usePartitionedAccountsByType(allFilteredAccounts)
 
   const conditionalStandardAccounts = useMemo(() => {
     return includeSelfAccount
@@ -154,11 +151,12 @@ export const SendRecipientScreenContainer: FC = () => {
   }, [query, reset, starknetAddress, starknetAddressIsValid])
 
   const placeholderValidAddress = useMemo(() => {
-    const isStarknetDomainNameQuery = isStarknetDomainName(query)
+    const isStarknetDomainNameQuery = starknetId.isStarkDomain(query)
     if (
       !addressOrDomainInputSchema.safeParse(query).success ||
       (isStarknetDomainNameQuery && isLoading) ||
-      (isStarknetDomainNameQuery && !starknetAddressIsValid)
+      (isStarknetDomainNameQuery && !starknetAddressIsValid) ||
+      (!isStarknetDomainNameQuery && query.includes("."))
     ) {
       return null
     }

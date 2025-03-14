@@ -1,11 +1,9 @@
-import { icons } from "@argent/x-ui"
+import { UpgradeSecondaryIcon } from "@argent/x-ui/icons"
 import { Spinner } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import type { BannerProps } from "./Banner"
 import { Banner } from "./Banner"
-
-const { UpgradeSecondaryIcon } = icons
 
 export interface BannerRouteState {
   from?: string

@@ -1,10 +1,9 @@
-import { Button, FlowHeader, icons, P2 } from "@argent/x-ui"
+import { NoShieldSecondaryIcon } from "@argent/x-ui/icons"
+import { Button, FlowHeader, P2 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 
 import { ESCAPE_SECURITY_PERIOD_DAYS } from "../../../../shared/account/details/escape.model"
-
-const { NoShieldSecondaryIcon } = icons
 
 interface EscapeGuardianReadyProps {
   accountGuardianIsSelf: boolean | null

@@ -1,4 +1,5 @@
-import { icons, P3 } from "@argent/x-ui"
+import { WalletSecondaryIcon, ResetPrimaryIcon } from "@argent/x-ui/icons"
+import { P3 } from "@argent/x-ui"
 import { Circle, Flex, Link, SimpleGrid } from "@chakra-ui/react"
 import type { FC, MouseEventHandler } from "react"
 
@@ -9,8 +10,6 @@ import {
   ARGENT_X_LEGAL_TERMS_OF_SERVICE_URL,
 } from "../../../shared/api/constants"
 import { IS_DEV } from "../../../shared/utils/dev"
-
-const { WalletSecondaryIcon, ResetPrimaryIcon } = icons
 
 interface OnboardingStartScreenProps {
   /** Called when user clicks to create a new wallet */

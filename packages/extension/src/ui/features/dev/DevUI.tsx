@@ -1,4 +1,11 @@
-import { TabBarHeight, icons } from "@argent/x-ui"
+import {
+  DropdownDownIcon,
+  SettingsSecondaryIcon,
+  RefreshPrimaryIcon,
+  CheckmarkSecondaryIcon,
+} from "@argent/x-ui/icons"
+
+import { TabBarHeight } from "@argent/x-ui"
 import {
   Button,
   Flex,
@@ -10,6 +17,7 @@ import {
 } from "@chakra-ui/react"
 import { DevTools, useAtomsDebugValue } from "jotai-devtools"
 import type { FC } from "react"
+import { useEffect } from "react"
 
 import { devStore } from "../../../shared/dev/store"
 import { useGetSetKeyValueStorage } from "../../hooks/useStorage"
@@ -17,16 +25,22 @@ import { useHardReload, useSoftReload } from "../../services/resetAndReload"
 import { useOpenExtensionInTab } from "../browser/tabs"
 
 import "jotai-devtools/styles.css"
-
-const {
-  DropdownDownIcon,
-  SettingsSecondaryIcon,
-  RefreshPrimaryIcon,
-  CheckmarkSecondaryIcon,
-} = icons
+import { setupLocationLogger } from "./locationLogger"
+import i18n from "../../i18n"
+import { I18N_ENABLED, availableLng } from "../../../shared/i18n/constants"
 
 function UseAtomsDebugValue() {
   useAtomsDebugValue()
+  return null
+}
+
+function UseLocationLogger() {
+  useEffect(() => {
+    const cleanup = setupLocationLogger()
+    return () => {
+      cleanup()
+    }
+  }, [])
   return null
 }
 
@@ -46,11 +60,14 @@ export const DevUI: FC = () => {
     useGetSetKeyValueStorage(devStore, "atomsDevToolsEnabled")
   const [atomsDebugValueEnabled, setAtomsDebugValueEnabled] =
     useGetSetKeyValueStorage(devStore, "atomsDebugValueEnabled")
+  const [locationLoggerEnabled, setLocationLoggerEnabled] =
+    useGetSetKeyValueStorage(devStore, "locationLoggerEnabled")
 
   return (
     <>
       {atomsDevToolsEnabled && <DevTools />}
       {atomsDebugValueEnabled && <UseAtomsDebugValue />}
+      {locationLoggerEnabled && <UseLocationLogger />}
       <Flex
         gap={2}
         m={2}
@@ -94,6 +111,18 @@ export const DevUI: FC = () => {
                 }}
               >
                 Open in Extended View
+              </MenuItem>
+              <MenuItem
+                icon={
+                  locationLoggerEnabled ? (
+                    <CheckmarkSecondaryIcon />
+                  ) : (
+                    <UncheckedIcon />
+                  )
+                }
+                onClick={() => setLocationLoggerEnabled(!locationLoggerEnabled)}
+              >
+                Log URL changes
               </MenuItem>
             </MenuGroup>
             <MenuGroup title="Jotai">
@@ -140,6 +169,32 @@ export const DevUI: FC = () => {
             <MenuItem onClick={softReload}>Reload React UI</MenuItem>
           </MenuList>
         </Menu>
+        {I18N_ENABLED && (
+          <Menu size={"2xs"}>
+            <MenuButton as={Button} size="2xs" rightIcon={<DropdownDownIcon />}>
+              {i18n.language}
+            </MenuButton>
+            <MenuList>
+              {availableLng.map((lng) => (
+                <MenuItem
+                  key={lng}
+                  icon={
+                    i18n.language === lng ? (
+                      <CheckmarkSecondaryIcon />
+                    ) : (
+                      <UncheckedIcon />
+                    )
+                  }
+                  onClick={() => {
+                    void i18n.changeLanguage(lng)
+                  }}
+                >
+                  {lng}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+        )}
       </Flex>
     </>
   )

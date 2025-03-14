@@ -22,7 +22,10 @@ import {
 import { getActiveFromNow } from "../../../../shared/utils/getActiveFromNow"
 
 export type LiveAccountEscapeProps = Escape &
-  ReturnType<typeof getActiveFromNow>
+  ReturnType<typeof getActiveFromNow> & {
+    expiresAt: number
+    expiresFromNowMs: number
+  }
 
 /** returns escape attributes including live countdown */
 
@@ -37,9 +40,16 @@ export const useLiveAccountEscape = (account?: WalletAccount) => {
       }
       const { activeAt, type } = account.escape
       const activeFromNow = getActiveFromNow(activeAt)
+
+      const { expiresFromNowMs, expiresAt } = getAccountEscapeExpiry(
+        account.escape,
+      )
+
       return {
         activeAt,
         type,
+        expiresAt,
+        expiresFromNowMs,
         ...activeFromNow,
       }
     },
@@ -48,6 +58,19 @@ export const useLiveAccountEscape = (account?: WalletAccount) => {
     },
   )
   return liveAccountEscape
+}
+
+export const getAccountEscapeExpiry = (escape: Escape) => {
+  const { activeAt } = escape
+  // expires after 7 days from activeAt in ms
+  const expiresAt = activeAt + 60 * 60 * 24 * 7
+  const { activeFromNowMs: expiresFromNowMs } = getActiveFromNow(expiresAt)
+  return { expiresAt, expiresFromNowMs }
+}
+
+export const hasAccountEscapeExpired = (escape: Escape) => {
+  const { expiresFromNowMs } = getAccountEscapeExpiry(escape)
+  return expiresFromNowMs <= 0
 }
 
 // need to be global because the react state does not update fast enough in the useAccountEscapeWarning hook, and the warning is shown twice
@@ -66,7 +89,9 @@ export const useAccountEscapeWarning = () => {
   const accountWithNewEscape = useMemo(() => {
     return accountsWithEscape.find(
       (account) =>
-        !escapeWarningKeys.includes(getEscapeWarningStoreKey(account)),
+        account.escape &&
+        !escapeWarningKeys.includes(getEscapeWarningStoreKey(account)) &&
+        !hasAccountEscapeExpired(account.escape),
     )
   }, [escapeWarningKeys, accountsWithEscape])
 

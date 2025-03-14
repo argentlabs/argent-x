@@ -18,6 +18,7 @@ import type { Hex } from "@argent/x-shared"
 import { addressSchema, hexSchema } from "@argent/x-shared"
 import { getAccountIdentifier } from "../../utils/accountIdentifier"
 import type { IAccountService } from "../../account/service/accountService/IAccountService"
+import { getAccountMeta } from "../../accountNameGenerator"
 
 vi.mock("../../network/makeSafeNetworks", () => ({
   makeSafeNetworks: vi.fn().mockImplementation((networks) => networks),
@@ -278,7 +279,7 @@ describe("ImportAccountSharedService", () => {
         address: mockValidationResult.result.address,
         networkId: mockValidationResult.result.networkId,
         signer,
-        name: "Imported Account 1",
+        name: getAccountMeta(id, "imported").name,
         type: "imported",
         network: mockNetwork,
         needsDeploy: false,
@@ -324,7 +325,7 @@ describe("ImportAccountSharedService", () => {
         "password",
       )
 
-      expect(result.name).toBe("Imported Account 3")
+      expect(result.name).toEqual(getAccountMeta(result.id, "imported").name)
     })
 
     it("should throw an error if storeEncryptedKey fails", async () => {

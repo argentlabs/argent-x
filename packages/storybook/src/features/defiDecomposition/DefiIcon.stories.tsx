@@ -1,17 +1,15 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
+import type { ParsedPosition } from "@argent-x/extension/src/shared/defiDecomposition/schema"
 import {
   isCollateralizedDebtPosition,
   isConcentratedLiquidityPosition,
   isDelegatedTokensPosition,
   isStakingPosition,
   isStrkDelegatedStakingPosition,
-  ParsedPosition,
 } from "@argent-x/extension/src/shared/defiDecomposition/schema"
-import {
-  DefiIcon,
-  DefiIconProps,
-} from "@argent-x/extension/src/ui/features/defi/defiDecomposition/DefiIcon"
+import type { DefiIconProps } from "@argent-x/extension/src/ui/features/defi/defiDecomposition/DefiIcon"
+import { DefiIcon } from "@argent-x/extension/src/ui/features/defi/defiDecomposition/DefiIcon"
 import { storybookCellStackDecorator } from "@argent/x-ui"
 import { parsedDefiDecomposition } from "./__fixtures__/parsedDefiDecomposition"
 

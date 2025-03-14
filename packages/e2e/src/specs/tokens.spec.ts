@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
 
 import test from "../test"
-import { transferTokens } from "../utils"
+import { requestFunds } from "../utils"
 
 const usdcAmount = "0.000002"
 const ethAmount = "0.00000001"
@@ -19,7 +19,7 @@ test.describe("Tokens", { tag: "@tx" }, () => {
       expect(extension.account.currentBalance("USDC")).toBeHidden(),
     ])
 
-    await transferTokens(+usdcAmount, accountAddresses[0], "USDC")
+    await requestFunds(accountAddresses[0], +usdcAmount, "USDC")
     //ensure that balance is updated
     await Promise.all([
       expect(extension.account.currentBalance("ETH")).toHaveText(

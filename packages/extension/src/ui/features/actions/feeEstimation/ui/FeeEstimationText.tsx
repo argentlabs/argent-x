@@ -1,9 +1,11 @@
-import { B3, icons, L2Bold, P3 } from "@argent/x-ui"
+import {
+  InfoCircleSecondaryIcon,
+  ChevronRightSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { B3, L2, L2Bold, P3 } from "@argent/x-ui"
 import type { ThemingProps } from "@chakra-ui/react"
 import { Center, Flex, Img, Spinner, Text, Tooltip } from "@chakra-ui/react"
 import type { FC, ReactNode } from "react"
-
-const { InfoCircleSecondaryIcon, ChevronRightSecondaryIcon } = icons
 
 export interface FeeEstimationTextProps extends ThemingProps<"Flex"> {
   allowFeeTokenSelection?: boolean
@@ -58,7 +60,7 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
                   _hover={{ color: "white" }}
                   aria-label={`Information about ${title}`}
                 >
-                  <InfoCircleSecondaryIcon />
+                  <InfoCircleSecondaryIcon mt={0.5} />
                 </Text>
               </Tooltip>
             )}
@@ -68,14 +70,7 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
         {isLoading ? (
           <Spinner size={"sm"} />
         ) : (
-          <Flex
-            data-testid="fee-token-picker"
-            gap="2"
-            alignItems="center"
-            cursor={allowFeeTokenSelection ? "pointer" : "default"}
-            onClick={() => allowFeeTokenSelection && onOpenFeeTokenPicker?.()}
-            role="group"
-          >
+          <Flex data-testid="fee-token-picker" gap="2" alignItems="center">
             <Flex gap="0.5" alignItems="end" direction="column" flexWrap="wrap">
               {primaryText && (
                 <Flex gap="1" alignItems="center" justifyContent="center">
@@ -91,22 +86,22 @@ export const FeeEstimationText: FC<FeeEstimationTextProps> = ({
                 </Flex>
               )}
               {secondaryText && (
-                <L2Bold cursor="inherit" color={`${colorScheme}.300`}>
+                <L2 cursor="inherit" color="text-secondary" fontWeight="medium">
                   {secondaryText}
-                </L2Bold>
+                </L2>
               )}
             </Flex>
             {allowFeeTokenSelection && (
               <Center
                 rounded={"lg"}
-                bg={`${colorScheme}.700`}
+                bg="icon-background"
                 p={1.5}
                 alignSelf={"stretch"}
-                _groupHover={{
-                  bg: `${colorScheme}.600`,
-                }}
+                _hover={{ bg: "white.30" }}
                 transitionProperty="common"
                 transitionDuration="fast"
+                cursor="pointer"
+                onClick={onOpenFeeTokenPicker}
               >
                 <ChevronRightSecondaryIcon />
               </Center>

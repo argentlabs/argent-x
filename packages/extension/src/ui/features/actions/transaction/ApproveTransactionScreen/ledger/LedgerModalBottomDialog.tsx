@@ -1,4 +1,8 @@
-import { CopyTooltip, H4, icons, L1Bold, P2, P3 } from "@argent/x-ui"
+import {
+  WarningCircleSecondaryIcon,
+  CrossSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { CopyTooltip, H4, L1Bold, P2, P3 } from "@argent/x-ui"
 import type { CenterProps } from "@chakra-ui/react"
 import { Button, Center, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
 import type { FC, ReactEventHandler, ReactNode } from "react"
@@ -247,8 +251,6 @@ import {
   Flex,
   useModalContext,
 } from "@chakra-ui/react"
-
-const { WarningCircleSecondaryIcon, CrossSecondaryIcon } = icons
 
 export interface ModalBottomDialogProps extends DrawerProps {
   disableCloseButton?: boolean

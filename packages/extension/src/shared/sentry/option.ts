@@ -42,7 +42,6 @@ export const baseSentryOptions: BrowserClientOptions = {
   integrations,
   environment,
   release,
-  autoSessionTracking: false, // don't want to track user sessions.
 }
 
 function getRelease() {

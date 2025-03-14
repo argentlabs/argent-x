@@ -13,8 +13,10 @@ import type { ActionItem } from "../../../../../shared/actionQueue/types"
 import type { IActivityCacheService } from "../../../../../shared/activity/cache/IActivityCacheService"
 import type { ActivitiesPayload } from "../../../../../shared/activity/types"
 import { transformTransaction } from "../../../../../shared/activity/utils/transform"
+import { buildBasicActivitySummary } from "../../../../../shared/activity/utils/transform/activity/buildActivitySummary"
 import { getTransactionSubtitle } from "../../../../../shared/activity/utils/transform/transaction/getTransactionSubtitle"
 import type { IAddressService } from "../../../../../shared/address/IAddressService"
+import type { IKnownDappService } from "../../../../../shared/knownDapps/IKnownDappService"
 import {
   TransactionCreatedForMultisigPendingTransaction,
   type MultisigEmitterEvents,
@@ -35,11 +37,10 @@ import {
 import type { BaseWalletAccount } from "../../../../../shared/wallet.model"
 import {
   TransactionCreatedForAction,
+  TransactionIntentCreatedForAction,
   type IBackgroundActionService,
 } from "../../../action/IBackgroundActionService"
 import { Activities, type IActivityService } from "../../IActivityService"
-import { buildBasicActivitySummary } from "../../../../../shared/activity/utils/transform/activity/buildActivitySummary"
-import type { IKnownDappService } from "../../../../../shared/knownDapps/IKnownDappService"
 import { knownDappToTargetDappSchema } from "../../schema"
 
 export class ActivityCacheWorker {
@@ -58,6 +59,11 @@ export class ActivityCacheWorker {
 
     this.actionService.emitter.on(TransactionCreatedForAction, (...args) =>
       this.transactionCreatedForAction(...args),
+    )
+
+    this.actionService.emitter.on(
+      TransactionIntentCreatedForAction,
+      (...args) => this.executeFromOutsideCreatedForAction(...args),
     )
 
     this.transactionsRepo.subscribe((...args) =>
@@ -187,6 +193,55 @@ export class ActivityCacheWorker {
         networkId,
         id,
       }
+      await this.activityCacheService.upsertActivities({
+        account,
+        activities: [nativeActivity],
+      })
+    }
+  }
+
+  // This is a temporary activity to show the user that a transaction intent has been received
+  // Will be replaced with the activity from BE once it's emitted
+  async executeFromOutsideCreatedForAction({
+    actionHash,
+    accountAddress,
+    networkId,
+    accountId,
+    txHash,
+  }: {
+    actionHash: ActionHash
+    accountAddress: string
+    networkId: string
+    accountId: string
+    txHash: string
+  }) {
+    const action = await this.actionQueue.get(actionHash)
+
+    /** create a NativeActivity item by merging the action and the transation if the action created a transaction */
+    if (action?.meta?.transactionReview) {
+      const status = "pending"
+      const submitted = Date.now()
+      const lastModified = Date.now()
+      const meta = {
+        ...action?.meta,
+        title: "Transaction intent",
+        isExecuteFromOutside: true,
+      }
+      const nativeActivity = createNativeActivity({
+        simulateAndReview: action?.meta.transactionReview,
+        meta,
+        transaction: { hash: txHash }, // since there is no transaction hash yet, we use the action hash
+        status,
+        submitted,
+        lastModified,
+      })
+
+      const account: BaseWalletAccount = {
+        address: accountAddress,
+        networkId,
+        id: accountId,
+      }
+
       await this.activityCacheService.upsertActivities({
         account,
         activities: [nativeActivity],

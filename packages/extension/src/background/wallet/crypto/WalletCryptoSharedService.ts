@@ -9,14 +9,13 @@ import {
 import { defaultNetwork } from "../../../shared/network"
 import type { WalletRecoverySharedService } from "../recovery/WalletRecoverySharedService"
 import type { WalletSessionService } from "../session/WalletSessionService"
-import type { WalletSession } from "../session/walletSession.model"
 import type { IWalletDeploymentService } from "../deployment/IWalletDeploymentService"
-import type { IObjectStore } from "../../../shared/storage/__new/interface"
 import { walletToKeystore } from "../utils"
+import type { ISecretStorageService } from "../session/interface"
 
 export class WalletCryptoSharedService {
   constructor(
-    private readonly sessionStore: IObjectStore<WalletSession | null>,
+    private readonly secretStorageService: ISecretStorageService,
     private readonly sessionService: WalletSessionService,
     private readonly backupService: WalletBackupService,
     private readonly recoverySharedService: WalletRecoverySharedService,
@@ -48,14 +47,15 @@ export class WalletCryptoSharedService {
   }
 
   public async getSeedPhrase(): Promise<string> {
-    const session = await this.sessionStore.get()
+    const decrypted = await this.secretStorageService.decrypt()
     const backup = await this.backupService.getBackup()
 
-    if (!(await this.sessionService.isSessionOpen()) || !session || !backup) {
+    if (!(await this.sessionService.isSessionOpen()) || !backup || !decrypted) {
       throw new Error("Session is not open")
     }
 
-    const keystore = await decryptKeystoreJson(backup, session.password)
+    const { password } = decrypted
+    const keystore = await decryptKeystoreJson(backup, password)
 
     if (!keystore.mnemonic?.entropy) {
       throw new Error("No entropy found in keystore")

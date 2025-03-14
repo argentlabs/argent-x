@@ -1,4 +1,3 @@
-import type { TokenWithBalance } from "@argent/x-shared"
 import {
   formatAddress,
   isAddress,
@@ -34,10 +33,7 @@ import { useView } from "../../views/implementation/react"
 import { tokenBalancesForAccountAndTokenView } from "../../views/tokenBalances"
 import { useTokenUnitAmountToCurrencyValue } from "../accountTokens/tokenPriceHooks"
 import { useToken } from "../accountTokens/tokens.state"
-import { useFeeTokenBalances } from "../accountTokens/useFeeTokenBalance"
 import { useMaxFeeEstimateForTransfer } from "../accountTokens/useMaxFeeForTransfer"
-import { useFeeTokenSelection } from "../actions/transactionV2/useFeeTokenSelection"
-import { useDefaultFeeToken } from "../actions/useDefaultFeeToken"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
 import { amountInputSchema } from "./amountInput"
 import type { SendAmountAndAssetScreenProps } from "./SendAmountAndAssetScreen"
@@ -120,35 +116,11 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
 
   const currencyValue = useTokenUnitAmountToCurrencyValue(token, inputAmount)
 
-  const defaultFeeToken = useDefaultFeeToken(account)
-  const feeTokens = useFeeTokenBalances(account)
-
-  const [feeToken, setFeeToken] = useState<TokenWithBalance>(defaultFeeToken)
-  const [isFeeTokenSelectionReady, setIsFeeTokenSelectionReady] =
-    useState(false)
-
   const {
-    data: maxFee,
+    data: { maxFee, feeTokenAddress },
     error: maxFeeError,
     isValidating: maxFeeLoading,
-  } = useMaxFeeEstimateForTransfer(
-    feeToken?.address,
-    tokenAddress,
-    account,
-    balance,
-    fetchMaxFee,
-  )
-
-  useFeeTokenSelection({
-    isFeeTokenSelectionReady,
-    setIsFeeTokenSelectionReady,
-    feeToken,
-    setFeeToken,
-    account,
-    fee: maxFee,
-    defaultFeeToken,
-    feeTokens,
-  })
+  } = useMaxFeeEstimateForTransfer(tokenAddress, account, balance, fetchMaxFee)
 
   const onSubmit = useCallback(async () => {
     if (token && recipientAddress && inputAmount) {
@@ -193,15 +165,17 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
   }, [])
 
   useEffect(() => {
-    if (balance && nonNullable(maxFee)) {
+    if (fetchMaxFee && balance && nonNullable(maxFee)) {
       const tokenDecimals = token.decimals
       const tokenBalance = formatTokenBalance(Infinity, balance, tokenDecimals)
 
       const deductMaxFeeFromMaxAmount = isEqualAddress(
         tokenAddress,
-        feeToken.address,
+        feeTokenAddress,
       )
-      const maxAmount = deductMaxFeeFromMaxAmount ? balance - maxFee : balance
+      // Deduct maxFee + 10% of maxFee
+      const deductedAmount = balance - maxFee - (maxFee * 10n) / 100n
+      const maxAmount = deductMaxFeeFromMaxAmount ? deductedAmount : balance
       const formattedMaxAmount = formatUnits(maxAmount, tokenDecimals)
 
       setValue("isMaxSend", true)
@@ -215,7 +189,8 @@ const GuardedSendAmountAndAssetTokenScreenContainer: FC<
     token.decimals,
     setValue,
     tokenAddress,
-    feeToken.address,
+    feeTokenAddress,
+    fetchMaxFee,
   ])
 
   const parsedInputAmount = parseAmount(

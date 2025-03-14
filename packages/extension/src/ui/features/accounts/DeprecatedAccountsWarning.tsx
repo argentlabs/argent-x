@@ -1,9 +1,8 @@
-import { H5, icons } from "@argent/x-ui"
+import { UpgradeSecondaryIcon } from "@argent/x-ui/icons"
+import { H5 } from "@argent/x-ui"
 import { Flex, HStack } from "@chakra-ui/react"
 // FIXME: remove when depricated accounts do not longer work
 import type { FC } from "react"
-
-const { UpgradeSecondaryIcon } = icons
 
 export const DeprecatedAccountsWarning: FC = () => (
   <Flex

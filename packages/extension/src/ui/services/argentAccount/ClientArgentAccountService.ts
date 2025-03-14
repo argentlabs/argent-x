@@ -29,14 +29,30 @@ export class ClientArgentAccountService implements IClientArgentAccountService {
   }
 
   validateAccount(flow: Flow) {
-    return this.trpcMessageClient.argentAccount.validateAccount.mutate(flow)
+    return this.trpcMessageClient.argentAccount.validateAccount.mutate({
+      flow,
+    })
   }
 
-  isTokenExpired() {
-    return this.trpcMessageClient.argentAccount.isTokenExpired.query()
+  isTokenExpired(extra: { initiator: string }) {
+    return this.trpcMessageClient.argentAccount.isTokenExpired.query(extra)
   }
 
   logout() {
     return this.trpcMessageClient.argentAccount.logout.mutate()
+  }
+
+  updateSecurityPeriod(periodInSeconds: number) {
+    return this.trpcMessageClient.argentAccount.updateSecurityPeriod.mutate({
+      periodInSeconds,
+    })
+  }
+
+  getSecurityPeriod() {
+    return this.trpcMessageClient.argentAccount.getSecurityPeriod.query()
+  }
+
+  removeGuardian() {
+    return this.trpcMessageClient.argentAccount.removeGuardian.mutate()
   }
 }

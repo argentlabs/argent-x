@@ -2,17 +2,15 @@ import type { FC } from "react"
 import { useEffect, useState } from "react"
 import { accountMessagingService } from "../../../../services/accountMessaging"
 import { Flex } from "@chakra-ui/react"
+import { CopyPrimaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   Button,
   CopyTooltip,
-  icons,
   NavigationContainer,
   P3,
-  scrollbarStyle,
 } from "@argent/x-ui"
-
-const { CopyPrimaryIcon } = icons
+import { scrollbarStyle } from "@argent/x-ui/theme"
 
 export const DeploymentDataScreen: FC = () => {
   const [deploymentData, setDeploymentData] = useState("")

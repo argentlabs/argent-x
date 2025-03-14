@@ -48,6 +48,7 @@ export const parseStakingPositions = (
         totalApy,
         token: tokens[0],
         liquidityToken,
+        investmentId: position.investmentId,
       }
     })
     .filter(

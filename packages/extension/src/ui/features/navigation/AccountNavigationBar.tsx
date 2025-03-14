@@ -1,59 +1,70 @@
 import {
-  BarIconButton,
-  icons,
-  L2Bold,
-  Label3Bold,
-  logosDeprecated,
-  NavigationBar,
-  typographyStyles,
-} from "@argent/x-ui"
+  MultisigSecondaryIcon,
+  SidebarSecondaryIcon,
+  ExtensionSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { BarIconButton, L2Bold, Label3Bold, NavigationBar } from "@argent/x-ui"
 import { Button, Flex, Text } from "@chakra-ui/react"
 import type { FC, ReactEventHandler } from "react"
 
-import type { AccountNavigationBarContainerProps } from "./AccountNavigationBarContainer"
+import type {
+  AvatarMeta,
+  WalletAccountType,
+} from "../../../shared/wallet.model"
 import { AccountAvatar } from "../accounts/AccountAvatar"
-import { getNetworkAccountImageUrl } from "../accounts/accounts.service"
+import { AccountListItemSmartAccountBadgeContainer } from "../accounts/AccountListItemSmartAccountBadgeContainer"
+import type { AccountNavigationBarContainerProps } from "./AccountNavigationBarContainer"
 import { SettingsBarIconButton } from "./SettingsBarIconButton"
 
-const { MultisigSecondaryIcon, ShieldSecondaryIcon, DonutSecondaryIcon } = icons
+import { typographyStyles } from "@argent/x-ui/theme"
 
-const { LedgerLogo } = logosDeprecated
+import { LedgerLogo } from "@argent/x-ui/logos-deprecated"
 
 export interface AccountNavigationBarProps
   extends AccountNavigationBarContainerProps {
   accountName?: string
   accountId?: string
+  accountType?: WalletAccountType
   isSmartAccount?: boolean
   isMultisig?: boolean
   isLedgerAccount?: boolean
   onAccountList?: ReactEventHandler
   envLabel?: string
-  onPortfolio?: ReactEventHandler
   networkName?: string
+  avtarMeta?: AvatarMeta
+  extensionIsInSidePanel?: boolean
 }
 
 export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
   accountName = "No account",
   accountId,
+  accountType,
   isSmartAccount,
   isMultisig,
   isLedgerAccount,
   onAccountList,
   scroll,
   showSettingsButton = true,
-  showPortfolioButton = true,
-  onPortfolio,
+  showSidePanelButton = true,
+  extensionIsInSidePanel,
+  onSidePanelClick,
   envLabel,
   networkName,
+  avtarMeta,
 }) => {
   const leftButton = showSettingsButton ? <SettingsBarIconButton /> : undefined
-  const rightButton = showPortfolioButton ? (
+  const rightButton = showSidePanelButton ? (
     <BarIconButton
-      aria-label="Show portfolio"
-      onClick={onPortfolio}
-      colorScheme="default"
+      aria-label={
+        extensionIsInSidePanel ? "Switch to popup" : "Switch to sidebar"
+      }
+      onClick={onSidePanelClick}
     >
-      <DonutSecondaryIcon />
+      {extensionIsInSidePanel ? (
+        <ExtensionSecondaryIcon />
+      ) : (
+        <SidebarSecondaryIcon />
+      )}
     </BarIconButton>
   ) : undefined
   return (
@@ -75,11 +86,20 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
             {accountName && accountId && (
               <AccountAvatar
                 size={5}
-                src={getNetworkAccountImageUrl({
-                  accountName,
-                  accountId,
-                })}
-              />
+                accountId={accountId}
+                accountName={accountName}
+                accountType={accountType}
+                emojiStyle={typographyStyles.P3}
+                initialsStyle={typographyStyles.L3Bold}
+                avatarMeta={avtarMeta}
+              >
+                {isSmartAccount && (
+                  <AccountListItemSmartAccountBadgeContainer
+                    accountId={accountId}
+                    size={"10px"}
+                  />
+                )}
+              </AccountAvatar>
             )}
             <Flex
               {...typographyStyles.B2}
@@ -87,12 +107,6 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
               overflow="hidden"
               alignItems="center"
             >
-              {isSmartAccount && (
-                <ShieldSecondaryIcon
-                  data-testid="smart-account-on-account-view"
-                  flexShrink={0}
-                />
-              )}
               {isMultisig && <MultisigSecondaryIcon flexShrink={0} />}
               {isLedgerAccount && <LedgerLogo flexShrink={0} />}
               <Text overflow="hidden" textOverflow="ellipsis">
@@ -105,12 +119,7 @@ export const AccountNavigationBar: FC<AccountNavigationBarProps> = ({
               borderLeftColor="text-secondary"
               my={1}
             />
-            <Label3Bold
-              as={Text}
-              color="text-secondary"
-              overflow="hidden"
-              textOverflow="ellipsis"
-            >
+            <Label3Bold as={Text} color="text-secondary" whiteSpace="normal">
               {networkName}
             </Label3Bold>
           </Button>

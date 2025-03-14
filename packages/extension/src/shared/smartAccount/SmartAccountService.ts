@@ -1,11 +1,10 @@
-import { liveQuery } from "dexie"
 import type { Device } from "@argent/x-guardian"
 import type Emittery from "emittery"
-
-import type { StoreDexie } from "./idb"
-import { isTokenExpired } from "./backend/account"
 import type { Events } from "./ISmartAccountService"
-import { IsSignedIn, type ISmartAccountService } from "./ISmartAccountService"
+import { IsSignedIn } from "./ISmartAccountService"
+import type { ISmartAccountService } from "./ISmartAccountService"
+import { checkTokenExpiry } from "./utils/tokenExpiry"
+import type { StoreDexie } from "./idb"
 
 export default class SmartAccountService implements ISmartAccountService {
   private _isSignedIn: boolean | null = null
@@ -14,16 +13,14 @@ export default class SmartAccountService implements ISmartAccountService {
     readonly emitter: Emittery<Events>,
     idb: StoreDexie,
   ) {
-    const device = liveQuery(() => idb.devices.get(0))
-    device.subscribe({
-      next: (result) => void this.onDeviceChange(result),
-      error: (error) => console.error(error),
-    })
+    void idb.devices.get(0).then(this.handleDeviceUpdate)
   }
 
-  private async onDeviceChange(device?: Device) {
+  public handleDeviceUpdate = async (device?: Device) => {
     if (device?.verifiedEmail) {
-      const expired = await isTokenExpired()
+      const { expired } = await checkTokenExpiry({
+        initiator: "SmartAccountService/handleDeviceUpdate",
+      })
       this.isSignedIn = !expired
     } else {
       this.isSignedIn = false

@@ -8,6 +8,8 @@ import {
   CarouselIndicator,
 } from "@argent/x-ui"
 
+import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+
 import { Box, Flex } from "@chakra-ui/react"
 
 export interface AccountBannersProps {
@@ -20,9 +22,18 @@ export const AccountBanners: FC<AccountBannersProps> = ({ banners }) => {
   if (!hasBanners) {
     return null
   }
+
   return (
     <Box mx={-4}>
-      <Carousel options={{ containScroll: false }}>
+      <Carousel
+        options={{ containScroll: false }}
+        plugins={[
+          // This is the plugin that is used to enable horizontal scrolling with the mouse wheel
+          WheelGesturesPlugin({
+            forceWheelAxis: "x",
+          }),
+        ]}
+      >
         <CarouselContent gap={2} prevNextInset={4}>
           {banners.map((banner, index) => (
             <CarouselItem key={index} w="calc(100% - 2rem)">

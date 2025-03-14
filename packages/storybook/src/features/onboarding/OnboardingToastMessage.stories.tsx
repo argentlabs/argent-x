@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 import { OnboardingToastMessage } from "@argent-x/extension/src/ui/features/onboarding/ui/OnboardingToastMessage"
 
 const meta: Meta<typeof OnboardingToastMessage> = {

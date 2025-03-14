@@ -6,6 +6,7 @@ import type { ExtensionActionItemOfType } from "../../../../shared/actionQueue/t
 import { TransactionHeader } from "./header"
 import { FeeEstimationBoxSkeleton } from "../feeEstimation/ui/FeeEstimationBox"
 import { NavigationBarSkeleton } from "@argent/x-ui"
+import { TransactionType } from "starknet"
 
 interface TransactionActionScreenSekeletonProps {
   action: ExtensionActionItemOfType<"TRANSACTION">
@@ -53,6 +54,7 @@ export const TransactionActionScreenSekeleton: FC<
           subtitle={action.meta?.subtitle ?? action.meta.origin}
           dappHost={action.meta.origin}
           iconKey={action.meta?.icon}
+          transactionType={TransactionType.INVOKE}
         />
         <TransactionReviewSkeleton px={4} />
         <Flex flex={1} />

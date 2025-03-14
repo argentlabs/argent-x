@@ -1,7 +1,11 @@
-import type { FlexProps } from "@chakra-ui/react"
+import type { FlexProps, TextProps } from "@chakra-ui/react"
 import type { ReactNode } from "react"
 
-import type { AccountId, WalletAccountType } from "../../../shared/wallet.model"
+import type {
+  AccountId,
+  AvatarMeta,
+  WalletAccountType,
+} from "../../../shared/wallet.model"
 import type { CustomButtonCellProps } from "../../components/CustomButtonCell"
 
 export interface AccountListItemProps extends CustomButtonCellProps {
@@ -19,6 +23,9 @@ export interface AccountListItemProps extends CustomButtonCellProps {
   avatarIcon?: ReactNode
   avatarOutlined?: boolean
   avatarSize?: number
+  emojiStyle?: TextProps
+  initialsStyle?: TextProps
+  avatarMeta?: AvatarMeta
   isSmartAccount?: boolean
   isOwner?: boolean
   isClickable?: boolean

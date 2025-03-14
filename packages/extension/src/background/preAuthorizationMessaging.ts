@@ -1,5 +1,5 @@
 import { uiService } from "../shared/ui"
-import type { PreAuthorisationMessage } from "../shared/messages/PreAuthorisationMessage"
+import type { PreAuthorizationMessage } from "../shared/messages/PreAuthorisationMessage"
 import { Opened, backgroundUIService } from "./services/ui"
 import { UnhandledMessage } from "./background"
 import type { HandleMessage } from "./background"
@@ -7,7 +7,7 @@ import { preAuthorizationService } from "../shared/preAuthorization"
 import { respondToHost } from "./respond"
 
 export const handlePreAuthorizationMessage: HandleMessage<
-  PreAuthorisationMessage
+  PreAuthorizationMessage
 > = async ({ msg, origin, background: { wallet, actionService }, respond }) => {
   switch (msg.type) {
     case "CONNECT_DAPP": {

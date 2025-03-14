@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 
+import type { ISettingsStorage } from "../../../shared/settings/types"
 import type { KeyValueStorage } from "../../../shared/storage"
 import type { WalletStorageProps } from "../../../shared/wallet/walletStore"
 import BackgroundUIService from "./BackgroundUIService"
@@ -29,6 +30,8 @@ describe("BackgroundUIService", () => {
       focusTab: vi.fn(),
       hasFloatingWindow: vi.fn(),
       focusFloatingWindow: vi.fn(),
+      setDefaultSidePanel: vi.fn(),
+      unsetDefaultSidePanel: vi.fn(),
     }
     const emitter = {
       anyEvent: vi.fn(),
@@ -52,6 +55,10 @@ describe("BackgroundUIService", () => {
     const walletStore = {
       get: vi.fn(),
     } as unknown as KeyValueStorage<WalletStorageProps>
+    const settingsStore = {
+      get: vi.fn(),
+      subscribe: vi.fn(),
+    } as unknown as KeyValueStorage<ISettingsStorage>
 
     const backgroundUIService = new BackgroundUIService(
       emitter,
@@ -59,6 +66,7 @@ describe("BackgroundUIService", () => {
       uiService,
       sessionService,
       walletStore,
+      settingsStore,
     )
     return {
       backgroundUIService,

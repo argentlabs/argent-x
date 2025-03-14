@@ -1,8 +1,7 @@
-import { CopyTooltip, icons } from "@argent/x-ui"
+import { CopyPrimaryIcon } from "@argent/x-ui/icons"
+import { CopyTooltip } from "@argent/x-ui"
 import { Box, Fade, useAccordionItemState } from "@chakra-ui/react"
 import type { FC } from "react"
-
-const { CopyPrimaryIcon } = icons
 
 interface CopyErrorIconProps {
   copyValue?: string

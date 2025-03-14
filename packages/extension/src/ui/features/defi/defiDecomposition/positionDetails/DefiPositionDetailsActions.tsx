@@ -1,35 +1,37 @@
 import type { Address } from "@argent/x-shared"
-import { icons } from "@argent/x-ui"
-import { HStack, useDisclosure } from "@chakra-ui/react"
-import type { FC } from "react"
-import { Suspense } from "react"
-import { useNavigate } from "react-router-dom"
-import type { ParsedStrkDelegatedStakingPosition } from "../../../../../shared/defiDecomposition/schema"
-import {
-  isStakingPosition,
-  isStrkDelegatedStakingPosition,
-  type ParsedPosition,
-} from "../../../../../shared/defiDecomposition/schema"
-import { routes } from "../../../../../shared/ui/routes"
-import { ActionButton } from "../../../../components/ActionButton"
-import {
-  useCurrentPathnameWithQuery,
-  useRouteAccountDefi,
-} from "../../../../hooks/useRoute"
-import { useAction } from "../../../../hooks/useAction"
-import { stakingService } from "../../../../services/staking"
-import type { WalletAccount } from "../../../../../shared/wallet.model"
-import { checkHasRewards } from "../../../../../shared/staking/utils"
-import { WithdrawWarningModalContainer } from "../../staking/WithdrawWarningModal"
-import { useTokenInfo } from "../../../accountTokens/tokens.state"
 
-const {
+import {
   InvestSecondaryIcon,
   ArrowDownSecondaryIcon,
   SparkleSecondaryIcon,
   SendSecondaryIcon,
   SwapPrimaryIcon,
-} = icons
+} from "@argent/x-ui/icons"
+
+import { HStack, useDisclosure } from "@chakra-ui/react"
+import type { FC } from "react"
+import { Suspense } from "react"
+import { useNavigate } from "react-router-dom"
+import type {
+  ParsedStakingPosition,
+  ParsedStrkDelegatedStakingPosition,
+} from "../../../../../shared/defiDecomposition/schema"
+import {
+  isStakingPosition,
+  isStrkDelegatedStakingPosition,
+  type ParsedPosition,
+} from "../../../../../shared/defiDecomposition/schema"
+import { checkHasRewards } from "../../../../../shared/staking/utils"
+import { routes } from "../../../../../shared/ui/routes"
+import type { WalletAccount } from "../../../../../shared/wallet.model"
+import { ActionButton } from "../../../../components/ActionButton"
+import { useAction } from "../../../../hooks/useAction"
+import {
+  useCurrentPathnameWithQuery,
+  useRouteAccountDefi,
+} from "../../../../hooks/useRoute"
+import { stakingService } from "../../../../services/staking"
+import { WithdrawWarningModalContainer } from "../../staking/WithdrawWarningModal"
 
 interface DefiPositionDetailsActionsProps {
   position: ParsedPosition
@@ -53,74 +55,92 @@ export const DefiPositionDetailsActions: FC<
     isOpen: isWithdrawWarningOpen,
   } = useDisclosure()
 
-  const Stake: FC<{ position: ParsedStrkDelegatedStakingPosition }> = ({
-    position,
-  }) => (
-    <ActionButton
-      icon={<InvestSecondaryIcon />}
-      label="Stake"
-      onClick={() =>
-        navigate(routes.nativeStaking(position.investmentId, returnTo))
-      }
-    />
-  )
-
-  const Withdraw: FC<{ position: ParsedStrkDelegatedStakingPosition }> = ({
-    position,
-  }) => (
-    <>
-      <ActionButton
-        icon={<ArrowDownSecondaryIcon />}
-        label="Withdraw"
-        onClick={() =>
-          position.pendingWithdrawal
-            ? onWithdrawWarningOpen()
-            : navigate(routes.unstake(position.id, returnTo))
-        }
-        isDisabled={
-          position.pendingWithdrawal?.amount === position.token.balance
-        }
-      />
-    </>
-  )
-
-  const Claim: FC<{ position: ParsedStrkDelegatedStakingPosition }> = ({
-    position,
-  }) => (
-    <ActionButton
-      icon={<SparkleSecondaryIcon />}
-      label="Claim"
-      onClick={() => {
-        void claimAction({
-          accountAddress: account.address as Address,
-          accountType: account.type,
-          amount: position.accruedRewards,
-          investmentId: position.investmentId,
-          stakerInfo: position.stakerInfo,
-          tokenAddress: position.token.address,
-        })
-        navigate(defiRoute)
-      }}
-      isDisabled={
-        !checkHasRewards(position.accruedRewards) ||
-        Boolean(position.pendingWithdrawal)
-      }
-    />
-  )
-
-  const Swap: FC<{ address: Address; networkId: string }> = ({
-    address,
-    networkId,
-  }) => {
-    const tokenInfo = useTokenInfo({ address, networkId })
-    if (!tokenInfo || !tokenInfo.tradable) {
+  const Stake: FC<{
+    position: ParsedStrkDelegatedStakingPosition | ParsedStakingPosition
+  }> = ({ position }) => {
+    if (!position.investmentId) {
       return null
+    }
+
+    const onStake = () => {
+      if (isStrkDelegatedStakingPosition(position)) {
+        void navigate(routes.nativeStaking(position.investmentId, returnTo))
+      } else if (isStakingPosition(position)) {
+        void navigate(routes.liquidStaking(position.investmentId, returnTo))
+      }
     }
     return (
       <ActionButton
-        icon={<SwapPrimaryIcon />}
-        label="Swap"
-        onClick={() => navigate(routes.swapToken(address, returnTo))}
+        icon={<InvestSecondaryIcon />}
+        label="Stake"
+        onClick={onStake}
+      />
+    )
+  }
+
+  const Withdraw: FC<{
+    position: ParsedStrkDelegatedStakingPosition | ParsedStakingPosition
+  }> = ({ position }) => {
+    if (!position.investmentId) {
+      return null
+    }
+
+    const isWithdrawDisabled =
+      isStrkDelegatedStakingPosition(position) &&
+      position.pendingWithdrawal?.amount === position.token.balance
+
+    const onWithdraw = () => {
+      if (isStrkDelegatedStakingPosition(position)) {
+        if (position.pendingWithdrawal) {
+          onWithdrawWarningOpen()
+          return
+        }
+
+        void navigate(routes.nativeUnstake(position.id, returnTo))
+      } else if (isStakingPosition(position)) {
+        void navigate(routes.liquidUnstake(position.id, returnTo))
+      }
+    }
+    return (
+      <ActionButton
+        icon={<ArrowDownSecondaryIcon />}
+        label="Withdraw"
+        onClick={onWithdraw}
+        isDisabled={isWithdrawDisabled}
+      />
+    )
+  }
+
+  const Claim: FC<{ position: ParsedStrkDelegatedStakingPosition }> = ({
+    position,
+  }) => {
+    if (!position.investmentId) {
+      return null
+    }
+
+    return (
+      <ActionButton
+        icon={<SparkleSecondaryIcon />}
+        label="Claim"
+        onClick={() => {
+          if (!position.investmentId) {
+            return
+          }
+
+          void claimAction({
+            accountAddress: account.address as Address,
+            accountType: account.type,
+            amount: position.accruedRewards,
+            investmentId: position.investmentId,
+            stakerInfo: position.stakerInfo,
+            tokenAddress: position.token.address,
+          })
+          void navigate(defiRoute)
+        }}
+        isDisabled={
+          !checkHasRewards(position.accruedRewards) ||
+          Boolean(position.pendingWithdrawal)
+        }
       />
     )
   }
@@ -130,12 +150,22 @@ export const DefiPositionDetailsActions: FC<
       icon={<SendSecondaryIcon />}
       label="Send"
       onClick={() =>
-        navigate(
+        void navigate(
           routes.sendRecipientScreen({ returnTo, tokenAddress: address }),
         )
       }
     />
   )
+
+  const Swap: FC<{ address: Address }> = ({ address }) => {
+    return (
+      <ActionButton
+        icon={<SwapPrimaryIcon />}
+        label="Swap"
+        onClick={() => void navigate(routes.swapToken(address, returnTo))}
+      />
+    )
+  }
 
   const Actions: FC<{ position: ParsedPosition }> = ({ position }) => {
     if (isStrkDelegatedStakingPosition(position)) {
@@ -146,21 +176,15 @@ export const DefiPositionDetailsActions: FC<
           <Claim position={position} />
         </>
       )
-    } else if (
-      isStakingPosition(position) ||
-      isStrkDelegatedStakingPosition(position)
-    ) {
-      const token = isStrkDelegatedStakingPosition(position)
-        ? position.token
-        : position.liquidityToken
-
+    } else if (isStakingPosition(position)) {
+      const token = position.liquidityToken
       if (!token) {
         return null
       }
       return (
         <Suspense fallback={null}>
           <Send address={token.address} />
-          <Swap address={token.address} networkId={token.networkId} />
+          <Swap address={token.address} />
         </Suspense>
       )
     }

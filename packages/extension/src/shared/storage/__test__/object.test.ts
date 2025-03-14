@@ -1,4 +1,4 @@
-import type { IObjectStorage } from "../object"
+import type { IObjectStorage } from "../types/IObjectStorage"
 import { ObjectStorage } from "../object"
 
 describe("full storage flow with object", () => {
@@ -63,7 +63,10 @@ describe("full storage flow with string and subscription", () => {
     await store.set("baz")
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith("baz", { newValue: "baz" })
+    expect(handler).toHaveBeenCalledWith("baz", {
+      newValue: "baz",
+      oldValue: "bar",
+    })
     const value = await store.get()
     expect(value).toBe("baz")
     unsub()

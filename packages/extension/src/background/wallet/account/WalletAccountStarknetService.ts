@@ -37,6 +37,7 @@ import { getAccountIdentifier } from "../../../shared/utils/accountIdentifier"
 import type { IAccountImportSharedService } from "../../../shared/accountImport/service/IAccountImportSharedService"
 import type { ValidatedImport } from "../../../shared/accountImport/types"
 import { ImportedAccount } from "../../../shared/accountImport/account"
+import type { ISecretStorageService } from "../session/interface"
 
 export class WalletAccountStarknetService {
   constructor(
@@ -48,6 +49,7 @@ export class WalletAccountStarknetService {
     private readonly multisigBackendService: IMultisigBackendService,
     private readonly ledgerService: ILedgerSharedService,
     private readonly importedAccountService: IAccountImportSharedService,
+    private readonly secretStorageService: ISecretStorageService,
   ) {}
 
   public async getStarknetAccount(
@@ -124,14 +126,14 @@ export class WalletAccountStarknetService {
     networkId: string,
     signerType: SignerType,
   ): Promise<PendingMultisig> {
-    const { index, derivationPath, publicKey } =
+    const { derivationPath, publicKey } =
       await this.cryptoStarknetService.getNextPublicKeyForMultisig(
         networkId,
         signerType,
       )
 
     const pendingMultisig: PendingMultisig = {
-      name: `Multisig ${index + 1}`,
+      name: "Multisig (Awaiting setup)",
       networkId,
       signer: {
         type: signerType,
@@ -266,15 +268,12 @@ export class WalletAccountStarknetService {
   }
 
   async importAccount(account: ValidatedImport) {
-    const session = await this.sessionService.sessionStore.get()
-
-    if (!session) {
+    const decrypted = await this.secretStorageService.decrypt()
+    if (!decrypted) {
       throw new SessionError({ code: "NO_OPEN_SESSION" })
     }
+    const { password } = decrypted
 
-    return await this.importedAccountService.importAccount(
-      account,
-      session.password,
-    )
+    return await this.importedAccountService.importAccount(account, password)
   }
 }

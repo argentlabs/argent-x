@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import { fireEvent, render, screen } from "@testing-library/react"
 
-import { getMockAccount } from "../../../../test/account.mock"
 import type { AccountTokensButtonsProps } from "./AccountTokensButtons"
 import { AccountTokensButtons } from "./AccountTokensButtons"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 
 const mockProps = {
-  account: getMockAccount({}),
+  account: getMockWalletAccount({}),
   alertDialogIsOpen: true,
   title: "Alert",
   message: "This is an alert",
@@ -25,6 +24,8 @@ const mockProps = {
   hasNonZeroBalance: true,
   showSwapButton: false,
   onSwap: () => {},
+  showPortfolioButton: true,
+  onPortfolio: vi.fn(),
 } as AccountTokensButtonsProps
 
 describe("AccountTokensButtons", async () => {
@@ -48,5 +49,11 @@ describe("AccountTokensButtons", async () => {
     expect(hideAccountButton).toBeInTheDocument()
     fireEvent.click(hideAccountButton)
     expect(mockProps.onHideMultisigModalOpen).toHaveBeenCalled()
+
+    // Portfolio button
+    const portfolioButton = screen.getByLabelText("Portfolio")
+    expect(portfolioButton).toBeInTheDocument()
+    fireEvent.click(portfolioButton)
+    expect(mockProps.onPortfolio).toHaveBeenCalled()
   })
 })

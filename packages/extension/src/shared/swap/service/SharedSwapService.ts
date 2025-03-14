@@ -57,7 +57,6 @@ export class SharedSwapService implements ISharedSwapService {
     }
 
     const quoteUrl = urlWithQuery(this.swapQuoteUrl, queryParams)
-
     try {
       const response = await this.httpService.get(quoteUrl)
       const quoteResult = await SwapQuoteResponseSchema.parseAsync(response)

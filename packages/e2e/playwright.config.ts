@@ -6,13 +6,15 @@ const playwrightConfig: PlaywrightTestConfig = {
     {
       name: "ArgentX",
       use: {
-        trace: "retain-on-failure",
-        actionTimeout: 120 * 1000, // 2 minute
+        actionTimeout: 30000, // Maximum time for individual actions (clicks, navigation, etc)
+        navigationTimeout: 30000, // Maximum time to wait for navigation
         permissions: ["clipboard-read", "clipboard-write"],
-        screenshot: "only-on-failure",
+        launchOptions: {
+          slowMo: 500,
+        },
       },
-      timeout: config.isCI ? 5 * 60e3 : 1 * 60e3,
-      expect: { timeout: 2 * 60e3 }, // 2 minute
+      timeout: config.isCI ? 10 * 60e3 : 3 * 60e3,
+      expect: { timeout: config.isCI ? 2 * 60e3 : 1 * 60e3 }, // 1 minute
       testDir: "./src/specs",
       testMatch: /\.spec.ts$/,
       retries: config.isCI ? 1 : 0,

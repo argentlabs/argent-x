@@ -6,7 +6,7 @@ import { clientAccountService } from "../../services/account"
 import { MultisigBanner } from "./MultisigBanner"
 import { multisigView } from "../multisig/multisig.state"
 import type { WalletAccount } from "../../../shared/wallet.model"
-import { useHasFeeTokenBalance } from "../accountTokens/useFeeTokenBalance"
+import { useHasNativeFeeTokenBalance } from "../accountTokens/useFeeTokenBalance"
 import { useView } from "../../views/implementation/react"
 import { voidify } from "@argent/x-shared"
 
@@ -17,7 +17,7 @@ interface MultisigBannerContainerProps {
 export const useShowMultisigBanner = (account: WalletAccount) => {
   const multisig = useView(multisigView(account))
   const isMultisigDeploying = useIsMultisigDeploying(multisig)
-  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
+  const hasFeeTokenBalance = useHasNativeFeeTokenBalance(account)
 
   const showActivateMultisigBanner = Boolean(
     !isMultisigDeploying && multisig?.needsDeploy && hasFeeTokenBalance,
@@ -31,7 +31,7 @@ export const MultisigBannerContainer: FC<MultisigBannerContainerProps> = ({
 }) => {
   const multisig = useView(multisigView(account))
   const isMultisigDeploying = useIsMultisigDeploying(multisig)
-  const hasFeeTokenBalance = useHasFeeTokenBalance(account)
+  const hasFeeTokenBalance = useHasNativeFeeTokenBalance(account)
 
   const showActivateMultisigBanner = Boolean(
     !isMultisigDeploying && multisig?.needsDeploy && hasFeeTokenBalance,

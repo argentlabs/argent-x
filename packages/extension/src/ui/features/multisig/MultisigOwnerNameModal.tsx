@@ -1,4 +1,4 @@
-import { Button, H4, Input } from "@argent/x-ui"
+import { Button, H4 } from "@argent/x-ui"
 import {
   Modal,
   ModalBody,
@@ -6,6 +6,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Input,
 } from "@chakra-ui/react"
 import type { FC } from "react"
 import { useState } from "react"

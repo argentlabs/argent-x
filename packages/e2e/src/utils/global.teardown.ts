@@ -2,15 +2,25 @@ import * as fs from "fs"
 import config from "../config"
 
 export default async function tearDown() {
-  console.time("tearDown")
+  const start = performance.now()
   try {
-    fs.readdirSync(config.artifactsDir)
+    const files = fs
+      .readdirSync(config.artifactsDir)
       .filter((f) => f.endsWith("webm"))
-      .forEach((fileToDelete) => {
-        fs.rmSync(`${config.artifactsDir}/${fileToDelete}`)
-      })
+
+    if (files.length > 0) {
+      console.log(`Cleaning up ${files.length} video files...`)
+      for (const file of files) {
+        fs.rmSync(`${config.artifactsDir}/${file}`)
+      }
+    }
   } catch (error) {
-    console.error({ op: "tearDown", error })
+    console.error(
+      "Teardown failed:",
+      error instanceof Error ? error.message : error,
+    )
+  } finally {
+    const duration = performance.now() - start
+    console.log(`Teardown completed in ${duration.toFixed(2)}ms`)
   }
-  console.timeEnd("tearDown")
 }

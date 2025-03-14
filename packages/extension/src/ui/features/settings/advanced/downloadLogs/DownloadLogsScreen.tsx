@@ -1,7 +1,7 @@
+import { DownloadIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   H2,
-  icons,
   L2Bold,
   NavigationContainer,
   P2,
@@ -21,8 +21,6 @@ import {
   getBrowserName,
   getOSName,
 } from "./utils"
-
-const { DownloadIcon } = icons
 
 export const DownloadLogsScreen: FC = () => {
   const toast = useToast()

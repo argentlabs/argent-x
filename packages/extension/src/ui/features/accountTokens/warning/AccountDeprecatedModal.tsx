@@ -1,7 +1,7 @@
+import { ExpandIcon } from "@argent/x-ui/icons"
 import {
   BarCloseButton,
   Button,
-  icons,
   NavigationContainer,
   Warning,
 } from "@argent/x-ui"
@@ -13,8 +13,7 @@ import { useNavigateReturnToOr } from "../../../hooks/useNavigateReturnTo"
 import { selectedNetworkIdView } from "../../../views/network"
 import { useView } from "../../../views/implementation/react"
 import { clientAccountService } from "../../../services/account"
-
-const { ExpandIcon } = icons
+import { voidify } from "@argent/x-shared"
 
 export const AccountDeprecatedModal = () => {
   const onBack = useNavigateReturnToOr(routes.accountTokens())
@@ -34,7 +33,7 @@ export const AccountDeprecatedModal = () => {
   return (
     <NavigationContainer
       isAbsolute
-      rightButton={<BarCloseButton onClick={onClose} />}
+      rightButton={<BarCloseButton onClick={voidify(onClose)} />}
     >
       <Flex py={4} px={5} direction="column" flex={1}>
         <Warning

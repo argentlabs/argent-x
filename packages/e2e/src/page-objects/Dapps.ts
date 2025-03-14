@@ -1,12 +1,11 @@
-import { ChromiumBrowserContext, Page, expect } from "@playwright/test"
+import { Page, expect } from "@playwright/test"
 
 import { lang } from "../languages"
 import Navigation from "./Navigation"
-import config from "../config"
 
 type DappUrl =
   | "https://app.starknet.id"
-  | "https://dapp-argentlabs.vercel.app"
+  | "https://demo-dapp-starknet.vercel.app/"
   | "https://starknetkit-blacked-listed.vercel.app"
   | "https://app.avnu.fi/"
 export default class Dapps extends Navigation {
@@ -30,8 +29,15 @@ export default class Dapps extends Navigation {
 
   get noConnectedDapps() {
     return this.page.locator(
-      `text=${lang.settings.account.authorisedDapps.noAuthorisedDapps}`,
+      `text=${lang.settings.account.authorizedDapps.noAuthorizedDapps}`,
     )
+  }
+  get reviewButton() {
+    return this.page.getByRole("button", { name: "Review" })
+  }
+
+  get acceptRiskButton() {
+    return this.page.getByRole("button", { name: "Accept risk" })
   }
 
   connected(url: DappUrl) {
@@ -44,21 +50,15 @@ export default class Dapps extends Navigation {
     )
   }
 
-  disconnectAll() {
-    return this.page.locator(
-      `p:text-is("${lang.settings.account.authorisedDapps.disconnectAll}")`,
-    )
-  }
-
   get accept() {
     return this.page.locator(
-      `button:text-is("${lang.settings.account.authorisedDapps.connect}")`,
+      `button:text-is("${lang.settings.account.authorizedDapps.connect}")`,
     )
   }
 
   get reject() {
     return this.page.locator(
-      `button:text-is("${lang.settings.account.authorisedDapps.reject}")`,
+      `button:text-is("${lang.settings.account.authorizedDapps.reject}")`,
     )
   }
 
@@ -68,68 +68,13 @@ export default class Dapps extends Navigation {
 
   async ensureKnowDappText() {
     return Promise.all([
-      expect(this.page.locator('h4:text-is("Known Dapp")')).toBeVisible(),
+      expect(
+        this.page.getByRole("heading", { name: "Known Dapp" }),
+      ).toBeVisible(),
       expect(
         this.page.locator('p:text-is("This dapp is listed on Dappland")'),
       ).toBeVisible(),
     ])
-  }
-  async requestConnectionFromDapp(
-    browserContext: ChromiumBrowserContext,
-    dappUrl: DappUrl,
-  ) {
-    //open dapp page
-    const dapp = await browserContext.newPage()
-    await dapp.setViewportSize({ width: 1080, height: 720 })
-    await dapp.goto("chrome://inspect/#extensions")
-    await dapp.waitForTimeout(1000)
-    await dapp.goto(dappUrl)
-
-    if (
-      dappUrl === "https://dapp-argentlabs.vercel.app" ||
-      dappUrl === "https://starknetkit-blacked-listed.vercel.app" ||
-      dappUrl === "https://app.avnu.fi/"
-    ) {
-      if (dappUrl === "https://dapp-argentlabs.vercel.app") {
-        await dapp
-          .locator('button:has-text("starknetkit@latest")')
-          .first()
-          .click()
-      } else {
-        await dapp.locator('button:has-text("Connect")').first().click()
-      }
-      //  await expect(dapp.locator('button:has-text("Connect")')).toHaveCount(1)
-      await expect(dapp.locator("text=Argent X")).toBeVisible()
-      await dapp.locator("text=Argent X").click()
-    } else {
-      // assert that if the connect button is visible click on it
-      const connectButton = dapp.getByRole("button", { name: "connect" })
-      await expect(connectButton)
-        .toBeVisible({ timeout: 5 * 1000 })
-        .then(async () => {
-          await connectButton.click()
-        })
-        .catch(async () => {
-          null
-        })
-      await expect(dapp.getByText("Argent X")).toBeVisible()
-      await dapp.getByText("Argent X").click()
-    }
-    return dapp
-  }
-
-  async claimSpok(browserContext: ChromiumBrowserContext) {
-    const spokCampaignUrl = config.spokCampaignUrl!
-    //open dapp page
-    const dapp = await browserContext.newPage()
-    await dapp.setViewportSize({ width: 1080, height: 720 })
-    await dapp.goto("chrome://inspect/#extensions")
-    await dapp.waitForTimeout(1000)
-    await dapp.goto(spokCampaignUrl)
-    await dapp.getByRole("button", { name: "Check eligibility" }).click()
-    await expect(dapp.locator("text=Argent X")).toBeVisible()
-    await dapp.locator("text=Argent X").click()
-    return dapp
   }
 
   checkCriticalRiskConnectionScreen() {

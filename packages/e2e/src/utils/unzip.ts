@@ -32,5 +32,5 @@ export const unzip = async (version: string): Promise<string> => {
     throw error
   }
 
-  return `${outputDir}/dist`
+  return `${outputDir}`
 }

@@ -21,8 +21,10 @@ export const AccountDetailsNavigationBarContainer: FC<NavigationBarProps> = (
       accountName={currentAccount?.name}
       accountId={currentAccount?.id}
       accountAddress={currentAccount?.address}
+      accountType={currentAccount?.type}
       networkName={currentNetwork.name}
       isLedgerConnected={usesLedgerSigner ? isLedgerConnected : undefined}
+      avatarMeta={currentAccount?.avatarMeta}
       {...props}
     />
   )

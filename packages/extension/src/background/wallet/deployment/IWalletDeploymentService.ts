@@ -11,7 +11,7 @@ import type {
   WalletAccount,
 } from "../../../shared/wallet.model"
 import type { Address, Hex } from "@argent/x-shared"
-import type { EstimatedFee } from "@argent/x-shared/simulation"
+import type { EstimatedFeeV2 } from "@argent/x-shared/simulation"
 
 // Extend to support multichain
 type InvocationsDetails = StarknetInvocationDetails
@@ -32,7 +32,7 @@ export interface IWalletDeploymentService {
   getAccountDeploymentFee(
     walletAccount: WalletAccount,
     feeTokenAddress?: Address,
-  ): Promise<EstimatedFee>
+  ): Promise<EstimatedFeeV2>
   getAccountDeploymentPayload(
     walletAccount: WalletAccount,
   ): Promise<Required<DeployAccountContractPayload>>

@@ -6,6 +6,9 @@ import { isTokenExpiredProcedure } from "./isTokenExpired"
 import { logoutProcedure } from "./logout"
 import { requestEmailProcedure } from "./requestEmail"
 import { validateAccountProcedure } from "./validateAccount"
+import { updateSecurityPeriodProcedure } from "./updateSecurityPeriod"
+import { removeGuardianProcedure } from "./removeGuardian"
+import { getSecurityPeriodProcedure } from "./getSecurityPeriod"
 
 export const argentAccountRouter = router({
   addGuardianAccount: addGuardianToAccountProcedure,
@@ -15,4 +18,7 @@ export const argentAccountRouter = router({
   confirmEmail: confirmEmailProcedure,
   isTokenExpired: isTokenExpiredProcedure,
   logout: logoutProcedure,
+  updateSecurityPeriod: updateSecurityPeriodProcedure,
+  removeGuardian: removeGuardianProcedure,
+  getSecurityPeriod: getSecurityPeriodProcedure,
 })

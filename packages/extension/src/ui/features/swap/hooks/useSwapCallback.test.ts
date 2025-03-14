@@ -1,11 +1,13 @@
-import { renderHook, act } from "@testing-library/react"
-import { useSwapCallback } from "./useSwapCallback"
-import * as reactViews from "../../../views/implementation/react"
-import * as swapServices from "../../../services/swap"
 import { addressSchema } from "@argent/x-shared"
+import { act, renderHook } from "@testing-library/react"
+import { stark } from "starknet"
 import { getMockTrade } from "../../../../../test/trade.mock"
 import { sampleOrderResponse } from "../../../../shared/swap/service/order.mock"
-import { stark } from "starknet"
+import * as swapServices from "../../../services/swap"
+import * as reactViews from "../../../views/implementation/react"
+import * as usePriceImpact from "./usePriceImpact"
+import { useSwapCallback } from "./useSwapCallback"
+import * as useSwapTradeProviders from "./useSwapTradeProviders"
 
 vi.mock("../../../views/implementation/react", () => ({
   useView: vi.fn(),
@@ -23,6 +25,11 @@ describe("useSwapCallback", () => {
   const mockParsedAddress = addressSchema.parse(stark.randomAddress())
   const mockSelectedAccount = { address: mockParsedAddress }
   const mockCalls = sampleOrderResponse.calls
+  const mockPriceImpact = {
+    value: 0.5,
+    type: "low" as const,
+  }
+  const mockTradeProviders = [{ name: "AVNU", iconUrl: "logo-url" }]
 
   beforeEach(() => {
     vi.resetAllMocks() // Reset all mocks to their initial state
@@ -33,6 +40,11 @@ describe("useSwapCallback", () => {
         calls: mockCalls,
       },
     )
+    vi.spyOn(useSwapTradeProviders, "useSwapTradeProviders").mockReturnValue(
+      mockTradeProviders,
+    )
+
+    vi.spyOn(usePriceImpact, "usePriceImpact").mockReturnValue(mockPriceImpact)
   })
 
   it("should return a handleSwap function", () => {
@@ -68,6 +80,70 @@ describe("useSwapCallback", () => {
         "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
         "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
       ],
+      {
+        executionPrice: "1 ETH ≈ 1 DAI",
+        priceImpact: mockPriceImpact,
+        providers: mockTradeProviders,
+        slippage: 0.01,
+        totalFeePercentage: 0.0002,
+        quoteToken: {
+          address:
+            "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+          decimals: 18,
+          name: "Dai Stablecoin",
+          networkId: "mainnet-alpha",
+          symbol: "DAI",
+        },
+        baseToken: {
+          address:
+            "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          decimals: 18,
+          name: "Ether",
+          networkId: "mainnet-alpha",
+          symbol: "ETH",
+        },
+      },
+    )
+  })
+
+  it("should execute swap with review trade information", async () => {
+    const { result } = renderHook(() => useSwapCallback(mockTrade, 0.01))
+    await act(async () => {
+      await result.current()
+    })
+
+    const expectedReviewTrade = {
+      providers: mockTradeProviders,
+      executionPrice: "1 ETH ≈ 1 DAI",
+      slippage: 0.01,
+      totalFeePercentage: mockTrade.totalFeePercentage,
+      priceImpact: mockPriceImpact,
+      quoteToken: {
+        address:
+          "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+        decimals: 18,
+        name: "Dai Stablecoin",
+        networkId: "mainnet-alpha",
+        symbol: "DAI",
+      },
+      baseToken: {
+        address:
+          "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        decimals: 18,
+        name: "Ether",
+        networkId: "mainnet-alpha",
+        symbol: "ETH",
+      },
+    }
+
+    expect(swapServices.swapService.makeSwap).toHaveBeenCalledWith(
+      mockCalls,
+      "Swap ETH to DAI",
+      [
+        "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+      ],
+      expectedReviewTrade,
     )
   })
 
@@ -137,6 +213,29 @@ describe("useSwapCallback", () => {
         "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
         "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
       ],
+      {
+        executionPrice: "1 ETH ≈ 1 DAI",
+        priceImpact: mockPriceImpact,
+        providers: mockTradeProviders,
+        slippage: 0,
+        totalFeePercentage: 0.0002,
+        quoteToken: {
+          address:
+            "0xda114221cb83fa859dbdb4c44beeaa0bb37c7537ad5ae66fe5e0efd20e6eb3",
+          decimals: 18,
+          name: "Dai Stablecoin",
+          networkId: "mainnet-alpha",
+          symbol: "DAI",
+        },
+        baseToken: {
+          address:
+            "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+          decimals: 18,
+          name: "Ether",
+          networkId: "mainnet-alpha",
+          symbol: "ETH",
+        },
+      },
     )
   })
 })

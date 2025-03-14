@@ -8,6 +8,7 @@ export const SwapDataSchema = z.object({
 export const SwapQuoteRouteSchema: z.ZodSchema<any> = z.lazy(() =>
   z.object({
     name: z.string(),
+    dappId: z.string().optional(),
     percent: z.number(),
     sellToken: addressSchema,
     buyToken: addressSchema,

@@ -1,17 +1,15 @@
 import type { FC } from "react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Button, H1, logosDeprecated, P2, P3 } from "@argent/x-ui"
+import { Button, H1, P2, P3 } from "@argent/x-ui"
 import type { FlexProps } from "@chakra-ui/react"
 import { Box, Flex, Text } from "@chakra-ui/react"
-
+import { ArgentXLogo } from "@argent/x-ui/logos-deprecated"
 import { routes } from "../../../shared/ui/routes"
 import { sessionService } from "../../services/session"
 import { PasswordForm } from "./PasswordForm"
 import { useResetAll } from "../../hooks/useResetAll"
 import { IS_DEV } from "../../../shared/utils/dev"
-
-const { ArgentXLogo } = logosDeprecated
 
 export const LockScreen: FC<FlexProps> = (props) => {
   const navigate = useNavigate()

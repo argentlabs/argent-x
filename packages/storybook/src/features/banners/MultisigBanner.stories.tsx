@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
 import { MultisigBanner } from "@argent-x/extension/src/ui/features/banners/MultisigBanner"
 import { decorators } from "../../decorators/routerDecorators"

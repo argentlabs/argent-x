@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 
 import { SaveRecoverySeedphraseBanner } from "@argent-x/extension/src/ui/features/banners/SaveRecoverySeedphraseBanner"
 import { decorators } from "../../decorators/routerDecorators"

@@ -7,6 +7,7 @@ export enum AccountImportError {
   INVALID_PK = "The private key is invalid",
   HAS_GUARDIAN = "This account has a guardian signer",
   IS_MULTISIG = "The account is a multisig account",
+  IS_NOT_ARGENT = "This account is not an Argent account",
 }
 
 export const importErrorTypeSchema = z.nativeEnum(AccountImportError)

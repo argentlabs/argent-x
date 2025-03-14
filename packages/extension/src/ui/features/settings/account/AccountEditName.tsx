@@ -1,4 +1,5 @@
-import { Button, icons } from "@argent/x-ui"
+import { EditPrimaryIcon, CheckmarkSecondaryIcon } from "@argent/x-ui/icons"
+import { Button } from "@argent/x-ui"
 import type { InputProps } from "@chakra-ui/react"
 import {
   Input,
@@ -10,8 +11,6 @@ import type { FC, FormEvent } from "react"
 import { useCallback, useRef, useState } from "react"
 
 import { useOnClickOutside } from "../../../services/useOnClickOutside"
-
-const { EditPrimaryIcon, CheckmarkSecondaryIcon } = icons
 
 interface AccountNameProps extends InputProps {
   onSubmit: () => void

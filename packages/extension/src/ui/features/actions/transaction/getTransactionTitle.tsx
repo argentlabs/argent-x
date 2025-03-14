@@ -2,6 +2,7 @@ import { pluralise, prettifyTokenAmount } from "@argent/x-shared"
 
 import type {
   EnrichedSimulateAndReview,
+  EnrichedSimulateAndReviewV2,
   Property,
 } from "@argent/x-shared/simulation"
 import {
@@ -16,7 +17,7 @@ import { ApproveScreenType } from "./types"
 
 export const getTransactionTitle = (
   approveScreenType: ApproveScreenType,
-  transactionReview?: EnrichedSimulateAndReview,
+  transactionReview?: Pick<EnrichedSimulateAndReviewV2, "transactions">,
   fallback: string = "transaction",
 ): string => {
   const reviewOfTransaction = getReviewOfTransaction(transactionReview)
@@ -58,7 +59,10 @@ export const getTransactionTitle = (
       transactionReview,
       false,
     )?.symbol
-    return `Swap ${srcSymbol} to ${dstSymbol}`
+    if (srcSymbol && dstSymbol) {
+      return `Swap ${srcSymbol} to ${dstSymbol}`
+    }
+    return `Swap`
   }
 
   if (isTransfer) {

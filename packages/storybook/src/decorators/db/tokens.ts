@@ -1,4 +1,4 @@
-import { Token } from "../../token/__new/types/token.model"
+import type { Token } from "../../token/__new/types/token.model"
 
 export const tokens: Token[] = [
   {

@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
     dts({
       insertTypesEntry: true,
       tsconfigPath: resolvePath(__dirname, "tsconfig.json"),
-      exclude: [".eslintrc.js"],
+      exclude: ["eslint.config.mjs"],
     }),
     react(),
   ],

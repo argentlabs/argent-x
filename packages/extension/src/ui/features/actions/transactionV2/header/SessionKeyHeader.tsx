@@ -3,14 +3,14 @@ import { Flex } from "@chakra-ui/react"
 import { TransactionIcon } from "./icon/TransactionIcon"
 import { TransactionTitle } from "./TransactionTitle"
 import type { FC } from "react"
-import type { IconKeys } from "@argent/x-ui"
 import { useDappDisplayAttributes } from "../../../../services/knownDapps/useDappDisplayAttributes"
+import type { TransactionIconKeys } from "../../../../../shared/actionQueue/schema"
 
 export interface SessionKeyHeaderProps extends FlexProps {
   title?: string
   dappLogoUrl?: string
   subtitle?: string
-  iconKey?: IconKeys
+  iconKey?: TransactionIconKeys
   dappHost?: string
   isInfluence: boolean
 }

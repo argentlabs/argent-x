@@ -4,31 +4,31 @@ import test from "../test"
 import { expireBESession, generateEmail } from "../utils"
 import config from "../config"
 
-const ethInitialBalance = 0.002 * Number(config.initialBalanceMultiplier)
+const strkInitialBalance = "5.0"
 
 test.describe("Smart Account", { tag: "@tx" }, () => {
-  test.slow()
   test.skip(config.skipTXTests === "true")
 
   test("User should be able to setup a wallet with a smart account", async ({
     extension,
   }) => {
     const email = generateEmail()
-    await extension.setupWallet({
+    const { accountNames } = await extension.setupWallet({
       email,
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
-        { assets: [{ token: "ETH", balance: 0 }] },
+        { assets: [{ token: "STRK", balance: 0 }] },
       ],
     })
-
+    const accountName1 = accountNames![0]
+    const accountName2 = accountNames![1]
     await extension.account.transfer({
-      originAccountName: extension.account.accountName1,
+      originAccountName: accountName1,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
+      token: "STRK",
       amount: "MAX",
     })
     //todo  check activity
@@ -36,44 +36,43 @@ test.describe("Smart Account", { tag: "@tx" }, () => {
     await extension.activity.ensureNoPendingTransactions()
 
     //other accounts should have independent Argent Shield
-    await extension.account.ensureSmartAccountNotEnabled(
-      extension.account.accountName2,
-    )
+    await extension.account.ensureSmartAccountNotEnabled(accountName2)
   })
 
   test("User should be able to upgrade/downgrade all accounts to smart account", async ({
     extension,
   }) => {
     const email = generateEmail()
-    await extension.setupWallet({
+    const { accountNames } = await extension.setupWallet({
       email,
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
       ],
     })
-
+    const accountName1 = accountNames![0]
+    const accountName2 = accountNames![1]
     await extension.activateSmartAccount({
-      accountName: extension.account.accountName2,
+      accountName: accountName2,
       email,
       validSession: true,
     })
 
     await extension.changeToStandardAccount({
-      accountName: extension.account.accountName1,
+      accountName: accountName1,
       email,
       validSession: true,
     })
     await extension.navigation.backLocator.click()
     await extension.navigation.closeLocator.click()
     await extension.changeToStandardAccount({
-      accountName: extension.account.accountName2,
+      accountName: accountName2,
       email,
       validSession: true,
     })
@@ -87,7 +86,7 @@ test.describe("Smart Account", { tag: "@tx" }, () => {
       email,
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
       ],
@@ -100,6 +99,8 @@ test.describe("Smart Account", { tag: "@tx" }, () => {
     })
 
     await extension.account.fillPin()
+    await extension.account.selectTokenButton.click()
+    await extension.account.token("STRK").click()
     await Promise.all([
       expect(extension.account.balance).toBeVisible(),
       expect(extension.account.sendMax).toBeVisible(),
@@ -119,7 +120,7 @@ test.describe("Smart Account", { tag: "@tx" }, () => {
       success: false,
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
       ],
@@ -130,21 +131,21 @@ test.describe("Smart Account", { tag: "@tx" }, () => {
     extension,
   }) => {
     const email = generateEmail()
-    const { seed } = await extension.setupWallet({
+    const { seed, accountNames } = await extension.setupWallet({
       email,
       accountsToSetup: [
         {
-          assets: [{ token: "ETH", balance: ethInitialBalance }],
+          assets: [{ token: "STRK", balance: strkInitialBalance }],
           deploy: true,
         },
-        { assets: [{ token: "ETH", balance: 0 }] },
+        { assets: [{ token: "STRK", balance: 0 }] },
       ],
     })
-
+    const accountName1 = accountNames![0]
     await extension.account.transfer({
-      originAccountName: extension.account.accountName1,
+      originAccountName: accountName1,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
+      token: "STRK",
       amount: 0.00001,
     })
 
@@ -153,16 +154,16 @@ test.describe("Smart Account", { tag: "@tx" }, () => {
     await extension.resetExtension()
     await extension.recoverWallet(seed)
     await extension.changeToStandardAccount({
-      accountName: extension.account.accountName1,
+      accountName: accountName1,
       email,
       validSession: false,
     })
     await extension.navigation.backLocator.click()
     await extension.navigation.closeLocator.click()
     await extension.account.transfer({
-      originAccountName: extension.account.accountName1,
+      originAccountName: accountName1,
       recipientAddress: config.destinationAddress!,
-      token: "ETH",
+      token: "STRK",
       amount: "MAX",
     })
     await extension.activity.ensureNoPendingTransactions()

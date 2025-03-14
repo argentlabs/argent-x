@@ -1,10 +1,8 @@
-import { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react"
 import { Menu } from "@chakra-ui/react"
 
-import {
-  NetworkSwitcherList,
-  NetworkSwitcherListProps,
-} from "@argent-x/extension/src/ui/features/navigation/NetworkSwitcherList"
+import type { NetworkSwitcherListProps } from "@argent-x/extension/src/ui/features/navigation/NetworkSwitcherList"
+import { NetworkSwitcherList } from "@argent-x/extension/src/ui/features/navigation/NetworkSwitcherList"
 import { decorators } from "../../decorators/routerDecorators"
 
 const meta: Meta<typeof NetworkSwitcherList> = {

@@ -1,12 +1,12 @@
 import { BarBackButton, H5, NavigationBar, P2 } from "@argent/x-ui"
-import { Divider, Flex, useDisclosure } from "@chakra-ui/react"
+import { Divider, Flex } from "@chakra-ui/react"
 import { useEffect, useMemo, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 
 import { formatTruncatedAddress } from "@argent/x-shared"
 import { isObject, isString } from "lodash-es"
 import { useCallback } from "react"
-import { num, TransactionType } from "starknet"
+import { constants, num, TransactionType } from "starknet"
 import {
   multisigPendingTransactionView,
   setHasSeenTransaction,
@@ -113,6 +113,16 @@ export const MultisigPendingTransactionDetailsScreen = () => {
     }
     return []
   }, [pendingTransaction])
+
+  const txVersion = useMemo(() => {
+    if (
+      pendingTransaction?.transaction.version &&
+      num.toHex(pendingTransaction.transaction.version) === "0x1"
+    ) {
+      return constants.TRANSACTION_VERSION.V1
+    }
+    return constants.TRANSACTION_VERSION.V3
+  }, [pendingTransaction?.transaction.version])
 
   useEffect(() => {
     if (requestId && pendingTransaction?.notify) {
@@ -283,6 +293,7 @@ export const MultisigPendingTransactionDetailsScreen = () => {
       useRejectButtonColorFallback={false}
       nonce={pendingTransaction.nonce}
       txNeedsRetry={txNeedsRetry}
+      txVersion={txVersion}
     />
   )
 }

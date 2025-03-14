@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest"
-import { ZodError } from "zod"
 
 import {
   defaultNetwork,
@@ -24,15 +23,15 @@ describe("networkSchema", () => {
   })
   describe("when invalid", () => {
     test("should not allow accountClassHash with invalid argentAccount", () => {
-      expect(
-        networkSchema.safeParse({
-          ...defaultLocalhostNetwork,
-          accountClassHash: {
-            standard: "foo",
-          },
-        }),
-      ).toEqual({
-        error: new ZodError([
+      const result = networkSchema.safeParse({
+        ...defaultLocalhostNetwork,
+        accountClassHash: {
+          standard: "foo",
+        },
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues).toMatchObject([
           {
             validation: "regex",
             code: "invalid_string",
@@ -40,9 +39,8 @@ describe("networkSchema", () => {
               "Account class hash must match the following: /^0x[a-f0-9]+$/i",
             path: ["accountClassHash", "standard"],
           },
-        ]),
-        success: false,
-      })
+        ])
+      }
     })
   })
 })

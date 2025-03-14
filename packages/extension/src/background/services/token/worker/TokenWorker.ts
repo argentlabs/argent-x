@@ -223,7 +223,7 @@ export class TokenWorker {
       .map((t) => ({ ...t, networkId }))
 
     await this.tokenService.updateTokens(
-      mergeTokensWithDefaults(tradableTokens, updatedTokens),
+      mergeTokensWithDefaults(updatedTokens, tradableTokens),
     )
   }
 

@@ -1,9 +1,8 @@
-import { H5, icons, P3 } from "@argent/x-ui"
+import { WarningCirclePrimaryIcon } from "@argent/x-ui/icons"
+import { H5, P3 } from "@argent/x-ui"
 import type { FlexProps } from "@chakra-ui/react"
 import { Box, Flex, HStack, VStack } from "@chakra-ui/react"
 import type { FC, ReactNode } from "react"
-
-const { WarningCirclePrimaryIcon } = icons
 
 export interface WarningRecoveryBannerProps extends Omit<FlexProps, "title"> {
   title: ReactNode

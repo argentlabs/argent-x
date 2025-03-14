@@ -2,6 +2,7 @@ import { isArray } from "lodash-es"
 import type {
   Action,
   EnrichedSimulateAndReview,
+  EnrichedSimulateAndReviewV2,
   Property,
   ReviewOfTransaction,
 } from "@argent/x-shared/simulation"
@@ -108,7 +109,7 @@ export const getTransactionReviewSwapToken = (
 }
 
 export const getReviewOfTransaction = (
-  transactionReview?: EnrichedSimulateAndReview,
+  transactionReview?: Pick<EnrichedSimulateAndReviewV2, "transactions">,
 ) => {
   return transactionReview?.transactions?.[0]?.reviewOfTransaction
 }

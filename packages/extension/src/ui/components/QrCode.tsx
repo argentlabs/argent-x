@@ -4,9 +4,8 @@ import type { Options } from "qr-code-styling"
 import QRCodeStyling from "qr-code-styling"
 import type { FC } from "react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { icons, useOnClickOutside } from "@argent/x-ui"
-
-const { MaximizeIcon } = icons
+import { MaximizeIcon } from "@argent/x-ui/icons"
+import { useOnClickOutside } from "@argent/x-ui"
 
 interface QrCodeProps extends CenterProps {
   size: number

@@ -1,9 +1,9 @@
-import type { Address, TransactionAction } from "@argent/x-shared"
+import type { TransactionAction } from "@argent/x-shared"
 import type { ITransactionReviewService } from "../../../shared/transactionReview/interface"
 import type { messageClient } from "../trpc"
 import type { BaseWalletAccount } from "../../../shared/wallet.model"
 import type { Call } from "starknet"
-import type { EstimatedFees } from "@argent/x-shared/simulation"
+import type { EstimatedFeesV2 } from "@argent/x-shared/simulation"
 import type { AccountDeployTransaction } from "../../../shared/transactionReview/transactionAction.model"
 
 export class ClientTransactionReviewService
@@ -13,21 +13,18 @@ export class ClientTransactionReviewService
 
   async simulateAndReview({
     transaction,
-    feeTokenAddress,
     accountDeployTransaction,
     appDomain,
     maxSendEstimate,
   }: {
     transaction: TransactionAction
     accountDeployTransaction?: AccountDeployTransaction
-    feeTokenAddress: Address
     appDomain?: string
     maxSendEstimate?: boolean
   }) {
     return this.trpcClient.transactionReview.simulateAndReview.query({
       transaction,
       accountDeployTransaction,
-      feeTokenAddress,
       appDomain,
       maxSendEstimate,
     })
@@ -36,7 +33,7 @@ export class ClientTransactionReviewService
   async getCompressedTransactionPayload(
     account: BaseWalletAccount,
     transactions: Call | Call[],
-    estimatedFees?: EstimatedFees,
+    estimatedFees?: EstimatedFeesV2,
     nonce?: string,
   ) {
     return this.trpcClient.transactionReview.getCompressedTransactionPayload.query(

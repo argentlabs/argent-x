@@ -2,7 +2,7 @@ import type { CustomButtonCellProps } from "../../../components/CustomButtonCell
 import type { FC } from "react"
 import React, { useMemo } from "react"
 import { Button, Flex } from "@chakra-ui/react"
-import { buttonHoverStyle, H5, P3, typographyStyles } from "@argent/x-ui"
+import { H5, P3 } from "@argent/x-ui"
 import type { MultisigPendingOffchainSignature } from "../../../../shared/multisig/pendingOffchainSignaturesStore"
 import { isString } from "lodash-es"
 import { useDappFromKnownDappsByName } from "../../../services/knownDapps"
@@ -10,6 +10,8 @@ import { DappIcon } from "../../actions/connectDapp/DappIcon"
 import { TransactionIcon } from "./ui/TransactionIcon"
 import { getDapplandUrlForDapp } from "@argent/x-shared"
 import type { DappDisplayAttributes } from "../../../services/knownDapps/types"
+
+import { buttonHoverStyle, typographyStyles } from "@argent/x-ui/theme"
 
 interface OffchainSignatureListItemProps extends CustomButtonCellProps {
   pendingOffchainSignature: MultisigPendingOffchainSignature

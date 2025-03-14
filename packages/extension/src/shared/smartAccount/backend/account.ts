@@ -5,7 +5,11 @@ import type {
   CosignerResponse,
 } from "@argent/x-guardian"
 import type { AddSmartAccountResponse, BackendAccount } from "@argent/x-shared"
-import { AddSmartAcountRequestSchema, BaseError } from "@argent/x-shared"
+import {
+  AddSmartAcountRequestSchema,
+  BaseError,
+  urlWithQuery,
+} from "@argent/x-shared"
 import retry from "async-retry"
 import urlJoin from "url-join"
 import { z } from "zod"
@@ -16,6 +20,8 @@ import { IS_DEV } from "../../utils/dev"
 import { coerceErrorToString } from "../../utils/error"
 import { idb } from "../idb"
 import { jwtFetcher } from "../jwtFetcher"
+import { argentApiNetworkForNetwork } from "../../api/headers"
+import { checkTokenExpiry } from "../utils/tokenExpiry"
 
 export const requestEmailAuthentication = async (
   email: string,
@@ -171,35 +177,37 @@ export const getRegistrationStatus = async () => {
   }
 }
 
-export const isTokenExpired = async () => {
-  try {
-    const res = await jwtFetcher<{ userId: string }>(
-      urlJoin(ARGENT_API_BASE_URL, `account`),
-    )
-
-    ampli.identify(res.userId)
-
-    await idb.ids.put({ key: "userId", id: res.userId })
-    return false
-  } catch (error) {
-    if (IS_DEV) {
-      console.warn(coerceErrorToString(error))
-    }
+export const isTokenExpired = async ({ initiator }: { initiator: string }) => {
+  const { expired, userId } = await checkTokenExpiry({
+    initiator,
+  })
+  if (userId) {
+    void ampli.identify(userId)
   }
-  return true
+  return expired
 }
 
 interface GetAccountsResponse {
   accounts: BackendAccount[]
 }
 
-export const getBackendAccounts = async () => {
+/**
+ * Get all smart accounts for a given network. If no network is provided, it will return all smart accounts for the default network.
+ * It returns only the smart accounts associated with the email address from the current login session
+ * @param networkId
+ */
+export const getSmartAccounts = async (networkId: string) => {
+  const argentNetwork = argentApiNetworkForNetwork(networkId)
+  if (!argentNetwork) {
+    throw new BaseError({ message: "Invalid network" })
+  }
   try {
     const json = await jwtFetcher<GetAccountsResponse>(
-      urlJoin(
-        ARGENT_API_BASE_URL,
-        `accounts?application=argentx&chain=starknet`,
-      ),
+      urlWithQuery([ARGENT_API_BASE_URL, `accounts`], {
+        application: "argentx",
+        chain: "starknet",
+        network: argentNetwork,
+      }),
     )
     return json.accounts
   } catch {
@@ -215,8 +223,15 @@ const AddBackendAccountSchema = AddSmartAcountRequestSchema.extend({
 type AddBackendAccountRequest = z.infer<typeof AddBackendAccountSchema>
 
 export const addBackendAccount = async (request: AddBackendAccountRequest) => {
-  const { accountAddress, name, icon, signature, implClassHash, ownerAddress } =
-    request
+  const {
+    accountAddress,
+    name,
+    icon,
+    signature,
+    implClassHash,
+    ownerAddress,
+    network,
+  } = request
 
   try {
     const json = await jwtFetcher<AddSmartAccountResponse>(
@@ -233,6 +248,9 @@ export const addBackendAccount = async (request: AddBackendAccountRequest) => {
           ...(icon && { icon }),
           signature,
           assignCosigner: true,
+          ...(network && {
+            network: argentApiNetworkForNetwork(network),
+          }),
         }),
       },
     )

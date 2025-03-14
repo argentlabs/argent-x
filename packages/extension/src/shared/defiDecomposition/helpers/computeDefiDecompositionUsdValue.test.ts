@@ -1,4 +1,4 @@
-import { getMockAccount } from "../../../../test/account.mock"
+import { getMockWalletAccount } from "../../../../test/walletAccount.mock"
 import { defiDecomposition } from "../__fixtures__/defiDecomposition"
 import { tokenPrices } from "../__fixtures__/tokenPrices"
 import { tokens } from "../__fixtures__/tokens"
@@ -17,7 +17,7 @@ import { computeDefiDecompositionUsdValue } from "./computeDefiDecompositionUsdV
 import { parseDefiDecomposition } from "./parseDefiDecomposition"
 
 describe("computeDefiDecompositionUsdValue", () => {
-  const mockAccount = getMockAccount({
+  const mockAccount = getMockWalletAccount({
     address: "0x123",
     networkId: "sepolia-alpha",
   })

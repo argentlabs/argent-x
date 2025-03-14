@@ -1,9 +1,9 @@
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
 import {
   BarBackButton,
   Button,
   CellStack,
   FlowHeader,
-  icons,
   NavigationContainer,
 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
@@ -12,8 +12,6 @@ import { useCallback } from "react"
 
 import type { SmartAccountValidationErrorMessage } from "../../../shared/errors/argentAccount"
 import SmartAccountError from "./ui/SmartAccountError"
-
-const { WarningCircleSecondaryIcon } = icons
 
 export interface SmartAccountValidationErrorScreenProps {
   onBack?: () => void

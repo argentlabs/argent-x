@@ -1,16 +1,7 @@
-import {
-  addressSchema,
-  formatTruncatedAddress,
-  isStarknetDomainName,
-} from "@argent/x-shared"
-import {
-  BarIconButton,
-  H5,
-  icons,
-  L2Bold,
-  P4,
-  typographyStyles,
-} from "@argent/x-ui"
+import { starknetId } from "starknet"
+import { addressSchema, formatTruncatedAddress } from "@argent/x-shared"
+import { LinkPrimaryIcon, MoreSecondaryIcon } from "@argent/x-ui/icons"
+import { BarIconButton, H5, L2Bold, P4 } from "@argent/x-ui"
 import {
   Box,
   Circle,
@@ -32,12 +23,11 @@ import { AccountListItemWarningBadge } from "./AccountListItemDeprecatedBadge"
 import { AccountListItemSmartAccountBadgeContainer } from "./AccountListItemSmartAccountBadgeContainer"
 import { AccountListItemUpgradeBadge } from "./AccountListItemUpgradeBadge"
 import type { AccountListItemProps } from "./accountListItem.model"
-import { getNetworkAccountImageUrl } from "./accounts.service"
 import { useWalletAccount } from "./accounts.state"
 import { useOnSettingsAccountNavigate } from "./useOnSettingsAccountNavigate"
 import { AccountListItemLedgerBadge } from "./AccountListItemLedgerBadge"
 
-const { LinkPrimaryIcon, MoreSecondaryIcon } = icons
+import { typographyStyles } from "@argent/x-ui/theme"
 
 const NetworkStatusWrapper = chakra(Flex, {
   baseStyle: {
@@ -127,6 +117,9 @@ export const AccountListItem: FC<AccountListItemProps> = ({
   avatarIcon,
   avatarOutlined,
   avatarSize = 12,
+  emojiStyle = typographyStyles.H2,
+  initialsStyle = typographyStyles.H4,
+  avatarMeta,
   children,
   isDeprecated,
   rightElementFlexProps,
@@ -163,7 +156,7 @@ export const AccountListItem: FC<AccountListItemProps> = ({
     const descriptionElements = []
     if (accountDescription) {
       descriptionElements.push(accountDescription)
-    } else if (isStarknetDomainName(accountAddress)) {
+    } else if (starknetId.isStarkDomain(accountAddress)) {
       descriptionElements.push(accountAddress)
     } else {
       if (addressSchema.safeParse(accountAddress).success) {
@@ -197,10 +190,12 @@ export const AccountListItem: FC<AccountListItemProps> = ({
         <AccountAvatar
           outlined={avatarOutlined}
           size={avatarSize}
-          src={getNetworkAccountImageUrl({
-            accountName,
-            accountId,
-          })}
+          accountId={accountId}
+          accountName={accountName}
+          accountType={accountType}
+          emojiStyle={emojiStyle}
+          initialsStyle={initialsStyle}
+          avatarMeta={avatarMeta}
         >
           {getAvatarBadge()}
         </AccountAvatar>

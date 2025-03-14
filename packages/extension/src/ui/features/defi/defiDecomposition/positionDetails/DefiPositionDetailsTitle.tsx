@@ -4,7 +4,7 @@ import type { ParsedPosition } from "../../../../../shared/defiDecomposition/sch
 import { HStack } from "@chakra-ui/react"
 import { DefiIcon } from "../DefiIcon"
 import { useView } from "../../../../views/implementation/react"
-import { positionTitleDetailsFindAtom } from "../../../../views/investments"
+import { investmentPositionViewFindByIdAtom } from "../../../../views/investments"
 
 interface DefiPositionDetailsTitleProps {
   position: ParsedPosition
@@ -14,7 +14,11 @@ interface DefiPositionDetailsTitleProps {
 export const DefiPositionDetailsTitle: React.FC<
   DefiPositionDetailsTitleProps
 > = ({ position, networkId }) => {
-  const detailsTitle = useView(positionTitleDetailsFindAtom(position))
+  const positionWithTitle = useView(
+    investmentPositionViewFindByIdAtom({ positionId: position.id }),
+  )
+
+  const detailsTitle = positionWithTitle?.titleDetails
 
   return (
     <HStack gap="2">

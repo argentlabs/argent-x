@@ -1,17 +1,23 @@
 import { isObject, isString } from "lodash-es"
 
+import type { SimulateAndReview } from "@argent/x-shared/simulation"
+import type Emittery from "emittery"
 import type { IActionQueue } from "../../../shared/actionQueue/queue/IActionQueue"
 import type {
   ActionHash,
   ActionItemExtra,
   ActionQueueItemMeta,
 } from "../../../shared/actionQueue/schema"
+import type { ApproveActionInput } from "../../../shared/actionQueue/service/IActionService"
 import type {
   ActionItem,
   ExtensionActionItem,
   ExtQueueItem,
 } from "../../../shared/actionQueue/types"
-import type { MessageType } from "../../../shared/messages"
+import { ActionError } from "../../../shared/errors/action"
+import type { MessageType } from "../../../shared/messages/types"
+import type { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
+import type { ArrayStorage } from "../../../shared/storage"
 import {
   handleActionApproval,
   handleActionRejection,
@@ -20,15 +26,11 @@ import type { Respond, RespondToHost } from "../../respond"
 import type { Wallet } from "../../wallet"
 import {
   TransactionCreatedForAction,
+  TransactionIntentCreatedForAction,
   type Events,
   type IBackgroundActionService,
 } from "./IBackgroundActionService"
-import { ActionError } from "../../../shared/errors/action"
-import type { SimulateAndReview } from "@argent/x-shared/simulation"
-import type Emittery from "emittery"
-import type { MultisigPendingTransaction } from "../../../shared/multisig/pendingTransactionsStore"
-import type { ArrayStorage } from "../../../shared/storage"
-import type { ApproveActionInput } from "../../../shared/actionQueue/service/IActionService"
+import type { ITransactionExecutionService } from "../transactionExecution/ITransactionExecutionService"
 
 const getResultData = (resultMessage?: MessageType) => {
   if (resultMessage && "data" in resultMessage) {
@@ -50,6 +52,7 @@ export default class BackgroundActionService
     readonly emitter: Emittery<Events>,
     private queue: IActionQueue<ActionItem>,
     private multisigPendingTransactionsStore: ArrayStorage<MultisigPendingTransaction>,
+    private transactionExecutor: ITransactionExecutionService,
     private wallet: Wallet,
     private respond: Respond,
     private respondToHost: RespondToHost,
@@ -74,7 +77,7 @@ export default class BackgroundActionService
     /**
      * Don't await handleActionApproval, this allows for existing patterns to use 'waitForMessage' after calling await clientActionService.approve(...)
      */
-    handleActionApproval(action, this.wallet, extra)
+    handleActionApproval(action, this.wallet, this.transactionExecutor, extra)
       .then(async (resultMessage) => {
         const error = getResultDataError(resultMessage)
         if (error) {
@@ -112,7 +115,12 @@ export default class BackgroundActionService
       startedApproving: Date.now(),
       errorApproving: undefined,
     })
-    const resultMessage = await handleActionApproval(action, this.wallet, extra)
+    const resultMessage = await handleActionApproval(
+      action,
+      this.wallet,
+      this.transactionExecutor,
+      extra,
+    )
 
     const error = getResultDataError(resultMessage)
     if (error) {
@@ -158,6 +166,15 @@ export default class BackgroundActionService
       await this.emitter.emit(TransactionCreatedForAction, {
         actionHash,
         transactionHash: resultMessage.data.txHash,
+      })
+    }
+    if (resultMessage.type === "SIGNATURE_SUCCESS") {
+      await this.emitter.emit(TransactionIntentCreatedForAction, {
+        actionHash,
+        accountAddress: resultMessage.data.accountAddress,
+        networkId: resultMessage.data.networkId,
+        accountId: resultMessage.data.accountId,
+        txHash: resultMessage.data.txHash,
       })
     }
   }

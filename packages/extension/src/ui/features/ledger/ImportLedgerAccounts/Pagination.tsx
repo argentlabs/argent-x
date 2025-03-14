@@ -1,9 +1,11 @@
 import type { BoxProps } from "@chakra-ui/react"
 import { Button, Center, HStack } from "@chakra-ui/react"
 import type { FC } from "react"
-import { icons, P3 } from "@argent/x-ui"
-
-const { ChevronLeftSecondaryIcon, ChevronRightSecondaryIcon } = icons
+import {
+  ChevronLeftSecondaryIcon,
+  ChevronRightSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { P3 } from "@argent/x-ui"
 
 interface PaginationProps extends BoxProps {
   goToPage: (page: number) => void

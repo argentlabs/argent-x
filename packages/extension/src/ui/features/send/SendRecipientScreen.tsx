@@ -1,4 +1,13 @@
 import {
+  SearchPrimaryIcon,
+  WalletSecondaryIcon,
+  CrossSecondaryIcon,
+  MultisigSecondaryIcon,
+  AddressBookIcon,
+  ImportIcon,
+} from "@argent/x-ui/icons"
+
+import {
   BarAddButton,
   BarBackButton,
   Button,
@@ -7,7 +16,6 @@ import {
   FieldError,
   H5,
   HeaderCell,
-  icons,
   NavigationContainer,
   TextareaAutosize,
 } from "@argent/x-ui"
@@ -38,14 +46,7 @@ import type { FormType } from "./sendRecipientScreen.model"
 import { AccountListItemEditAccessory } from "../accounts/AccountListItemEditAccessory"
 import { useTabIndexWithHash } from "../../hooks/useTabIndexWithHash"
 
-const {
-  SearchPrimaryIcon,
-  WalletSecondaryIcon,
-  CrossSecondaryIcon,
-  MultisigSecondaryIcon,
-  AddressBookIcon,
-  ImportIcon,
-} = icons
+import { typographyStyles } from "@argent/x-ui/theme"
 
 interface SendRecipientScreenProps {
   errors: FieldErrors<FormType>
@@ -175,7 +176,11 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                 }}
               />
               {isLoading && (
-                <InputRightElement pointerEvents="none" h={"full"}>
+                <InputRightElement
+                  pointerEvents="none"
+                  h={"full"}
+                  data-testid="loading-spinner"
+                >
                   <Spinner size={"sm"} />
                 </InputRightElement>
               )}
@@ -300,6 +305,8 @@ export const SendRecipientScreen: FC<SendRecipientScreenProps> = ({
                         <AccountListItem
                           key={contact.id}
                           avatarSize={9}
+                          emojiStyle={typographyStyles.H3}
+                          initialsStyle={typographyStyles.H4}
                           accountAddress={contact.address}
                           accountId={contact.id}
                           networkId={contact.networkId}

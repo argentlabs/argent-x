@@ -2,9 +2,9 @@ import memoize from "memoizee"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { swrCacheProvider } from "../services/swr.service"
-import type { IArrayStorage } from "../../shared/storage/array"
-import type { IKeyValueStorage } from "../../shared/storage/keyvalue"
-import type { IObjectStorage } from "../../shared/storage/object"
+import type { IArrayStorage } from "../../shared/storage/types/IArrayStorage"
+import type { IKeyValueStorage } from "../../shared/storage/types/IKeyValueStorage"
+import type { IObjectStorage } from "../../shared/storage/types/IObjectStorage"
 import type { SelectorFn } from "../../shared/storage/types"
 
 export function useGetSetKeyValueStorage<
@@ -39,7 +39,9 @@ export function useKeyValueStorage<
   )
 
   useEffect(() => {
-    void storage.get(key).then(set)
+    // storage.get can be either a Promise or a direct value,
+    // wrap the value in Promise.resolve() to handle both cases
+    void Promise.resolve(storage.get(key)).then(set)
     const sub = storage.subscribe(key, set)
     return () => sub()
   }, [storage, key, set])

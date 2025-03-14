@@ -9,6 +9,7 @@ import {
   maxAmountSpendFromTokenBalance,
   predefinedSortOrder,
   sortSwapTokens,
+  getProvidersFromTradeRoute,
 } from "./index"
 
 describe("swap utils", () => {
@@ -136,6 +137,143 @@ describe("swap utils", () => {
     it("handles an array with a single token", () => {
       const singleTokenArray = [getMockToken({ symbol: "ETH" })]
       expect(sortSwapTokens(singleTokenArray)).toEqual(singleTokenArray)
+    })
+  })
+
+  describe("getProvidersFromTradeRoute", () => {
+    const mockAddress =
+      "0x062bd02616B4d85040b0B7Af610923Aed51F4E8458201c19d94CEB6E30150372"
+
+    it("should extract provider info from a simple route", () => {
+      const route = {
+        name: "Ekubo",
+        dappId: "ekubo-123",
+        percent: 100,
+        sellToken: mockAddress,
+        buyToken: mockAddress,
+        routes: [],
+      }
+
+      const result = getProvidersFromTradeRoute(route)
+      expect(result).toEqual([{ name: "Ekubo", dappId: "ekubo-123" }])
+    })
+
+    it("should handle nested routes", () => {
+      const route = {
+        name: "Aggregator",
+        dappId: "agg-123",
+        percent: 100,
+        sellToken: mockAddress,
+        buyToken: mockAddress,
+        routes: [
+          {
+            name: "JediSwap",
+            dappId: "jedi-123",
+            percent: 60,
+            sellToken: mockAddress,
+            buyToken: mockAddress,
+            routes: [],
+          },
+          {
+            name: "MySwap",
+            percent: 40,
+            sellToken: mockAddress,
+            buyToken: mockAddress,
+            routes: [],
+          },
+        ],
+      }
+
+      const result = getProvidersFromTradeRoute(route)
+      expect(result).toEqual([
+        { name: "Aggregator", dappId: "agg-123" },
+        { name: "JediSwap", dappId: "jedi-123" },
+        { name: "MySwap" },
+      ])
+    })
+
+    it("should keep entry with dappId when duplicate providers exist", () => {
+      const route = {
+        name: "Aggregator",
+        percent: 100,
+        sellToken: mockAddress,
+        buyToken: mockAddress,
+        routes: [
+          {
+            name: "JediSwap",
+            dappId: "jedi-123",
+            percent: 50,
+            sellToken: mockAddress,
+            buyToken: mockAddress,
+            routes: [],
+          },
+          {
+            name: "JediSwap",
+            percent: 50,
+            sellToken: mockAddress,
+            buyToken: mockAddress,
+            routes: [],
+          },
+        ],
+      }
+
+      const result = getProvidersFromTradeRoute(route)
+      expect(result).toEqual([
+        { name: "Aggregator" },
+        { name: "JediSwap", dappId: "jedi-123" },
+      ])
+    })
+
+    it("should handle deeply nested routes", () => {
+      const route = {
+        name: "Aggregator",
+        dappId: "agg-123",
+        percent: 100,
+        sellToken: mockAddress,
+        buyToken: mockAddress,
+        routes: [
+          {
+            name: "JediSwap",
+            percent: 60,
+            sellToken: mockAddress,
+            buyToken: mockAddress,
+            routes: [
+              {
+                name: "MySwap",
+                dappId: "my-123",
+                percent: 100,
+                sellToken: mockAddress,
+                buyToken: mockAddress,
+                routes: [],
+              },
+            ],
+          },
+          {
+            name: "MySwap",
+            percent: 40,
+            sellToken: mockAddress,
+            buyToken: mockAddress,
+            routes: [],
+          },
+        ],
+      }
+
+      const result = getProvidersFromTradeRoute(route)
+      expect(result).toEqual([
+        { name: "Aggregator", dappId: "agg-123" },
+        { name: "JediSwap" },
+        { name: "MySwap", dappId: "my-123" },
+      ])
+    })
+
+    it("should throw error for invalid route schema", () => {
+      const invalidRoute = {
+        name: "Invalid",
+        // missing required fields
+        routes: [],
+      }
+
+      expect(() => getProvidersFromTradeRoute(invalidRoute as any)).toThrow()
     })
   })
 })

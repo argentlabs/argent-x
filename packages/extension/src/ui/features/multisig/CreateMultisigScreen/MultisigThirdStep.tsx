@@ -1,12 +1,14 @@
-import { icons, MassiveTitle, P3 } from "@argent/x-ui"
+import {
+  SuccessSecondaryIcon,
+  InfoCircleSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { MassiveTitle, P3 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 
 import { ScreenLayout } from "./ScreenLayout"
 import { SignerType } from "../../../../shared/wallet.model"
 import { useMemo } from "react"
 import { ActionButton } from "../../../components/FullScreenPage"
-
-const { SuccessSecondaryIcon, InfoCircleSecondaryIcon } = icons
 
 interface MultisigThirdStepProps {
   index: number

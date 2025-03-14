@@ -1,18 +1,10 @@
-import {
-  Button,
-  H2,
-  icons,
-  NavigationContainer,
-  P2,
-  StickyGroup,
-} from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { Button, H2, NavigationContainer, P2, StickyGroup } from "@argent/x-ui"
 import { Box, Center, Circle, Flex } from "@chakra-ui/react"
 import type { FC } from "react"
 import { isValidElement, useCallback, useState } from "react"
 import type { ContentRect } from "react-measure"
 import Measure from "react-measure"
-
-const { WarningCircleSecondaryIcon } = icons
 
 export interface WarningScreenProps {
   title: React.ReactNode

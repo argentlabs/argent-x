@@ -18,11 +18,11 @@ export const handleMiscellaneousMessage: HandleMessage<
     case "RESET_ALL": {
       try {
         await browser.storage.local.clear()
+        await browser.storage.session.clear()
         await browser.storage.sync.clear()
         await browser.storage.managed.clear()
-        await browser.storage.session.clear()
       } catch {
-        // Ignore browser.storage.session error "This is a read-only store"
+        // Ignore browser.managed.session error "This is a read-only store"
       }
       await resetDevice()
       return respond({ type: "DISCONNECT_ACCOUNT" })

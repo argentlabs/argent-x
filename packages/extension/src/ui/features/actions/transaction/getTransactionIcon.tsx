@@ -1,5 +1,4 @@
-import type { EnrichedSimulateAndReview } from "@argent/x-shared/simulation"
-import type { IconKeys } from "@argent/x-ui"
+import type { EnrichedSimulateAndReviewV2 } from "@argent/x-shared/simulation"
 import {
   getReviewOfTransaction,
   transactionReviewHasNft,
@@ -7,11 +6,60 @@ import {
   transactionReviewHasTransfer,
 } from "../../../../shared/transactionReview.service"
 import { ApproveScreenType } from "./types"
+import {
+  DocumentIcon,
+  RocketSecondaryIcon,
+  MultisigSecondaryIcon,
+  RemoveContactSecondaryIcon,
+  AddContactSecondaryIcon,
+  ApproveIcon,
+  CrossSecondaryIcon,
+  ShieldSecondaryIcon,
+  NoShieldSecondaryIcon,
+  SendSecondaryIcon,
+  SwapPrimaryIcon,
+  NftIcon,
+  NetworkSecondaryIcon,
+  MultisigReplaceIcon,
+  UpgradeSecondaryIcon,
+  InvestSecondaryIcon,
+  ArrowDownPrimaryIcon,
+  SparkleSecondaryIcon,
+  LegalPrimaryIcon,
+} from "@argent/x-ui/icons"
+import type { TransactionIconKeys } from "../../../../shared/actionQueue/schema"
+import type { ComponentType, SVGProps } from "react"
+import type { ChakraComponent } from "@chakra-ui/react"
+
+export const transactionIcons: Record<
+  TransactionIconKeys,
+  ChakraComponent<ComponentType<SVGProps<SVGSVGElement>>>
+> = {
+  DocumentIcon,
+  RocketSecondaryIcon,
+  MultisigSecondaryIcon,
+  RemoveContactSecondaryIcon,
+  AddContactSecondaryIcon,
+  ApproveIcon,
+  CrossSecondaryIcon,
+  ShieldSecondaryIcon,
+  NoShieldSecondaryIcon,
+  SendSecondaryIcon,
+  SwapPrimaryIcon,
+  NftIcon,
+  NetworkSecondaryIcon,
+  MultisigReplaceIcon,
+  UpgradeSecondaryIcon,
+  InvestSecondaryIcon,
+  ArrowDownPrimaryIcon,
+  SparkleSecondaryIcon,
+  LegalPrimaryIcon,
+}
 
 export const getTransactionIcon = (
   approveScreenType?: ApproveScreenType,
-  transactionReview?: EnrichedSimulateAndReview,
-): IconKeys => {
+  transactionReview?: Pick<EnrichedSimulateAndReviewV2, "transactions">,
+): TransactionIconKeys => {
   const reviewOfTransaction = getReviewOfTransaction(transactionReview)
 
   const isNft = transactionReviewHasNft(reviewOfTransaction)

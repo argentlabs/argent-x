@@ -23,7 +23,6 @@ export const SignActionScreenContainer: FC = () => {
       <ApproveSignatureScreenContainer
         dataToSign={action.payload.typedData}
         host={action.meta.origin || ""}
-        skipDeployWarning={action.payload.options?.skipDeploy}
         onSubmit={() => void approveAndClose()}
         onReject={() => void reject()}
         onRejectWithoutClose={() => void rejectWithoutClose()}

@@ -1,9 +1,12 @@
-import { icons, P3 } from "@argent/x-ui"
+import {
+  LockPrimaryIcon,
+  ResetPrimaryIcon,
+  KeySecondaryIcon,
+  MobileIcon,
+} from "@argent/x-ui/icons"
+import { P3 } from "@argent/x-ui"
 import { Flex } from "@chakra-ui/react"
 import React from "react"
-
-const { LockPrimaryIcon, ResetPrimaryIcon, KeySecondaryIcon, MobileIcon } =
-  icons
 
 export const SmartAccountDetailedDescription: React.FC = () => {
   return (
@@ -11,7 +14,7 @@ export const SmartAccountDetailedDescription: React.FC = () => {
       <Flex>
         <LockPrimaryIcon color="stroke-brand" />
         <P3 ml={2} mb={1} sx={{ textWrap: "wrap" }}>
-          Add 2FA when recovering your account
+          Add 2FA for extra security
         </P3>
       </Flex>
       <Flex>

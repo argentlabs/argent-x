@@ -6,7 +6,7 @@ import type { StoredWalletAccount, WalletAccount } from "../../wallet.model"
  */
 export function migrateAccount(account: WalletAccount): WalletAccount {
   const { type, ...rest } = account
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
   // @ts-expect-error This is a migration, so we can ignore the type error
   if (type === "argent") {
     return { ...rest, type: "standard" }

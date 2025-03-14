@@ -1,4 +1,9 @@
-import { CopyTooltip, H5, icons, P3 } from "@argent/x-ui"
+import {
+  SettingsSecondaryIcon,
+  EditPrimaryIcon,
+  CheckmarkSecondaryIcon,
+} from "@argent/x-ui/icons"
+import { CopyTooltip, H5, P3 } from "@argent/x-ui"
 import {
   Flex,
   IconButton,
@@ -21,8 +26,6 @@ import { routes } from "../../../shared/ui/routes"
 import type { WalletAccount } from "../../../shared/wallet.model"
 import { useOnLedgerStart } from "../ledger/hooks/useOnLedgerStart"
 import { useCurrentNetwork } from "../networks/hooks/useCurrentNetwork"
-
-const { SettingsSecondaryIcon, EditPrimaryIcon, CheckmarkSecondaryIcon } = icons
 
 interface MultisigOwnerProps {
   owner: string

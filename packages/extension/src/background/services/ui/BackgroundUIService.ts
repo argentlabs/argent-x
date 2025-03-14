@@ -2,6 +2,7 @@ import type Emittery from "emittery"
 import browser from "webextension-polyfill"
 
 import { urlWithQuery } from "@argent/x-shared"
+import type { ISettingsStorage } from "../../../shared/settings/types"
 import type { KeyValueStorage } from "../../../shared/storage"
 import type { DeepPick } from "../../../shared/types/deepPick"
 import type { IUIService } from "../../../shared/ui/IUIService"
@@ -34,6 +35,8 @@ type MinimalIUIService = Pick<
   | "focusTab"
   | "hasFloatingWindow"
   | "focusFloatingWindow"
+  | "setDefaultSidePanel"
+  | "unsetDefaultSidePanel"
 >
 
 type MinimalPort = DeepPick<
@@ -57,8 +60,10 @@ export default class BackgroundUIService implements IBackgroundUIService {
     private uiService: MinimalIUIService,
     private sessionService: MinimalIWalletSessionService,
     private walletStore: KeyValueStorage<WalletStorageProps>,
+    private readonly settingsStore: KeyValueStorage<ISettingsStorage>,
   ) {
     this.initListeners()
+    void this.updateSidePanelSetting()
     void (async () => {
       /** initialise opened state */
       const hasTab = await this.uiService.hasTab()
@@ -75,6 +80,19 @@ export default class BackgroundUIService implements IBackgroundUIService {
 
   private initListeners() {
     this.browser.runtime.onConnect.addListener(this.onConnectPort.bind(this))
+    this.settingsStore.subscribe(
+      "sidePanelEnabled",
+      this.updateSidePanelSetting.bind(this),
+    )
+  }
+
+  private async updateSidePanelSetting() {
+    const sidePanelEnabled = await this.settingsStore.get("sidePanelEnabled")
+    if (sidePanelEnabled) {
+      await this.uiService.setDefaultSidePanel()
+    } else {
+      await this.uiService.unsetDefaultSidePanel()
+    }
   }
 
   /** listen for the port connection from the UI, then detect disconnection */
@@ -220,6 +238,10 @@ export default class BackgroundUIService implements IBackgroundUIService {
     let left = 0
     let top = 0
     try {
+      const sidePanelEnabled = await this.settingsStore.get("sidePanelEnabled")
+      if (sidePanelEnabled && this.opened) {
+        return
+      }
       const lastFocused = await this.browser.windows.getLastFocused()
 
       // Position window in top right corner of lastFocused window.

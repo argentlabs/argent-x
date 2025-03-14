@@ -1,4 +1,10 @@
-import { icons, L1Bold, TabBar, TabBarTab } from "@argent/x-ui"
+import {
+  WalletPrimaryIcon,
+  ActivityPrimaryIcon,
+  HotPrimaryIcon,
+  SwapPrimaryIcon,
+} from "@argent/x-ui/icons"
+import { L1Bold, TabBar, TabBarTab } from "@argent/x-ui"
 import { Center } from "@chakra-ui/react"
 import type { ComponentProps, FC } from "react"
 import { NavLink } from "react-router-dom"
@@ -6,8 +12,6 @@ import { NavLink } from "react-router-dom"
 import { routes } from "../../../shared/ui/routes"
 import { LegalAgreementsBannerContainer } from "../legal/LegalAgreementsBannerContainer"
 import { ampli } from "../../../shared/analytics"
-
-const { WalletPrimaryIcon, ActivityPrimaryIcon, HotPrimaryIcon } = icons
 
 interface RootTabsProps {
   activityBadgeLabel: ComponentProps<typeof TabBarTab>["badgeLabel"]
@@ -55,6 +59,19 @@ export const RootTabs: FC<RootTabsProps> = ({
               replace
               icon={<WalletPrimaryIcon />}
               label="Tokens"
+            />
+            <TabBarTab
+              as={NavLink}
+              to={routes.swapToken()}
+              onClick={() =>
+                void ampli.swapTabClicked({
+                  "wallet platform": "browser extension",
+                  "swap entered from": "swap tab",
+                })
+              }
+              replace
+              icon={<SwapPrimaryIcon />}
+              label="Swap"
             />
             <TabBarTab
               as={NavLink}

@@ -38,6 +38,22 @@ const rule: eslint.Rule.RuleModule = {
       description: "Disallow imports e.g. UI code from background process",
       recommended: true,
     },
+    schema: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          target: { type: "string" },
+          disallow: {
+            type: "array",
+            items: { type: "string" },
+          },
+          message: { type: "string" },
+        },
+        required: ["target", "disallow"],
+        additionalProperties: false,
+      },
+    },
   },
 
   create: (context) => {

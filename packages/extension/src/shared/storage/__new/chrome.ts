@@ -1,4 +1,5 @@
 import { isArray, isFunction, partition } from "lodash-es"
+import type browser from "webextension-polyfill"
 
 import { mergeArrayStableWith, optionsWithDefaults } from "./base"
 import type {
@@ -11,46 +12,157 @@ import type {
   StorageChange,
   UpsertResult,
 } from "./interface"
-import type { DeepPick } from "../../types/deepPick"
+import { ensureArray } from "@argent/x-shared"
 
 interface ChromeRepositoryOptions {
-  areaName: chrome.storage.AreaName
+  areaName: browser.storage.AreaName
+  version?: number
+  migrations?: Record<number, (oldValue: any) => any>
 }
-
-type AnyStorageArea =
-  | chrome.storage.SyncStorageArea
-  | chrome.storage.StorageArea
-  | chrome.storage.LocalStorageArea
-  | chrome.storage.SessionStorageArea
-
-type MinimalBrowser = DeepPick<typeof chrome, "storage">
 
 export class ChromeRepository<T> implements IRepository<T> {
   public readonly namespace: string
-  private readonly browser: MinimalBrowser
-  private readonly storage: AnyStorageArea
+  private readonly browserStorage: typeof browser.storage
+  private readonly storageArea: (typeof browser.storage)[browser.storage.AreaName]
   private readonly options: Required<IRepositoryOptions<T>> &
     ChromeRepositoryOptions
+  private migrationPromise: Promise<void> | null = null
 
   constructor(
-    chrome: MinimalBrowser,
+    browserStorage: typeof browser.storage,
     options: IRepositoryOptions<T> & ChromeRepositoryOptions,
   ) {
-    this.browser = chrome
+    this.browserStorage = browserStorage
     this.options = optionsWithDefaults(options)
-    this.storage = this.browser.storage[this.options.areaName]
+    this.storageArea = this.browserStorage[this.options.areaName]
     this.namespace = `repository:${this.options.namespace}`
   }
 
-  private getStorage = async (): Promise<T[]> => {
-    const all = await this.storage.get(this.namespace)
+  private getMetaKey = () => `${this.namespace}$meta`
+
+  private async getMeta(): Promise<{ version?: number }> {
+    const all = await this.storageArea.get(this.getMetaKey())
+    return all[this.getMetaKey()] || {}
+  }
+
+  private async setMeta(meta: { version?: number }): Promise<void> {
+    await this.storageArea.set({
+      [this.getMetaKey()]: meta,
+    })
+  }
+
+  private async getRawStorage(): Promise<T[]> {
+    const all = await this.storageArea.get(this.namespace)
     const values = all[this.namespace]
 
-    if (!values) {
+    // Only return defaults if the key doesn't exist in storage
+    if (values === undefined) {
       return this.options.defaults
     }
 
-    return this.options.deserialize(values)
+    const deserialized = this.options.deserialize(values)
+
+    return deserialized
+  }
+
+  private async migrate(): Promise<void> {
+    const targetVersion = this.options.version || 1
+    if (targetVersion < 1) {
+      throw new Error("Version cannot be less than 1")
+    }
+
+    const meta = await this.getMeta()
+    const currentVersion = meta.version || 1
+
+    if (currentVersion > targetVersion) {
+      throw new Error(
+        `Version downgrade detected (v${currentVersion} -> v${targetVersion}) for "${this.namespace}"`,
+      )
+    }
+
+    if (currentVersion === targetVersion) {
+      return
+    }
+
+    const items = await this.getRawStorage()
+
+    console.debug(
+      `[ChromeRepository] Starting migration for ${this.namespace}: v${currentVersion} -> v${targetVersion}`,
+      { items },
+    )
+
+    const migrationsToRun = Array.from(
+      { length: targetVersion - currentVersion },
+      (_, i) => currentVersion + i + 1,
+    )
+
+    let migratedValue = [...items]
+    for (const migrateToVersion of migrationsToRun) {
+      try {
+        const migrationFn = this.options.migrations?.[migrateToVersion]
+        if (migrationFn) {
+          console.debug(
+            `[ChromeRepository] Running migration v${migrateToVersion} for ${this.namespace}`,
+            {
+              before: migratedValue,
+            },
+          )
+
+          const result = await migrationFn(migratedValue)
+          migratedValue = ensureArray(result).map((item) => ({ ...item }))
+
+          console.debug(
+            `[ChromeRepository] Completed migration v${migrateToVersion} for ${this.namespace}`,
+            {
+              after: migratedValue,
+            },
+          )
+        }
+      } catch (err) {
+        throw new Error(
+          `v${migrateToVersion} migration failed for "${this.namespace}"`,
+          {
+            cause: err,
+          },
+        )
+      }
+    }
+
+    // First update the version in meta
+    await this.setMeta({ version: targetVersion })
+
+    // Then save the migrated data
+    await this.setRawStorage(migratedValue)
+
+    console.debug(
+      `[ChromeRepository] Migration completed for ${this.namespace} v${targetVersion}`,
+      { migratedValue },
+    )
+  }
+
+  private async ensureMigrated(): Promise<void> {
+    if (!this.options.version) {
+      return
+    }
+
+    if (!this.migrationPromise) {
+      this.migrationPromise = this.migrate()
+    }
+
+    await this.migrationPromise
+  }
+
+  private async setRawStorage(value: T[]): Promise<void> {
+    const serialized = await this.options.serialize(value)
+
+    return this.storageArea.set({
+      [this.namespace]: serialized,
+    })
+  }
+
+  private getStorage = async (): Promise<T[]> => {
+    await this.ensureMigrated()
+    return this.getRawStorage()
   }
 
   async get(selector?: (value: T) => boolean): Promise<T[]> {
@@ -63,12 +175,12 @@ export class ChromeRepository<T> implements IRepository<T> {
   }
 
   private async set(value: T[]): Promise<void> {
-    return this.storage.set({
-      [this.namespace]: await this.options.serialize(value),
-    })
+    await this.ensureMigrated()
+    return this.setRawStorage(value)
   }
 
   async remove(value: SelectorFn<T> | AllowArray<T>): Promise<T[]> {
+    await this.ensureMigrated()
     const items = await this.getStorage()
 
     const compareFn = this.options.compare.bind(this)
@@ -89,7 +201,7 @@ export class ChromeRepository<T> implements IRepository<T> {
     value: AllowArray<T> | SetterFn<T>,
     insertMode: "push" | "unshift" = "push",
   ): Promise<UpsertResult> {
-    // use mergeArrayStableWith to merge the new values with the existing values
+    await this.ensureMigrated()
     const items = await this.getStorage()
 
     let newValues: T[]
@@ -119,9 +231,10 @@ export class ChromeRepository<T> implements IRepository<T> {
   ): () => void {
     const onChange = (
       changes: { [key: string]: StorageChange<T[]> },
-      areaName: chrome.storage.AreaName,
+      areaName?: chrome.storage.AreaName,
     ) => {
-      if (areaName !== this.options.areaName) {
+      // For mock storage, use the instance's areaName if not provided
+      if (areaName !== undefined && areaName !== this.options.areaName) {
         return
       }
 
@@ -132,6 +245,7 @@ export class ChromeRepository<T> implements IRepository<T> {
       }
 
       const asyncCb = async () => {
+        await this.ensureMigrated()
         return callback({
           newValue: changeSet.newValue
             ? await this.options.deserialize(changeSet.newValue)
@@ -145,10 +259,10 @@ export class ChromeRepository<T> implements IRepository<T> {
       void asyncCb()
     }
 
-    this.browser.storage.onChanged.addListener(onChange)
+    this.browserStorage.onChanged.addListener(onChange)
 
     return () => {
-      this.browser.storage.onChanged.removeListener(onChange)
+      this.browserStorage.onChanged.removeListener(onChange)
     }
   }
 }

@@ -1,10 +1,8 @@
-// just using types here
-// eslint-disable-next-line @argent/local/code-import-patterns
-import type { LogoDeprecatedKeys } from "@argent/x-ui"
+import type { NftMarketplaceLogoKeys } from "../nft/marketplaces"
 
 export interface BlockExplorer {
   title: string
-  logo: LogoDeprecatedKeys
+  logo: NftMarketplaceLogoKeys
   url: Record<string, string>
   campaignParams: string
 }

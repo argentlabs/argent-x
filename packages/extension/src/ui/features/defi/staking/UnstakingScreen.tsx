@@ -1,5 +1,9 @@
 import type { FC } from "react"
 import {
+  InfoCircleSecondaryIcon,
+  ValidatorSecondaryIcon,
+} from "@argent/x-ui/icons"
+import {
   BarBackButton,
   CellStack,
   H5,
@@ -8,7 +12,6 @@ import {
   NavigationContainer,
   P4Bold,
   TokenIcon,
-  icons,
 } from "@argent/x-ui"
 import {
   Box,
@@ -21,38 +24,46 @@ import {
   Button,
 } from "@chakra-ui/react"
 import type { StakerInfo } from "@argent/x-shared"
-import { prettifyCurrencyValue, prettifyTokenAmount } from "@argent/x-shared"
+import {
+  formatTruncatedAddress,
+  prettifyCurrencyValue,
+  prettifyTokenAmount,
+} from "@argent/x-shared"
 import type { Token } from "../../../../shared/token/__new/types/token.model"
 import type { StrkDelegatedBalance } from "../../../views/staking"
 import { checkHasRewards } from "../../../../shared/staking/utils"
 import { StakingWarningBox } from "./StakingWarningBox"
 
-const { InfoCircleSecondaryIcon, NoImageSecondaryIcon } = icons
-
 interface UnstakingScreenProps {
   tokenInfo: Token
+  liquidityToken: Token
   stakerInfo: StakerInfo
   balance: StrkDelegatedBalance
   usdValue: StrkDelegatedBalance
   onBack: () => void
   onWithdraw: () => void
   withdrawLoading?: boolean
+  stakingType?: "strkDelegatedStaking" | "staking"
 }
 
 export const UnstakingScreen: FC<UnstakingScreenProps> = ({
   onBack,
   tokenInfo,
+  liquidityToken,
   balance,
   stakerInfo, // provider and staker are used interchangeably
   usdValue,
   withdrawLoading = false,
   onWithdraw,
+  stakingType = "strkDelegatedStaking",
 }) => {
-  const hasRewards = checkHasRewards(balance.rewards)
+  const hasRewards = checkHasRewards(balance.rewards ?? "0")
+  const isNativeStaking = stakingType === "strkDelegatedStaking"
+  const title = isNativeStaking ? "Initiate withdraw" : "Withdraw"
 
   return (
     <NavigationContainer
-      title="Initiate withdraw"
+      title={title}
       leftButton={<BarBackButton onClick={onBack} />}
     >
       <CellStack flex={1}>
@@ -111,10 +122,13 @@ export const UnstakingScreen: FC<UnstakingScreenProps> = ({
                   <Image
                     fit="cover"
                     src={stakerInfo.iconUrl}
-                    fallback={<NoImageSecondaryIcon fontSize="xl" />}
+                    fallback={<ValidatorSecondaryIcon fontSize="small" />}
                   />
                 </Square>
-                <H5>{stakerInfo.name}</H5>
+                <H5>
+                  {stakerInfo.name ||
+                    formatTruncatedAddress(stakerInfo.address ?? "")}
+                </H5>
               </HStack>
             </HStack>
 
@@ -123,7 +137,9 @@ export const UnstakingScreen: FC<UnstakingScreenProps> = ({
             <HStack justify="space-between" py="3.5" px="4">
               <Flex alignItems="center" gap="1" color="text-secondary">
                 <P4Bold>Staked Balance</P4Bold>
-                <Tooltip label="Total amount of STRK you staked with this provider">
+                <Tooltip
+                  label={`Total amount of ${liquidityToken.symbol} you staked with this provider`}
+                >
                   <P4Bold cursor="pointer">
                     <InfoCircleSecondaryIcon />
                   </P4Bold>
@@ -131,34 +147,37 @@ export const UnstakingScreen: FC<UnstakingScreenProps> = ({
               </Flex>
               <H5>
                 {prettifyTokenAmount({
-                  ...tokenInfo,
+                  ...liquidityToken,
                   amount: balance.stakedAmount,
                 })}
               </H5>
             </HStack>
+            {balance.rewards && (
+              <>
+                <Divider bg="stroke-default" height="1px" />
 
-            <Divider bg="stroke-default" height="1px" />
-
-            <HStack justify="space-between" py="3.5" px="4">
-              <Flex alignItems="center" gap="1" color="text-secondary">
-                <P4Bold>Rewards</P4Bold>
-                <Tooltip label="Total amount of STRK earned by staking">
-                  <P4Bold cursor="pointer">
-                    <InfoCircleSecondaryIcon />
-                  </P4Bold>
-                </Tooltip>
-              </Flex>
-              <H5 color={hasRewards ? "text-success" : "text-primary"}>
-                {prettifyTokenAmount({
-                  ...tokenInfo,
-                  amount: balance.rewards,
-                })}
-              </H5>
-            </HStack>
+                <HStack justify="space-between" py="3.5" px="4">
+                  <Flex alignItems="center" gap="1" color="text-secondary">
+                    <P4Bold>Rewards</P4Bold>
+                    <Tooltip label="Total amount of STRK earned by staking">
+                      <P4Bold cursor="pointer">
+                        <InfoCircleSecondaryIcon />
+                      </P4Bold>
+                    </Tooltip>
+                  </Flex>
+                  <H5 color={hasRewards ? "text-success" : "text-primary"}>
+                    {prettifyTokenAmount({
+                      ...tokenInfo,
+                      amount: balance.rewards,
+                    })}
+                  </H5>
+                </HStack>
+              </>
+            )}
           </CellStack>
         </Box>
 
-        <StakingWarningBox />
+        {isNativeStaking && <StakingWarningBox />}
 
         <Flex flex={1} />
 

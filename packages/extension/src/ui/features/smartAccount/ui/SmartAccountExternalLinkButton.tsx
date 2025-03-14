@@ -1,8 +1,7 @@
-import { Button, icons } from "@argent/x-ui"
+import { ExpandIcon } from "@argent/x-ui/icons"
+import { Button } from "@argent/x-ui"
 import type { ButtonProps } from "@chakra-ui/react"
 import type { ComponentPropsWithoutRef, FC } from "react"
-
-const { ExpandIcon } = icons
 
 export const ARGENT_GUARDIAN_LINK =
   "https://support.argent.xyz/hc/en-us/articles/9950649206685"

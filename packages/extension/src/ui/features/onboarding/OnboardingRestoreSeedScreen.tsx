@@ -1,5 +1,6 @@
 import { seedphraseSchema } from "@argent/x-shared"
-import { Alert, B3, FieldError, icons, SeedInput } from "@argent/x-ui"
+import { WarningCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { Alert, B3, FieldError, SeedInput } from "@argent/x-ui"
 import { Flex, chakra } from "@chakra-ui/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { FC, MouseEventHandler } from "react"
@@ -8,8 +9,7 @@ import { z } from "zod"
 
 import { OnboardingButton } from "./ui/OnboardingButton"
 import { OnboardingScreen } from "./ui/OnboardingScreen"
-
-const { WarningCircleSecondaryIcon } = icons
+import { IS_DEV } from "../../../shared/utils/dev"
 
 interface OnboardingRestoreSeedScreenProps {
   onBack?: MouseEventHandler
@@ -80,18 +80,21 @@ export const OnboardingRestoreSeedScreen: FC<
           <OnboardingButton type="submit" isDisabled={isSubmitting}>
             Continue
           </OnboardingButton>
-          <B3
-            color={"neutrals.500"}
-            textDecoration={"underline"}
-            display={"flex"}
-            marginLeft={"auto"}
-            textAlign={"right"}
-            onClick={onUseBackup}
-            cursor={"pointer"}
-            mt={2}
-          >
-            Recover using a backup file
-          </B3>
+          {/** Keep Restore with Backup only for Dev builds for user-support purposes */}
+          {IS_DEV && (
+            <B3
+              color={"neutrals.500"}
+              textDecoration={"underline"}
+              display={"flex"}
+              marginLeft={"auto"}
+              textAlign={"right"}
+              onClick={onUseBackup}
+              cursor={"pointer"}
+              mt={2}
+            >
+              Recover using a backup file
+            </B3>
+          )}
         </Flex>
 
         {errors.root?.message && (

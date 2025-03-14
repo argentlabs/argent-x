@@ -1,10 +1,13 @@
 import {
+  PlusSecondaryIcon,
+  AddContactSecondaryIcon,
+  MultisigImageIcon,
+} from "@argent/x-ui/icons"
+import {
   B2,
   BarBackButton,
   BarCloseButton,
   H5,
-  icons,
-  logosDeprecated,
   NavigationContainer,
   P3,
   StickyGroup,
@@ -20,9 +23,7 @@ import { useIsFirefox } from "../../hooks/useUserAgent"
 import { selectedNetworkIdView } from "../../views/network"
 import { useView } from "../../views/implementation/react"
 
-const { PlusSecondaryIcon, AddContactSecondaryIcon, MultisigImageIcon } = icons
-
-const { LedgerLogo } = logosDeprecated
+import { LedgerLogo } from "@argent/x-ui/logos-deprecated"
 
 type MultisigOptionType = "create" | "join"
 

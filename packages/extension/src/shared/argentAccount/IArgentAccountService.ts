@@ -12,5 +12,8 @@ export interface IArgentAccountService {
   validateAccount(flow: Flow): Promise<void>
   confirmEmail(code: string): Promise<void>
   requestEmail(email: string): Promise<void>
-  isTokenExpired(): Promise<boolean>
+  isTokenExpired(extra: { initiator: string }): Promise<boolean>
+  updateSecurityPeriod(periodInSeconds: number): Promise<void>
+  removeGuardian(): Promise<void>
+  getSecurityPeriod(): Promise<number>
 }

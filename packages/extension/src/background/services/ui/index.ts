@@ -1,11 +1,12 @@
 import Emittery from "emittery"
 import browser from "webextension-polyfill"
 
+import { settingsStore } from "../../../shared/settings"
 import { uiService } from "../../../shared/ui"
+import { old_walletStore } from "../../../shared/wallet/walletStore"
 import { sessionService } from "../../walletSingleton"
 import BackgroundUIService from "./BackgroundUIService"
 import type { Events } from "./IBackgroundUIService"
-import { old_walletStore } from "../../../shared/wallet/walletStore"
 
 export { Opened } from "./IBackgroundUIService"
 
@@ -17,4 +18,5 @@ export const backgroundUIService = new BackgroundUIService(
   uiService,
   sessionService,
   old_walletStore,
+  settingsStore,
 )

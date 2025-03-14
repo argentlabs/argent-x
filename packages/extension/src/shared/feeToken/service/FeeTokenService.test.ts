@@ -30,10 +30,10 @@ import { TokenService } from "../../token/__new/service/TokenService"
 import type { ITransactionsRepository } from "../../transactions/store"
 import type { FeeTokenPreference } from "../types/preference.model"
 import { FeeTokenService } from "./FeeTokenService"
-import { getMockSigner } from "../../../../test/account.mock"
 import { getAccountIdentifier } from "../../utils/accountIdentifier"
 import type { IPKManager } from "../../accountImport/pkManager/IPKManager"
 import { emitterMock } from "../../test.utils"
+import { getMockSigner } from "../../../../test/signer.mock"
 
 const randomAddress1 = addressSchema.parse(stark.randomAddress())
 

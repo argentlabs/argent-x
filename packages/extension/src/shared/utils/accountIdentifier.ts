@@ -48,3 +48,11 @@ export const deserializeAccountIdentifier = (id: AccountId) => {
     },
   }
 }
+
+export const getAccountIdentifier__old = (
+  address: string,
+  networkId: string,
+) => {
+  const parsedAddress = addressSchema.parse(address)
+  return `${parsedAddress}::${networkId}`
+}

@@ -3,11 +3,12 @@ import {
   ButtonCell,
   CellStack,
   NavigationContainer,
-  Switch,
 } from "@argent/x-ui"
 import type { FC, ReactEventHandler } from "react"
 
 import type { ISettingsStorage } from "../../../../shared/settings/types"
+
+import { Switch } from "@chakra-ui/react"
 
 type Settings = Pick<
   ISettingsStorage,

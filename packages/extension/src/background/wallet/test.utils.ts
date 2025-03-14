@@ -2,7 +2,7 @@ import { Wallet } from "."
 import { AccountImportSharedService } from "../../shared/accountImport/service/AccountImportSharedService"
 import { AnalyticsService } from "../../shared/analytics/AnalyticsService"
 import type { ISettingsStorage } from "../../shared/settings/types"
-import type { KeyValueStorage } from "../../shared/storage"
+import { KeyValueStorage } from "../../shared/storage"
 import {
   accountServiceMock,
   accountSharedServiceMock,
@@ -10,7 +10,6 @@ import {
   getKeyValueStorage,
   getMultisigStoreMock,
   getPendingMultisigStoreMock,
-  getSessionStoreMock,
   getStoreMock,
   getWalletStoreMock,
   ledgerServiceMock,
@@ -29,16 +28,34 @@ import { WalletDeploymentStarknetService } from "./deployment/WalletDeploymentSt
 import { WalletRecoverySharedService } from "./recovery/WalletRecoverySharedService"
 import { WalletRecoveryStarknetService } from "./recovery/WalletRecoveryStarknetService"
 import { WalletSessionService } from "./session/WalletSessionService"
+import type { ISessionStore } from "../../shared/session/storage"
+import SecretStorageService from "./session/secretStorageService"
+import type { ISecureServiceSessionStore } from "./session/interface"
+
+const sessionStore = new KeyValueStorage<ISecureServiceSessionStore>(
+  { exportedKey: "", salt: "", vault: "" },
+  "test:sessionStore",
+)
+const mockSecretStorageService = new SecretStorageService(sessionStore)
+
+vi.spyOn(mockSecretStorageService, "decrypt").mockImplementation(async () => {
+  return {
+    secret:
+      "0x12d584f675fd8e84637c84c610a39b4b6bae59e33d0dc75fbee0ab865c1ea2a8",
+    password: "Test1234",
+  }
+})
+
+const mockSessionStore = new KeyValueStorage<ISessionStore>(
+  {
+    isUnlocked: false,
+  },
+  "test:wallet",
+)
 
 export const cryptoStarknetServiceMock = new WalletCryptoStarknetService(
   getWalletStoreMock(),
-  getSessionStoreMock({
-    get: async () => ({
-      secret:
-        "0x12d584f675fd8e84637c84c610a39b4b6bae59e33d0dc75fbee0ab865c1ea2a8",
-      password: "Test1234",
-    }),
-  }),
+  mockSecretStorageService,
   getPendingMultisigStoreMock(),
   accountSharedServiceMock,
   ledgerServiceMock,
@@ -58,7 +75,7 @@ export const recoverySharedServiceMock = new WalletRecoverySharedService(
   emitterMock,
   getStoreMock(),
   getWalletStoreMock(),
-  getSessionStoreMock(),
+  mockSecretStorageService,
   networkServiceMock,
   recoveryStarknetServiceMock,
 )
@@ -72,7 +89,8 @@ export const backupServiceMock = new WalletBackupService(
 export const sessionServiceMock = new WalletSessionService(
   emitterMock,
   getStoreMock(),
-  getSessionStoreMock(),
+  mockSessionStore,
+  mockSecretStorageService,
   backupServiceMock,
   recoverySharedServiceMock,
   SCRYPT_N_TEST,
@@ -93,6 +111,7 @@ export const accountStarknetServiceMock = new WalletAccountStarknetService(
   multisigBackendServiceMock,
   ledgerServiceMock,
   importAccountServiceMock,
+  mockSecretStorageService,
 )
 export const getDefaultReferralService = (): IReferralService => {
   return { trackReferral: () => Promise.resolve() }
@@ -107,7 +126,7 @@ export const deployStarknetServiceMock = new WalletDeploymentStarknetService(
   getWalletStoreMock(),
   getMultisigStoreMock(),
   sessionServiceMock,
-  getSessionStoreMock(),
+  mockSecretStorageService,
   accountSharedServiceMock,
   accountStarknetServiceMock,
   cryptoStarknetServiceMock,
@@ -118,7 +137,7 @@ export const deployStarknetServiceMock = new WalletDeploymentStarknetService(
 )
 
 export const cryptoSharedServiceMock = new WalletCryptoSharedService(
-  getSessionStoreMock(),
+  mockSecretStorageService,
   sessionServiceMock,
   backupServiceMock,
   recoverySharedServiceMock,

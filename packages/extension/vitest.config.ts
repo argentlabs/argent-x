@@ -8,7 +8,7 @@ import viteConfig from "./vite.config"
 export default mergeConfig(viteConfig, {
   test: {
     environment: "happy-dom",
-    pool: "forks",
+    pool: "threads",
     globals: true,
     setupFiles: ["test/setup.ts", "fake-indexeddb/auto"],
     testTimeout: 50 * 60 * 1000,
@@ -37,7 +37,7 @@ export default mergeConfig(viteConfig, {
       excludeNodeModules: true,
       reporter: ["text", "lcov"],
       all: true,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
       provider: "v8",
     },
     server: {

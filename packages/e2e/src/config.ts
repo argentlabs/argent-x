@@ -26,6 +26,18 @@ const commonConfig = {
   migDir: path.join(__dirname, "../../e2e/mig/"),
   distDir: path.join(__dirname, "../../extension/dist/"),
   migVersionDir: path.join(__dirname, "../../e2e/mig/dist"),
+  slackToken: process.env.SLACK_TOKEN || "",
+  slackChannelId: process.env.SLACK_CHANNEL_ID_PERFORMANCE || "",
+  performanceThresholdRegression:
+    process.env.E2E_PERFORMANCE_THRESHOLD_REGRESSION || "0.15",
+  performanceThresholdImprovement:
+    process.env.E2E_PERFORMANCE_THRESHOLD_IMPROVEMENT || "-0.1",
+  performanceThresholdWarning:
+    process.env.E2E_PERFORMANCE_THRESHOLD_WARNING || "0.1",
+  migRepo: process.env.E2E_REPO || "",
+  migRepoToken: process.env.E2E_REPO_TOKEN || "",
+  migRepoOwner: process.env.E2E_REPO_OWNER || "",
+  migReleaseName: process.env.E2E_REPO_RELEASE_NAME || "",
 }
 
 const extensionHydrogenConfig = {
@@ -46,7 +58,7 @@ const extensionHydrogenConfig = {
   qaUtilsAuthToken: process.env.E2E_QA_UTILS_AUTH_TOKEN,
   initialBalanceMultiplier: process.env.INITIAL_BALANCE_MULTIPLIER || 1,
   migAccountAddress: process.env.E2E_MIG_ACCOUNT_ADDRESS,
-  migVersions: process.env.E2E_MIG_VERSIONS,
+  accountsToImportProd: "",
 }
 
 const extensionProdConfig = {
@@ -69,6 +81,7 @@ const extensionProdConfig = {
   initialBalanceMultiplier: 1,
   migAccountAddress: "",
   migVersions: "",
+  accountsToImportProd: process.env.E2E_ACCOUNTS_TO_IMPORT_PROD,
 }
 
 const config = commonConfig.isProdTesting

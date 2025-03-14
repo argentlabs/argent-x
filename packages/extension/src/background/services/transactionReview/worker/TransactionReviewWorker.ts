@@ -19,7 +19,7 @@ import { everyWhenOpen } from "../../worker/schedule/decorators"
 import type { IScheduleService } from "../../../../shared/schedule/IScheduleService"
 import type { IDebounceService } from "../../../../shared/debounce"
 
-const REFRESH_PERIOD_SECONDS = RefreshIntervalInSeconds.VERY_SLOW
+const REFRESH_PERIOD_SECONDS = RefreshIntervalInSeconds.SLOW
 const labelsEndpoint = urlJoin(
   ARGENT_TRANSACTION_REVIEW_API_BASE_URL || "",
   "labels",

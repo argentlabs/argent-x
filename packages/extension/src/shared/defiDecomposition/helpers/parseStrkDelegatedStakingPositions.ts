@@ -22,7 +22,6 @@ export const parseStrkDelegatedStakingPositions = (
   }
 
   const positions = product.positions as ApiStrkDelegatedStaking[]
-
   const parsedPositions: ParsedStrkDelegatedStakingPosition[] = positions
     .map((position) => {
       if (!isStrkDelegatedStaking(position)) {
@@ -56,7 +55,7 @@ export const parseStrkDelegatedStakingPositions = (
 
       return {
         id,
-        investmentId,
+        investmentId: investmentId ?? "",
         stakerInfo,
         accruedRewards,
         stakedAmount,
@@ -67,6 +66,5 @@ export const parseStrkDelegatedStakingPositions = (
       }
     })
     .filter((position) => position !== undefined)
-
   return parsedPositions
 }

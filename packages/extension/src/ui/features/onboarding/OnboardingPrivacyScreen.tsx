@@ -1,12 +1,11 @@
-import { icons, P3 } from "@argent/x-ui"
+import { CheckmarkSecondaryIcon } from "@argent/x-ui/icons"
+import { P3 } from "@argent/x-ui"
 import { Button, Flex, Link } from "@chakra-ui/react"
 import type { FC, MouseEventHandler } from "react"
 
 import { OnboardingScreen } from "./ui/OnboardingScreen"
 import { ARGENT_X_LEGAL_PRIVACY_POLICY_URL } from "../../../shared/api/constants"
 import { OnboardingButton } from "./ui/OnboardingButton"
-
-const { CheckmarkSecondaryIcon } = icons
 
 interface OnboardingPrivacyScreenProps {
   onAccept: MouseEventHandler

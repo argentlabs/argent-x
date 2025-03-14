@@ -22,7 +22,7 @@ export interface SimulationError extends Error {
 }
 
 export interface SimulateDeployAccountRequest {
-  type: TransactionType.DEPLOY_ACCOUNT
+  type: typeof TransactionType.DEPLOY_ACCOUNT
   classHash: string
   calldata: Calldata
   salt: string

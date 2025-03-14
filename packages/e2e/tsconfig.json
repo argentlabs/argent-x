@@ -1,22 +1,19 @@
 {
   "compilerOptions": {
-    "target": "Esnext",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "resolveJsonModule": true,
-    "inlineSources": true,
-    "inlineSourceMap": true,
-    "composite": true,
-    "types": ["node"],
+    "target": "es2021",
+    "module": "commonjs",
+    "skipLibCheck": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "strict": true,
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node", "@playwright/test"],
+    "paths": {
+      "*": ["./src/types/*"]
+    }
   },
-  "include": ["**/src", "**/shared"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

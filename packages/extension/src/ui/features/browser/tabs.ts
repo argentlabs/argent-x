@@ -2,6 +2,8 @@ import { isNumber } from "lodash-es"
 import { useCallback, useEffect, useState } from "react"
 import browser from "webextension-polyfill"
 
+import { uiService } from "../../../shared/ui"
+
 export const openExtensionInTab = async () => {
   const url = browser.runtime.getURL("index.html")
   const tab = await browser.tabs.create({ url })
@@ -10,6 +12,13 @@ export const openExtensionInTab = async () => {
 
 export const extensionIsInTab = async () => {
   return Boolean(await browser.tabs.getCurrent())
+}
+
+export const extensionIsInSidePanel = async () => {
+  const contexts = await browser.runtime.getContexts({
+    contextTypes: [browser.runtime.ContextType.SIDE_PANEL],
+  })
+  return contexts.length > 0
 }
 
 export const focusExtensionTab = async () => {
@@ -46,7 +55,28 @@ export const useExtensionIsInTab = () => {
 
 export const useOpenExtensionInTab = () => {
   return useCallback(async () => {
+    await uiService.unsetDefaultSidePanel()
     await openExtensionInTab()
+    window.close()
+  }, [])
+}
+
+export const useExtensionIsInSidePanel = () => {
+  const [isInSidePanel, setIsInSidePanel] = useState(false)
+  useEffect(() => {
+    const init = async () => {
+      const inTab = await extensionIsInSidePanel()
+      setIsInSidePanel(inTab)
+    }
+    void init()
+  }, [])
+  return isInSidePanel
+}
+
+export const useOpenExtensionInSidePanel = () => {
+  return useCallback(async () => {
+    await uiService.setDefaultSidePanel()
+    await uiService.openSidePanel()
     window.close()
   }, [])
 }

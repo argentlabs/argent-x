@@ -3,9 +3,10 @@ import {
   ButtonCell,
   CellStack,
   NavigationContainer,
-  Switch,
 } from "@argent/x-ui"
 import type { FC } from "react"
+
+import { Switch } from "@chakra-ui/react"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface BetaFeaturesSettingsScreenProps {}

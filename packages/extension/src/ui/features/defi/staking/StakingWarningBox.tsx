@@ -1,8 +1,7 @@
 import type { FC } from "react"
-import { L2, icons } from "@argent/x-ui"
+import { InfoCircleSecondaryIcon } from "@argent/x-ui/icons"
+import { L2 } from "@argent/x-ui"
 import { Box, HStack } from "@chakra-ui/react"
-
-const { InfoCircleSecondaryIcon } = icons
 
 export const StakingWarningBox: FC = () => {
   return (
